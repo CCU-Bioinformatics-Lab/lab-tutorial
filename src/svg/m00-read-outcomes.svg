@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <title>同樣找到突變 A 與 B 時，read 圖可能給出的三種答案</title>
+  <desc>三個並排的 read 圖。在讀取品質足夠且無明顯嵌合的簡化前提下，左圖中多條跨越兩個位置的 reads 同時帶有 A 與 B，支持兩者位在同一份 DNA。
+        中圖中，跨越兩個位置的 reads 穩定分成只帶 A 與只帶 B 兩群，支持兩者分開在兩份 DNA。
+        右圖中，reads 太短，只能各自看到 A 或 B，沒有任何一條 read 能同時觀察兩點，所以資訊不足。</desc>
+
+  <text class="ttl mid zh" x="500" y="36">先問「read 看不看得到兩點」，再問「兩個點如何組合」</text>
+
+  <!-- ══ 1. 同一份 DNA ════════════════════════════════════════════ -->
+  <rect class="box ok" x="16" y="58" width="304" height="366" rx="12"/>
+  <text class="lbl bold mid zh ok" x="168" y="92">① 支持同一份 DNA</text>
+  <text class="tick mid zh" x="112" y="120">突變 A</text>
+  <text class="tick mid zh" x="232" y="120">突變 B</text>
+  <line class="guide" x1="112" y1="128" x2="112" y2="292"/>
+  <line class="guide" x1="232" y1="128" x2="232" y2="292"/>
+
+  <rect class="read hp1" x="50" y="146" width="236" height="15" rx="7"/>
+  <circle class="mark somatic" cx="112" cy="153" r="7"/>
+  <circle class="mark somatic" cx="232" cy="153" r="7"/>
+  <rect class="read hp2" x="64" y="182" width="220" height="15" rx="7"/>
+  <circle class="mark ref" cx="112" cy="189" r="7"/>
+  <circle class="mark ref" cx="232" cy="189" r="7"/>
+  <rect class="read hp1" x="42" y="218" width="230" height="15" rx="7"/>
+  <circle class="mark somatic" cx="112" cy="225" r="7"/>
+  <circle class="mark somatic" cx="232" cy="225" r="7"/>
+  <rect class="read hp2" x="56" y="254" width="238" height="15" rx="7"/>
+  <circle class="mark ref" cx="112" cy="261" r="7"/>
+  <circle class="mark ref" cx="232" cy="261" r="7"/>
+
+  <path class="conn" d="M112,306 L112,326 L232,326 L232,306"/>
+  <text class="anno bold mid zh" x="172" y="354">A 與 B 一起出現</text>
+  <text class="tick mid zh" x="168" y="382">多條獨立 read 都看到相同組合</text>
+  <rect class="box ok" x="72" y="394" width="192" height="42" rx="7"/>
+  <text class="anno bold mid zh ok" x="168" y="422">結論：同一份</text>
+
+  <!-- ══ 2. 分開在兩份 DNA ═══════════════════════════════════════ -->
+  <rect class="box accent" x="348" y="58" width="304" height="366" rx="12"/>
+  <text class="lbl bold mid zh" x="500" y="92">② 支持分開在兩份</text>
+  <text class="tick mid zh" x="444" y="120">突變 A</text>
+  <text class="tick mid zh" x="564" y="120">突變 B</text>
+  <line class="guide" x1="444" y1="128" x2="444" y2="292"/>
+  <line class="guide" x1="564" y1="128" x2="564" y2="292"/>
+
+  <rect class="read hp1" x="382" y="146" width="236" height="15" rx="7"/>
+  <circle class="mark somatic" cx="444" cy="153" r="7"/>
+  <circle class="mark ref" cx="564" cy="153" r="7"/>
+  <rect class="read hp2" x="396" y="182" width="220" height="15" rx="7"/>
+  <circle class="mark ref" cx="444" cy="189" r="7"/>
+  <circle class="mark somatic" cx="564" cy="189" r="7"/>
+  <rect class="read hp1" x="374" y="218" width="230" height="15" rx="7"/>
+  <circle class="mark somatic" cx="444" cy="225" r="7"/>
+  <circle class="mark ref" cx="564" cy="225" r="7"/>
+  <rect class="read hp2" x="388" y="254" width="238" height="15" rx="7"/>
+  <circle class="mark ref" cx="444" cy="261" r="7"/>
+  <circle class="mark somatic" cx="564" cy="261" r="7"/>
+
+  <path class="conn" d="M444,306 L444,326 L564,326 L564,306"/>
+  <text class="anno bold mid zh" x="504" y="354">A-only 與 B-only</text>
+  <text class="tick mid zh" x="500" y="382">每條 read 都跨兩點，組合卻分開</text>
+  <rect class="box accent" x="404" y="394" width="192" height="42" rx="7"/>
+  <text class="anno bold mid zh" x="500" y="422">結論：分開</text>
+
+  <!-- ══ 3. 資訊不足 ══════════════════════════════════════════════ -->
+  <rect class="box warn" x="680" y="58" width="304" height="366" rx="12"/>
+  <text class="lbl bold mid zh" x="832" y="92">③ 資訊不足</text>
+  <text class="tick mid zh" x="776" y="120">突變 A</text>
+  <text class="tick mid zh" x="896" y="120">突變 B</text>
+  <line class="guide" x1="776" y1="128" x2="776" y2="292"/>
+  <line class="guide" x1="896" y1="128" x2="896" y2="292"/>
+
+  <rect class="read hp1" x="700" y="146" width="116" height="15" rx="7"/>
+  <circle class="mark somatic" cx="776" cy="153" r="7"/>
+  <rect class="read hp2" x="842" y="182" width="126" height="15" rx="7"/>
+  <circle class="mark somatic" cx="896" cy="189" r="7"/>
+  <rect class="read hp1" x="716" y="218" width="102" height="15" rx="7"/>
+  <circle class="mark somatic" cx="776" cy="225" r="7"/>
+  <rect class="read hp2" x="834" y="254" width="118" height="15" rx="7"/>
+  <circle class="mark somatic" cx="896" cy="261" r="7"/>
+
+  <path class="conn" d="M794,316 L818,340 M818,316 L794,340"/>
+  <path class="conn" d="M850,316 L874,340 M874,316 L850,340"/>
+  <text class="anno bold mid zh" x="832" y="366">沒有 read 同時看見兩點</text>
+  <text class="tick mid zh" x="832" y="388">「沒看見一起」不等於「證明分開」</text>
+  <rect class="box warn" x="736" y="402" width="192" height="42" rx="7"/>
+  <text class="anno bold mid zh" x="832" y="430">結論：不知道</text>
+
+  <path class="conn" d="M16,466 L984,466"/>
+  <text class="anno bold mid zh" x="500" y="494">共同前提：同一條 read 需在品質足夠時同時觀察 A 與 B，才可支持對兩者關係的判斷。</text>
+</svg>

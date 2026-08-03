@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>從細胞、染色體與 DNA 到定序 reads</title>
+  <desc>五個由左到右的層次。第一格是一個有細胞核的細胞。第二格把細胞核放大，顯示兩份相似的染色體。
+        第三格把一條染色體展開成由 A、C、G、T 組成的長 DNA，並框出其中一段基因。
+        第四格是定序儀，把抽出的 DNA 片段逐段量測。第五格是電腦收到的多條 read，
+        每一條 read 通常是源自一條實體 DNA 分子的局部序列觀測。圖下方標示左側屬於人體裡的物理世界，
+        右側是量測後的資料世界。</desc>
+
+  <text class="ttl mid zh" x="500" y="36">一層一層放大：人體裡的 DNA，如何變成電腦裡的 reads？</text>
+
+  <!-- ══ 1. 細胞 ═══════════════════════════════════════════════════ -->
+  <rect class="box plain" x="12" y="62" width="176" height="344" rx="12"/>
+  <text class="lbl bold mid zh" x="100" y="96">1　細胞</text>
+
+  <circle class="cell normal" cx="100" cy="196" r="66"/>
+  <circle class="nucleus" cx="100" cy="196" r="38"/>
+  <path class="conn hp1 thick" d="M87,178 L101,192 M101,178 L87,192"/>
+  <path class="conn hp2 thick" d="M103,200 L117,214 M117,200 L103,214"/>
+
+  <text class="anno mid zh" x="100" y="286">一管檢體裡</text>
+  <text class="anno mid zh" x="100" y="312">有很多細胞</text>
+  <line class="guide" x1="32" y1="332" x2="168" y2="332"/>
+  <text class="tick mid zh" x="100" y="358">DNA 主要收在細胞核中</text>
+  <text class="tick mid zh" x="100" y="382">檢體也可能含細胞外 DNA</text>
+
+  <path class="flow" d="M190,234 L208,234" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="199" y="216">放大</text>
+
+  <!-- ══ 2. 染色體 ════════════════════════════════════════════════ -->
+  <rect class="box plain" x="212" y="62" width="176" height="344" rx="12"/>
+  <text class="lbl bold mid zh" x="300" y="96">2　染色體</text>
+
+  <rect class="chr hp1" x="250" y="136" width="34" height="132" rx="17"/>
+  <rect class="chr hp1" x="267" y="178" width="34" height="48" rx="17"/>
+  <rect class="chr hp2" x="316" y="136" width="34" height="132" rx="17"/>
+  <rect class="chr hp2" x="299" y="178" width="34" height="48" rx="17"/>
+
+  <text class="anno mid zh" x="300" y="302">多數常染色體有兩份</text>
+  <text class="tick mid zh hp1" x="300" y="330">一份通常來自父親</text>
+  <text class="tick mid zh hp2" x="300" y="354">一份通常來自母親</text>
+  <text class="tick mid zh" x="300" y="382">兩份相似，但不完全相同</text>
+
+  <path class="flow" d="M390,234 L408,234" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="399" y="216">展開</text>
+
+  <!-- ══ 3. DNA 與基因 ════════════════════════════════════════════ -->
+  <rect class="box plain" x="412" y="62" width="176" height="344" rx="12"/>
+  <text class="lbl bold mid zh" x="500" y="96">3　DNA 與基因</text>
+
+  <line class="conn hp1 thick" x1="432" y1="154" x2="568" y2="154"/>
+  <line class="conn hp2 thick" x1="432" y1="218" x2="568" y2="218"/>
+  <line class="guide" x1="444" y1="154" x2="444" y2="218"/>
+  <line class="guide" x1="472" y1="154" x2="472" y2="218"/>
+  <line class="guide" x1="500" y1="154" x2="500" y2="218"/>
+  <line class="guide" x1="528" y1="154" x2="528" y2="218"/>
+  <line class="guide" x1="556" y1="154" x2="556" y2="218"/>
+  <text class="base a" x="444" y="177">A</text>
+  <text class="base c" x="472" y="177">C</text>
+  <text class="base g" x="500" y="177">G</text>
+  <text class="base t" x="528" y="177">T</text>
+  <text class="base a" x="556" y="177">A</text>
+  <text class="base t" x="444" y="207">T</text>
+  <text class="base g" x="472" y="207">G</text>
+  <text class="base c" x="500" y="207">C</text>
+  <text class="base a" x="528" y="207">A</text>
+  <text class="base t" x="556" y="207">T</text>
+
+  <rect class="region" x="466" y="134" width="70" height="104" rx="5"/>
+  <path class="conn" d="M466,252 L466,266 L536,266 L536,252"/>
+  <text class="anno bold mid zh" x="501" y="292">基因</text>
+  <text class="tick mid zh" x="500" y="320">DNA 長字串中</text>
+  <text class="tick mid zh" x="500" y="344">具有功能的一段</text>
+  <text class="tick mid zh" x="500" y="382">染色體 = 一條很長的 DNA</text>
+
+  <path class="flow animate-flow" d="M590,234 L608,234" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="599" y="216">量測</text>
+
+  <!-- ══ 4. 定序 ═══════════════════════════════════════════════════ -->
+  <rect class="box accent" x="612" y="62" width="176" height="344" rx="12"/>
+  <text class="lbl bold mid zh" x="700" y="96">4　定序</text>
+
+  <path class="conn hp1 thick" d="M630,164 L658,164" marker-end="url(#arrow-sm)"/>
+  <rect class="box plain" x="660" y="132" width="82" height="112" rx="10"/>
+  <circle class="mark germline" cx="701" cy="166" r="17"/>
+  <line class="conn" x1="678" y1="204" x2="724" y2="204"/>
+  <line class="conn" x1="684" y1="220" x2="718" y2="220"/>
+  <path class="conn hp2 thick" d="M744,164 L770,164" marker-end="url(#arrow-sm)"/>
+
+  <text class="anno mid zh" x="700" y="282">逐段讀取 DNA</text>
+  <text class="anno mid zh" x="700" y="308">轉成 A／C／G／T</text>
+  <line class="guide" x1="632" y1="332" x2="768" y2="332"/>
+  <text class="tick mid zh" x="700" y="358">這一步把實體分子</text>
+  <text class="tick mid zh" x="700" y="382">變成電腦資料</text>
+
+  <path class="flow animate-flow" d="M790,234 L808,234" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="799" y="216">輸出</text>
+
+  <!-- ══ 5. reads ══════════════════════════════════════════════════ -->
+  <rect class="box accent" x="812" y="62" width="176" height="344" rx="12"/>
+  <text class="lbl bold mid" x="900" y="96">5　reads</text>
+
+  <rect class="read hp1" x="834" y="140" width="124" height="14" rx="7"/>
+  <rect class="read hp2" x="850" y="170" width="112" height="14" rx="7"/>
+  <rect class="read hp1" x="826" y="200" width="118" height="14" rx="7"/>
+  <rect class="read hp2" x="842" y="230" width="128" height="14" rx="7"/>
+  <circle class="mark somatic" cx="890" cy="147" r="6"/>
+  <circle class="mark ref" cx="890" cy="177" r="6"/>
+  <circle class="mark somatic" cx="890" cy="207" r="6"/>
+  <circle class="mark ref" cx="890" cy="237" r="6"/>
+
+  <text class="anno mid zh" x="900" y="282">每條橫線是一段</text>
+  <text class="anno mid zh" x="900" y="308">局部 DNA 觀測</text>
+  <line class="guide" x1="832" y1="332" x2="968" y2="332"/>
+  <text class="tick mid zh" x="900" y="358">電腦拿到很多片段</text>
+  <text class="tick mid zh" x="900" y="382">不是一條完整染色體</text>
+
+  <!-- ══ 物理世界 vs 資料世界 ═════════════════════════════════════ -->
+  <rect class="box plain" x="12" y="428" width="576" height="54" rx="8"/>
+  <text class="anno bold mid zh" x="300" y="461">人體裡的物理世界：細胞 → 染色體 → DNA 分子</text>
+
+  <rect class="box accent" x="612" y="428" width="376" height="54" rx="8"/>
+  <text class="anno bold mid zh" x="800" y="461">量測後的資料世界：定序 → reads</text>
+
+  <path class="conn" d="M12,506 L988,506"/>
+  <text class="anno mid zh" x="500" y="536">分析流程將 reads 比對至參考 DNA，再由 variant-calling 產生候選變異清單。</text>
+</svg>

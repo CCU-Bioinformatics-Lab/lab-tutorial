@@ -1,0 +1,185 @@
+<!--tw
+{
+  "objectives": [
+    "說明細胞、染色體、DNA、基因、突變與 read 之間的關係",
+    "解釋定序如何將 DNA 轉換為可計算分析的資料",
+    "區分「辨識突變」與「推定突變間的分子連結」兩類問題",
+    "說明三項工具的依賴關係與後續學習路線"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>先建立最小的生物模型</h2>
+
+<p class="prose">本模組先從基本概念開始，暫不引入癌症、EGFR 或其他縮寫。理解下列五個層次的關係後，
+即可建立後續模組所需的資料模型：</p>
+
+{{svg:m00-dna-sequencing | [wide] 左側示意人體內的生物結構：細胞核內含染色體；在本教材的簡化模型中，每條染色體可視為一條長 DNA 分子，基因則是 DNA 上具有特定功能的區段。定序對 DNA 分子進行片段化量測，輸出 A／C／G／T 字串，也就是 reads。}}
+
+<p class="prose">人體細胞核內含有染色體。在本教材的簡化模型中，<b>每條染色體可視為一條長 DNA 分子</b>；
+DNA 以 A、C、G、T 四種鹼基記錄序列資訊。多數正常常染色體具有父源與母源兩份拷貝；
+性染色體與腫瘤拷貝數異常將於後續模組另行說明。</p>
+
+<p class="prose"><b>基因</b>不是另一種物質，而是 DNA 序列中具有特定功能的區段；可將其類比為程式系統中的模組。
+當其中某個位置相對參考序列發生差異，稱為<b>變異</b>；「突變」則常用於描述新取得的變化。
+部分變異可能影響蛋白質功能或治療反應，仍需依變異與情境判定。</p>
+
+<h3>「定序」到底做了什麼</h3>
+
+<p class="prose">我們無法把一整條染色體直接貼進文字編輯器。實際流程是：</p>
+
+<ol class="prose">
+<li>從檢體取出大量 DNA 分子。</li>
+<li>定序儀逐段量測 DNA，把每一段轉成 A／C／G／T 字串。</li>
+<li>每一段序列觀測稱為一條 <b>read</b>；依平台與定序深度，一個樣本可產生大量且部分重疊的 reads。</li>
+<li>電腦把 reads 對回人類參考序列，找出不同的字母位置。</li>
+</ol>
+
+<pre><code>參考序列：... A C G T T A C G ...
+某條 read：... A C A T T A C G ...
+                     ↑
+                 這裡有一筆差異</code></pre>
+
+<p class="prose">所以定序資料不是「病人的完整基因組序列」，而是<b>很多條來自不同實體 DNA 分子的局部觀測</b>。
+分析流程先將它們比對至參考序列，再由 variant-calling 步驟產生候選變異清單。</p>
+
+{{guard:7 | read 是分子片段的觀測，不是細胞標籤}}
+<p class="prose">一條 read 通常源自<b>某一 DNA 分子的片段</b>；在未加細胞條碼的標準 bulk 流程中，通常無法直接得知其來源細胞。
+若多條獨立且品質可靠的 reads 同時涵蓋兩個變異，可支持兩者位於同一分子；此證據不能單獨確認細胞群。</p>
+<p class="prose">下一個模組將並列細胞層級與分子層級，進一步說明推論邊界。</p>
+{{/guard}}
+
+<h3>與治療決策相關的示例</h3>
+
+<p class="prose"><b class="en">EGFR</b> 是一個編碼細胞生長訊號相關蛋白質的基因。
+部分帶有活化 EGFR 變異的肺癌可受益於特定 EGFR 抑制劑；另一些變異則可能降低特定藥物的抑制效果。
+實際治療判定仍需依藥物、變異與臨床情境評估。</p>
+
+<p class="prose">一位非小細胞肺癌病人在治療後，檢測報告同時找到 EGFR 上的
+<b class="en">T790M</b> 與 <b class="en">C797S</b>。這兩個名字只是「EGFR 的哪個位置、變成什麼」的標籤；
+現在不用記。重要的是：報告只告訴我們兩個突變都存在，卻沒有回答它們是否在<b>同一份 EGFR DNA</b> 上。</p>
+
+<pre><code>報告已知：detected("T790M") = true
+          detected("C797S") = true
+
+還不知道：same_DNA_molecule("T790M", "C797S") = ?</code></pre>
+
+<p class="prose">下面每一條橫線是一條 read。實心點表示該 read 帶有那個突變，
+空心點表示該位置與參考序列相同。先只根據圖上的分子證據作答：</p>
+
+{{widget:cis-trans-drug #egfr {"force":"trans"} | 兩個突變是一起出現在同一份 DNA 上，分開在兩份 DNA 上，還是目前的觀測其實不足？}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>read 顯示的排列</th><th>分子層次發生什麼</th><th>研究中的治療意義</th></tr></thead>
+<tbody>
+<tr>
+  <td><b>分開在兩份 DNA 上</b></td>
+  <td>兩個抗藥改變位在不同的 EGFR 分子上</td>
+  <td>在特定研究模型中，第一代與第三代 EGFR 藥物的組合可能分別抑制兩份分子</td>
+</tr>
+<tr>
+  <td><b>一起在同一份 DNA 上</b></td>
+  <td>兩個抗藥改變疊在同一個 EGFR 分子上</td>
+  <td>在該研究模型中，同樣的藥物組合未能有效抑制此排列</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p class="cli-note">這個案例來自
+<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4587765/">Niederst 等人的原始研究</a>；後續也有
+<a href="https://pubmed.ncbi.nlm.nih.gov/28843359/">依排列方式選藥的臨床案例</a>。
+這裡用它說明「分子關係會改變決策」，不是提供個別病人的治療建議。</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">研究主題摘要</p>
+<p class="prose"><b>本課程介紹如何以計算方法，從定序 reads 推定哪些 DNA 變異位於同一實體分子，
+並在腫瘤混合與定序誤差下評估此關係的可信度。</b></p>
+</div>
+</section>
+
+
+<section data-part="concept">
+<h2>同樣找到兩個突變，read 圖可能給三種答案</h2>
+
+<p class="prose">前面的 EGFR 報告只說「T790M 有、C797S 也有」。要知道兩者的排列，
+需回到產生這張清單的原始 reads。在本簡化情境中，可能的判讀可分為下面三種：</p>
+
+{{svg:m00-read-outcomes | [wide] 左：在讀取品質足夠時，多條 read 同時帶 A 與 B，支持兩個突變在同一份 DNA。中：跨越兩點的 reads 穩定分成 A-only 與 B-only，支持分開在兩份 DNA。右：reads 太短，沒有一條能同時觀察兩點，因此只能回答「不知道」，不能誤判成分開。}}
+
+<p class="prose"><b>判讀順序先看範圍，再看實心點。</b>如果同一條 read 根本沒有機會同時看見兩個位置，
+目前只能判定資訊不足；只有在 read 確實跨過兩點且品質足夠時，點的組合才可支持「同一份」或「分開」的解釋。</p>
+
+<p class="prose">長 read 通常可增加同一次觀測涵蓋的距離，但實際可連結範圍仍取決於讀長分布、覆蓋度與品質。
+上面的 EGFR 兩點很近，短片段也可能回答；實際分析也可能處理相距數千至數萬 bp 的變異。
+定序技術之間的長度與準確度取捨，留到定序單元完整比較。</p>
+</section>
+
+
+<section data-part="evidence">
+<h2>兩位點問題如何延伸為三種分析情境</h2>
+
+<p class="prose">前述圖示只包含兩個突變，且假設 reads 品質良好。真實研究處理相同類型的問題，
+但資料會逐層變難：先擴大到整個基因體，再加入腫瘤混合，最後還可能拿不到同一病人的正常檢體。
+<b>三項工具分別處理這三個層級的分析條件。</b></p>
+
+{{svg:m00-dependency | [wide] 同一個研究問題逐層變難。LongPhase 先在一般樣本中，根據大量 reads 推定突變是否位在同一條 DNA 上。進入腫瘤後，longphase-s 可利用同一病人的正常檢體作直接對照；若只有腫瘤，longphase-to 需整合更多間接證據。}}
+
+<p class="prose">這三項工具共同說明如何將 read-level 判讀問題，
+擴展為可處理人類基因體與腫瘤資料的分析方法。M11–M13 依相同層級排列：
+M11 是一般樣本，M12 加入腫瘤與正常對照，M13 再拿掉正常對照。</p>
+</section>
+
+
+<section data-part="predict">
+<h2>未觀察到證據，不等於證明不存在</h2>
+
+{{ask}}
+<p class="prose">現在換一組資料。每條 read 都太短，只能碰到一個位置：</p>
+
+<pre><code>read 1, 2, 3  → 只覆蓋左邊，看到 T790M
+read 4, 5, 6  → 只覆蓋右邊，看到 C797S</code></pre>
+
+<p class="prose">沒有任何一條 read 同時看到兩個突變。你可以下結論說它們分開在兩份 DNA 上嗎？</p>
+{{reveal}}
+<p class="prose"><b>不可以，答案是資訊不足。</b></p>
+
+<p class="prose">要回答 <code>same_DNA_molecule(A, B)</code>，至少要有觀測範圍同時包含 A 與 B。
+這批 read 從來沒有具備同時觀察兩者的能力，所以結果不是 <code>false</code>，而是 <code>unknown</code>。</p>
+
+<p class="prose">這個區分會一直出現：<b>沒有支持證據</b>可能代表關係不存在，也可能只是 read 太短、
+數量太少或資料品質不夠。分析流程應將這些情況分開處理。</p>
+{{/ask}}
+</section>
+
+
+<section data-part="practice">
+<h2>接下來的路線</h2>
+
+<p class="prose">此時不需先安裝軟體或另讀生物學教科書。請依序學習，各模組會在需要時引入新的概念與資料物件：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>階段</th><th>新增的問題</th></tr></thead>
+<tbody>
+<tr><td><b>M1–M3　建立資料模型</b></td><td>樣本、DNA、突變與定序片段到底是什麼？</td></tr>
+<tr><td><b>M4–M5　讀懂輸入</b></td><td>這些物件如何寫進 BAM／VCF，候選突變又怎麼被找出來？</td></tr>
+<tr><td><b>M6–M10　做可信推理</b></td><td>如何恢復分子關係，並處理腫瘤混合、甲基化與評估陷阱？</td></tr>
+<tr><td><b>M11–M13　實作三項工具</b></td><td>每個工具如何把前面的概念變成演算法、指令與輸出？</td></tr>
+<tr><td><b>Capstone　獨立判讀</b></td><td>面對一個真實位點，能不能說清楚證據、結論與不確定性？</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">本頁核心重點如下：</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">presence 不等於 relationship</p>
+<p class="prose"><b>知道突變 A 存在、突變 B 也存在，仍然不知道 A 與 B 是否來自同一條 DNA 分子。</b>
+後續單元將介紹如何以可檢驗的證據推定這個關係。</p>
+</div>
+
+{{quiz:m00}}
+</section>

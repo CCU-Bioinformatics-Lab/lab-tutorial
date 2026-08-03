@@ -1,0 +1,192 @@
+<!--tw
+{
+  "objectives": [
+    "解讀教學用簡化區段模型，並說明四群細胞與三個突變的關係",
+    "說明標準 bulk 定序為何不保留 read 與來源細胞的對應關係",
+    "在明確列出的簡化假設下，由細胞比例推算 VAF",
+    "區分 read 提供的分子層級觀測與由多條 read 建立的細胞群推論",
+    "說明 haplotype、germline variant、somatic variant、clone 與 subclone 在本模型中的基本角色"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<p class="prose">本教材採用同一個簡化模型連結多項概念。本模組先完整建立細胞、DNA 分子與 read 的基本關係，
+並在專有名詞首次出現時提供本頁所需的簡要定義。</p>
+
+<p class="prose">本模型聚焦於一個核心問題：<b>腫瘤檢體經過標準 bulk 定序後，資料保留了哪些資訊，
+又不再包含哪些細胞層級資訊？</b></p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">本模組的四項核心概念</p>
+<ol class="prose">
+<li>同一份腫瘤檢體可以包含多個細胞群。</li>
+<li>標準 bulk 定序混合多個細胞來源的 DNA，因此不保留 read 與來源細胞的對應。</li>
+<li>一條 read 來自單一 DNA 分子的局部序列，而非一個完整細胞。</li>
+<li>若同一條 read 的觀測範圍涵蓋兩個突變，兩者的共同出現可直接支持其位於同一條 DNA 分子。</li>
+</ol>
+<p class="prose">本模組使用少量英文術語作為圖例與群組名稱。下方資料表會先提供足以解讀本模型的定義；
+較完整的生物學與資料格式定義會在各自的主題模組中展開。</p>
+</div>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>基本資料模型</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>概念</th><th>本模組採用的定義</th></tr></thead>
+<tbody>
+<tr><td><b>位點（locus）</b></td><td>DNA 序列中的特定位置；S1、S2、S3 代表三個不同位置</td></tr>
+<tr><td><b>染色體拷貝</b></td><td>本簡化模型假設每個位置有兩份 DNA 拷貝，分別標示為 HP1 與 HP2</td></tr>
+<tr><td><b>變異（variant）</b></td><td>相對於參考序列的 DNA 序列差異</td></tr>
+<tr><td><b>[[read]]</b></td><td>定序儀對單一 DNA 分子局部序列的觀測</td></tr>
+<tr><td><b>[[VAF]]</b></td><td>在特定位點上，支持變異的 read 佔全部涵蓋該位點 read 的比例</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>教學用簡化區段模型</h3>
+
+{{svg:m01-toy-locus | [wide] 左側呈現樣本中的四個細胞群，右側呈現各群對應的 DNA 組成；下方則表示標準 bulk 定序後可觀測的 VAF。橫線區隔細胞層級組成與定序後的分子層級資料。}}
+
+<p class="prose">圖中元素的意義如下：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>圖中元素</th><th>代表意義</th></tr></thead>
+<tbody>
+<tr><td><b>灰色細胞</b></td><td>正常細胞，佔 50%</td></tr>
+<tr><td><b>紅／藍／橘色細胞</b></td><td>三個腫瘤細胞群；最早形成者為 founder [[clone]]，由其分出的後續細胞群為 [[subclone]]</td></tr>
+<tr><td><b>藍色長條 HP1／橘色長條 HP2</b></td><td>同一段染色體的兩份 DNA 拷貝；跨多個位置的一組序列差異構成 [[haplotype]]</td></tr>
+<tr><td><b>綠點</b></td><td>由親代遺傳、存在於多數體細胞的 [[germline variant|DNA 差異]]；常見的單一核苷酸差異稱為 [[SNP]]，可協助區分 HP1 與 HP2</td></tr>
+<tr><td><b>紅點 S1／S2／S3</b></td><td>受精後新產生、僅存在於部分細胞譜系的 [[somatic variant|三個體細胞變異]]</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>三個變異代表不同的細胞譜系階段</h3>
+
+<p class="prose">三個變異在細胞群中的分布反映其出現的先後與分支關係：</p>
+
+<ul class="prose">
+<li><b>S1</b> 先出現，因此紅、藍、橘三個腫瘤細胞群皆帶有 S1。</li>
+<li><b>S2</b> 出現於後續分支，僅存在於藍色細胞群。</li>
+<li><b>S3</b> 出現於另一後續分支，僅存在於橘色細胞群。</li>
+</ul>
+
+<p class="prose">本模型另設定 <b>S1、S2、S3 均位於 HP1</b>。在此簡化情境中，每個新增變異最初發生於其中一份
+DNA 拷貝，因此可以進一步分析變異與 HP1 或 HP2 的分子連結。此處的 HP1／HP2 是方向任意的相對標籤，
+不代表父系或母系。</p>
+
+<h3>由細胞比例推算 VAF</h3>
+
+<p class="prose">VAF 是<b>支持特定變異的 read 比例</b>。在本模型的假設下，可由細胞比例推算其預期值。
+以 S1 為例：</p>
+
+<ul class="prose">
+<li>帶有 S1 的細胞比例 = 紅色群（20%）+ 藍色群（20%）+ 橘色群（10%）= <b>50%</b></li>
+<li>本模型假設每個細胞在此位置有<b>兩份</b> DNA 拷貝，而 S1 僅位於其中一份（HP1）</li>
+<li>因此，支持 S1 的預期 read 比例為 50% × ½ = <b>25%</b></li>
+</ul>
+
+<p class="prose">因此圖中標示 S1 的預期 <b>VAF 為 0.25</b>。依相同假設，S2 與 S3 的預期 VAF 分別為 0.10 與 0.05。</p>
+
+{{guard:3 | VAF 不是「有多少細胞帶這個突變」}}
+<p class="prose">上述「÷2」換算僅在以下三項假設下成立：</p>
+<ul class="prose">
+<li>每個細胞在該位置均貢獻兩份 DNA 拷貝</li>
+<li>變異僅存在於其中一份拷貝</li>
+<li>不同 DNA 分子被定序的機率不存在系統性偏差</li>
+</ul>
+<p class="prose">實際腫瘤樣本可能不符合這些假設，例如正常細胞混入、局部 DNA 拷貝數改變，或變異僅存在於部分腫瘤細胞。
+因此，VAF = 0.25 <b>不能直接解讀為「25% 的細胞帶有該變異」</b>。本模組僅要求在指定假設下完成換算，
+並辨識此簡化結果的適用範圍。</p>
+{{/guard}}
+</section>
+
+
+<section data-part="evidence">
+<h2>bulk 定序保留與未保留的資訊</h2>
+
+<h3>read 內的分子連結</h3>
+
+<p class="prose">在標準 bulk 定序資料中，read 與來源細胞的對應關係不會被保留；輸出是一組來自多個細胞的
+DNA 片段序列。因此，無法僅由這些資料直接辨識每條 read 原先所屬的細胞群。</p>
+
+<p class="prose">然而，read 內仍保留分子層級的連結資訊。若某條 read 同時涵蓋兩個變異，
+該觀測可直接支持兩個變異位於同一條 DNA 分子。</p>
+
+<p class="prose">這項分子連結構成本教材後續分析方法的共同證據基礎：</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">本教材的核心推論問題</p>
+<p class="prose" style="font-size:1.05rem"><b>長 DNA 分子可以提供哪些 DNA 變異與分子狀態共同出現的證據？</b></p>
+<p class="prose">後續模組將分別處理此問題所需的生物學定義、定序限制、資料格式與推論方法。</p>
+</div>
+
+<h3>與 single-cell 定序比較</h3>
+
+{{svg:m01-bulk-vs-singlecell | [wide] 左側：single-cell 定序先分離個別細胞，因此可保留 read 與來源細胞的對應，但通常面臨較高成本與較低的單細胞訊號量。右側：標準 bulk 定序不保留 read 的細胞來源；若 read 同時涵蓋兩個變異，仍可保留兩者位於同一 DNA 分子的連結證據。}}
+
+<p class="prose">single-cell 定序會先分離個別細胞再進行定序，因此可追溯 read 的細胞來源，
+並直接比較不同細胞的變異組合。</p>
+
+<p class="prose">相較之下，single-cell 定序通常需要在成本、細胞數與單細胞覆蓋度之間取捨。
+本教材聚焦於 bulk 定序，因此細胞群結構屬於根據分子連結建立的<b>推論模型</b>，而非直接的細胞層級觀測。
+後續分析均需維持此證據層級的區分。</p>
+</section>
+
+
+<section data-part="predict">
+<h2>判讀練習</h2>
+
+{{ask}}
+<p class="prose">假設某條 read 同時涵蓋 S1、S2、S3，並觀察到 S1 = ALT、S2 = ALT、S3 = REF。<br><br>
+依據本模組的簡化模型，哪一個細胞群與此變異組合相容？</p>
+{{reveal}}
+<p class="prose">此組合與<b>藍色細胞群（後續分支 1）</b>相容，因為該群帶有 S1 與 S2，但不帶有 S3。</p>
+<p class="prose">精確的表述為：<b>此 DNA 分子的變異組合與藍色細胞群的模型相容。</b></p>
+<p class="prose">直接觀測的對象是一條 DNA 分子，而非完整細胞群。若要支持特定細胞群的存在，
+仍需多條獨立 read 呈現一致組合，並排除定序與比對錯誤。此結論屬於<b>資料支持的模型推論</b>，
+而非直接的細胞層級觀測。</p>
+{{/ask}}
+</section>
+
+
+<section data-part="practice">
+<h2>練習與自我檢核</h2>
+
+<h3>VAF 計算練習</h3>
+
+<p class="prose">依據上圖的細胞比例與本模組的簡化假設，計算三個變異的預期 VAF：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>變異</th><th>帶有它的細胞比例</th><th>÷2（因為只在一條染色體上）</th><th>預期 VAF</th></tr></thead>
+<tbody>
+<tr><td>S1</td><td>20 + 20 + 10 = 50%</td><td>50% ÷ 2</td><td><b>0.25</b></td></tr>
+<tr><td>S2</td><td>20%</td><td>20% ÷ 2</td><td><b>0.10</b></td></tr>
+<tr><td>S3</td><td>10%</td><td>10% ÷ 2</td><td><b>0.05</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>VAF 推論的限制</h3>
+
+<p class="prose">若三個變異的 VAF 分別為 0.30、0.30、0.08，是否可以據此推論
+「前兩個變異位於同一細胞群，且第三個變異較晚出現」？</p>
+
+<p class="prose"><b>不可以。</b>VAF 是各位置獨立統計的 read 比例，不包含變異共同出現或發生順序的資訊。
+因此，相同 VAF 不代表兩個變異位於同一條分子，較低 VAF 也不能單獨證明變異較晚出現。
+可支持的結論僅為：「第三個變異的相對 read 支持較少；其細胞分布與發生順序仍需分子連結及其他證據判定。」</p>
+
+<p class="prose">分析與報告時應明確區分三個層級：<b>直接觀測、資料支持的模型推論，以及目前證據無法支持的結論。</b></p>
+
+{{quiz:m01}}
+</section>

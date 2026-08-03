@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-gloss="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Phasing 與 haplotagging · 長讀癌症基因體學入門</title>
+<meta name="description" content="介紹實驗室的核心方法，包含手動 phasing 練習，以及 somatic haplotype HP1-1、HP2-1 與 HP3 的意義。">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/diagram.css">
+<link rel="stylesheet" href="assets/css/widgets.css">
+<link rel="stylesheet" href="assets/css/print.css">
+<script>
+/* 主題 / 字級 / 詞彙語言：必須在第一次繪製前套用，否則會閃一下白底。
+   刻意寫成同步的 inline script，不可移到外部檔案。 */
+(function () {
+  try {
+    var s = JSON.parse(localStorage.getItem('ccu.lrcg.tutorial.v1') || '{}');
+    var ui = s.ui || {};
+    var d = document.documentElement;
+    if (ui.theme === 'dark' || ui.theme === 'light') d.setAttribute('data-theme', ui.theme);
+    if (ui.fontScale && ui.fontScale !== 'm') d.setAttribute('data-fs', ui.fontScale);
+    if (ui.glossLang) d.setAttribute('data-gloss', ui.glossLang);
+  } catch (e) { /* Safari 私密瀏覽會丟 QuotaExceededError，忽略即可 */ }
+})();
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要內容</a>
+
+<header class="site-header">
+  <div class="site-header__in">
+    <a class="brand" href="index.html">
+      長讀癌症基因體學 · 入門教材
+      <small>中正大學資工系 · 黃耀廷實驗室</small>
+    </a>
+    <span class="site-header__spacer"></span>
+
+    <span class="hgroup gloss-toggle" role="group" aria-label="術語定義語言">
+      <button type="button" class="hbtn" data-gloss-btn="zh"   aria-pressed="true">繁中</button>
+      <button type="button" class="hbtn" data-gloss-btn="en"   aria-pressed="false">English</button>
+      <button type="button" class="hbtn" data-gloss-btn="both" aria-pressed="false">雙語</button>
+    </span>
+
+    <button type="button" class="hbtn theme-toggle" data-theme-btn
+            aria-label="切換深色／淺色主題">◐</button>
+    <button type="button" class="hbtn" data-fs-btn aria-label="調整字級">A</button>
+    <a class="hbtn" href="glossary.html">完整術語表</a>
+  </div>
+</header>
+
+<div class="wrap ">
+  <main class="main" id="main">
+    <header class="mhead"><p class="mhead__kicker">模組 6 · Phasing and haplotagging</p><h1>Phasing 與 haplotagging</h1><p class="mhead__sub">介紹實驗室的核心方法，包含手動 phasing 練習，以及 somatic haplotype HP1-1、HP2-1 與 HP3 的意義。</p><p class="mhead__meta"><span class="chip">約 70 分鐘</span><a class="chip" href="m05.html">建議先修：Germline variant calling</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>將一組 read 分配至 HP1 與 HP2，並說明所採用的判準</li><li>說明 phase set 是什麼，以及為什麼 haplotype 方向只在 phase set 內部有意義</li><li>說出 switch error 是什麼、通常發生在哪裡</li><li>畫出 germline haplotype 與 somatic haplotype 的層級關係，包含 HP3 的處理</li></ul></section>
+
+<section data-part="why" class="part" id="part-why">
+<h2 data-num="①" id="為什麼重要">為什麼重要</h2>
+
+<p class="prose">本模組整合前述資料與概念，聚焦於 phasing 與 haplotagging。</p>
+
+<p class="prose">先以簡化 pileup 練習 read 分群，再說明工具如何根據 read 與 variant 的連結進行 phasing。</p>
+</section>
+
+
+<section data-part="concept" class="part" id="part-concept">
+<h2 data-num="②" id="概念與互動">概念與互動</h2>
+
+<h3 id="練習一次-phasing-判讀">練習一次 phasing 判讀</h3>
+
+<p class="prose">下面是一段 pileup，包含三個 <span class="term" data-term="heterozygous" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-heterozygous-0">heterozygous<span class="term__pop" id="gd-heterozygous-0" role="tooltip"><b class="term__hd">heterozygous <i>異型合子</i></b><span class="term__def" data-lang="zh">在一般二倍體位點上，兩份 allele 不同（例如一份 A、一份 G）。此類位點可作為區分 haplotype 的資訊錨點；複雜拷貝數情況需另行解讀。</span><span class="term__def" data-lang="en">At a typical diploid locus, carrying two different allele copies (for example A and G). These sites can anchor phasing; copy-number changes require separate interpretation.</span><a class="term__more" href="glossary.html#heterozygous">完整條目 →</a></span></span> 位點；每條 read 在其覆蓋到的位點上顯示一個鹼基。
+請依跨位點的 allele pattern 將 read 分群，使<b>同群 read 的組合盡可能一致</b>，並保留無法可靠判定的 read。</p>
+
+<figure class="widget" data-widget="pileup-phasing" data-wid="m06.ex1" data-config='{"reads":12,"sites":3}'><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>點選 read 可在「未指派 → HP1 → HP2 → 未指派」之間切換；完成後選擇「檢查」。<b>提示</b>：可先以覆蓋 informative 位點最多的 read 作為暫定基準，再比較其他 read。</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
+
+<p class="prose">做完之後，注意三件事：</p>
+
+<ul class="prose">
+<li><b>有一條 read 在此練習中無法可靠指派</b> —— 它沒有覆蓋任何 informative het 位點，因此保持未標記即可。
+若該 read 另帶有 somatic signal，才可能在後續流程中進入 <code>HP3</code> 類別；一般 untagged read 不等於 HP3。</li>
+<li><b>示例中有一個錯誤鹼基</b>（檢查後會被圈出來）。該 read 在其他位點仍可能呈現一致 pattern，
+因此可根據多個位點的整體證據進行分群，但此方法不保證修正所有錯誤。</li>
+<li><b>HP1 與 HP2 整體互換仍可表示相同的相對 phasing。</b>原因見下方說明。</li>
+</ul>
+
+<aside class="guardrail" id="guard-1"><p class="guardrail__hd">重要區分 #1：HP1 與 HP2 不等於父系與母系</p><p class="prose">練習接受整體互換，因為 HP1／HP2 標籤本身沒有固定的生物學方向。</p>
+<p class="prose">單獨樣本的 phasing 可推得變異的相對 haplotype，但<b>不能僅憑 HP1／HP2 判定父系或母系</b>；
+若要判定親本來源，需要 trio 或其他親本證據。</p>
+<p class="prose">此外，方向只在同一個 <b><span class="term" data-term="PS tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ps-tag-1">phase set<span class="term__pop" id="gd-ps-tag-1" role="tooltip"><b class="term__hd">PS tag <i>phase set</i></b><span class="term__def" data-lang="zh">標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</span><span class="term__def" data-lang="en">Phase set identifier grouping variants phased together. Haplotype orientation is only consistent within one PS.</span><a class="term__more" href="glossary.html#ps-tag">完整條目 →</a></span></span></b> 內可直接比較。
+跨過 phase block 斷點後，左側的 HP1 不一定對應右側的 HP1；跨 PS 聚合甲基化等統計前，需先校正方向或使用不依賴標籤方向的統計。</p>
+<p class="prose">部分工具文件會以「父系／母系 haplotype」描述 HP1／HP2；若未使用 trio 或其他親本證據，教材與論文應採用 haplotype 1／2 的中性稱呼。</p></aside>
+
+<h3 id="cis-與-trans">cis 與 trans</h3>
+
+<p class="prose">phasing 的產物就是回答「兩個變異的相對位置」：</p>
+
+<ul class="prose">
+<li><b><span class="term" data-term="cis" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cis-2">cis<span class="term__pop" id="gd-cis-2" role="tooltip"><b class="term__hd">cis</b><span class="term__def" data-lang="zh">兩個 variants 在<b>同一條</b> haplotype 上。</span><span class="term__def" data-lang="en">Two variants on the same haplotype.</span><a class="term__more" href="glossary.html#cis">完整條目 →</a></span></span></b>：在同一條 haplotype 上；藥物或功能影響需依特定 EGFR 變異與研究證據判定</li>
+<li><b><span class="term" data-term="trans" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-trans-3">trans<span class="term__pop" id="gd-trans-3" role="tooltip"><b class="term__hd">trans</b><span class="term__def" data-lang="zh">兩個 variants 分別在<b>兩條不同</b>的 haplotype 上。</span><span class="term__def" data-lang="en">Two variants on opposite haplotypes.</span><a class="term__more" href="glossary.html#trans">完整條目 →</a></span></span></b>：分屬兩條 haplotype</li>
+</ul>
+
+<h3 id="phase-set-與-switch-error">phase set 與 switch error</h3>
+
+<p class="prose">phasing 可能因缺乏重疊 read 或 informative 位點而中止，形成新的 <b><span class="term" data-term="phase block" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-phase-block-4">phase block<span class="term__pop" id="gd-phase-block-4" role="tooltip"><b class="term__hd">phase block</b><span class="term__def" data-lang="zh">一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</span><span class="term__def" data-lang="en">A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.</span><a class="term__more" href="glossary.html#phase-block">完整條目 →</a></span></span></b>。
+VCF 用 <code>PS</code> 欄位標示每個 block。</p>
+
+<p class="prose"><b><span class="term" data-term="switch error" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-switch-error-5">switch error<span class="term__pop" id="gd-switch-error-5" role="tooltip"><b class="term__hd">switch error</b><span class="term__def" data-lang="zh">phasing 結果自某一位置起將兩條 haplotype 的方向對調，是常見的 phasing 錯誤類型。</span><span class="term__def" data-lang="en">A phasing error in which the two haplotype labels swap from some point onward; a common phasing error mode.</span><a class="term__more" href="glossary.html#switch-error">完整條目 →</a></span></span></b> 是常見的 phasing 錯誤類型：自某一位置起，演算法將兩條 haplotype 的標籤對調。
+它可能發生在 het 位點稀疏、read 重疊不足或證據歧義較高的區域。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" class="dia-svg" role="img">
+  <title>phase block 的中止與 switch error 示意</title>
+  <desc>上排：可區分兩條 haplotype 的位點與 read 重疊充分時，可能形成較長的 phase block。
+        中排：若中間缺乏可用位點或重疊 read，兩側可能形成獨立 block；兩個 block 的 HP1／HP2 方向彼此獨立。
+        下排：證據不足或存在歧義時可能發生 switch error，表現為某一位置後的相位標籤反轉；錯誤範圍取決於工具與資料品質。</desc>
+
+  <!-- 座標尺 -->
+  <line class="axis" x1="60" y1="34" x2="940" y2="34"/>
+  <text class="tick" x="60" y="24">染色體位置 →</text>
+
+  <!-- ══ 情況一：連續 ══ -->
+  <text class="anno bold zh" x="20" y="66">① 位點與 read 重疊充分 → 較長的 block</text>
+
+  <g>
+    <!-- het 位點 -->
+    <circle class="mark germline" cx="140" cy="92" r="6"/>
+    <circle class="mark germline" cx="240" cy="92" r="6"/>
+    <circle class="mark germline" cx="340" cy="92" r="6"/>
+    <circle class="mark germline" cx="440" cy="92" r="6"/>
+    <circle class="mark germline" cx="540" cy="92" r="6"/>
+    <circle class="mark germline" cx="640" cy="92" r="6"/>
+    <circle class="mark germline" cx="740" cy="92" r="6"/>
+    <circle class="mark germline" cx="840" cy="92" r="6"/>
+
+    <!-- 互相重疊的 read -->
+    <rect class="read hp1" x="110" y="106" width="230" height="11" rx="5.5"/>
+    <rect class="read hp2" x="200" y="121" width="240" height="11" rx="5.5"/>
+    <rect class="read hp1" x="310" y="136" width="250" height="11" rx="5.5"/>
+    <rect class="read hp2" x="440" y="121" width="230" height="11" rx="5.5"/>
+    <rect class="read hp1" x="580" y="136" width="250" height="11" rx="5.5"/>
+    <rect class="read hp2" x="700" y="121" width="200" height="11" rx="5.5"/>
+
+    <rect class="region" x="110" y="86" width="790" height="70" rx="6"/>
+    <text class="tick mid zh bold ok" x="505" y="172">一個 phase block（PS 相同）</text>
+  </g>
+
+  <!-- ══ 情況二：斷開 ══ -->
+  <text class="anno bold zh" x="20" y="212">② 中間缺乏可用位點 → 可能形成兩個 block</text>
+
+  <g>
+    <circle class="mark germline" cx="140" cy="238" r="6"/>
+    <circle class="mark germline" cx="220" cy="238" r="6"/>
+    <circle class="mark germline" cx="300" cy="238" r="6"/>
+    <!-- 空白區 -->
+    <circle class="mark germline" cx="700" cy="238" r="6"/>
+    <circle class="mark germline" cx="780" cy="238" r="6"/>
+    <circle class="mark germline" cx="860" cy="238" r="6"/>
+
+    <rect class="read hp1" x="110" y="252" width="220" height="11" rx="5.5"/>
+    <rect class="read hp2" x="180" y="267" width="200" height="11" rx="5.5"/>
+    <rect class="read hp1" x="670" y="252" width="230" height="11" rx="5.5"/>
+    <rect class="read hp2" x="700" y="267" width="220" height="11" rx="5.5"/>
+
+    <rect class="region" x="110" y="232" width="280" height="56" rx="6"/>
+    <rect class="region" x="660" y="232" width="270" height="56" rx="6"/>
+
+    <!-- 中間的斷裂 -->
+    <rect class="box ghost" x="400" y="232" width="250" height="56" rx="6"/>
+    <text class="tick mid zh" x="525" y="256">此區段缺乏</text>
+    <text class="tick mid zh" x="525" y="276">可區分位點</text>
+
+    <text class="tick mid zh bold" x="250" y="304">block 1</text>
+    <text class="tick mid zh bold" x="795" y="304">block 2</text>
+    <text class="tick mid zh bad" x="525" y="304">無法可靠連結</text>
+
+    <text class="anno zh bad" x="110" y="330">兩個 block 的 HP1／HP2 方向<tspan class="bold">彼此獨立</tspan> —— 左邊的 HP1 不一定對應右邊的 HP1。</text>
+  </g>
+
+  <!-- ══ 情況三：switch error ══ -->
+  <line class="guide" x1="20" y1="348" x2="980" y2="348"/>
+  <text class="anno bold zh" x="20" y="374">③ 證據不足或有歧義 → 可能發生 switch error</text>
+
+  <g>
+    <rect class="read hp1" x="110" y="386" width="300" height="11" rx="5.5"/>
+    <rect class="read hp2" x="110" y="401" width="300" height="11" rx="5.5"/>
+    <!-- 對調 -->
+    <rect class="read hp2" x="430" y="386" width="300" height="11" rx="5.5"/>
+    <rect class="read hp1" x="430" y="401" width="300" height="11" rx="5.5"/>
+
+    <line class="axis" x1="420" y1="380" x2="420" y2="418" stroke="var(--bad)" stroke-width="3"/>
+    <text class="tick zh bad bold" x="428" y="378">此處起相位標籤可能反轉</text>
+    <text class="tick zh" x="750" y="401">switch 後的標籤可能持續錯置</text>
+  </g>
+</svg><figcaption>三種狀況。① 位點密度與 read 重疊足夠時，可形成較長的 phase block。② 中間缺乏可用位點或重疊 read，兩側可能形成獨立 block；<b>兩個 block 的 HP1／HP2 方向彼此獨立</b>，左側 HP1 不一定對應右側 HP1。③ 證據不足或存在歧義時可能發生 switch error，該位置後的相位標籤可能反轉。</figcaption></figure>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">LOH 對 phasing 的限制</p>
+<p class="prose"><span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-6">LOH<span class="term__pop" id="gd-loh-6" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 可能減少可用的 heterozygous 錨點，使 phasing 變弱或分段；LOH 可為部分、copy-neutral 或 subclonal，
+未必使所有位點都變成 homozygous。缺乏 informative 位點時，跨區域連結會變得不可靠。</p>
+<p class="prose">不同工具對 LOH 的處理能力取決於 coverage、purity、LOH 型態與演算法。若 LongPhase-TO 能在特定條件下跨越 LOH，
+應以相應 benchmark 與版本文件界定其適用範圍。</p>
+</div>
+
+<h3 id="haplotagging-將-haplotype-assignment-寫入-read">haplotagging：將 haplotype assignment 寫入 read</h3>
+
+<p class="prose"><span class="term" data-term="phasing" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-phasing-7">phasing<span class="term__pop" id="gd-phasing-7" role="tooltip"><b class="term__hd">phasing <i>定相</i></b><span class="term__def" data-lang="zh">為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。</span><span class="term__def" data-lang="en">Determining which variants lie on the same physical chromosome, turning 0/1 into 0|1. Long reads provide direct molecular evidence.</span><a class="term__more" href="glossary.html#phasing">完整條目 →</a></span></span> 將 variant 的 haplotype assignment 寫入 VCF；
+<span class="term" data-term="haplotagging" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-haplotagging-8">haplotagging<span class="term__pop" id="gd-haplotagging-8" role="tooltip"><b class="term__hd">haplotagging</b><span class="term__def" data-lang="zh">根據已 phase 好的 variants，把每一條 read 指派到 HP1 或 HP2，並把結果寫回 BAM 的 <code>HP</code> tag。</span><span class="term__def" data-lang="en">Assigning each read to HP1 or HP2 using phased variants, and writing the result back as a BAM HP tag.</span><a class="term__more" href="glossary.html#haplotagging">完整條目 →</a></span></span> 則將每條 <b>read</b> 的 assignment 寫入 BAM 的 <code><span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-hp-tag-9">HP<span class="term__pop" id="gd-hp-tag-9" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span></code> tag。
+之後可在 IGV 中依 haplotype 分組或著色顯示。</p>
+
+<h3 id="somatic-haplotype-的延伸層級">somatic haplotype 的延伸層級</h3>
+
+<p class="prose">到目前為止介紹的是標準 germline phasing。接著再說明 somatic haplotype 的延伸層級：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" class="dia-svg" role="img">
+  <title>germline haplotype 與 somatic haplotype 的層級示意</title>
+  <desc>上層是由 germline SNP 區分的 HP1 與 HP2。
+        中層示意帶有 somatic 變異且可判定來源的 read，可標為 HP1-1 或 HP2-1。
+        下層示意尚未能可靠判定 germline 來源、但帶有 somatic signal 的 read 可標為 HP3；
+        若同一 somatic allele 已有可靠的 haplotype assignment，流程可依條件重新分類部分 HP3 read。</desc>
+
+  <!-- ══ 第一層：germline ══════════════════════════════════════ -->
+  <text class="lbl bold zh" x="20" y="28">第一層　germline haplotype</text>
+  <text class="anno zh" x="20" y="52">用 germline SNP（綠點）把 read 分成兩群</text>
+
+  <rect class="read hp1" x="330" y="24" width="300" height="16" rx="8"/>
+  <circle class="mark germline" cx="400" cy="32" r="6"/>
+  <circle class="mark germline" cx="490" cy="32" r="6"/>
+  <circle class="mark germline" cx="580" cy="32" r="6"/>
+  <text class="lbl bold hp1" x="646" y="38">HP1</text>
+
+  <rect class="read hp2" x="330" y="56" width="300" height="16" rx="8"/>
+  <circle class="mark ref" cx="400" cy="64" r="6"/>
+  <circle class="mark ref" cx="490" cy="64" r="6"/>
+  <circle class="mark ref" cx="580" cy="64" r="6"/>
+  <text class="lbl bold hp2" x="646" y="70">HP2</text>
+
+  <!-- 分支箭頭 -->
+  <path class="conn hp1" d="M480,80 L480,120" marker-end="url(#arrow)"/>
+  <path class="conn hp2" d="M700,80 L700,120" marker-end="url(#arrow)"/>
+  <text class="tick zh somatic" x="492" y="106">發生 somatic 突變</text>
+  <text class="tick zh somatic" x="712" y="106">發生 somatic 突變</text>
+
+  <!-- ══ 第二層：somatic ═══════════════════════════════════════ -->
+  <text class="lbl bold zh" x="20" y="150">第二層　somatic haplotype</text>
+  <text class="anno zh" x="20" y="174">在 germline haplotype 基礎上再細分</text>
+  <text class="anno zh" x="20" y="198">圖示命名：來源 + 流水號</text>
+
+  <rect class="read hp1" x="330" y="140" width="280" height="16" rx="8"/>
+  <circle class="mark germline" cx="380" cy="148" r="6"/>
+  <circle class="mark germline" cx="450" cy="148" r="6"/>
+  <circle class="mark somatic" cx="530" cy="148" r="7"/>
+  <text class="lbl bold hp1" x="626" y="154">HP1-1</text>
+  <text class="tick zh" x="700" y="154">源自 HP1 的 somatic haplotype</text>
+
+  <rect class="read hp2" x="330" y="176" width="280" height="16" rx="8"/>
+  <circle class="mark ref" cx="380" cy="184" r="6"/>
+  <circle class="mark ref" cx="450" cy="184" r="6"/>
+  <circle class="mark somatic" cx="530" cy="184" r="7"/>
+  <text class="lbl bold hp2" x="626" y="190">HP2-1</text>
+  <text class="tick zh" x="700" y="190">源自 HP2 的 somatic haplotype</text>
+
+  <!-- 再一層 -->
+  <path class="conn somatic" d="M480,200 L480,232" marker-end="url(#arrow)"/>
+  <rect class="read hp1" x="330" y="240" width="280" height="16" rx="8"/>
+  <circle class="mark germline" cx="380" cy="248" r="6"/>
+  <circle class="mark germline" cx="450" cy="248" r="6"/>
+  <circle class="mark somatic" cx="530" cy="248" r="7"/>
+  <circle class="mark somatic" cx="575" cy="248" r="7"/>
+  <text class="lbl bold hp1" x="626" y="254">HP1-1-1</text>
+  <text class="tick zh" x="710" y="254">再累積一個 somatic assignment</text>
+
+  <!-- ══ 第三層：HP3 ═══════════════════════════════════════════ -->
+  <line class="axis" x1="20" y1="284" x2="980" y2="284"/>
+  <text class="lbl bold zh" x="20" y="316">第三層　無法判定來源的 read</text>
+  <text class="anno zh" x="20" y="340">read 未涵蓋足夠的 germline informative SNP</text>
+
+  <rect class="read hp0" x="470" y="304" width="150" height="16" rx="8"/>
+  <circle class="mark somatic" cx="530" cy="312" r="7"/>
+  <text class="lbl bold" x="636" y="318">HP3</text>
+  <text class="tick zh" x="690" y="318">有 somatic signal，來源未定</text>
+
+  <text class="anno zh" x="20" y="376">它帶有 somatic signal，但缺乏足夠的 germline 錨點或其他判定證據，</text>
+  <text class="anno zh" x="20" y="400">因此尚無法可靠判斷源自 HP1 或 HP2。</text>
+
+  <!-- 繼承 -->
+  <path class="conn somatic" d="M560,330 L560,362" marker-end="url(#arrow)"/>
+  <rect class="box accent" x="440" y="368" width="520" height="82" rx="8"/>
+  <text class="anno bold zh" x="460" y="396">依既有 assignment 重新分類</text>
+  <text class="tick zh" x="460" y="420">若同一 somatic allele 在其他 read 上已有可靠的 HP1-1 assignment，</text>
+  <text class="tick zh" x="460" y="440">可在條件成立時將部分 HP3 read 重新分類為 HP1-1。</text>
+
+  <text class="tick zh" x="20" y="440">圖示 LongPhase-S 流程的最後一步。</text>
+</svg><figcaption>在 germline haplotype（HP1／HP2）下，帶有 somatic 變異且可判定來源的 read 可再細分為 HP1-1 與 HP2-1。尚未能可靠判定來源、但帶有 somatic signal 的 read 可先標為 HP3；若同一 somatic allele 已有可靠的 haplotype assignment，流程可依條件重新分類部分 HP3 read。</figcaption></figure>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>標籤</th><th>意思</th></tr></thead>
+<tbody>
+<tr><td><code>HP1</code> / <code>HP2</code></td><td>已指派至 germline haplotype 的 read，不表示只涵蓋 germline 變異</td></tr>
+<tr><td><code>HP1-1</code></td><td>帶有 somatic 變異，且可判定源自 HP1</td></tr>
+<tr><td><code>HP2-1</code></td><td>帶有 somatic 變異，且可判定源自 HP2</td></tr>
+<tr><td><code>HP1-1-1</code></td><td>在 HP1-1 之上再累積一個 somatic assignment；不應單獨解讀為已證實的 subclone</td></tr>
+<tr><td><code>HP3</code></td><td>帶有 somatic signal，但<b>尚未能可靠判定</b>源自哪一條 germline haplotype</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">若某個 somatic allele 在其他 read 上已有可靠的 HP1-1 assignment，
+流程可在條件成立時將攜帶相同 allele 的部分 HP3 read 重新分類為 HP1-1；此步驟可能增加可用 read，
+但也需評估相同 allele、mapping 與相位錯誤造成的誤分類風險。</p>
+</section>
+
+
+<section data-part="evidence" class="part" id="part-evidence">
+<h2 data-num="③" id="真實證據">真實證據</h2>
+
+<p class="prose">以下示範 germline phasing 與 haplotagging 指令：</p>
+
+<pre><code># 1. 對 germline VCF 執行 phasing
+longphase-s phase \
+  -s SNP.vcf \
+  -b alignment.bam \
+  -r reference.fasta \
+  -t 8 \
+  -o phased_prefix \
+  --ont
+
+# 2. 依 phased VCF 將 read 標記為 HP tag
+longphase-s haplotag \
+  -r reference.fasta \
+  -s phased_snp.vcf \
+  -b alignment.bam \
+  -t 8 \
+  -o tagged_bam_prefix</code></pre>
+
+<p class="cli-note">依目前版本，LongPhase-S 的 <code>--ont</code>／<code>--pb</code> 參數要求與 LongPhase-TO 的處理方式不同。
+LongPhase-TO 僅支援 ONT，某些不相容參數可能被接受但不產生預期效果；請依版本文件核對，
+不要預期流程在所有版本都提示警告。</p>
+
+<p class="prose">完成後，可在 IGV 中依 <code>HP</code> tag 分組，觀察 read 是否呈現 haplotype 分層。</p>
+</section>
+
+
+<section data-part="predict" class="part" id="part-predict">
+<h2 data-num="④" id="判讀練習">判讀練習</h2>
+
+<div class="reveal__q"><p class="prose">在一段區域完成 haplotag 後，若有 <b>30% 的 read 沒有 HP tag</b>，請列出至少三個可能原因，
+並說明可如何區分這些原因。</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose">可從以下方向逐一排查：</p>
+<ul class="prose">
+<li><b>read 未覆蓋 informative het 位點</b> —— 沒有足夠的判斷依據，可能保持未標記。</li>
+<li><b>這段區域可能是 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-10">LOH<span class="term__pop" id="gd-loh-10" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span></b> —— 若區段缺乏可用的 het 位點，read 的 haplotype assignment 會變得困難。
+若未標記 read 集中於連續區段，應優先檢查 LOH、低複雜度或 coverage。</li>
+<li><b>mapping quality 太低被濾掉</b> —— 以此版本設定為例，<code>haplotag</code> 預設 <code>-q 1</code>，
+而 <code>estimate_purity</code> 預設為 <code>-q 20</code>；同一份資料用不同子命令可能得到不同結果。</li>
+<li><b>證據不夠一致</b> —— 在預設 <code>-p 0.6</code> 等門檻下，read 的 allele 若未明顯偏向某一條 haplotype，
+工具可能保持未標記。</li>
+<li><b>phase set 破碎</b> —— 若 phasing 本身就斷成很多小段，能用的錨點自然變少。</li>
+</ul>
+<p class="prose">可先檢查未標記 read 是否<b>集中在特定區域</b>（優先檢查 LOH、低複雜度或 coverage），
+或<b>均勻散布</b>（再檢查 read 長度、mapping quality 與參數設定）。</p></div></details>
+</section>
+
+
+<section data-part="practice" class="part" id="part-practice">
+<h2 data-num="⑤" id="實作練習">實作練習</h2>
+
+<h3 id="執行-phasing-與-haplotagging">執行 phasing 與 haplotagging</h3>
+
+<pre><code># 1. 對 germline VCF 執行 phasing
+longphase-s phase \
+  -s SNP.vcf \
+  -b alignment.bam \
+  -r reference.fasta \
+  -t 8 \
+  -o phased_prefix \
+  --ont
+
+# 2. 依 phased VCF 將 read 標記為 HP tag
+longphase-s haplotag \
+  -r reference.fasta \
+  -s phased_prefix.vcf \
+  -b alignment.bam \
+  -t 8 \
+  -o tagged_prefix</code></pre>
+
+<h3 id="以-igv-檢查-haplotagging-結果">以 IGV 檢查 haplotagging 結果</h3>
+
+<p class="prose">建議將 <code>tagged_prefix.bam</code> 載入 IGV，依序檢查以下項目：</p>
+
+<ol class="prose">
+<li>在 read 上按右鍵 → <b>Group alignments by</b> → <b>phase</b>（或 tag <code>HP</code>）</li>
+<li>前往一個 het 位點</li>
+<li>在相位品質良好的區域，通常可觀察到 read 分成兩層，且<b>同一層的 read 在該位點上呈現一致 allele pattern</b></li>
+</ol>
+
+<p class="prose">這項可視化有助於理解 haplotype 分層。若分群不清，請檢查輸入 VCF、coverage、mapping quality、
+phase set 與工具參數，不能僅憑單一區域判定 phasing 失敗。</p>
+
+<h3 id="量化-phasing-的品質">量化 phasing 的品質</h3>
+
+<pre><code># phase block 的 contig＋PS 鍵數；需搭配 block 長度與 switch error 評估
+bcftools query -f '%CHROM\t[%PS]\n' phased_prefix.vcf | grep -v '\t\.
+    <nav class="pager" aria-label="模組導覽"><a class="prev" href="m05.html"><small>← 上一模組</small>Germline variant calling：從證據到判定</a><a class="next" href="m07.html"><small>下一模組 →</small>Somatic variant calling：tumor–normal 與 tumor-only</a></nav>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>PS tag（phase set）</dt><dd>標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</dd><dt>cis</dt><dd>兩個 variants 在<b>同一條</b> haplotype 上。</dd><dt>haplotagging</dt><dd>根據已 phase 好的 variants，把每一條 read 指派到 HP1 或 HP2，並把結果寫回 BAM 的 <code>HP</code> tag。</dd><dt>heterozygous（異型合子）</dt><dd>在一般二倍體位點上，兩份 allele 不同（例如一份 A、一份 G）。此類位點可作為區分 haplotype 的資訊錨點；複雜拷貝數情況需另行解讀。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>phasing（定相）</dt><dd>為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。</dd><dt>switch error</dt><dd>phasing 結果自某一位置起將兩條 haplotype 的方向對調，是常見的 phasing 錯誤類型。</dd><dt>trans</dt><dd>兩個 variants 分別在<b>兩條不同</b>的 haplotype 上。</dd></dl></section>
+  </main>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#練習一次-phasing-判讀">練習一次 phasing 判讀</a></li><li class="lv3"><a href="#cis-與-trans">cis 與 trans</a></li><li class="lv3"><a href="#phase-set-與-switch-error">phase set 與 switch error</a></li><li class="lv3"><a href="#haplotagging-將-haplotype-assignment-寫入-read">haplotagging：將 haplotype assignment 寫入 read</a></li><li class="lv3"><a href="#somatic-haplotype-的延伸層級">somatic haplotype 的延伸層級</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行-phasing-與-haplotagging">執行 phasing 與 haplotagging</a></li><li class="lv3"><a href="#以-igv-檢查-haplotagging-結果">以 IGV 檢查 haplotagging 結果</a></li><li class="lv3"><a href="#量化-phasing-的品質">量化 phasing 的品質</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+</div>
+
+<footer class="site-footer">
+  本教材供中正大學資工系黃耀廷實驗室新進成員自學，聚焦
+  <code>LongPhase-S</code> 與 <code>LongPhase-TO</code> 的概念、證據與限制。
+</footer>
+
+<svg class="tw-defs" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+  </marker></defs></svg>
+<script src="assets/js/progress.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/glossary.js"></script>
+<script src="assets/js/quiz.js"></script>
+<script src="assets/data/quiz.data.js"></script>
+<script src="assets/js/widgets/pileup-phasing.js"></script>
+</body>
+</html>
+ | sort -u | wc -l
+
+# 計算帶有 HP tag 的 read 比例
+total=$(samtools view -c tagged_prefix.bam)
+tagged=$(samtools view tagged_prefix.bam | grep -c 'HP:')
+echo &quot;標記率: $tagged / $total&quot;</code></pre>
+
+<p class="cli-note">標記率若低於同類資料或依預期明顯偏低，再依上方順序檢查；七成僅是示例門檻，
+實際判讀需考慮 read 長度、heterozygous-site density、coverage、平台與工具版本。</p>
+
+<section class="quiz" data-quiz="m06"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+</section>
+
+    {{slot:pager}}
+    {{slot:glossary-appendix}}
+  </main>
+  {{slot:toc}}
+</div>
+
+<footer class="site-footer">
+  本教材供中正大學資工系黃耀廷實驗室新進成員自學，聚焦
+  <code>LongPhase-S</code> 與 <code>LongPhase-TO</code> 的概念、證據與限制。
+</footer>
+
+{{slot:defs}}
+<script src="assets/js/progress.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/glossary.js"></script>
+<script src="assets/js/quiz.js"></script>
+{{slot:scripts}}
+</body>
+</html>

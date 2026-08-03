@@ -1,0 +1,213 @@
+<!--tw
+{
+  "objectives": [
+    "寫出 VAF、purity、copy number 與 multiplicity 之間的關係式，並說明每一項的角色",
+    "區分 tumor cellular purity 與 tumor DNA fraction，並說明兩者何時產生差異",
+    "區分 copy-loss LOH 與 copy-neutral LOH，並說明為什麼只看 coverage 會漏掉後者",
+    "解釋為什麼低 purity 讓 somatic calling 變困難"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<p class="prose">本節用於檢驗腫瘤資料分析中的常見假設；這些概念也常在研究文獻中被混用或誤解。</p>
+
+<p class="prose">核心訊息是：<b>腫瘤資料中的觀測值通常同時受多項潛在因素影響。</b></p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>VAF 的完整關係式</h3>
+
+<p class="prose">M1 使用了簡化情境：「purity=0.5、樣本為 diploid，且每個腫瘤細胞帶有一份變異拷貝，因此 VAF 為 0.25」。在一般情況下，關係式為：</p>
+
+<pre><code>VAF = purity × multiplicity × CCF
+      ────────────────────────────────────
+      purity × totalCN + (1 − purity) × 2</code></pre>
+
+<p class="prose">這是理想化模型：正常細胞的拷貝數設為 2，tumor totalCN 在此位置可代表腫瘤群體，且 read depth 與 DNA 量近似成正比；
+實務上仍需考慮 allele-specific copy number、mapping／定序偏差與估計不確定性。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>符號</th><th>意思</th><th>是否可直接觀測</th></tr></thead>
+<tbody>
+<tr><td><code>purity</code></td><td>[[tumour purity|腫瘤細胞比例]]</td><td>通常需估計</td></tr>
+<tr><td><code>totalCN</code></td><td>該位置的 [[copy number|總拷貝數]]（整體平均值即 [[ploidy]]）</td><td>通常需估計</td></tr>
+<tr><td><code>multiplicity</code></td><td>[[mutation multiplicity|突變佔了幾份拷貝]]</td><td>通常需推論</td></tr>
+<tr><td><code>CCF</code></td><td>[[cancer cell fraction|帶有此突變的腫瘤細胞比例]]</td><td>通常是分析所要估計的目標</td></tr>
+<tr><td><code>VAF</code></td><td>支持 alt 的 read 比例</td><td>可由 reads 估計</td></tr>
+</tbody>
+</table>
+</div>
+
+{{svg:m08-vaf-formula | [wide] 圖上方拆解分子與分母：分母是此位置讀到的 DNA 總量，由腫瘤與正常細胞共同貢獻；分子是其中帶有變異的份數。下方示範<b>同一個 VAF 0.20 可由多種生物狀態產生</b>，僅第三例具有 subclonal CCF。}}
+
+<p class="prose"><b>VAF 是可由 reads 估計的觀測量；purity、totalCN、multiplicity 與 CCF 通常需由多項證據估計或推論。</b>
+這些參數之間存在可識別性限制，因此「估計腫瘤細胞比例」本身就是一個獨立的研究題目。</p>
+
+{{widget:purity-vaf #vaf | 先以 CN=2、multiplicity=1、CCF=1 作為基準，確認曲線為 purity 的一半；再將 total CN 調至 3 或 4，比較曲線與右側 tumor DNA fraction 和 cellular purity 的差異。}}
+
+{{guard:3 | VAF 不是 cancer cell fraction}}
+<p class="prose">上面的滑桿已經示範過了：同一個 VAF = 0.20，可能是</p>
+<ul class="prose">
+<li>purity 0.4、diploid、clonal 的突變，或</li>
+<li>purity 0.8、CN 4、multiplicity 1、clonal 的突變，或</li>
+<li>purity 0.8、diploid、CCF 只有 0.5 的 subclonal 突變</li>
+</ul>
+<p class="prose">三種情況的生物意義不同；第三例的 CCF=0.5 表示 subclonal，但 VAF 仍然相同。</p>
+<p class="prose">此限制已被列為後續工作：可納入 allele-specific CNV、LOH、tumor purity、DNA fraction 與 mutation multiplicity，
+以建立 CN-aware 的 read-AF 解讀。這是方法適用範圍的重要限制。</p>
+{{/guard}}
+
+{{guard:2 | tumor cellular purity 不等於 tumor DNA fraction}}
+<p class="prose">注意上面關係式的<b>分母</b>：腫瘤細胞貢獻 <code>totalCN</code> 份 allele，
+正常細胞貢獻 2 份。當 <code>totalCN ≠ 2</code> 時，兩者就不成比例了。</p>
+<p class="prose">具體例子：一個四倍體腫瘤，50% 的細胞是腫瘤。</p>
+<ul class="prose">
+<li>cellular purity = <b>0.50</b>（一半的細胞）</li>
+<li>DNA fraction = <code>0.5×4 ÷ (0.5×4 + 0.5×2)</code> = <b>0.67</b>（三分之二的 DNA）</li>
+</ul>
+<p class="prose">在<b>依 coverage 混合 BAM</b> 的合成資料中，文件可能分別以 purity 或 DNA fraction 描述混合比例；
+這種命名差異不代表兩者在一般實際樣本中等同。只有在來源樣本接近純腫瘤、輸入深度已校正，且 tumor／normal 每細胞 DNA 量相近時，read fraction 才可近似目標 purity。</p>
+{{/guard}}
+
+<h3>LOH 的常見機制及其可觀測差異</h3>
+
+<p class="prose">[[LOH]] 是「原本 heterozygous 的區域只剩下一種 allele」。
+但其形成機制不只一種；以下比較兩類常見情形：</p>
+
+{{widget:loh-sim #loh | 比較四種狀態，並特別觀察 <b>Copy-neutral LOH</b>：在理想示意中 coverage 近似正常，但 heterozygosity 降低。}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th></th><th>coverage（理想示意）</th><th>heterozygosity</th><th>僅依 coverage 是否可偵測</th></tr></thead>
+<tbody>
+<tr><td>正常</td><td>2×</td><td>1</td><td>—</td></tr>
+<tr><td><b>Copy-loss LOH</b></td><td>1×（理想上減少一半）</td><td>0</td><td>通常可見</td></tr>
+<tr><td><b>Copy-neutral LOH</b></td><td>2×（理想上不變）</td><td>0</td><td><b>難以由 coverage 單獨辨識</b></td></tr>
+</tbody>
+</table>
+</div>
+
+{{guard:4 | LOH 不等於缺失}}
+<p class="prose">copy-neutral LOH 可由有絲分裂重組或單親二倍體等機制造成；在一種常見情形中，一條 haplotype 遺失後由另一條複製補償，
+因此 copy number 仍為 2，但<b>兩份都來自同一個親代</b>。</p>
+<p class="prose">此類 LOH 可見於癌症（也可能涉及抑癌基因的 two-hit 機制）。在理想 copy-neutral 情況下，僅依 coverage 通常難以辨識，
+需結合 heterozygosity 或 allele balance。</p>
+<p class="prose"><b>LongPhase-TO 使用 heterozygosity ratio 提供 LOH 訊號</b>；此訊號可涵蓋兩類常見情形，但實際靈敏度仍受 purity、coverage 與標註影響。</p>
+{{/guard}}
+
+<h3>低 purity 對 somatic variant detection 的影響</h3>
+
+<p class="prose">以下以數值示例說明：50× coverage、purity 0.2，以及一個 clonal 的 diploid somatic 變異：</p>
+
+<pre><code>預期 VAF   = 0.2 × 1 ÷ (0.2×2 + 0.8×2) = 0.10
+支持 read 數 = 50 × 0.10 = 5 條</code></pre>
+
+<p class="prose">因此預期僅有約五條支持 read。ONT 的錯誤率受 basecaller、序列脈絡與 read 品質影響；
+在此深度下，少量錯誤 read 可能與變異訊號重疊，降低可分辨性。</p>
+
+<p class="prose">這說明 LongPhase-S 為何採用 <b>purity 感知的過濾</b>：低 purity 通常需要重新校準過濾參數，
+並以驗證資料在 sensitivity 與 precision 間取得平衡。<br><br>
+在 LongPhase-S 的此實作中，流程先估計 purity，再依 purity 調整過濾參數；其他方法也可能採用聯合或迭代估計。</p>
+</section>
+
+
+<section data-part="evidence">
+<h2>真實證據</h2>
+
+<p class="prose">LongPhase-S 以 <b>ASCAT</b> 作為 purity 估計的比較基準。ASCAT 是常用的 allele-specific copy-number、purity 與 ploidy 估計方法；
+具體適用範圍與資料平台應依研究設計說明。</p>
+
+<p class="prose">該研究報告 LongPhase-S 在<b>低 purity</b> 合成樣本上的估計誤差多數低於 10%，
+交叉驗證 MAE 約 4%、R² 約 0.95；解讀時應同時確認誤差定義、資料集與切分方式。</p>
+
+<p class="prose">這項比較僅涵蓋合成樣本，且<b>假設來源 tumor BAM 接近純腫瘤</b>。
+細胞株仍可能包含少量正常或異質細胞，因此此假設限定了 purity 結果的適用範圍。</p>
+
+{{fig:a-s31-f1-purity}}
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">解讀合成資料結果時應明確標示的限制</p>
+<p class="prose">「本方法在標示為 purity 0.2（或 DNA fraction 0.2，依研究定義）的樣本上誤差小於 10%」應完整表述為「在<b>來源 tumor BAM 接近純腫瘤，並依指定 coverage／read fraction 混合的合成樣本</b>上，
+誤差小於 10%」。<br><br>
+實際檢體可能具有不同的細胞組成、拷貝數與技術變異；報告合成資料結果時，應同時說明合成方式與其前提。</p>
+</div>
+</section>
+
+
+<section data-part="predict">
+<h2>先提出預測，再查看解答</h2>
+
+{{ask}}
+<p class="prose">兩個 somatic 變異在同一個腫瘤樣本裡，VAF 分別是 0.30 與 0.15。<br><br>
+可否僅據此判斷「第一個比第二個早發生」？</p>
+{{reveal}}
+<p class="prose"><b>不足以直接判斷，但可作為演化順序的線索。</b></p>
+<p class="prose">「較早發生的突變會被更多後代細胞繼承，所以 VAF 較高」這個推理在<b>其他條件相同</b>時成立。
+問題是其他條件經常不同：</p>
+<ul class="prose">
+<li>兩個位置的 <b>local copy number</b> 可能不一樣。CN=4 的位置上，同一個 CCF 會給出不同的 VAF。</li>
+<li><b>multiplicity</b> 可能不同。若突變所在的拷貝後續被保留並複製，multiplicity 可能 &gt; 1。</li>
+<li>其中一個可能落在 <b>LOH</b> 區域，VAF 會被推高。</li>
+</ul>
+<p class="prose">subclone 重建可使用此線索（稱為 <b>read-AF</b>）排序候選演化樹；
+該方法將其限定為「<b>只在最小成本候選集合形成之後</b>用來選擇與排序」，
+且<b>最高分並列時全部保留</b>，不強行決定唯一順序。</p>
+<p class="prose">此例示範以弱線索排序並保留不確定性的做法。</p>
+{{/ask}}
+</section>
+
+
+<section data-part="practice">
+<h2>實作練習</h2>
+
+<h3>合成不同 DNA fraction 的混合樣本</h3>
+
+<p class="prose">以下是評估混合樣本穩健性的常用設計之一：</p>
+
+{{cli}}
+# 1. 先量測兩個 BAM 的有效 coverage
+mosdepth --by 500 tumor_cov  tumor.bam
+mosdepth --by 500 normal_cov normal.bam
+
+# 2. 依實測 coverage 計算抽樣比例（-s 的格式是 seed.fraction）
+#    只有輸入深度已標準化時，才可用 60%／40% 近似目標 DNA fraction
+samtools view -s 1.60 -b tumor.bam  > t_sub.bam
+samtools view -s 1.40 -b normal.bam > n_sub.bam
+
+# 3. 合併
+samtools merge dna_frac_0.6.bam t_sub.bam n_sub.bam
+samtools index dna_frac_0.6.bam
+{{/cli}}
+
+<p class="cli-note">可建立 0.2 / 0.4 / 0.6 / 0.8 / 1.0 五個 DNA fraction 梯度，
+以評估方法在低 DNA fraction 條件下的效能變化；這是一組常見的基礎評估設計。</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">此合成流程的前提與限制</p>
+<p class="prose">上面的配方假設<b>來源 tumor BAM 接近純腫瘤，tumor／normal coverage 已校正，且每細胞 DNA 量差異可忽略</b>。
+實際細胞株可能仍包含少量正常或異質細胞。</p>
+<p class="prose">因此「本方法在標示為 purity 0.2（或 DNA fraction 0.2，依研究定義）時誤差小於 10%」應表述為「在<b>以此方式合成</b>的樣本上，誤差小於 10%」。
+此結果的適用範圍受合成方式與來源樣本前提限制。</p>
+</div>
+
+<h3>以 heterozygous 位點密度初步篩查 LOH</h3>
+
+{{cli}}
+# 計算沿染色體分箱的 het 位點密度
+# 需與配對 normal、鄰近可呼叫區域及 coverage 比較，以列出 LOH 候選
+bcftools view -H -g het sample.vcf | awk '{print $1, int($2/1000000)}' | \
+  sort | uniq -c | awk '{print $2, $3, $1}' | head -40
+{{/cli}}
+
+<p class="prose">可呼叫區域的 het 密度受樣本、族群、coverage、caller 與過濾條件影響，應以配對 normal 或鄰近區段建立基線。
+若某區段密度顯著低於基線，可列為 LOH 候選；purity 混合可能保留部分 het reads，仍需結合 allele balance、coverage 與其他證據。</p>
+
+{{quiz:m08}}
+</section>

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300">
+  <title>整份教材的學習路徑</title>
+  <desc>五個階段由左至右：基礎模組建立資料模型，工具模組介紹實際檔案，
+        核心模組處理腫瘤資料的分析限制，工具實作介紹三項程式，
+        最後以綜合評量完成整合式判讀。
+        下方標出兩個轉折點：從第四個模組開始需要能操作終端機，
+        本教材不預設先備癌症生物學知識。</desc>
+
+  <!-- 五個階段 -->
+  <g>
+    <rect class="box accent" x="20" y="52" width="176" height="92" rx="8"/>
+    <text class="anno mid bold zh" x="108" y="82">基礎</text>
+    <text class="tick mid" x="108" y="106">M0 – M3</text>
+    <text class="tick mid zh" x="108" y="130">建立基本資料模型</text>
+
+    <rect class="box" x="216" y="52" width="176" height="92" rx="8"/>
+    <text class="anno mid bold zh" x="304" y="82">工具</text>
+    <text class="tick mid" x="304" y="106">M4 – M5</text>
+    <text class="tick mid zh" x="304" y="130">讀懂實際檔案</text>
+
+    <rect class="box" x="412" y="52" width="176" height="92" rx="8"/>
+    <text class="anno mid bold zh" x="500" y="82">核心</text>
+    <text class="tick mid" x="500" y="106">M6 – M10</text>
+    <text class="tick mid zh" x="500" y="130">腫瘤資料的複雜度</text>
+
+    <rect class="box" x="608" y="52" width="176" height="92" rx="8"/>
+    <text class="anno mid bold zh" x="696" y="82">工具實作</text>
+    <text class="tick mid" x="696" y="106">M11 – M13</text>
+    <text class="tick mid zh" x="696" y="130">三項分析工具</text>
+
+    <rect class="box ok" x="804" y="52" width="176" height="92" rx="8"/>
+    <text class="anno mid bold zh" x="892" y="82">綜合評量</text>
+    <text class="tick mid" x="892" y="106">Capstone</text>
+    <text class="tick mid zh" x="892" y="130">完成整合式判讀</text>
+  </g>
+
+  <!-- 箭頭 -->
+  <path class="flow" d="M198,98 L212,98" marker-end="url(#arrow-sm)"/>
+  <path class="flow" d="M394,98 L408,98" marker-end="url(#arrow-sm)"/>
+  <path class="flow" d="M590,98 L604,98" marker-end="url(#arrow-sm)"/>
+  <path class="flow" d="M786,98 L800,98" marker-end="url(#arrow-sm)"/>
+
+  <!-- 上方：起點標示 -->
+  <path class="conn somatic" d="M108,44 L108,26" marker-start="url(#arrow-sm)" stroke-width="3"/>
+  <text class="anno mid zh bold somatic" x="108" y="20">從這裡開始</text>
+
+  <!-- 下方：兩個轉折 -->
+  <line class="guide" x1="216" y1="152" x2="216" y2="188"/>
+  <text class="tick zh" x="226" y="176">M4 起需要基本終端機操作</text>
+
+  <line class="axis" x1="20" y1="212" x2="980" y2="212"/>
+
+  <text class="anno zh" x="20" y="244">本教材不預設先備癌症生物學知識；必要概念會在對應模組引入。</text>
+  <text class="tick zh" x="20" y="272">M0–M3 以閱讀與互動為主，M4 起再進入終端機實作。</text>
+  <text class="tick zh end" x="980" y="272">全部約 14 小時，建議分 6 週</text>
+</svg>

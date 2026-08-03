@@ -1,0 +1,52 @@
+{
+  "_comment": [
+    "Deck 代號 → 實際檔案。刻意不改使用者的原始檔名（含中文、空格、問號），",
+    "只在這裡建立穩定的 ASCII 代號供教材與工具引用。",
+    "file 欄位相對於專案根目錄。"
+  ],
+
+  "A": {
+    "label": "LongPhase-S：Somatic haplotype 重建與 tumor purity 估計",
+    "label_en": "Reconstruction of Somatic Haplotypes and Tumor Purity Estimation Using Tumor/Normal Paired Long-Read Sequencing",
+    "speaker": "Ho M.-E.",
+    "slides": 67,
+    "repo": "longphase-s",
+    "file": "Reconstruction of Somatic Haplotypes and Tumor Purity Estimation Using TumorNormal Paired Long-Read Sequencing_20250818.pptx"
+  },
+
+  "B": {
+    "label": "LongPhase-TO：Tumor-only somatic phasing、LOH 與 purity",
+    "label_en": "Joint Somatic Phasing and Purity Estimation Incorporating Loss of Heterozygosity in Tumor-Only Long-Read Sequencing",
+    "speaker": "陳振裕",
+    "slides": 36,
+    "repo": "longphase-to",
+    "file": "陳振裕口試投影片-1.pptx"
+  },
+
+  "C": {
+    "label": "CNN somatic indel 再校正（tumor–normal）",
+    "label_en": "Convolutional Neural Network-Based Refinement of Somatic Indel Calls in Tumor-Normal Paired Long-Read Sequencing",
+    "speaker": "姜懷翔",
+    "slides": 36,
+    "repo": "longphase-s",
+    "file": "Convolutional Neural Network?B ased Refinement of Somatic Indel Calls in Tumor–Normal Paired  Long-Read Sequencing_notes.pptx"
+  },
+
+  "D": {
+    "label": "Haplotype 與 methylation 感知的 somatic indel calling（tumor-only）",
+    "label_en": "Haplotype- and Methylation-Aware Somatic Indel Calling for Tumor-Only Nanopore Sequencing",
+    "speaker": "符絮棻",
+    "slides": 45,
+    "repo": "longphase-to",
+    "file": "Haplotype- and Methylation-Aware Somatic Indel Calling for Tumor-Only Nanopore Sequencing -- 20260729.pptx"
+  },
+
+  "E": {
+    "label": "以 somatic haplotagging 與 methylation 重建區域 subclone 拓撲",
+    "label_en": "Subclonal reconstruction using somatic haplotagging and methylation profiles with Nanopore sequencing",
+    "speaker": "廖子游",
+    "slides": 48,
+    "repo": "longphase-s",
+    "file": "20260730_碩士口試報告_廖子游_Subclonal reconstruction using somatic haplotagging and methylation profiles with Nanopore sequencing.pptx"
+  }
+}

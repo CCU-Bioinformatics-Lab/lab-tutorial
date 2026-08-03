@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420">
+  <title>phase block 的中止與 switch error 示意</title>
+  <desc>上排：可區分兩條 haplotype 的位點與 read 重疊充分時，可能形成較長的 phase block。
+        中排：若中間缺乏可用位點或重疊 read，兩側可能形成獨立 block；兩個 block 的 HP1／HP2 方向彼此獨立。
+        下排：證據不足或存在歧義時可能發生 switch error，表現為某一位置後的相位標籤反轉；錯誤範圍取決於工具與資料品質。</desc>
+
+  <!-- 座標尺 -->
+  <line class="axis" x1="60" y1="34" x2="940" y2="34"/>
+  <text class="tick" x="60" y="24">染色體位置 →</text>
+
+  <!-- ══ 情況一：連續 ══ -->
+  <text class="anno bold zh" x="20" y="66">① 位點與 read 重疊充分 → 較長的 block</text>
+
+  <g>
+    <!-- het 位點 -->
+    <circle class="mark germline" cx="140" cy="92" r="6"/>
+    <circle class="mark germline" cx="240" cy="92" r="6"/>
+    <circle class="mark germline" cx="340" cy="92" r="6"/>
+    <circle class="mark germline" cx="440" cy="92" r="6"/>
+    <circle class="mark germline" cx="540" cy="92" r="6"/>
+    <circle class="mark germline" cx="640" cy="92" r="6"/>
+    <circle class="mark germline" cx="740" cy="92" r="6"/>
+    <circle class="mark germline" cx="840" cy="92" r="6"/>
+
+    <!-- 互相重疊的 read -->
+    <rect class="read hp1" x="110" y="106" width="230" height="11" rx="5.5"/>
+    <rect class="read hp2" x="200" y="121" width="240" height="11" rx="5.5"/>
+    <rect class="read hp1" x="310" y="136" width="250" height="11" rx="5.5"/>
+    <rect class="read hp2" x="440" y="121" width="230" height="11" rx="5.5"/>
+    <rect class="read hp1" x="580" y="136" width="250" height="11" rx="5.5"/>
+    <rect class="read hp2" x="700" y="121" width="200" height="11" rx="5.5"/>
+
+    <rect class="region" x="110" y="86" width="790" height="70" rx="6"/>
+    <text class="tick mid zh bold ok" x="505" y="172">一個 phase block（PS 相同）</text>
+  </g>
+
+  <!-- ══ 情況二：斷開 ══ -->
+  <text class="anno bold zh" x="20" y="212">② 中間缺乏可用位點 → 可能形成兩個 block</text>
+
+  <g>
+    <circle class="mark germline" cx="140" cy="238" r="6"/>
+    <circle class="mark germline" cx="220" cy="238" r="6"/>
+    <circle class="mark germline" cx="300" cy="238" r="6"/>
+    <!-- 空白區 -->
+    <circle class="mark germline" cx="700" cy="238" r="6"/>
+    <circle class="mark germline" cx="780" cy="238" r="6"/>
+    <circle class="mark germline" cx="860" cy="238" r="6"/>
+
+    <rect class="read hp1" x="110" y="252" width="220" height="11" rx="5.5"/>
+    <rect class="read hp2" x="180" y="267" width="200" height="11" rx="5.5"/>
+    <rect class="read hp1" x="670" y="252" width="230" height="11" rx="5.5"/>
+    <rect class="read hp2" x="700" y="267" width="220" height="11" rx="5.5"/>
+
+    <rect class="region" x="110" y="232" width="280" height="56" rx="6"/>
+    <rect class="region" x="660" y="232" width="270" height="56" rx="6"/>
+
+    <!-- 中間的斷裂 -->
+    <rect class="box ghost" x="400" y="232" width="250" height="56" rx="6"/>
+    <text class="tick mid zh" x="525" y="256">此區段缺乏</text>
+    <text class="tick mid zh" x="525" y="276">可區分位點</text>
+
+    <text class="tick mid zh bold" x="250" y="304">block 1</text>
+    <text class="tick mid zh bold" x="795" y="304">block 2</text>
+    <text class="tick mid zh bad" x="525" y="304">無法可靠連結</text>
+
+    <text class="anno zh bad" x="110" y="330">兩個 block 的 HP1／HP2 方向<tspan class="bold">彼此獨立</tspan> —— 左邊的 HP1 不一定對應右邊的 HP1。</text>
+  </g>
+
+  <!-- ══ 情況三：switch error ══ -->
+  <line class="guide" x1="20" y1="348" x2="980" y2="348"/>
+  <text class="anno bold zh" x="20" y="374">③ 證據不足或有歧義 → 可能發生 switch error</text>
+
+  <g>
+    <rect class="read hp1" x="110" y="386" width="300" height="11" rx="5.5"/>
+    <rect class="read hp2" x="110" y="401" width="300" height="11" rx="5.5"/>
+    <!-- 對調 -->
+    <rect class="read hp2" x="430" y="386" width="300" height="11" rx="5.5"/>
+    <rect class="read hp1" x="430" y="401" width="300" height="11" rx="5.5"/>
+
+    <line class="axis" x1="420" y1="380" x2="420" y2="418" stroke="var(--bad)" stroke-width="3"/>
+    <text class="tick zh bad bold" x="428" y="378">此處起相位標籤可能反轉</text>
+    <text class="tick zh" x="750" y="401">switch 後的標籤可能持續錯置</text>
+  </g>
+</svg>

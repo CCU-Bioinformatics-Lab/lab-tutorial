@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-gloss="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>長讀癌症基因體學 · 入門教材</title>
+<meta name="description" content="供中正大學資工系黃耀廷實驗室新進成員自學的教材">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/diagram.css">
+<link rel="stylesheet" href="assets/css/widgets.css">
+<link rel="stylesheet" href="assets/css/print.css">
+<script>
+/* 主題 / 字級 / 詞彙語言：必須在第一次繪製前套用，否則會閃一下白底。
+   刻意寫成同步的 inline script，不可移到外部檔案。 */
+(function () {
+  try {
+    var s = JSON.parse(localStorage.getItem('ccu.lrcg.tutorial.v1') || '{}');
+    var ui = s.ui || {};
+    var d = document.documentElement;
+    if (ui.theme === 'dark' || ui.theme === 'light') d.setAttribute('data-theme', ui.theme);
+    if (ui.fontScale && ui.fontScale !== 'm') d.setAttribute('data-fs', ui.fontScale);
+    if (ui.glossLang) d.setAttribute('data-gloss', ui.glossLang);
+  } catch (e) { /* Safari 私密瀏覽會丟 QuotaExceededError，忽略即可 */ }
+})();
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要內容</a>
+
+<header class="site-header">
+  <div class="site-header__in">
+    <a class="brand" href="index.html">
+      長讀癌症基因體學 · 入門教材
+      <small>中正大學資工系 · 黃耀廷實驗室</small>
+    </a>
+    <span class="site-header__spacer"></span>
+
+    <span class="hgroup gloss-toggle" role="group" aria-label="術語定義語言">
+      <button type="button" class="hbtn" data-gloss-btn="zh"   aria-pressed="true">繁中</button>
+      <button type="button" class="hbtn" data-gloss-btn="en"   aria-pressed="false">English</button>
+      <button type="button" class="hbtn" data-gloss-btn="both" aria-pressed="false">雙語</button>
+    </span>
+
+    <button type="button" class="hbtn theme-toggle" data-theme-btn
+            aria-label="切換深色／淺色主題">◐</button>
+    <button type="button" class="hbtn" data-fs-btn aria-label="調整字級">A</button>
+    <a class="hbtn" href="glossary.html">完整術語表</a>
+  </div>
+</header>
+
+<div class="wrap wrap--plain">
+  <main class="main" id="main">
+    <header class="mhead"><p class="mhead__kicker">自學課程</p><h1>長讀癌症基因體學 · 入門教材</h1></header><div class="home-hook"><p>某肺癌檢體檢出兩個變異。即使兩者都被檢出，報告仍可能不足以支持後續判讀，因為還需要回答一個關鍵問題：</p><p class="home-hook__q">這兩個變異位於<b>同一條</b>染色體拷貝，還是<b>分別位於兩條</b>？</p><p>相同的位點結果，若相位不同，生物學與臨床解讀可能不同。本教材將帶你從定序資料判斷這項關聯，並理解其證據與限制。</p></div><div class="home-facts"><div><dt>適合對象</dt><dd>資訊工程背景、未受癌症生物學與定序訓練的自學者</dd></div><div><dt>先備能力</dt><dd>不要求生物學背景；M4 起需能使用終端機執行基本指令</dd></div><div><dt>預計時間</dt><dd>總時數約 14 小時，建議分 6 週完成</dd></div><div><dt>完成後能力</dt><dd>獨立判讀一個位點，並寫出標示不確定性的結論</dd></div></div><figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" class="dia-svg" role="img">
+  <title>整份教材的學習路徑</title>
+  <desc>五個階段由左至右：基礎模組建立資料模型，工具模組介紹實際檔案，
+        核心模組處理腫瘤資料的分析限制，工具實作介紹三項程式，
+        最後以綜合評量完成整合式判讀。
+        下方標出兩個轉折點：從第四個模組開始需要能操作終端機，
+        本教材不預設先備癌症生物學知識。</desc>
+
+  <!-- 五個階段 -->
+  <g>
+    <rect class="box accent" x="20" y="52" width="176" height="92" rx="8"/>
+    <text class="anno mid bold zh" x="108" y="82">基礎</text>
+    <text class="tick mid" x="108" y="106">M0 – M3</text>
+    <text class="tick mid zh" x="108" y="130">建立基本資料模型</text>
+
+    <rect class="box" x="216" y="52" width="176" height="92" rx="8"/>
+    <text class="anno mid bold zh" x="304" y="82">工具</text>
+    <text class="tick mid" x="304" y="106">M4 – M5</text>
+    <text class="tick mid zh" x="304" y="130">讀懂實際檔案</text>
+
+    <rect class="box" x="412" y="52" width="176" height="92" rx="8"/>
+    <text class="anno mid bold zh" x="500" y="82">核心</text>
+    <text class="tick mid" x="500" y="106">M6 – M10</text>
+    <text class="tick mid zh" x="500" y="130">腫瘤資料的複雜度</text>
+
+    <rect class="box" x="608" y="52" width="176" height="92" rx="8"/>
+    <text class="anno mid bold zh" x="696" y="82">工具實作</text>
+    <text class="tick mid" x="696" y="106">M11 – M13</text>
+    <text class="tick mid zh" x="696" y="130">三項分析工具</text>
+
+    <rect class="box ok" x="804" y="52" width="176" height="92" rx="8"/>
+    <text class="anno mid bold zh" x="892" y="82">綜合評量</text>
+    <text class="tick mid" x="892" y="106">Capstone</text>
+    <text class="tick mid zh" x="892" y="130">完成整合式判讀</text>
+  </g>
+
+  <!-- 箭頭 -->
+  <path class="flow" d="M198,98 L212,98" marker-end="url(#arrow-sm)"/>
+  <path class="flow" d="M394,98 L408,98" marker-end="url(#arrow-sm)"/>
+  <path class="flow" d="M590,98 L604,98" marker-end="url(#arrow-sm)"/>
+  <path class="flow" d="M786,98 L800,98" marker-end="url(#arrow-sm)"/>
+
+  <!-- 上方：起點標示 -->
+  <path class="conn somatic" d="M108,44 L108,26" marker-start="url(#arrow-sm)" stroke-width="3"/>
+  <text class="anno mid zh bold somatic" x="108" y="20">從這裡開始</text>
+
+  <!-- 下方：兩個轉折 -->
+  <line class="guide" x1="216" y1="152" x2="216" y2="188"/>
+  <text class="tick zh" x="226" y="176">M4 起需要基本終端機操作</text>
+
+  <line class="axis" x1="20" y1="212" x2="980" y2="212"/>
+
+  <text class="anno zh" x="20" y="244">本教材不預設先備癌症生物學知識；必要概念會在對應模組引入。</text>
+  <text class="tick zh" x="20" y="272">M0–M3 以閱讀與互動為主，M4 起再進入終端機實作。</text>
+  <text class="tick zh end" x="980" y="272">全部約 14 小時，建議分 6 週</text>
+</svg></figure><p class="home-cta"><a class="btn btn--big" href="m00.html">開始第一個模組 →</a><a class="chip chip--accent" href="#resume" data-resume hidden>繼續上次</a><span class="chip" data-progress-summary>—</span></p><section class="mgroup"><h2>起點</h2><ol class="mgrid"><li class="mcard" data-mod="m00"><a href="m00.html"><span class="mcard__num">0</span><span class="mcard__body"><b>研究主題與學習路徑</b><small class="mcard__q">兩個變異都被檢出，為什麼仍無法直接決定治療？</small><span class="mcard__time">約 20 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li></ol></section><section class="mgroup"><h2>基礎</h2><ol class="mgrid"><li class="mcard" data-mod="m01"><a href="m01.html"><span class="mcard__num">1</span><span class="mcard__body"><b>腫瘤樣本的簡化區域模型</b><small class="mcard__q">定序將細胞分解後，還保留哪些可用資訊？</small><span class="mcard__time">約 30 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li><li class="mcard" data-mod="m02"><a href="m02.html"><span class="mcard__num">2</span><span class="mcard__body"><b>癌症基因體分析的基礎生物學</b><small class="mcard__q">allele、genotype 與 haplotype 有何不同？</small><span class="mcard__time">約 45 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li><li class="mcard" data-mod="m03"><a href="m03.html"><span class="mcard__num">3</span><span class="mcard__body"><b>定序原理與長讀的分析價值</b><small class="mcard__q">為什麼需要較長的定序片段？它的代價是什麼？</small><span class="mcard__time">約 45 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li></ol></section><section class="mgroup"><h2>工具</h2><ol class="mgrid"><li class="mcard" data-mod="m04"><a href="m04.html"><span class="mcard__num">4</span><span class="mcard__body"><b>資料格式讀寫能力</b><small class="mcard__q">一筆變異紀錄，如何回溯到其原始資料？</small><span class="mcard__time">約 60 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li><li class="mcard" data-mod="m05"><a href="m05.html"><span class="mcard__num">5</span><span class="mcard__body"><b>Germline variant calling：從證據到判定</b><small class="mcard__q">電腦如何判斷某個位置真的有變異，而不是定序錯誤？</small><span class="mcard__time">約 35 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li></ol></section><section class="mgroup"><h2>核心</h2><ol class="mgrid"><li class="mcard" data-mod="m06"><a href="m06.html"><span class="mcard__num">6</span><span class="mcard__body"><b>Phasing 與 haplotagging</b><small class="mcard__q">如何判斷兩個變異是否位於同一條染色體拷貝？</small><span class="mcard__time">約 70 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li><li class="mcard" data-mod="m07"><a href="m07.html"><span class="mcard__num">7</span><span class="mcard__body"><b>Somatic variant calling：tumor–normal 與 tumor-only</b><small class="mcard__q">有配對正常組織時，能多得到哪些證據？沒有時會失去什麼？</small><span class="mcard__time">約 55 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li><li class="mcard" data-mod="m08"><a href="m08.html"><span class="mcard__num">8</span><span class="mcard__body"><b>腫瘤樣本的混合組成</b><small class="mcard__q">同一個數值，為何可能對應三種不同的生物學情況？</small><span class="mcard__time">約 75 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li><li class="mcard" data-mod="m09"><a href="m09.html"><span class="mcard__num">9</span><span class="mcard__body"><b>甲基化入門</b><small class="mcard__q">除了序列本身，同一個 DNA 分子還能提供哪些資訊？</small><span class="mcard__time">約 45 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li><li class="mcard" data-mod="m10"><a href="m10.html"><span class="mcard__num">10</span><span class="mcard__body"><b>證據、驗證與效能評估</b><small class="mcard__q">如何從一張效能圖表看出它沒有告訴你的事？</small><span class="mcard__time">約 60 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li></ol></section><section class="mgroup"><h2>實驗室工具</h2><ol class="mgrid"><li class="mcard" data-mod="m11"><a href="m11.html"><span class="mcard__num">11</span><span class="mcard__body"><b>LongPhase：核心 phasing 流程</b><small class="mcard__q">程式如何把變異分配到不同染色體拷貝？</small><span class="mcard__time">約 45 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li><li class="mcard" data-mod="m12"><a href="m12.html"><span class="mcard__num">12</span><span class="mcard__body"><b>LongPhase-S（配對 tumor–normal）</b><small class="mcard__q">有配對正常組織時，完整的腫瘤分析流程如何運作？</small><span class="mcard__time">約 80 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li><li class="mcard" data-mod="m13"><a href="m13.html"><span class="mcard__num">13</span><span class="mcard__body"><b>LongPhase-TO（tumor-only）</b><small class="mcard__q">沒有配對正常組織時，如何以其他證據補足對照？</small><span class="mcard__time">約 80 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li></ol></section><section class="mgroup"><h2>綜合評量</h2><ol class="mgrid"><li class="mcard" data-mod="capstone"><a href="capstone.html"><span class="mcard__num">★</span><span class="mcard__body"><b>Capstone：整合式位點判讀</b><small class="mcard__q">面對一個位點的完整證據，你能提出什麼結論？</small><span class="mcard__time">約 120 分鐘</span></span><span class="mcard__state" data-state aria-hidden="true"></span></a></li></ol></section><section class="mgroup"><h2>工具與資源</h2><p class="mhead__meta"><a class="chip" href="glossary.html">完整術語表</a><a class="chip" href="print-all.html">完整手冊（可列印）</a><button type="button" class="chip" data-export-progress>匯出進度</button><button type="button" class="chip" data-import-progress>匯入進度</button></p><details class="reveal"><summary>換電腦或共用帳號時，進度如何保存？</summary><div class="reveal__a"><p class="prose">進度存在<b>目前這台電腦的這個瀏覽器</b>裡，不會隨教材檔案移轉；瀏覽器無法把本機檔案的進度與檔案本身綁定。</p><p class="prose">所以換電腦、換瀏覽器、或多人共用同一個帳號時，請用上面的「匯出進度」存成檔案，再到另一台「匯入進度」。</p></div></details></section>
+    
+    
+  </main>
+  
+</div>
+
+<footer class="site-footer">
+  本教材供中正大學資工系黃耀廷實驗室新進成員自學，聚焦
+  <code>LongPhase-S</code> 與 <code>LongPhase-TO</code> 的概念、證據與限制。
+</footer>
+
+<svg class="tw-defs" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="arrow-sm" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+  </marker></defs></svg>
+<script src="assets/js/progress.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/glossary.js"></script>
+<script src="assets/js/quiz.js"></script>
+<script src="assets/data/modules.data.js"></script>
+<script src="assets/js/index-page.js"></script>
+</body>
+</html>

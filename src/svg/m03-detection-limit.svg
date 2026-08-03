@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400">
+  <title>低腫瘤比例為什麼難：把數字算出來就懂了</title>
+  <desc>在本簡化模型中，定序深度相同時，腫瘤細胞比例越低，支持一個真變異的 read 數就越少。
+        在腫瘤佔兩成且符合模型假設的樣本上，一個所有腫瘤細胞都帶有的變異期望約有五條 read 支持。
+        定序本身也可能在位置產生錯誤 read；背景若接近真訊號，會增加低比例樣本的判讀困難。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">同樣 50× 的定序深度，腫瘤比例不同的結果</text>
+
+  <!-- 表頭 -->
+  <text class="tick zh bold" x="40" y="72">腫瘤比例</text>
+  <text class="tick zh bold" x="180" y="72">支持真變異的 read 數</text>
+  <text class="tick zh bold" x="700" y="72">好不好判斷</text>
+
+  <line class="guide" x1="20" y1="82" x2="980" y2="82"/>
+
+  <!-- 100% -->
+  <text class="anno mono bold" x="40" y="118">100%</text>
+  <g>
+    <rect class="bar somatic" x="180" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="204" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="228" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="252" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="276" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="300" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="324" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="348" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="372" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="396" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="420" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="444" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="468" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="492" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="516" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="540" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="564" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="588" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="612" y="102" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="636" y="102" width="20" height="20" rx="3"/>
+  </g>
+  <text class="tick mono" x="664" y="118">25</text>
+  <text class="tick zh ok bold" x="700" y="118">較易判讀</text>
+
+  <!-- 60% -->
+  <text class="anno mono bold" x="40" y="158">60%</text>
+  <g>
+    <rect class="bar somatic" x="180" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="204" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="228" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="252" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="276" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="300" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="324" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="348" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="372" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="396" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="420" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="444" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="468" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="492" y="142" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="516" y="142" width="20" height="20" rx="3"/>
+  </g>
+  <text class="tick mono" x="664" y="158">15</text>
+  <text class="tick zh ok" x="700" y="158">中等難度</text>
+
+  <!-- 20% -->
+  <text class="anno mono bold" x="40" y="198">20%</text>
+  <g>
+    <rect class="bar somatic" x="180" y="182" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="204" y="182" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="228" y="182" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="252" y="182" width="20" height="20" rx="3"/>
+    <rect class="bar somatic" x="276" y="182" width="20" height="20" rx="3"/>
+  </g>
+  <text class="tick mono bad bold" x="664" y="198">5</text>
+  <text class="tick zh bad bold" x="700" y="198">較難判讀</text>
+
+  <!-- 對照：雜訊 -->
+  <line class="guide" x1="20" y1="222" x2="980" y2="222"/>
+  <text class="anno bold zh artifact" x="40" y="258">定序錯誤</text>
+  <text class="tick zh" x="40" y="280">各位置可能有</text>
+  <g>
+    <rect class="bar artifact" x="180" y="242" width="20" height="20" rx="3"/>
+    <rect class="bar artifact" x="204" y="242" width="20" height="20" rx="3"/>
+  </g>
+  <text class="tick mono artifact" x="664" y="258">1–2</text>
+  <text class="tick zh artifact" x="700" y="258">模型中的背景假設</text>
+
+  <!-- 結論 -->
+  <rect class="box bad" x="20" y="300" width="960" height="84" rx="8"/>
+  <text class="anno bold zh bad" x="42" y="330">在本模型中，腫瘤佔 20% 時期望真訊號約 5 條，背景約 1–2 條。</text>
+  <text class="anno zh" x="42" y="358">兩者距離較近，過濾門檻會面臨 precision–recall 取捨。</text>
+  <text class="anno zh bold" x="42" y="378">門檻過嚴可能漏掉真變異，過鬆則可能保留較多假陽性；實際結果依資料與模型而異。</text>
+</svg>

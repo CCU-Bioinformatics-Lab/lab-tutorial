@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-gloss="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>研究主題與學習路徑 · 長讀癌症基因體學入門</title>
+<meta name="description" content="從細胞、染色體與 DNA 建立定序資料的基本模型，再說明與治療決策相關的分子關聯問題。">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/diagram.css">
+<link rel="stylesheet" href="assets/css/widgets.css">
+<link rel="stylesheet" href="assets/css/print.css">
+<script>
+/* 主題 / 字級 / 詞彙語言：必須在第一次繪製前套用，否則會閃一下白底。
+   刻意寫成同步的 inline script，不可移到外部檔案。 */
+(function () {
+  try {
+    var s = JSON.parse(localStorage.getItem('ccu.lrcg.tutorial.v1') || '{}');
+    var ui = s.ui || {};
+    var d = document.documentElement;
+    if (ui.theme === 'dark' || ui.theme === 'light') d.setAttribute('data-theme', ui.theme);
+    if (ui.fontScale && ui.fontScale !== 'm') d.setAttribute('data-fs', ui.fontScale);
+    if (ui.glossLang) d.setAttribute('data-gloss', ui.glossLang);
+  } catch (e) { /* Safari 私密瀏覽會丟 QuotaExceededError，忽略即可 */ }
+})();
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要內容</a>
+
+<header class="site-header">
+  <div class="site-header__in">
+    <a class="brand" href="index.html">
+      長讀癌症基因體學 · 入門教材
+      <small>中正大學資工系 · 黃耀廷實驗室</small>
+    </a>
+    <span class="site-header__spacer"></span>
+
+    <span class="hgroup gloss-toggle" role="group" aria-label="術語定義語言">
+      <button type="button" class="hbtn" data-gloss-btn="zh"   aria-pressed="true">繁中</button>
+      <button type="button" class="hbtn" data-gloss-btn="en"   aria-pressed="false">English</button>
+      <button type="button" class="hbtn" data-gloss-btn="both" aria-pressed="false">雙語</button>
+    </span>
+
+    <button type="button" class="hbtn theme-toggle" data-theme-btn
+            aria-label="切換深色／淺色主題">◐</button>
+    <button type="button" class="hbtn" data-fs-btn aria-label="調整字級">A</button>
+    <a class="hbtn" href="glossary.html">完整術語表</a>
+  </div>
+</header>
+
+<div class="wrap ">
+  <main class="main" id="main">
+    <header class="mhead"><p class="mhead__kicker">模組 0 · Orientation</p><h1>研究主題與學習路徑</h1><p class="mhead__sub">從細胞、染色體與 DNA 建立定序資料的基本模型，再說明與治療決策相關的分子關聯問題。</p><p class="mhead__meta"><span class="chip">約 20 分鐘</span></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說明細胞、染色體、DNA、基因、突變與 read 之間的關係</li><li>解釋定序如何將 DNA 轉換為可計算分析的資料</li><li>區分「辨識突變」與「推定突變間的分子連結」兩類問題</li><li>說明三項工具的依賴關係與後續學習路線</li></ul></section>
+
+<section data-part="why" class="part" id="part-why">
+<h2 data-num="①" id="先建立最小的生物模型">先建立最小的生物模型</h2>
+
+<p class="prose">本模組先從基本概念開始，暫不引入癌症、EGFR 或其他縮寫。理解下列五個層次的關係後，
+即可建立後續模組所需的資料模型：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img">
+  <title>從細胞、染色體與 DNA 到定序 reads</title>
+  <desc>五個由左到右的層次。第一格是一個有細胞核的細胞。第二格把細胞核放大，顯示兩份相似的染色體。
+        第三格把一條染色體展開成由 A、C、G、T 組成的長 DNA，並框出其中一段基因。
+        第四格是定序儀，把抽出的 DNA 片段逐段量測。第五格是電腦收到的多條 read，
+        每一條 read 通常是源自一條實體 DNA 分子的局部序列觀測。圖下方標示左側屬於人體裡的物理世界，
+        右側是量測後的資料世界。</desc>
+
+  <text class="ttl mid zh" x="500" y="36">一層一層放大：人體裡的 DNA，如何變成電腦裡的 reads？</text>
+
+  <!-- ══ 1. 細胞 ═══════════════════════════════════════════════════ -->
+  <rect class="box plain" x="12" y="62" width="176" height="344" rx="12"/>
+  <text class="lbl bold mid zh" x="100" y="96">1　細胞</text>
+
+  <circle class="cell normal" cx="100" cy="196" r="66"/>
+  <circle class="nucleus" cx="100" cy="196" r="38"/>
+  <path class="conn hp1 thick" d="M87,178 L101,192 M101,178 L87,192"/>
+  <path class="conn hp2 thick" d="M103,200 L117,214 M117,200 L103,214"/>
+
+  <text class="anno mid zh" x="100" y="286">一管檢體裡</text>
+  <text class="anno mid zh" x="100" y="312">有很多細胞</text>
+  <line class="guide" x1="32" y1="332" x2="168" y2="332"/>
+  <text class="tick mid zh" x="100" y="358">DNA 主要收在細胞核中</text>
+  <text class="tick mid zh" x="100" y="382">檢體也可能含細胞外 DNA</text>
+
+  <path class="flow" d="M190,234 L208,234" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="199" y="216">放大</text>
+
+  <!-- ══ 2. 染色體 ════════════════════════════════════════════════ -->
+  <rect class="box plain" x="212" y="62" width="176" height="344" rx="12"/>
+  <text class="lbl bold mid zh" x="300" y="96">2　染色體</text>
+
+  <rect class="chr hp1" x="250" y="136" width="34" height="132" rx="17"/>
+  <rect class="chr hp1" x="267" y="178" width="34" height="48" rx="17"/>
+  <rect class="chr hp2" x="316" y="136" width="34" height="132" rx="17"/>
+  <rect class="chr hp2" x="299" y="178" width="34" height="48" rx="17"/>
+
+  <text class="anno mid zh" x="300" y="302">多數常染色體有兩份</text>
+  <text class="tick mid zh hp1" x="300" y="330">一份通常來自父親</text>
+  <text class="tick mid zh hp2" x="300" y="354">一份通常來自母親</text>
+  <text class="tick mid zh" x="300" y="382">兩份相似，但不完全相同</text>
+
+  <path class="flow" d="M390,234 L408,234" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="399" y="216">展開</text>
+
+  <!-- ══ 3. DNA 與基因 ════════════════════════════════════════════ -->
+  <rect class="box plain" x="412" y="62" width="176" height="344" rx="12"/>
+  <text class="lbl bold mid zh" x="500" y="96">3　DNA 與基因</text>
+
+  <line class="conn hp1 thick" x1="432" y1="154" x2="568" y2="154"/>
+  <line class="conn hp2 thick" x1="432" y1="218" x2="568" y2="218"/>
+  <line class="guide" x1="444" y1="154" x2="444" y2="218"/>
+  <line class="guide" x1="472" y1="154" x2="472" y2="218"/>
+  <line class="guide" x1="500" y1="154" x2="500" y2="218"/>
+  <line class="guide" x1="528" y1="154" x2="528" y2="218"/>
+  <line class="guide" x1="556" y1="154" x2="556" y2="218"/>
+  <text class="base a" x="444" y="177">A</text>
+  <text class="base c" x="472" y="177">C</text>
+  <text class="base g" x="500" y="177">G</text>
+  <text class="base t" x="528" y="177">T</text>
+  <text class="base a" x="556" y="177">A</text>
+  <text class="base t" x="444" y="207">T</text>
+  <text class="base g" x="472" y="207">G</text>
+  <text class="base c" x="500" y="207">C</text>
+  <text class="base a" x="528" y="207">A</text>
+  <text class="base t" x="556" y="207">T</text>
+
+  <rect class="region" x="466" y="134" width="70" height="104" rx="5"/>
+  <path class="conn" d="M466,252 L466,266 L536,266 L536,252"/>
+  <text class="anno bold mid zh" x="501" y="292">基因</text>
+  <text class="tick mid zh" x="500" y="320">DNA 長字串中</text>
+  <text class="tick mid zh" x="500" y="344">具有功能的一段</text>
+  <text class="tick mid zh" x="500" y="382">染色體 = 一條很長的 DNA</text>
+
+  <path class="flow animate-flow" d="M590,234 L608,234" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="599" y="216">量測</text>
+
+  <!-- ══ 4. 定序 ═══════════════════════════════════════════════════ -->
+  <rect class="box accent" x="612" y="62" width="176" height="344" rx="12"/>
+  <text class="lbl bold mid zh" x="700" y="96">4　定序</text>
+
+  <path class="conn hp1 thick" d="M630,164 L658,164" marker-end="url(#arrow-sm)"/>
+  <rect class="box plain" x="660" y="132" width="82" height="112" rx="10"/>
+  <circle class="mark germline" cx="701" cy="166" r="17"/>
+  <line class="conn" x1="678" y1="204" x2="724" y2="204"/>
+  <line class="conn" x1="684" y1="220" x2="718" y2="220"/>
+  <path class="conn hp2 thick" d="M744,164 L770,164" marker-end="url(#arrow-sm)"/>
+
+  <text class="anno mid zh" x="700" y="282">逐段讀取 DNA</text>
+  <text class="anno mid zh" x="700" y="308">轉成 A／C／G／T</text>
+  <line class="guide" x1="632" y1="332" x2="768" y2="332"/>
+  <text class="tick mid zh" x="700" y="358">這一步把實體分子</text>
+  <text class="tick mid zh" x="700" y="382">變成電腦資料</text>
+
+  <path class="flow animate-flow" d="M790,234 L808,234" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="799" y="216">輸出</text>
+
+  <!-- ══ 5. reads ══════════════════════════════════════════════════ -->
+  <rect class="box accent" x="812" y="62" width="176" height="344" rx="12"/>
+  <text class="lbl bold mid" x="900" y="96">5　reads</text>
+
+  <rect class="read hp1" x="834" y="140" width="124" height="14" rx="7"/>
+  <rect class="read hp2" x="850" y="170" width="112" height="14" rx="7"/>
+  <rect class="read hp1" x="826" y="200" width="118" height="14" rx="7"/>
+  <rect class="read hp2" x="842" y="230" width="128" height="14" rx="7"/>
+  <circle class="mark somatic" cx="890" cy="147" r="6"/>
+  <circle class="mark ref" cx="890" cy="177" r="6"/>
+  <circle class="mark somatic" cx="890" cy="207" r="6"/>
+  <circle class="mark ref" cx="890" cy="237" r="6"/>
+
+  <text class="anno mid zh" x="900" y="282">每條橫線是一段</text>
+  <text class="anno mid zh" x="900" y="308">局部 DNA 觀測</text>
+  <line class="guide" x1="832" y1="332" x2="968" y2="332"/>
+  <text class="tick mid zh" x="900" y="358">電腦拿到很多片段</text>
+  <text class="tick mid zh" x="900" y="382">不是一條完整染色體</text>
+
+  <!-- ══ 物理世界 vs 資料世界 ═════════════════════════════════════ -->
+  <rect class="box plain" x="12" y="428" width="576" height="54" rx="8"/>
+  <text class="anno bold mid zh" x="300" y="461">人體裡的物理世界：細胞 → 染色體 → DNA 分子</text>
+
+  <rect class="box accent" x="612" y="428" width="376" height="54" rx="8"/>
+  <text class="anno bold mid zh" x="800" y="461">量測後的資料世界：定序 → reads</text>
+
+  <path class="conn" d="M12,506 L988,506"/>
+  <text class="anno mid zh" x="500" y="536">分析流程將 reads 比對至參考 DNA，再由 variant-calling 產生候選變異清單。</text>
+</svg><figcaption>左側示意人體內的生物結構：細胞核內含染色體；在本教材的簡化模型中，每條染色體可視為一條長 DNA 分子，基因則是 DNA 上具有特定功能的區段。定序對 DNA 分子進行片段化量測，輸出 A／C／G／T 字串，也就是 reads。</figcaption></figure>
+
+<p class="prose">人體細胞核內含有染色體。在本教材的簡化模型中，<b>每條染色體可視為一條長 DNA 分子</b>；
+DNA 以 A、C、G、T 四種鹼基記錄序列資訊。多數正常常染色體具有父源與母源兩份拷貝；
+性染色體與腫瘤拷貝數異常將於後續模組另行說明。</p>
+
+<p class="prose"><b>基因</b>不是另一種物質，而是 DNA 序列中具有特定功能的區段；可將其類比為程式系統中的模組。
+當其中某個位置相對參考序列發生差異，稱為<b>變異</b>；「突變」則常用於描述新取得的變化。
+部分變異可能影響蛋白質功能或治療反應，仍需依變異與情境判定。</p>
+
+<h3 id="定序-到底做了什麼">「定序」到底做了什麼</h3>
+
+<p class="prose">我們無法把一整條染色體直接貼進文字編輯器。實際流程是：</p>
+
+<ol class="prose">
+<li>從檢體取出大量 DNA 分子。</li>
+<li>定序儀逐段量測 DNA，把每一段轉成 A／C／G／T 字串。</li>
+<li>每一段序列觀測稱為一條 <b>read</b>；依平台與定序深度，一個樣本可產生大量且部分重疊的 reads。</li>
+<li>電腦把 reads 對回人類參考序列，找出不同的字母位置。</li>
+</ol>
+
+<pre><code>參考序列：... A C G T T A C G ...
+某條 read：... A C A T T A C G ...
+                     ↑
+                 這裡有一筆差異</code></pre>
+
+<p class="prose">所以定序資料不是「病人的完整基因組序列」，而是<b>很多條來自不同實體 DNA 分子的局部觀測</b>。
+分析流程先將它們比對至參考序列，再由 variant-calling 步驟產生候選變異清單。</p>
+
+<aside class="guardrail" id="guard-7"><p class="guardrail__hd">重要區分 #7：read 是分子片段的觀測，不是細胞標籤</p><p class="prose">一條 read 通常源自<b>某一 DNA 分子的片段</b>；在未加細胞條碼的標準 bulk 流程中，通常無法直接得知其來源細胞。
+若多條獨立且品質可靠的 reads 同時涵蓋兩個變異，可支持兩者位於同一分子；此證據不能單獨確認細胞群。</p>
+<p class="prose">下一個模組將並列細胞層級與分子層級，進一步說明推論邊界。</p></aside>
+
+<h3 id="與治療決策相關的示例">與治療決策相關的示例</h3>
+
+<p class="prose"><b class="en">EGFR</b> 是一個編碼細胞生長訊號相關蛋白質的基因。
+部分帶有活化 EGFR 變異的肺癌可受益於特定 EGFR 抑制劑；另一些變異則可能降低特定藥物的抑制效果。
+實際治療判定仍需依藥物、變異與臨床情境評估。</p>
+
+<p class="prose">一位非小細胞肺癌病人在治療後，檢測報告同時找到 EGFR 上的
+<b class="en">T790M</b> 與 <b class="en">C797S</b>。這兩個名字只是「EGFR 的哪個位置、變成什麼」的標籤；
+現在不用記。重要的是：報告只告訴我們兩個突變都存在，卻沒有回答它們是否在<b>同一份 EGFR DNA</b> 上。</p>
+
+<pre><code>報告已知：detected("T790M") = true
+          detected("C797S") = true
+
+還不知道：same_DNA_molecule("T790M", "C797S") = ?</code></pre>
+
+<p class="prose">下面每一條橫線是一條 read。實心點表示該 read 帶有那個突變，
+空心點表示該位置與參考序列相同。先只根據圖上的分子證據作答：</p>
+
+<figure class="widget" data-widget="cis-trans-drug" data-wid="m00.egfr" data-config='{"force":"trans"}'><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>兩個突變是一起出現在同一份 DNA 上，分開在兩份 DNA 上，還是目前的觀測其實不足？</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>read 顯示的排列</th><th>分子層次發生什麼</th><th>研究中的治療意義</th></tr></thead>
+<tbody>
+<tr>
+  <td><b>分開在兩份 DNA 上</b></td>
+  <td>兩個抗藥改變位在不同的 EGFR 分子上</td>
+  <td>在特定研究模型中，第一代與第三代 EGFR 藥物的組合可能分別抑制兩份分子</td>
+</tr>
+<tr>
+  <td><b>一起在同一份 DNA 上</b></td>
+  <td>兩個抗藥改變疊在同一個 EGFR 分子上</td>
+  <td>在該研究模型中，同樣的藥物組合未能有效抑制此排列</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p class="cli-note">這個案例來自
+<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4587765/">Niederst 等人的原始研究</a>；後續也有
+<a href="https://pubmed.ncbi.nlm.nih.gov/28843359/">依排列方式選藥的臨床案例</a>。
+這裡用它說明「分子關係會改變決策」，不是提供個別病人的治療建議。</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">研究主題摘要</p>
+<p class="prose"><b>本課程介紹如何以計算方法，從定序 reads 推定哪些 DNA 變異位於同一實體分子，
+並在腫瘤混合與定序誤差下評估此關係的可信度。</b></p>
+</div>
+</section>
+
+
+<section data-part="concept" class="part" id="part-concept">
+<h2 data-num="②" id="同樣找到兩個突變-read-圖可能給三種答案">同樣找到兩個突變，read 圖可能給三種答案</h2>
+
+<p class="prose">前面的 EGFR 報告只說「T790M 有、C797S 也有」。要知道兩者的排列，
+需回到產生這張清單的原始 reads。在本簡化情境中，可能的判讀可分為下面三種：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img">
+  <title>同樣找到突變 A 與 B 時，read 圖可能給出的三種答案</title>
+  <desc>三個並排的 read 圖。在讀取品質足夠且無明顯嵌合的簡化前提下，左圖中多條跨越兩個位置的 reads 同時帶有 A 與 B，支持兩者位在同一份 DNA。
+        中圖中，跨越兩個位置的 reads 穩定分成只帶 A 與只帶 B 兩群，支持兩者分開在兩份 DNA。
+        右圖中，reads 太短，只能各自看到 A 或 B，沒有任何一條 read 能同時觀察兩點，所以資訊不足。</desc>
+
+  <text class="ttl mid zh" x="500" y="36">先問「read 看不看得到兩點」，再問「兩個點如何組合」</text>
+
+  <!-- ══ 1. 同一份 DNA ════════════════════════════════════════════ -->
+  <rect class="box ok" x="16" y="58" width="304" height="366" rx="12"/>
+  <text class="lbl bold mid zh ok" x="168" y="92">① 支持同一份 DNA</text>
+  <text class="tick mid zh" x="112" y="120">突變 A</text>
+  <text class="tick mid zh" x="232" y="120">突變 B</text>
+  <line class="guide" x1="112" y1="128" x2="112" y2="292"/>
+  <line class="guide" x1="232" y1="128" x2="232" y2="292"/>
+
+  <rect class="read hp1" x="50" y="146" width="236" height="15" rx="7"/>
+  <circle class="mark somatic" cx="112" cy="153" r="7"/>
+  <circle class="mark somatic" cx="232" cy="153" r="7"/>
+  <rect class="read hp2" x="64" y="182" width="220" height="15" rx="7"/>
+  <circle class="mark ref" cx="112" cy="189" r="7"/>
+  <circle class="mark ref" cx="232" cy="189" r="7"/>
+  <rect class="read hp1" x="42" y="218" width="230" height="15" rx="7"/>
+  <circle class="mark somatic" cx="112" cy="225" r="7"/>
+  <circle class="mark somatic" cx="232" cy="225" r="7"/>
+  <rect class="read hp2" x="56" y="254" width="238" height="15" rx="7"/>
+  <circle class="mark ref" cx="112" cy="261" r="7"/>
+  <circle class="mark ref" cx="232" cy="261" r="7"/>
+
+  <path class="conn" d="M112,306 L112,326 L232,326 L232,306"/>
+  <text class="anno bold mid zh" x="172" y="354">A 與 B 一起出現</text>
+  <text class="tick mid zh" x="168" y="382">多條獨立 read 都看到相同組合</text>
+  <rect class="box ok" x="72" y="394" width="192" height="42" rx="7"/>
+  <text class="anno bold mid zh ok" x="168" y="422">結論：同一份</text>
+
+  <!-- ══ 2. 分開在兩份 DNA ═══════════════════════════════════════ -->
+  <rect class="box accent" x="348" y="58" width="304" height="366" rx="12"/>
+  <text class="lbl bold mid zh" x="500" y="92">② 支持分開在兩份</text>
+  <text class="tick mid zh" x="444" y="120">突變 A</text>
+  <text class="tick mid zh" x="564" y="120">突變 B</text>
+  <line class="guide" x1="444" y1="128" x2="444" y2="292"/>
+  <line class="guide" x1="564" y1="128" x2="564" y2="292"/>
+
+  <rect class="read hp1" x="382" y="146" width="236" height="15" rx="7"/>
+  <circle class="mark somatic" cx="444" cy="153" r="7"/>
+  <circle class="mark ref" cx="564" cy="153" r="7"/>
+  <rect class="read hp2" x="396" y="182" width="220" height="15" rx="7"/>
+  <circle class="mark ref" cx="444" cy="189" r="7"/>
+  <circle class="mark somatic" cx="564" cy="189" r="7"/>
+  <rect class="read hp1" x="374" y="218" width="230" height="15" rx="7"/>
+  <circle class="mark somatic" cx="444" cy="225" r="7"/>
+  <circle class="mark ref" cx="564" cy="225" r="7"/>
+  <rect class="read hp2" x="388" y="254" width="238" height="15" rx="7"/>
+  <circle class="mark ref" cx="444" cy="261" r="7"/>
+  <circle class="mark somatic" cx="564" cy="261" r="7"/>
+
+  <path class="conn" d="M444,306 L444,326 L564,326 L564,306"/>
+  <text class="anno bold mid zh" x="504" y="354">A-only 與 B-only</text>
+  <text class="tick mid zh" x="500" y="382">每條 read 都跨兩點，組合卻分開</text>
+  <rect class="box accent" x="404" y="394" width="192" height="42" rx="7"/>
+  <text class="anno bold mid zh" x="500" y="422">結論：分開</text>
+
+  <!-- ══ 3. 資訊不足 ══════════════════════════════════════════════ -->
+  <rect class="box warn" x="680" y="58" width="304" height="366" rx="12"/>
+  <text class="lbl bold mid zh" x="832" y="92">③ 資訊不足</text>
+  <text class="tick mid zh" x="776" y="120">突變 A</text>
+  <text class="tick mid zh" x="896" y="120">突變 B</text>
+  <line class="guide" x1="776" y1="128" x2="776" y2="292"/>
+  <line class="guide" x1="896" y1="128" x2="896" y2="292"/>
+
+  <rect class="read hp1" x="700" y="146" width="116" height="15" rx="7"/>
+  <circle class="mark somatic" cx="776" cy="153" r="7"/>
+  <rect class="read hp2" x="842" y="182" width="126" height="15" rx="7"/>
+  <circle class="mark somatic" cx="896" cy="189" r="7"/>
+  <rect class="read hp1" x="716" y="218" width="102" height="15" rx="7"/>
+  <circle class="mark somatic" cx="776" cy="225" r="7"/>
+  <rect class="read hp2" x="834" y="254" width="118" height="15" rx="7"/>
+  <circle class="mark somatic" cx="896" cy="261" r="7"/>
+
+  <path class="conn" d="M794,316 L818,340 M818,316 L794,340"/>
+  <path class="conn" d="M850,316 L874,340 M874,316 L850,340"/>
+  <text class="anno bold mid zh" x="832" y="366">沒有 read 同時看見兩點</text>
+  <text class="tick mid zh" x="832" y="388">「沒看見一起」不等於「證明分開」</text>
+  <rect class="box warn" x="736" y="402" width="192" height="42" rx="7"/>
+  <text class="anno bold mid zh" x="832" y="430">結論：不知道</text>
+
+  <path class="conn" d="M16,466 L984,466"/>
+  <text class="anno bold mid zh" x="500" y="494">共同前提：同一條 read 需在品質足夠時同時觀察 A 與 B，才可支持對兩者關係的判斷。</text>
+</svg><figcaption>左：在讀取品質足夠時，多條 read 同時帶 A 與 B，支持兩個突變在同一份 DNA。中：跨越兩點的 reads 穩定分成 A-only 與 B-only，支持分開在兩份 DNA。右：reads 太短，沒有一條能同時觀察兩點，因此只能回答「不知道」，不能誤判成分開。</figcaption></figure>
+
+<p class="prose"><b>判讀順序先看範圍，再看實心點。</b>如果同一條 read 根本沒有機會同時看見兩個位置，
+目前只能判定資訊不足；只有在 read 確實跨過兩點且品質足夠時，點的組合才可支持「同一份」或「分開」的解釋。</p>
+
+<p class="prose">長 read 通常可增加同一次觀測涵蓋的距離，但實際可連結範圍仍取決於讀長分布、覆蓋度與品質。
+上面的 EGFR 兩點很近，短片段也可能回答；實際分析也可能處理相距數千至數萬 bp 的變異。
+定序技術之間的長度與準確度取捨，留到定序單元完整比較。</p>
+</section>
+
+
+<section data-part="evidence" class="part" id="part-evidence">
+<h2 data-num="③" id="兩位點問題如何延伸為三種分析情境">兩位點問題如何延伸為三種分析情境</h2>
+
+<p class="prose">前述圖示只包含兩個突變，且假設 reads 品質良好。真實研究處理相同類型的問題，
+但資料會逐層變難：先擴大到整個基因體，再加入腫瘤混合，最後還可能拿不到同一病人的正常檢體。
+<b>三項工具分別處理這三個層級的分析條件。</b></p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 570" class="dia-svg" role="img">
+  <title>同一個 read 關係問題如何對應三類分析工具</title>
+  <desc>最上方是共同問題：從大量 reads 推定哪些突變位在同一條 DNA 分子上。
+        第一層 LongPhase 把兩位點的直覺擴大到一般樣本的全基因體資料。
+        進入腫瘤後，資料多了正常細胞混合、低比例突變與更多錯誤訊號，並依是否有同一病人的正常檢體分岔。
+        有正常檢體時使用 longphase-s 做直接對照；只有腫瘤檢體時使用 longphase-to，需整合更多間接證據。</desc>
+
+  <text class="ttl mid zh" x="500" y="36">同一個問題，資料情境不同就對應不同方法</text>
+
+  <!-- ══ 共通研究問題 ═════════════════════════════════════════════ -->
+  <rect class="box plain" x="90" y="60" width="820" height="104" rx="12"/>
+  <text class="anno bold zh" x="116" y="92">共同研究問題</text>
+
+  <rect class="read hp1" x="122" y="112" width="180" height="13" rx="6"/>
+  <circle class="mark somatic" cx="174" cy="118" r="6"/>
+  <circle class="mark somatic" cx="256" cy="118" r="6"/>
+  <rect class="read hp2" x="138" y="136" width="180" height="13" rx="6"/>
+  <circle class="mark ref" cx="174" cy="142" r="6"/>
+  <circle class="mark ref" cx="256" cy="142" r="6"/>
+
+  <path class="conn" d="M350,112 L390,112" marker-end="url(#arrow)"/>
+  <text class="lbl bold zh" x="422" y="116">從 reads 恢復：</text>
+  <text class="lbl bold zh somatic" x="600" y="116">哪些突變位在同一條 DNA？</text>
+  <text class="tick zh" x="422" y="144">上一節的兩位點判讀，是此分析問題的最小示例。</text>
+
+  <path class="flow animate-flow" d="M500,166 L500,204" marker-end="url(#arrow)"/>
+  <text class="tick zh" x="516" y="190">從兩個位置擴大到全基因體</text>
+
+  <!-- ══ LongPhase 基礎層 ══════════════════════════════════════════ -->
+  <rect class="box accent" x="180" y="210" width="640" height="116" rx="12"/>
+  <text class="lbl bold mid" x="310" y="250">LongPhase</text>
+  <text class="tick mid zh" x="310" y="278">一般樣本</text>
+  <line class="guide" x1="410" y1="230" x2="410" y2="306"/>
+
+  <circle class="mark germline" cx="462" cy="254" r="8"/>
+  <circle class="mark germline" cx="532" cy="254" r="8"/>
+  <circle class="mark germline" cx="602" cy="254" r="8"/>
+  <path class="conn hp1 thick" d="M462,254 L532,254 L602,254"/>
+  <circle class="mark hp1" cx="462" cy="284" r="8"/>
+  <circle class="mark hp2" cx="532" cy="284" r="8"/>
+  <circle class="mark hp1" cx="602" cy="284" r="8"/>
+  <path class="conn hp2 thick" d="M462,284 L532,284 L602,284"/>
+
+  <text class="anno bold zh" x="648" y="252">建立基礎能力</text>
+  <text class="tick zh" x="648" y="278">根據大量 reads 推定</text>
+  <text class="tick zh" x="648" y="300">分子關係與其可信度</text>
+
+  <path class="flow animate-flow" d="M500,328 L500,364" marker-end="url(#arrow)"/>
+  <text class="tick mid zh" x="500" y="350">進入腫瘤：多了混合、低比例訊號與更多假象</text>
+
+  <!-- ══ 腫瘤分岔問題 ═════════════════════════════════════════════ -->
+  <text class="anno bold mid zh" x="500" y="386">關鍵分岔：有沒有同一病人的正常檢體可以直接比較？</text>
+  <path class="conn thick" d="M500,394 L500,410 L254,410 L254,430" marker-end="url(#arrow)"/>
+  <path class="conn thick" d="M500,394 L500,410 L746,410 L746,430" marker-end="url(#arrow)"/>
+
+  <!-- LongPhase-S -->
+  <rect class="box ok" x="40" y="434" width="428" height="116" rx="12"/>
+  <circle class="cell tumor" cx="92" cy="490" r="28"/>
+  <circle class="cell normal" cx="154" cy="490" r="28"/>
+  <text class="tick mid zh" x="92" y="536">腫瘤</text>
+  <text class="tick mid zh" x="154" y="536">正常</text>
+  <line class="guide" x1="196" y1="454" x2="196" y2="530"/>
+  <text class="lbl bold" x="220" y="472">longphase-s</text>
+  <text class="anno bold zh ok" x="220" y="504">有直接對照</text>
+  <text class="tick zh" x="220" y="530">同一病人的正常檢體可協助排除混淆</text>
+
+  <!-- LongPhase-TO -->
+  <rect class="box warn" x="532" y="434" width="428" height="116" rx="12"/>
+  <circle class="cell tumor" cx="584" cy="490" r="28"/>
+  <circle class="cell normal" cx="646" cy="490" r="28" opacity=".25"/>
+  <path class="conn" d="M626,470 L666,510 M666,470 L626,510"/>
+  <text class="tick mid zh" x="584" y="536">腫瘤</text>
+  <text class="tick mid zh" x="646" y="536">沒有正常</text>
+  <line class="guide" x1="688" y1="454" x2="688" y2="530"/>
+  <text class="lbl bold" x="712" y="472">longphase-to</text>
+  <text class="anno bold zh bad" x="712" y="504">缺少直接對照</text>
+  <text class="tick zh" x="712" y="530">需整合更多間接訊號補足資訊</text>
+</svg><figcaption>同一個研究問題逐層變難。LongPhase 先在一般樣本中，根據大量 reads 推定突變是否位在同一條 DNA 上。進入腫瘤後，longphase-s 可利用同一病人的正常檢體作直接對照；若只有腫瘤，longphase-to 需整合更多間接證據。</figcaption></figure>
+
+<p class="prose">這三項工具共同說明如何將 read-level 判讀問題，
+擴展為可處理人類基因體與腫瘤資料的分析方法。M11–M13 依相同層級排列：
+M11 是一般樣本，M12 加入腫瘤與正常對照，M13 再拿掉正常對照。</p>
+</section>
+
+
+<section data-part="predict" class="part" id="part-predict">
+<h2 data-num="④" id="未觀察到證據-不等於證明不存在">未觀察到證據，不等於證明不存在</h2>
+
+<div class="reveal__q"><p class="prose">現在換一組資料。每條 read 都太短，只能碰到一個位置：</p>
+
+<pre><code>read 1, 2, 3  → 只覆蓋左邊，看到 T790M
+read 4, 5, 6  → 只覆蓋右邊，看到 C797S</code></pre>
+
+<p class="prose">沒有任何一條 read 同時看到兩個突變。你可以下結論說它們分開在兩份 DNA 上嗎？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>不可以，答案是資訊不足。</b></p>
+
+<p class="prose">要回答 <code>same_DNA_molecule(A, B)</code>，至少要有觀測範圍同時包含 A 與 B。
+這批 read 從來沒有具備同時觀察兩者的能力，所以結果不是 <code>false</code>，而是 <code>unknown</code>。</p>
+
+<p class="prose">這個區分會一直出現：<b>沒有支持證據</b>可能代表關係不存在，也可能只是 read 太短、
+數量太少或資料品質不夠。分析流程應將這些情況分開處理。</p></div></details>
+</section>
+
+
+<section data-part="practice" class="part" id="part-practice">
+<h2 data-num="⑤" id="接下來的路線">接下來的路線</h2>
+
+<p class="prose">此時不需先安裝軟體或另讀生物學教科書。請依序學習，各模組會在需要時引入新的概念與資料物件：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>階段</th><th>新增的問題</th></tr></thead>
+<tbody>
+<tr><td><b>M1–M3　建立資料模型</b></td><td>樣本、DNA、突變與定序片段到底是什麼？</td></tr>
+<tr><td><b>M4–M5　讀懂輸入</b></td><td>這些物件如何寫進 BAM／VCF，候選突變又怎麼被找出來？</td></tr>
+<tr><td><b>M6–M10　做可信推理</b></td><td>如何恢復分子關係，並處理腫瘤混合、甲基化與評估陷阱？</td></tr>
+<tr><td><b>M11–M13　實作三項工具</b></td><td>每個工具如何把前面的概念變成演算法、指令與輸出？</td></tr>
+<tr><td><b>Capstone　獨立判讀</b></td><td>面對一個真實位點，能不能說清楚證據、結論與不確定性？</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">本頁核心重點如下：</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">presence 不等於 relationship</p>
+<p class="prose"><b>知道突變 A 存在、突變 B 也存在，仍然不知道 A 與 B 是否來自同一條 DNA 分子。</b>
+後續單元將介紹如何以可檢驗的證據推定這個關係。</p>
+</div>
+
+<section class="quiz" data-quiz="m00"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+</section>
+
+    <nav class="pager" aria-label="模組導覽"><span></span><a class="next" href="m01.html"><small>下一模組 →</small>腫瘤樣本的簡化區域模型</a></nav>
+    
+  </main>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#先建立最小的生物模型">先建立最小的生物模型</a></li><li class="lv3"><a href="#定序-到底做了什麼">「定序」到底做了什麼</a></li><li class="lv3"><a href="#與治療決策相關的示例">與治療決策相關的示例</a></li><li class="lv2"><a href="#同樣找到兩個突變-read-圖可能給三種答案">同樣找到兩個突變，read 圖可能給三種答案</a></li><li class="lv2"><a href="#兩位點問題如何延伸為三種分析情境">兩位點問題如何延伸為三種分析情境</a></li><li class="lv2"><a href="#未觀察到證據-不等於證明不存在">未觀察到證據，不等於證明不存在</a></li><li class="lv2"><a href="#接下來的路線">接下來的路線</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+</div>
+
+<footer class="site-footer">
+  本教材供中正大學資工系黃耀廷實驗室新進成員自學，聚焦
+  <code>LongPhase-S</code> 與 <code>LongPhase-TO</code> 的概念、證據與限制。
+</footer>
+
+<svg class="tw-defs" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+  </marker><marker id="arrow-sm" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+  </marker></defs></svg>
+<script src="assets/js/progress.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/glossary.js"></script>
+<script src="assets/js/quiz.js"></script>
+<script src="assets/data/quiz.data.js"></script>
+<script src="assets/js/widgets/cis-trans-drug.js"></script>
+</body>
+</html>

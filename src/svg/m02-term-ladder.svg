@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440">
+  <title>locus、allele、genotype、haplotype 四個詞在同一張圖上的位置</title>
+  <desc>同一段染色體上標出三個位置。
+        locus 指的是一個位置；allele 指的是該位置上可能出現的其中一種序列（SNV 情況可由單一鹼基表示）；
+        genotype 描述單一位置上兩份 allele 的組合；
+        haplotype 則是跨越多個位置、同一條染色體上的一整串 allele。
+        最下方對比未定相與已定相的寫法：斜線只說「有哪兩份」，
+        豎線多說了「哪一份在哪一條染色體上」。</desc>
+
+  <!-- 兩條染色體 -->
+  <text class="lbl bold zh" x="20" y="34">同一段染色體，兩份拷貝</text>
+
+  <line class="guide" x1="300" y1="52" x2="300" y2="150"/>
+  <line class="guide" x1="500" y1="52" x2="500" y2="150"/>
+  <line class="guide" x1="700" y1="52" x2="700" y2="150"/>
+
+  <rect class="read hp1" x="180" y="64" width="700" height="18" rx="9"/>
+  <text class="tick end hp1 bold" x="172" y="78">第一條</text>
+  <text class="base a mono bold" x="300" y="78" font-size="17">A</text>
+  <text class="base c mono bold" x="500" y="78" font-size="17">C</text>
+  <text class="base g mono bold" x="700" y="78" font-size="17">G</text>
+
+  <rect class="read hp2" x="180" y="102" width="700" height="18" rx="9"/>
+  <text class="tick end hp2 bold" x="172" y="116">第二條</text>
+  <text class="base t mono bold" x="300" y="116" font-size="17">T</text>
+  <text class="base c mono bold" x="500" y="116" font-size="17">C</text>
+  <text class="base a mono bold" x="700" y="116" font-size="17">A</text>
+
+  <text class="tick mid" x="300" y="146">位置 ①</text>
+  <text class="tick mid" x="500" y="146">位置 ②</text>
+  <text class="tick mid" x="700" y="146">位置 ③</text>
+
+  <!-- ── locus ── -->
+  <line class="axis" x1="20" y1="170" x2="980" y2="170"/>
+
+  <rect class="box plain" x="20" y="188" width="228" height="106" rx="8"/>
+  <text class="anno bold" x="40" y="216">locus</text>
+  <text class="tick zh" x="40" y="240">一個<tspan class="bold">位置</tspan></text>
+  <text class="tick zh" x="40" y="266">上圖有三個 locus</text>
+  <circle class="mark ref" cx="212" cy="234" r="10"/>
+  <text class="tick mid" x="212" y="262">①</text>
+
+  <!-- ── allele ── -->
+  <rect class="box plain" x="264" y="188" width="228" height="106" rx="8"/>
+  <text class="anno bold" x="284" y="216">allele</text>
+  <text class="tick zh" x="284" y="240">該位置上的<tspan class="bold">一種序列</tspan></text>
+  <text class="tick zh" x="284" y="266">位置① 有 A 與 T 兩種</text>
+  <text class="base a mono bold" x="452" y="246" font-size="22">A</text>
+  <text class="base t mono bold" x="476" y="246" font-size="22">T</text>
+
+  <!-- ── genotype ── -->
+  <rect class="box accent" x="508" y="188" width="228" height="106" rx="8"/>
+  <text class="anno bold" x="528" y="216">genotype</text>
+  <text class="tick zh" x="528" y="240"><tspan class="bold">單一位置</tspan>上兩份的組合</text>
+  <text class="tick zh" x="528" y="266">位置① 是「一份 A、一份 T」</text>
+  <rect class="box ghost" x="592" y="196" width="126" height="26" rx="4"/>
+  <text class="tick mid mono bold" x="655" y="214">A / T</text>
+
+  <!-- ── haplotype ── -->
+  <rect class="box accent" x="752" y="188" width="228" height="106" rx="8"/>
+  <text class="anno bold" x="772" y="216">haplotype</text>
+  <text class="tick zh" x="772" y="240"><tspan class="bold">跨越多個位置</tspan>的一整串</text>
+  <text class="tick zh" x="772" y="266">第一條是 A–C–G</text>
+  <rect class="read hp1" x="856" y="200" width="108" height="14" rx="7"/>
+
+  <!-- 對照關係 -->
+  <path class="conn" d="M300,152 L134,184" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M310,152 L400,184" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M320,152 L610,184" marker-end="url(#arrow-sm)"/>
+  <path class="conn hp1" d="M560,90 L850,184" marker-end="url(#arrow-sm)"/>
+
+  <!-- ── 斜線 vs 豎線 ── -->
+  <line class="axis" x1="20" y1="316" x2="980" y2="316"/>
+  <text class="lbl bold zh" x="20" y="348">VCF 裡的兩種寫法</text>
+
+  <rect class="box warn" x="20" y="364" width="470" height="62" rx="8"/>
+  <text class="anno mono bold" x="42" y="392">A / T</text>
+  <text class="tick zh" x="132" y="388">「有一份 A、一份 T」</text>
+  <text class="tick zh bad" x="132" y="412">但沒說哪一份在哪一條上（未定相）</text>
+
+  <rect class="box ok" x="510" y="364" width="470" height="62" rx="8"/>
+  <text class="anno mono bold" x="532" y="392">A | T</text>
+  <text class="tick zh" x="622" y="388">「第一條是 A、第二條是 T」</text>
+  <text class="tick zh ok" x="622" y="412">多說了位置歸屬（已定相）</text>
+</svg>

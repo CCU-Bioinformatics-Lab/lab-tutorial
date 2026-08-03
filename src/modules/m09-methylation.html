@@ -1,0 +1,196 @@
+<!--tw
+{
+  "objectives": [
+    "說明 5mC 是什麼、ONT 為什麼能直接偵測它",
+    "說明 MM/ML tag 可能在流程中遺失的情況，以及保留方法",
+    "區分「甲基化當作證據」與「甲基化當作事後註記」兩種用法",
+    "說明什麼是 within-state epigenetic heterogeneity"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<p class="prose">甲基化是本實驗室兩項分析任務的共同資料層；以下補充理解這些任務所需的背景。</p>
+
+<p class="prose">更重要的是：這兩項任務<b>使用甲基化的方式不同</b> ——
+一個把它當成判斷依據，另一個刻意不讓它影響判斷。
+若未區分兩種角色，學習者可能混淆分析流程並產生循環論證。</p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>5mC：序列之外的表觀遺傳資訊</h3>
+
+<p class="prose">[[5mC]] 是在胞嘧啶（C）的 5 位碳上加上甲基。在序列字母表示上，<b>它不改變 C 的識別</b>；
+5mC 可與基因調控及表現相關，但作用取決於基因組脈絡。</p>
+
+<p class="prose">在哺乳類，5mC 主要集中於 <b>[[CpG]]</b> 位點（一個 C 後面接著一個 G），但也可能出現在非 CpG 脈絡。
+在本節的分析中，基本單位是「某個 CpG 位點上，一條 read 的 methylated 或 unmethylated 狀態」。</p>
+
+<p class="prose">bisulfite-seq 是測量甲基化的常用方法之一，會將未甲基化的 C 轉換為 U（在定序中通常讀為 T），流程較為繁複。
+[[ONT]] 可利用電流訊號搭配修飾辨識模型推定 5mC，通常不需 bisulfite 前處理；
+在完成修飾辨識且保留 MM/ML 後，同一條 read 可同時提供序列變異<b>與</b>甲基化狀態。</p>
+
+{{svg:m09-methylation | [wide] 上方區分序列與甲基化資訊；示意中的修飾標記位於 C 後接 G 的 CpG 位點，且不改變序列字母。下方示範同一分子可同時關聯變異與修飾狀態。}}
+
+<h3>甲基化資訊的儲存方式</h3>
+
+<p class="prose">甲基化資訊存在 BAM 的兩個 tag 裡：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>tag</th><th>內容</th></tr></thead>
+<tbody>
+<tr><td><code>[[MM/ML tag|MM]]</code></td><td>修飾類型及其相對於 read 上標準鹼基的位置與跳過規則</td></tr>
+<tr><td><code>ML</code></td><td>與 MM 項目對應的修飾機率或信心，以 0–255 的位元組值編碼</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">重新比對可能遺失 MM/ML 標籤</p>
+<p class="prose">若未明確傳遞 SAM tags，將帶有甲基化的 BAM 轉成 FASTQ 再重新比對時，通常不會保留 MM/ML。
+結果可能是格式正常、但修飾欄位空白的 BAM；工具是否發出警告取決於實作與版本。</p>
+<p class="prose">在以下 samtools→minimap2 流程中，需同時保留 tags 並啟用相應選項：</p>
+<pre><code>samtools fastq -T '*' methylcall.raw.bam &gt; raw.fastq
+minimap2 -ax map-ont -y reference.fasta raw.fastq</code></pre>
+<p class="prose"><code>-T '*'</code> 將 tags 帶入 FASTQ comment，<code>-y</code> 讓 minimap2 將其寫回 BAM。
+請確認工具版本及 FASTQ comment 未被其他步驟改寫；缺少 tags 時，後續需要 MM/ML 的分析將無法取得修飾資訊。</p>
+</div>
+
+<h3>甲基化的兩種分析角色</h3>
+
+<p class="prose">本節的核心區分是：兩項任務都使用甲基化，但甲基化在流程中的角色不同：</p>
+
+{{svg:m09-two-uses | [wide] 左：將甲基化納入分類器的輸入特徵，使其<b>參與判斷</b>；若要評估模型，應使用未參與訓練或搜尋的獨立資料。右：先僅用變異證據完成推論，再附加甲基化描述結果；在未參與推論的前提下，它可作為獨立觀察。}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th></th><th>甲基化感知的方法：當作<b>證據</b></th><th>subclone 重建：當作<b>註記</b></th></tr></thead>
+<tbody>
+<tr><td>用途</td><td>將甲基化轉為 XGBoost 分類器的輸入特徵</td><td>候選拓撲完成<b>之後</b>才附加描述</td></tr>
+<tr><td>會影響結果嗎</td><td><b>會</b> —— 它可影響候選是否保留</td><td><b>在此實作中不會</b> —— 不參與搜尋、成本或排序</td></tr>
+<tr><td>是否可作為獨立驗證</td><td>同一資料流程中不宜宣稱為獨立驗證</td><td>若未參與推論，可作為獨立觀察</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">為避免角色混淆，請區分以下原則：「在此 subclone 重建實作中，甲基化是重建完成後的補充標記，
+<b>不參與搜尋、成本或排序</b>」。</p>
+
+<p class="prose">若甲基化已納入同一資料流程的推論，便不宜再宣稱它是獨立驗證；
+應改用未參與訓練或搜尋的資料評估，以避免循環論證。</p>
+
+<h3>同一狀態內的 read-level 異質性</h3>
+
+<p class="prose">下面的熱圖呈現一個區域內的 read × CpG 資料；比較不同排序方式對結構可見性的影響：</p>
+
+{{widget:methyl-heatmap #heat | 「原始順序」通常呈現為近似隨機的排列；依 haplotype 排序未必出現明顯結構。<b>依 allele 排序</b>可觀察 ALT 與 REF 的差異；依<b>甲基化群組</b>排序後，可進一步觀察 read-level 分群。}}
+
+<p class="prose">可觀察到：<b>ALT reads 仍可再分成兩群</b>。
+它們的 allele 與 haplotype 相同，僅依序列無法區分，但甲基化模式可能不同。</p>
+
+<p class="prose">這個現象稱為 <b>within-ALT residual structure</b>；研究依其統計定義，在七個資料集中將其量化為主要殘餘變異來源（51.2%–80.4%）。
+換句話說：<b>固定 haplotype 與 allele 後，仍可觀察到額外的 read-level 甲基化分群。</b></p>
+
+{{guard:8 | 甲基化的相關性不是因果}}
+<p class="prose">即使觀察到帶有突變的 reads 甲基化程度較高，也不宜直接推論「該突變造成甲基化改變」。</p>
+<p class="prose">研究將此結果描述為同一區域中的<b>伴隨差異</b>，不解讀為突變直接造成甲基化改變。</p>
+<p class="prose">仍有多項替代解釋：兩群 reads 可能來自不同的細胞族群，且各自具有不同的甲基化背景；也可能受到 coverage、批次效應或區域基因組脈絡影響。</p>
+{{/guard}}
+</section>
+
+
+<section data-part="evidence">
+<h2>真實證據</h2>
+
+<p class="prose">實務限制之一是：本教材示例使用的六個細胞株中，
+<b>只有五份資料集有可用的甲基化資料</b>。
+因此使用甲基化的分析樣本數較少；甲基化較適合作為區域層級的補充證據，而非唯一判準。</p>
+
+<p class="prose">研究統計各資料集中帶有<b>穩定甲基化差異</b>的 sSNV 位點比例，
+COLO829 為 9.5%、H2009 為 35.4%，資料集間差異明顯。不可評估的主要限制之一是 <b>ALT read 的 coverage 不足</b>；
+要估計兩組甲基化差異，兩邊都需要足夠且相對平衡的 reads。</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">對實驗設計的影響</p>
+<p class="prose">依區域與效應大小，甲基化差異分析通常需要足夠且平衡的 coverage。
+若研究問題包含甲基化，應在設計階段提高目標 coverage，以降低不可評估位點的比例。</p>
+</div>
+</section>
+
+
+<section data-part="predict">
+<h2>先提出預測，再查看解答</h2>
+
+{{ask}}
+<p class="prose">若研究問題是判定「某個 somatic 突變造成周圍甲基化改變」，
+現有 tumor ONT 資料顯示帶突變的 reads 甲基化程度較高。<br><br>
+請評估此證據是否足以支持因果結論，並指出需要補充的資料。</p>
+{{reveal}}
+<p class="prose"><b>不足以支持因果結論。</b>目前觀察到的是相關性，且至少有四個替代解釋尚未排除：</p>
+<ul class="prose">
+<li><b>細胞族群不同</b> —— 帶突變與不帶突變的 reads 可能來自不同細胞群；在配對樣本中，後者也可能來自正常細胞。
+兩者的甲基化背景可能不同，未必由突變造成。</li>
+<li><b>反向因果</b> —— 也可能是該區域原本的甲基化狀態讓突變比較容易發生。</li>
+<li><b>coverage 不對等</b> —— ALT 那邊 read 少，比例估計本來就比較不穩。</li>
+<li><b>批次或區域效應</b> —— 該區域的序列脈絡就會造成 basecaller 的甲基化判讀偏差。</li>
+</ul>
+<p class="prose">至少可比較<b>配對正常樣本的同一區域</b>，並納入獨立重複或 allele-aware 分析：
+若 normal 與 tumor REF reads 的甲基化模式相似，可降低區域背景差異的解釋，但不能完全排除。</p>
+<p class="prose">因此，該方法將甲基化定位為<b>事後註記</b>而非推論證據；在缺乏獨立對照時，這可避免過度的因果解讀。</p>
+{{/ask}}
+</section>
+
+
+<section data-part="practice">
+<h2>實作練習</h2>
+
+<h3>確認 BAM 是否包含甲基化資料</h3>
+
+<p class="prose">先確認必要的 MM/ML tags，以免後續修飾分析缺少資料：</p>
+
+{{cli}}
+# 抽查一條 read 是否包含 MM / ML tags
+samtools view methyl.bam | head -1 | tr '\t' '\n' | grep -E '^(MM|ML|Mm|Ml):'
+
+# 統計帶有 MM tag 的 reads（抽查多條 reads，不只查看第一條）
+total=$(samtools view -c methyl.bam)
+withmod=$(samtools view methyl.bam | grep -c 'MM:Z:')
+echo "$withmod / $total 條 read 帶甲基化 tag"
+{{/cli}}
+
+<p class="prose">若第二個數字為 0，先確認原始 BAM 是否已完成修飾辨識及 tag 命名格式；可能是尚未呼叫修飾，也可能在前處理中遺失。可用以下流程重新保留 tags：</p>
+
+{{cli}}
+samtools fastq -T '*' original.bam > with_tags.fastq
+minimap2 -ax map-ont -y reference.fasta with_tags.fastq | \
+  samtools sort -o remapped.bam && samtools index remapped.bam
+{{/cli}}
+
+<h3>提取並統計甲基化訊號</h3>
+
+{{cli}}
+# 產生每個 CpG 位點的甲基化比例（bedMethyl 格式）
+modkit pileup methyl.bam output.bed --ref reference.fasta
+
+# 依 haplotype 分開統計（需要先 haplotag）
+modkit pileup methyl.bam out_hp.bed --ref reference.fasta --partition-tag HP
+{{/cli}}
+
+<p class="cli-note"><code>--partition-tag HP</code> 可將甲基化<b>依 haplotype 分層</b>統計，
+以比較兩條 haplotype 的甲基化模式。依 M6 所述，haplotype 方向僅在同一 phase block 內一致，
+因此統計應限制於同一 phase block，或先完成方向校正。</p>
+
+<h3>在 IGV 中檢視甲基化</h3>
+
+<p class="prose">在支援 base-modification 且 BAM 含有效 MM/ML、參考序列與相容版本時，IGV 可顯示 ONT 甲基化。載入 BAM 之後右鍵 →
+<b>Color alignments by</b> → <b>base modification (5mC)</b>。
+搭配前面的 <b>Group by phase</b>，即可同時檢視 haplotype 與甲基化資訊。</p>
+
+{{quiz:m09}}
+</section>

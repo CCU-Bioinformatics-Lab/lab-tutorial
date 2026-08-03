@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>clone 與 subclone 如何形成，以及治療後抗藥群比例如何變化</title>
+  <desc>上排由左至右是時間軸：一個正常細胞取得第一個突變後增生，形成帶有相同突變的一群細胞，這叫 clone。
+        其中部分細胞又取得新突變並各自擴增，形成兩個 subclone，其中一個帶有抗藥突變。
+        下排以簡化模型顯示治療的後果：藥物可優先減少沒有抗藥突變的細胞，
+        原本只佔一小部分的抗藥 subclone 可能因此成為主要群體，並伴隨腫瘤復發。
+        這說明為什麼只知道「有哪些突變」不夠，還要知道「這些突變分別在哪一群細胞裡」。</desc>
+
+  <!-- ══ 時間軸 ══════════════════════════════════════════════════ -->
+  <line class="axis" x1="40" y1="40" x2="960" y2="40" marker-end="url(#arrow)"/>
+  <text class="tick zh" x="40" y="30">時間</text>
+
+  <!-- ── 階段 1：正常細胞 ── -->
+  <text class="anno bold zh" x="40" y="72">① 起點</text>
+  <circle class="cell normal" cx="78" cy="118" r="20"/>
+  <circle class="nucleus" cx="78" cy="118" r="9"/>
+  <text class="tick mid zh" x="78" y="158">一個正常細胞</text>
+
+  <path class="conn" d="M108,118 L158,118" marker-end="url(#arrow)"/>
+
+  <!-- ── 階段 2：第一個突變 + 增生 → clone ── -->
+  <text class="anno bold zh" x="180" y="72">② 增生成 clone</text>
+  <circle class="cell tumor" cx="200" cy="118" r="20"/>
+  <circle class="nucleus" cx="200" cy="118" r="9"/>
+  <circle class="mark somatic" cx="200" cy="118" r="6"/>
+
+  <path class="conn somatic" d="M226,118 L266,118" marker-end="url(#arrow)"/>
+
+  <circle class="cell tumor" cx="292" cy="100" r="15"/>
+  <circle class="mark somatic" cx="292" cy="100" r="4"/>
+  <circle class="cell tumor" cx="326" cy="100" r="15"/>
+  <circle class="mark somatic" cx="326" cy="100" r="4"/>
+  <circle class="cell tumor" cx="292" cy="136" r="15"/>
+  <circle class="mark somatic" cx="292" cy="136" r="4"/>
+  <circle class="cell tumor" cx="326" cy="136" r="15"/>
+  <circle class="mark somatic" cx="326" cy="136" r="4"/>
+  <text class="tick mid zh somatic" x="309" y="172">全都帶著同一個突變</text>
+
+  <path class="conn" d="M356,118 L400,118" marker-end="url(#arrow)"/>
+
+  <!-- ── 階段 3：分支成兩個 subclone ── -->
+  <text class="anno bold zh" x="424" y="72">③ 分支成 subclone</text>
+
+  <!-- subclone A -->
+  <circle class="cell clone1" cx="450" cy="96" r="15"/>
+  <circle class="mark somatic" cx="446" cy="93" r="4"/>
+  <circle class="mark hp1" cx="455" cy="100" r="4"/>
+  <circle class="cell clone1" cx="484" cy="96" r="15"/>
+  <circle class="mark somatic" cx="480" cy="93" r="4"/>
+  <circle class="mark hp1" cx="489" cy="100" r="4"/>
+  <circle class="cell clone1" cx="518" cy="96" r="15"/>
+  <circle class="mark somatic" cx="514" cy="93" r="4"/>
+  <circle class="mark hp1" cx="523" cy="100" r="4"/>
+  <text class="tick hp1 bold" x="544" y="101">subclone A</text>
+
+  <!-- subclone B：抗藥 -->
+  <circle class="cell clone2" cx="450" cy="146" r="15"/>
+  <circle class="mark somatic" cx="446" cy="143" r="4"/>
+  <circle class="mark artifact" cx="455" cy="150" r="4"/>
+  <text class="tick hp2 bold" x="478" y="151">subclone B</text>
+  <text class="tick bad bold zh" x="478" y="172">帶有抗藥突變</text>
+
+  <path class="conn hp1" d="M420,110 L440,98"/>
+  <path class="conn hp2" d="M420,126 L440,142"/>
+
+  <!-- ── 階段 4：治療前的組成 ── -->
+  <line class="guide" x1="640" y1="60" x2="640" y2="200"/>
+  <text class="anno bold zh" x="700" y="72">④ 治療前的組成</text>
+
+  <rect class="box plain" x="666" y="88" width="290" height="96" rx="8"/>
+  <rect class="bar hp1" x="686" y="106" width="200" height="22" rx="3"/>
+  <text class="tick" x="894" y="122">75%</text>
+  <text class="tick zh hp1" x="686" y="146">subclone A（無抗藥性）</text>
+  <rect class="bar hp2" x="686" y="156" width="14" height="18" rx="3"/>
+  <text class="tick" x="894" y="170">5%</text>
+  <text class="tick zh hp2" x="708" y="170">subclone B</text>
+
+  <!-- ══ 下半：治療之後 ══════════════════════════════════════════ -->
+  <line class="axis" x1="20" y1="222" x2="980" y2="222"/>
+  <text class="lbl bold zh" x="20" y="256">治療之後發生什麼事</text>
+
+  <!-- 藥物 -->
+  <rect class="box warn" x="20" y="276" width="176" height="80" rx="8"/>
+  <text class="anno mid bold zh" x="108" y="308">給藥</text>
+  <text class="tick mid zh" x="108" y="336">優先減少非抗藥細胞</text>
+
+  <path class="flow" d="M204,316 L256,316" marker-end="url(#arrow)"/>
+
+  <!-- 治療中 -->
+  <text class="anno bold zh" x="280" y="286">subclone A 大幅減少</text>
+  <circle class="cell clone1" cx="298" cy="320" r="15" opacity="0.25"/>
+  <circle class="cell clone1" cx="332" cy="320" r="15" opacity="0.25"/>
+  <circle class="cell clone1" cx="366" cy="320" r="15" opacity="0.25"/>
+  <line class="conn" x1="286" y1="332" x2="378" y2="308" stroke="var(--bad)" stroke-width="3"/>
+
+  <circle class="cell clone2" cx="420" cy="320" r="15"/>
+  <circle class="mark somatic" cx="416" cy="317" r="4"/>
+  <circle class="mark artifact" cx="425" cy="324" r="4"/>
+  <text class="tick zh bad bold" x="444" y="325">B 存活</text>
+
+  <path class="flow" d="M520,316 L572,316" marker-end="url(#arrow)"/>
+  <text class="tick mid zh" x="546" y="306">B 開始擴增</text>
+
+  <!-- 復發 -->
+  <text class="anno bold zh bad" x="596" y="286">模型中：B 比例上升</text>
+  <circle class="cell clone2" cx="614" cy="312" r="15"/>
+  <circle class="mark artifact" cx="614" cy="312" r="4"/>
+  <circle class="cell clone2" cx="648" cy="312" r="15"/>
+  <circle class="mark artifact" cx="648" cy="312" r="4"/>
+  <circle class="cell clone2" cx="682" cy="312" r="15"/>
+  <circle class="mark artifact" cx="682" cy="312" r="4"/>
+  <circle class="cell clone2" cx="716" cy="312" r="15"/>
+  <circle class="mark artifact" cx="716" cy="312" r="4"/>
+  <circle class="cell clone2" cx="631" cy="346" r="15"/>
+  <circle class="mark artifact" cx="631" cy="346" r="4"/>
+  <circle class="cell clone2" cx="665" cy="346" r="15"/>
+  <circle class="mark artifact" cx="665" cy="346" r="4"/>
+  <circle class="cell clone2" cx="699" cy="346" r="15"/>
+  <circle class="mark artifact" cx="699" cy="346" r="4"/>
+
+  <rect class="box bad" x="770" y="278" width="200" height="80" rx="8"/>
+  <rect class="bar hp2" x="788" y="300" width="164" height="22" rx="3"/>
+  <text class="tick mid" x="870" y="344">本模型中 B 約佔 95%</text>
+
+  <!-- ══ 結論 ══════════════════════════════════════════════════ -->
+  <line class="axis" x1="20" y1="382" x2="980" y2="382"/>
+
+  <rect class="box bad" x="20" y="400" width="470" height="140" rx="8"/>
+  <text class="anno bold zh bad" x="42" y="430">只知道「有哪些突變」不夠</text>
+  <text class="tick zh" x="42" y="462">治療前的報告會說：這顆腫瘤有</text>
+  <text class="tick zh" x="42" y="486">「第一個突變」與「抗藥突變」兩個。</text>
+  <text class="tick zh bold" x="42" y="516">但這樣寫看不出抗藥突變只在一小群細胞裡。</text>
+
+  <rect class="box ok" x="510" y="400" width="470" height="140" rx="8"/>
+  <text class="anno bold zh ok" x="532" y="430">還要知道「分別在哪一群細胞裡」</text>
+  <text class="tick zh" x="532" y="462">如果知道抗藥突變<tspan class="bold">獨立成一群</tspan>、只佔 5%，</text>
+  <text class="tick zh" x="532" y="486">可提高治療後比例上升的預期，但並非必然。</text>
+  <text class="tick zh bold" x="532" y="516">這種細胞組成的不均勻叫 intratumour heterogeneity。</text>
+</svg>

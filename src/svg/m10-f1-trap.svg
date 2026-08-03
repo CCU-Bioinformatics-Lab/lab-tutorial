@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540">
+  <title>固定候選集合下，precision 上升而 F1 變化有限</title>
+  <desc>上半部定義三個指標：
+        precision 是所報變異中屬於真陽性的比例，recall 是所有真陽性中被找出的比例，
+        F1 是兩者的調和平均。
+        下半部示範在固定候選集合、且後處理僅移除假陽性的情況下，FP 減少而 FN 維持不變。
+        當 FN 遠多於 FP 時，移除一半 FP 對 F1 的改善有限；若誤刪 TP，FN 還會增加。</desc>
+
+  <!-- ══ 上：三個指標在數什麼 ══ -->
+  <text class="lbl bold zh" x="20" y="32">三項指標的計算對象</text>
+
+  <!-- 全體變異的方框圖 -->
+  <rect class="box ghost" x="120" y="52" width="440" height="160" rx="8"/>
+  <text class="tick mid zh" x="340" y="44">benchmark 標註的真陽性集合</text>
+
+  <!-- 所報候選集合 -->
+  <rect class="box accent" x="360" y="72" width="380" height="120" rx="8" opacity="0.55"/>
+  <text class="tick mid zh accent bold" x="700" y="64">所報候選</text>
+
+  <!-- 三個區塊 -->
+  <rect class="bar" x="150" y="92" width="196" height="80" rx="4" fill="var(--warn-fill)" stroke="var(--warn)"/>
+  <text class="anno mid bold zh warn" x="248" y="128">假陰性</text>
+  <text class="tick mid mono" x="248" y="154">FN</text>
+
+  <rect class="bar" x="376" y="92" width="164" height="80" rx="4" fill="var(--ok-fill)" stroke="var(--ok)"/>
+  <text class="anno mid bold zh ok" x="458" y="128">真陽性</text>
+  <text class="tick mid mono" x="458" y="154">TP</text>
+
+  <rect class="bar" x="570" y="92" width="152" height="80" rx="4" fill="var(--bad-fill)" stroke="var(--bad)"/>
+  <text class="anno mid bold zh bad" x="646" y="128">假陽性</text>
+  <text class="tick mid mono" x="646" y="154">FP</text>
+
+  <!-- 指標定義 -->
+  <text class="anno bold zh ok" x="790" y="96">precision</text>
+  <text class="tick zh" x="790" y="122">所報候選中的比例：</text>
+  <text class="tick mono" x="790" y="146">TP ÷ (TP+FP)</text>
+
+  <text class="anno bold zh warn" x="790" y="182">recall</text>
+  <text class="tick zh" x="790" y="208">所有真陽性中的比例：</text>
+  <text class="tick mono" x="790" y="232">TP ÷ (TP+FN)</text>
+
+  <!-- ══ 下：後處理能做與不能做 ══ -->
+  <line class="axis" x1="20" y1="264" x2="980" y2="264"/>
+  <text class="lbl bold zh" x="20" y="296">在本示例中，後處理僅移除部分假陽性</text>
+
+  <!-- 過濾前 -->
+  <text class="tick end zh" x="112" y="342">過濾前</text>
+  <rect class="bar" x="120" y="322" width="268" height="30" rx="4" fill="var(--warn-fill)" stroke="var(--warn)"/>
+  <text class="tick mid zh" x="254" y="342">FN 335</text>
+  <rect class="bar" x="392" y="322" width="330" height="30" rx="4" fill="var(--ok-fill)" stroke="var(--ok)"/>
+  <text class="tick mid zh" x="557" y="342">TP 412</text>
+  <rect class="bar" x="726" y="322" width="70" height="30" rx="4" fill="var(--bad-fill)" stroke="var(--bad)"/>
+  <text class="tick mid zh" x="761" y="342">FP 88</text>
+
+  <text class="tick mono" x="820" y="336">precision 0.824</text>
+  <text class="tick mono" x="820" y="356">F1 　　　0.661</text>
+
+  <!-- 過濾後 -->
+  <text class="tick end zh" x="112" y="404">過濾後</text>
+  <rect class="bar" x="120" y="384" width="268" height="30" rx="4" fill="var(--warn-fill)" stroke="var(--warn)"/>
+  <text class="tick mid zh" x="254" y="404">FN 335（本示例維持不變）</text>
+  <rect class="bar" x="392" y="384" width="330" height="30" rx="4" fill="var(--ok-fill)" stroke="var(--ok)"/>
+  <text class="tick mid zh" x="557" y="404">TP 412</text>
+  <rect class="bar" x="726" y="384" width="35" height="30" rx="4" fill="var(--bad-fill)" stroke="var(--bad)"/>
+  <text class="tick mid zh" x="743" y="404">FP 44</text>
+  <rect class="box ghost" x="761" y="384" width="35" height="30" rx="4" stroke="var(--bad)" stroke-dasharray="4 3"/>
+
+  <text class="tick mono ok bold" x="820" y="398">precision 0.904</text>
+  <text class="tick mono bad" x="820" y="418">F1 　　　0.685</text>
+
+  <!-- 箭頭標示變化 -->
+  <text class="anno bold ok" x="820" y="446">＋0.080</text>
+  <text class="anno bold bad" x="920" y="446">＋0.024</text>
+
+  <!-- ══ 結論 ══ -->
+  <rect class="box warn" x="20" y="466" width="960" height="62" rx="8"/>
+  <text class="anno zh" x="42" y="494">本示例中 FN 維持不變 —— 僅移除候選的後處理不會恢復 caller 未產生的候選。</text>
+  <text class="anno zh bold" x="42" y="518">當 FN 遠多於 FP 時，移除 FP 對 F1 的改善有限；若誤刪 TP，FN 會增加。</text>
+</svg>

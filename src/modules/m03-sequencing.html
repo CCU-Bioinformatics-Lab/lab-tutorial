@@ -1,0 +1,214 @@
+<!--tw
+{
+  "objectives": [
+    "說明長讀在建立長距離分子連結上的優勢與限制",
+    "描述 ONT 的常見錯誤特性，並比較 indel 與 SNV 的判讀難度",
+    "說明 homopolymer 為何是 indel 假陽性的常見來源",
+    "說出 coverage、VAF 與 basecaller 版本各自會如何影響下游結果",
+    "辨識 CIGAR 所記錄的 alignment 操作，並說明低支持度過濾如何影響 recall"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<p class="prose">M1 已建立以下觀察：<b>若 read 同時涵蓋兩個變異位置，且判讀可靠，
+可支持兩者位於同一 DNA 分子。</b>本模組將此觀察連結至定序技術，說明讀長差異、長讀的分析優勢與相應限制。</p>
+
+<p class="prose">自學閱讀時，可先比較短讀通常能辨識各位置的變異、但較難由單條 read 建立遠距分子關係，
+以及長讀可涵蓋較遠位置的特性；再學習平台名稱與錯誤類型。</p>
+
+<p class="prose">瞭解這些限制很重要；後續介紹的 somatic-indel 方法，
+即聚焦於降低此類錯誤並改善候選判讀。</p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>[[long read|長讀]]提供的長距離資訊</h3>
+
+{{svg:m03-read-length | [wide] 兩個變異位點相距 3 kb。上：在本示意中，約 100 bp 的 Illumina reads 可分別觀察兩個位點，但沒有單條 read 同時涵蓋兩點。下：一條較長的 ONT read 涵蓋兩點，並可在完成修飾辨識時關聯中間的甲基化訊號。}}
+
+<p class="prose">此圖說明短讀與長讀的主要資訊差異。上半部並非表示短讀無法偵測變異；
+在本比較條件下，Illumina 可分別辨識兩個位點，且單鹼基錯誤率通常較低，
+但不能由單條 read 建立 3 kb 的<b>分子連結</b>。實際效能依平台、化學版本、basecaller 與變異類型而異。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th></th><th>Illumina</th><th>[[ONT]]</th></tr></thead>
+<tbody>
+<tr><td>讀長</td><td>常見約 100–150 bp，依平台與建庫而異</td><td>可達數千至數萬 bp，分布依流程而異</td></tr>
+<tr><td>單鹼基準確度</td><td>通常較高</td><td>依化學、basecaller 與變異類型而異；[[indel]] 常較具挑戰</td></tr>
+<tr><td>跨越多個變異</td><td>限於片段長度與建庫設計</td><td>較能建立長距離相位與分子連結</td></tr>
+<tr><td>甲基化</td><td>bisulfite-seq 是常見方法之一</td><td>native-DNA 流程可搭配模型由訊號推定修飾</td></tr>
+<tr><td>常見優勢</td><td>高準確度的局部變異偵測</td><td>長距離 phasing 與分子連結</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>長讀 indel 判讀的主要限制</h3>
+
+<p class="prose">ONT 與 Illumina 的錯誤特性不同。<b>[[homopolymer]]</b> 是 ONT indel 錯誤的常見高風險區域，
+例如 <code>AAAAAA</code>。</p>
+
+<p class="prose">原因在判讀原理上：</p>
+
+{{svg:m03-homopolymer | [wide] 左上：一般序列的電流訊號隨鹼基組合變化。右上：連續重複時，六個與七個重複單元的訊號差異可能很小，因而增加長度判讀錯誤。下方：一個單元的誤差可形成表觀插入或缺失；僅憑目前證據可能難以與真實 indel 區分。}}
+
+<p class="prose">下表提供效能示例，用於比較 SNV 與 indel 的相對差異。
+數值解讀需同時記錄 caller 名稱與版本、資料集、truth set 與指標定義：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Caller</th><th>SNV F1</th><th>INDEL F1</th></tr></thead>
+<tbody>
+<tr><td>ClairS（示例）</td><td>0.71</td><td><b>0.32</b></td></tr>
+<tr><td>DeepSomatic（示例）</td><td>0.81</td><td><b>0.53</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">在此示例中，indel F1 低於 SNV F1，表示 somatic-indel 的整體偵測效能仍有改善空間；
+後續方法會利用更多 read-level 特徵處理此問題。</p>
+
+<p class="prose">除了 homopolymer，還有一個原因是 <b>alignment 位置的模糊性</b>：
+同一個 deletion 在重複序列中可有多種等價表示位置，使不同 reads 的訊號分散。
+這些差異會反映在 [[CIGAR]]；CIGAR 是描述 read 與參考序列對齊操作的字串。</p>
+
+<h3>三項核心數值</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>量</th><th>意思</th><th>本教材示例值</th></tr></thead>
+<tbody>
+<tr><td>[[coverage]]</td><td>某個位置被多少條 read 覆蓋</td><td>tumor 50×，normal 25×</td></tr>
+<tr><td>[[VAF]]</td><td>支持 alt allele 的 read 比例</td><td>germline het 在簡化二倍體模型中 ≈ 0.5；somatic 依 purity、copy number 與 clonality 而異</td></tr>
+<tr><td>[[tumour purity|purity]]</td><td>樣本中腫瘤細胞的比例</td><td>合成資料用 0.2 / 0.4 / 0.6 / 0.8 / 1.0</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">以下以簡化數值示例說明低腫瘤比例如何減少可用訊號：</p>
+
+{{svg:m03-detection-limit | [wide] 每個方塊代表一條支持變異的 read。在本模型中，tumor DNA fraction 為 100% 時期望約 25 條，20% 時約 5 條；下方另以每個位置約 1–2 條錯誤 read 作為背景假設。少量背景錯誤可能與低比例變異訊號重疊。}}
+
+<p class="prose">在二倍體、單拷貝、clonal、無偏取樣且 tumor DNA fraction 為 0.2 的簡化模型中，
+期望支持數為 <code>50 × 0.2 ÷ 2 = 5</code> 條。訊號數量不足是主要限制之一；背景錯誤、品質與演算法也會影響可靠性。</p>
+
+<h3>basecaller 是實驗變數</h3>
+
+<p class="prose">[[basecalling]] 是把電流訊號轉成 A/C/G/T 的那一步。不同版本的 basecaller
+會產生<b>不同的錯誤特性</b>，所以：</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">同一個細胞株，不同 basecaller，可視為兩份不同的資料集</p>
+<p class="prose">此記錄並非次要細節。跨 basecaller 的同株資料可作為穩健性評估的一部分；例如
+<code>HCC1395_HKU</code> 與 <code>HCC1395_NYGC</code> 來自同一細胞株，但流程不同。
+因此分析時應將 [[provenance]]（細胞株、平台、basecaller、[[reference genome|reference build]]、
+caller 版本、benchmark 來源與混合方式）與結果一併記錄。</p>
+</div>
+</section>
+
+
+<section data-part="evidence">
+<h2>真實證據</h2>
+
+<h3>合成不同 purity 的樣本</h3>
+
+<p class="prose">若要評估方法在不同 tumor DNA fraction 下的效能，可依計算後的比例混合 tumor 與 normal BAM，
+建立預先設定的合成梯度：</p>
+
+{{cli}}
+# 1. 先量出兩個 BAM 的實際 coverage
+mosdepth --by 500 tumor_cov  tumor.bam
+mosdepth --by 500 normal_cov normal.bam
+
+# 2. 依實測 coverage 與目標 DNA fraction 計算抽樣比例（以下僅為深度已標準化的示意）
+samtools view -s 1.60 -b tumor.bam  > tumor_sub.bam
+samtools view -s 1.40 -b normal.bam > normal_sub.bam
+
+# 3. 合併成指定 DNA fraction 的樣本
+samtools merge dna_frac_0.6.bam tumor_sub.bam normal_sub.bam
+samtools index dna_frac_0.6.bam
+{{/cli}}
+
+<p class="cli-note">此示例以 tumor coverage 50×、normal 25× 建立 1.0 / 0.8 / 0.6 / 0.4 / 0.2 梯度。
+此類 coverage 混合直接控制的是 <b>tumor DNA/read fraction</b>；若來源深度未標準化，不能直接以 0.60／0.40 作抽樣率。</p>
+
+{{guard:2 | tumor cellular purity 不等於 tumor DNA fraction}}
+<p class="prose">上述配方依 coverage 近似控制 DNA 量。在來源 tumor BAM 接近純腫瘤、
+且 tumor／normal 每細胞 DNA 量與輸入深度均已校正的合成設定下，tumor DNA fraction 才可近似 cellular purity。
+此近似不能推廣至一般實際樣本。</p>
+<p class="prose">但在<b>真實腫瘤</b>裡兩者可能不同。原因包括 [[aneuploidy]] 與 whole-genome duplication：
+一個四倍體的腫瘤細胞含有的 DNA 是正常細胞的兩倍。所以</p>
+<ul class="prose">
+<li>50% 的細胞是腫瘤（cellular [[tumour purity|purity]] = 0.5）</li>
+<li>但腫瘤貢獻的 DNA 佔 <code>0.5×4 ÷ (0.5×4 + 0.5×2) = 0.67</code>（[[tumour DNA fraction]] = 0.67）</li>
+</ul>
+<p class="prose">M8 的互動元件可將 copy number 調整為 4，以比較 cellular purity 與 tumor DNA fraction。</p>
+{{/guard}}
+</section>
+
+
+<section data-part="predict">
+<h2>判讀練習</h2>
+
+{{ask}}
+<p class="prose">同樣是 50× coverage 的樣本，你在某個位點看到 <b>3 條 read</b> 支持一個 1 bp 的 deletion，
+而且那個位置位於一段 <code>TTTTTTT</code> 裡面。<br><br>
+你會怎麼看待這個候選點？</p>
+{{reveal}}
+<p class="prose"><b>此候選應列為低可信並以其他證據複核</b>，因為三項風險同時存在：</p>
+<ul class="prose">
+<li>只有 3/50 條 read 支持（VAF 0.06），支持數偏少、可信度較低</li>
+<li>它是 <b>indel</b>，在 ONT 資料中通常較具挑戰</li>
+<li>它落在 <b>homopolymer</b> 裡，是 ONT 較容易發生長度判讀誤差的區域</li>
+</ul>
+<p class="prose">但請注意：<b>列為低可信候選不等於可以直接刪除。</b>
+低 purity 樣本中的 genuine somatic 變異也可能只有少數 reads 支持。
+僅依低支持度刪除候選可能降低 [[recall]]。</p>
+<p class="prose">因此需加入更細緻的證據，例如支持 reads 是否具有一致的 haplotype 來源，而非只依數量判定。</p>
+<p class="prose">此問題也可能受資料可辨識性限制：某些 false positives 在現有特徵下與真變異非常相近，
+使模型無法可靠區分。
+若 truth set 在這種困難區域的標註不一致，特徵相近的位點可能得到相反標籤，
+模型因而難以學得穩定規則。評估時應將 label uncertainty 納入解讀。</p>
+{{/ask}}
+</section>
+
+
+<section data-part="practice">
+<h2>實作練習</h2>
+
+<h3>檢查資料讀長</h3>
+
+<p class="prose">讀長會影響可連結的變異距離，仍需同時考慮 coverage、品質與演算法。取得新資料時可先檢查：</p>
+
+{{cli}}
+# 讀長的統計摘要
+samtools stats aln.bam | grep -E '^SN' | grep -E 'length|reads mapped'
+
+# 讀長分布（看有多少條真的夠長）
+samtools view aln.bam | awk '{print length($10)}' | sort -n | \
+  awk '{a[NR]=$1} END {print "中位數", a[int(NR/2)]; print "第 50 百分位", a[int(NR*0.5)]; print "最長", a[NR]}'
+
+# 覆蓋度
+mosdepth --by 500 out aln.bam && head out.mosdepth.summary.txt
+{{/cli}}
+
+<h3>估算簡化模型中的預期支持數</h3>
+
+<p class="prose">可使用資料的 coverage，估算在二倍體、單拷貝、clonal 與無偏取樣假設下的預期支持 read 數；
+這不是經驗證的 detection limit：</p>
+
+<pre><code>預期支持 read 數 = 覆蓋度 × tumor DNA fraction ÷ 2
+
+例：覆蓋度 50×、tumor DNA fraction 為 20%
+    → 50 × 0.2 ÷ 2 = 5 條</code></pre>
+
+<p class="prose">若期望值僅為兩至三條，可靠偵測低頻變異可能較困難。資料量是限制之一，
+仍需比較增加定序深度、改善品質與調整模型的相對效益。</p>
+
+{{quiz:m03}}
+</section>

@@ -1,0 +1,204 @@
+<!--tw
+{
+  "objectives": [
+    "說出從 FASTQ 到 VCF 的每一個中間檔案各自負責什麼",
+    "判讀一個 CIGAR 字串，並說出它消耗了多少參考序列與多少 read",
+    "解釋 soft clip 是什麼，以及為什麼大量集中的 clipping 可作為結構變異斷點的候選訊號",
+    "在 VCF 裡認出 GT、PS，並在 BAM 裡認出 HP 與 MM/ML tag",
+    "區分一般 untagged read 與帶有 somatic signal 但來源未定的 somatic haplotype HP3"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<p class="prose">[[CIGAR]] 在正式課程中常被簡略帶過，但在判讀比對結果與變異證據時十分重要。
+本教材的兩個案例會使用 CIGAR：一個以 clipping 分布協助定位染色體結構變異的候選邊界，
+另一個將 CIGAR 編碼為影像供神經網路分析。理解 CIGAR 有助於解讀這些流程的輸入與限制。</p>
+
+<p class="prose">本節以互動解碼與命令列操作為主，實作比例較高。</p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>從樣本到變異的檔案鏈</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>檔案</th><th>裝什麼</th><th>一筆記錄通常代表</th></tr></thead>
+<tbody>
+<tr><td><code>.fasta</code></td><td>[[reference genome]]</td><td>一條染色體或 contig 的序列</td></tr>
+<tr><td><code>[[FASTQ|.fastq]]</code></td><td>定序儀產生的 read</td><td>一筆 read 記錄（序列與品質）</td></tr>
+<tr><td><code>[[BAM|.bam]]</code></td><td>已比對到參考的 read</td><td>一筆 alignment record，含位置、CIGAR、tag</td></tr>
+<tr><td><code>[[VCF|.vcf]]</code></td><td>變異</td><td><b>一個位點</b>，含 ref/alt、FILTER、FORMAT</td></tr>
+<tr><td><code>.bed</code></td><td>區間</td><td>一段 chrom / start / end</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">注意 BAM 與 VCF 的記錄單位不同：<b>BAM 以 alignment record 為單位，VCF 以變異位點為單位</b>。
+後續模組會反覆使用此區分；例如 LongPhase-S 將 [[somatic haplotype]] assignment 寫在 BAM 的 read 上，
+而 LongPhase-TO 將判定寫在 VCF 的位點上。</p>
+
+<h3>CIGAR：read 與參考序列的對齊表示</h3>
+
+<p class="prose">CIGAR 是一串「數字＋字母」，描述 read 與參考序列的對應關係。
+可在下方元件輸入 CIGAR，查看各操作碼對參考序列與 read 的消耗方式。</p>
+
+{{widget:cigar-decoder #cig {"value":"5M1I5M"} | 請先使用預設按鈕；以 <code>10S8M</code> 為例，前 10 個鹼基<b>未與</b>參考序列對齊，屬於 soft clipping，但仍保留於 BAM。}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>操作碼</th><th>意思</th><th>消耗參考</th><th>消耗 read</th></tr></thead>
+<tbody>
+<tr><td><code>M</code></td><td>對齊（可能吻合，也可能錯配）</td><td>✓</td><td>✓</td></tr>
+<tr><td><code>I</code></td><td>insertion：read 有、參考沒有</td><td>✗</td><td>✓</td></tr>
+<tr><td><code>D</code></td><td>deletion：參考有、read 沒有</td><td>✓</td><td>✗</td></tr>
+<tr><td><code>S</code></td><td>[[soft clipping|soft clip]]：read 保留但沒對上</td><td>✗</td><td>✓</td></tr>
+<tr><td><code>H</code></td><td>hard clip：該段序列未保留在 BAM 的 read 序列中</td><td>✗</td><td>✗</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">一個常見的誤解：<b><code>M</code> 不代表「吻合」</b>，它只代表「有對齊」。
+錯配（mismatch）在 CIGAR 上仍然是 <code>M</code>。若要判定實際鹼基差異，需查看 <code>MD</code> tag 或直接比對參考序列。</p>
+
+<h3>soft clipping 的判讀意義</h3>
+
+<p class="prose">當 read 的一端無法可靠地與參考序列對齊時，比對演算法通常會將該端標記為
+<code>S</code>（soft clipping）。序列本身仍保留在 BAM 中，但不計入對齊區段。</p>
+
+{{svg:m04-softclip | [wide] 最上一列是參考序列，每格一個字母。中間兩列是左端與右端 soft-clipped 的 read；<b>紅色虛線框表示未納入對齊的部分</b>，序列仍保留在檔案中，對應的 CIGAR 標示於下方。最底下比較兩種情況：clipping 可能分散於不同 read 的端部；若多條 read 的 clipping 位置集中，則可作為結構變異斷點候選，仍需結合其他證據確認。}}
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">LongPhase-TO 如何利用 clipping 協助界定 CNV / BFB 區間</p>
+<p class="prose">LongPhase-TO 會統計 clipping 在基因體上的分布：<b>覆蓋度上升的位置</b>可能累積左端 soft clipping，
+<b>下降的位置</b>可能累積右端 soft clipping。一組上升與下降可形成事件區間候選，
+但仍需結合覆蓋度、序列脈絡與其他證據，確認該區段是否與參考基因體不同。</p>
+<p class="prose">此訊號可在不使用預先呼叫的變異資訊時，從 read 與參考序列的對齊模式取得結構變異候選；完整流程會在後續模組中說明。</p>
+</div>
+
+<h3>VCF 與 BAM 的關鍵欄位</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>在哪</th><th>欄位</th><th>意思</th></tr></thead>
+<tbody>
+<tr><td>VCF FORMAT</td><td><code>GT</code></td><td>[[genotype]]。<code>0/1</code> 未定相、<code>0|1</code> 已定相</td></tr>
+<tr><td>VCF FORMAT</td><td><code>[[PS tag|PS]]</code></td><td>phase set 編號。<b>同一個 PS 內</b>的 haplotype 方向才一致</td></tr>
+<tr><td>VCF FILTER</td><td><code>PASS</code> 等</td><td>caller 或下游工具的判定；在特定 LongPhase-TO 版本／設定中可見 <code>LP_nonSomatic</code>、<code>LP_PON</code></td></tr>
+<tr><td>BAM tag</td><td><code>[[HP tag|HP]]</code></td><td>若存在，表示工具對此 read 的 haplotype assignment</td></tr>
+<tr><td>BAM tag</td><td><code>[[MM/ML tag|MM]]</code> / <code>ML</code></td><td>甲基化的位置與機率</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose"><code>HP</code> tag 的 SAM 型別可能不同。LongPhase-S 的 germline <code>haplotag</code> 寫成整數
+<code>HP:i:1</code>，而其 <code>somatic_haplotag</code> 與 LongPhase-TO 的示例寫成字串 <code>HP:Z:1-1</code>。
+請依所用版本核對文件與實作；若沒有 HP tag 或標記為 HP3，表示工具未能可靠指派該 read 的 haplotype。</p>
+</section>
+
+
+<section data-part="evidence">
+<h2>真實證據</h2>
+
+<h3>前處理指令示範</h3>
+
+<p class="prose">以下示範一組前處理流程；請依所用版本文件、輸入路徑與分析平台調整參數後執行。</p>
+
+{{cli}}
+# 參考基因體索引
+samtools faidx reference.fasta
+
+# 比對。--MD 會寫入 MD tag（某些下游工具需要）
+minimap2 --MD -ax map-ont -t 10 reference.fasta reads.fastq -o alignment.sam
+
+# 排序與索引
+samtools sort -@ 10 alignment.sam -o alignment.bam
+samtools index -@ 10 alignment.bam
+{{/cli}}
+
+<h3>重比對時保留甲基化 tag</h3>
+
+<p class="prose">如果 BAM 帶有 <code>MM</code>／<code>ML</code>（甲基化）tag，重比對時若未使用保留 tag 的選項，
+流程可能不會保留這些 tag。要保留它們，請明確處理：</p>
+
+{{cli}}
+# -T '*' 把所有 tag 帶進 FASTQ 的 header
+samtools fastq -T '*' methylcall.raw.bam > methylcall.raw.fastq
+
+# -y 讓 minimap2 把 FASTQ header 裡的 tag 寫回 BAM
+minimap2 -ax map-ont -y reference.fasta methylcall.raw.fastq
+{{/cli}}
+
+<p class="cli-note">若漏掉 <code>-T '*'</code> 或 <code>-y</code>，流程可能不會報錯，但輸出 BAM 的 MM/ML 欄位可能為空。
+請在重比對後檢查 tag 是否仍存在，避免將缺失的甲基化資訊誤認為生物學結果。</p>
+</section>
+
+
+<section data-part="predict">
+<h2>判讀練習</h2>
+
+{{ask}}
+<p class="prose">一條 read 的 CIGAR 是 <code>60S40M</code>，比對位置是 <code>chr7:1,000,000</code>。<br><br>
+這條 read 總共多長？它覆蓋了參考基因體的哪一段？</p>
+{{reveal}}
+<p class="prose"><b>read 長 100 bp</b>（60 + 40，soft clip 的序列仍在 read 裡）。</p>
+<p class="prose"><b>但它只覆蓋參考的 <code>chr7:1,000,000–1,000,039</code></b>，也就是 40 bp。
+因為 <code>S</code> 不消耗參考序列。</p>
+<p class="prose">此 read 顯示前 60 bp 未與參考序列可靠對齊，從 1,000,000 開始才進入對齊區段。
+若<b>多條 read 都在 1,000,000 出現相同方向的 clipping</b>，可將此位置列為結構變異斷點候選；
+被剪序列也可能與低品質、重複序列或其他比對問題有關，需結合其他證據確認。</p>
+<p class="prose">完整字串可能超出元件的顯示範圍；可輸入 <code>10S8M</code> 觀察相同的消耗規則。</p>
+{{/ask}}
+</section>
+
+
+<section data-part="practice">
+<h2>實作練習</h2>
+
+<h3>由 BAM 回溯 VCF 位點證據</h3>
+
+<p class="prose">此練習將 VCF 位點與 BAM 的 read-level 證據連結起來。挑選一個 VCF 變異，再回到 BAM 檢查其支持情況：</p>
+
+{{cli}}
+# 1. 從 VCF 挑一個位點
+bcftools view -H sample.vcf | head -3
+
+# 2. 回到 BAM 看那個位置上的每一條 read
+samtools view aln.bam chr1:1000000-1000000
+
+# 3. 用 pileup 直接看每條 read 在那個位置的鹼基
+samtools mpileup -f reference.fasta -r chr1:1000000-1000000 aln.bam
+
+# 4. 檢查該位置附近的 CIGAR 型式
+samtools view aln.bam chr1:1000000-1000000 | awk '{print $6}' | sort | uniq -c | sort -rn
+{{/cli}}
+
+<p class="cli-note">第 4 步可用來檢查對齊型式：若同一位置的 CIGAR 型式高度多樣，可能表示重複序列或 indel 對齊不確定，
+應結合 mapping/base quality 與 pileup 謹慎評估；型式一致也不代表證據必然可靠。</p>
+
+<h3>CIGAR 讀法練習</h3>
+
+<p class="prose">請在上方解碼器輸入以下 CIGAR，先計算 read 與參考序列的消耗長度，再核對答案：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>CIGAR</th><th>read 長度</th><th>參考涵蓋長度（bp）</th></tr></thead>
+<tbody>
+<tr><td><code>10M</code></td><td>10</td><td>10</td></tr>
+<tr><td><code>5M2I3M</code></td><td>10</td><td>8</td></tr>
+<tr><td><code>5M2D5M</code></td><td>10</td><td>12</td></tr>
+<tr><td><code>3S7M</code></td><td>10</td><td>7</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">判讀時先掌握一項核心規則：<b>查看每個操作碼消耗哪一側的序列。</b><code>I</code> 與 <code>S</code>
+只消耗 read，<code>D</code> 只消耗參考序列，<code>M</code> 兩側都消耗。</p>
+
+{{quiz:m04}}
+</section>

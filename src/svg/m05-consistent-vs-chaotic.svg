@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>以 haplotype 分布作為候選判讀的輔助證據</title>
+  <desc>兩邊示意同一種畫面：中間是待判斷的候選位置，左右兩側各有一個已知參考位點，
+        用來把 read 分成兩個 haplotype 群組。左半部示意在一般 heterozygous、相位可靠的情境下，
+        支持 read 較集中於一群；右半部示意隨機錯誤的支持 read 可能分布於兩群。
+        系統性錯誤、mapping bias、copy-number／LOH 或 phasing 錯誤可能不符合此簡化模式。
+        最下方比較兩邊的數量與分布，說明僅依 read 數量可能無法區分。</desc>
+
+  <!-- ══════════════ 左：真的變異 ══════════════ -->
+  <rect class="box ok" x="16" y="16" width="472" height="410" rx="10"/>
+  <text class="lbl bold zh ok" x="38" y="48">候選變異（示例）</text>
+  <text class="tick zh" x="38" y="70">簡化情境：支持 read 多集中於<tspan class="bold">一群</tspan></text>
+
+  <!-- 欄位導引 -->
+  <line class="guide" x1="130" y1="92" x2="130" y2="332"/>
+  <line class="guide" x1="252" y1="88" x2="252" y2="336"/>
+  <line class="guide" x1="374" y1="92" x2="374" y2="332"/>
+  <text class="tick mid" x="130" y="94">參考點</text>
+  <text class="tick mid somatic bold" x="252" y="92">候選</text>
+  <text class="tick mid" x="374" y="94">參考點</text>
+
+  <!-- HP1 群：全部帶有候選變異 -->
+  <text class="tick hp1 bold" x="38" y="118">HP1</text>
+  <rect class="read hp1" x="46" y="104" width="410" height="13" rx="6.5"/>
+  <text class="base a mono" x="130" y="115" font-size="14">A</text>
+  <circle class="mark somatic" cx="252" cy="110" r="5"/>
+  <text class="base g mono" x="374" y="115" font-size="14">G</text>
+
+  <rect class="read hp1" x="52" y="123" width="400" height="13" rx="6.5"/>
+  <text class="base a mono" x="130" y="134" font-size="14">A</text>
+  <circle class="mark somatic" cx="252" cy="129" r="5"/>
+  <text class="base g mono" x="374" y="134" font-size="14">G</text>
+
+  <rect class="read hp1" x="42" y="142" width="415" height="13" rx="6.5"/>
+  <text class="base a mono" x="130" y="153" font-size="14">A</text>
+  <circle class="mark somatic" cx="252" cy="148" r="5"/>
+  <text class="base g mono" x="374" y="153" font-size="14">G</text>
+
+  <rect class="read hp1" x="56" y="161" width="398" height="13" rx="6.5"/>
+  <text class="base a mono" x="130" y="172" font-size="14">A</text>
+  <circle class="mark somatic" cx="252" cy="167" r="5"/>
+  <text class="base g mono" x="374" y="172" font-size="14">G</text>
+
+  <rect class="read hp1" x="48" y="180" width="405" height="13" rx="6.5"/>
+  <text class="base a mono" x="130" y="191" font-size="14">A</text>
+  <circle class="mark somatic" cx="252" cy="186" r="5"/>
+  <text class="base g mono" x="374" y="191" font-size="14">G</text>
+
+  <!-- 分隔 -->
+  <line class="guide" x1="38" y1="204" x2="466" y2="204"/>
+
+  <!-- HP2 群：此示例沒有候選訊號 -->
+  <text class="tick hp2 bold" x="38" y="232">HP2</text>
+  <rect class="read hp2" x="44" y="218" width="412" height="13" rx="6.5"/>
+  <text class="base t mono" x="130" y="229" font-size="14">T</text>
+  <circle class="mark ref" cx="252" cy="224" r="5"/>
+  <text class="base c mono" x="374" y="229" font-size="14">C</text>
+
+  <rect class="read hp2" x="54" y="237" width="400" height="13" rx="6.5"/>
+  <text class="base t mono" x="130" y="248" font-size="14">T</text>
+  <circle class="mark ref" cx="252" cy="243" r="5"/>
+  <text class="base c mono" x="374" y="248" font-size="14">C</text>
+
+  <rect class="read hp2" x="46" y="256" width="408" height="13" rx="6.5"/>
+  <text class="base t mono" x="130" y="267" font-size="14">T</text>
+  <circle class="mark ref" cx="252" cy="262" r="5"/>
+  <text class="base c mono" x="374" y="267" font-size="14">C</text>
+
+  <rect class="read hp2" x="50" y="275" width="404" height="13" rx="6.5"/>
+  <text class="base t mono" x="130" y="286" font-size="14">T</text>
+  <circle class="mark ref" cx="252" cy="281" r="5"/>
+  <text class="base c mono" x="374" y="286" font-size="14">C</text>
+
+  <rect class="read hp2" x="42" y="294" width="414" height="13" rx="6.5"/>
+  <text class="base t mono" x="130" y="305" font-size="14">T</text>
+  <circle class="mark ref" cx="252" cy="300" r="5"/>
+  <text class="base c mono" x="374" y="305" font-size="14">C</text>
+
+  <!-- 左側統計 -->
+  <rect class="box ok" x="38" y="348" width="428" height="62" rx="8"/>
+  <text class="anno bold zh ok" x="58" y="376">支持 read 集中於 HP1</text>
+  <text class="tick mono" x="58" y="400">HP1: 5 條　　HP2: 0 條</text>
+  <text class="lbl bold ok" x="336" y="390">分布集中</text>
+
+  <!-- ══════════════ 右：定序錯誤 ══════════════ -->
+  <rect class="box bad" x="512" y="16" width="472" height="410" rx="10"/>
+  <text class="lbl bold zh bad" x="534" y="48">隨機錯誤（示例）</text>
+  <text class="tick zh" x="534" y="70">支持 read 可能<tspan class="bold">分散</tspan>於兩群</text>
+
+  <line class="guide" x1="626" y1="92" x2="626" y2="332"/>
+  <line class="guide" x1="748" y1="88" x2="748" y2="336"/>
+  <line class="guide" x1="870" y1="92" x2="870" y2="332"/>
+  <text class="tick mid" x="626" y="94">參考點</text>
+  <text class="tick mid artifact bold" x="748" y="92">候選</text>
+  <text class="tick mid" x="870" y="94">參考點</text>
+
+  <!-- HP1 群：只有兩條帶有 -->
+  <text class="tick hp1 bold" x="534" y="118">HP1</text>
+  <rect class="read hp1" x="542" y="104" width="410" height="13" rx="6.5"/>
+  <text class="base a mono" x="626" y="115" font-size="14">A</text>
+  <circle class="mark artifact" cx="748" cy="110" r="5"/>
+  <text class="base g mono" x="870" y="115" font-size="14">G</text>
+
+  <rect class="read hp1" x="548" y="123" width="400" height="13" rx="6.5"/>
+  <text class="base a mono" x="626" y="134" font-size="14">A</text>
+  <circle class="mark ref" cx="748" cy="129" r="5"/>
+  <text class="base g mono" x="870" y="134" font-size="14">G</text>
+
+  <rect class="read hp1" x="538" y="142" width="415" height="13" rx="6.5"/>
+  <text class="base a mono" x="626" y="153" font-size="14">A</text>
+  <circle class="mark ref" cx="748" cy="148" r="5"/>
+  <text class="base g mono" x="870" y="153" font-size="14">G</text>
+
+  <rect class="read hp1" x="552" y="161" width="398" height="13" rx="6.5"/>
+  <text class="base a mono" x="626" y="172" font-size="14">A</text>
+  <circle class="mark artifact" cx="748" cy="167" r="5"/>
+  <text class="base g mono" x="870" y="172" font-size="14">G</text>
+
+  <rect class="read hp1" x="544" y="180" width="405" height="13" rx="6.5"/>
+  <text class="base a mono" x="626" y="191" font-size="14">A</text>
+  <circle class="mark ref" cx="748" cy="186" r="5"/>
+  <text class="base g mono" x="870" y="191" font-size="14">G</text>
+
+  <line class="guide" x1="534" y1="204" x2="962" y2="204"/>
+
+  <!-- HP2 群：也有兩條帶有 -->
+  <text class="tick hp2 bold" x="534" y="232">HP2</text>
+  <rect class="read hp2" x="540" y="218" width="412" height="13" rx="6.5"/>
+  <text class="base t mono" x="626" y="229" font-size="14">T</text>
+  <circle class="mark artifact" cx="748" cy="224" r="5"/>
+  <text class="base c mono" x="870" y="229" font-size="14">C</text>
+
+  <rect class="read hp2" x="550" y="237" width="400" height="13" rx="6.5"/>
+  <text class="base t mono" x="626" y="248" font-size="14">T</text>
+  <circle class="mark ref" cx="748" cy="243" r="5"/>
+  <text class="base c mono" x="870" y="248" font-size="14">C</text>
+
+  <rect class="read hp2" x="542" y="256" width="408" height="13" rx="6.5"/>
+  <text class="base t mono" x="626" y="267" font-size="14">T</text>
+  <circle class="mark artifact" cx="748" cy="262" r="5"/>
+  <text class="base c mono" x="870" y="267" font-size="14">C</text>
+
+  <rect class="read hp2" x="546" y="275" width="404" height="13" rx="6.5"/>
+  <text class="base t mono" x="626" y="286" font-size="14">T</text>
+  <circle class="mark ref" cx="748" cy="281" r="5"/>
+  <text class="base c mono" x="870" y="286" font-size="14">C</text>
+
+  <rect class="read hp2" x="538" y="294" width="414" height="13" rx="6.5"/>
+  <text class="base t mono" x="626" y="305" font-size="14">T</text>
+  <circle class="mark artifact" cx="748" cy="300" r="5"/>
+  <text class="base c mono" x="870" y="305" font-size="14">C</text>
+
+  <rect class="box bad" x="534" y="348" width="428" height="62" rx="8"/>
+  <text class="anno bold zh bad" x="554" y="376">兩群皆有支持，分布較分散</text>
+  <text class="tick mono" x="554" y="400">HP1: 2 條　　HP2: 3 條</text>
+  <text class="lbl bold bad" x="832" y="390">分布分散</text>
+
+  <!-- ══════════════ 結論 ══════════════ -->
+  <line class="axis" x1="20" y1="448" x2="980" y2="448"/>
+
+  <text class="lbl bold zh" x="20" y="480">支持 read 的 haplotype 分布可作為重要輔助線索。</text>
+  <text class="anno zh" x="20" y="512">此示例兩邊的<tspan class="bold">總數相近</tspan>（5 條對 5 條）—— 僅依數量難以區分，</text>
+  <text class="anno zh" x="20" y="542">需先建立 HP1／HP2 分群，再結合品質、比對與其他證據判讀。</text>
+</svg>

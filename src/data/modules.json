@@ -1,0 +1,226 @@
+[
+  {
+    "id": "m00",
+    "num": "0",
+    "src": "m00-orientation.html",
+    "group": "起點",
+    "short": "學習導覽",
+    "title_zh": "研究主題與學習路徑",
+    "title_en": "Orientation",
+    "q": "兩個變異都被檢出，為什麼仍無法直接決定治療？",
+    "sub": "從細胞、染色體與 DNA 建立定序資料的基本模型，再說明與治療決策相關的分子關聯問題。",
+    "est_min": 20
+  },
+  {
+    "id": "m01",
+    "num": "1",
+    "src": "m01-one-locus.html",
+    "group": "基礎",
+    "short": "簡化模型",
+    "title_zh": "腫瘤樣本的簡化區域模型",
+    "title_en": "A simplified tumour-region model",
+    "q": "定序將細胞分解後，還保留哪些可用資訊？",
+    "sub": "以簡化模型說明：bulk 定序通常無法保留 read 的細胞來源，但可以保留同一分子跨位點的連結。",
+    "est_min": 30,
+    "prereq": [
+      "m00"
+    ]
+  },
+  {
+    "id": "m02",
+    "num": "2",
+    "src": "m02-biology.html",
+    "group": "基礎",
+    "short": "生物學",
+    "title_zh": "癌症基因體分析的基礎生物學",
+    "title_en": "Essential biology for cancer genomics",
+    "q": "allele、genotype 與 haplotype 有何不同？",
+    "sub": "區分 allele、variant、genotype 與 haplotype，並說明 germline、somatic、clone 與 subclone 的關係。",
+    "est_min": 45,
+    "prereq": [
+      "m01"
+    ]
+  },
+  {
+    "id": "m03",
+    "num": "3",
+    "src": "m03-sequencing.html",
+    "group": "基礎",
+    "short": "定序",
+    "title_zh": "定序原理與長讀的分析價值",
+    "title_en": "Sequencing principles and the value of long reads",
+    "q": "為什麼需要較長的定序片段？它的代價是什麼？",
+    "sub": "比較 Illumina 與 ONT 的讀取方式與錯誤特性，並介紹 homopolymer、coverage、VAF 與 5mC。",
+    "est_min": 45,
+    "prereq": [
+      "m02"
+    ]
+  },
+  {
+    "id": "m04",
+    "num": "4",
+    "src": "m04-data-literacy.html",
+    "group": "工具",
+    "short": "資料格式",
+    "title_zh": "資料格式讀寫能力",
+    "title_en": "Data literacy",
+    "q": "一筆變異紀錄，如何回溯到其原始資料？",
+    "sub": "從 BAM 中的 read 觀測追溯到 VCF 紀錄，並使用 CIGAR 解碼器練習讀取對齊資訊。",
+    "est_min": 60,
+    "prereq": [
+      "m03"
+    ]
+  },
+  {
+    "id": "m05",
+    "num": "5",
+    "src": "m05-germline-calling.html",
+    "group": "工具",
+    "short": "Germline variant calling",
+    "title_zh": "Germline variant calling：從證據到判定",
+    "title_en": "Germline variant calling",
+    "q": "電腦如何判斷某個位置真的有變異，而不是定序錯誤？",
+    "sub": "說明 Clair3 與 DeepVariant 的角色，以及 phasing 如何提供額外證據、協助區分變異與定序雜訊。",
+    "est_min": 35,
+    "prereq": [
+      "m04"
+    ]
+  },
+  {
+    "id": "m06",
+    "num": "6",
+    "src": "m06-phasing.html",
+    "group": "核心",
+    "short": "Phasing",
+    "title_zh": "Phasing 與 haplotagging",
+    "title_en": "Phasing and haplotagging",
+    "q": "如何判斷兩個變異是否位於同一條染色體拷貝？",
+    "sub": "介紹實驗室的核心方法，包含手動 phasing 練習，以及 somatic haplotype HP1-1、HP2-1 與 HP3 的意義。",
+    "est_min": 70,
+    "prereq": [
+      "m05"
+    ]
+  },
+  {
+    "id": "m07",
+    "num": "7",
+    "src": "m07-somatic-calling.html",
+    "group": "核心",
+    "short": "Somatic variant calling",
+    "title_zh": "Somatic variant calling：tumor–normal 與 tumor-only",
+    "title_en": "Somatic variant calling: tumour–normal and tumour-only",
+    "q": "有配對正常組織時，能多得到哪些證據？沒有時會失去什麼？",
+    "sub": "說明配對正常樣本提供的個體基線，以及 tumor-only 分析在 germline 與技術性 artifact 判斷上的限制。",
+    "est_min": 55,
+    "prereq": [
+      "m06"
+    ]
+  },
+  {
+    "id": "m08",
+    "num": "8",
+    "src": "m08-tumor-mixtures.html",
+    "group": "核心",
+    "short": "腫瘤混合體",
+    "title_zh": "腫瘤樣本的混合組成",
+    "title_en": "Tumour mixtures",
+    "q": "同一個數值，為何可能對應三種不同的生物學情況？",
+    "sub": "說明 purity、DNA fraction、ploidy、copy number、multiplicity、LOH 與 TINC 如何影響變異判讀，並檢視簡化模型的適用範圍。",
+    "est_min": 75,
+    "prereq": [
+      "m07"
+    ]
+  },
+  {
+    "id": "m09",
+    "num": "9",
+    "src": "m09-methylation.html",
+    "group": "核心",
+    "short": "甲基化",
+    "title_zh": "甲基化入門",
+    "title_en": "Methylation primer",
+    "q": "除了序列本身，同一個 DNA 分子還能提供哪些資訊？",
+    "sub": "介紹 5mC、allele-specific methylation、MM/ML tags，以及區分直接證據與註記的方法。",
+    "est_min": 45,
+    "prereq": [
+      "m06"
+    ]
+  },
+  {
+    "id": "m10",
+    "num": "10",
+    "src": "m10-benchmarking.html",
+    "group": "核心",
+    "short": "評估",
+    "title_zh": "證據、驗證與效能評估",
+    "title_en": "Evidence and benchmarking",
+    "q": "如何從一張效能圖表看出它沒有告訴你的事？",
+    "sub": "從 precision、recall、F1、資料來源與參考標註品質，系統性評估效能結果與適用範圍。",
+    "est_min": 60,
+    "prereq": [
+      "m07"
+    ]
+  },
+  {
+    "id": "m11",
+    "num": "11",
+    "src": "m11-longphase.html",
+    "group": "實驗室工具",
+    "short": "LongPhase",
+    "title_zh": "LongPhase：核心 phasing 流程",
+    "title_en": "LongPhase core",
+    "q": "程式如何把變異分配到不同染色體拷貝？",
+    "sub": "介紹 phase graph、phase set 與 haplotagging，以及主要失效情境與診斷方法。",
+    "est_min": 45,
+    "prereq": [
+      "m06"
+    ]
+  },
+  {
+    "id": "m12",
+    "num": "12",
+    "src": "m12-longphase-s.html",
+    "group": "實驗室工具",
+    "short": "LongPhase-S",
+    "title_zh": "LongPhase-S（配對 tumor–normal）",
+    "title_en": "LongPhase-S: matched tumour–normal",
+    "q": "有配對正常組織時，完整的腫瘤分析流程如何運作？",
+    "sub": "依序說明 GHIR、LCVF、purity 迴歸、purity-aware 過濾與最終 somatic haplotagging，並標示模型假設與限制。",
+    "est_min": 80,
+    "prereq": [
+      "m08",
+      "m10",
+      "m11"
+    ]
+  },
+  {
+    "id": "m13",
+    "num": "13",
+    "src": "m13-longphase-to.html",
+    "group": "實驗室工具",
+    "short": "LongPhase-TO",
+    "title_zh": "LongPhase-TO（tumor-only）",
+    "title_en": "LongPhase-TO: tumour-only",
+    "q": "沒有配對正常組織時，如何以其他證據補足對照？",
+    "sub": "依序說明 clipping、CNV/BFB 區間、染色體等級 LOH、triplet graph 與 purity 估計，並練習 GT:GT2:GT3 解碼。",
+    "est_min": 80,
+    "prereq": [
+      "m12"
+    ]
+  },
+  {
+    "id": "capstone",
+    "num": "★",
+    "src": "capstone.html",
+    "group": "綜合評量",
+    "short": "Capstone",
+    "title_zh": "Capstone：整合式位點判讀",
+    "title_en": "Capstone",
+    "q": "面對一個位點的完整證據，你能提出什麼結論？",
+    "sub": "整合單一位點的多項證據，完成可重現的推論流程，並撰寫明確標示不確定性的結論。",
+    "est_min": 120,
+    "prereq": [
+      "m13"
+    ]
+  }
+]

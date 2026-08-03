@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>教學用簡化區段模型：腫瘤樣本中的四個細胞群</title>
+  <desc>左側表示樣本中的四個細胞群：正常細胞、最早出現的腫瘤細胞群，以及兩個後續分支。
+        右側表示同一染色體區段的兩份 DNA 拷貝 HP1 與 HP2，以及依序出現的三個體細胞變異 S1、S2、S3。
+        本模型設定 S1 位於 HP1 且由所有腫瘤細胞群共享；S2 僅位於後續分支 1；S3 僅位於後續分支 2。
+        最下方表示標準 bulk 定序混合多個細胞來源的 DNA 後，各變異的預期 VAF。</desc>
+
+  <!-- ══ 左欄：細胞群 ══════════════════════════════════════════════ -->
+  <text class="lbl bold zh" x="20" y="26">樣本中的四個細胞群</text>
+
+  <!-- 正常細胞 -->
+  <rect class="box plain" x="20" y="42" width="300" height="88" rx="8"/>
+  <circle class="cell normal" cx="52" cy="76" r="15"/>
+  <circle class="nucleus" cx="52" cy="76" r="7"/>
+  <circle class="cell normal" cx="86" cy="76" r="15"/>
+  <circle class="nucleus" cx="86" cy="76" r="7"/>
+  <circle class="cell normal" cx="120" cy="76" r="15"/>
+  <circle class="nucleus" cx="120" cy="76" r="7"/>
+  <circle class="cell normal" cx="154" cy="76" r="15"/>
+  <circle class="nucleus" cx="154" cy="76" r="7"/>
+  <circle class="cell normal" cx="188" cy="76" r="15"/>
+  <circle class="nucleus" cx="188" cy="76" r="7"/>
+  <text class="anno zh" x="212" y="72">正常細胞</text>
+  <text class="tick" x="212" y="94">50%　HP1 / HP2</text>
+  <text class="tick zh" x="36" y="122">未帶有本模型設定的 S1／S2／S3</text>
+
+  <!-- founder clone -->
+  <rect class="box plain" x="20" y="142" width="300" height="72" rx="8"/>
+  <circle class="cell tumor" cx="52" cy="172" r="15"/>
+  <circle class="nucleus" cx="52" cy="172" r="7"/>
+  <circle class="cell tumor" cx="86" cy="172" r="15"/>
+  <circle class="nucleus" cx="86" cy="172" r="7"/>
+  <text class="anno zh somatic" x="112" y="168">最早腫瘤細胞群</text>
+  <text class="tick" x="112" y="190">20%　+S1</text>
+  <text class="tick zh" x="36" y="206">本模型設定所有腫瘤細胞群均帶有 S1</text>
+
+  <!-- subclone 1 -->
+  <rect class="box plain" x="20" y="226" width="300" height="72" rx="8"/>
+  <circle class="cell clone1" cx="52" cy="256" r="15"/>
+  <circle class="nucleus" cx="52" cy="256" r="7"/>
+  <circle class="cell clone1" cx="86" cy="256" r="15"/>
+  <circle class="nucleus" cx="86" cy="256" r="7"/>
+  <circle class="cell clone1" cx="120" cy="256" r="15"/>
+  <circle class="nucleus" cx="120" cy="256" r="7"/>
+  <text class="anno zh hp1" x="146" y="252">後續分支 1</text>
+  <text class="tick" x="146" y="274">20%　+S1 +S2</text>
+  <text class="tick zh" x="36" y="290">在原有 S1 的基礎上新增 S2</text>
+
+  <!-- subclone 2 -->
+  <rect class="box plain" x="20" y="310" width="300" height="72" rx="8"/>
+  <circle class="cell clone2" cx="52" cy="340" r="15"/>
+  <circle class="nucleus" cx="52" cy="340" r="7"/>
+  <text class="anno zh hp2" x="78" y="336">後續分支 2</text>
+  <text class="tick" x="78" y="358">10%　+S1 +S3</text>
+  <text class="tick zh" x="36" y="374">另一後續分支，新增 S3</text>
+
+  <!-- ══ 右欄：分子層次 ════════════════════════════════════════════ -->
+  <text class="lbl bold zh" x="380" y="18">各細胞群的 DNA 組成</text>
+
+  <!-- 座標軸 -->
+  <line class="guide" x1="470" y1="42" x2="470" y2="392"/>
+  <line class="guide" x1="640" y1="42" x2="640" y2="392"/>
+  <line class="guide" x1="810" y1="42" x2="810" y2="392"/>
+  <text class="tick mid somatic bold" x="470" y="38">S1</text>
+  <text class="tick mid somatic bold" x="640" y="38">S2</text>
+  <text class="tick mid somatic bold" x="810" y="38">S3</text>
+
+  <!-- 正常細胞的兩條 haplotype -->
+  <rect class="read hp1" x="380" y="60" width="560" height="14" rx="7"/>
+  <text class="tick end hp1" x="374" y="71">HP1</text>
+  <rect class="read hp2" x="380" y="92" width="560" height="14" rx="7"/>
+  <text class="tick end hp2" x="374" y="103">HP2</text>
+  <circle class="mark germline" cx="540" cy="67" r="6"/>
+  <circle class="mark germline" cx="720" cy="99" r="6"/>
+  <text class="tick germline" x="380" y="128">綠點：遺傳的序列差異，可區分兩份 DNA 拷貝</text>
+
+  <!-- founder clone -->
+  <rect class="read hp1" x="380" y="152" width="560" height="14" rx="7"/>
+  <text class="tick end hp1" x="374" y="163">HP1</text>
+  <rect class="read hp2" x="380" y="184" width="560" height="14" rx="7"/>
+  <text class="tick end hp2" x="374" y="195">HP2</text>
+  <circle class="mark germline" cx="540" cy="159" r="6"/>
+  <circle class="mark germline" cx="720" cy="191" r="6"/>
+  <circle class="mark somatic" cx="470" cy="159" r="7"/>
+
+  <!-- subclone 1 -->
+  <rect class="read hp1" x="380" y="236" width="560" height="14" rx="7"/>
+  <text class="tick end hp1" x="374" y="247">HP1</text>
+  <rect class="read hp2" x="380" y="268" width="560" height="14" rx="7"/>
+  <text class="tick end hp2" x="374" y="279">HP2</text>
+  <circle class="mark germline" cx="540" cy="243" r="6"/>
+  <circle class="mark germline" cx="720" cy="275" r="6"/>
+  <circle class="mark somatic" cx="470" cy="243" r="7"/>
+  <circle class="mark somatic" cx="640" cy="243" r="7"/>
+
+  <!-- subclone 2 -->
+  <rect class="read hp1" x="380" y="320" width="560" height="14" rx="7"/>
+  <text class="tick end hp1" x="374" y="331">HP1</text>
+  <rect class="read hp2" x="380" y="352" width="560" height="14" rx="7"/>
+  <text class="tick end hp2" x="374" y="363">HP2</text>
+  <circle class="mark germline" cx="540" cy="327" r="6"/>
+  <circle class="mark germline" cx="720" cy="359" r="6"/>
+  <circle class="mark somatic" cx="470" cy="327" r="7"/>
+  <circle class="mark somatic" cx="810" cy="327" r="7"/>
+
+  <!-- ══ 底部：bulk 定序之後 ══════════════════════════════════════ -->
+  <line class="axis" x1="20" y1="410" x2="980" y2="410"/>
+  <text class="lbl bold zh" x="20" y="438">標準 bulk 定序混合多個細胞來源的 DNA 後，可直接觀測：</text>
+
+  <rect class="box warn" x="380" y="452" width="560" height="88" rx="8"/>
+  <text class="tick mid" x="470" y="474">S1</text>
+  <text class="tick mid" x="640" y="474">S2</text>
+  <text class="tick mid" x="810" y="474">S3</text>
+  <text class="lbl mid bold somatic" x="470" y="502">VAF 0.25</text>
+  <text class="lbl mid bold somatic" x="640" y="502">VAF 0.10</text>
+  <text class="lbl mid bold somatic" x="810" y="502">VAF 0.05</text>
+  <text class="tick mid zh" x="470" y="524">細胞比例 50%</text>
+  <text class="tick mid zh" x="640" y="524">細胞比例 20%</text>
+  <text class="tick mid zh" x="810" y="524">細胞比例 10%</text>
+
+  <text class="anno zh" x="20" y="478">read 與來源細胞的對應</text>
+  <text class="anno zh bad" x="20" y="502">在標準 bulk 流程中</text>
+  <text class="anno zh bad bold" x="20" y="526">通常無法取得</text>
+</svg>

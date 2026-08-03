@@ -1,0 +1,289 @@
+<!--tw
+{
+  "objectives": [
+    "畫出 LongPhase-S 的五個階段，並說明為什麼 purity 估計必須排在過濾之前",
+    "解釋 GHIR 是什麼，以及它為什麼能反映 tumor purity",
+    "說出四個 somatic variant filter 各自在偵測什麼樣的假陽性",
+    "在 BAM 裡找到 somatic haplotype 的標籤，並知道 purity 被寫到哪裡"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<p class="prose">這是 [[LongPhase-S]] 的完整流程，也是 tumor–normal 分析支線的基礎。
+後續的 somatic indel CNN 方法與 subclone 重建都會使用它的輸出。</p>
+
+<p class="prose">前面模組介紹的相關概念，會在本節整合使用。</p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>五個階段</h3>
+
+{{svg:m12-pipeline | [wide] 紅色回饋線表示 <b>purity 估計值用於調整過濾門檻</b>。流程順序與理由如下。}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>階段</th><th>做什麼</th></tr></thead>
+<tbody>
+<tr><td>①</td><td>[[ClairS]] 產生 tumor variants、[[Clair3]] 產生 normal variants</td></tr>
+<tr><td>②</td><td>把 normal variants [[phasing|phase]] 起來，建立 HP1／HP2 骨架</td></tr>
+<tr><td>③</td><td>初步 [[somatic haplotagging]]：把 tumor read 分到 HP1-1／HP2-1</td></tr>
+<tr><td>④</td><td>用 [[GHIR]] ＋ 多項式迴歸估計 [[tumour purity]]</td></tr>
+<tr><td>⑤</td><td>依 purity 動態調整門檻，跑四個 filter，最後重建 somatic haplotype</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">為何 purity 估計先於過濾</p>
+<p class="prose">回到 M8 的合成示例：purity 0.2（此處與 tumor DNA fraction 相等）、50× coverage，一個 clonal somatic 變異
+只有<b>約 5 條 read</b> 支持。</p>
+<p class="prose">若套用適合 purity 1.0 的嚴格門檻，真變異可能被當成雜訊而漏掉，[[recall]] 下降。
+若一律放寬，高 purity 樣本的偽陽性則可能增加。</p>
+<p class="prose">因此此流程先估計 purity，再依估計值調整過濾門檻。</p>
+</div>
+
+<h3>GHIR：用失衡程度估計模型定義的 purity</h3>
+
+<p class="prose">[[GHIR]]（Germline Haplotype Imbalance Ratio）的基本原理如下：</p>
+
+<ul class="prose">
+<li>在理想且無系統性偏差的<b>正常</b>細胞裡，某個 germline 位點的 HP1 與 HP2 read 預期接近 50:50，GHIR ≈ 0.5</li>
+<li>若腫瘤細胞在 HP2 上發生 somatic 突變，部分 read 會被分到 HP2-1，
+因此不再計入原本 HP2 分支的比例</li>
+<li>在其他條件相近時，<b>tumor DNA fraction（此模型中的 purity）越高，失衡訊號通常越明顯</b></li>
+</ul>
+
+{{svg:m12-ghir | [wide] 上排：在此比值定義下，突變 read 被分到新的分支後不再計入原 haplotype，因此比值偏離 0.5；在其他條件相近時，tumor DNA fraction 越高，偏移通常可能越明顯。下排：將全基因體位點的比值畫成直方圖；在此資料與定義下，分布可能向較高比值移動。}}
+
+<p class="prose">可量化這個分布的位置（例如取<b>中位數與四分位距</b>），
+再以驗證資料建立「分布特徵 → 模型定義的 purity」的迴歸關係，估計樣本的 purity。</p>
+
+<h3>實際分布與 LCVF</h3>
+
+<p class="prose">真實資料的 GHIR 分布可能受到低信心位點干擾。因此 LongPhase-S 設計了
+<b>LCVF</b>（Low-Confidence Variant Filtering），以四個條件過濾：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Filter</th><th>排除什麼</th></tr></thead>
+<tbody>
+<tr><td>Germline Haplotype Imbalance</td><td>在 <b>normal</b> 樣本裡就已經失衡的位點（多半是 [[copy number|CNV]] 造成）</td></tr>
+<tr><td>Germline Haplotype Read Ratio</td><td>大量 read 沒被分配到任何 haplotype 的位點（例如大片段 deletion）</td></tr>
+<tr><td>Read Count（static）</td><td>read 數太少的位點 —— 分母太小，GHIR 會亂跳</td></tr>
+<tr><td>Read Count（dynamic）</td><td>用 <b>bimodal valley thresholding</b> 自動找雙峰之間的谷點當門檻</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">最後一項不是固定單一數字，而是依<b>資料分布形狀</b>決定門檻 ——
+先高斯平滑、找兩個主峰，再取中間的谷點。此作法可降低對固定門檻的依賴；穩健性仍需由驗證資料評估。</p>
+
+<h3>四個 somatic variant filter</h3>
+
+<p class="prose">purity 估好之後，用它動態調整門檻，跑四個過濾器：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Filter</th><th>偽陽性訊號</th><th>判斷依據</th></tr></thead>
+<tbody>
+<tr><td><b>TINC</b></td><td>可能是 germline，或 normal 含有腫瘤污染</td><td>檢查該位點在 <b>normal</b> 樣本的 [[VAF]]；較高時增加 germline/TINC 疑慮</td></tr>
+<tr><td><b>Read-level</b></td><td>比對或 read 證據混亂造成的可疑訊號</td><td>帶變異的 read 若<b>同時</b>帶有 HP1 與 HP2 的 germline allele → 提高疑慮</td></tr>
+<tr><td><b>Haplotype origin</b></td><td>同一問題的整體統計</td><td>支持 read 若多來自<b>同一條</b> germline haplotype，則增加來源一致性的支持</td></tr>
+<tr><td><b>Variant cluster</b></td><td>密集 read pattern 造成的可疑訊號</td><td>檢查變異是否集中於<b>同一群 read</b>；以 z-score 識別異常模式，仍需配合其他證據</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">這四個 filter 都檢查<b>haplotype 來源的一致性或 read pattern 的異常</b>，
+但各自的指標與閾值不同，應合併判讀。</p>
+
+<h3>HP3 的後續指派</h3>
+
+<p class="prose">重建 somatic haplotype 時，未涵蓋 germline 錨點的 read
+會先標為 <code>HP3</code>。之後再依其攜帶的 somatic 變異證據，嘗試指派到對應的 somatic haplotype
+（見 M6 的下半部示意）。</p>
+
+<p class="prose">並非所有 HP3 都能完成指派。如果某個 somatic 變異的支持 read
+<b>同時來自兩條 germline haplotype</b>，來源證據互相衝突，則保留為不可指派。</p>
+</section>
+
+
+<section data-part="evidence">
+<h2>真實證據</h2>
+
+<h3>實際指令</h3>
+
+{{cli}}
+# 僅估計 purity
+longphase-s estimate_purity \
+  -s phased_normal_snp.vcf \
+  -b normal.bam \
+  --tumor-snv-file tumor_snv.vcf \
+  --tumor-bam-file tumor.bam \
+  -r reference.fasta \
+  -t 8 \
+  -o output_prefix
+
+# somatic haplotagging（依版本可自動估計或指定 purity）
+longphase-s somatic_haplotag \
+  -s phased_germline_snp.vcf \
+  -b normal.bam \
+  --tumor-snv-file tumor_snv_indel.vcf \
+  --tumor-bam-file tumor.bam \
+  -r reference.fasta \
+  -t 8 \
+  -o tagged_prefix \
+  --output-somatic-vcf
+{{/cli}}
+
+<h3>輸出檔案位置</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>東西</th><th>位置</th></tr></thead>
+<tbody>
+<tr><td>somatic haplotype 標籤</td><td>BAM 的 <code>HP:Z:1-1</code> / <code>2-1</code> / <code>3</code>（<b>字串</b>型別）</td></tr>
+<tr><td>tumor purity</td><td><code>&lt;prefix&gt;_purity.out</code> <b>文字檔</b></td></tr>
+<tr><td>過濾後的 somatic VCF</td><td><code>&lt;prefix&gt;_sc.vcf</code>（需加 <code>--output-somatic-vcf</code>）</td></tr>
+<tr><td>haplotagging 效能</td><td><code>&lt;prefix&gt;_somatic_haplotag.metrics</code>（需給 <code>--truth-vcf</code>）</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">三項常見注意事項</p>
+<ul class="prose">
+<li><b>purity 不會印到 stdout。</b>請讀取 <code>_purity.out</code>，尋找
+<code>Tumor purity: 0.169599</code> 這一行。</li>
+<li><b>是 <code>--tumor-bam-file</code>，不是 <code>--tumor-bam</code>。</b>
+同理是 <code>--tumor-snv-file</code>。</li>
+<li><b><code>--tumor-purity</code> 的合法範圍是 0.1–1.0</b>（不是 0–1）。
+給了這個參數就會關閉自動估計。</li>
+</ul>
+</div>
+
+<h3>輸出結果示例</h3>
+
+<p class="prose">以下是 LongPhase-S 在真實資料上的 IGV 截圖，可作為流程完成後的檢視示例：</p>
+
+{{fig:a-s40-igv-hp11}}
+
+<p class="prose">圖中 somatic 變異兩側缺少 HP2 的 germline allele，<b>支持其來源為 HP1</b>；
+仍應結合 read、base 與 mapping quality，以及其他 filter 結果，不能僅憑視覺判定。</p>
+
+{{fig:a-s41-igv-loh}}
+
+<h3>purity 估計的結果</h3>
+
+{{fig:a-s27-purity}}
+
+<h3>結果摘要</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>面向</th><th>LongPhase-S 的結論</th></tr></thead>
+<tbody>
+<tr><td>purity 估計</td><td>在所報告的 benchmark 與評估設定中，低 purity 區段優於 ASCAT；leave-k-out 的 MAE 約 4%、R² 約 0.95</td></tr>
+<tr><td>somatic SNV calling</td><td>部分 cell line 有明顯提升，其餘持平或略降</td></tr>
+<tr><td>somatic haplotagging</td><td>有明確 germline 來源的 read 指派穩定；<code>HP3</code> 這類則相對不穩</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">最後一列列出明確限制：<b>HP3 的分類不穩定。</b>
+閱讀結果時，應將此限制納入解讀，不由自陳內容推論檢查充分。</p>
+</section>
+
+
+<section data-part="predict">
+<h2>判讀練習</h2>
+
+{{ask}}
+<p class="prose">執行 <code>estimate_purity</code> 後得到 0.95，但外部資料估計這個檢體只有大約 40% 的腫瘤細胞。<br><br>
+可能出了什麼問題？</p>
+{{reveal}}
+<p class="prose">依可能性排序：</p>
+<ol class="prose">
+<li><b>大範圍的 [[LOH]] 或 [[copy number|CNV]]</b>。GHIR 量的是 haplotype 失衡，
+LOH 與 somatic 突變可能造成相似的失衡訊號。若未被 LCVF 充分過濾，模型可能高估 purity。</li>
+<li><b>輸入的 normal VCF 沒有正確 phase</b>。GHIR 依賴 HP1／HP2 的分群；
+若 phasing 錯誤，比例便失去解釋力。先檢查 phased VCF 裡的 <code>PS</code> 是否合理。</li>
+<li><b>[[TINC]]</b>。如果 normal 樣本含有腫瘤 DNA 污染，germline 基準線可能發生偏移。</li>
+<li><b>模型外推</b>。迴歸是在六個細胞株的合成樣本上訓練的。
+如果你的樣本在某個維度上不像那批訓練資料（不同癌別、不同 [[basecalling|basecaller]]、不同 coverage），
+預測可能不可靠。</li>
+</ol>
+<p class="prose">建議的排查順序是：先以 IGV 檢視多個區域的 phasing 品質，
+再查看 <code>_purity.out</code> 的 filter 統計，確認 LCVF 濾掉的位點比例。
+若濾除比例異常低，第 1 項的可能性較高。</p>
+{{/ask}}
+</section>
+
+
+<section data-part="practice">
+<h2>實作練習</h2>
+
+<h3>執行完整流程</h3>
+
+{{cli}}
+# 前置：normal 的 germline VCF 要先 phase 好
+longphase-s phase \
+  -s normal_snp.vcf -b normal.bam -r reference.fasta \
+  -t 8 -o phased_normal --ont
+
+# 主流程：估純度 + 過濾 + somatic haplotagging
+longphase-s somatic_haplotag \
+  -s phased_normal.vcf \
+  -b normal.bam \
+  --tumor-snv-file tumor_snv.vcf \
+  --tumor-bam-file tumor.bam \
+  -r reference.fasta \
+  -t 8 \
+  -o tagged \
+  --output-somatic-vcf \
+  --somatic-calling-log
+{{/cli}}
+
+<h3>逐項檢視輸出</h3>
+
+{{cli}}
+# purity 估計（不會印到 stdout，請讀取輸出檔案）
+grep -A2 'Estimation result' tagged_purity.out
+
+# 每條 read 被分到哪個 somatic haplotype
+samtools view tagged.bam | grep -o 'HP:Z:[0-9-]*' | sort | uniq -c
+
+# 過濾後的 somatic 變異（PASS 與 LowQual）
+awk '!/^#/ {print $7}' tagged_sc.vcf | sort | uniq -c
+{{/cli}}
+
+<h3>三項常見注意事項</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>細節</th><th>正確做法</th></tr></thead>
+<tbody>
+<tr><td>找不到純度結果</td><td>它<b>不印到 stdout</b>，在 <code>&lt;prefix&gt;_purity.out</code> 裡</td></tr>
+<tr><td>參數名稱</td><td>是 <code>--tumor-bam-file</code> 與 <code>--tumor-snv-file</code>，不是 <code>--tumor-bam</code></td></tr>
+<tr><td>手動指定純度</td><td><code>--tumor-purity</code> 的合法範圍是 <b>0.1–1.0</b>（不是 0–1）；給了就關閉自動估計</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>使用 IGV 驗證輸出</h3>
+
+<p class="prose">載入 <code>tagged.bam</code>，依 <code>HP</code> tag 分組，檢視一個 somatic 變異。
+可檢查帶有 somatic 變異的 read 是否集中於某一條 haplotype，
+以及兩側的 germline allele 是否一致。</p>
+
+<p class="prose"><b>若帶變異的 read 兩側 germline allele 混合</b>，
+該位點的偽陽性疑慮會增加；仍需結合四個過濾器與其他品質指標判斷。</p>
+
+{{quiz:m12}}
+</section>

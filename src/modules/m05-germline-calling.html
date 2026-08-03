@@ -1,0 +1,176 @@
+<!--tw
+{
+  "objectives": [
+    "說明 variant caller 在做什麼判斷，以及為什麼它不是單純數 read",
+    "說明 phasing 資訊如何作為辨識定序錯誤的輔助證據",
+    "說出 Clair3 與 DeepVariant 在流程中的位置",
+    "建立 precision、recall 與 F1 的基本概念，並說明三項指標各自衡量的內容"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<p class="prose">本課程後續工具多以 caller 輸出的候選變異為輸入，進一步進行篩選或校正。
+因此需要先理解 caller 的輸出內容與限制。</p>
+
+<p class="prose">germline calling 的情境相對單純。本節先建立 [[precision]] 與 [[recall]] 的基本直覺，
+再於 M07 延伸到 somatic calling 的額外因素。</p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>[[variant calling|變異檢測]]的判斷內容</h3>
+
+<p class="prose">僅依 read 計數時，某個位置有 30 條 read 支持 <code>A</code>、28 條支持 <code>G</code>，
+可提出 heterozygous 候選，但不能單獨判定為真變異。錯誤率較高的平台（例如部分 ONT 資料）可能在支持數中包含定序錯誤。</p>
+
+<p class="prose">以 [[Clair3]] 與 [[DeepVariant]] 為例，caller 使用深度學習模型整合多種 read、品質與比對特徵；
+不同 caller 的模型與特徵並不完全相同：</p>
+
+{{svg:m05-caller-features | [wide] 左：僅依 read 計數時，30 比 28 只能提出候選，不能單獨定案；其中部分支持可能來自讀取錯誤。右：示意模型可整合多類 read、品質與比對特徵，再輸出候選類別與信心分數。}}
+
+<h3>phasing 如何協助辨識定序雜訊</h3>
+
+<p class="prose">以下示範 read-level phasing 如何作為辨識候選變異的輔助證據：</p>
+
+<ul class="prose">
+<li><b>一般 heterozygous germline 變異</b>：在 phasing 與 mapping 品質可靠的簡化情境下，支持 read 往往較集中於同一條 [[haplotype]]。</li>
+<li><b>隨機定序錯誤</b>：通常較分散於 HP1 與 HP2；但系統性錯誤、mapping bias、copy-number／LOH 或 phasing 錯誤可能不符合此模式。</li>
+</ul>
+
+{{svg:m05-consistent-vs-chaotic | [wide] 兩邊示意同一種畫面：中間是待判斷的候選位置，左右各有一個已知參考位點，將 read 分成兩個 haplotype 群組。左邊示意支持 read 集中於一群；右邊示意支持 read 分布於兩群。兩邊的<b>總數相近</b>，因此僅依數量難以區分，仍需整合品質與比對證據。}}
+
+<p class="prose">換句話說，「這個候選的支持 read 是否集中在單一 haplotype 上」可作為重要的輔助特徵。
+後續模組會在不同情境中再次使用這項訊息：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>應用情境</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td>germline calling（本節）</td><td>支持 read 分布分散 → 可列為定序錯誤的候選訊號</td></tr>
+<tr><td>LongPhase-S 的 read-level filter</td><td>somatic read 若同時帶有 HP1 與 HP2 的 germline allele → 可疑</td></tr>
+<tr><td>LongPhase-S 的 haplotype origin filter</td><td>若資料可可靠建立 haplotype origin，somatic-supporting read 的分布可作為來源判定的輔助證據；CN／LOH 等情況需另行評估</td></tr>
+<tr><td>LongPhase-TO / D 的 triplet graph</td><td>候選點與左右兩個 germline 位點的連結樣態</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">在本節示例中，<b>「分布集中或分散」是重要線索之一</b>，但不能取代品質、比對與 copy-number 等證據。</p>
+
+<h3>precision 與 recall：基礎概念</h3>
+
+<p class="prose">評估 caller 時，至少應同時查看 precision 與 recall。假設 benchmark 標示某區域有 100 個真變異，
+而 caller 報告 90 個，其中 80 個為真變異：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>指標</th><th>計算方式</th><th>這個例子</th><th>解讀問題</th></tr></thead>
+<tbody>
+<tr><td>[[precision]]</td><td>TP ÷（TP + FP）</td><td>80 ÷ 90 = <b>0.89</b></td><td>報告的候選中有多少為真變異？</td></tr>
+<tr><td>[[recall]]</td><td>TP ÷（TP + FN）</td><td>80 ÷ 100 = <b>0.80</b></td><td>所有真變異中有多少被找出？</td></tr>
+<tr><td>[[F1]]</td><td>兩者的調和平均</td><td><b>0.84</b></td><td>同時摘要 precision 與 recall</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">調整判定門檻通常會改變 precision–recall trade-off：放寬門檻可能提高 recall，收緊門檻可能提高 precision，
+但實際方向與幅度取決於資料與模型。M10 的滑桿示範：<b>precision 增加時，F1 不一定同步增加相同幅度。</b></p>
+</section>
+
+
+<section data-part="evidence">
+<h2>真實證據</h2>
+
+<p class="prose">本教材示例使用 [[Clair3]]；部分流程也會使用 PEPPER-Margin-DeepVariant。
+以下提供一組示範指令：</p>
+
+{{cli}}
+docker run \
+  -v "${INPUT_DIR}":"${INPUT_DIR}" \
+  -v "${OUTPUT_DIR}":"${OUTPUT_DIR}" \
+  kishwars/pepper_deepvariant:r0.7 \
+  run_pepper_margin_deepvariant call_variant \
+  -b "${INPUT_DIR}/alignment.bam" \
+  -f "${INPUT_DIR}/reference.fasta" \
+  -o "${OUTPUT_DIR}" \
+  -t 10 \
+  --ont_r9_guppy5_sup
+{{/cli}}
+
+<p class="cli-note">最後的 <code>--ont_r9_guppy5_sup</code> 是與特定 ONT 化學版本／basecaller 資料相容的模型選項。
+R10 與 PacBio HiFi 應依所用版本文件選擇相容模型（例如 <code>--ont_r10_q20</code> 或 <code>--hifi</code>）。
+模型不匹配可能降低效能，且流程未必報錯；請將平台、basecaller 與模型版本記錄於 [[provenance]]。</p>
+
+<p class="prose">在本教材流程中，germline VCF 產生後，再由後續 phasing 工具使用其中的 heterozygous 位點作為錨點。
+這是本流程的先 call、再 phase 順序；其他工具可能採用不同的整合方式。</p>
+</section>
+
+
+<section data-part="predict">
+<h2>判讀練習</h2>
+
+{{ask}}
+<p class="prose">某個位點有 50 條 read 覆蓋，其中 25 條支持 alt allele（VAF = 0.5）。
+檢查這 25 條 read 的 [[HP tag]]，發現 13 條屬於 HP1、12 條屬於 HP2。<br><br>
+請判斷此分布較支持一般 germline 變異，還是定序錯誤／比對假訊號，並說明需要補充哪些證據。</p>
+{{reveal}}
+<p class="prose"><b>在相位與 mapping 品質可靠、且未見 CN／LOH 等因素時，這個分布與一般 heterozygous germline 模式不一致，可列為可疑訊號。</b></p>
+<p class="prose">一般 heterozygous germline 變異預期位於其中一條染色體，因此支持 read 往往較集中於 HP1 或 HP2；13 比 12 的分布需要結合其他證據判讀，不能單獨定義為錯誤。</p>
+<p class="prose">接近均分的支持 read 可與隨機錯誤一致，但系統性錯誤、mapping bias、相位錯誤或腫瘤區域的 copy-number 狀態也可能造成類似結果。</p>
+<p class="prose">另需注意以下情況：</p>
+<ul class="prose">
+<li>若位點的 DNA 拷貝數相對一般二倍體狀態改變，haplotype 比例可能失衡</li>
+<li>若為 <b>homozygous</b> 變異，兩條 haplotype 都可能帶有該 allele；VAF 仍會受 copy number、污染與測序品質影響，不必然等於 1.0</li>
+</ul>
+<p class="prose">因此，VAF = 0.5 加上 HP 近乎均分只能提高可疑程度，仍需搭配 allele balance、base／mapping quality 與 copy-number 證據。</p>
+{{/ask}}
+</section>
+
+
+<section data-part="practice">
+<h2>實作練習</h2>
+
+<h3>執行一次 germline calling</h3>
+
+{{cli}}
+# Clair3（Docker 範例；請依環境調整路徑）
+docker run -v "${INPUT_DIR}":"${INPUT_DIR}" -v "${OUTPUT_DIR}":"${OUTPUT_DIR}" \
+  hkubal/clair3:latest \
+  /opt/bin/run_clair3.sh \
+  --bam_fn="${INPUT_DIR}/aln.bam" \
+  --ref_fn="${INPUT_DIR}/reference.fasta" \
+  --threads=10 \
+  --platform="ont" \
+  --model_path="/opt/models/ont" \
+  --output="${OUTPUT_DIR}"
+{{/cli}}
+
+<p class="cli-note">模型應與定序化學版本、basecaller 與工具版本相容。模型不匹配可能降低效能，
+且未必觸發錯誤；請在執行前核對模型文件，並將設定記錄於 provenance。</p>
+
+<h3>檢查結果的合理性</h3>
+
+<p class="prose">取得 VCF 後，先進行以下基本合理性檢查：</p>
+
+{{cli}}
+# 變異總數；典型高品質人類全基因體 callset 約為數百萬筆，實際值依篩選條件而異
+bcftools view -H out.vcf | wc -l
+
+# het 與 hom 的比例；實際值依族群、平台與篩選條件而異
+bcftools view -H -g het out.vcf | wc -l
+bcftools view -H -g hom out.vcf | wc -l
+
+# SNV 與 indel 的比例；實際值依平台與篩選條件而異
+bcftools view -H -v snps out.vcf | wc -l
+bcftools view -H -v indels out.vcf | wc -l
+{{/cli}}
+
+<p class="prose">這些統計若明顯偏離同類資料的預期，可能提示 coverage、模型相容性、參數、過濾條件或樣本品質問題。
+請先檢查原因，再進行 phasing，以降低問題在後續流程中傳遞的風險。</p>
+
+{{quiz:m05}}
+</section>

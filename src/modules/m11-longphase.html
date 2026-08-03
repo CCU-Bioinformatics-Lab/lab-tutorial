@@ -1,0 +1,223 @@
+<!--tw
+{
+  "objectives": [
+    "說出 LongPhase 的輸入與輸出各是什麼",
+    "描述 phase graph 的節點與邊各自代表什麼",
+    "說出三種會讓 phasing 失敗的情況",
+    "跑一個最小的 LongPhase 範例並解讀輸出"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<p class="prose">[[LongPhase]] 是本教材後續工具共用的基礎，處理的是<b>一般（非腫瘤）樣本</b>的 phasing。
+開始分析腫瘤資料前，先掌握這個基本流程。</p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>輸入與輸出</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>子命令</th><th>輸入</th><th>輸出</th></tr></thead>
+<tbody>
+<tr><td><code>phase</code></td><td>germline SNP VCF ＋ BAM ＋ reference</td><td>含以 <code>|</code> 表示相位的 <code>GT</code> 與 <code>[[PS tag|PS]]</code> 的 phased VCF</td></tr>
+<tr><td><code>haplotag</code></td><td>已 phase 的 VCF ＋ BAM ＋ reference</td><td>每條 read 帶 <code>[[HP tag|HP]]</code> tag 的 BAM</td></tr>
+<tr><td><code>modcall</code></td><td>帶甲基化的 BAM ＋ reference</td><td>甲基化的 VCF；是否可供後續 phase 請依目前版本文件確認</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">注意這個順序：<b>先 call variant，再 phase，最後 haplotag。</b>
+LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位點當錨點。</p>
+
+<h3>phase graph 的基本概念</h3>
+
+{{svg:m11-phase-graph | [wide] 三個步驟。① 將可區分兩條染色體的位置表示為節點。② 若 read 同時跨過兩個節點，就建立一條邊；邊的粗細表示支持強度 —— allele 組合一致時較強、互相衝突時較弱、沒有 read 跨過時不建立邊。③ 依一致性選擇相位指派，<b>各連通部分形成一個 phase block</b>。}}
+
+<p class="prose">可將每個 heterozygous 位點表示為圖上的一個節點。兩個節點之間若有 read 同時跨過，
+就建立一條邊；邊的權重代表<b>支持強度</b>：</p>
+
+<ul class="prose">
+<li>多條 read 支持 A–C 與 G–T 的 allele 組合 → 強邊，方向較明確</li>
+<li>read 支持的 allele 組合互相衝突（有些支持 A–C、有些支持 A–T）→ 弱邊，可能有定序錯誤或比對問題</li>
+<li>完全沒有 read 跨過 → 沒有邊，[[phase block]] 在這裡斷開</li>
+</ul>
+
+<p class="prose">Phasing 會依據 read 支持的 allele 組合，選擇加權一致性較高的指派。
+各連通部分形成一個 <b>phase set</b>，VCF 用 <code>PS</code> 標示。</p>
+
+<h3>三種失敗模式</h3>
+
+{{svg:m11-failure-modes | [wide] 三種失敗模式及其可觀測指標。① 分段破碎：檢查 phase set 的數量。② 方向對調：與 truth 比對時，錯誤從某點起系統性出現。③ 大量 read 無法指派：檢查 HP 標記率。}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>失敗</th><th>原因</th><th>徵兆</th></tr></thead>
+<tbody>
+<tr><td><b>[[phase block]] 斷裂</b></td><td>read 太短，或中間沒有 het 位點</td><td>同一條染色體上出現很多不同的 <code>PS</code> 值</td></tr>
+<tr><td><b>[[switch error]]</b></td><td>某處證據太弱，兩條 haplotype 被對調</td><td>與 truth 比對時，錯誤從某一點之後系統性地發生</td></tr>
+<tr><td><b>大量 read 未標記</b></td><td>[[LOH]]、低 coverage、mapping quality 太低</td><td>haplotag 後很多 read 沒有 <code>HP</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">第一項與第三項在<b>腫瘤</b>樣本上可能更明顯，因為 LOH 與 copy number 異常會減少可用的 phasing 錨點。
+LongPhase-S 與 LongPhase-TO 都針對這些腫瘤資料情境提供額外處理。</p>
+</section>
+
+
+<section data-part="evidence">
+<h2>真實證據</h2>
+
+<h3>最小可跑範例</h3>
+
+{{cli}}
+# 1. 準備輸入（見 M4）
+samtools faidx reference.fasta
+minimap2 --MD -ax map-ont -t 10 reference.fasta reads.fastq -o aln.sam
+samtools sort -@ 10 aln.sam -o aln.bam && samtools index aln.bam
+
+# 2. germline calling（Clair3 或 PEPPER-DeepVariant，見 M5）
+#    產生 SNP.vcf
+
+# 3. phasing
+longphase-s phase \
+  -s SNP.vcf \
+  -b aln.bam \
+  -r reference.fasta \
+  -t 8 \
+  -o phased \
+  --ont
+
+# 4. haplotagging
+longphase-s haplotag \
+  -r reference.fasta \
+  -s phased.vcf \
+  -b aln.bam \
+  -t 8 \
+  -o tagged
+{{/cli}}
+
+<h3>如何驗證輸出</h3>
+
+{{cli}}
+# 在已定相的 heterozygous records 檢查 | 與 PS
+grep -v '^##' phased.vcf | head -5
+
+# BAM 裡應該有 HP tag
+samtools view tagged.bam | grep -o 'HP:i:[12]' | sort | uniq -c
+
+# 有多少 read 沒被標到？
+samtools view -c tagged.bam
+samtools view tagged.bam | grep -c 'HP:i:'
+{{/cli}}
+
+<p class="cli-note">最後兩行的差可用來估算未標記的 read 數。請將差值除以總 read 數，
+再依資料品質與分析目標判讀；比例偏高時，回到 M6 的排查清單。</p>
+
+<h3>常見參數注意事項</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>細節</th><th>說明</th></tr></thead>
+<tbody>
+<tr><td><code>--ont</code> / <code>--pb</code></td><td>LongPhase-S 的 <code>phase</code> 需指定平台。LongPhase-TO 目前僅支援 ONT；即使接受平台旗標，也不會改變其處理方式。</td></tr>
+<tr><td><code>-q</code> 預設值不一致</td><td><code>haplotag</code> 是 1，<code>estimate_purity</code> 是 20；同一份資料可能因子命令不同而產生不同結果。</td></tr>
+<tr><td><code>--sv-window</code></td><td>部分版本的 help 與實際註冊選項不同，實際選項可能是 <code>--svWindow</code>；執行前請核對版本。</td></tr>
+<tr><td><code>modcall</code> 的 <code>-b</code></td><td>部分版本的 help 顯示 <code>--bam-file</code>，實際選項可能是 <code>--methylbamfile</code>；請以目前版本為準。</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">遇到不一致時的處理</p>
+<p class="prose">以上差異是在特定版本觀察到的 help、文件與程式選項不一致。
+請以目前版本的 <code>src/phase/Phasing.cpp</code> 中 <code>longopts</code> 表為準，並記錄版本。
+使用新參數前，先檢索該表確認名稱。</p>
+</div>
+</section>
+
+
+<section data-part="predict">
+<h2>判讀練習</h2>
+
+{{ask}}
+<p class="prose">你在一條染色體上完成 phasing，發現輸出的 VCF 裡有 <b>將近 200 個不同的 <code>PS</code> 值</b>。<br><br>
+這正常嗎？該從哪裡查起？</p>
+{{reveal}}
+<p class="prose"><b>數量偏高，建議檢查。</b>在 read 長度與 heterozygous 位點密度足夠時，長讀通常可形成較大的 phase blocks；實際數量仍取決於資料品質與參數設定。</p>
+<p class="prose">排查順序：</p>
+<ol class="prose">
+<li><b>先看 read 長度分布。</b><code>samtools stats</code> 看平均與 N50。
+如果 read 只有 2–3 kb，block 破碎可能是預期結果，不一定代表程式錯誤。</li>
+<li><b>再看 het 位點密度。</b>如果 VCF 裡的 het 位點本來就稀疏（例如樣本本身雜合度低，
+或這條染色體有大段 [[LOH]]），可用錨點就會減少。</li>
+<li><b>看斷點的位置分布。</b>如果斷點<b>集中在特定區段</b>，那多半是該區段有問題
+（LOH、重複序列、低 coverage）。如果<b>均勻散布</b>，那是全域性的 read 長度或參數問題。</li>
+<li><b>檢查 <code>-d</code>（distance）參數。</b>若目前版本預設為 300000，距離超過此值時就不嘗試連接。
+如果資料 read 特別長，可依版本文件評估是否調大。</li>
+</ol>
+<p class="prose">腫瘤樣本中，LOH 是造成這種現象的常見可能性之一：該區域的兩條染色體變得難以區分，
+可用錨點可能大幅減少。腫瘤專用工具因此需要額外處理 LOH 區域，否則 phase blocks 可能變得零碎。</p>
+{{/ask}}
+</section>
+
+
+<section data-part="practice">
+<h2>實作練習</h2>
+
+<h3>執行最小流程</h3>
+
+{{cli}}
+# 僅執行小區域測試，以縮短重複測試時間
+REGION="chr20:1000000-2000000"
+
+longphase-s phase \
+  -s SNP.vcf \
+  -b aln.bam \
+  -r reference.fasta \
+  -t 8 \
+  -o phased \
+  --ont
+
+longphase-s haplotag \
+  -r reference.fasta \
+  -s phased.vcf \
+  -b aln.bam \
+  --region "${REGION}" \
+  -t 8 \
+  -o tagged
+{{/cli}}
+
+<h3>保存參數設定</h3>
+
+<p class="prose">執行前請確認目前版本可接受的長選項，因為 help 訊息與實際接受的長選項
+<b>不一定一致</b>：</p>
+
+{{cli}}
+# 確認目前版本接受的長選項
+longphase-s phase --help
+
+# 如果 help 與實際行為不符，查閱原始碼裡的選項表
+grep -A40 'static struct option' src/phase/Phasing.cpp
+{{/cli}}
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">目前版本的已知差異</p>
+<ul class="prose">
+<li>部分版本的 help 寫 <code>--sv-window</code>，實際註冊的是 <code>--svWindow</code>；請核對版本後再執行。</li>
+<li><code>modcall</code> 的 help 可能寫 <code>--bam-file</code>，實際選項可能是 <code>--methylbamfile</code>；請以版本為準。</li>
+<li><code>-q</code> 的預設值在不同子命令不一樣（<code>haplotag</code> 是 1、
+純度估計是 20）。同一份資料用不同子命令會得到不同結果。</li>
+</ul>
+<p class="prose">遇到不一致時，請以目前版本原始碼的選項表為準。</p>
+</div>
+
+{{quiz:m11}}
+</section>

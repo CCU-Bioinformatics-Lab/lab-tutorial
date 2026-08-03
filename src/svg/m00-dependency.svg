@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 570">
+  <title>同一個 read 關係問題如何對應三類分析工具</title>
+  <desc>最上方是共同問題：從大量 reads 推定哪些突變位在同一條 DNA 分子上。
+        第一層 LongPhase 把兩位點的直覺擴大到一般樣本的全基因體資料。
+        進入腫瘤後，資料多了正常細胞混合、低比例突變與更多錯誤訊號，並依是否有同一病人的正常檢體分岔。
+        有正常檢體時使用 longphase-s 做直接對照；只有腫瘤檢體時使用 longphase-to，需整合更多間接證據。</desc>
+
+  <text class="ttl mid zh" x="500" y="36">同一個問題，資料情境不同就對應不同方法</text>
+
+  <!-- ══ 共通研究問題 ═════════════════════════════════════════════ -->
+  <rect class="box plain" x="90" y="60" width="820" height="104" rx="12"/>
+  <text class="anno bold zh" x="116" y="92">共同研究問題</text>
+
+  <rect class="read hp1" x="122" y="112" width="180" height="13" rx="6"/>
+  <circle class="mark somatic" cx="174" cy="118" r="6"/>
+  <circle class="mark somatic" cx="256" cy="118" r="6"/>
+  <rect class="read hp2" x="138" y="136" width="180" height="13" rx="6"/>
+  <circle class="mark ref" cx="174" cy="142" r="6"/>
+  <circle class="mark ref" cx="256" cy="142" r="6"/>
+
+  <path class="conn" d="M350,112 L390,112" marker-end="url(#arrow)"/>
+  <text class="lbl bold zh" x="422" y="116">從 reads 恢復：</text>
+  <text class="lbl bold zh somatic" x="600" y="116">哪些突變位在同一條 DNA？</text>
+  <text class="tick zh" x="422" y="144">上一節的兩位點判讀，是此分析問題的最小示例。</text>
+
+  <path class="flow animate-flow" d="M500,166 L500,204" marker-end="url(#arrow)"/>
+  <text class="tick zh" x="516" y="190">從兩個位置擴大到全基因體</text>
+
+  <!-- ══ LongPhase 基礎層 ══════════════════════════════════════════ -->
+  <rect class="box accent" x="180" y="210" width="640" height="116" rx="12"/>
+  <text class="lbl bold mid" x="310" y="250">LongPhase</text>
+  <text class="tick mid zh" x="310" y="278">一般樣本</text>
+  <line class="guide" x1="410" y1="230" x2="410" y2="306"/>
+
+  <circle class="mark germline" cx="462" cy="254" r="8"/>
+  <circle class="mark germline" cx="532" cy="254" r="8"/>
+  <circle class="mark germline" cx="602" cy="254" r="8"/>
+  <path class="conn hp1 thick" d="M462,254 L532,254 L602,254"/>
+  <circle class="mark hp1" cx="462" cy="284" r="8"/>
+  <circle class="mark hp2" cx="532" cy="284" r="8"/>
+  <circle class="mark hp1" cx="602" cy="284" r="8"/>
+  <path class="conn hp2 thick" d="M462,284 L532,284 L602,284"/>
+
+  <text class="anno bold zh" x="648" y="252">建立基礎能力</text>
+  <text class="tick zh" x="648" y="278">根據大量 reads 推定</text>
+  <text class="tick zh" x="648" y="300">分子關係與其可信度</text>
+
+  <path class="flow animate-flow" d="M500,328 L500,364" marker-end="url(#arrow)"/>
+  <text class="tick mid zh" x="500" y="350">進入腫瘤：多了混合、低比例訊號與更多假象</text>
+
+  <!-- ══ 腫瘤分岔問題 ═════════════════════════════════════════════ -->
+  <text class="anno bold mid zh" x="500" y="386">關鍵分岔：有沒有同一病人的正常檢體可以直接比較？</text>
+  <path class="conn thick" d="M500,394 L500,410 L254,410 L254,430" marker-end="url(#arrow)"/>
+  <path class="conn thick" d="M500,394 L500,410 L746,410 L746,430" marker-end="url(#arrow)"/>
+
+  <!-- LongPhase-S -->
+  <rect class="box ok" x="40" y="434" width="428" height="116" rx="12"/>
+  <circle class="cell tumor" cx="92" cy="490" r="28"/>
+  <circle class="cell normal" cx="154" cy="490" r="28"/>
+  <text class="tick mid zh" x="92" y="536">腫瘤</text>
+  <text class="tick mid zh" x="154" y="536">正常</text>
+  <line class="guide" x1="196" y1="454" x2="196" y2="530"/>
+  <text class="lbl bold" x="220" y="472">longphase-s</text>
+  <text class="anno bold zh ok" x="220" y="504">有直接對照</text>
+  <text class="tick zh" x="220" y="530">同一病人的正常檢體可協助排除混淆</text>
+
+  <!-- LongPhase-TO -->
+  <rect class="box warn" x="532" y="434" width="428" height="116" rx="12"/>
+  <circle class="cell tumor" cx="584" cy="490" r="28"/>
+  <circle class="cell normal" cx="646" cy="490" r="28" opacity=".25"/>
+  <path class="conn" d="M626,470 L666,510 M666,470 L626,510"/>
+  <text class="tick mid zh" x="584" y="536">腫瘤</text>
+  <text class="tick mid zh" x="646" y="536">沒有正常</text>
+  <line class="guide" x1="688" y1="454" x2="688" y2="530"/>
+  <text class="lbl bold" x="712" y="472">longphase-to</text>
+  <text class="anno bold zh bad" x="712" y="504">缺少直接對照</text>
+  <text class="tick zh" x="712" y="530">需整合更多間接訊號補足資訊</text>
+</svg>

@@ -1,0 +1,321 @@
+<!--tw
+{
+  "objectives": [
+    "獨立判讀一個位點的所有證據，並得出有根據的結論",
+    "在 tumor-normal 與 tumor-only 兩種情境下做出不同的判斷，並說明理由",
+    "計算 precision 與 recall，並指出它們在這個案例裡的限制",
+    "寫出一段帶有明確不確定性的結論"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<p class="prose">前面十四個模組提供了相關概念與工具。本節將它們整合到同一個案例中，要求你獨立判讀證據。</p>
+
+<p class="prose"><b>評量標準不只包括完成指令，也包括解讀是否有證據支持。</b>
+實務上需要說明觀測值代表什麼、哪些結論仍受資料或模型限制，以及你對各項判讀的確定程度。</p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>案例：chr9 上的一個候選點</h3>
+
+<p class="prose">給定條件：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>項目</th><th>值</th></tr></thead>
+<tbody>
+<tr><td>樣本</td><td>HCC1395（乳癌細胞株），ONT R10</td></tr>
+<tr><td>位置</td><td><code>chr9:5,073,770</code>，落在 JAK2 基因範圍內</td></tr>
+<tr><td>候選變異</td><td>SNV，<code>G → T</code></td></tr>
+<tr><td>Tumor coverage</td><td>50×，其中 <b>11 條</b>支持 ALT</td></tr>
+<tr><td>Normal coverage</td><td>25×，其中 <b>0 條</b>支持 ALT</td></tr>
+<tr><td>估計 [[tumour purity|purity]]</td><td>0.6（本題簡化模型中視為 tumor DNA fraction）</td></tr>
+<tr><td>該區段 [[copy number]]</td><td>2（無 CNV，無 [[LOH]]）</td></tr>
+<tr><td>周圍 200 bp 內的 het germline SNP</td><td>2 個，皆已 phase</td></tr>
+<tr><td>支持 ALT 的 11 條 read 的 [[HP tag]]</td><td><b>10 條 HP1、1 條 HP2</b></td></tr>
+<tr><td>序列脈絡</td><td>非 homopolymer、非重複區</td></tr>
+<tr><td>PON</td><td>不在任何族群資料庫中</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>完整推理鏈示例</h3>
+
+{{svg:capstone-reasoning-chain | [wide] 左：逐項檢查五類證據，標示其定性支持程度。右：改用僅有腫瘤樣本的情境時，第二類證據不可用；下方比較兩種情境的結論表述與確定程度。}}
+
+<h3>任務一：是否為 somatic 變異？</h3>
+
+{{ask}}
+<p class="prose">請先列出支持與反對的理由，再展開解析。</p>
+{{reveal}}
+<p class="prose"><b>結論：目前證據與 somatic 變異相容，支持度較高。</b>證據如下：</p>
+
+<p class="prose"><b>支持的證據：</b></p>
+<ul class="prose">
+<li><b>VAF 與簡化模型相容。</b>觀測 VAF = 11/50 = 0.22。
+在 tumor DNA fraction = 0.6、diploid、無拷貝數變化、單拷貝且 clonal 的合成假設下，
+理論預期為 <code>0.6 × 1 ÷ 2 = 0.30</code>。0.22 略低於此值，可能與
+[[cancer cell fraction|CCF]] 約 0.73 的次要 clone 或取樣波動相容；這不是對 CCF 的直接量測。</li>
+<li><b>normal 樣本未觀測到 ALT。</b>25× 深度、0 條 ALT。若此位點是典型 het germline，
+在相同覆蓋與取樣假設下原本可預期約一半 read 支持 ALT；觀測到 0 條會降低此解釋的可能性，
+但不能僅憑此結果完全排除 germline。</li>
+<li><b>haplotype 來源偏向一致。</b>11 條中有 10 條是 HP1。這支持 ALT read 集中於一個 haplotype，
+但仍需結合 mapping/base quality、read 證據數量與 haplotagging 品質判讀，不能單獨視為證明。</li>
+<li><b>序列脈絡未見已知高風險特徵。</b>此處不是 homopolymer 或重複區，因而降低部分 ONT 錯誤來源的疑慮；
+這項觀察不足以排除所有 SNV 誤差。</li>
+</ul>
+
+<p class="prose"><b>需要保留的疑慮：</b></p>
+<ul class="prose">
+<li>那 1 條 HP2 read 可能反映定序、比對或 haplotagging 誤差，也可能是更複雜的局部訊號。
+10:1 仍偏向單一來源；若比例更接近 1:1，單一 haplotype 的解釋就會減弱。</li>
+<li>purity 0.6 是<b>模型估計值</b>而非直接量測值。如果估計偏差，
+「VAF 與預期相容」這項證據也會隨之改變。</li>
+<li>11 條 read 的絕對數量不算多。統計波動的空間仍在。</li>
+</ul>
+{{/ask}}
+
+<h3>任務二：如果沒有 normal 樣本呢？</h3>
+
+{{ask}}
+<p class="prose">同一個位點，但你只有 tumor BAM。判斷會怎麼改變？</p>
+{{reveal}}
+<p class="prose"><b>確定程度會下降，因為缺少配對 normal 的直接比較。</b></p>
+<p class="prose">上面四條支持證據裡，<b>第二條（normal 未觀測到 ALT）不可用</b>，
+因此排除 germline 的能力較弱。</p>
+<p class="prose">剩下能用的：</p>
+<ul class="prose">
+<li><b>[[PON]] 查詢</b> —— 不在這個族群資料庫裡，會降低常見 germline 的可能性，
+但排除不了<b>病人私有的</b> germline 變異（M7 的核心限制）。</li>
+<li><b>VAF 0.22</b> —— 在沒有拷貝數、LOH 或 purity 偏差的簡化 diploid 假設下，
+典型 het germline 的 VAF 通常接近 0.5；實際腫瘤樣本的 VAF 仍可能受這些因素影響，
+因此 tumor-only 下不能以單一 VAF 值作出定論。</li>
+<li><b>haplotype 結構</b> —— 這是 LongPhase-TO 主要利用的證據。
+用左右兩個 germline SNP 建 [[triplet graph]]，看這個候選點是不是
+「從某一條既有 haplotype 分支出來」的樣態。</li>
+</ul>
+<p class="prose">因此結論可寫成：<b>「目前證據與 somatic 變異相容，但無法完全排除私有 germline 變異」</b> ——
+並在報告中明確標示這項限制。</p>
+<p class="prose">這也是 tumor-only 研究需要特別報告 precision 的原因之一：
+族群資料庫無法涵蓋所有個體特異的 germline 變異。</p>
+{{/ask}}
+
+<h3>任務三：算一次效能</h3>
+
+<p class="prose">假設你在這個 chr9 評估資料集上跑完流程，並與所採用的 SEQC2 truth set 比對後得到：</p>
+
+{{svg:capstone-metrics | [wide] 先將結果分為 TP、FP、FN，再說明 precision、recall 與 F1 各自使用哪些計數。以下數值僅適用於本例的評估設定：若 FP 減半且未誤刪 TP，precision 增加 0.080，而 F1 增加 0.024；recall 不變。}}
+
+{{ask}}
+<p class="prose">算出 [[precision]]、[[recall]]、[[F1]]。然後回答：
+如果你加一個後處理過濾器，把 FP 從 88 降到 44，F1 會變成多少？這個改善值得嗎？</p>
+{{reveal}}
+<p class="prose"><b>目前：</b></p>
+<ul class="prose">
+<li>precision = 412 / (412+88) = <b>0.824</b></li>
+<li>recall = 412 / (412+335) = <b>0.551</b></li>
+<li>F1 = 2 × 0.824 × 0.551 / (0.824+0.551) = <b>0.661</b></li>
+</ul>
+<p class="prose"><b>把 FP 減半之後（假設未誤刪 TP，屬於理想化情境）：</b></p>
+<ul class="prose">
+<li>precision = 412/456 = <b>0.904</b>（+0.080）</li>
+<li>recall = <b>0.551</b>（不變）</li>
+<li>F1 = <b>0.685</b>（<b>只有 +0.024</b>）</li>
+</ul>
+<p class="prose"><b>這個例子呈現了該 CNN 方法所討論的現象。</b>precision 增加 8 個百分點，
+F1 只動了 2.4 個百分點 —— 因為 <b>FN（335）遠多於 FP（88）</b>，
+F1 被 recall 那一側綁住了。</p>
+<p class="prose">而且這仍是理想化假設。實際過濾器可能誤刪部分 TP，
+使 FN 增加並縮小改善幅度。</p>
+<p class="prose"><b>值得嗎？看你的用途：</b></p>
+<ul class="prose">
+<li>如果下游需要人工逐一檢視候選點，precision 提升可減少需檢視的 FP 數量；實際節省幅度仍取決於資料集與工作流程。</li>
+<li>如果你的目標是「盡量不要漏掉任何可能的 driver」，那 recall 才是關鍵，這個改善幫助有限。</li>
+<li>如果你要在論文裡宣稱「方法變好了」，<b>只報 F1 會低估你的貢獻，只報 precision 則是選擇性呈現</b>。
+兩個都報，並解釋 FN 的組成。</li>
+</ul>
+<p class="prose">最後應追查 335 個 FN 中有多少是 caller 一開始就未產生的候選。
+若占大多數，後處理無法補回這些事件，應改從 caller、覆蓋度或候選產生階段處理。</p>
+{{/ask}}
+</section>
+
+
+<section data-part="evidence">
+<h2>真實證據</h2>
+
+<h3>執行一次可重現的流程</h3>
+
+<p class="prose">兩個 repo 都<b>沒有附範例資料</b>；可準備一個小型測試區段
+（BAM 切片及其對應的 VCF），再依下列步驟執行：</p>
+
+{{cli}}
+# 僅執行小區域，便於快速驗證
+REGION="chr9:5000000-5200000"
+
+longphase-s somatic_haplotag \
+  -s phased_normal.vcf \
+  -b normal.bam \
+  --tumor-snv-file tumor.vcf \
+  --tumor-bam-file tumor.bam \
+  -r reference.fasta \
+  --region "${REGION}" \
+  -t 8 \
+  -o capstone_out \
+  --output-somatic-vcf \
+  --log
+
+# purity 估計會寫入此檔案（不會印到 stdout）
+grep -A2 'Estimation result' capstone_out_purity.out
+
+# 檢視 read 的 somatic haplotype 指派
+samtools view capstone_out.bam | grep -o 'HP:Z:[0-9-]*' | sort | uniq -c
+{{/cli}}
+
+<h3>使用 IGV 檢視</h3>
+
+<p class="prose">將 <code>capstone_out.bam</code> 載入 IGV，依 <code>HP</code> tag 分組並定位到候選位點。
+可檢查 somatic 變異 read 是否偏向某一條 haplotype，以及兩側 germline allele 是否一致；
+這些視覺訊號仍需與 mapping/base quality、覆蓋度及過濾結果一併判讀。</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">通過標準</p>
+<p class="prose">寫一頁報告，內容包含：</p>
+<ol class="prose">
+<li>你選的位點與所有觀測值</li>
+<li>你的判斷（somatic / germline / artifact）與逐條理由</li>
+<li>如果改成 tumor-only，判斷會怎麼變、為什麼</li>
+<li>precision / recall 的計算，以及它們在這個案例裡的限制</li>
+<li><b>一段明確的不確定性陳述</b> —— 哪些結論你有信心、哪些只是「與資料相容」</li>
+</ol>
+<p class="prose">第 5 點要求報告明確呈現證據範圍與不確定性。</p>
+</div>
+</section>
+
+
+<section data-part="predict">
+<h2>判讀練習</h2>
+
+{{ask}}
+<p class="prose">最後一題著重於區分觀測與推論。</p>
+<p class="prose">你在同一個區域找到<b>三個</b>候選 somatic 變異，而且有一條 read 同時跨過全部三個，
+顯示 ALT–ALT–REF。你想說「我發現了一個 subclone」。<br><br>
+你可以這樣寫嗎？</p>
+{{reveal}}
+<p class="prose"><b>不可以。</b>這是整份教材最後要留給你的一課。</p>
+<p class="prose">你直接觀測到的是：<b>一個 DNA 分子片段的序列上，第一與第二個變異同時存在，第三個不存在。</b>
+這不是對細胞數量或獨立分子數量的直接計數。</p>
+<p class="prose">從這裡到「存在一個 subclone」，中間隔著好幾層推論：</p>
+<ul class="prose">
+<li><b>一條 read 通常反映一個 DNA 分子片段，不等於一個細胞，也不保證是獨立分子觀測</b>（guardrail #7）。
+需要多條彼此獨立且品質足夠的 read，才能評估這個組合是否可重現。</li>
+<li>你需要排除 <b>定序錯誤</b> 與 <b>比對錯誤</b>。</li>
+<li>你需要考慮 <b>[[copy number]] 與 [[mutation multiplicity]]</b>，
+否則無法從 VAF 反推細胞比例。</li>
+<li>即使完成上述檢查，得到的仍是<b>與 clone／subclone 差異相容的候選解釋</b>，
+而不是已確認的細胞族群；仍需額外的拷貝數、細胞比例或單細胞/多區域資料支持。</li>
+</ul>
+<p class="prose">這是最需要謹慎的地方：輸出「不是唯一的全基因體演化樹，
+也不是已確認的細胞族群，而是由目前 read 證據支持、並在結構上與 clone／subclone 差異相容的<b>區域候選</b>」。</p>
+<p class="prose">以下警告框示範如何保留這項限制。</p>
+{{/ask}}
+
+{{guard:9 | latent node 不是「還沒觀察到的細胞」}}
+<p class="prose">subclone 重建在建立候選演化樹時，有時必須<b>加入沒有被任何 read 直接觀測到的中間狀態</b>，
+才能在模型限制下保持圖的連通性。例如只觀察到 <code>00</code> 與 <code>11</code> 時，
+若每條邊只能新增一個突變，模型可能加入 <code>10</code> 或 <code>01</code> 作為中間狀態。</p>
+<p class="prose">這種節點稱為 <b>latent node</b>。它是模型為滿足連通條件加入的候選分子狀態，
+<b>不是未觀察到的細胞、clone 或 subclone</b>。</p>
+<p class="prose">為什麼要這麼小心？因為 latent node 是<b>模型的產物</b>，不是資料的產物。
+把它當成「存在一個尚未發現的 subclone」會超出資料支持範圍；
+換用不同模型假設或新增資料後，該節點可能不再出現。</p>
+<p class="prose">同理，subclone 重建的「候選拓撲」也不是完整的腫瘤演化樹：
+它是<b>區域層級</b>的、而且經常保留多個並列候選。</p>
+{{/guard}}
+
+{{ask}}
+<p class="prose">（承上）那麼，如何在報告中適當表述？</p>
+{{reveal}}
+<p class="prose"><b>建議表述：</b>「在 chr9:5.03–5.11 Mb 區域的 HP1 family 中，
+read 證據支持一個分支式、多步驟的候選拓撲，其結構與 clone／subclone 的分化相容。
+此結果是區域層級的候選解釋，尚需單細胞或多區域資料驗證。」</p>
+<p class="prose">這樣可明確區分觀測證據、模型推論與尚待驗證的部分。</p>
+{{/ask}}
+</section>
+
+
+<section data-part="practice">
+<h2>實作練習</h2>
+
+<h3>執行一次可重現的流程</h3>
+
+<p class="prose">開源版本沒有附範例資料；可準備一個小型測試區段
+（BAM 切片及其對應的 VCF），再依下列步驟執行：</p>
+
+{{cli}}
+# 僅執行小區域，便於快速驗證
+REGION="chr9:5000000-5200000"
+
+longphase-s somatic_haplotag \
+  -s phased_normal.vcf \
+  -b normal.bam \
+  --tumor-snv-file tumor.vcf \
+  --tumor-bam-file tumor.bam \
+  -r reference.fasta \
+  --region "${REGION}" \
+  -t 8 \
+  -o capstone_out \
+  --output-somatic-vcf \
+  --log
+
+# purity 估計會寫入此檔案（不會印到 stdout）
+grep -A2 'Estimation result' capstone_out_purity.out
+
+# 檢視 read 的 somatic haplotype 指派
+samtools view capstone_out.bam | grep -o 'HP:Z:[0-9-]*' | sort | uniq -c
+{{/cli}}
+
+<h3>使用 IGV 檢視</h3>
+
+<p class="prose">載入 <code>capstone_out.bam</code>，依 <code>HP</code> tag 分組並定位到候選位點。
+可檢查 somatic 變異 read 是否偏向某一條 haplotype，以及兩側 germline allele 是否一致；
+這些視覺訊號仍需與 mapping/base quality、覆蓋度及過濾結果一併判讀。</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">通過標準</p>
+<p class="prose">寫一頁報告，內容包含：</p>
+<ol class="prose">
+<li>你選的位點與所有觀測值</li>
+<li>你的判斷（somatic／germline／定序錯誤）與逐條理由</li>
+<li>如果改成只有腫瘤樣本，判斷會怎麼變、為什麼</li>
+<li>precision 與 recall 的計算，以及它們在這個案例裡的限制</li>
+<li><b>一段明確的不確定性陳述</b> —— 哪些結論你有信心、哪些只是「與資料相容」</li>
+</ol>
+<p class="prose">第 5 點要求報告明確呈現證據範圍與不確定性。</p>
+</div>
+
+<h3>接下來讀什麼</h3>
+
+<p class="prose">完成 capstone 之後，可依研究題目選擇補充方向：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>如果你的題目是</th><th>需要補的背景</th></tr></thead>
+<tbody>
+<tr><td>配對樣本的 indel</td><td>CNN 基礎、把 pileup 編碼成影像、類別不平衡的處理</td></tr>
+<tr><td>僅腫瘤樣本的 indel 或甲基化</td><td>梯度提升樹（XGBoost）、特徵工程、PCA</td></tr>
+<tr><td>subclone 重建</td><td>布林超立方體、簡約演化樹、Group Steiner tree</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">最後一列的演算法背景是本教材<b>尚未涵蓋</b>的部分；
+若研究涉及該方向，請另行取得 Steiner tree 的參考資料。</p>
+
+{{quiz:capstone}}
+</section>

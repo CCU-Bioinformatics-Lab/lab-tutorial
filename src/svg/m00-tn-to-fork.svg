@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420">
+  <title>「有沒有配對正常組織」如何影響分析路線</title>
+  <desc>我們要找的是腫瘤後天產生的突變，但每個人身上本來就有大量與生俱來的變異，
+        兩類混在同一份資料裡需要區分。
+        上路線：拿同一個人的正常組織來對照，兩邊都有的候選較支持 germline，但仍需考慮污染與拷貝數，
+        而且因為對照來自同一個人，較有機會辨識該個體特有的變異，仍可能受品質與污染影響。
+        下路線：拿不到正常組織時可查公開資料庫，常見變異較易排除，
+        但這個人獨有的變異較難由公開資料庫辨識，可能殘留為誤判。</desc>
+
+  <!-- 起點 -->
+  <rect class="box plain" x="20" y="150" width="200" height="110" rx="8"/>
+  <text class="anno mid bold zh" x="120" y="180">腫瘤樣本裡的</text>
+  <text class="anno mid bold zh" x="120" y="206">一堆候選變異</text>
+  <line class="guide" x1="40" y1="220" x2="200" y2="220"/>
+  <text class="tick mid zh somatic" x="120" y="242">要找的：後天產生的</text>
+
+  <path class="flow" d="M224,180 L286,120" marker-end="url(#arrow)"/>
+  <path class="flow" d="M224,230 L286,290" marker-end="url(#arrow)"/>
+
+  <!-- 上路線：有正常組織 -->
+  <rect class="box ok" x="292" y="30" width="688" height="164" rx="10"/>
+  <text class="anno bold zh ok" x="314" y="60">有配對的正常組織</text>
+
+  <rect class="box plain" x="314" y="76" width="180" height="52" rx="6"/>
+  <text class="tick mid zh" x="404" y="100">拿同一個人的</text>
+  <text class="tick mid zh" x="404" y="120">正常組織來比對</text>
+
+  <path class="conn" d="M498,102 L536,102" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box plain" x="542" y="76" width="196" height="52" rx="6"/>
+  <text class="tick mid zh" x="640" y="100">兩邊都有 → 較支持 germline</text>
+  <text class="tick mid zh" x="640" y="120">只有腫瘤有 → 較支持 somatic</text>
+
+  <path class="conn" d="M742,102 L780,102" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box ok" x="786" y="76" width="172" height="52" rx="6"/>
+  <text class="tick mid zh ok bold" x="872" y="100">對照較完整</text>
+  <text class="tick mid zh" x="872" y="120">較有機會辨識獨有變異</text>
+
+  <text class="tick zh" x="314" y="166">對照資料<tspan class="bold">來自同一個人</tspan>，有助於辨識其個體特有的變異。</text>
+
+  <!-- 下路線：只有腫瘤 -->
+  <rect class="box bad" x="292" y="216" width="688" height="180" rx="10"/>
+  <text class="anno bold zh bad" x="314" y="246">只有腫瘤樣本</text>
+
+  <rect class="box plain" x="314" y="262" width="180" height="52" rx="6"/>
+  <text class="tick mid zh" x="404" y="286">查公開資料庫</text>
+  <text class="tick mid zh" x="404" y="306">（幾十萬個別人）</text>
+
+  <path class="conn" d="M498,288 L536,288" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box plain" x="542" y="262" width="196" height="52" rx="6"/>
+  <text class="tick mid zh" x="640" y="286">常見的 → 較易排除</text>
+  <text class="tick mid zh bad" x="640" y="306">獨有的 → 較難辨識</text>
+
+  <path class="conn" d="M742,288 L780,288" marker-end="url(#arrow-sm)" stroke="var(--bad)"/>
+
+  <rect class="box bad" x="786" y="262" width="172" height="52" rx="6"/>
+  <text class="tick mid zh bad bold" x="872" y="286">會殘留誤判</text>
+  <text class="tick mid zh" x="872" y="306">precision 掉下來</text>
+
+  <text class="tick zh" x="314" y="352">「族群裡常見」與「這個人有」<tspan class="bold">不是同一件事</tspan>。</text>
+  <text class="tick zh bold bad" x="314" y="380">因此這條路線需要整合其他證據，以降低誤判風險。</text>
+</svg>

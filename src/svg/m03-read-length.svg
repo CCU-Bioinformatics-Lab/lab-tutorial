@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400">
+  <title>短讀與長讀在跨越兩個變異位點時的差別</title>
+  <desc>上半部是 Illumina 短讀：本示意以約 100 bp 的 read 為例，兩個相距數千鹼基的變異位點無法被同一條 read 跨過，
+        因此看得到兩個變異各自的存在，卻無法判斷它們是否在同一條分子上。
+        下半部是 Oxford Nanopore 長讀：單條 read 可達數千至數萬鹼基，可能同時跨過兩個位點，
+        並可在適當的修飾辨識模型下，由同一條分子推定甲基化訊號。</desc>
+
+  <!-- 兩個變異位點的位置 -->
+  <line class="guide" x1="260" y1="30" x2="260" y2="370"/>
+  <line class="guide" x1="740" y1="30" x2="740" y2="370"/>
+  <text class="tick mid somatic bold" x="260" y="24">變異 A</text>
+  <text class="tick mid somatic bold" x="740" y="24">變異 B</text>
+  <text class="tick mid zh" x="500" y="24">相距約 3,000 bp</text>
+  <path class="guide" d="M300,16 L700,16" marker-start="url(#arrow-sm)" marker-end="url(#arrow-sm)"/>
+
+  <!-- ══ 上：Illumina ═══════════════════════════════════════════ -->
+  <rect class="box plain" x="16" y="40" width="968" height="150" rx="10"/>
+  <text class="lbl bold" x="36" y="70">Illumina（二代定序）</text>
+  <text class="anno zh" x="36" y="94">本示意讀長約 100 bp · 準確度通常較高</text>
+
+  <!-- 短 reads：只覆蓋 A -->
+  <rect class="read hp0" x="215" y="110" width="90" height="12" rx="6"/>
+  <rect class="read hp0" x="230" y="128" width="90" height="12" rx="6"/>
+  <rect class="read hp0" x="200" y="146" width="90" height="12" rx="6"/>
+  <circle class="mark somatic" cx="260" cy="116" r="5"/>
+  <circle class="mark ref" cx="260" cy="134" r="5"/>
+  <circle class="mark somatic" cx="260" cy="152" r="5"/>
+
+  <!-- 短 reads：只覆蓋 B -->
+  <rect class="read hp0" x="695" y="110" width="90" height="12" rx="6"/>
+  <rect class="read hp0" x="710" y="128" width="90" height="12" rx="6"/>
+  <rect class="read hp0" x="680" y="146" width="90" height="12" rx="6"/>
+  <circle class="mark somatic" cx="740" cy="116" r="5"/>
+  <circle class="mark somatic" cx="740" cy="134" r="5"/>
+  <circle class="mark ref" cx="740" cy="152" r="5"/>
+
+  <!-- 中間的斷裂 -->
+  <text class="anno mid zh bad bold" x="500" y="126">沒有任何一條 read 能同時跨過兩個位點</text>
+  <text class="anno mid zh" x="500" y="152">→ 兩個變異是不是在同一條分子上？<tspan class="bad bold">無法判斷</tspan></text>
+
+  <!-- ══ 下：ONT ════════════════════════════════════════════════ -->
+  <rect class="box accent" x="16" y="206" width="968" height="180" rx="10"/>
+  <text class="lbl bold" x="36" y="236">Oxford Nanopore（三代定序）</text>
+  <text class="anno zh" x="36" y="260">讀長可達數千至數萬 bp · 錯誤特性依流程而異，可由模型推定甲基化</text>
+
+  <!-- 長 reads -->
+  <rect class="read hp1" x="120" y="284" width="760" height="14" rx="7"/>
+  <circle class="mark somatic" cx="260" cy="291" r="6"/>
+  <circle class="mark somatic" cx="740" cy="291" r="6"/>
+  <circle class="cpg met" cx="420" cy="291" r="5"/>
+  <circle class="cpg unmet" cx="500" cy="291" r="5"/>
+  <circle class="cpg met" cx="580" cy="291" r="5"/>
+
+  <rect class="read hp2" x="160" y="312" width="740" height="14" rx="7"/>
+  <circle class="mark ref" cx="260" cy="319" r="6"/>
+  <circle class="mark ref" cx="740" cy="319" r="6"/>
+  <circle class="cpg unmet" cx="420" cy="319" r="5"/>
+  <circle class="cpg unmet" cx="500" cy="319" r="5"/>
+  <circle class="cpg unmet" cx="580" cy="319" r="5"/>
+
+  <rect class="read hp1" x="100" y="340" width="700" height="14" rx="7"/>
+  <circle class="mark somatic" cx="260" cy="347" r="6"/>
+  <circle class="mark somatic" cx="740" cy="347" r="6"/>
+  <circle class="cpg met" cx="420" cy="347" r="5"/>
+  <circle class="cpg met" cx="500" cy="347" r="5"/>
+
+  <text class="anno zh ok bold" x="36" y="376">品質足夠時，read 同時涵蓋兩變異 → 支持同一分子（cis）</text>
+  <text class="tick zh" x="640" y="376">實心／空心小圓 = 甲基化狀態，也在同一條分子上</text>
+</svg>

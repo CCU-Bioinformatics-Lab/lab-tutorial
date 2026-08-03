@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 552">
+  <title>為什麼 HP1 與 HP2 可是任意編號，不代表父系與母系</title>
+  <desc>上半部：在未指定外部方向時，同一份資料可有兩種等價編號方式。演算法能確定「這些變異在同一條染色體上」，
+        但無法決定該把那一條叫 HP1 還是 HP2，所以整組對調是等價的答案。
+        下半部：編號的方向只在同一個 phase block 內部一致。
+        跨過斷點之後方向重新開始，所以左邊的 HP1 不一定對應右邊的 HP1，
+        未先校正方向時，跨區段直接統計「HP1 的某種性質」可能失真。</desc>
+
+  <!-- ══ 上半：整組對調也正確 ══════════════════════════════════ -->
+  <text class="lbl bold zh" x="20" y="30">同一份資料，兩種編號都對</text>
+
+  <!-- 觀測到的 read -->
+  <text class="anno zh" x="20" y="66">你觀測到的 read（直接序列觀測之一）</text>
+
+  <line class="guide" x1="330" y1="76" x2="330" y2="176"/>
+  <line class="guide" x1="470" y1="76" x2="470" y2="176"/>
+  <line class="guide" x1="610" y1="76" x2="610" y2="176"/>
+
+  <rect class="read hp0" x="240" y="88" width="440" height="14" rx="7"/>
+  <text class="base a mono" x="330" y="100" font-size="15">A</text>
+  <text class="base c mono" x="470" y="100" font-size="15">C</text>
+  <text class="base g mono" x="610" y="100" font-size="15">G</text>
+
+  <rect class="read hp0" x="250" y="112" width="430" height="14" rx="7"/>
+  <text class="base t mono" x="330" y="124" font-size="15">T</text>
+  <text class="base a mono" x="470" y="124" font-size="15">A</text>
+  <text class="base c mono" x="610" y="124" font-size="15">C</text>
+
+  <rect class="read hp0" x="230" y="136" width="440" height="14" rx="7"/>
+  <text class="base a mono" x="330" y="148" font-size="15">A</text>
+  <text class="base c mono" x="470" y="148" font-size="15">C</text>
+  <text class="base g mono" x="610" y="148" font-size="15">G</text>
+
+  <rect class="read hp0" x="245" y="160" width="435" height="14" rx="7"/>
+  <text class="base t mono" x="330" y="172" font-size="15">T</text>
+  <text class="base a mono" x="470" y="172" font-size="15">A</text>
+  <text class="base c mono" x="610" y="172" font-size="15">C</text>
+
+  <text class="tick zh" x="700" y="132">read 明顯分成兩群：</text>
+  <text class="tick mono" x="700" y="156">A-C-G 與 T-A-C</text>
+
+  <!-- 兩種編號 -->
+  <text class="anno zh" x="20" y="216">兩種可能的編號方式</text>
+
+  <!-- 版本 1 -->
+  <rect class="box ok" x="110" y="232" width="360" height="106" rx="8"/>
+  <text class="anno mid bold zh ok" x="290" y="258">版本一</text>
+  <rect class="read hp1" x="134" y="274" width="200" height="14" rx="7"/>
+  <text class="tick hp1 bold" x="344" y="286">HP1</text>
+  <text class="tick mono" x="404" y="286">A-C-G</text>
+  <rect class="read hp2" x="134" y="304" width="200" height="14" rx="7"/>
+  <text class="tick hp2 bold" x="344" y="316">HP2</text>
+  <text class="tick mono" x="404" y="316">T-A-C</text>
+
+  <text class="lbl bold mid ok" x="290" y="360">✓ 等價</text>
+
+  <!-- 版本 2 -->
+  <rect class="box ok" x="530" y="232" width="360" height="106" rx="8"/>
+  <text class="anno mid bold zh ok" x="710" y="258">版本二（整組對調）</text>
+  <rect class="read hp1" x="554" y="274" width="200" height="14" rx="7"/>
+  <text class="tick hp1 bold" x="764" y="286">HP1</text>
+  <text class="tick mono" x="824" y="286">T-A-C</text>
+  <rect class="read hp2" x="554" y="304" width="200" height="14" rx="7"/>
+  <text class="tick hp2 bold" x="764" y="316">HP2</text>
+  <text class="tick mono" x="824" y="316">A-C-G</text>
+
+  <text class="lbl bold mid ok" x="710" y="360">✓ 亦等價</text>
+
+  <text class="anno zh bold" x="20" y="392">演算法可推定「哪些變異在同一條上」，但無外部方向時無法決定該叫它 1 還是 2。</text>
+
+  <!-- ══ 下半：跨 phase block 方向會重設 ══════════════════════ -->
+  <line class="axis" x1="20" y1="414" x2="980" y2="414"/>
+  <text class="lbl bold zh" x="20" y="444">而且編號方向只在同一個 phase block 內部一致</text>
+
+  <!-- block 1 -->
+  <rect class="region" x="80" y="458" width="300" height="44" rx="6"/>
+  <rect class="read hp1" x="100" y="464" width="260" height="13" rx="6.5"/>
+  <rect class="read hp2" x="100" y="484" width="260" height="13" rx="6.5"/>
+  <text class="tick mid zh bold" x="230" y="514">block 1</text>
+
+  <!-- 斷點 -->
+  <rect class="box ghost" x="396" y="458" width="200" height="44" rx="6"/>
+  <text class="tick mid zh" x="496" y="486">斷點（沒有錨點）</text>
+
+  <!-- block 2：方向反過來 -->
+  <rect class="region" x="612" y="458" width="300" height="44" rx="6"/>
+  <rect class="read hp2" x="632" y="464" width="260" height="13" rx="6.5"/>
+  <rect class="read hp1" x="632" y="484" width="260" height="13" rx="6.5"/>
+  <text class="tick mid zh bold" x="762" y="514">block 2</text>
+
+  <text class="tick zh" x="80" y="536">這一段的上排叫 HP1</text>
+  <text class="tick zh bad bold" x="612" y="536">這一段的上排卻是原本的 HP2</text>
+</svg>

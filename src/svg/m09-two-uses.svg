@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420">
+  <title>甲基化的兩種分析角色：模型輸入或推論後描述</title>
+  <desc>左半部：將甲基化轉為分類器輸入特徵，使其參與判斷候選是否為真變異。
+        若要評估模型，應使用未參與訓練或搜尋的獨立資料。
+        右半部：先僅用變異證據完成推論，再附加甲基化描述結果。
+        在未參與推論的前提下，甲基化可作為獨立觀察。
+        關鍵原則是：同一證據不應同時作為推論與其獨立驗證依據。</desc>
+
+  <!-- ══ 左：當證據 ══ -->
+  <rect class="box warn" x="16" y="16" width="472" height="330" rx="10"/>
+  <text class="lbl bold zh" x="38" y="48">角色一：作為模型輸入</text>
+
+  <rect class="box plain" x="60" y="72" width="170" height="46" rx="6"/>
+  <text class="tick mid zh" x="145" y="101">變異本身的證據</text>
+
+  <rect class="box plain" x="272" y="72" width="170" height="46" rx="6"/>
+  <text class="tick mid zh met" x="357" y="101">甲基化特徵</text>
+
+  <path class="flow" d="M145,120 L200,150" marker-end="url(#arrow)"/>
+  <path class="flow" d="M357,120 L302,150" marker-end="url(#arrow)"/>
+
+  <rect class="box accent" x="150" y="156" width="202" height="52" rx="8"/>
+  <text class="anno mid bold zh" x="251" y="188">分類器</text>
+
+  <path class="flow" d="M251,208 L251,236" marker-end="url(#arrow)"/>
+  <rect class="box plain" x="150" y="242" width="202" height="46" rx="6"/>
+  <text class="tick mid zh" x="251" y="271">是 / 不是真變異</text>
+
+  <rect class="box bad" x="38" y="302" width="428" height="34" rx="6"/>
+  <text class="tick mid zh bad bold" x="252" y="324">甲基化已納入輸入 → 同一流程中不宜作獨立驗證</text>
+
+  <!-- ══ 右：當註記 ══ -->
+  <rect class="box ok" x="512" y="16" width="472" height="330" rx="10"/>
+  <text class="lbl bold zh" x="534" y="48">角色二：作為推論後描述</text>
+
+  <rect class="box plain" x="640" y="72" width="216" height="46" rx="6"/>
+  <text class="tick mid zh" x="748" y="101">只用變異本身的證據</text>
+
+  <path class="flow" d="M748,120 L748,148" marker-end="url(#arrow)"/>
+  <rect class="box accent" x="647" y="154" width="202" height="52" rx="8"/>
+  <text class="anno mid bold zh" x="748" y="186">完成推論</text>
+
+  <path class="flow" d="M748,206 L748,234" marker-end="url(#arrow)"/>
+  <rect class="box plain" x="647" y="240" width="202" height="46" rx="6"/>
+  <text class="tick mid zh" x="748" y="269">推論結果</text>
+
+  <!-- 甲基化從旁邊附加 -->
+  <rect class="box plain" x="534" y="240" width="94" height="46" rx="6"/>
+  <text class="tick mid zh met" x="581" y="262">甲基化</text>
+  <text class="tick mid zh met" x="581" y="280">註記</text>
+  <path class="conn" d="M628,263 L641,263" marker-end="url(#arrow-sm)" stroke="var(--met)"/>
+
+  <rect class="box ok" x="534" y="302" width="428" height="34" rx="6"/>
+  <text class="tick mid zh ok bold" x="748" y="324">未參與推論 → 可作為獨立觀察</text>
+
+  <!-- ══ 原則 ══ -->
+  <rect class="box accent" x="20" y="360" width="960" height="48" rx="8"/>
+  <text class="anno mid zh bold" x="500" y="390">原則：同一證據不應同時作為推論與其獨立驗證依據。</text>
+</svg>

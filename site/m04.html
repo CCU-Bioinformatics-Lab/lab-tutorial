@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-gloss="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>資料格式讀寫能力 · 長讀癌症基因體學入門</title>
+<meta name="description" content="從 BAM 中的 read 觀測追溯到 VCF 紀錄，並使用 CIGAR 解碼器練習讀取對齊資訊。">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/diagram.css">
+<link rel="stylesheet" href="assets/css/widgets.css">
+<link rel="stylesheet" href="assets/css/print.css">
+<script>
+/* 主題 / 字級 / 詞彙語言：必須在第一次繪製前套用，否則會閃一下白底。
+   刻意寫成同步的 inline script，不可移到外部檔案。 */
+(function () {
+  try {
+    var s = JSON.parse(localStorage.getItem('ccu.lrcg.tutorial.v1') || '{}');
+    var ui = s.ui || {};
+    var d = document.documentElement;
+    if (ui.theme === 'dark' || ui.theme === 'light') d.setAttribute('data-theme', ui.theme);
+    if (ui.fontScale && ui.fontScale !== 'm') d.setAttribute('data-fs', ui.fontScale);
+    if (ui.glossLang) d.setAttribute('data-gloss', ui.glossLang);
+  } catch (e) { /* Safari 私密瀏覽會丟 QuotaExceededError，忽略即可 */ }
+})();
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要內容</a>
+
+<header class="site-header">
+  <div class="site-header__in">
+    <a class="brand" href="index.html">
+      長讀癌症基因體學 · 入門教材
+      <small>中正大學資工系 · 黃耀廷實驗室</small>
+    </a>
+    <span class="site-header__spacer"></span>
+
+    <span class="hgroup gloss-toggle" role="group" aria-label="術語定義語言">
+      <button type="button" class="hbtn" data-gloss-btn="zh"   aria-pressed="true">繁中</button>
+      <button type="button" class="hbtn" data-gloss-btn="en"   aria-pressed="false">English</button>
+      <button type="button" class="hbtn" data-gloss-btn="both" aria-pressed="false">雙語</button>
+    </span>
+
+    <button type="button" class="hbtn theme-toggle" data-theme-btn
+            aria-label="切換深色／淺色主題">◐</button>
+    <button type="button" class="hbtn" data-fs-btn aria-label="調整字級">A</button>
+    <a class="hbtn" href="glossary.html">完整術語表</a>
+  </div>
+</header>
+
+<div class="wrap ">
+  <main class="main" id="main">
+    <header class="mhead"><p class="mhead__kicker">模組 4 · Data literacy</p><h1>資料格式讀寫能力</h1><p class="mhead__sub">從 BAM 中的 read 觀測追溯到 VCF 紀錄，並使用 CIGAR 解碼器練習讀取對齊資訊。</p><p class="mhead__meta"><span class="chip">約 60 分鐘</span><a class="chip" href="m03.html">建議先修：定序</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說出從 FASTQ 到 VCF 的每一個中間檔案各自負責什麼</li><li>判讀一個 CIGAR 字串，並說出它消耗了多少參考序列與多少 read</li><li>解釋 soft clip 是什麼，以及為什麼大量集中的 clipping 可作為結構變異斷點的候選訊號</li><li>在 VCF 裡認出 GT、PS，並在 BAM 裡認出 HP 與 MM/ML tag</li><li>區分一般 untagged read 與帶有 somatic signal 但來源未定的 somatic haplotype HP3</li></ul></section>
+
+<section data-part="why" class="part" id="part-why">
+<h2 data-num="①" id="為什麼重要">為什麼重要</h2>
+
+<p class="prose"><span class="term" data-term="CIGAR" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cigar-0">CIGAR<span class="term__pop" id="gd-cigar-0" role="tooltip"><b class="term__hd">CIGAR</b><span class="term__def" data-lang="zh">描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。</span><span class="term__def" data-lang="en">A compact string describing how read bases and reference positions are consumed by an alignment. For example, 5M1I5M has five alignment columns, one insertion, then five alignment columns; M may contain matches or mismatches.</span><a class="term__more" href="glossary.html#cigar">完整條目 →</a></span></span> 在正式課程中常被簡略帶過，但在判讀比對結果與變異證據時十分重要。
+本教材的兩個案例會使用 CIGAR：一個以 clipping 分布協助定位染色體結構變異的候選邊界，
+另一個將 CIGAR 編碼為影像供神經網路分析。理解 CIGAR 有助於解讀這些流程的輸入與限制。</p>
+
+<p class="prose">本節以互動解碼與命令列操作為主，實作比例較高。</p>
+</section>
+
+
+<section data-part="concept" class="part" id="part-concept">
+<h2 data-num="②" id="概念與互動">概念與互動</h2>
+
+<h3 id="從樣本到變異的檔案鏈">從樣本到變異的檔案鏈</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>檔案</th><th>裝什麼</th><th>一筆記錄通常代表</th></tr></thead>
+<tbody>
+<tr><td><code>.fasta</code></td><td><span class="term" data-term="reference genome" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-reference-genome-1">reference genome<span class="term__pop" id="gd-reference-genome-1" role="tooltip"><b class="term__hd">reference genome <i>參考基因體</i></b><span class="term__def" data-lang="zh">用於比對的標準序列（人類資料常用 GRCh38）。所有座標均相對於指定版本；更換 build 會改變座標系，座標不可直接比較。</span><span class="term__def" data-lang="en">The standard sequence everything is aligned to. All coordinates are relative to it, so changing build changes coordinates.</span><a class="term__more" href="glossary.html#reference-genome">完整條目 →</a></span></span></td><td>一條染色體或 contig 的序列</td></tr>
+<tr><td><code><span class="term" data-term="FASTQ" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-fastq-2">.fastq<span class="term__pop" id="gd-fastq-2" role="tooltip"><b class="term__hd">FASTQ</b><span class="term__def" data-lang="zh">存放 read 序列與每個鹼基品質分數的文字格式；每筆紀錄由四行組成。</span><span class="term__def" data-lang="en">Text format holding read sequences plus per-base quality scores; four lines per record.</span><a class="term__more" href="glossary.html#fastq">完整條目 →</a></span></span></code></td><td>定序儀產生的 read</td><td>一筆 read 記錄（序列與品質）</td></tr>
+<tr><td><code><span class="term" data-term="BAM" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-bam-3">.bam<span class="term__pop" id="gd-bam-3" role="tooltip"><b class="term__hd">BAM</b><span class="term__def" data-lang="zh">已比對到參考基因體的 read 的二進位格式（SAM 的壓縮版）。每一列是一條 read，帶著它的位置、CIGAR、品質與各種 tag。</span><span class="term__def" data-lang="en">Binary format for reads aligned to the reference. One record per read, carrying position, CIGAR, quality and tags.</span><a class="term__more" href="glossary.html#bam">完整條目 →</a></span></span></code></td><td>已比對到參考的 read</td><td>一筆 alignment record，含位置、CIGAR、tag</td></tr>
+<tr><td><code><span class="term" data-term="VCF" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-vcf-4">.vcf<span class="term__pop" id="gd-vcf-4" role="tooltip"><b class="term__hd">VCF</b><span class="term__def" data-lang="zh">存放 variant 的文字格式。每一列是一個位點，記錄位置、ref/alt allele、品質、FILTER 與各種 FORMAT 欄位。</span><span class="term__def" data-lang="en">Text format for variants: one line per site with position, ref/alt alleles, quality, FILTER and FORMAT fields.</span><a class="term__more" href="glossary.html#vcf">完整條目 →</a></span></span></code></td><td>變異</td><td><b>一個位點</b>，含 ref/alt、FILTER、FORMAT</td></tr>
+<tr><td><code>.bed</code></td><td>區間</td><td>一段 chrom / start / end</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">注意 BAM 與 VCF 的記錄單位不同：<b>BAM 以 alignment record 為單位，VCF 以變異位點為單位</b>。
+後續模組會反覆使用此區分；例如 LongPhase-S 將 <span class="term" data-term="somatic haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-somatic-haplotype-5">somatic haplotype<span class="term__pop" id="gd-somatic-haplotype-5" role="tooltip"><b class="term__hd">somatic haplotype</b><span class="term__def" data-lang="zh">在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</span><span class="term__def" data-lang="en">A sub-level beneath the germline haplotype: HP1-1 and HP2-1 carry somatic mutations derived from HP1 and HP2; HP3 is unassignable.</span><a class="term__more" href="glossary.html#somatic-haplotype">完整條目 →</a></span></span> assignment 寫在 BAM 的 read 上，
+而 LongPhase-TO 將判定寫在 VCF 的位點上。</p>
+
+<h3 id="cigar-read-與參考序列的對齊表示">CIGAR：read 與參考序列的對齊表示</h3>
+
+<p class="prose">CIGAR 是一串「數字＋字母」，描述 read 與參考序列的對應關係。
+可在下方元件輸入 CIGAR，查看各操作碼對參考序列與 read 的消耗方式。</p>
+
+<figure class="widget" data-widget="cigar-decoder" data-wid="m04.cig" data-config='{"value":"5M1I5M"}'><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>請先使用預設按鈕；以 <code>10S8M</code> 為例，前 10 個鹼基<b>未與</b>參考序列對齊，屬於 soft clipping，但仍保留於 BAM。</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>操作碼</th><th>意思</th><th>消耗參考</th><th>消耗 read</th></tr></thead>
+<tbody>
+<tr><td><code>M</code></td><td>對齊（可能吻合，也可能錯配）</td><td>✓</td><td>✓</td></tr>
+<tr><td><code>I</code></td><td>insertion：read 有、參考沒有</td><td>✗</td><td>✓</td></tr>
+<tr><td><code>D</code></td><td>deletion：參考有、read 沒有</td><td>✓</td><td>✗</td></tr>
+<tr><td><code>S</code></td><td><span class="term" data-term="soft clipping" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-soft-clipping-6">soft clip<span class="term__pop" id="gd-soft-clipping-6" role="tooltip"><b class="term__hd">soft clipping</b><span class="term__def" data-lang="zh">read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</span><span class="term__def" data-lang="en">A read end that failed to align but is retained in the BAM (CIGAR S). Clipping clustered at one position may suggest a structural breakpoint and needs corroborating evidence.</span><a class="term__more" href="glossary.html#soft-clipping">完整條目 →</a></span></span>：read 保留但沒對上</td><td>✗</td><td>✓</td></tr>
+<tr><td><code>H</code></td><td>hard clip：該段序列未保留在 BAM 的 read 序列中</td><td>✗</td><td>✗</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">一個常見的誤解：<b><code>M</code> 不代表「吻合」</b>，它只代表「有對齊」。
+錯配（mismatch）在 CIGAR 上仍然是 <code>M</code>。若要判定實際鹼基差異，需查看 <code>MD</code> tag 或直接比對參考序列。</p>
+
+<h3 id="soft-clipping-的判讀意義">soft clipping 的判讀意義</h3>
+
+<p class="prose">當 read 的一端無法可靠地與參考序列對齊時，比對演算法通常會將該端標記為
+<code>S</code>（soft clipping）。序列本身仍保留在 BAM 中，但不計入對齊區段。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img">
+  <title>soft clip：read 端部未可靠對齊參考序列時的示意</title>
+  <desc>最上方一列是參考基因體序列，每個字母一格。
+        第二列示意左端 soft clipping：紅框表示未納入對齊的 read 端，圖中以 GCT…概略表示，
+        對應的 CIGAR 為 10S；該序列仍保留在檔案中。右側另示意 2D，表示參考序列存在而 read 沒有。
+        第三列示意右端 soft clipping，方向相反。
+        下方比較兩種情況：clipping 可分散於不同 read 的端部；若多條 read 的 clipping 位置集中，
+        可作為結構變異斷點候選，仍需結合其他證據確認。</desc>
+
+  <!-- ══════ 參考基因體 ══════ -->
+  <text class="anno bold zh" x="20" y="52">參考基因體</text>
+  <text class="tick zh" x="20" y="76">（比對的基準）</text>
+
+  <g>
+    <rect class="box plain" x="300" y="32" width="28" height="28" rx="3"/><text class="base c mono mid" x="314" y="53" font-size="17">C</text>
+    <rect class="box plain" x="334" y="32" width="28" height="28" rx="3"/><text class="base a mono mid" x="348" y="53" font-size="17">A</text>
+    <rect class="box plain" x="368" y="32" width="28" height="28" rx="3"/><text class="base c mono mid" x="382" y="53" font-size="17">C</text>
+    <rect class="box plain" x="402" y="32" width="28" height="28" rx="3"/><text class="base a mono mid" x="416" y="53" font-size="17">A</text>
+    <rect class="box plain" x="436" y="32" width="28" height="28" rx="3"/><text class="base t mono mid" x="450" y="53" font-size="17">T</text>
+    <rect class="box plain" x="470" y="32" width="28" height="28" rx="3"/><text class="base t mono mid" x="484" y="53" font-size="17">T</text>
+    <rect class="box plain" x="504" y="32" width="28" height="28" rx="3"/><text class="base a mono mid" x="518" y="53" font-size="17">A</text>
+    <rect class="box plain" x="538" y="32" width="28" height="28" rx="3"/><text class="base g mono mid" x="552" y="53" font-size="17">G</text>
+    <rect class="box plain" x="572" y="32" width="28" height="28" rx="3"/><text class="base g mono mid" x="586" y="53" font-size="17">G</text>
+    <rect class="box plain" x="606" y="32" width="28" height="28" rx="3"/><text class="base c mono mid" x="620" y="53" font-size="17">C</text>
+    <rect class="box plain" x="640" y="32" width="28" height="28" rx="3"/><text class="base t mono mid" x="654" y="53" font-size="17">T</text>
+    <rect class="box plain" x="674" y="32" width="28" height="28" rx="3"/><text class="base a mono mid" x="688" y="53" font-size="17">A</text>
+    <rect class="box plain" x="708" y="32" width="28" height="28" rx="3"/><text class="base t mono mid" x="722" y="53" font-size="17">T</text>
+    <rect class="box plain" x="742" y="32" width="28" height="28" rx="3"/><text class="base a mono mid" x="756" y="53" font-size="17">A</text>
+  </g>
+
+  <line class="guide" x1="300" y1="70" x2="300" y2="330"/>
+  <text class="tick zh accent" x="306" y="86">比對從這裡開始</text>
+
+  <!-- ══════ 左端被剪的 read ══════ -->
+  <text class="anno bold zh artifact" x="20" y="140">左端被剪的 read</text>
+  <text class="tick zh" x="20" y="164">前端未可靠對齊</text>
+
+  <g>
+    <!-- 被剪掉的部分：虛線紅框 -->
+    <rect class="box ghost" x="198" y="120" width="96" height="28" rx="3" stroke="var(--artifact)" stroke-dasharray="5 3"/>
+    <text class="mono mid artifact" x="246" y="140" font-size="15">GCT…</text>
+    <!-- 對上的部分 -->
+    <rect class="box plain" x="300" y="120" width="28" height="28" rx="3"/><text class="base a mono mid" x="314" y="141" font-size="17">A</text>
+    <rect class="box plain" x="334" y="120" width="28" height="28" rx="3"/><text class="base t mono mid" x="348" y="141" font-size="17">T</text>
+    <rect class="box plain" x="368" y="120" width="28" height="28" rx="3"/><text class="base t mono mid" x="382" y="141" font-size="17">T</text>
+    <rect class="box plain" x="402" y="120" width="28" height="28" rx="3"/><text class="base a mono mid" x="416" y="141" font-size="17">A</text>
+    <rect class="box plain" x="436" y="120" width="28" height="28" rx="3"/><text class="base g mono mid" x="450" y="141" font-size="17">G</text>
+    <!-- 缺失：read 沒有這兩格 -->
+    <rect class="box ghost" x="470" y="120" width="62" height="28" rx="3"/>
+    <text class="tick mid" x="501" y="140">– –</text>
+    <rect class="box plain" x="538" y="120" width="28" height="28" rx="3"/><text class="base t mono mid" x="552" y="141" font-size="17">T</text>
+  </g>
+
+  <!-- CIGAR -->
+  <text class="tick zh" x="20" y="192">此 read 的 CIGAR</text>
+  <text class="anno mono bold artifact mid" x="246" y="192">10S</text>
+  <text class="anno mono bold mid" x="382" y="192">5M</text>
+  <text class="anno mono bold hp2 mid" x="501" y="192">2D</text>
+  <text class="anno mono bold mid" x="552" y="192">1M</text>
+
+  <text class="tick zh" x="600" y="140">序列仍保留於檔案</text>
+  <text class="tick zh" x="600" y="164">不計入對齊區段</text>
+  <text class="tick zh hp2" x="600" y="192">2D＝參考有、read 沒有</text>
+
+  <!-- ══════ 右端被剪的 read ══════ -->
+  <text class="anno bold zh artifact" x="20" y="256">右端被剪的 read</text>
+  <text class="tick zh" x="20" y="280">後端未可靠對齊</text>
+
+  <g>
+    <rect class="box plain" x="300" y="236" width="28" height="28" rx="3"/><text class="base a mono mid" x="314" y="257" font-size="17">A</text>
+    <rect class="box plain" x="334" y="236" width="28" height="28" rx="3"/><text class="base t mono mid" x="348" y="257" font-size="17">T</text>
+    <rect class="box plain" x="368" y="236" width="28" height="28" rx="3"/><text class="base t mono mid" x="382" y="257" font-size="17">T</text>
+    <rect class="box plain" x="402" y="236" width="28" height="28" rx="3"/><text class="base a mono mid" x="416" y="257" font-size="17">A</text>
+    <rect class="box plain" x="436" y="236" width="28" height="28" rx="3"/><text class="base g mono mid" x="450" y="257" font-size="17">G</text>
+    <rect class="box plain" x="470" y="236" width="28" height="28" rx="3"/><text class="base g mono mid" x="484" y="257" font-size="17">G</text>
+    <rect class="box plain" x="504" y="236" width="28" height="28" rx="3"/><text class="base c mono mid" x="518" y="257" font-size="17">C</text>
+    <rect class="box plain" x="538" y="236" width="28" height="28" rx="3"/><text class="base t mono mid" x="552" y="257" font-size="17">T</text>
+    <rect class="box ghost" x="572" y="236" width="96" height="28" rx="3" stroke="var(--artifact)" stroke-dasharray="5 3"/>
+    <text class="mono mid artifact" x="620" y="256" font-size="15">AGC…</text>
+  </g>
+
+  <text class="tick zh" x="20" y="308">此 read 的 CIGAR</text>
+  <text class="anno mono bold mid" x="430" y="308">8M</text>
+  <text class="anno mono bold artifact mid" x="620" y="308">10S</text>
+
+  <!-- ══════ 為什麼重要 ══════ -->
+  <line class="axis" x1="20" y1="342" x2="980" y2="342"/>
+  <text class="lbl bold zh" x="20" y="374">單一 read 的 clipping 可見於技術或比對現象；若多條在<tspan class="bold somatic">同一位置</tspan>出現 ——</text>
+
+  <!-- 左：散落的 clipping（正常） -->
+  <rect class="box ok" x="20" y="392" width="466" height="148" rx="8"/>
+  <text class="anno bold zh ok" x="42" y="420">位置分散：可見於一般現象</text>
+
+  <rect class="read hp0" x="60" y="436" width="150" height="11" rx="5.5"/>
+  <rect class="box ghost" x="46" y="436" width="14" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="read hp0" x="140" y="452" width="160" height="11" rx="5.5"/>
+  <rect class="read hp0" x="90" y="468" width="170" height="11" rx="5.5"/>
+  <rect class="box ghost" x="260" y="468" width="14" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="read hp0" x="200" y="484" width="180" height="11" rx="5.5"/>
+  <rect class="read hp0" x="120" y="500" width="200" height="11" rx="5.5"/>
+  <rect class="box ghost" x="320" y="500" width="14" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+
+  <text class="tick zh" x="42" y="530">clipping 可分散於不同 read 的端部</text>
+
+  <!-- 右：集中的 clipping（斷點） -->
+  <rect class="box bad" x="510" y="392" width="470" height="148" rx="8"/>
+  <text class="anno bold zh bad" x="532" y="420">位置集中：結構變異斷點候選</text>
+
+  <line class="axis" x1="742" y1="428" x2="742" y2="516" stroke="var(--bad)" stroke-width="3"/>
+
+  <rect class="read hp0" x="592" y="436" width="150" height="11" rx="5.5"/>
+  <rect class="box ghost" x="742" y="436" width="16" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="read hp0" x="576" y="452" width="166" height="11" rx="5.5"/>
+  <rect class="box ghost" x="742" y="452" width="16" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="read hp0" x="604" y="468" width="138" height="11" rx="5.5"/>
+  <rect class="box ghost" x="742" y="468" width="16" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="read hp0" x="586" y="484" width="156" height="11" rx="5.5"/>
+  <rect class="box ghost" x="742" y="484" width="16" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="read hp0" x="598" y="500" width="144" height="11" rx="5.5"/>
+  <rect class="box ghost" x="742" y="500" width="16" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+
+  <text class="tick zh bad bold" x="532" y="530">read 與參考序列的對齊可能不一致，需進一步確認</text>
+</svg><figcaption>最上一列是參考序列，每格一個字母。中間兩列是左端與右端 soft-clipped 的 read；<b>紅色虛線框表示未納入對齊的部分</b>，序列仍保留在檔案中，對應的 CIGAR 標示於下方。最底下比較兩種情況：clipping 可能分散於不同 read 的端部；若多條 read 的 clipping 位置集中，則可作為結構變異斷點候選，仍需結合其他證據確認。</figcaption></figure>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">LongPhase-TO 如何利用 clipping 協助界定 CNV / BFB 區間</p>
+<p class="prose">LongPhase-TO 會統計 clipping 在基因體上的分布：<b>覆蓋度上升的位置</b>可能累積左端 soft clipping，
+<b>下降的位置</b>可能累積右端 soft clipping。一組上升與下降可形成事件區間候選，
+但仍需結合覆蓋度、序列脈絡與其他證據，確認該區段是否與參考基因體不同。</p>
+<p class="prose">此訊號可在不使用預先呼叫的變異資訊時，從 read 與參考序列的對齊模式取得結構變異候選；完整流程會在後續模組中說明。</p>
+</div>
+
+<h3 id="vcf-與-bam-的關鍵欄位">VCF 與 BAM 的關鍵欄位</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>在哪</th><th>欄位</th><th>意思</th></tr></thead>
+<tbody>
+<tr><td>VCF FORMAT</td><td><code>GT</code></td><td><span class="term" data-term="genotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-genotype-7">genotype<span class="term__pop" id="gd-genotype-7" role="tooltip"><b class="term__hd">genotype <i>基因型</i></b><span class="term__def" data-lang="zh">某個 locus 上觀察到的 allele 組合；對一般二倍體常染色體位點，通常是兩份 allele。VCF 裡寫成 <code>0/1</code>（未定相）或 <code>0|1</code>（已定相）。</span><span class="term__def" data-lang="en">The allele combination observed at a locus. At a typical diploid autosomal locus it has two copies; VCF writes these as 0/1 (unphased) or 0|1 (phased).</span><a class="term__more" href="glossary.html#genotype">完整條目 →</a></span></span>。<code>0/1</code> 未定相、<code>0|1</code> 已定相</td></tr>
+<tr><td>VCF FORMAT</td><td><code><span class="term" data-term="PS tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ps-tag-8">PS<span class="term__pop" id="gd-ps-tag-8" role="tooltip"><b class="term__hd">PS tag <i>phase set</i></b><span class="term__def" data-lang="zh">標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</span><span class="term__def" data-lang="en">Phase set identifier grouping variants phased together. Haplotype orientation is only consistent within one PS.</span><a class="term__more" href="glossary.html#ps-tag">完整條目 →</a></span></span></code></td><td>phase set 編號。<b>同一個 PS 內</b>的 haplotype 方向才一致</td></tr>
+<tr><td>VCF FILTER</td><td><code>PASS</code> 等</td><td>caller 或下游工具的判定；在特定 LongPhase-TO 版本／設定中可見 <code>LP_nonSomatic</code>、<code>LP_PON</code></td></tr>
+<tr><td>BAM tag</td><td><code><span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-hp-tag-9">HP<span class="term__pop" id="gd-hp-tag-9" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span></code></td><td>若存在，表示工具對此 read 的 haplotype assignment</td></tr>
+<tr><td>BAM tag</td><td><code><span class="term" data-term="MM/ML tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-mm-ml-tag-10">MM<span class="term__pop" id="gd-mm-ml-tag-10" role="tooltip"><b class="term__hd">MM/ML tag</b><span class="term__def" data-lang="zh">BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。</span><span class="term__def" data-lang="en">BAM tags carrying per-read methylation calls: MM for positions, ML for probabilities. Easily lost during processing.</span><a class="term__more" href="glossary.html#mm-ml-tag">完整條目 →</a></span></span></code> / <code>ML</code></td><td>甲基化的位置與機率</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose"><code>HP</code> tag 的 SAM 型別可能不同。LongPhase-S 的 germline <code>haplotag</code> 寫成整數
+<code>HP:i:1</code>，而其 <code>somatic_haplotag</code> 與 LongPhase-TO 的示例寫成字串 <code>HP:Z:1-1</code>。
+請依所用版本核對文件與實作；若沒有 HP tag 或標記為 HP3，表示工具未能可靠指派該 read 的 haplotype。</p>
+</section>
+
+
+<section data-part="evidence" class="part" id="part-evidence">
+<h2 data-num="③" id="真實證據">真實證據</h2>
+
+<h3 id="前處理指令示範">前處理指令示範</h3>
+
+<p class="prose">以下示範一組前處理流程；請依所用版本文件、輸入路徑與分析平台調整參數後執行。</p>
+
+<pre><code># 參考基因體索引
+samtools faidx reference.fasta
+
+# 比對。--MD 會寫入 MD tag（某些下游工具需要）
+minimap2 --MD -ax map-ont -t 10 reference.fasta reads.fastq -o alignment.sam
+
+# 排序與索引
+samtools sort -@ 10 alignment.sam -o alignment.bam
+samtools index -@ 10 alignment.bam</code></pre>
+
+<h3 id="重比對時保留甲基化-tag">重比對時保留甲基化 tag</h3>
+
+<p class="prose">如果 BAM 帶有 <code>MM</code>／<code>ML</code>（甲基化）tag，重比對時若未使用保留 tag 的選項，
+流程可能不會保留這些 tag。要保留它們，請明確處理：</p>
+
+<pre><code># -T '*' 把所有 tag 帶進 FASTQ 的 header
+samtools fastq -T '*' methylcall.raw.bam &gt; methylcall.raw.fastq
+
+# -y 讓 minimap2 把 FASTQ header 裡的 tag 寫回 BAM
+minimap2 -ax map-ont -y reference.fasta methylcall.raw.fastq</code></pre>
+
+<p class="cli-note">若漏掉 <code>-T '*'</code> 或 <code>-y</code>，流程可能不會報錯，但輸出 BAM 的 MM/ML 欄位可能為空。
+請在重比對後檢查 tag 是否仍存在，避免將缺失的甲基化資訊誤認為生物學結果。</p>
+</section>
+
+
+<section data-part="predict" class="part" id="part-predict">
+<h2 data-num="④" id="判讀練習">判讀練習</h2>
+
+<div class="reveal__q"><p class="prose">一條 read 的 CIGAR 是 <code>60S40M</code>，比對位置是 <code>chr7:1,000,000</code>。<br><br>
+這條 read 總共多長？它覆蓋了參考基因體的哪一段？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>read 長 100 bp</b>（60 + 40，soft clip 的序列仍在 read 裡）。</p>
+<p class="prose"><b>但它只覆蓋參考的 <code>chr7:1,000,000–1,000,039</code></b>，也就是 40 bp。
+因為 <code>S</code> 不消耗參考序列。</p>
+<p class="prose">此 read 顯示前 60 bp 未與參考序列可靠對齊，從 1,000,000 開始才進入對齊區段。
+若<b>多條 read 都在 1,000,000 出現相同方向的 clipping</b>，可將此位置列為結構變異斷點候選；
+被剪序列也可能與低品質、重複序列或其他比對問題有關，需結合其他證據確認。</p>
+<p class="prose">完整字串可能超出元件的顯示範圍；可輸入 <code>10S8M</code> 觀察相同的消耗規則。</p></div></details>
+</section>
+
+
+<section data-part="practice" class="part" id="part-practice">
+<h2 data-num="⑤" id="實作練習">實作練習</h2>
+
+<h3 id="由-bam-回溯-vcf-位點證據">由 BAM 回溯 VCF 位點證據</h3>
+
+<p class="prose">此練習將 VCF 位點與 BAM 的 read-level 證據連結起來。挑選一個 VCF 變異，再回到 BAM 檢查其支持情況：</p>
+
+<pre><code># 1. 從 VCF 挑一個位點
+bcftools view -H sample.vcf | head -3
+
+# 2. 回到 BAM 看那個位置上的每一條 read
+samtools view aln.bam chr1:1000000-1000000
+
+# 3. 用 pileup 直接看每條 read 在那個位置的鹼基
+samtools mpileup -f reference.fasta -r chr1:1000000-1000000 aln.bam
+
+# 4. 檢查該位置附近的 CIGAR 型式
+samtools view aln.bam chr1:1000000-1000000 | awk '{print $6}' | sort | uniq -c | sort -rn</code></pre>
+
+<p class="cli-note">第 4 步可用來檢查對齊型式：若同一位置的 CIGAR 型式高度多樣，可能表示重複序列或 indel 對齊不確定，
+應結合 mapping/base quality 與 pileup 謹慎評估；型式一致也不代表證據必然可靠。</p>
+
+<h3 id="cigar-讀法練習">CIGAR 讀法練習</h3>
+
+<p class="prose">請在上方解碼器輸入以下 CIGAR，先計算 read 與參考序列的消耗長度，再核對答案：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>CIGAR</th><th>read 長度</th><th>參考涵蓋長度（bp）</th></tr></thead>
+<tbody>
+<tr><td><code>10M</code></td><td>10</td><td>10</td></tr>
+<tr><td><code>5M2I3M</code></td><td>10</td><td>8</td></tr>
+<tr><td><code>5M2D5M</code></td><td>10</td><td>12</td></tr>
+<tr><td><code>3S7M</code></td><td>10</td><td>7</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">判讀時先掌握一項核心規則：<b>查看每個操作碼消耗哪一側的序列。</b><code>I</code> 與 <code>S</code>
+只消耗 read，<code>D</code> 只消耗參考序列，<code>M</code> 兩側都消耗。</p>
+
+<section class="quiz" data-quiz="m04"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+</section>
+
+    <nav class="pager" aria-label="模組導覽"><a class="prev" href="m03.html"><small>← 上一模組</small>定序原理與長讀的分析價值</a><a class="next" href="m05.html"><small>下一模組 →</small>Germline variant calling：從證據到判定</a></nav>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>BAM</dt><dd>已比對到參考基因體的 read 的二進位格式（SAM 的壓縮版）。每一列是一條 read，帶著它的位置、CIGAR、品質與各種 tag。</dd><dt>CIGAR</dt><dd>描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。</dd><dt>FASTQ</dt><dd>存放 read 序列與每個鹼基品質分數的文字格式；每筆紀錄由四行組成。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>MM/ML tag</dt><dd>BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。</dd><dt>PS tag（phase set）</dt><dd>標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</dd><dt>VCF</dt><dd>存放 variant 的文字格式。每一列是一個位點，記錄位置、ref/alt allele、品質、FILTER 與各種 FORMAT 欄位。</dd><dt>genotype（基因型）</dt><dd>某個 locus 上觀察到的 allele 組合；對一般二倍體常染色體位點，通常是兩份 allele。VCF 裡寫成 <code>0/1</code>（未定相）或 <code>0|1</code>（已定相）。</dd><dt>reference genome（參考基因體）</dt><dd>用於比對的標準序列（人類資料常用 GRCh38）。所有座標均相對於指定版本；更換 build 會改變座標系，座標不可直接比較。</dd><dt>soft clipping</dt><dd>read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd></dl></section>
+  </main>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#從樣本到變異的檔案鏈">從樣本到變異的檔案鏈</a></li><li class="lv3"><a href="#cigar-read-與參考序列的對齊表示">CIGAR：read 與參考序列的對齊表示</a></li><li class="lv3"><a href="#soft-clipping-的判讀意義">soft clipping 的判讀意義</a></li><li class="lv3"><a href="#vcf-與-bam-的關鍵欄位">VCF 與 BAM 的關鍵欄位</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#前處理指令示範">前處理指令示範</a></li><li class="lv3"><a href="#重比對時保留甲基化-tag">重比對時保留甲基化 tag</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#由-bam-回溯-vcf-位點證據">由 BAM 回溯 VCF 位點證據</a></li><li class="lv3"><a href="#cigar-讀法練習">CIGAR 讀法練習</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+</div>
+
+<footer class="site-footer">
+  本教材供中正大學資工系黃耀廷實驗室新進成員自學，聚焦
+  <code>LongPhase-S</code> 與 <code>LongPhase-TO</code> 的概念、證據與限制。
+</footer>
+
+
+<script src="assets/js/progress.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/glossary.js"></script>
+<script src="assets/js/quiz.js"></script>
+<script src="assets/data/quiz.data.js"></script>
+<script src="assets/js/widgets/cigar-decoder.js"></script>
+</body>
+</html>

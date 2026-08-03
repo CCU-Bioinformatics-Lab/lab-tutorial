@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420">
+  <title>germline variant 與 somatic variant 的來源差別</title>
+  <desc>左半部：父方與母方的生殖細胞各帶有變異，受精後形成的胚胎通常在多數細胞裡都有這些變異，
+        並可能傳給下一代，這叫 germline variant。
+        右半部：個體長大過程中某個非生殖系細胞分裂時新產生的變異，可只存在於它的後代細胞裡，
+        通常不以遺傳方式傳遞，這叫 somatic variant。</desc>
+
+  <!-- ══ 左：germline ═══════════════════════════════════════════ -->
+  <rect class="box plain" x="16" y="16" width="470" height="388" rx="10"/>
+  <text class="lbl bold germline" x="36" y="46">Germline variant</text>
+  <text class="anno zh" x="36" y="70">與生俱來，來自父母</text>
+
+  <!-- 父 -->
+  <circle class="cell normal" cx="110" cy="120" r="26"/>
+  <circle class="nucleus" cx="110" cy="120" r="12"/>
+  <circle class="mark germline" cx="110" cy="120" r="5"/>
+  <text class="tick mid zh" x="110" y="162">父方生殖細胞</text>
+
+  <!-- 母 -->
+  <circle class="cell normal" cx="380" cy="120" r="26"/>
+  <circle class="nucleus" cx="380" cy="120" r="12"/>
+  <circle class="mark germline" cx="380" cy="120" r="5"/>
+  <text class="tick mid zh" x="380" y="162">母方生殖細胞</text>
+
+  <!-- 箭頭匯合 -->
+  <path class="conn germline" d="M130,142 L225,196" marker-end="url(#arrow)"/>
+  <path class="conn germline" d="M360,142 L265,196" marker-end="url(#arrow)"/>
+
+  <!-- 胚胎 -->
+  <circle class="cell normal" cx="245" cy="224" r="30"/>
+  <circle class="nucleus" cx="245" cy="224" r="14"/>
+  <circle class="mark germline" cx="238" cy="222" r="5"/>
+  <circle class="mark germline" cx="252" cy="228" r="5"/>
+  <text class="tick mid zh" x="245" y="272">受精卵</text>
+
+  <!-- 全身細胞 -->
+  <path class="conn" d="M245,286 L245,308" marker-end="url(#arrow)"/>
+  <circle class="cell normal" cx="130" cy="344" r="17"/>
+  <circle class="mark germline" cx="130" cy="344" r="4"/>
+  <circle class="cell normal" cx="178" cy="344" r="17"/>
+  <circle class="mark germline" cx="178" cy="344" r="4"/>
+  <circle class="cell normal" cx="226" cy="344" r="17"/>
+  <circle class="mark germline" cx="226" cy="344" r="4"/>
+  <circle class="cell normal" cx="274" cy="344" r="17"/>
+  <circle class="mark germline" cx="274" cy="344" r="4"/>
+  <circle class="cell normal" cx="322" cy="344" r="17"/>
+  <circle class="mark germline" cx="322" cy="344" r="4"/>
+  <circle class="cell normal" cx="370" cy="344" r="17"/>
+  <circle class="mark germline" cx="370" cy="344" r="4"/>
+
+  <text class="anno mid zh germline bold" x="250" y="388">通常存在於多數細胞 · 可能傳給子代</text>
+
+  <!-- ══ 右：somatic ════════════════════════════════════════════ -->
+  <rect class="box plain" x="514" y="16" width="470" height="388" rx="10"/>
+  <text class="lbl bold somatic" x="534" y="46">Somatic variant</text>
+  <text class="anno zh" x="534" y="70">後天產生，可限於部分細胞</text>
+
+  <!-- 起始細胞 -->
+  <circle class="cell normal" cx="600" cy="126" r="24"/>
+  <circle class="nucleus" cx="600" cy="126" r="11"/>
+  <text class="tick mid zh" x="600" y="166">正常細胞</text>
+
+  <path class="conn" d="M624,126 L688,126" marker-end="url(#arrow)"/>
+  <text class="tick mid zh" x="656" y="116">分裂時出錯</text>
+
+  <!-- 新突變細胞 -->
+  <circle class="cell tumor" cx="712" cy="126" r="24"/>
+  <circle class="nucleus" cx="712" cy="126" r="11"/>
+  <circle class="mark somatic" cx="712" cy="126" r="5"/>
+  <text class="tick mid zh somatic" x="712" y="166">新增 somatic 突變</text>
+
+  <!-- 增生 -->
+  <path class="conn somatic" d="M712,196 L712,222" marker-end="url(#arrow)"/>
+  <text class="tick zh" x="726" y="212">持續增生</text>
+
+  <circle class="cell tumor" cx="660" cy="252" r="17"/>
+  <circle class="mark somatic" cx="660" cy="252" r="4"/>
+  <circle class="cell tumor" cx="712" cy="252" r="17"/>
+  <circle class="mark somatic" cx="712" cy="252" r="4"/>
+  <circle class="cell tumor" cx="764" cy="252" r="17"/>
+  <circle class="mark somatic" cx="764" cy="252" r="4"/>
+
+  <!-- 未受影響的細胞 -->
+  <circle class="cell normal" cx="560" cy="320" r="17"/>
+  <circle class="cell normal" cx="608" cy="320" r="17"/>
+  <circle class="cell tumor" cx="700" cy="320" r="17"/>
+  <circle class="mark somatic" cx="700" cy="320" r="4"/>
+  <circle class="cell tumor" cx="748" cy="320" r="17"/>
+  <circle class="mark somatic" cx="748" cy="320" r="4"/>
+  <circle class="cell tumor" cx="796" cy="320" r="17"/>
+  <circle class="mark somatic" cx="796" cy="320" r="4"/>
+  <circle class="cell normal" cx="900" cy="320" r="17"/>
+
+  <line class="guide" x1="654" y1="292" x2="654" y2="348"/>
+  <text class="tick zh" x="540" y="356">沒有突變</text>
+  <text class="tick zh somatic" x="672" y="356">帶有突變的那一群</text>
+
+  <text class="anno mid zh somatic bold" x="748" y="388">可限於部分細胞 · 通常不以遺傳方式傳遞</text>
+</svg>

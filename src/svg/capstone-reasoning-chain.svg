@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>判讀一個候選位點的完整推理鏈</title>
+  <desc>從觀測資料開始，依序檢查五類證據：
+        頻率是否符合預期、配對正常組織是否乾淨、支持的 read 是否集中在同一條染色體上、
+        序列脈絡是否容易出錯、以及公開資料庫有沒有收錄。
+        每一項標示定性支持程度，最後匯總成一個帶有明確不確定性的結論。
+        右側列出每一項如果換成只有腫瘤樣本的情況會怎麼改變。</desc>
+
+  <!-- 觀測 -->
+  <rect class="box plain" x="20" y="20" width="240" height="122" rx="8"/>
+  <text class="anno bold zh" x="40" y="48">觀測資料</text>
+  <text class="tick mono" x="40" y="74">tumor  50× · ALT 11</text>
+  <text class="tick mono" x="40" y="96">normal 25× · ALT 0</text>
+  <text class="tick mono" x="40" y="118">ALT 的 HP: 10 / 1</text>
+  <text class="tick mono" x="40" y="136">purity 0.6 · CN 2</text>
+
+  <!-- 五項檢查 -->
+  <path class="flow" d="M264,80 L300,80" marker-end="url(#arrow)"/>
+
+  <g>
+    <rect class="box ok" x="304" y="20" width="352" height="44" rx="6"/>
+    <text class="tick bold zh ok" x="322" y="40">① 頻率符合預期嗎</text>
+    <text class="tick zh" x="322" y="58">11/50 = 0.22，理論值 0.30 → 相容</text>
+    <text class="lbl bold ok" x="672" y="50">＋</text>
+
+    <rect class="box ok" x="304" y="72" width="352" height="44" rx="6"/>
+    <text class="tick bold zh ok" x="322" y="92">② 正常組織乾淨嗎</text>
+    <text class="tick zh" x="322" y="110">25× 深度、0 條 → 降低 het germline 可能</text>
+    <text class="lbl bold ok" x="672" y="102">＋＋</text>
+
+    <rect class="box ok" x="304" y="124" width="352" height="44" rx="6"/>
+    <text class="tick bold zh ok" x="322" y="144">③ 支持的 read 集中嗎</text>
+    <text class="tick zh" x="322" y="162">10 比 1 偏向一條 → 支持來源一致</text>
+    <text class="lbl bold ok" x="672" y="154">＋＋</text>
+
+    <rect class="box ok" x="304" y="176" width="352" height="44" rx="6"/>
+    <text class="tick bold zh ok" x="322" y="196">④ 序列脈絡容易出錯嗎</text>
+    <text class="tick zh" x="322" y="214">非重複、非 homopolymer → 已知風險較低</text>
+    <text class="lbl bold ok" x="672" y="206">＋</text>
+
+    <rect class="box warn" x="304" y="228" width="352" height="44" rx="6"/>
+    <text class="tick bold zh warn" x="322" y="248">⑤ 資料庫有收錄嗎</text>
+    <text class="tick zh" x="322" y="266">沒有 —— 但這只排除「常見」的遺傳變異</text>
+    <text class="lbl bold warn" x="672" y="258">○</text>
+  </g>
+
+  <!-- 右側：只有腫瘤樣本時 -->
+  <rect class="box bad" x="712" y="20" width="268" height="252" rx="8"/>
+  <text class="anno bold zh bad" x="732" y="48">若只有腫瘤樣本</text>
+  <text class="tick zh" x="732" y="78">① 還在</text>
+  <text class="tick zh bad bold" x="732" y="104">② 不可用</text>
+  <text class="tick zh" x="732" y="126">（此類證據不可用）</text>
+  <text class="tick zh" x="732" y="152">③ 還在，而且變成主力</text>
+  <text class="tick zh" x="732" y="178">④ 還在</text>
+  <text class="tick zh" x="732" y="204">⑤ 還在，但幫助有限</text>
+  <text class="tick zh bad" x="732" y="240">→ 無法排除「這個人</text>
+  <text class="tick zh bad" x="732" y="260">　 獨有的遺傳變異」</text>
+
+  <!-- 匯總 -->
+  <line class="axis" x1="20" y1="298" x2="980" y2="298"/>
+  <text class="lbl bold zh" x="20" y="330">結論該怎麼寫</text>
+
+  <rect class="box ok" x="20" y="348" width="470" height="196" rx="8"/>
+  <text class="anno bold zh ok" x="42" y="378">有配對正常組織時</text>
+  <text class="tick zh" x="42" y="410">「與 somatic 變異相容，支持度較高。」</text>
+  <text class="tick zh" x="42" y="440">四項支持證據，其中兩項有力：</text>
+  <text class="tick zh" x="42" y="464">正常組織乾淨、支持 read 集中。</text>
+  <text class="tick zh bold" x="42" y="496">保留的疑慮：那 1 條例外要解釋，</text>
+  <text class="tick zh bold" x="42" y="518">而 purity 0.6 本身是估計值。</text>
+
+  <rect class="box warn" x="510" y="348" width="470" height="196" rx="8"/>
+  <text class="anno bold zh warn" x="532" y="378">只有腫瘤樣本時</text>
+  <text class="tick zh" x="532" y="410">「與 somatic 變異相容，</text>
+  <text class="tick zh" x="532" y="434">　但<tspan class="bold">無法完全排除</tspan>是這個人</text>
+  <text class="tick zh" x="532" y="458">　獨有的遺傳變異。」</text>
+  <text class="tick zh bold" x="532" y="490">而且必須在報告裡明講這個限制 ——</text>
+  <text class="tick zh bold" x="532" y="512">此表述明確標示證據限制。</text>
+</svg>

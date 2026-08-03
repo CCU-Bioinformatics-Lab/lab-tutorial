@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>配對正常樣本與族群資料庫的過濾差異</title>
+  <desc>上半部：有配對正常樣本時，把腫瘤候選與同一個人的正常樣本比較。
+        正常樣本有支持時，較支持 germline 或其他非腫瘤來源；但仍受 coverage、污染與 caller sensitivity 限制。
+        下半部：沒有配對正常樣本時，改用族群資料庫。已收錄且符合條件的常見 germline 變異可作為排除依據，
+        但 private germline 與未觀察過的 artifact 可能未被涵蓋，剩餘候選不能直接視為 somatic。</desc>
+
+  <!-- ══════════ 上半：有配對正常樣本 ══════════ -->
+  <rect class="box ok" x="16" y="16" width="968" height="238" rx="10"/>
+  <text class="lbl bold zh" x="36" y="46">有配對的正常組織可以比對</text>
+
+  <!-- 候選變異 -->
+  <text class="anno zh" x="36" y="82">腫瘤樣本裡找到的候選變異</text>
+  <circle class="mark somatic"  cx="52"  cy="112" r="11"/>
+  <circle class="mark somatic"  cx="82"  cy="112" r="11"/>
+  <circle class="mark somatic"  cx="112" cy="112" r="11"/>
+  <circle class="mark germline" cx="152" cy="112" r="11"/>
+  <circle class="mark germline" cx="182" cy="112" r="11"/>
+  <circle class="mark germline" cx="212" cy="112" r="11"/>
+  <circle class="mark germline" cx="242" cy="112" r="11"/>
+  <circle class="mark artifact" cx="282" cy="112" r="11"/>
+  <circle class="mark artifact" cx="312" cy="112" r="11"/>
+
+  <!-- 比對步驟 -->
+  <path class="flow" d="M340,112 L392,112" marker-end="url(#arrow)"/>
+  <rect class="box accent" x="396" y="72" width="188" height="80" rx="8"/>
+  <text class="anno mid bold zh" x="490" y="100">與配對 normal 比較</text>
+  <text class="tick mid zh" x="490" y="124">同一個人的</text>
+  <text class="tick mid zh" x="490" y="142">正常細胞 DNA</text>
+
+  <!-- 結果 -->
+  <path class="flow" d="M588,112 L640,112" marker-end="url(#arrow)"/>
+  <text class="anno zh" x="648" y="82">留下來的</text>
+  <circle class="mark somatic" cx="664" cy="112" r="11"/>
+  <circle class="mark somatic" cx="694" cy="112" r="11"/>
+  <circle class="mark somatic" cx="724" cy="112" r="11"/>
+  <text class="lbl bold" x="756" y="118">候選保留（示例）</text>
+
+  <!-- 被排除的 -->
+  <path class="guide" d="M490,156 L490,196" marker-end="url(#arrow)"/>
+  <text class="anno zh bad" x="300" y="192">normal 有支持 → 較支持 germline 或其他來源</text>
+  <circle class="mark germline" cx="512" cy="212" r="9" opacity="0.4"/>
+  <circle class="mark germline" cx="536" cy="212" r="9" opacity="0.4"/>
+  <circle class="mark germline" cx="560" cy="212" r="9" opacity="0.4"/>
+  <circle class="mark germline" cx="584" cy="212" r="9" opacity="0.4"/>
+  <circle class="mark artifact" cx="616" cy="212" r="9" opacity="0.4"/>
+  <circle class="mark artifact" cx="640" cy="212" r="9" opacity="0.4"/>
+  <text class="tick zh" x="664" y="217">部分 artifact 可能一併被排除</text>
+
+  <text class="anno zh" x="36" y="238">關鍵：這份對照資料<tspan class="bold">來自同一個人</tspan>，所以他獨有的遺傳變異也查得到。</text>
+
+  <!-- ══════════ 下半：只有腫瘤樣本 ══════════ -->
+  <rect class="box bad" x="16" y="272" width="968" height="272" rx="10"/>
+  <text class="lbl bold zh" x="36" y="302">缺少 matched normal，改以族群資料庫提供部分背景</text>
+
+  <text class="anno zh" x="36" y="338">同樣一批候選變異</text>
+  <circle class="mark somatic"  cx="52"  cy="368" r="11"/>
+  <circle class="mark somatic"  cx="82"  cy="368" r="11"/>
+  <circle class="mark somatic"  cx="112" cy="368" r="11"/>
+  <circle class="mark germline" cx="152" cy="368" r="11"/>
+  <circle class="mark germline" cx="182" cy="368" r="11"/>
+  <circle class="mark germline" cx="212" cy="368" r="11"/>
+  <circle class="mark germline" cx="242" cy="368" r="11"/>
+  <circle class="mark artifact" cx="282" cy="368" r="11"/>
+  <circle class="mark artifact" cx="312" cy="368" r="11"/>
+
+  <path class="flow" d="M340,368 L392,368" marker-end="url(#arrow)"/>
+  <rect class="box warn" x="396" y="322" width="188" height="92" rx="8"/>
+  <text class="anno mid bold zh" x="490" y="350">查公開族群資料庫</text>
+  <text class="tick mid zh" x="490" y="374">已收錄的常見</text>
+  <text class="tick mid zh" x="490" y="392">germline 變異清單</text>
+
+  <path class="flow" d="M588,368 L640,368" marker-end="url(#arrow)"/>
+  <text class="anno zh" x="648" y="338">留下來的</text>
+  <circle class="mark somatic"  cx="664" cy="368" r="11"/>
+  <circle class="mark somatic"  cx="694" cy="368" r="11"/>
+  <circle class="mark somatic"  cx="724" cy="368" r="11"/>
+  <circle class="mark germline" cx="758" cy="368" r="11"/>
+  <text class="tick mid bold bad" x="758" y="373">!</text>
+  <circle class="mark artifact" cx="788" cy="368" r="11"/>
+  <text class="tick mid bold bad" x="788" y="373">!</text>
+  <circle class="mark artifact" cx="818" cy="368" r="11"/>
+  <text class="tick mid bold bad" x="818" y="373">!</text>
+  <text class="lbl bold bad" x="848" y="374">候選仍可能混合</text>
+
+  <!-- 被排除 -->
+  <path class="guide" d="M490,418 L490,452" marker-end="url(#arrow)"/>
+  <text class="anno zh" x="240" y="448">資料庫已收錄的常見 germline → 可作排除依據</text>
+  <circle class="mark germline" cx="512" cy="468" r="9" opacity="0.4"/>
+  <circle class="mark germline" cx="536" cy="468" r="9" opacity="0.4"/>
+  <circle class="mark germline" cx="560" cy="468" r="9" opacity="0.4"/>
+
+  <!-- 核心說明 -->
+  <line class="guide" x1="36" y1="494" x2="964" y2="494"/>
+  <text class="anno zh bold bad" x="36" y="520">資料庫未涵蓋的候選，可能包含：</text>
+  <text class="tick zh" x="36" y="538">① 這個病人的<tspan class="bold"> private germline</tspan>　② <tspan class="bold">尚未觀察過</tspan>的技術性 artifact</text>
+</svg>

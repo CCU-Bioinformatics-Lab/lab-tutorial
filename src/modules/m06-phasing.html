@@ -1,0 +1,217 @@
+<!--tw
+{
+  "objectives": [
+    "將一組 read 分配至 HP1 與 HP2，並說明所採用的判準",
+    "說明 phase set 是什麼，以及為什麼 haplotype 方向只在 phase set 內部有意義",
+    "說出 switch error 是什麼、通常發生在哪裡",
+    "畫出 germline haplotype 與 somatic haplotype 的層級關係，包含 HP3 的處理"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<p class="prose">本模組整合前述資料與概念，聚焦於 phasing 與 haplotagging。</p>
+
+<p class="prose">先以簡化 pileup 練習 read 分群，再說明工具如何根據 read 與 variant 的連結進行 phasing。</p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>練習一次 phasing 判讀</h3>
+
+<p class="prose">下面是一段 pileup，包含三個 [[heterozygous]] 位點；每條 read 在其覆蓋到的位點上顯示一個鹼基。
+請依跨位點的 allele pattern 將 read 分群，使<b>同群 read 的組合盡可能一致</b>，並保留無法可靠判定的 read。</p>
+
+{{widget:pileup-phasing #ex1 {"reads":12,"sites":3} | 點選 read 可在「未指派 → HP1 → HP2 → 未指派」之間切換；完成後選擇「檢查」。<b>提示</b>：可先以覆蓋 informative 位點最多的 read 作為暫定基準，再比較其他 read。}}
+
+<p class="prose">做完之後，注意三件事：</p>
+
+<ul class="prose">
+<li><b>有一條 read 在此練習中無法可靠指派</b> —— 它沒有覆蓋任何 informative het 位點，因此保持未標記即可。
+若該 read 另帶有 somatic signal，才可能在後續流程中進入 <code>HP3</code> 類別；一般 untagged read 不等於 HP3。</li>
+<li><b>示例中有一個錯誤鹼基</b>（檢查後會被圈出來）。該 read 在其他位點仍可能呈現一致 pattern，
+因此可根據多個位點的整體證據進行分群，但此方法不保證修正所有錯誤。</li>
+<li><b>HP1 與 HP2 整體互換仍可表示相同的相對 phasing。</b>原因見下方說明。</li>
+</ul>
+
+{{guard:1 | HP1 與 HP2 不等於父系與母系}}
+<p class="prose">練習接受整體互換，因為 HP1／HP2 標籤本身沒有固定的生物學方向。</p>
+<p class="prose">單獨樣本的 phasing 可推得變異的相對 haplotype，但<b>不能僅憑 HP1／HP2 判定父系或母系</b>；
+若要判定親本來源，需要 trio 或其他親本證據。</p>
+<p class="prose">此外，方向只在同一個 <b>[[PS tag|phase set]]</b> 內可直接比較。
+跨過 phase block 斷點後，左側的 HP1 不一定對應右側的 HP1；跨 PS 聚合甲基化等統計前，需先校正方向或使用不依賴標籤方向的統計。</p>
+<p class="prose">部分工具文件會以「父系／母系 haplotype」描述 HP1／HP2；若未使用 trio 或其他親本證據，教材與論文應採用 haplotype 1／2 的中性稱呼。</p>
+{{/guard}}
+
+<h3>cis 與 trans</h3>
+
+<p class="prose">phasing 的產物就是回答「兩個變異的相對位置」：</p>
+
+<ul class="prose">
+<li><b>[[cis]]</b>：在同一條 haplotype 上；藥物或功能影響需依特定 EGFR 變異與研究證據判定</li>
+<li><b>[[trans]]</b>：分屬兩條 haplotype</li>
+</ul>
+
+<h3>phase set 與 switch error</h3>
+
+<p class="prose">phasing 可能因缺乏重疊 read 或 informative 位點而中止，形成新的 <b>[[phase block]]</b>。
+VCF 用 <code>PS</code> 欄位標示每個 block。</p>
+
+<p class="prose"><b>[[switch error]]</b> 是常見的 phasing 錯誤類型：自某一位置起，演算法將兩條 haplotype 的標籤對調。
+它可能發生在 het 位點稀疏、read 重疊不足或證據歧義較高的區域。</p>
+
+{{svg:m06-phase-block | [wide] 三種狀況。① 位點密度與 read 重疊足夠時，可形成較長的 phase block。② 中間缺乏可用位點或重疊 read，兩側可能形成獨立 block；<b>兩個 block 的 HP1／HP2 方向彼此獨立</b>，左側 HP1 不一定對應右側 HP1。③ 證據不足或存在歧義時可能發生 switch error，該位置後的相位標籤可能反轉。}}
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">LOH 對 phasing 的限制</p>
+<p class="prose">[[LOH]] 可能減少可用的 heterozygous 錨點，使 phasing 變弱或分段；LOH 可為部分、copy-neutral 或 subclonal，
+未必使所有位點都變成 homozygous。缺乏 informative 位點時，跨區域連結會變得不可靠。</p>
+<p class="prose">不同工具對 LOH 的處理能力取決於 coverage、purity、LOH 型態與演算法。若 LongPhase-TO 能在特定條件下跨越 LOH，
+應以相應 benchmark 與版本文件界定其適用範圍。</p>
+</div>
+
+<h3>haplotagging：將 haplotype assignment 寫入 read</h3>
+
+<p class="prose">[[phasing]] 將 variant 的 haplotype assignment 寫入 VCF；
+[[haplotagging]] 則將每條 <b>read</b> 的 assignment 寫入 BAM 的 <code>[[HP tag|HP]]</code> tag。
+之後可在 IGV 中依 haplotype 分組或著色顯示。</p>
+
+<h3>somatic haplotype 的延伸層級</h3>
+
+<p class="prose">到目前為止介紹的是標準 germline phasing。接著再說明 somatic haplotype 的延伸層級：</p>
+
+{{svg:m06-somatic-haplotype | [wide] 在 germline haplotype（HP1／HP2）下，帶有 somatic 變異且可判定來源的 read 可再細分為 HP1-1 與 HP2-1。尚未能可靠判定來源、但帶有 somatic signal 的 read 可先標為 HP3；若同一 somatic allele 已有可靠的 haplotype assignment，流程可依條件重新分類部分 HP3 read。}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>標籤</th><th>意思</th></tr></thead>
+<tbody>
+<tr><td><code>HP1</code> / <code>HP2</code></td><td>已指派至 germline haplotype 的 read，不表示只涵蓋 germline 變異</td></tr>
+<tr><td><code>HP1-1</code></td><td>帶有 somatic 變異，且可判定源自 HP1</td></tr>
+<tr><td><code>HP2-1</code></td><td>帶有 somatic 變異，且可判定源自 HP2</td></tr>
+<tr><td><code>HP1-1-1</code></td><td>在 HP1-1 之上再累積一個 somatic assignment；不應單獨解讀為已證實的 subclone</td></tr>
+<tr><td><code>HP3</code></td><td>帶有 somatic signal，但<b>尚未能可靠判定</b>源自哪一條 germline haplotype</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">若某個 somatic allele 在其他 read 上已有可靠的 HP1-1 assignment，
+流程可在條件成立時將攜帶相同 allele 的部分 HP3 read 重新分類為 HP1-1；此步驟可能增加可用 read，
+但也需評估相同 allele、mapping 與相位錯誤造成的誤分類風險。</p>
+</section>
+
+
+<section data-part="evidence">
+<h2>真實證據</h2>
+
+<p class="prose">以下示範 germline phasing 與 haplotagging 指令：</p>
+
+{{cli}}
+# 1. 對 germline VCF 執行 phasing
+longphase-s phase \
+  -s SNP.vcf \
+  -b alignment.bam \
+  -r reference.fasta \
+  -t 8 \
+  -o phased_prefix \
+  --ont
+
+# 2. 依 phased VCF 將 read 標記為 HP tag
+longphase-s haplotag \
+  -r reference.fasta \
+  -s phased_snp.vcf \
+  -b alignment.bam \
+  -t 8 \
+  -o tagged_bam_prefix
+{{/cli}}
+
+<p class="cli-note">依目前版本，LongPhase-S 的 <code>--ont</code>／<code>--pb</code> 參數要求與 LongPhase-TO 的處理方式不同。
+LongPhase-TO 僅支援 ONT，某些不相容參數可能被接受但不產生預期效果；請依版本文件核對，
+不要預期流程在所有版本都提示警告。</p>
+
+<p class="prose">完成後，可在 IGV 中依 <code>HP</code> tag 分組，觀察 read 是否呈現 haplotype 分層。</p>
+</section>
+
+
+<section data-part="predict">
+<h2>判讀練習</h2>
+
+{{ask}}
+<p class="prose">在一段區域完成 haplotag 後，若有 <b>30% 的 read 沒有 HP tag</b>，請列出至少三個可能原因，
+並說明可如何區分這些原因。</p>
+{{reveal}}
+<p class="prose">可從以下方向逐一排查：</p>
+<ul class="prose">
+<li><b>read 未覆蓋 informative het 位點</b> —— 沒有足夠的判斷依據，可能保持未標記。</li>
+<li><b>這段區域可能是 [[LOH]]</b> —— 若區段缺乏可用的 het 位點，read 的 haplotype assignment 會變得困難。
+若未標記 read 集中於連續區段，應優先檢查 LOH、低複雜度或 coverage。</li>
+<li><b>mapping quality 太低被濾掉</b> —— 以此版本設定為例，<code>haplotag</code> 預設 <code>-q 1</code>，
+而 <code>estimate_purity</code> 預設為 <code>-q 20</code>；同一份資料用不同子命令可能得到不同結果。</li>
+<li><b>證據不夠一致</b> —— 在預設 <code>-p 0.6</code> 等門檻下，read 的 allele 若未明顯偏向某一條 haplotype，
+工具可能保持未標記。</li>
+<li><b>phase set 破碎</b> —— 若 phasing 本身就斷成很多小段，能用的錨點自然變少。</li>
+</ul>
+<p class="prose">可先檢查未標記 read 是否<b>集中在特定區域</b>（優先檢查 LOH、低複雜度或 coverage），
+或<b>均勻散布</b>（再檢查 read 長度、mapping quality 與參數設定）。</p>
+{{/ask}}
+</section>
+
+
+<section data-part="practice">
+<h2>實作練習</h2>
+
+<h3>執行 phasing 與 haplotagging</h3>
+
+{{cli}}
+# 1. 對 germline VCF 執行 phasing
+longphase-s phase \
+  -s SNP.vcf \
+  -b alignment.bam \
+  -r reference.fasta \
+  -t 8 \
+  -o phased_prefix \
+  --ont
+
+# 2. 依 phased VCF 將 read 標記為 HP tag
+longphase-s haplotag \
+  -r reference.fasta \
+  -s phased_prefix.vcf \
+  -b alignment.bam \
+  -t 8 \
+  -o tagged_prefix
+{{/cli}}
+
+<h3>以 IGV 檢查 haplotagging 結果</h3>
+
+<p class="prose">建議將 <code>tagged_prefix.bam</code> 載入 IGV，依序檢查以下項目：</p>
+
+<ol class="prose">
+<li>在 read 上按右鍵 → <b>Group alignments by</b> → <b>phase</b>（或 tag <code>HP</code>）</li>
+<li>前往一個 het 位點</li>
+<li>在相位品質良好的區域，通常可觀察到 read 分成兩層，且<b>同一層的 read 在該位點上呈現一致 allele pattern</b></li>
+</ol>
+
+<p class="prose">這項可視化有助於理解 haplotype 分層。若分群不清，請檢查輸入 VCF、coverage、mapping quality、
+phase set 與工具參數，不能僅憑單一區域判定 phasing 失敗。</p>
+
+<h3>量化 phasing 的品質</h3>
+
+{{cli}}
+# phase block 的 contig＋PS 鍵數；需搭配 block 長度與 switch error 評估
+bcftools query -f '%CHROM\t[%PS]\n' phased_prefix.vcf | grep -v '\t\.$' | sort -u | wc -l
+
+# 計算帶有 HP tag 的 read 比例
+total=$(samtools view -c tagged_prefix.bam)
+tagged=$(samtools view tagged_prefix.bam | grep -c 'HP:')
+echo "標記率: $tagged / $total"
+{{/cli}}
+
+<p class="cli-note">標記率若低於同類資料或依預期明顯偏低，再依上方順序檢查；七成僅是示例門檻，
+實際判讀需考慮 read 長度、heterozygous-site density、coverage、平台與工具版本。</p>
+
+{{quiz:m06}}
+</section>

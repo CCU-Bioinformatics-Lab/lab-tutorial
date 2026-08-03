@@ -1,0 +1,226 @@
+<!--tw
+{
+  "objectives": [
+    "精確區分 locus、allele、variant、genotype、haplotype 這幾個常被混用的詞",
+    "說明 germline 與 somatic 變異在來源、分布與可遺傳性上的差別",
+    "解釋 heterozygous 位點如何提供 phasing 資訊，以及 homozygous 位點的限制",
+    "說明 subclone 與治療反應之間的可能關係",
+    "定義 SNV 與 LOH，並說明它們在腫瘤基因體分析中的角色"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<p class="prose">M1 先以 HP1／HP2、founder clone 與 subclone 作為圖示標籤，以呈現整體資料流。
+本模組將進一步區分這些標籤，並建立較精確的生物學資料模型。</p>
+
+<p class="prose">這些術語形式相近，但所指的資料層級不同。常見混淆是將 variant 與 allele、
+或 genotype 與 haplotype 混用，因而難以精確解讀文獻與資料格式。</p>
+
+<p class="prose">自學閱讀時，可先將下列五個詞對應至資料結構的不同層級：
+<b>地址、該地址的一種值、與參考不同的事件、單一地址的兩份值、跨多個地址的一整串值。</b>
+先掌握概念層級，再對應英文術語。</p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>五個容易混用的詞</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>詞</th><th>指的是</th><th>例子</th></tr></thead>
+<tbody>
+<tr><td><b>[[locus]]</b></td><td>一個<b>位置</b></td><td><code>chr1:162,404,043</code></td></tr>
+<tr><td><b>[[allele]]</b></td><td>該位置上<b>其中一種</b>序列</td><td>這個 locus 可以是 <code>A</code> 或 <code>G</code>，各是一個 allele</td></tr>
+<tr><td>variant / [[SNV]]</td><td>variant 是相對參考序列的差異；SNV 是單一鹼基替換的 variant</td><td>參考為 <code>A</code>、樣本為 <code>G</code> → 一個 SNV</td></tr>
+<tr><td><b>[[genotype]]</b></td><td>該位置上<b>兩份</b> allele 的組合</td><td><code>0/1</code>：一份跟參考一樣、一份不一樣</td></tr>
+<tr><td><b>[[haplotype]]</b></td><td>同一條染色體拷貝上具有一致相位的一組 alleles</td><td>HP1 = <code>A…C…G</code>，HP2 = <code>T…A…C</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">上表以正常二倍體常染色體為模型，因此同一個 locus 通常有兩份 allele。
+這種具有兩份拷貝的狀態稱為 [[diploid]]；性染色體與腫瘤拷貝數異常將於後續模組另行處理。</p>
+
+{{svg:m02-term-ladder | [wide] 同一段染色體上標出三個位置。注意 <b>genotype 只描述單一位置</b>（那一格上有哪兩份），而 <b>haplotype 跨越多個位置</b>（同一條染色體上的一整串）。最下面是兩種寫法的差別。}}
+
+<p class="prose">關鍵差別在最後兩個：<b>genotype 是單一位置的，haplotype 是跨越多個位置的。</b>
+genotype 說「這裡有一份 A、一份 G」，但沒說 A 跟隔壁位置的 C 是不是在同一條染色體上。
+補上這個資訊，正是 [[phasing]] 要推定的關係之一。</p>
+
+<p class="prose">VCF 可用下列符號表示這項差異：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>寫法</th><th>意思</th></tr></thead>
+<tbody>
+<tr><td><code>0/1</code>（斜線）</td><td>未定相。一份 ref、一份 alt，但不知道哪份在哪條上</td></tr>
+<tr><td><code>0|1</code>（豎線）</td><td>已定相。第一條 haplotype 是 ref，第二條是 alt</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">phasing 會以 reads 或統計模型推定等位基因在不同染色體拷貝上的歸屬；
+VCF 可使用豎線表示已推定的相位結果。</p>
+
+<h3>heterozygous 位點提供主要 phasing 資訊</h3>
+
+<p class="prose">一個 locus 若兩份 allele 不同（[[heterozygous]]，例如 <code>0/1</code>），
+在讀取品質足夠的簡化模型中，可用來區分兩條 haplotype —— 看到 <code>A</code> 的 read 可歸到一條，看到 <code>G</code> 的可歸到另一條。</p>
+
+<p class="prose">若兩份相同（[[homozygous]]），該位點本身通常不能區分兩條 haplotype。</p>
+
+<p class="prose">het 位點密度是影響 phasing 的因素之一；讀長、coverage 與錯誤率也會影響可建立的相位範圍。</p>
+
+<p class="prose">腫瘤中的 [[LOH]]（loss of heterozygosity，異型合子性喪失）可能使一個區段失去其中一種 allele，
+使原本可用的 heterozygous 位點減少，因而降低可用的 phasing 錨點。</p>
+
+<p class="prose">因此，僅依這些錨點的 phasing 在 LOH 區段會更困難，可能需要其他證據或專門方法；
+實際影響取決於 LOH 型態、coverage、purity 與演算法。</p>
+
+<h3>germline 與 somatic</h3>
+
+{{svg:m02-germline-somatic | [wide] 左：germline 變異通常存在於多數細胞，並可能傳給子代。右：somatic 變異在非生殖系細胞譜系中取得，可只存在於部分細胞，通常不以遺傳方式傳遞。腫瘤研究常特別關注 somatic 變異；germline 變異也可能影響風險、治療與 phasing。}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th></th><th>[[germline variant]]</th><th>[[somatic variant]]</th></tr></thead>
+<tbody>
+<tr><td>來源</td><td>生殖系；可能由親代遺傳或 de novo 形成</td><td>非生殖系細胞譜系</td></tr>
+<tr><td>分布</td><td>通常存在於多數細胞（視嵌合而定）</td><td>可限於部分細胞，也可能為 clonal</td></tr>
+<tr><td>是否可傳給子代</td><td>可能，但不代表必然傳遞</td><td>通常不以遺傳方式傳遞</td></tr>
+<tr><td>典型 [[VAF]]</td><td>在二倍體且無污染／CNV 時，het 常接近 0.5</td><td>受 purity、copy number、multiplicity 與 clonality 影響</td></tr>
+<tr><td>在本課程示例中的角色</td><td><b>工具</b> —— 可作為 phasing 的錨點</td><td><b>分析目標</b> —— 需依流程與證據判定</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">在特定 somatic calling 流程中，germline calls 常被排除；然而 heterozygous germline [[SNP]]
+也可作為建立 haplotype 骨架的錨點之一。錨點不足時，區分 HP1／HP2 及連結 somatic 變異會更困難。</p>
+
+<h3>clone 與 subclone</h3>
+
+<p class="prose">回到 M1 的簡化區段模型。一個細胞取得突變後增生，形成一群共享可辨識突變的細胞，稱為 [[clone]]。
+其中某些細胞又取得新突變、再擴增，就形成 [[subclone]]。</p>
+
+<p class="prose">許多 somatic 變異可能是 passenger；可提高生長或存活優勢的候選變異稱為 [[driver mutation]]，
+其判定需依癌別與功能證據。</p>
+
+<p class="prose">治療可能改變不同細胞群的相對比例，使具有抗藥優勢的 subclone 富集：</p>
+
+{{svg:m02-clone-evolution | [wide] 上排示意細胞取得變異、形成 clone，並再分支為兩個 subclones，其中一群帶有抗藥變異。下排是簡化治療模型：非抗藥群大幅減少後，抗藥 subclone 的相對比例由 5% 上升至 95%；真實反應仍取決於藥物、變異與腫瘤生態。}}
+
+<p class="prose">因此，除列出腫瘤中的變異外，也需評估這些變異可能分布於哪些細胞群。
+這種細胞組成的不均勻，就叫 [[intratumour heterogeneity]]。</p>
+
+{{guard:1 | HP1 與 HP2 不等於父系與母系}}
+<p class="prose">口語討論有時會將 HP1／HP2 稱為父系或母系 haplotype，但若未指定外部方向證據，
+不能據此判定其親本來源。</p>
+<p class="prose">判定親本來源可使用父母基因型（trio）或其他族譜與參照證據。
+沒有 trio 資料時，HP1 與 HP2 只是<b>演算法給的編號</b>，而且：</p>
+
+<ul class="prose">
+<li>在未指定外部方向時，編號方向可<b>任意選定</b> —— 整組對調代表等價的相位解</li>
+<li>方向只在同一個 <b>[[PS tag|phase set]]</b> 內部一致；跨過 phase block 的斷點之後，
+HP1 可能就接到原本的 HP2 上了</li>
+</ul>
+
+{{svg:m02-hp-arbitrary | [wide] 上半部顯示同一份 read 資料可有兩種等價編號；演算法可推定哪些變異位於同一 haplotype，但 HP1／HP2 的命名方向任意。下半部顯示方向只在同一 phase block 內一致；跨 block 比較前需先校正方向。}}
+<p class="prose">因此，M6 的 phasing 練習會將 HP1／HP2 整體互換視為等價的相位解。</p>
+{{/guard}}
+</section>
+
+
+<section data-part="evidence">
+<h2>真實證據</h2>
+
+<p class="prose">評估方法時需有可供對照的高可信度參考標註。
+<b>truth set</b> 通常由多種技術與證據建立，但仍可能包含不確定區域；benchmark 還包含評估範圍與程序。</p>
+
+<p class="prose">以下列出六個具有參考標註的癌症細胞株作為示例：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>細胞株</th><th>癌別</th><th>常用的 truth set</th></tr></thead>
+<tbody>
+<tr><td><b>HCC1395</b></td><td>乳癌</td><td>SEQC2（示例參考集）</td></tr>
+<tr><td>COLO829</td><td>黑色素瘤</td><td>NYGC</td></tr>
+<tr><td>HCC1937</td><td>乳癌</td><td>Google（多工具交叉比對）</td></tr>
+<tr><td>HCC1954</td><td>乳癌</td><td>Google</td></tr>
+<tr><td>H1437</td><td>肺癌</td><td>Google</td></tr>
+<tr><td>H2009</td><td>肺癌</td><td>Google</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">這些細胞株具有可用的配對正常樣本與參考標註，可提供區分 germline 與 somatic 的重要對照；
+實際判定仍受 coverage、污染、變異類型與參考集品質影響。</p>
+
+<p class="prose"><b>HCC1395</b> 將於後續示例中再次出現；可比較兩份資料：
+<code>HCC1395_HKU</code> 與 <code>HCC1395_NYGC</code>，<b>同一個細胞株、不同的 [[basecalling|basecaller]] 與分析流程</b>。
+兩份資料的組成相似度（0.909）可作為跨流程一致性的觀察，但不能單獨證明方法穩健性。
+因此，[[provenance]] 應視為重要實驗變數，而非附註。</p>
+</section>
+
+
+<section data-part="predict">
+<h2>判讀練習</h2>
+
+{{ask}}
+<p class="prose">某個位點在腫瘤樣本裡的 VAF 是 0.50，在配對的正常樣本裡也是 0.50。<br><br>
+它比較可能是 germline 還是 somatic？</p>
+{{reveal}}
+<p class="prose"><b>在本題假設下，結果較支持 heterozygous germline。</b></p>
+<p class="prose">若為二倍體、normal coverage 足夠，且無污染、拷貝數變化或嵌合，
+腫瘤與正常樣本均接近 0.5 的 VAF 與 heterozygous germline 相容。</p>
+<p class="prose">但有兩種例外要知道：</p>
+<ul class="prose">
+<li><b>正常樣本被腫瘤污染了。</b>採檢時如果「正常」組織裡混進少量腫瘤細胞，
+那麼腫瘤特有的變異在正常樣本裡<b>也會出現訊號</b>。<br>
+分辨時可檢查訊號強度：在二倍體且無其他偏差時，germline het 變異常接近一半的 read，
+污染訊號常低於完整 germline 訊號，但實際數值仍取決於污染比例、copy number 與取樣。</li>
+<li><b>該位置的染色體份數不是兩份。</b>如果某段染色體被複製或刪掉了
+（這在腫瘤裡很常見），
+那麼「一份有、一份沒有」的算法就不成立，VAF 自然偏離 0.5。</li>
+</ul>
+{{/ask}}
+</section>
+
+
+<section data-part="practice">
+<h2>練習與自我檢核</h2>
+
+<h3>三項概念檢核</h3>
+
+<p class="prose">可先自行回答，再核對下方解析：</p>
+
+<ol class="prose">
+<li>「這個位置有一份 A、一份 G」—— 這句話講的是 genotype 還是 haplotype？</li>
+<li><code>0|1</code> 比 <code>0/1</code> 多告訴你什麼？</li>
+<li>為什麼 heterozygous 位點通常比 homozygous 位點更能提供 phasing 資訊？</li>
+</ol>
+
+<p class="prose">答案依序是：genotype（單一位置）／多告訴你「哪一份在哪一條染色體上」／
+因為兩份 allele 不同時，才提供區分兩條染色體的訊號；homozygous 位點通常無法單獨區分。</p>
+
+<h3>在實際資料中檢查</h3>
+
+<p class="prose">若已有一份 VCF，可使用下列指令檢查 genotype 分布：</p>
+
+{{cli}}
+# 各種 genotype 各有多少個
+bcftools query -f '%POS\t[%GT]\n' sample.vcf | cut -f2 | sort | uniq -c | sort -rn
+
+# 只留下 heterozygous 的位點（phasing 能用的錨點）
+bcftools view -g het sample.vcf | grep -vc '^#'
+{{/cli}}
+
+<p class="cli-note">het 位點密度會影響 phasing，亦需同時考慮讀長、coverage 與品質。
+人類全基因體中的 het 位點通常為數百萬量級，但會因族群、參考基因組、callable region 與過濾條件而異；請以資料集統計為準。</p>
+
+{{quiz:m02}}
+</section>

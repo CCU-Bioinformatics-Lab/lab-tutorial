@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400">
+  <title>正常樣本被腫瘤細胞污染時，判斷會出什麼錯</title>
+  <desc>左側：簡化示例中，正常樣本未觀察到腫瘤來源，因此該位置沒有支持訊號。
+        右側：正常樣本含少量腫瘤來源，腫瘤候選在 normal 中也出現低頻支持；
+        若使用「normal 有支持即排除」的規則，可能誤刪 genuine somatic candidate。
+        訊號強度僅作示例：germline 與污染訊號的 VAF 仍受 purity、coverage 與 copy number 等因素影響。</desc>
+
+  <!-- ══ 左：乾淨的正常樣本 ══ -->
+  <rect class="box ok" x="16" y="16" width="472" height="368" rx="10"/>
+  <text class="lbl bold zh" x="36" y="46">示例：normal 未觀察到腫瘤來源</text>
+
+  <text class="anno zh" x="36" y="80">正常樣本的細胞組成</text>
+  <circle class="cell normal" cx="56"  cy="110" r="15"/>
+  <circle class="cell normal" cx="90"  cy="110" r="15"/>
+  <circle class="cell normal" cx="124" cy="110" r="15"/>
+  <circle class="cell normal" cx="158" cy="110" r="15"/>
+  <circle class="cell normal" cx="192" cy="110" r="15"/>
+  <circle class="cell normal" cx="226" cy="110" r="15"/>
+  <text class="tick zh" x="252" y="115">normal 細胞示例</text>
+
+  <text class="anno zh" x="36" y="160">在腫瘤變異的位置上看 read</text>
+  <rect class="read hp0" x="36" y="178" width="180" height="12" rx="6"/>
+  <rect class="read hp0" x="36" y="196" width="180" height="12" rx="6"/>
+  <rect class="read hp0" x="36" y="214" width="180" height="12" rx="6"/>
+  <rect class="read hp0" x="36" y="232" width="180" height="12" rx="6"/>
+  <rect class="read hp0" x="36" y="250" width="180" height="12" rx="6"/>
+  <text class="anno zh ok bold" x="230" y="218">未觀察到支持</text>
+
+  <text class="anno mid" x="252" y="300">示例 normal VAF = 0.00</text>
+  <rect class="box plain" x="120" y="318" width="264" height="48" rx="8"/>
+  <text class="anno mid zh bold ok" x="252" y="348">可保留為 somatic candidate</text>
+
+  <!-- ══ 右：被污染的正常樣本 ══ -->
+  <rect class="box bad" x="512" y="16" width="472" height="368" rx="10"/>
+  <text class="lbl bold zh" x="532" y="46">示例：normal 含少量腫瘤來源</text>
+
+  <text class="anno zh" x="532" y="80">正常樣本的細胞組成</text>
+  <circle class="cell normal" cx="552" cy="110" r="15"/>
+  <circle class="cell normal" cx="586" cy="110" r="15"/>
+  <circle class="cell normal" cx="620" cy="110" r="15"/>
+  <circle class="cell normal" cx="654" cy="110" r="15"/>
+  <circle class="cell tumor"  cx="688" cy="110" r="15"/>
+  <circle class="cell normal" cx="722" cy="110" r="15"/>
+  <text class="tick zh somatic" x="748" y="105">含少量</text>
+  <text class="tick zh somatic" x="748" y="123">腫瘤來源</text>
+
+  <text class="anno zh" x="532" y="160">在同一個位置上看 read</text>
+  <rect class="read hp0" x="532" y="178" width="180" height="12" rx="6"/>
+  <rect class="read hp0" x="532" y="196" width="180" height="12" rx="6"/>
+  <rect class="read hp0" x="532" y="214" width="180" height="12" rx="6"/>
+  <rect class="read hp2" x="532" y="232" width="180" height="12" rx="6"/>
+  <circle class="mark somatic" cx="622" cy="238" r="6"/>
+  <rect class="read hp0" x="532" y="250" width="180" height="12" rx="6"/>
+  <text class="anno zh bad bold" x="726" y="243">觀察到低頻支持</text>
+
+  <text class="anno mid" x="748" y="300">示例 normal VAF = 0.04</text>
+  <rect class="box plain" x="616" y="318" width="264" height="48" rx="8"/>
+  <text class="anno mid zh bold bad" x="748" y="348">簡化規則可能誤刪候選</text>
+
+  <!-- 中間箭頭 -->
+  <path class="conn" d="M492,200 L508,200" marker-end="url(#arrow)" stroke="var(--bad)"/>
+</svg>

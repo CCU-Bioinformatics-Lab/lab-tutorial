@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480">
+  <title>VAF 的組成與參數不可識別性</title>
+  <desc>上半部拆解 VAF 的分子與分母。
+        分母是這個位置上總共有幾份 DNA 被讀到，
+        由腫瘤細胞貢獻的份數加上正常細胞貢獻的份數組成。
+        分子是其中帶有這個變異的份數。
+        下半部示範：同一個 VAF 0.20 可由多種生物狀態產生，
+        因此僅依 VAF 通常無法直接反推出帶有此突變的細胞比例。</desc>
+
+  <!-- ══ 公式圖解 ══ -->
+  <text class="lbl bold zh" x="20" y="32">VAF 定義為「帶變異的份數 ÷ 總讀取份數」</text>
+
+  <!-- 分子 -->
+  <text class="anno bold zh somatic" x="20" y="80">分子</text>
+  <text class="tick zh" x="20" y="104">帶有變異的份數</text>
+
+  <rect class="bar somatic" x="200" y="62" width="120" height="30" rx="4"/>
+  <text class="tick mid zh" x="260" y="82">腫瘤細胞裡</text>
+  <text class="tick zh" x="336" y="82">× 每個細胞帶了幾份</text>
+  <text class="tick zh" x="336" y="102">× 有多少比例的腫瘤細胞帶著它</text>
+
+  <!-- 分隔線 -->
+  <line class="axis" x1="200" y1="126" x2="820" y2="126" stroke-width="3"/>
+
+  <!-- 分母 -->
+  <text class="anno bold zh" x="20" y="168">分母</text>
+  <text class="tick zh" x="20" y="192">總共讀到的份數</text>
+
+  <rect class="bar somatic" x="200" y="146" width="150" height="30" rx="4"/>
+  <text class="tick mid zh" x="275" y="166">腫瘤細胞貢獻</text>
+  <text class="anno mid" x="366" y="166">＋</text>
+  <rect class="bar" x="384" y="146" width="150" height="30" rx="4" fill="var(--muted-fill)" stroke="var(--rule-strong)"/>
+  <text class="tick mid zh" x="459" y="166">正常細胞貢獻</text>
+
+  <text class="tick zh" x="556" y="160">腫瘤那邊的份數取決於</text>
+  <text class="tick zh" x="556" y="182">該位置有幾份染色體</text>
+
+  <!-- 四個未知數 -->
+  <rect class="box warn" x="20" y="216" width="960" height="76" rx="8"/>
+  <text class="anno bold zh warn" x="42" y="244">VAF 可由 reads 估計；purity、copy number、multiplicity 與 CCF 通常需由多項證據推論：</text>
+  <text class="tick zh" x="42" y="274">① 腫瘤細胞佔多少比例　② 該位置有幾份染色體　③ 變異佔了幾份　④ 多少比例的腫瘤細胞帶著它</text>
+
+  <!-- ══ 三個例子：同一個 VAF ══ -->
+  <line class="axis" x1="20" y1="316" x2="980" y2="316"/>
+  <text class="lbl bold zh" x="20" y="348">同一個 VAF = 0.20，可由三種狀態產生</text>
+
+  <rect class="box plain" x="20" y="366" width="306" height="104" rx="8"/>
+  <text class="anno bold mid" x="173" y="394">情況 A</text>
+  <text class="tick mid zh" x="173" y="420">腫瘤佔 40%，兩份染色體</text>
+  <text class="tick mid zh" x="173" y="442">所有腫瘤細胞都帶著它</text>
+  <text class="tick mid zh ok bold" x="173" y="464">→ clonal 狀態（時間需其他證據）</text>
+
+  <rect class="box plain" x="346" y="366" width="306" height="104" rx="8"/>
+  <text class="anno bold mid" x="499" y="394">情況 B</text>
+  <text class="tick mid zh" x="499" y="420">腫瘤佔 80%，四份染色體</text>
+  <text class="tick mid zh" x="499" y="442">所有腫瘤細胞都帶著它</text>
+  <text class="tick mid zh ok bold" x="499" y="464">→ clonal 狀態（時間需其他證據）</text>
+
+  <rect class="box bad" x="672" y="366" width="308" height="104" rx="8"/>
+  <text class="anno bold mid bad" x="826" y="394">情況 C</text>
+  <text class="tick mid zh" x="826" y="420">腫瘤佔 80%，兩份染色體</text>
+  <text class="tick mid zh" x="826" y="442">但只有一半的腫瘤細胞有</text>
+  <text class="tick mid zh bad bold" x="826" y="464">→ subclonal CCF（時間需其他證據）</text>
+</svg>

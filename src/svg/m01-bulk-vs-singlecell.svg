@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480">
+  <title>bulk 與 single-cell 定序所保留及未保留的資訊</title>
+  <desc>左側表示 single-cell 定序：先分離並標記個別細胞，因此可保留 read 與來源細胞的對應，
+        並比較不同細胞的變異組合；其限制通常包括較高成本與較低的單細胞資料量。
+        右側表示標準 bulk 定序：多個細胞來源的 DNA 混合處理後，read 通常無法對應至來源細胞。
+        若 read 同時涵蓋兩個變異且判讀可靠，仍可直接支持兩者位於同一條 DNA 分子。
+        此 read 內的分子連結是本教材後續方法的共同證據基礎。</desc>
+
+  <!-- ══ 左：single-cell ══ -->
+  <rect class="box plain" x="16" y="16" width="472" height="410" rx="10"/>
+  <text class="lbl bold zh" x="38" y="48">single-cell 定序</text>
+
+  <text class="tick zh" x="38" y="78">先分離並標記個別細胞</text>
+
+  <!-- 三個分開的細胞，各自有 read -->
+  <rect class="box ghost" x="38" y="94" width="132" height="130" rx="8"/>
+  <circle class="cell tumor" cx="104" cy="126" r="18"/>
+  <circle class="mark somatic" cx="98" cy="122" r="4"/>
+  <circle class="mark hp1" cx="109" cy="130" r="4"/>
+  <rect class="read hp1" x="52" y="158" width="104" height="10" rx="5"/>
+  <rect class="read hp1" x="52" y="174" width="104" height="10" rx="5"/>
+  <rect class="read hp1" x="52" y="190" width="104" height="10" rx="5"/>
+  <text class="tick mid zh" x="104" y="216">來自細胞 1 的 read</text>
+
+  <rect class="box ghost" x="186" y="94" width="132" height="130" rx="8"/>
+  <circle class="cell clone1" cx="252" cy="126" r="18"/>
+  <circle class="mark somatic" cx="252" cy="126" r="4"/>
+  <rect class="read hp2" x="200" y="158" width="104" height="10" rx="5"/>
+  <rect class="read hp2" x="200" y="174" width="104" height="10" rx="5"/>
+  <text class="tick mid zh" x="252" y="216">來自細胞 2 的 read</text>
+
+  <rect class="box ghost" x="334" y="94" width="132" height="130" rx="8"/>
+  <circle class="cell normal" cx="400" cy="126" r="18"/>
+  <rect class="read hp0" x="348" y="158" width="104" height="10" rx="5"/>
+  <rect class="read hp0" x="348" y="174" width="104" height="10" rx="5"/>
+  <rect class="read hp0" x="348" y="190" width="104" height="10" rx="5"/>
+  <text class="tick mid zh" x="400" y="216">來自細胞 3 的 read</text>
+
+  <rect class="box ok" x="38" y="244" width="428" height="76" rx="8"/>
+  <text class="anno bold zh ok" x="58" y="272">保留：read 的來源細胞標籤</text>
+  <text class="tick zh" x="58" y="300">可比較不同細胞的變異組合</text>
+
+  <rect class="box warn" x="38" y="334" width="428" height="76" rx="8"/>
+  <text class="anno bold zh warn" x="58" y="362">限制</text>
+  <text class="tick zh" x="58" y="390">成本較高；每細胞資料量通常較少</text>
+
+  <!-- ══ 右：bulk ══ -->
+  <rect class="box plain" x="512" y="16" width="472" height="410" rx="10"/>
+  <text class="lbl bold zh" x="534" y="48">標準 bulk 定序（本教材聚焦）</text>
+
+  <text class="tick zh" x="534" y="78">多個細胞來源的 DNA 混合處理</text>
+
+  <!-- 混合池 -->
+  <rect class="box sunken" x="534" y="94" width="428" height="60" rx="8" fill="var(--muted-fill)" stroke="var(--rule)"/>
+  <circle class="cell tumor" cx="566" cy="124" r="13"/>
+  <circle class="cell normal" cx="600" cy="124" r="13"/>
+  <circle class="cell clone1" cx="634" cy="124" r="13"/>
+  <circle class="cell normal" cx="668" cy="124" r="13"/>
+  <circle class="cell tumor" cx="702" cy="124" r="13"/>
+  <circle class="cell clone2" cx="736" cy="124" r="13"/>
+  <circle class="cell normal" cx="770" cy="124" r="13"/>
+  <circle class="cell tumor" cx="804" cy="124" r="13"/>
+  <text class="tick zh" x="836" y="129">混合 DNA</text>
+
+  <path class="flow" d="M748,158 L748,178" marker-end="url(#arrow)"/>
+
+  <!-- 混合後的 read：顏色都變灰（不知來源） -->
+  <rect class="read hp0" x="546" y="188" width="300" height="11" rx="5.5"/>
+  <circle class="mark somatic" cx="620" cy="193" r="5"/>
+  <circle class="mark hp1" cx="740" cy="193" r="5"/>
+  <rect class="read hp0" x="580" y="204" width="300" height="11" rx="5.5"/>
+  <circle class="mark somatic" cx="620" cy="209" r="5"/>
+  <rect class="read hp0" x="556" y="220" width="300" height="11" rx="5.5"/>
+  <rect class="read hp0" x="600" y="236" width="300" height="11" rx="5.5"/>
+  <circle class="mark hp1" cx="740" cy="241" r="5"/>
+
+  <rect class="box bad" x="534" y="262" width="428" height="70" rx="8"/>
+  <text class="anno bold zh bad" x="554" y="290">通常無法取得：read 的來源細胞</text>
+  <text class="tick zh" x="554" y="318">未加入細胞標籤時，無法由 read 直接判定</text>
+
+  <rect class="box ok" x="534" y="346" width="428" height="64" rx="8"/>
+  <text class="anno bold zh ok" x="554" y="374">保留：read 內的分子連結</text>
+  <text class="tick zh" x="554" y="398">同一 read 涵蓋兩個變異 → 支持兩者位於同一分子</text>
+
+  <!-- ══ 底部 ══ -->
+  <text class="anno zh bold" x="20" y="458">本教材後續方法採用的共同證據基礎：</text>
+  <text class="anno zh bold somatic" x="20" y="476">bulk 不保留來源細胞對應，但可保留 read 內的分子連結。</text>
+</svg>

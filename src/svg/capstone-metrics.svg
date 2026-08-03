@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440">
+  <title>用實際數字算一次 precision、recall 與 F1</title>
+  <desc>把本例評估資料的結果分成 TP、FP、FN 三類。
+        precision 表示報出的候選中有多少為 TP；
+        recall 表示 truth set 中有多少被找到；F1 是兩者的調和平均。
+        下半部在假設 FP 減半且未誤刪 TP 的理想化情境下，示範三個指標的變化，
+        說明 F1 的改善為何可能小於 precision 的改善。</desc>
+
+  <!-- 三塊 -->
+  <text class="lbl bold zh" x="20" y="32">先把評估結果分成 TP、FP、FN</text>
+
+  <rect class="bar" x="120" y="52" width="268" height="52" rx="4" fill="var(--warn-fill)" stroke="var(--warn)"/>
+  <text class="anno mid bold zh warn" x="254" y="76">FN：漏掉的</text>
+  <text class="tick mid mono" x="254" y="96">FN = 335</text>
+
+  <rect class="bar" x="392" y="52" width="330" height="52" rx="4" fill="var(--ok-fill)" stroke="var(--ok)"/>
+  <text class="anno mid bold zh ok" x="557" y="76">TP：抓對的</text>
+  <text class="tick mid mono" x="557" y="96">TP = 412</text>
+
+  <rect class="bar" x="726" y="52" width="120" height="52" rx="4" fill="var(--bad-fill)" stroke="var(--bad)"/>
+  <text class="anno mid bold zh bad" x="786" y="76">FP：報錯的</text>
+  <text class="tick mid mono" x="786" y="96">FP = 88</text>
+
+  <!-- 括號標示 -->
+  <path class="axis" d="M392,116 L392,126 L846,126 L846,116"/>
+  <text class="tick mid zh" x="619" y="146">報出的候選 = 500 個</text>
+  <path class="axis" d="M120,160 L120,170 L722,170 L722,160"/>
+  <text class="tick mid zh" x="421" y="190">truth set 中的事件 = 747 個</text>
+
+  <!-- 三個指標 -->
+  <line class="axis" x1="20" y1="210" x2="980" y2="210"/>
+
+  <rect class="box ok" x="20" y="228" width="306" height="92" rx="8"/>
+  <text class="anno bold zh ok" x="42" y="256">precision</text>
+  <text class="tick zh" x="42" y="280">報出候選中 TP 的比例</text>
+  <text class="anno mono bold" x="42" y="308">412 ÷ 500 = 0.824</text>
+
+  <rect class="box warn" x="346" y="228" width="306" height="92" rx="8"/>
+  <text class="anno bold zh warn" x="368" y="256">recall</text>
+  <text class="tick zh" x="368" y="280">truth set 找回的比例</text>
+  <text class="anno mono bold" x="368" y="308">412 ÷ 747 = 0.551</text>
+
+  <rect class="box accent" x="672" y="228" width="308" height="92" rx="8"/>
+  <text class="anno bold zh" x="694" y="256">F1</text>
+  <text class="tick zh" x="694" y="280">兩者的調和平均</text>
+  <text class="anno mono bold" x="694" y="308">= 0.661</text>
+
+  <!-- 砍半之後 -->
+  <line class="axis" x1="20" y1="340" x2="980" y2="340"/>
+  <text class="lbl bold zh" x="20" y="372">若 FP 減半且未誤刪 TP（理想化情境）</text>
+
+  <text class="anno mono" x="20" y="406">precision</text>
+  <text class="anno mono bold ok" x="160" y="406">0.824 → 0.904</text>
+  <text class="anno mono bold ok" x="330" y="406">＋0.080</text>
+
+  <text class="anno mono" x="470" y="406">F1</text>
+  <text class="anno mono bold bad" x="560" y="406">0.661 → 0.685</text>
+  <text class="anno mono bold bad" x="730" y="406">＋0.024</text>
+
+  <text class="anno zh bold" x="20" y="432">原因：recall 不變 —— 未被 caller 產生的 FN，後處理無法補回。</text>
+</svg>

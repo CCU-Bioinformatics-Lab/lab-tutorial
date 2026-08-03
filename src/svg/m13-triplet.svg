@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540">
+  <title>三點 triplet graph 如何區分候選 somatic indel 與定序錯誤</title>
+  <desc>上半部：取候選點與左右兩個 germline 位點，共三個位置。
+        在此示例中，候選插入以 C-GT-A 表示，從原本兩條路徑之一形成第三條候選路徑；
+        新路徑與其來源只差一個位置。定序錯誤則產生無法由既有來源解釋的路徑。
+        下半部：若只取兩個位置，真變異與錯誤的拓撲在此示例下相同，僅憑兩點無法分辨。</desc>
+
+  <!-- ══ 上半：三個位點，看得出差別 ══ -->
+  <text class="lbl bold zh" x="20" y="28">用三個位點：兩種情況畫出不同的圖</text>
+
+  <!-- 左：真腫瘤變異 -->
+  <rect class="box ok" x="20" y="44" width="466" height="212" rx="10"/>
+  <text class="anno bold zh ok" x="40" y="72">候選 somatic 變異（示意）</text>
+
+  <text class="tick zh" x="40" y="98">read 上看到的三個位置</text>
+  <g class="mono">
+    <text class="anno hp1" x="40" y="126">A — G — T</text>
+    <text class="tick zh" x="180" y="126">原本的路徑一</text>
+    <text class="anno hp2" x="40" y="152">C — G — A</text>
+    <text class="tick zh" x="180" y="152">原本的路徑二</text>
+    <text class="anno somatic bold" x="40" y="178">C-GT-A</text>
+    <text class="tick zh somatic" x="180" y="178">新出現的第三條</text>
+  </g>
+
+  <path class="conn somatic" d="M104,160 L104,170" marker-end="url(#arrow-sm)"/>
+  <rect class="box plain" x="40" y="196" width="426" height="48" rx="6"/>
+  <text class="tick zh" x="56" y="216">第三條跟「路徑二」只差中間<tspan class="bold">一個</tspan>位置。</text>
+  <text class="tick zh bold ok" x="56" y="236">與路徑二相差一個位置，符合此模型的來源。</text>
+
+  <!-- 右：定序錯誤 -->
+  <rect class="box bad" x="514" y="44" width="466" height="212" rx="10"/>
+  <text class="anno bold zh bad" x="534" y="72">定序錯誤</text>
+
+  <text class="tick zh" x="534" y="98">read 上看到的三個位置</text>
+  <g class="mono">
+    <text class="anno hp1" x="534" y="126">A — G — T</text>
+    <text class="tick zh" x="674" y="126">原本的路徑一</text>
+    <text class="anno hp2" x="534" y="152">C — G — A</text>
+    <text class="tick zh" x="674" y="152">原本的路徑二</text>
+    <text class="anno artifact bold" x="534" y="178">A — A — T</text>
+    <text class="tick zh artifact" x="674" y="178">無法對應來源的路徑</text>
+  </g>
+
+  <rect class="box plain" x="534" y="196" width="426" height="48" rx="6"/>
+  <text class="tick zh" x="550" y="216">它跟兩條原本的路徑<tspan class="bold">都</tspan>差了不只一個位置。</text>
+  <text class="tick zh bold bad" x="550" y="236">無法由既有路徑解釋。</text>
+
+  <!-- ══ 下半：兩個位點就分不出來了 ══ -->
+  <line class="axis" x1="20" y1="284" x2="980" y2="284"/>
+  <text class="lbl bold zh" x="20" y="314">如果只用兩個位置：在此示例下拓撲相同</text>
+
+  <!-- 左 -->
+  <rect class="box plain" x="20" y="330" width="466" height="196" rx="10"/>
+  <text class="anno bold zh" x="40" y="358">真腫瘤變異（去掉第三個位置）</text>
+  <g class="mono">
+    <text class="anno hp1" x="40" y="392">A — G</text>
+    <text class="anno hp2" x="40" y="418">C — G</text>
+    <text class="anno somatic bold" x="40" y="444">C-GT</text>
+  </g>
+  <text class="tick zh" x="180" y="392">路徑一</text>
+  <text class="tick zh" x="180" y="418">路徑二</text>
+  <text class="tick zh" x="180" y="444">第三條</text>
+
+  <rect class="box ghost" x="290" y="368" width="176" height="90" rx="6"/>
+  <text class="tick mid zh" x="378" y="394">三條路徑</text>
+  <text class="tick mid zh" x="378" y="416">各差一個位置</text>
+  <text class="tick mid zh bold" x="378" y="442">拓撲：Y 字型</text>
+
+  <text class="tick zh" x="40" y="480">僅憑兩點無法確認來源。</text>
+
+  <!-- 右 -->
+  <rect class="box plain" x="514" y="330" width="466" height="196" rx="10"/>
+  <text class="anno bold zh" x="534" y="358">定序錯誤（去掉第三個位置）</text>
+  <g class="mono">
+    <text class="anno hp1" x="534" y="392">A — G</text>
+    <text class="anno hp2" x="534" y="418">C — G</text>
+    <text class="anno artifact bold" x="534" y="444">A — A</text>
+  </g>
+  <text class="tick zh" x="674" y="392">路徑一</text>
+  <text class="tick zh" x="674" y="418">路徑二</text>
+  <text class="tick zh" x="674" y="444">第三條</text>
+
+  <rect class="box ghost" x="784" y="368" width="176" height="90" rx="6"/>
+  <text class="tick mid zh" x="872" y="394">三條路徑</text>
+  <text class="tick mid zh" x="872" y="416">也各差一個位置</text>
+  <text class="tick mid zh bold" x="872" y="442">拓撲：Y 字型</text>
+
+  <text class="tick zh bold bad" x="534" y="480">在此示意下相同 —— 僅憑兩點無法分辨。</text>
+
+  <text class="anno zh bold" x="20" y="516">因此此方法使用三個位置；少一個時，真變異與定序錯誤可能呈現相同拓撲。</text>
+</svg>

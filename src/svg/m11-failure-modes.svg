@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400">
+  <title>phasing 的三種失敗模式與各自的徵兆</title>
+  <desc>第一種是分段破碎：read 太短或中間沒有可區分的位置，導致同一條染色體被切成多個小段。
+        第二種是方向對調：某處證據太弱，從那一點之後兩條被互換，後半段可能整體錯置。
+        第三種是大量 read 無法指派：可能是局部拷貝數狀態、覆蓋度不足、或比對品質太低。
+        每一種都有可以在資料上直接檢查的徵兆。</desc>
+
+  <!-- ① 分段破碎 -->
+  <rect class="box warn" x="16" y="16" width="316" height="368" rx="10"/>
+  <text class="anno bold zh warn" x="38" y="48">① 分段破碎</text>
+
+  <text class="tick zh" x="38" y="80">示意</text>
+  <rect class="region" x="38" y="94" width="80" height="34" rx="4"/>
+  <rect class="read hp1" x="46" y="98" width="64" height="10" rx="5"/>
+  <rect class="read hp2" x="46" y="114" width="64" height="10" rx="5"/>
+  <rect class="region" x="128" y="94" width="60" height="34" rx="4"/>
+  <rect class="read hp1" x="136" y="98" width="44" height="10" rx="5"/>
+  <rect class="read hp2" x="136" y="114" width="44" height="10" rx="5"/>
+  <rect class="region" x="198" y="94" width="52" height="34" rx="4"/>
+  <rect class="read hp1" x="206" y="98" width="36" height="10" rx="5"/>
+  <rect class="read hp2" x="206" y="114" width="36" height="10" rx="5"/>
+  <rect class="region" x="260" y="94" width="48" height="34" rx="4"/>
+  <rect class="read hp1" x="268" y="98" width="32" height="10" rx="5"/>
+  <rect class="read hp2" x="268" y="114" width="32" height="10" rx="5"/>
+  <text class="tick zh" x="38" y="150">多個彼此不相連的小段</text>
+
+  <text class="tick bold zh" x="38" y="188">原因</text>
+  <text class="tick zh" x="38" y="212">read 太短，或中間</text>
+  <text class="tick zh" x="38" y="234">沒有可區分的位置</text>
+
+  <text class="tick bold zh" x="38" y="272">徵兆</text>
+  <text class="tick zh" x="38" y="296">同一條染色體上出現</text>
+  <text class="tick zh" x="38" y="318">很多不同的分段編號</text>
+
+  <text class="tick zh" x="38" y="358">腫瘤樣本裡最常見</text>
+
+  <!-- ② 方向對調 -->
+  <rect class="box bad" x="348" y="16" width="316" height="368" rx="10"/>
+  <text class="anno bold zh bad" x="370" y="48">② 方向對調</text>
+
+  <text class="tick zh" x="370" y="80">示意</text>
+  <rect class="read hp1" x="370" y="96" width="130" height="12" rx="6"/>
+  <rect class="read hp2" x="370" y="114" width="130" height="12" rx="6"/>
+  <rect class="read hp2" x="506" y="96" width="130" height="12" rx="6"/>
+  <rect class="read hp1" x="506" y="114" width="130" height="12" rx="6"/>
+  <line class="axis" x1="503" y1="90" x2="503" y2="132" stroke="var(--bad)" stroke-width="3"/>
+  <text class="tick zh bad bold" x="370" y="150">從該點之後可能整體錯置</text>
+
+  <text class="tick bold zh" x="370" y="188">原因</text>
+  <text class="tick zh" x="370" y="212">某處證據太薄弱，</text>
+  <text class="tick zh" x="370" y="234">兩條被互相對調</text>
+
+  <text class="tick bold zh" x="370" y="272">徵兆</text>
+  <text class="tick zh" x="370" y="296">與標準答案比對時，</text>
+  <text class="tick zh" x="370" y="318">錯誤從某一點開始</text>
+  <text class="tick zh" x="370" y="340">系統性地發生</text>
+
+  <text class="tick zh" x="370" y="376">需結合資料與版本設定確認</text>
+
+  <!-- ③ 無法指派 -->
+  <rect class="box plain" x="680" y="16" width="304" height="368" rx="10"/>
+  <text class="anno bold zh" x="702" y="48">③ 大量 read 無法指派</text>
+
+  <text class="tick zh" x="702" y="80">示意</text>
+  <rect class="read hp1" x="702" y="96" width="110" height="11" rx="5.5"/>
+  <rect class="read hp0" x="702" y="112" width="110" height="11" rx="5.5"/>
+  <rect class="read hp0" x="702" y="128" width="110" height="11" rx="5.5"/>
+  <rect class="read hp0" x="702" y="144" width="110" height="11" rx="5.5"/>
+  <rect class="read hp2" x="702" y="160" width="110" height="11" rx="5.5"/>
+  <rect class="read hp0" x="702" y="176" width="110" height="11" rx="5.5"/>
+  <text class="tick zh" x="828" y="140">灰色 read 未帶</text>
+  <text class="tick zh" x="828" y="162">HP 標籤</text>
+
+  <text class="tick bold zh" x="702" y="212">原因</text>
+  <text class="tick zh" x="702" y="236">整段失去一條染色體、</text>
+  <text class="tick zh" x="702" y="258">覆蓋度不足、</text>
+  <text class="tick zh" x="702" y="280">或比對品質太低</text>
+
+  <text class="tick bold zh" x="702" y="318">徵兆</text>
+  <text class="tick zh" x="702" y="342">標記率明顯偏低</text>
+  <text class="tick zh" x="702" y="364">（標記率偏低應進一步檢查）</text>
+</svg>

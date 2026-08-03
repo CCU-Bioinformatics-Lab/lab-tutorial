@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-gloss="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>證據、驗證與效能評估 · 長讀癌症基因體學入門</title>
+<meta name="description" content="從 precision、recall、F1、資料來源與參考標註品質，系統性評估效能結果與適用範圍。">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/diagram.css">
+<link rel="stylesheet" href="assets/css/widgets.css">
+<link rel="stylesheet" href="assets/css/print.css">
+<script>
+/* 主題 / 字級 / 詞彙語言：必須在第一次繪製前套用，否則會閃一下白底。
+   刻意寫成同步的 inline script，不可移到外部檔案。 */
+(function () {
+  try {
+    var s = JSON.parse(localStorage.getItem('ccu.lrcg.tutorial.v1') || '{}');
+    var ui = s.ui || {};
+    var d = document.documentElement;
+    if (ui.theme === 'dark' || ui.theme === 'light') d.setAttribute('data-theme', ui.theme);
+    if (ui.fontScale && ui.fontScale !== 'm') d.setAttribute('data-fs', ui.fontScale);
+    if (ui.glossLang) d.setAttribute('data-gloss', ui.glossLang);
+  } catch (e) { /* Safari 私密瀏覽會丟 QuotaExceededError，忽略即可 */ }
+})();
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要內容</a>
+
+<header class="site-header">
+  <div class="site-header__in">
+    <a class="brand" href="index.html">
+      長讀癌症基因體學 · 入門教材
+      <small>中正大學資工系 · 黃耀廷實驗室</small>
+    </a>
+    <span class="site-header__spacer"></span>
+
+    <span class="hgroup gloss-toggle" role="group" aria-label="術語定義語言">
+      <button type="button" class="hbtn" data-gloss-btn="zh"   aria-pressed="true">繁中</button>
+      <button type="button" class="hbtn" data-gloss-btn="en"   aria-pressed="false">English</button>
+      <button type="button" class="hbtn" data-gloss-btn="both" aria-pressed="false">雙語</button>
+    </span>
+
+    <button type="button" class="hbtn theme-toggle" data-theme-btn
+            aria-label="切換深色／淺色主題">◐</button>
+    <button type="button" class="hbtn" data-fs-btn aria-label="調整字級">A</button>
+    <a class="hbtn" href="glossary.html">完整術語表</a>
+  </div>
+</header>
+
+<div class="wrap ">
+  <main class="main" id="main">
+    <header class="mhead"><p class="mhead__kicker">模組 10 · Evidence and benchmarking</p><h1>證據、驗證與效能評估</h1><p class="mhead__sub">從 precision、recall、F1、資料來源與參考標註品質，系統性評估效能結果與適用範圍。</p><p class="mhead__meta"><span class="chip">約 60 分鐘</span><a class="chip" href="m07.html">建議先修：Somatic variant calling</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>批判性解讀效能圖，而非僅依最高長條判斷</li><li>解釋為什麼 precision 明顯上升時 F1 可能幾乎不動</li><li>說明 truth set 之間的可靠度差異，以及本研究如何處理</li><li>指出 data leakage、distribution shift 與 label noise 各自的徵兆</li></ul></section>
+
+<section data-part="why" class="part" id="part-why">
+<h2 data-num="①" id="為什麼重要">為什麼重要</h2>
+
+<p class="prose">後續閱讀的論文通常會包含多張長條圖與折線圖。
+判讀<b>圖表未呈現的資訊</b>，是研究與工程實務中的重要能力。</p>
+
+<p class="prose">本節的目標不只是計算 F1，也包括培養批判性解讀與驗證能力。</p>
+</section>
+
+
+<section data-part="concept" class="part" id="part-concept">
+<h2 data-num="②" id="概念與互動">概念與互動</h2>
+
+<h3 id="先釐清三項指標">先釐清三項指標</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>指標</th><th>計算公式</th><th>所代表的問題</th><th>僅移除候選的後處理如何影響</th></tr></thead>
+<tbody>
+<tr><td><span class="term" data-term="precision" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-precision-0">precision<span class="term__pop" id="gd-precision-0" role="tooltip"><b class="term__hd">precision <i>精確率</i></b><span class="term__def" data-lang="zh">所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</span><span class="term__def" data-lang="en">Of the calls you made, the fraction that are correct: TP / (TP + FP).</span><a class="term__more" href="glossary.html#precision">完整條目 →</a></span></span></td><td>TP ÷（TP+FP）</td><td>所報變異中屬於真陽性的比例</td><td><b>通常上升</b>（移除 FP）</td></tr>
+<tr><td><span class="term" data-term="recall" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-recall-1">recall<span class="term__pop" id="gd-recall-1" role="tooltip"><b class="term__hd">recall <i>召回率</i></b><span class="term__def" data-lang="zh">在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</span><span class="term__def" data-lang="en">Within a stated evaluation scope, the fraction of true positives that were found: TP / (TP + FN). With a fixed caller candidate set, post-filtering can preserve or lower recall but cannot recover variants the caller never emitted; report the candidate-set scope explicitly.</span><a class="term__more" href="glossary.html#recall">完整條目 →</a></span></span></td><td>TP ÷（TP+FN）</td><td>所有真陽性中被找出的比例</td><td><b>至多維持，可能下降</b></td></tr>
+<tr><td><span class="term" data-term="F1" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-f1-2">F1<span class="term__pop" id="gd-f1-2" role="tooltip"><b class="term__hd">F1</b><span class="term__def" data-lang="zh">precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。</span><span class="term__def" data-lang="en">The harmonic mean of precision and recall. A precision gain has little effect when false negatives dominate the evaluation.</span><a class="term__more" href="glossary.html#f1">完整條目 →</a></span></span></td><td>precision 與 recall 的調和平均</td><td>兩項指標的綜合表現</td><td>依 TP、FP、FN 的變化而定</td></tr>
+</tbody>
+</table>
+</div>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" class="dia-svg" role="img">
+  <title>固定候選集合下，precision 上升而 F1 變化有限</title>
+  <desc>上半部定義三個指標：
+        precision 是所報變異中屬於真陽性的比例，recall 是所有真陽性中被找出的比例，
+        F1 是兩者的調和平均。
+        下半部示範在固定候選集合、且後處理僅移除假陽性的情況下，FP 減少而 FN 維持不變。
+        當 FN 遠多於 FP 時，移除一半 FP 對 F1 的改善有限；若誤刪 TP，FN 還會增加。</desc>
+
+  <!-- ══ 上：三個指標在數什麼 ══ -->
+  <text class="lbl bold zh" x="20" y="32">三項指標的計算對象</text>
+
+  <!-- 全體變異的方框圖 -->
+  <rect class="box ghost" x="120" y="52" width="440" height="160" rx="8"/>
+  <text class="tick mid zh" x="340" y="44">benchmark 標註的真陽性集合</text>
+
+  <!-- 所報候選集合 -->
+  <rect class="box accent" x="360" y="72" width="380" height="120" rx="8" opacity="0.55"/>
+  <text class="tick mid zh accent bold" x="700" y="64">所報候選</text>
+
+  <!-- 三個區塊 -->
+  <rect class="bar" x="150" y="92" width="196" height="80" rx="4" fill="var(--warn-fill)" stroke="var(--warn)"/>
+  <text class="anno mid bold zh warn" x="248" y="128">假陰性</text>
+  <text class="tick mid mono" x="248" y="154">FN</text>
+
+  <rect class="bar" x="376" y="92" width="164" height="80" rx="4" fill="var(--ok-fill)" stroke="var(--ok)"/>
+  <text class="anno mid bold zh ok" x="458" y="128">真陽性</text>
+  <text class="tick mid mono" x="458" y="154">TP</text>
+
+  <rect class="bar" x="570" y="92" width="152" height="80" rx="4" fill="var(--bad-fill)" stroke="var(--bad)"/>
+  <text class="anno mid bold zh bad" x="646" y="128">假陽性</text>
+  <text class="tick mid mono" x="646" y="154">FP</text>
+
+  <!-- 指標定義 -->
+  <text class="anno bold zh ok" x="790" y="96">precision</text>
+  <text class="tick zh" x="790" y="122">所報候選中的比例：</text>
+  <text class="tick mono" x="790" y="146">TP ÷ (TP+FP)</text>
+
+  <text class="anno bold zh warn" x="790" y="182">recall</text>
+  <text class="tick zh" x="790" y="208">所有真陽性中的比例：</text>
+  <text class="tick mono" x="790" y="232">TP ÷ (TP+FN)</text>
+
+  <!-- ══ 下：後處理能做與不能做 ══ -->
+  <line class="axis" x1="20" y1="264" x2="980" y2="264"/>
+  <text class="lbl bold zh" x="20" y="296">在本示例中，後處理僅移除部分假陽性</text>
+
+  <!-- 過濾前 -->
+  <text class="tick end zh" x="112" y="342">過濾前</text>
+  <rect class="bar" x="120" y="322" width="268" height="30" rx="4" fill="var(--warn-fill)" stroke="var(--warn)"/>
+  <text class="tick mid zh" x="254" y="342">FN 335</text>
+  <rect class="bar" x="392" y="322" width="330" height="30" rx="4" fill="var(--ok-fill)" stroke="var(--ok)"/>
+  <text class="tick mid zh" x="557" y="342">TP 412</text>
+  <rect class="bar" x="726" y="322" width="70" height="30" rx="4" fill="var(--bad-fill)" stroke="var(--bad)"/>
+  <text class="tick mid zh" x="761" y="342">FP 88</text>
+
+  <text class="tick mono" x="820" y="336">precision 0.824</text>
+  <text class="tick mono" x="820" y="356">F1 　　　0.661</text>
+
+  <!-- 過濾後 -->
+  <text class="tick end zh" x="112" y="404">過濾後</text>
+  <rect class="bar" x="120" y="384" width="268" height="30" rx="4" fill="var(--warn-fill)" stroke="var(--warn)"/>
+  <text class="tick mid zh" x="254" y="404">FN 335（本示例維持不變）</text>
+  <rect class="bar" x="392" y="384" width="330" height="30" rx="4" fill="var(--ok-fill)" stroke="var(--ok)"/>
+  <text class="tick mid zh" x="557" y="404">TP 412</text>
+  <rect class="bar" x="726" y="384" width="35" height="30" rx="4" fill="var(--bad-fill)" stroke="var(--bad)"/>
+  <text class="tick mid zh" x="743" y="404">FP 44</text>
+  <rect class="box ghost" x="761" y="384" width="35" height="30" rx="4" stroke="var(--bad)" stroke-dasharray="4 3"/>
+
+  <text class="tick mono ok bold" x="820" y="398">precision 0.904</text>
+  <text class="tick mono bad" x="820" y="418">F1 　　　0.685</text>
+
+  <!-- 箭頭標示變化 -->
+  <text class="anno bold ok" x="820" y="446">＋0.080</text>
+  <text class="anno bold bad" x="920" y="446">＋0.024</text>
+
+  <!-- ══ 結論 ══ -->
+  <rect class="box warn" x="20" y="466" width="960" height="62" rx="8"/>
+  <text class="anno zh" x="42" y="494">本示例中 FN 維持不變 —— 僅移除候選的後處理不會恢復 caller 未產生的候選。</text>
+  <text class="anno zh bold" x="42" y="518">當 FN 遠多於 FP 時，移除 FP 對 F1 的改善有限；若誤刪 TP，FN 會增加。</text>
+</svg><figcaption>上方定義三項指標；下方示範在固定候選集合、且後處理僅移除假陽性的情況下，FP 減少而 FN 維持不變。因此 precision 上升 0.080，而 F1 僅上升 0.024。</figcaption></figure>
+
+<p class="prose">第三欄的條件限定上述結論。<b>在固定 caller 候選集合且後處理僅移除候選時，recall 至多維持，若誤刪 TP 則可能下降。</b>
+caller 未產生的候選不會由此恢復；若後處理包含 re-calling 或 assembly，則需另行評估。</p>
+
+<h3 id="觀察-precision-與-f1-的差異">觀察 precision 與 F1 的差異</h3>
+
+<figure class="widget" data-widget="pr-threshold" data-wid="m10.pr"><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>將門檻由 0.5 調至 0.9，比較 precision 與 F1 的變化；再將<b>模擬中的 caller 漏失數設為 0</b>，重複操作並比較兩種情境。</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
+
+<aside class="guardrail" id="guard-10"><p class="guardrail__hd">重要區分 #10：僅移除候選的後處理無法恢復 caller 未產生的候選</p><p class="prose">一項可由指標定義解釋的結果是：<b>precision 明顯提升，但 F1 僅維持或小幅增加。</b></p>
+<p class="prose">F1 同時受 FP 與 FN 影響。在該資料中，原始 caller 漏失多個真實 indel，因此 <b>FN 的數量遠多於 FP</b>。
+在此情況下，少量減少 FP 對 F1 的影響有限；如果過濾時又誤刪少量 TP，
+增加的 FN 還會把改善抵銷掉。</p>
+<p class="prose"><b>此限制不僅適用於該 CNN 方法。</b>許多分析工具屬於 caller 後處理，因此可能存在相同的效能上限。
+解讀 precision 提升時，亦應檢視 recall 的變化及原始 FN 數量。</p></aside>
+
+<h3 id="truth-settruth-set-標準答案集評估用的參考標註-可靠度依資料來源與建立方法而異-困難區域可能包含標註錯誤-the-reference-labels-used-for-evaluation-a-truth-set-is-not-infallible-truth-reliability-varies-and-hard-regions-can-contain-label-errors-完整條目-並非無誤的標準"><span class="term" data-term="truth set" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-truth-set-3">truth set<span class="term__pop" id="gd-truth-set-3" role="tooltip"><b class="term__hd">truth set <i>標準答案集</i></b><span class="term__def" data-lang="zh">評估用的參考標註。可靠度依資料來源與建立方法而異，困難區域可能包含標註錯誤。</span><span class="term__def" data-lang="en">The reference labels used for evaluation. A truth set is not infallible truth: reliability varies, and hard regions can contain label errors.</span><a class="term__more" href="glossary.html#truth-set">完整條目 →</a></span></span> 並非無誤的標準</h3>
+
+<p class="prose">評估需要參考答案；不同資料來源的標註可靠度可能存在差異：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>來源</th><th>形成方式</th><th>可靠度評估</th></tr></thead>
+<tbody>
+<tr><td>SEQC2</td><td>多平台、多中心的共識計畫</td><td>需依變異類型與區域評估</td></tr>
+<tr><td>NYGC</td><td>單一機構產生</td><td>需依驗證設計評估</td></tr>
+<tr><td>Google（orthogonal tools）</td><td>多個工具交叉比對的共識</td><td>需確認工具獨立性與共識形成方式</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">LongPhase-S 在搜尋過濾參數時，
+<b>依不同 cell line 的 benchmark 可靠度乘上相對應的權重</b>。
+此設計可能減少 benchmark 差異的影響，但比較不同論文的數字時，仍應確認 truth set 與加權方式是否一致。</p>
+
+<p class="prose">另一項常被忽略的限制是 <b><span class="term" data-term="high-confidence region" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-high-confidence-region-4">high-confidence region<span class="term__pop" id="gd-high-confidence-region-4" role="tooltip"><b class="term__hd">high-confidence region</b><span class="term__def" data-lang="zh">benchmark 建立者指定的高可信度區間，通常以 BED 檔表示；區間外不宜視為具有相同標註可靠度。</span><span class="term__def" data-lang="en">Intervals that benchmark authors consider reliable, usually supplied as a BED file. Results outside those intervals should not be assumed to have the same label reliability.</span><a class="term__more" href="glossary.html#high-confidence-region">完整條目 →</a></span></span></b>。
+benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
+區間外的標註信心通常較低，結果不宜直接解讀，除非有其他獨立驗證。</p>
+
+<h3 id="三項可能造成評估偏差的因素">三項可能造成評估偏差的因素</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>因素</th><th>可能徵兆</th><th>本例的處理</th></tr></thead>
+<tbody>
+<tr><td><span class="term" data-term="data leakage" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-data-leakage-5">data leakage<span class="term__pop" id="gd-data-leakage-5" role="tooltip"><b class="term__hd">data leakage <i>資料洩漏</i></b><span class="term__def" data-lang="zh">訓練或模型選擇階段取得了評估資料的資訊，讓效能被高估。實驗室的做法是<b>按染色體切分</b>，確保同一個位點不會同時出現在訓練、驗證與最終測試中。</span><span class="term__def" data-lang="en">Evaluation information entering training or model selection and inflating performance. The lab splits by chromosome so a locus cannot appear in training, validation and final test partitions at once.</span><a class="term__more" href="glossary.html#data-leakage">完整條目 →</a></span></span></td><td>測試效能異常偏高</td><td>研究按染色體切分：chr2 與 chr8 僅用於驗證；仍需檢查樣本與位點是否跨 split</td></tr>
+<tr><td><span class="term" data-term="distribution shift" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-distribution-shift-6">distribution shift<span class="term__pop" id="gd-distribution-shift-6" role="tooltip"><b class="term__hd">distribution shift <i>分布偏移</i></b><span class="term__def" data-lang="zh">測試資料的組成與訓練資料存在顯著差異（例如正負樣本比例不同），使得模型表現不如預期。</span><span class="term__def" data-lang="en">Test data differing in composition from training data, so measured performance does not transfer.</span><a class="term__more" href="glossary.html#distribution-shift">完整條目 →</a></span></span></td><td>訓練與測試的類別或特徵分布不同</td><td>研究指出訓練 FP 佔 4%、測試佔 19%，因此不能只看 loss</td></tr>
+<tr><td><span class="term" data-term="label noise" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-label-noise-7">label noise<span class="term__pop" id="gd-label-noise-7" role="tooltip"><b class="term__hd">label noise <i>標籤雜訊</i></b><span class="term__def" data-lang="zh">訓練或評估標籤與真實狀態不一致的情況。在 homopolymer 與重複區域可能較常見；特徵相近的位點也可能得到相反標籤。</span><span class="term__def" data-lang="en">Errors in the labels themselves. They can be more frequent in homopolymers and repeats, where near-identical sites may receive different labels.</span><a class="term__more" href="glossary.html#label-noise">完整條目 →</a></span></span></td><td>特定類別的表現持續受限</td><td>特徵相近的兩個位點被賦予相反標籤，提示可能存在標註不確定性</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">最後一項可由具體案例說明。研究比較兩個 deletion 的影像編碼：
+一個是 true positive（分數 0.997），一個是 false positive（分數 0.994）。
+兩者的 tumor reads 都顯示集中一致的 deletion，normal reads 未見相應支持。
+<b>就該影像編碼呈現的特徵而言，兩個候選近似。</b></p>
+
+<figure class="fig"><img src="assets/img/c/c-s34-lookalike.webp" alt="兩個 deletion 候選點的影像編碼並列比較：左邊是 true positive 分數 0.997，右邊是 false positive 分數 0.994；在此影像中兩者外觀相近" loading="lazy" decoding="async"><figcaption>兩個 deletion 候選點的模型分數相近：左側 true positive（0.997），右側 false positive（0.994）。兩者在此影像中都有集中對齊的 deletion，normal 均未呈現明顯異常。就此影像可見的訊息而言，兩個候選點難以區分；需要其他證據補充判讀。</figcaption></figure>
+
+<p class="prose">研究結論指出：「這兩類 candidates 在該影像輸入下未呈現可辨識差異。」這類位點常落在 homopolymer 或 tandem repeat 區域，
+<b>benchmark 標註的不確定性可能較高</b>；若要判定 label noise，仍需獨立 truth 或重複實驗支持。</p>
+
+<h3 id="合成-dna-fraction-混合樣本及其適用範圍">合成 DNA fraction 混合樣本及其適用範圍</h3>
+
+<p class="prose">常用流程假設來源 tumor BAM 接近純腫瘤，再依指定比例與 normal BAM 混合。
+此流程可產生預先設定的 DNA／read fraction，作為近似真值；但來源樣本的純度、輸入深度、每細胞 DNA 量與拷貝數仍需校正，
+實際細胞株也可能包含少量正常或異質細胞。</p>
+
+<p class="prose">因此「在標示為 purity 0.2（或 DNA fraction 0.2，依研究定義）的樣本上誤差小於 10%」應完整表述為「在<b>以此方式合成</b>的樣本上」；
+結果僅適用於該合成方式與來源樣本前提。</p>
+</section>
+
+
+<section data-part="evidence" class="part" id="part-evidence">
+<h2 data-num="③" id="真實證據">真實證據</h2>
+
+<h3 id="用對的指標選模型">用對的指標選模型</h3>
+
+<p class="prose">一項可注意的模型選擇設計是：<b>研究未以 validation loss 最低的 epoch 作為最佳模型。</b></p>
+
+<p class="prose">理由是 loss 反映所選損失函數（例如 cross-entropy）的平均目標，不必然等同於分類錯誤率；
+若任務目標是「在盡量保留真 indel 的前提下，篩掉更多假的」，
+兩者不是同一件事。</p>
+
+<p class="prose">因此研究定義以下任務導向分數：</p>
+
+<pre><code>score = (成功移除的 FP − λ × 誤刪的 TP) ÷ FP 總數</code></pre>
+
+<p class="prose">λ 由 benchmark 與驗證集的正負比例估計，而非人工指定（該資料約為 1.45）；
+應同時說明估計資料、FP 總數為零時的處理，以及權重敏感度。</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">核心原則</p>
+<p class="prose"><b>模型選擇的標準應與任務目標對齊，而不必與 loss 最小化完全相同。</b>
+此原則適用於 variant calling 以外的應用 ML 任務。</p>
+</div>
+
+<h3 id="本例交叉驗證以樣本為分割單位">本例交叉驗證以樣本為分割單位</h3>
+
+<p class="prose">LongPhase-S 用 <b>leave-k-out</b> 交叉驗證評估 purity 模型，
+每次留下 1 或 2 個 <b>cell line</b> 當測試集。結果 MAE 約 4%、R² 約 0.95。</p>
+
+<p class="prose">這種做法叫 <span class="term" data-term="cross-validation" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cross-validation-8">cross-validation<span class="term__pop" id="gd-cross-validation-8" role="tooltip"><b class="term__hd">cross-validation <i>交叉驗證</i></b><span class="term__def" data-lang="zh">輪流保留資料子集作為驗證折，用來估計模型的泛化能力與選擇設定；這些折是 validation，不是最終 test。最終測試集應在模型與設定確定後才使用，並另行保留。</span><span class="term__def" data-lang="en">Repeatedly holding out validation folds to estimate generalisation and choose model settings. The folds are validation data, not the final test; an untouched final test set is used only after the model is fixed.</span><a class="term__more" href="glossary.html#cross-validation">完整條目 →</a></span></span>。此處保留 cell line 作測試，有助於評估<b>跨樣本的泛化能力</b>。
+若同一 cell line 的高度相關位點同時出現在訓練與測試中，可能造成 <span class="term" data-term="data leakage" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-data-leakage-9">data leakage<span class="term__pop" id="gd-data-leakage-9" role="tooltip"><b class="term__hd">data leakage <i>資料洩漏</i></b><span class="term__def" data-lang="zh">訓練或模型選擇階段取得了評估資料的資訊，讓效能被高估。實驗室的做法是<b>按染色體切分</b>，確保同一個位點不會同時出現在訓練、驗證與最終測試中。</span><span class="term__def" data-lang="en">Evaluation information entering training or model selection and inflating performance. The lab splits by chromosome so a locus cannot appear in training, validation and final test partitions at once.</span><a class="term__more" href="glossary.html#data-leakage">完整條目 →</a></span></span> 或效能高估。</p>
+</section>
+
+
+<section data-part="predict" class="part" id="part-predict">
+<h2 data-num="④" id="先提出預測-再查看解答">先提出預測，再查看解答</h2>
+
+<div class="reveal__q"><p class="prose">一篇論文說：「我們的方法把 precision 從 0.72 提升到 0.89。」<br><br>
+請列出解讀此結果時應先確認的三項資訊。</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose">依重要性排序：</p>
+<ol class="prose">
+<li><b>recall 如何變化？</b>若只報 precision 而不報 recall，可能遺漏門檻調整造成的取捨。
+提高門檻通常會提高 precision，但可能只保留少量 calls。</li>
+<li><b>在哪個資料集、用哪一份 truth set？</b>Google 的 orthogonal-tools 共識與 SEQC2
+的標註範圍與難度可能不同；是否限制在 <span class="term" data-term="high-confidence region" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-high-confidence-region-10">high-confidence region<span class="term__pop" id="gd-high-confidence-region-10" role="tooltip"><b class="term__hd">high-confidence region</b><span class="term__def" data-lang="zh">benchmark 建立者指定的高可信度區間，通常以 BED 檔表示；區間外不宜視為具有相同標註可靠度。</span><span class="term__def" data-lang="en">Intervals that benchmark authors consider reliable, usually supplied as a BED file. Results outside those intervals should not be assumed to have the same label reliability.</span><a class="term__more" href="glossary.html#high-confidence-region">完整條目 →</a></span></span> 內，也可能造成明顯差異。</li>
+<li><b>測試資料是否參與閾值選擇或調參？</b>若門檻在同一批測試資料上挑選，0.89 可能是 test-set overfitting 的樂觀估計，不代表泛化效能。</li>
+</ol>
+<p class="prose">若資料可得，另應確認<b>絕對數量是多少？</b>
+precision 從 0.72 到 0.89，如果 TP 只有 20 個，那可能只是移除了少數幾個 FP，
+統計不確定性可能較高；若未提供分母，比例的精確度難以評估。</p></div></details>
+</section>
+
+
+<section data-part="practice" class="part" id="part-practice">
+<h2 data-num="⑤" id="實作練習">實作練習</h2>
+
+<h3 id="以標準化流程評估效能">以標準化流程評估效能</h3>
+
+<p class="prose">除非已處理 variant normalization，否則不建議自行實作比對；
+同一個 indel 可能有多種等價表示，多等位與複雜變異也需要額外處理。可使用專門工具：</p>
+
+<pre><code># SNV / indel 的常用評估工具（hap.py）
+docker run -v $(pwd):/data pkrusche/hap.py /opt/hap.py/bin/hap.py \
+  /data/truth.vcf.gz \
+  /data/query.vcf.gz \
+  -f /data/high_confidence_region.bed \
+  -r /data/reference.fasta \
+  -o /data/result</code></pre>
+
+<p class="cli-note"><code>-f</code> 是<b>關鍵參數之一</b>：它限制在 benchmark 信心較高的區間內評估。
+未限制區域時，應分層報告並說明標註信心，否則結果難以直接解讀。</p>
+
+<h3 id="解讀效能數字時的四項檢核">解讀效能數字時的四項檢核</h3>
+
+<p class="prose">解讀效能數字時，可依序確認：</p>
+
+<ol class="prose">
+<li><b>另一個指標呢？</b>若只報 precision，應同時檢視 recall 的變化。</li>
+<li><b>在哪個資料集、用哪一份標準答案、有沒有限制在高信心區間內？</b></li>
+<li><b>測試資料是否參與過調參？</b>若門檻在同一批測試資料上挑選，結果可能是對該資料集過度擬合的估計。</li>
+<li><b>絕對數量是多少？</b>precision 從 0.72 到 0.89，如果 TP 只有 20 個，統計上不穩定。</li>
+</ol>
+
+<h3 id="檢查訓練-測試資料是否存在洩漏">檢查訓練／測試資料是否存在洩漏</h3>
+
+<pre><code># 檢查訓練與測試的染色體名稱是否重疊（僅為初步檢查）
+cut -f1 train_sites.tsv | sort -u &gt; /tmp/train_chr
+cut -f1 test_sites.tsv  | sort -u &gt; /tmp/test_chr
+comm -12 /tmp/train_chr /tmp/test_chr    # 有輸出表示染色體名稱重疊，仍需檢查座標與樣本
+
+# 比較訓練與測試的類別比例
+awk '{c[$NF]++} END {for (k in c) print k, c[k]}' train_sites.tsv
+awk '{c[$NF]++} END {for (k in c) print k, c[k]}' test_sites.tsv</code></pre>
+
+<p class="prose">類別比例差異會影響評估：若訓練集的假陽性佔 4%、測試集佔 19%，
+兩組資料的類別分布不同，<b>不宜僅以 loss 判定模型優劣</b>；仍應檢查其他特徵與品質分布。</p>
+
+<section class="quiz" data-quiz="m10"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+</section>
+
+    <nav class="pager" aria-label="模組導覽"><a class="prev" href="m09.html"><small>← 上一模組</small>甲基化入門</a><a class="next" href="m11.html"><small>下一模組 →</small>LongPhase：核心 phasing 流程</a></nav>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>F1</dt><dd>precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。</dd><dt>cross-validation（交叉驗證）</dt><dd>輪流保留資料子集作為驗證折，用來估計模型的泛化能力與選擇設定；這些折是 validation，不是最終 test。最終測試集應在模型與設定確定後才使用，並另行保留。</dd><dt>data leakage（資料洩漏）</dt><dd>訓練或模型選擇階段取得了評估資料的資訊，讓效能被高估。實驗室的做法是<b>按染色體切分</b>，確保同一個位點不會同時出現在訓練、驗證與最終測試中。</dd><dt>distribution shift（分布偏移）</dt><dd>測試資料的組成與訓練資料存在顯著差異（例如正負樣本比例不同），使得模型表現不如預期。</dd><dt>high-confidence region</dt><dd>benchmark 建立者指定的高可信度區間，通常以 BED 檔表示；區間外不宜視為具有相同標註可靠度。</dd><dt>label noise（標籤雜訊）</dt><dd>訓練或評估標籤與真實狀態不一致的情況。在 homopolymer 與重複區域可能較常見；特徵相近的位點也可能得到相反標籤。</dd><dt>precision（精確率）</dt><dd>所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</dd><dt>recall（召回率）</dt><dd>在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</dd><dt>truth set（標準答案集）</dt><dd>評估用的參考標註。可靠度依資料來源與建立方法而異，困難區域可能包含標註錯誤。</dd></dl></section>
+  </main>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#先釐清三項指標">先釐清三項指標</a></li><li class="lv3"><a href="#觀察-precision-與-f1-的差異">觀察 precision 與 F1 的差異</a></li><li class="lv3"><a href="#truth-settruth-set-標準答案集評估用的參考標註-可靠度依資料來源與建立方法而異-困難區域可能包含標註錯誤-the-reference-labels-used-for-evaluation-a-truth-set-is-not-infallible-truth-reliability-varies-and-hard-regions-can-contain-label-errors-完整條目-並非無誤的標準">truth settruth set 標準答案集評估用的參考標註。可靠度依資料來源與建立方法而異，困難區域可能包含標註錯誤。The reference labels used for evaluation. A truth set is not infallible truth: reliability varies, and hard regions can contain label errors.完整條目 → 並非無誤的標準</a></li><li class="lv3"><a href="#三項可能造成評估偏差的因素">三項可能造成評估偏差的因素</a></li><li class="lv3"><a href="#合成-dna-fraction-混合樣本及其適用範圍">合成 DNA fraction 混合樣本及其適用範圍</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#用對的指標選模型">用對的指標選模型</a></li><li class="lv3"><a href="#本例交叉驗證以樣本為分割單位">本例交叉驗證以樣本為分割單位</a></li><li class="lv2"><a href="#先提出預測-再查看解答">先提出預測，再查看解答</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#以標準化流程評估效能">以標準化流程評估效能</a></li><li class="lv3"><a href="#解讀效能數字時的四項檢核">解讀效能數字時的四項檢核</a></li><li class="lv3"><a href="#檢查訓練-測試資料是否存在洩漏">檢查訓練／測試資料是否存在洩漏</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+</div>
+
+<footer class="site-footer">
+  本教材供中正大學資工系黃耀廷實驗室新進成員自學，聚焦
+  <code>LongPhase-S</code> 與 <code>LongPhase-TO</code> 的概念、證據與限制。
+</footer>
+
+
+<script src="assets/js/progress.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/glossary.js"></script>
+<script src="assets/js/quiz.js"></script>
+<script src="assets/data/quiz.data.js"></script>
+<script src="assets/js/widgets/pr-threshold.js"></script>
+</body>
+</html>
