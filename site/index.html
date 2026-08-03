@@ -53,7 +53,209 @@
 
 <div class="wrap wrap--plain">
   <main class="main" id="main">
-    <header class="mhead"><p class="mhead__kicker">自學課程</p><h1>長讀癌症基因體學 · 入門教材</h1></header><div class="home-hook"><p>某肺癌檢體檢出兩個變異。即使兩者都被檢出，報告仍可能不足以支持後續判讀，因為還需要回答一個關鍵問題：</p><p class="home-hook__q">這兩個變異位於<b>同一條</b>染色體拷貝，還是<b>分別位於兩條</b>？</p><p>相同的位點結果，若相位不同，生物學與臨床解讀可能不同。本教材將帶你從定序資料判斷這項關聯，並理解其證據與限制。</p></div><div class="home-facts"><div><dt>適合對象</dt><dd>資訊工程背景、未受癌症生物學與定序訓練的自學者</dd></div><div><dt>先備能力</dt><dd>不要求生物學背景；M4 起需能使用終端機執行基本指令</dd></div><div><dt>預計時間</dt><dd>總時數約 14 小時，建議分 6 週完成</dd></div><div><dt>完成後能力</dt><dd>獨立判讀一個位點，並寫出標示不確定性的結論</dd></div></div><figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" class="dia-svg" role="img">
+    <header class="mhead"><p class="mhead__kicker">自學課程</p><h1>長讀癌症基因體學 · 入門教材</h1></header><div class="home-hook"><p class="home-hook__q">這個實驗室做的事，是寫程式分析 DNA 定序資料。</p><p>定序機把一管檢體裡的 DNA 打斷成片段、逐條讀出，產出幾百萬條帶著錯誤的字串。麻煩的是：這管檢體裡同時有正常細胞和癌細胞，而字串上沒有標記誰是誰。把它還原回來，就是我們寫的軟體要做的事。</p></div><figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 668" class="dia-svg" role="img">
+  <title>這個實驗室在寫什麼軟體</title>
+  <desc>由上而下三層。第一層是輸入：一管檢體裡同時有正常細胞與癌細胞，定序機把 DNA 打斷成片段逐條讀出，
+        得到一堆長得一樣的字串；字串本身沒有標記來源，也沒有標記哪個字母是機器讀錯的。
+        第二層是本實驗室開發的 C++ 軟體。第三層是輸出：每一條片段被判回它屬於哪一份 DNA，
+        哪些變異是癌細胞才有的，以及這管檢體裡癌細胞佔多少比例。</desc>
+
+  <!-- ══════════ ① 輸入 ══════════ -->
+  <rect class="box" x="16" y="40" width="968" height="240" rx="10"/>
+  <text class="lbl bold zh" x="40" y="74">① 定序機丟給你的東西</text>
+
+  <!-- 檢體 -->
+  <rect class="box plain" x="40" y="92" width="196" height="160" rx="10"/>
+  <text class="anno mid bold zh" x="138" y="120">一管檢體</text>
+  <circle class="cell normal" cx="74"  cy="156" r="14"/>
+  <circle class="cell tumor"  cx="110" cy="156" r="14"/>
+  <circle class="cell normal" cx="146" cy="156" r="14"/>
+  <circle class="cell normal" cx="182" cy="156" r="14"/>
+  <circle class="cell tumor"  cx="74"  cy="194" r="14"/>
+  <circle class="cell normal" cx="110" cy="194" r="14"/>
+  <circle class="cell tumor"  cx="146" cy="194" r="14"/>
+  <circle class="cell normal" cx="182" cy="194" r="14"/>
+  <text class="tick mid zh" x="138" y="234">正常細胞與癌細胞混在一起</text>
+
+  <!-- 定序箭頭 -->
+  <path class="flow" d="M244,172 L286,172" marker-end="url(#arrow)"/>
+  <text class="tick mid zh" x="265" y="150">定序</text>
+
+  <!-- read 堆：所有 read 都是 hp0（來源未知） -->
+  <text class="anno zh" x="300" y="118">機器讀出來的片段</text>
+
+  <rect class="read hp0" x="300" y="132" width="312" height="22" rx="6"/>
+  <text class="base a mono" x="313" y="148" font-size="15">A</text>
+  <text class="base t mono" x="339" y="148" font-size="15">T</text>
+  <text class="base g mono" x="365" y="148" font-size="15">G</text>
+  <text class="base a mono" x="391" y="148" font-size="15">A</text>
+  <text class="base c mono" x="417" y="148" font-size="15">C</text>
+  <text class="base t mono" x="443" y="148" font-size="15">T</text>
+  <text class="base g mono" x="469" y="148" font-size="15">G</text>
+  <text class="base a mono" x="495" y="148" font-size="15">A</text>
+  <text class="base c mono" x="521" y="148" font-size="15">C</text>
+  <text class="base t mono" x="547" y="148" font-size="15">T</text>
+  <text class="base g mono" x="573" y="148" font-size="15">G</text>
+  <text class="base a mono" x="599" y="148" font-size="15">A</text>
+
+  <rect class="read hp0" x="300" y="160" width="312" height="22" rx="6"/>
+  <text class="base a mono" x="313" y="176" font-size="15">A</text>
+  <text class="base t mono" x="339" y="176" font-size="15">T</text>
+  <text class="base g mono" x="365" y="176" font-size="15">G</text>
+  <text class="base g mono" x="391" y="176" font-size="15">G</text>
+  <text class="base c mono" x="417" y="176" font-size="15">C</text>
+  <text class="base t mono" x="443" y="176" font-size="15">T</text>
+  <text class="base g mono" x="469" y="176" font-size="15">G</text>
+  <text class="base a mono" x="495" y="176" font-size="15">A</text>
+  <text class="base c mono" x="521" y="176" font-size="15">C</text>
+  <text class="base t mono" x="547" y="176" font-size="15">T</text>
+  <text class="base g mono" x="573" y="176" font-size="15">G</text>
+  <text class="base a mono" x="599" y="176" font-size="15">A</text>
+
+  <rect class="read hp0" x="300" y="188" width="312" height="22" rx="6"/>
+  <text class="base a mono" x="313" y="204" font-size="15">A</text>
+  <text class="base t mono" x="339" y="204" font-size="15">T</text>
+  <text class="base g mono" x="365" y="204" font-size="15">G</text>
+  <text class="base a mono" x="391" y="204" font-size="15">A</text>
+  <text class="base c mono" x="417" y="204" font-size="15">C</text>
+  <text class="base t mono" x="443" y="204" font-size="15">T</text>
+  <text class="base g mono" x="469" y="204" font-size="15">G</text>
+  <text class="base t mono" x="495" y="204" font-size="15">T</text>
+  <text class="base c mono" x="521" y="204" font-size="15">C</text>
+  <text class="base t mono" x="547" y="204" font-size="15">T</text>
+  <text class="base g mono" x="573" y="204" font-size="15">G</text>
+  <text class="base a mono" x="599" y="204" font-size="15">A</text>
+
+  <rect class="read hp0" x="300" y="216" width="312" height="22" rx="6"/>
+  <text class="base a mono" x="313" y="232" font-size="15">A</text>
+  <text class="base t mono" x="339" y="232" font-size="15">T</text>
+  <text class="base g mono" x="365" y="232" font-size="15">G</text>
+  <text class="base g mono" x="391" y="232" font-size="15">G</text>
+  <text class="base c mono" x="417" y="232" font-size="15">C</text>
+  <text class="base t mono" x="443" y="232" font-size="15">T</text>
+  <text class="base g mono" x="469" y="232" font-size="15">G</text>
+  <text class="base a mono" x="495" y="232" font-size="15">A</text>
+  <text class="base c mono" x="521" y="232" font-size="15">C</text>
+  <text class="base c mono" x="547" y="232" font-size="15">C</text>
+  <text class="base g mono" x="573" y="232" font-size="15">G</text>
+  <text class="base a mono" x="599" y="232" font-size="15">A</text>
+
+  <rect class="read hp0" x="300" y="244" width="312" height="22" rx="6"/>
+  <text class="base a mono" x="313" y="260" font-size="15">A</text>
+  <text class="base t mono" x="339" y="260" font-size="15">T</text>
+  <text class="base g mono" x="365" y="260" font-size="15">G</text>
+  <text class="base a mono" x="391" y="260" font-size="15">A</text>
+  <text class="base c mono" x="417" y="260" font-size="15">C</text>
+  <text class="base t mono" x="443" y="260" font-size="15">T</text>
+  <text class="base g mono" x="469" y="260" font-size="15">G</text>
+  <text class="base t mono" x="495" y="260" font-size="15">T</text>
+  <text class="base c mono" x="521" y="260" font-size="15">C</text>
+  <text class="base t mono" x="547" y="260" font-size="15">T</text>
+  <text class="base g mono" x="573" y="260" font-size="15">G</text>
+  <text class="base a mono" x="599" y="260" font-size="15">A</text>
+
+  <text class="anno zh bold" x="638" y="152">每一條長得都一樣。</text>
+  <text class="anno zh" x="638" y="184">哪些來自正常細胞、</text>
+  <text class="anno zh" x="638" y="212">哪些來自癌細胞、</text>
+  <text class="anno zh" x="638" y="240">哪個字母是機器讀錯的 ——</text>
+  <text class="anno zh bold bad" x="638" y="268">資料本身沒有標。</text>
+
+  <path class="flow" d="M500,282 L500,310" marker-end="url(#arrow)"/>
+
+  <!-- ══════════ ② 軟體 ══════════ -->
+  <rect class="box accent" x="16" y="314" width="968" height="82" rx="10"/>
+  <text class="lbl mid bold zh" x="500" y="348">② 這個實驗室寫的軟體</text>
+  <text class="anno mid zh" x="500" y="378">C++ 程式：從這堆字串反推出每一條的來源</text>
+
+  <path class="flow" d="M500,398 L500,426" marker-end="url(#arrow)"/>
+
+  <!-- ══════════ ③ 輸出 ══════════ -->
+  <rect class="box ok" x="16" y="430" width="968" height="222" rx="10"/>
+  <text class="lbl bold zh" x="40" y="464">③ 軟體要算出來的東西</text>
+
+  <text class="lbl bold hp1 zh" x="46" y="512">第 1 份 DNA</text>
+  <text class="lbl bold hp2 zh" x="46" y="600">第 2 份 DNA</text>
+  <text class="tick zh" x="46" y="634">編號只是標籤，沒有先後之分</text>
+
+  <!-- 標出癌細胞才有的那一欄 -->
+  <rect class="region bad" x="482" y="514" width="26" height="56"/>
+
+  <rect class="read hp1" x="300" y="486" width="312" height="22" rx="6"/>
+  <text class="base a mono" x="313" y="502" font-size="15">A</text>
+  <text class="base t mono" x="339" y="502" font-size="15">T</text>
+  <text class="base g mono" x="365" y="502" font-size="15">G</text>
+  <text class="base a mono" x="391" y="502" font-size="15">A</text>
+  <text class="base c mono" x="417" y="502" font-size="15">C</text>
+  <text class="base t mono" x="443" y="502" font-size="15">T</text>
+  <text class="base g mono" x="469" y="502" font-size="15">G</text>
+  <text class="base a mono" x="495" y="502" font-size="15">A</text>
+  <text class="base c mono" x="521" y="502" font-size="15">C</text>
+  <text class="base t mono" x="547" y="502" font-size="15">T</text>
+  <text class="base g mono" x="573" y="502" font-size="15">G</text>
+  <text class="base a mono" x="599" y="502" font-size="15">A</text>
+
+  <rect class="read hp1" x="300" y="514" width="312" height="22" rx="6"/>
+  <text class="base a mono" x="313" y="530" font-size="15">A</text>
+  <text class="base t mono" x="339" y="530" font-size="15">T</text>
+  <text class="base g mono" x="365" y="530" font-size="15">G</text>
+  <text class="base a mono" x="391" y="530" font-size="15">A</text>
+  <text class="base c mono" x="417" y="530" font-size="15">C</text>
+  <text class="base t mono" x="443" y="530" font-size="15">T</text>
+  <text class="base g mono" x="469" y="530" font-size="15">G</text>
+  <text class="base t mono" x="495" y="530" font-size="15">T</text>
+  <text class="base c mono" x="521" y="530" font-size="15">C</text>
+  <text class="base t mono" x="547" y="530" font-size="15">T</text>
+  <text class="base g mono" x="573" y="530" font-size="15">G</text>
+  <text class="base a mono" x="599" y="530" font-size="15">A</text>
+
+  <rect class="read hp1" x="300" y="542" width="312" height="22" rx="6"/>
+  <text class="base a mono" x="313" y="558" font-size="15">A</text>
+  <text class="base t mono" x="339" y="558" font-size="15">T</text>
+  <text class="base g mono" x="365" y="558" font-size="15">G</text>
+  <text class="base a mono" x="391" y="558" font-size="15">A</text>
+  <text class="base c mono" x="417" y="558" font-size="15">C</text>
+  <text class="base t mono" x="443" y="558" font-size="15">T</text>
+  <text class="base g mono" x="469" y="558" font-size="15">G</text>
+  <text class="base t mono" x="495" y="558" font-size="15">T</text>
+  <text class="base c mono" x="521" y="558" font-size="15">C</text>
+  <text class="base t mono" x="547" y="558" font-size="15">T</text>
+  <text class="base g mono" x="573" y="558" font-size="15">G</text>
+  <text class="base a mono" x="599" y="558" font-size="15">A</text>
+
+  <rect class="read hp2" x="300" y="578" width="312" height="22" rx="6"/>
+  <text class="base a mono" x="313" y="594" font-size="15">A</text>
+  <text class="base t mono" x="339" y="594" font-size="15">T</text>
+  <text class="base g mono" x="365" y="594" font-size="15">G</text>
+  <text class="base g mono" x="391" y="594" font-size="15">G</text>
+  <text class="base c mono" x="417" y="594" font-size="15">C</text>
+  <text class="base t mono" x="443" y="594" font-size="15">T</text>
+  <text class="base g mono" x="469" y="594" font-size="15">G</text>
+  <text class="base a mono" x="495" y="594" font-size="15">A</text>
+  <text class="base c mono" x="521" y="594" font-size="15">C</text>
+  <text class="base t mono" x="547" y="594" font-size="15">T</text>
+  <text class="base g mono" x="573" y="594" font-size="15">G</text>
+  <text class="base a mono" x="599" y="594" font-size="15">A</text>
+
+  <rect class="read hp2" x="300" y="606" width="312" height="22" rx="6"/>
+  <text class="base a mono" x="313" y="622" font-size="15">A</text>
+  <text class="base t mono" x="339" y="622" font-size="15">T</text>
+  <text class="base g mono" x="365" y="622" font-size="15">G</text>
+  <text class="base g mono" x="391" y="622" font-size="15">G</text>
+  <text class="base c mono" x="417" y="622" font-size="15">C</text>
+  <text class="base t mono" x="443" y="622" font-size="15">T</text>
+  <text class="base g mono" x="469" y="622" font-size="15">G</text>
+  <text class="base a mono" x="495" y="622" font-size="15">A</text>
+  <text class="base c mono" x="521" y="622" font-size="15">C</text>
+  <text class="base c mono" x="547" y="622" font-size="15">C</text>
+  <text class="base g mono" x="573" y="622" font-size="15">G</text>
+  <text class="base a mono" x="599" y="622" font-size="15">A</text>
+
+  <text class="anno zh bold" x="638" y="492">同時算出三件事：</text>
+  <text class="tick zh" x="638" y="524">① 每一條片段屬於哪一份 DNA</text>
+  <text class="tick zh" x="638" y="552">② 哪個位置是癌細胞才有的</text>
+  <text class="tick zh" x="638" y="580">③ 這管檢體裡癌細胞佔多少</text>
+  <text class="tick zh" x="638" y="622">整份教材就是在拆解這三件事。</text>
+</svg><figcaption>定序機給的是一堆看不出來源的字串；把每一條判回它從哪來，就是這個實驗室寫的軟體在做的事。</figcaption></figure><div class="home-facts"><div><dt>適合對象</dt><dd>資訊工程背景、未受癌症生物學與定序訓練的自學者</dd></div><div><dt>先備能力</dt><dd>不要求生物學背景；M4 起需能使用終端機執行基本指令</dd></div><div><dt>預計時間</dt><dd>總時數約 14 小時，建議分 6 週完成</dd></div><div><dt>完成後能力</dt><dd>獨立判讀一個位點，並寫出標示不確定性的結論</dd></div></div><figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" class="dia-svg" role="img">
   <title>整份教材的學習路徑</title>
   <desc>五個階段由左至右：基礎模組建立資料模型，工具模組介紹實際檔案，
         核心模組處理腫瘤資料的分析限制，工具實作介紹三項程式，
@@ -120,7 +322,10 @@
   <code>LongPhase-S</code> 與 <code>LongPhase-TO</code> 的概念、證據與限制。
 </footer>
 
-<svg class="tw-defs" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="arrow-sm" viewBox="0 0 10 10" refX="9" refY="5"
+<svg class="tw-defs" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+  </marker><marker id="arrow-sm" viewBox="0 0 10 10" refX="9" refY="5"
           markerWidth="5" markerHeight="5" orient="auto-start-reverse">
     <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
   </marker></defs></svg>
