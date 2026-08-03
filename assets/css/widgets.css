@@ -1,0 +1,144 @@
+/* ============================================================================
+   widgets.css — 互動元件外殼（元件內部一律用 diagram.css 的 class）
+   ============================================================================ */
+
+.widget {
+  margin: var(--sp-5) 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--paper-raised);
+  overflow: hidden;
+}
+.widget__hd {
+  display: flex; align-items: center; gap: .6em;
+  padding: .5em var(--sp-4);
+  background: var(--paper-sunken);
+  border-bottom: 1px solid var(--rule);
+  font-size: .8rem; color: var(--muted);
+  font-weight: 600; letter-spacing: .03em;
+}
+.widget__hd::before {
+  content: "";
+  width: .55em; height: .55em; border-radius: 50%;
+  background: var(--rule-strong);
+  flex: none;
+}
+.widget[data-ready="1"] .widget__hd::before { background: var(--ok); }
+
+.widget__stage {
+  padding: var(--sp-4);
+  overflow-x: auto;
+}
+.widget__stage > svg { width: 100%; height: auto; display: block; }
+.widget__stage > svg.min-wide { min-width: 620px; }
+.widget__stage > canvas { max-width: 100%; display: block; }
+
+.widget__ctl {
+  display: flex; flex-wrap: wrap; gap: var(--sp-2);
+  align-items: center;
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 1px solid var(--rule);
+  background: var(--paper-sunken);
+}
+.widget__msg {
+  font-size: .87rem; font-weight: 600;
+  margin-left: auto; text-align: right;
+  min-height: 1.4em;
+}
+.widget__msg[data-ok="true"]  { color: var(--ok); }
+.widget__msg[data-ok="false"] { color: var(--bad); }
+@media (max-width: 34rem) {
+  .widget__msg { margin-left: 0; width: 100%; text-align: left; }
+}
+
+.widget > figcaption { padding: 0 var(--sp-4) var(--sp-4); margin-top: 0; }
+
+.widget__err {
+  padding: var(--sp-4);
+  color: var(--bad);
+  background: var(--bad-fill);
+  font-size: .88rem;
+}
+
+/* --- 控制項 -------------------------------------------------------------- */
+.wctl {
+  display: inline-flex; align-items: center; gap: .45em;
+  font-size: .85rem; color: var(--muted);
+}
+.wctl input[type="range"] {
+  accent-color: var(--accent);
+  width: 9rem; vertical-align: middle;
+}
+.wctl select, .wctl input[type="text"], .wctl input[type="number"] {
+  font: inherit; font-size: .85rem;
+  padding: .25em .45em;
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.wctl input[type="text"].mono { font-family: var(--font-mono); }
+.wctl output {
+  font-family: var(--font-mono);
+  font-weight: 700; color: var(--ink);
+  min-width: 3.2em; display: inline-block;
+}
+.wctl input[type="checkbox"] { accent-color: var(--accent); }
+
+.wseg { display: inline-flex; }
+.wseg button {
+  font: inherit; font-size: .82rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  color: var(--muted);
+  padding: .28em .7em;
+  cursor: pointer;
+  margin-left: -1px;
+}
+.wseg button:first-child { border-radius: 5px 0 0 5px; margin-left: 0; }
+.wseg button:last-child  { border-radius: 0 5px 5px 0; }
+.wseg button[aria-pressed="true"] {
+  background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
+  position: relative; z-index: 1;
+}
+
+/* --- 圖例 ---------------------------------------------------------------- */
+.wlegend {
+  display: flex; flex-wrap: wrap; gap: .4em 1em;
+  padding: 0 var(--sp-4) var(--sp-3);
+  font-size: .78rem; color: var(--muted);
+}
+.wlegend span { display: inline-flex; align-items: center; gap: .35em; }
+.wlegend i {
+  width: .8em; height: .8em; border-radius: 3px;
+  border: 1.5px solid currentColor; flex: none;
+}
+.wlegend .hp1 { color: var(--hp1); } .wlegend .hp1 i { background: var(--hp1-fill); }
+.wlegend .hp2 { color: var(--hp2); } .wlegend .hp2 i { background: var(--hp2-fill); }
+.wlegend .hp0 { color: var(--hp0); } .wlegend .hp0 i { background: var(--hp0-fill); }
+.wlegend .som { color: var(--somatic); }  .wlegend .som i { background: var(--somatic); }
+.wlegend .gl  { color: var(--germline); } .wlegend .gl i  { background: var(--germline); }
+.wlegend .art { color: var(--artifact); } .wlegend .art i { background: var(--artifact-fill); }
+.wlegend .met { color: var(--met); }   .wlegend .met i   { background: var(--met); border-radius: 50%; }
+.wlegend .unmet { color: var(--met); } .wlegend .unmet i { background: var(--paper); border-radius: 50%; }
+
+/* --- 數值讀出面板 -------------------------------------------------------- */
+.wreadout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 1px solid var(--rule);
+  font-size: .82rem;
+}
+.wreadout div { display: flex; flex-direction: column; gap: .1em; }
+.wreadout dt, .wreadout .k { color: var(--muted); font-size: .92em; }
+.wreadout dd, .wreadout .v {
+  margin: 0; font-family: var(--font-mono);
+  font-size: 1.15em; font-weight: 700; color: var(--ink);
+}
+.wreadout .v.hp1 { color: var(--hp1); }
+.wreadout .v.hp2 { color: var(--hp2); }
+.wreadout .v.som { color: var(--somatic); }
+.wreadout .v.bad { color: var(--bad); }
+.wreadout .v.ok  { color: var(--ok); }

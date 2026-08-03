@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-gloss="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>腫瘤樣本的混合組成 · 長讀癌症基因體學入門</title>
+<meta name="description" content="說明 purity、DNA fraction、ploidy、copy number、multiplicity、LOH 與 TINC 如何影響變異判讀，並檢視簡化模型的適用範圍。">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/diagram.css">
+<link rel="stylesheet" href="assets/css/widgets.css">
+<link rel="stylesheet" href="assets/css/print.css">
+<script>
+/* 主題 / 字級 / 詞彙語言：必須在第一次繪製前套用，否則會閃一下白底。
+   刻意寫成同步的 inline script，不可移到外部檔案。 */
+(function () {
+  try {
+    var s = JSON.parse(localStorage.getItem('ccu.lrcg.tutorial.v1') || '{}');
+    var ui = s.ui || {};
+    var d = document.documentElement;
+    if (ui.theme === 'dark' || ui.theme === 'light') d.setAttribute('data-theme', ui.theme);
+    if (ui.fontScale && ui.fontScale !== 'm') d.setAttribute('data-fs', ui.fontScale);
+    if (ui.glossLang) d.setAttribute('data-gloss', ui.glossLang);
+  } catch (e) { /* Safari 私密瀏覽會丟 QuotaExceededError，忽略即可 */ }
+})();
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要內容</a>
+
+<header class="site-header">
+  <div class="site-header__in">
+    <a class="brand" href="index.html">
+      長讀癌症基因體學 · 入門教材
+      <small>中正大學資工系 · 黃耀廷實驗室</small>
+    </a>
+    <span class="site-header__spacer"></span>
+
+    <span class="hgroup gloss-toggle" role="group" aria-label="術語定義語言">
+      <button type="button" class="hbtn" data-gloss-btn="zh"   aria-pressed="true">繁中</button>
+      <button type="button" class="hbtn" data-gloss-btn="en"   aria-pressed="false">English</button>
+      <button type="button" class="hbtn" data-gloss-btn="both" aria-pressed="false">雙語</button>
+    </span>
+
+    <button type="button" class="hbtn theme-toggle" data-theme-btn
+            aria-label="切換深色／淺色主題">◐</button>
+    <button type="button" class="hbtn" data-fs-btn aria-label="調整字級">A</button>
+    <a class="hbtn" href="glossary.html">完整術語表</a>
+  </div>
+</header>
+
+<div class="wrap ">
+  <main class="main" id="main">
+    <header class="mhead"><p class="mhead__kicker">模組 8 · Tumour mixtures</p><h1>腫瘤樣本的混合組成</h1><p class="mhead__sub">說明 purity、DNA fraction、ploidy、copy number、multiplicity、LOH 與 TINC 如何影響變異判讀，並檢視簡化模型的適用範圍。</p><p class="mhead__meta"><span class="chip">約 75 分鐘</span><a class="chip" href="m07.html">建議先修：Somatic variant calling</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>寫出 VAF、purity、copy number 與 multiplicity 之間的關係式，並說明每一項的角色</li><li>區分 tumor cellular purity 與 tumor DNA fraction，並說明兩者何時產生差異</li><li>區分 copy-loss LOH 與 copy-neutral LOH，並說明為什麼只看 coverage 會漏掉後者</li><li>解釋為什麼低 purity 讓 somatic calling 變困難</li></ul></section>
+
+<section data-part="why" class="part" id="part-why">
+<h2 data-num="①" id="為什麼重要">為什麼重要</h2>
+
+<p class="prose">本節用於檢驗腫瘤資料分析中的常見假設；這些概念也常在研究文獻中被混用或誤解。</p>
+
+<p class="prose">核心訊息是：<b>腫瘤資料中的觀測值通常同時受多項潛在因素影響。</b></p>
+</section>
+
+
+<section data-part="concept" class="part" id="part-concept">
+<h2 data-num="②" id="概念與互動">概念與互動</h2>
+
+<h3 id="vaf-的完整關係式">VAF 的完整關係式</h3>
+
+<p class="prose">M1 使用了簡化情境：「purity=0.5、樣本為 diploid，且每個腫瘤細胞帶有一份變異拷貝，因此 VAF 為 0.25」。在一般情況下，關係式為：</p>
+
+<pre><code>VAF = purity × multiplicity × CCF
+      ────────────────────────────────────
+      purity × totalCN + (1 − purity) × 2</code></pre>
+
+<p class="prose">這是理想化模型：正常細胞的拷貝數設為 2，tumor totalCN 在此位置可代表腫瘤群體，且 read depth 與 DNA 量近似成正比；
+實務上仍需考慮 allele-specific copy number、mapping／定序偏差與估計不確定性。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>符號</th><th>意思</th><th>是否可直接觀測</th></tr></thead>
+<tbody>
+<tr><td><code>purity</code></td><td><span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-purity-0">腫瘤細胞比例<span class="term__pop" id="gd-tumour-purity-0" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span></td><td>通常需估計</td></tr>
+<tr><td><code>totalCN</code></td><td>該位置的 <span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-copy-number-1">總拷貝數<span class="term__pop" id="gd-copy-number-1" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span>（整體平均值即 <span class="term" data-term="ploidy" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ploidy-2">ploidy<span class="term__pop" id="gd-ploidy-2" role="tooltip"><b class="term__hd">ploidy <i>倍性</i></b><span class="term__def" data-lang="zh">細胞內染色體套數。多數正常常染色體為 2（diploid）；腫瘤可呈現 3、4 或其他非整倍體狀態。</span><span class="term__def" data-lang="en">The number of chromosome sets in a cell. Most normal autosomal regions are diploid (2); tumours may be triploid, tetraploid or otherwise non-diploid.</span><a class="term__more" href="glossary.html#ploidy">完整條目 →</a></span></span>）</td><td>通常需估計</td></tr>
+<tr><td><code>multiplicity</code></td><td><span class="term" data-term="mutation multiplicity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-mutation-multiplicity-3">突變佔了幾份拷貝<span class="term__pop" id="gd-mutation-multiplicity-3" role="tooltip"><b class="term__hd">mutation multiplicity</b><span class="term__def" data-lang="zh">在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</span><span class="term__def" data-lang="en">How many mutant-allele copies are present in a cell carrying the mutation; a necessary term when converting VAF to cancer cell fraction.</span><a class="term__more" href="glossary.html#mutation-multiplicity">完整條目 →</a></span></span></td><td>通常需推論</td></tr>
+<tr><td><code>CCF</code></td><td><span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cancer-cell-fraction-4">帶有此突變的腫瘤細胞比例<span class="term__pop" id="gd-cancer-cell-fraction-4" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span></td><td>通常是分析所要估計的目標</td></tr>
+<tr><td><code>VAF</code></td><td>支持 alt 的 read 比例</td><td>可由 reads 估計</td></tr>
+</tbody>
+</table>
+</div>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" class="dia-svg" role="img">
+  <title>VAF 的組成與參數不可識別性</title>
+  <desc>上半部拆解 VAF 的分子與分母。
+        分母是這個位置上總共有幾份 DNA 被讀到，
+        由腫瘤細胞貢獻的份數加上正常細胞貢獻的份數組成。
+        分子是其中帶有這個變異的份數。
+        下半部示範：同一個 VAF 0.20 可由多種生物狀態產生，
+        因此僅依 VAF 通常無法直接反推出帶有此突變的細胞比例。</desc>
+
+  <!-- ══ 公式圖解 ══ -->
+  <text class="lbl bold zh" x="20" y="32">VAF 定義為「帶變異的份數 ÷ 總讀取份數」</text>
+
+  <!-- 分子 -->
+  <text class="anno bold zh somatic" x="20" y="80">分子</text>
+  <text class="tick zh" x="20" y="104">帶有變異的份數</text>
+
+  <rect class="bar somatic" x="200" y="62" width="120" height="30" rx="4"/>
+  <text class="tick mid zh" x="260" y="82">腫瘤細胞裡</text>
+  <text class="tick zh" x="336" y="82">× 每個細胞帶了幾份</text>
+  <text class="tick zh" x="336" y="102">× 有多少比例的腫瘤細胞帶著它</text>
+
+  <!-- 分隔線 -->
+  <line class="axis" x1="200" y1="126" x2="820" y2="126" stroke-width="3"/>
+
+  <!-- 分母 -->
+  <text class="anno bold zh" x="20" y="168">分母</text>
+  <text class="tick zh" x="20" y="192">總共讀到的份數</text>
+
+  <rect class="bar somatic" x="200" y="146" width="150" height="30" rx="4"/>
+  <text class="tick mid zh" x="275" y="166">腫瘤細胞貢獻</text>
+  <text class="anno mid" x="366" y="166">＋</text>
+  <rect class="bar" x="384" y="146" width="150" height="30" rx="4" fill="var(--muted-fill)" stroke="var(--rule-strong)"/>
+  <text class="tick mid zh" x="459" y="166">正常細胞貢獻</text>
+
+  <text class="tick zh" x="556" y="160">腫瘤那邊的份數取決於</text>
+  <text class="tick zh" x="556" y="182">該位置有幾份染色體</text>
+
+  <!-- 四個未知數 -->
+  <rect class="box warn" x="20" y="216" width="960" height="76" rx="8"/>
+  <text class="anno bold zh warn" x="42" y="244">VAF 可由 reads 估計；purity、copy number、multiplicity 與 CCF 通常需由多項證據推論：</text>
+  <text class="tick zh" x="42" y="274">① 腫瘤細胞佔多少比例　② 該位置有幾份染色體　③ 變異佔了幾份　④ 多少比例的腫瘤細胞帶著它</text>
+
+  <!-- ══ 三個例子：同一個 VAF ══ -->
+  <line class="axis" x1="20" y1="316" x2="980" y2="316"/>
+  <text class="lbl bold zh" x="20" y="348">同一個 VAF = 0.20，可由三種狀態產生</text>
+
+  <rect class="box plain" x="20" y="366" width="306" height="104" rx="8"/>
+  <text class="anno bold mid" x="173" y="394">情況 A</text>
+  <text class="tick mid zh" x="173" y="420">腫瘤佔 40%，兩份染色體</text>
+  <text class="tick mid zh" x="173" y="442">所有腫瘤細胞都帶著它</text>
+  <text class="tick mid zh ok bold" x="173" y="464">→ clonal 狀態（時間需其他證據）</text>
+
+  <rect class="box plain" x="346" y="366" width="306" height="104" rx="8"/>
+  <text class="anno bold mid" x="499" y="394">情況 B</text>
+  <text class="tick mid zh" x="499" y="420">腫瘤佔 80%，四份染色體</text>
+  <text class="tick mid zh" x="499" y="442">所有腫瘤細胞都帶著它</text>
+  <text class="tick mid zh ok bold" x="499" y="464">→ clonal 狀態（時間需其他證據）</text>
+
+  <rect class="box bad" x="672" y="366" width="308" height="104" rx="8"/>
+  <text class="anno bold mid bad" x="826" y="394">情況 C</text>
+  <text class="tick mid zh" x="826" y="420">腫瘤佔 80%，兩份染色體</text>
+  <text class="tick mid zh" x="826" y="442">但只有一半的腫瘤細胞有</text>
+  <text class="tick mid zh bad bold" x="826" y="464">→ subclonal CCF（時間需其他證據）</text>
+</svg><figcaption>圖上方拆解分子與分母：分母是此位置讀到的 DNA 總量，由腫瘤與正常細胞共同貢獻；分子是其中帶有變異的份數。下方示範<b>同一個 VAF 0.20 可由多種生物狀態產生</b>，僅第三例具有 subclonal CCF。</figcaption></figure>
+
+<p class="prose"><b>VAF 是可由 reads 估計的觀測量；purity、totalCN、multiplicity 與 CCF 通常需由多項證據估計或推論。</b>
+這些參數之間存在可識別性限制，因此「估計腫瘤細胞比例」本身就是一個獨立的研究題目。</p>
+
+<figure class="widget" data-widget="purity-vaf" data-wid="m08.vaf"><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>先以 CN=2、multiplicity=1、CCF=1 作為基準，確認曲線為 purity 的一半；再將 total CN 調至 3 或 4，比較曲線與右側 tumor DNA fraction 和 cellular purity 的差異。</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
+
+<aside class="guardrail" id="guard-3"><p class="guardrail__hd">重要區分 #3：VAF 不是 cancer cell fraction</p><p class="prose">上面的滑桿已經示範過了：同一個 VAF = 0.20，可能是</p>
+<ul class="prose">
+<li>purity 0.4、diploid、clonal 的突變，或</li>
+<li>purity 0.8、CN 4、multiplicity 1、clonal 的突變，或</li>
+<li>purity 0.8、diploid、CCF 只有 0.5 的 subclonal 突變</li>
+</ul>
+<p class="prose">三種情況的生物意義不同；第三例的 CCF=0.5 表示 subclonal，但 VAF 仍然相同。</p>
+<p class="prose">此限制已被列為後續工作：可納入 allele-specific CNV、LOH、tumor purity、DNA fraction 與 mutation multiplicity，
+以建立 CN-aware 的 read-AF 解讀。這是方法適用範圍的重要限制。</p></aside>
+
+<aside class="guardrail" id="guard-2"><p class="guardrail__hd">重要區分 #2：tumor cellular purity 不等於 tumor DNA fraction</p><p class="prose">注意上面關係式的<b>分母</b>：腫瘤細胞貢獻 <code>totalCN</code> 份 allele，
+正常細胞貢獻 2 份。當 <code>totalCN ≠ 2</code> 時，兩者就不成比例了。</p>
+<p class="prose">具體例子：一個四倍體腫瘤，50% 的細胞是腫瘤。</p>
+<ul class="prose">
+<li>cellular purity = <b>0.50</b>（一半的細胞）</li>
+<li>DNA fraction = <code>0.5×4 ÷ (0.5×4 + 0.5×2)</code> = <b>0.67</b>（三分之二的 DNA）</li>
+</ul>
+<p class="prose">在<b>依 coverage 混合 BAM</b> 的合成資料中，文件可能分別以 purity 或 DNA fraction 描述混合比例；
+這種命名差異不代表兩者在一般實際樣本中等同。只有在來源樣本接近純腫瘤、輸入深度已校正，且 tumor／normal 每細胞 DNA 量相近時，read fraction 才可近似目標 purity。</p></aside>
+
+<h3 id="loh-的常見機制及其可觀測差異">LOH 的常見機制及其可觀測差異</h3>
+
+<p class="prose"><span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-5">LOH<span class="term__pop" id="gd-loh-5" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 是「原本 heterozygous 的區域只剩下一種 allele」。
+但其形成機制不只一種；以下比較兩類常見情形：</p>
+
+<figure class="widget" data-widget="loh-sim" data-wid="m08.loh"><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>比較四種狀態，並特別觀察 <b>Copy-neutral LOH</b>：在理想示意中 coverage 近似正常，但 heterozygosity 降低。</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th></th><th>coverage（理想示意）</th><th>heterozygosity</th><th>僅依 coverage 是否可偵測</th></tr></thead>
+<tbody>
+<tr><td>正常</td><td>2×</td><td>1</td><td>—</td></tr>
+<tr><td><b>Copy-loss LOH</b></td><td>1×（理想上減少一半）</td><td>0</td><td>通常可見</td></tr>
+<tr><td><b>Copy-neutral LOH</b></td><td>2×（理想上不變）</td><td>0</td><td><b>難以由 coverage 單獨辨識</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<aside class="guardrail" id="guard-4"><p class="guardrail__hd">重要區分 #4：LOH 不等於缺失</p><p class="prose">copy-neutral LOH 可由有絲分裂重組或單親二倍體等機制造成；在一種常見情形中，一條 haplotype 遺失後由另一條複製補償，
+因此 copy number 仍為 2，但<b>兩份都來自同一個親代</b>。</p>
+<p class="prose">此類 LOH 可見於癌症（也可能涉及抑癌基因的 two-hit 機制）。在理想 copy-neutral 情況下，僅依 coverage 通常難以辨識，
+需結合 heterozygosity 或 allele balance。</p>
+<p class="prose"><b>LongPhase-TO 使用 heterozygosity ratio 提供 LOH 訊號</b>；此訊號可涵蓋兩類常見情形，但實際靈敏度仍受 purity、coverage 與標註影響。</p></aside>
+
+<h3 id="低-purity-對-somatic-variant-detection-的影響">低 purity 對 somatic variant detection 的影響</h3>
+
+<p class="prose">以下以數值示例說明：50× coverage、purity 0.2，以及一個 clonal 的 diploid somatic 變異：</p>
+
+<pre><code>預期 VAF   = 0.2 × 1 ÷ (0.2×2 + 0.8×2) = 0.10
+支持 read 數 = 50 × 0.10 = 5 條</code></pre>
+
+<p class="prose">因此預期僅有約五條支持 read。ONT 的錯誤率受 basecaller、序列脈絡與 read 品質影響；
+在此深度下，少量錯誤 read 可能與變異訊號重疊，降低可分辨性。</p>
+
+<p class="prose">這說明 LongPhase-S 為何採用 <b>purity 感知的過濾</b>：低 purity 通常需要重新校準過濾參數，
+並以驗證資料在 sensitivity 與 precision 間取得平衡。<br><br>
+在 LongPhase-S 的此實作中，流程先估計 purity，再依 purity 調整過濾參數；其他方法也可能採用聯合或迭代估計。</p>
+</section>
+
+
+<section data-part="evidence" class="part" id="part-evidence">
+<h2 data-num="③" id="真實證據">真實證據</h2>
+
+<p class="prose">LongPhase-S 以 <b>ASCAT</b> 作為 purity 估計的比較基準。ASCAT 是常用的 allele-specific copy-number、purity 與 ploidy 估計方法；
+具體適用範圍與資料平台應依研究設計說明。</p>
+
+<p class="prose">該研究報告 LongPhase-S 在<b>低 purity</b> 合成樣本上的估計誤差多數低於 10%，
+交叉驗證 MAE 約 4%、R² 約 0.95；解讀時應同時確認誤差定義、資料集與切分方式。</p>
+
+<p class="prose">這項比較僅涵蓋合成樣本，且<b>假設來源 tumor BAM 接近純腫瘤</b>。
+細胞株仍可能包含少量正常或異質細胞，因此此假設限定了 purity 結果的適用範圍。</p>
+
+<figure class="fig"><img src="assets/img/a/a-s31-f1-purity.webp" srcset="assets/img/a/a-s31-f1-purity.webp 1x, assets/img/a/a-s31-f1-purity@2x.webp 2x" alt="不同 tumor purity 下 somatic SNV calling 的 F1-score 折線圖，八個 cell line 分別呈現" loading="lazy" decoding="async"><figcaption>不同 purity 下的 F1-score。虛線是 caller 原始輸出，實線是加上 LongPhase-S 之後。在此資料中，多數曲線隨 purity 下降而下降，顯示低 purity 是常見困難；實際表現仍取決於方法與資料。</figcaption></figure>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">解讀合成資料結果時應明確標示的限制</p>
+<p class="prose">「本方法在標示為 purity 0.2（或 DNA fraction 0.2，依研究定義）的樣本上誤差小於 10%」應完整表述為「在<b>來源 tumor BAM 接近純腫瘤，並依指定 coverage／read fraction 混合的合成樣本</b>上，
+誤差小於 10%」。<br><br>
+實際檢體可能具有不同的細胞組成、拷貝數與技術變異；報告合成資料結果時，應同時說明合成方式與其前提。</p>
+</div>
+</section>
+
+
+<section data-part="predict" class="part" id="part-predict">
+<h2 data-num="④" id="先提出預測-再查看解答">先提出預測，再查看解答</h2>
+
+<div class="reveal__q"><p class="prose">兩個 somatic 變異在同一個腫瘤樣本裡，VAF 分別是 0.30 與 0.15。<br><br>
+可否僅據此判斷「第一個比第二個早發生」？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>不足以直接判斷，但可作為演化順序的線索。</b></p>
+<p class="prose">「較早發生的突變會被更多後代細胞繼承，所以 VAF 較高」這個推理在<b>其他條件相同</b>時成立。
+問題是其他條件經常不同：</p>
+<ul class="prose">
+<li>兩個位置的 <b>local copy number</b> 可能不一樣。CN=4 的位置上，同一個 CCF 會給出不同的 VAF。</li>
+<li><b>multiplicity</b> 可能不同。若突變所在的拷貝後續被保留並複製，multiplicity 可能 &gt; 1。</li>
+<li>其中一個可能落在 <b>LOH</b> 區域，VAF 會被推高。</li>
+</ul>
+<p class="prose">subclone 重建可使用此線索（稱為 <b>read-AF</b>）排序候選演化樹；
+該方法將其限定為「<b>只在最小成本候選集合形成之後</b>用來選擇與排序」，
+且<b>最高分並列時全部保留</b>，不強行決定唯一順序。</p>
+<p class="prose">此例示範以弱線索排序並保留不確定性的做法。</p></div></details>
+</section>
+
+
+<section data-part="practice" class="part" id="part-practice">
+<h2 data-num="⑤" id="實作練習">實作練習</h2>
+
+<h3 id="合成不同-dna-fraction-的混合樣本">合成不同 DNA fraction 的混合樣本</h3>
+
+<p class="prose">以下是評估混合樣本穩健性的常用設計之一：</p>
+
+<pre><code># 1. 先量測兩個 BAM 的有效 coverage
+mosdepth --by 500 tumor_cov  tumor.bam
+mosdepth --by 500 normal_cov normal.bam
+
+# 2. 依實測 coverage 計算抽樣比例（-s 的格式是 seed.fraction）
+#    只有輸入深度已標準化時，才可用 60%／40% 近似目標 DNA fraction
+samtools view -s 1.60 -b tumor.bam  &gt; t_sub.bam
+samtools view -s 1.40 -b normal.bam &gt; n_sub.bam
+
+# 3. 合併
+samtools merge dna_frac_0.6.bam t_sub.bam n_sub.bam
+samtools index dna_frac_0.6.bam</code></pre>
+
+<p class="cli-note">可建立 0.2 / 0.4 / 0.6 / 0.8 / 1.0 五個 DNA fraction 梯度，
+以評估方法在低 DNA fraction 條件下的效能變化；這是一組常見的基礎評估設計。</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">此合成流程的前提與限制</p>
+<p class="prose">上面的配方假設<b>來源 tumor BAM 接近純腫瘤，tumor／normal coverage 已校正，且每細胞 DNA 量差異可忽略</b>。
+實際細胞株可能仍包含少量正常或異質細胞。</p>
+<p class="prose">因此「本方法在標示為 purity 0.2（或 DNA fraction 0.2，依研究定義）時誤差小於 10%」應表述為「在<b>以此方式合成</b>的樣本上，誤差小於 10%」。
+此結果的適用範圍受合成方式與來源樣本前提限制。</p>
+</div>
+
+<h3 id="以-heterozygous-位點密度初步篩查-loh">以 heterozygous 位點密度初步篩查 LOH</h3>
+
+<pre><code># 計算沿染色體分箱的 het 位點密度
+# 需與配對 normal、鄰近可呼叫區域及 coverage 比較，以列出 LOH 候選
+bcftools view -H -g het sample.vcf | awk '{print $1, int($2/1000000)}' | \
+  sort | uniq -c | awk '{print $2, $3, $1}' | head -40</code></pre>
+
+<p class="prose">可呼叫區域的 het 密度受樣本、族群、coverage、caller 與過濾條件影響，應以配對 normal 或鄰近區段建立基線。
+若某區段密度顯著低於基線，可列為 LOH 候選；purity 混合可能保留部分 het reads，仍需結合 allele balance、coverage 與其他證據。</p>
+
+<section class="quiz" data-quiz="m08"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+</section>
+
+    <nav class="pager" aria-label="模組導覽"><a class="prev" href="m07.html"><small>← 上一模組</small>Somatic variant calling：tumor–normal 與 tumor-only</a><a class="next" href="m09.html"><small>下一模組 →</small>甲基化入門</a></nav>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>mutation multiplicity</dt><dd>在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</dd><dt>ploidy（倍性）</dt><dd>細胞內染色體套數。多數正常常染色體為 2（diploid）；腫瘤可呈現 3、4 或其他非整倍體狀態。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
+  </main>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#vaf-的完整關係式">VAF 的完整關係式</a></li><li class="lv3"><a href="#loh-的常見機制及其可觀測差異">LOH 的常見機制及其可觀測差異</a></li><li class="lv3"><a href="#低-purity-對-somatic-variant-detection-的影響">低 purity 對 somatic variant detection 的影響</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv2"><a href="#先提出預測-再查看解答">先提出預測，再查看解答</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#合成不同-dna-fraction-的混合樣本">合成不同 DNA fraction 的混合樣本</a></li><li class="lv3"><a href="#以-heterozygous-位點密度初步篩查-loh">以 heterozygous 位點密度初步篩查 LOH</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+</div>
+
+<footer class="site-footer">
+  本教材供中正大學資工系黃耀廷實驗室新進成員自學，聚焦
+  <code>LongPhase-S</code> 與 <code>LongPhase-TO</code> 的概念、證據與限制。
+</footer>
+
+
+<script src="assets/js/progress.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/glossary.js"></script>
+<script src="assets/js/quiz.js"></script>
+<script src="assets/data/quiz.data.js"></script>
+<script src="assets/js/widgets/loh-sim.js"></script>
+<script src="assets/js/widgets/purity-vaf.js"></script>
+</body>
+</html>

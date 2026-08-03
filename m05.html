@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-gloss="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Germline variant calling：從證據到判定 · 長讀癌症基因體學入門</title>
+<meta name="description" content="說明 Clair3 與 DeepVariant 的角色，以及 phasing 如何提供額外證據、協助區分變異與定序雜訊。">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/diagram.css">
+<link rel="stylesheet" href="assets/css/widgets.css">
+<link rel="stylesheet" href="assets/css/print.css">
+<script>
+/* 主題 / 字級 / 詞彙語言：必須在第一次繪製前套用，否則會閃一下白底。
+   刻意寫成同步的 inline script，不可移到外部檔案。 */
+(function () {
+  try {
+    var s = JSON.parse(localStorage.getItem('ccu.lrcg.tutorial.v1') || '{}');
+    var ui = s.ui || {};
+    var d = document.documentElement;
+    if (ui.theme === 'dark' || ui.theme === 'light') d.setAttribute('data-theme', ui.theme);
+    if (ui.fontScale && ui.fontScale !== 'm') d.setAttribute('data-fs', ui.fontScale);
+    if (ui.glossLang) d.setAttribute('data-gloss', ui.glossLang);
+  } catch (e) { /* Safari 私密瀏覽會丟 QuotaExceededError，忽略即可 */ }
+})();
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要內容</a>
+
+<header class="site-header">
+  <div class="site-header__in">
+    <a class="brand" href="index.html">
+      長讀癌症基因體學 · 入門教材
+      <small>中正大學資工系 · 黃耀廷實驗室</small>
+    </a>
+    <span class="site-header__spacer"></span>
+
+    <span class="hgroup gloss-toggle" role="group" aria-label="術語定義語言">
+      <button type="button" class="hbtn" data-gloss-btn="zh"   aria-pressed="true">繁中</button>
+      <button type="button" class="hbtn" data-gloss-btn="en"   aria-pressed="false">English</button>
+      <button type="button" class="hbtn" data-gloss-btn="both" aria-pressed="false">雙語</button>
+    </span>
+
+    <button type="button" class="hbtn theme-toggle" data-theme-btn
+            aria-label="切換深色／淺色主題">◐</button>
+    <button type="button" class="hbtn" data-fs-btn aria-label="調整字級">A</button>
+    <a class="hbtn" href="glossary.html">完整術語表</a>
+  </div>
+</header>
+
+<div class="wrap ">
+  <main class="main" id="main">
+    <header class="mhead"><p class="mhead__kicker">模組 5 · Germline variant calling</p><h1>Germline variant calling：從證據到判定</h1><p class="mhead__sub">說明 Clair3 與 DeepVariant 的角色，以及 phasing 如何提供額外證據、協助區分變異與定序雜訊。</p><p class="mhead__meta"><span class="chip">約 35 分鐘</span><a class="chip" href="m04.html">建議先修：資料格式</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說明 variant caller 在做什麼判斷，以及為什麼它不是單純數 read</li><li>說明 phasing 資訊如何作為辨識定序錯誤的輔助證據</li><li>說出 Clair3 與 DeepVariant 在流程中的位置</li><li>建立 precision、recall 與 F1 的基本概念，並說明三項指標各自衡量的內容</li></ul></section>
+
+<section data-part="why" class="part" id="part-why">
+<h2 data-num="①" id="為什麼重要">為什麼重要</h2>
+
+<p class="prose">本課程後續工具多以 caller 輸出的候選變異為輸入，進一步進行篩選或校正。
+因此需要先理解 caller 的輸出內容與限制。</p>
+
+<p class="prose">germline calling 的情境相對單純。本節先建立 <span class="term" data-term="precision" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-precision-0">precision<span class="term__pop" id="gd-precision-0" role="tooltip"><b class="term__hd">precision <i>精確率</i></b><span class="term__def" data-lang="zh">所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</span><span class="term__def" data-lang="en">Of the calls you made, the fraction that are correct: TP / (TP + FP).</span><a class="term__more" href="glossary.html#precision">完整條目 →</a></span></span> 與 <span class="term" data-term="recall" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-recall-1">recall<span class="term__pop" id="gd-recall-1" role="tooltip"><b class="term__hd">recall <i>召回率</i></b><span class="term__def" data-lang="zh">在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</span><span class="term__def" data-lang="en">Within a stated evaluation scope, the fraction of true positives that were found: TP / (TP + FN). With a fixed caller candidate set, post-filtering can preserve or lower recall but cannot recover variants the caller never emitted; report the candidate-set scope explicitly.</span><a class="term__more" href="glossary.html#recall">完整條目 →</a></span></span> 的基本直覺，
+再於 M07 延伸到 somatic calling 的額外因素。</p>
+</section>
+
+
+<section data-part="concept" class="part" id="part-concept">
+<h2 data-num="②" id="概念與互動">概念與互動</h2>
+
+<h3 id="變異檢測variant-calling從已比對-read-中判斷哪些位置具有足夠證據支持變異存在的過程-通常輸出-vcf-deciding-which-positions-genuinely-carry-variants-given-aligned-reads-outputs-a-vcf-完整條目-的判斷內容"><span class="term" data-term="variant calling" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-variant-calling-2">變異檢測<span class="term__pop" id="gd-variant-calling-2" role="tooltip"><b class="term__hd">variant calling</b><span class="term__def" data-lang="zh">從已比對 read 中判斷哪些位置具有足夠證據支持變異存在的過程，通常輸出 VCF。</span><span class="term__def" data-lang="en">Deciding which positions genuinely carry variants, given aligned reads. Outputs a VCF.</span><a class="term__more" href="glossary.html#variant-calling">完整條目 →</a></span></span>的判斷內容</h3>
+
+<p class="prose">僅依 read 計數時，某個位置有 30 條 read 支持 <code>A</code>、28 條支持 <code>G</code>，
+可提出 heterozygous 候選，但不能單獨判定為真變異。錯誤率較高的平台（例如部分 ONT 資料）可能在支持數中包含定序錯誤。</p>
+
+<p class="prose">以 <span class="term" data-term="Clair3" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clair3-3">Clair3<span class="term__pop" id="gd-clair3-3" role="tooltip"><b class="term__hd">Clair3</b><span class="term__def" data-lang="zh">以深度學習做 germline variant calling 的工具，長 read 上常用。</span><span class="term__def" data-lang="en">A deep-learning germline variant caller widely used for long reads.</span><a class="term__more" href="glossary.html#clair3">完整條目 →</a></span></span> 與 <span class="term" data-term="DeepVariant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-deepvariant-4">DeepVariant<span class="term__pop" id="gd-deepvariant-4" role="tooltip"><b class="term__hd">DeepVariant</b><span class="term__def" data-lang="zh">Google 開發的 germline variant caller，把 pileup 轉成影像再用 CNN 分類。</span><span class="term__def" data-lang="en">Google's germline variant caller; encodes pileups as images and classifies them with a CNN.</span><a class="term__more" href="glossary.html#deepvariant">完整條目 →</a></span></span> 為例，caller 使用深度學習模型整合多種 read、品質與比對特徵；
+不同 caller 的模型與特徵並不完全相同：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" class="dia-svg" role="img">
+  <title>僅依 read 計數不足；caller 可整合多類特徵</title>
+  <desc>左半部示意僅依兩種鹼基的 read 數量判斷：30 比 28 只能提出候選，不能單獨定案；
+        錯誤率較高的平台可能在支持數中包含定序錯誤。右半部示意模型可整合多類特徵，
+        例如鹼基數量、鹼基品質、比對品質、鄰近序列脈絡、比對型式，以及正反股向的平衡，
+        再輸出候選類別與信心分數；實際特徵依 caller 與版本而異。</desc>
+
+  <!-- ══ 左：僅依計數的簡化做法 ═════════════════════════════════ -->
+  <rect class="box bad" x="16" y="16" width="452" height="240" rx="10"/>
+  <text class="lbl bold zh" x="38" y="48">限制：僅依 read 計數</text>
+
+  <!-- 兩堆 read -->
+  <text class="tick zh" x="38" y="82">某個位置上：</text>
+
+  <rect class="bar" x="38" y="96" width="240" height="26" rx="4"/>
+  <text class="anno mid bold" x="158" y="115">30 條支持 A</text>
+
+  <rect class="bar" x="38" y="132" width="224" height="26" rx="4"/>
+  <text class="anno mid bold" x="150" y="151">28 條支持 G</text>
+
+  <text class="anno zh" x="300" y="118">30 比 28</text>
+  <text class="anno zh" x="300" y="146">觀測數接近</text>
+
+  <rect class="box plain" x="38" y="178" width="410" height="60" rx="6"/>
+  <text class="anno zh" x="58" y="204">可提出 heterozygous 候選</text>
+  <text class="tick zh bad bold" x="58" y="228">—— 不能單獨判定</text>
+
+  <!-- 問題所在 -->
+  <text class="lbl bold zh bad" x="38" y="292">限制</text>
+  <text class="anno zh" x="38" y="322">部分支持可能來自錯誤觀測：</text>
+
+  <rect class="bar" x="38" y="338" width="112" height="22" rx="4"/>
+  <text class="tick mid" x="94" y="354">14 個正確觀測</text>
+  <rect class="bar artifact" x="152" y="338" width="112" height="22" rx="4"/>
+  <text class="tick mid" x="208" y="354">14 個錯誤觀測</text>
+
+  <text class="anno zh bad bold" x="38" y="390">僅依數量無法區分這兩種情況。</text>
+
+  <!-- ══ 右：實際做法 ══════════════════════════════════════════ -->
+  <rect class="box accent" x="492" y="16" width="492" height="374" rx="10"/>
+  <text class="lbl bold zh" x="514" y="48">示意：整合多類特徵</text>
+
+  <!-- 六個特徵方塊 -->
+  <rect class="box plain" x="514" y="72" width="216" height="54" rx="6"/>
+  <text class="tick bold zh" x="530" y="96">每個鹼基的 read 數</text>
+  <text class="tick zh" x="530" y="116">基本特徵之一</text>
+
+  <rect class="box plain" x="746" y="72" width="216" height="54" rx="6"/>
+  <text class="tick bold zh" x="762" y="96">鹼基品質</text>
+  <text class="tick zh" x="762" y="116">該鹼基觀測的不確定性</text>
+
+  <rect class="box plain" x="514" y="136" width="216" height="54" rx="6"/>
+  <text class="tick bold zh" x="530" y="160">比對品質</text>
+  <text class="tick zh" x="530" y="180">read 對應此位置的可靠度</text>
+
+  <rect class="box plain" x="746" y="136" width="216" height="54" rx="6"/>
+  <text class="tick bold zh" x="762" y="160">周圍序列脈絡</text>
+  <text class="tick zh" x="762" y="180">是否造成重複或其他對齊歧義</text>
+
+  <rect class="box plain" x="514" y="200" width="216" height="54" rx="6"/>
+  <text class="tick bold zh" x="530" y="224">比對的形狀</text>
+  <text class="tick zh" x="530" y="244">附近有沒有插入或缺失</text>
+
+  <rect class="box plain" x="746" y="200" width="216" height="54" rx="6"/>
+  <text class="tick bold zh" x="762" y="224">正反股是否平衡</text>
+  <text class="tick zh" x="762" y="244">單股偏高：可能有 strand bias</text>
+
+  <!-- 匯入模型 -->
+  <path class="flow" d="M622,258 L622,282" marker-end="url(#arrow)"/>
+  <path class="flow" d="M854,258 L854,282" marker-end="url(#arrow)"/>
+
+  <rect class="box accent" x="558" y="288" width="360" height="56" rx="8"/>
+  <text class="anno mid bold zh" x="738" y="322">模型整合判斷</text>
+
+  <path class="flow" d="M738,346 L738,364" marker-end="url(#arrow)"/>
+  <text class="anno mid zh bold" x="738" y="382">候選類別與信心分數</text>
+
+  <!-- ══ 底部 ══════════════════════════════════════════════════ -->
+  <line class="axis" x1="20" y1="412" x2="980" y2="412"/>
+  <text class="anno zh bold" x="20" y="444">在腫瘤資料中，還可加入一項 haplotype 分布訊息 ——</text>
+  <text class="anno zh bold somatic" x="20" y="464">「支持這個候選的 read 是否集中於同一 haplotype」。</text>
+</svg><figcaption>左：僅依 read 計數時，30 比 28 只能提出候選，不能單獨定案；其中部分支持可能來自讀取錯誤。右：示意模型可整合多類 read、品質與比對特徵，再輸出候選類別與信心分數。</figcaption></figure>
+
+<h3 id="phasing-如何協助辨識定序雜訊">phasing 如何協助辨識定序雜訊</h3>
+
+<p class="prose">以下示範 read-level phasing 如何作為辨識候選變異的輔助證據：</p>
+
+<ul class="prose">
+<li><b>一般 heterozygous germline 變異</b>：在 phasing 與 mapping 品質可靠的簡化情境下，支持 read 往往較集中於同一條 <span class="term" data-term="haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-haplotype-5">haplotype<span class="term__pop" id="gd-haplotype-5" role="tooltip"><b class="term__hd">haplotype <i>單倍型</i></b><span class="term__def" data-lang="zh">同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</span><span class="term__def" data-lang="en">A set of variants that lie on the same physical chromosome copy and are inherited together.</span><a class="term__more" href="glossary.html#haplotype">完整條目 →</a></span></span>。</li>
+<li><b>隨機定序錯誤</b>：通常較分散於 HP1 與 HP2；但系統性錯誤、mapping bias、copy-number／LOH 或 phasing 錯誤可能不符合此模式。</li>
+</ul>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img">
+  <title>以 haplotype 分布作為候選判讀的輔助證據</title>
+  <desc>兩邊示意同一種畫面：中間是待判斷的候選位置，左右兩側各有一個已知參考位點，
+        用來把 read 分成兩個 haplotype 群組。左半部示意在一般 heterozygous、相位可靠的情境下，
+        支持 read 較集中於一群；右半部示意隨機錯誤的支持 read 可能分布於兩群。
+        系統性錯誤、mapping bias、copy-number／LOH 或 phasing 錯誤可能不符合此簡化模式。
+        最下方比較兩邊的數量與分布，說明僅依 read 數量可能無法區分。</desc>
+
+  <!-- ══════════════ 左：真的變異 ══════════════ -->
+  <rect class="box ok" x="16" y="16" width="472" height="410" rx="10"/>
+  <text class="lbl bold zh ok" x="38" y="48">候選變異（示例）</text>
+  <text class="tick zh" x="38" y="70">簡化情境：支持 read 多集中於<tspan class="bold">一群</tspan></text>
+
+  <!-- 欄位導引 -->
+  <line class="guide" x1="130" y1="92" x2="130" y2="332"/>
+  <line class="guide" x1="252" y1="88" x2="252" y2="336"/>
+  <line class="guide" x1="374" y1="92" x2="374" y2="332"/>
+  <text class="tick mid" x="130" y="94">參考點</text>
+  <text class="tick mid somatic bold" x="252" y="92">候選</text>
+  <text class="tick mid" x="374" y="94">參考點</text>
+
+  <!-- HP1 群：全部帶有候選變異 -->
+  <text class="tick hp1 bold" x="38" y="118">HP1</text>
+  <rect class="read hp1" x="46" y="104" width="410" height="13" rx="6.5"/>
+  <text class="base a mono" x="130" y="115" font-size="14">A</text>
+  <circle class="mark somatic" cx="252" cy="110" r="5"/>
+  <text class="base g mono" x="374" y="115" font-size="14">G</text>
+
+  <rect class="read hp1" x="52" y="123" width="400" height="13" rx="6.5"/>
+  <text class="base a mono" x="130" y="134" font-size="14">A</text>
+  <circle class="mark somatic" cx="252" cy="129" r="5"/>
+  <text class="base g mono" x="374" y="134" font-size="14">G</text>
+
+  <rect class="read hp1" x="42" y="142" width="415" height="13" rx="6.5"/>
+  <text class="base a mono" x="130" y="153" font-size="14">A</text>
+  <circle class="mark somatic" cx="252" cy="148" r="5"/>
+  <text class="base g mono" x="374" y="153" font-size="14">G</text>
+
+  <rect class="read hp1" x="56" y="161" width="398" height="13" rx="6.5"/>
+  <text class="base a mono" x="130" y="172" font-size="14">A</text>
+  <circle class="mark somatic" cx="252" cy="167" r="5"/>
+  <text class="base g mono" x="374" y="172" font-size="14">G</text>
+
+  <rect class="read hp1" x="48" y="180" width="405" height="13" rx="6.5"/>
+  <text class="base a mono" x="130" y="191" font-size="14">A</text>
+  <circle class="mark somatic" cx="252" cy="186" r="5"/>
+  <text class="base g mono" x="374" y="191" font-size="14">G</text>
+
+  <!-- 分隔 -->
+  <line class="guide" x1="38" y1="204" x2="466" y2="204"/>
+
+  <!-- HP2 群：此示例沒有候選訊號 -->
+  <text class="tick hp2 bold" x="38" y="232">HP2</text>
+  <rect class="read hp2" x="44" y="218" width="412" height="13" rx="6.5"/>
+  <text class="base t mono" x="130" y="229" font-size="14">T</text>
+  <circle class="mark ref" cx="252" cy="224" r="5"/>
+  <text class="base c mono" x="374" y="229" font-size="14">C</text>
+
+  <rect class="read hp2" x="54" y="237" width="400" height="13" rx="6.5"/>
+  <text class="base t mono" x="130" y="248" font-size="14">T</text>
+  <circle class="mark ref" cx="252" cy="243" r="5"/>
+  <text class="base c mono" x="374" y="248" font-size="14">C</text>
+
+  <rect class="read hp2" x="46" y="256" width="408" height="13" rx="6.5"/>
+  <text class="base t mono" x="130" y="267" font-size="14">T</text>
+  <circle class="mark ref" cx="252" cy="262" r="5"/>
+  <text class="base c mono" x="374" y="267" font-size="14">C</text>
+
+  <rect class="read hp2" x="50" y="275" width="404" height="13" rx="6.5"/>
+  <text class="base t mono" x="130" y="286" font-size="14">T</text>
+  <circle class="mark ref" cx="252" cy="281" r="5"/>
+  <text class="base c mono" x="374" y="286" font-size="14">C</text>
+
+  <rect class="read hp2" x="42" y="294" width="414" height="13" rx="6.5"/>
+  <text class="base t mono" x="130" y="305" font-size="14">T</text>
+  <circle class="mark ref" cx="252" cy="300" r="5"/>
+  <text class="base c mono" x="374" y="305" font-size="14">C</text>
+
+  <!-- 左側統計 -->
+  <rect class="box ok" x="38" y="348" width="428" height="62" rx="8"/>
+  <text class="anno bold zh ok" x="58" y="376">支持 read 集中於 HP1</text>
+  <text class="tick mono" x="58" y="400">HP1: 5 條　　HP2: 0 條</text>
+  <text class="lbl bold ok" x="336" y="390">分布集中</text>
+
+  <!-- ══════════════ 右：定序錯誤 ══════════════ -->
+  <rect class="box bad" x="512" y="16" width="472" height="410" rx="10"/>
+  <text class="lbl bold zh bad" x="534" y="48">隨機錯誤（示例）</text>
+  <text class="tick zh" x="534" y="70">支持 read 可能<tspan class="bold">分散</tspan>於兩群</text>
+
+  <line class="guide" x1="626" y1="92" x2="626" y2="332"/>
+  <line class="guide" x1="748" y1="88" x2="748" y2="336"/>
+  <line class="guide" x1="870" y1="92" x2="870" y2="332"/>
+  <text class="tick mid" x="626" y="94">參考點</text>
+  <text class="tick mid artifact bold" x="748" y="92">候選</text>
+  <text class="tick mid" x="870" y="94">參考點</text>
+
+  <!-- HP1 群：只有兩條帶有 -->
+  <text class="tick hp1 bold" x="534" y="118">HP1</text>
+  <rect class="read hp1" x="542" y="104" width="410" height="13" rx="6.5"/>
+  <text class="base a mono" x="626" y="115" font-size="14">A</text>
+  <circle class="mark artifact" cx="748" cy="110" r="5"/>
+  <text class="base g mono" x="870" y="115" font-size="14">G</text>
+
+  <rect class="read hp1" x="548" y="123" width="400" height="13" rx="6.5"/>
+  <text class="base a mono" x="626" y="134" font-size="14">A</text>
+  <circle class="mark ref" cx="748" cy="129" r="5"/>
+  <text class="base g mono" x="870" y="134" font-size="14">G</text>
+
+  <rect class="read hp1" x="538" y="142" width="415" height="13" rx="6.5"/>
+  <text class="base a mono" x="626" y="153" font-size="14">A</text>
+  <circle class="mark ref" cx="748" cy="148" r="5"/>
+  <text class="base g mono" x="870" y="153" font-size="14">G</text>
+
+  <rect class="read hp1" x="552" y="161" width="398" height="13" rx="6.5"/>
+  <text class="base a mono" x="626" y="172" font-size="14">A</text>
+  <circle class="mark artifact" cx="748" cy="167" r="5"/>
+  <text class="base g mono" x="870" y="172" font-size="14">G</text>
+
+  <rect class="read hp1" x="544" y="180" width="405" height="13" rx="6.5"/>
+  <text class="base a mono" x="626" y="191" font-size="14">A</text>
+  <circle class="mark ref" cx="748" cy="186" r="5"/>
+  <text class="base g mono" x="870" y="191" font-size="14">G</text>
+
+  <line class="guide" x1="534" y1="204" x2="962" y2="204"/>
+
+  <!-- HP2 群：也有兩條帶有 -->
+  <text class="tick hp2 bold" x="534" y="232">HP2</text>
+  <rect class="read hp2" x="540" y="218" width="412" height="13" rx="6.5"/>
+  <text class="base t mono" x="626" y="229" font-size="14">T</text>
+  <circle class="mark artifact" cx="748" cy="224" r="5"/>
+  <text class="base c mono" x="870" y="229" font-size="14">C</text>
+
+  <rect class="read hp2" x="550" y="237" width="400" height="13" rx="6.5"/>
+  <text class="base t mono" x="626" y="248" font-size="14">T</text>
+  <circle class="mark ref" cx="748" cy="243" r="5"/>
+  <text class="base c mono" x="870" y="248" font-size="14">C</text>
+
+  <rect class="read hp2" x="542" y="256" width="408" height="13" rx="6.5"/>
+  <text class="base t mono" x="626" y="267" font-size="14">T</text>
+  <circle class="mark artifact" cx="748" cy="262" r="5"/>
+  <text class="base c mono" x="870" y="267" font-size="14">C</text>
+
+  <rect class="read hp2" x="546" y="275" width="404" height="13" rx="6.5"/>
+  <text class="base t mono" x="626" y="286" font-size="14">T</text>
+  <circle class="mark ref" cx="748" cy="281" r="5"/>
+  <text class="base c mono" x="870" y="286" font-size="14">C</text>
+
+  <rect class="read hp2" x="538" y="294" width="414" height="13" rx="6.5"/>
+  <text class="base t mono" x="626" y="305" font-size="14">T</text>
+  <circle class="mark artifact" cx="748" cy="300" r="5"/>
+  <text class="base c mono" x="870" y="305" font-size="14">C</text>
+
+  <rect class="box bad" x="534" y="348" width="428" height="62" rx="8"/>
+  <text class="anno bold zh bad" x="554" y="376">兩群皆有支持，分布較分散</text>
+  <text class="tick mono" x="554" y="400">HP1: 2 條　　HP2: 3 條</text>
+  <text class="lbl bold bad" x="832" y="390">分布分散</text>
+
+  <!-- ══════════════ 結論 ══════════════ -->
+  <line class="axis" x1="20" y1="448" x2="980" y2="448"/>
+
+  <text class="lbl bold zh" x="20" y="480">支持 read 的 haplotype 分布可作為重要輔助線索。</text>
+  <text class="anno zh" x="20" y="512">此示例兩邊的<tspan class="bold">總數相近</tspan>（5 條對 5 條）—— 僅依數量難以區分，</text>
+  <text class="anno zh" x="20" y="542">需先建立 HP1／HP2 分群，再結合品質、比對與其他證據判讀。</text>
+</svg><figcaption>兩邊示意同一種畫面：中間是待判斷的候選位置，左右各有一個已知參考位點，將 read 分成兩個 haplotype 群組。左邊示意支持 read 集中於一群；右邊示意支持 read 分布於兩群。兩邊的<b>總數相近</b>，因此僅依數量難以區分，仍需整合品質與比對證據。</figcaption></figure>
+
+<p class="prose">換句話說，「這個候選的支持 read 是否集中在單一 haplotype 上」可作為重要的輔助特徵。
+後續模組會在不同情境中再次使用這項訊息：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>應用情境</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td>germline calling（本節）</td><td>支持 read 分布分散 → 可列為定序錯誤的候選訊號</td></tr>
+<tr><td>LongPhase-S 的 read-level filter</td><td>somatic read 若同時帶有 HP1 與 HP2 的 germline allele → 可疑</td></tr>
+<tr><td>LongPhase-S 的 haplotype origin filter</td><td>若資料可可靠建立 haplotype origin，somatic-supporting read 的分布可作為來源判定的輔助證據；CN／LOH 等情況需另行評估</td></tr>
+<tr><td>LongPhase-TO / D 的 triplet graph</td><td>候選點與左右兩個 germline 位點的連結樣態</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">在本節示例中，<b>「分布集中或分散」是重要線索之一</b>，但不能取代品質、比對與 copy-number 等證據。</p>
+
+<h3 id="precision-與-recall-基礎概念">precision 與 recall：基礎概念</h3>
+
+<p class="prose">評估 caller 時，至少應同時查看 precision 與 recall。假設 benchmark 標示某區域有 100 個真變異，
+而 caller 報告 90 個，其中 80 個為真變異：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>指標</th><th>計算方式</th><th>這個例子</th><th>解讀問題</th></tr></thead>
+<tbody>
+<tr><td><span class="term" data-term="precision" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-precision-6">precision<span class="term__pop" id="gd-precision-6" role="tooltip"><b class="term__hd">precision <i>精確率</i></b><span class="term__def" data-lang="zh">所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</span><span class="term__def" data-lang="en">Of the calls you made, the fraction that are correct: TP / (TP + FP).</span><a class="term__more" href="glossary.html#precision">完整條目 →</a></span></span></td><td>TP ÷（TP + FP）</td><td>80 ÷ 90 = <b>0.89</b></td><td>報告的候選中有多少為真變異？</td></tr>
+<tr><td><span class="term" data-term="recall" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-recall-7">recall<span class="term__pop" id="gd-recall-7" role="tooltip"><b class="term__hd">recall <i>召回率</i></b><span class="term__def" data-lang="zh">在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</span><span class="term__def" data-lang="en">Within a stated evaluation scope, the fraction of true positives that were found: TP / (TP + FN). With a fixed caller candidate set, post-filtering can preserve or lower recall but cannot recover variants the caller never emitted; report the candidate-set scope explicitly.</span><a class="term__more" href="glossary.html#recall">完整條目 →</a></span></span></td><td>TP ÷（TP + FN）</td><td>80 ÷ 100 = <b>0.80</b></td><td>所有真變異中有多少被找出？</td></tr>
+<tr><td><span class="term" data-term="F1" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-f1-8">F1<span class="term__pop" id="gd-f1-8" role="tooltip"><b class="term__hd">F1</b><span class="term__def" data-lang="zh">precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。</span><span class="term__def" data-lang="en">The harmonic mean of precision and recall. A precision gain has little effect when false negatives dominate the evaluation.</span><a class="term__more" href="glossary.html#f1">完整條目 →</a></span></span></td><td>兩者的調和平均</td><td><b>0.84</b></td><td>同時摘要 precision 與 recall</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">調整判定門檻通常會改變 precision–recall trade-off：放寬門檻可能提高 recall，收緊門檻可能提高 precision，
+但實際方向與幅度取決於資料與模型。M10 的滑桿示範：<b>precision 增加時，F1 不一定同步增加相同幅度。</b></p>
+</section>
+
+
+<section data-part="evidence" class="part" id="part-evidence">
+<h2 data-num="③" id="真實證據">真實證據</h2>
+
+<p class="prose">本教材示例使用 <span class="term" data-term="Clair3" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clair3-9">Clair3<span class="term__pop" id="gd-clair3-9" role="tooltip"><b class="term__hd">Clair3</b><span class="term__def" data-lang="zh">以深度學習做 germline variant calling 的工具，長 read 上常用。</span><span class="term__def" data-lang="en">A deep-learning germline variant caller widely used for long reads.</span><a class="term__more" href="glossary.html#clair3">完整條目 →</a></span></span>；部分流程也會使用 PEPPER-Margin-DeepVariant。
+以下提供一組示範指令：</p>
+
+<pre><code>docker run \
+  -v &quot;${INPUT_DIR}&quot;:&quot;${INPUT_DIR}&quot; \
+  -v &quot;${OUTPUT_DIR}&quot;:&quot;${OUTPUT_DIR}&quot; \
+  kishwars/pepper_deepvariant:r0.7 \
+  run_pepper_margin_deepvariant call_variant \
+  -b &quot;${INPUT_DIR}/alignment.bam&quot; \
+  -f &quot;${INPUT_DIR}/reference.fasta&quot; \
+  -o &quot;${OUTPUT_DIR}&quot; \
+  -t 10 \
+  --ont_r9_guppy5_sup</code></pre>
+
+<p class="cli-note">最後的 <code>--ont_r9_guppy5_sup</code> 是與特定 ONT 化學版本／basecaller 資料相容的模型選項。
+R10 與 PacBio HiFi 應依所用版本文件選擇相容模型（例如 <code>--ont_r10_q20</code> 或 <code>--hifi</code>）。
+模型不匹配可能降低效能，且流程未必報錯；請將平台、basecaller 與模型版本記錄於 <span class="term" data-term="provenance" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-provenance-10">provenance<span class="term__pop" id="gd-provenance-10" role="tooltip"><b class="term__hd">provenance <i>資料來源履歷</i></b><span class="term__def" data-lang="zh">記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。</span><span class="term__def" data-lang="en">The full origin record of a dataset. In this lab it is a first-class experimental variable, not metadata.</span><a class="term__more" href="glossary.html#provenance">完整條目 →</a></span></span>。</p>
+
+<p class="prose">在本教材流程中，germline VCF 產生後，再由後續 phasing 工具使用其中的 heterozygous 位點作為錨點。
+這是本流程的先 call、再 phase 順序；其他工具可能採用不同的整合方式。</p>
+</section>
+
+
+<section data-part="predict" class="part" id="part-predict">
+<h2 data-num="④" id="判讀練習">判讀練習</h2>
+
+<div class="reveal__q"><p class="prose">某個位點有 50 條 read 覆蓋，其中 25 條支持 alt allele（VAF = 0.5）。
+檢查這 25 條 read 的 <span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-hp-tag-11">HP tag<span class="term__pop" id="gd-hp-tag-11" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span>，發現 13 條屬於 HP1、12 條屬於 HP2。<br><br>
+請判斷此分布較支持一般 germline 變異，還是定序錯誤／比對假訊號，並說明需要補充哪些證據。</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>在相位與 mapping 品質可靠、且未見 CN／LOH 等因素時，這個分布與一般 heterozygous germline 模式不一致，可列為可疑訊號。</b></p>
+<p class="prose">一般 heterozygous germline 變異預期位於其中一條染色體，因此支持 read 往往較集中於 HP1 或 HP2；13 比 12 的分布需要結合其他證據判讀，不能單獨定義為錯誤。</p>
+<p class="prose">接近均分的支持 read 可與隨機錯誤一致，但系統性錯誤、mapping bias、相位錯誤或腫瘤區域的 copy-number 狀態也可能造成類似結果。</p>
+<p class="prose">另需注意以下情況：</p>
+<ul class="prose">
+<li>若位點的 DNA 拷貝數相對一般二倍體狀態改變，haplotype 比例可能失衡</li>
+<li>若為 <b>homozygous</b> 變異，兩條 haplotype 都可能帶有該 allele；VAF 仍會受 copy number、污染與測序品質影響，不必然等於 1.0</li>
+</ul>
+<p class="prose">因此，VAF = 0.5 加上 HP 近乎均分只能提高可疑程度，仍需搭配 allele balance、base／mapping quality 與 copy-number 證據。</p></div></details>
+</section>
+
+
+<section data-part="practice" class="part" id="part-practice">
+<h2 data-num="⑤" id="實作練習">實作練習</h2>
+
+<h3 id="執行一次-germline-calling">執行一次 germline calling</h3>
+
+<pre><code># Clair3（Docker 範例；請依環境調整路徑）
+docker run -v &quot;${INPUT_DIR}&quot;:&quot;${INPUT_DIR}&quot; -v &quot;${OUTPUT_DIR}&quot;:&quot;${OUTPUT_DIR}&quot; \
+  hkubal/clair3:latest \
+  /opt/bin/run_clair3.sh \
+  --bam_fn=&quot;${INPUT_DIR}/aln.bam&quot; \
+  --ref_fn=&quot;${INPUT_DIR}/reference.fasta&quot; \
+  --threads=10 \
+  --platform=&quot;ont&quot; \
+  --model_path=&quot;/opt/models/ont&quot; \
+  --output=&quot;${OUTPUT_DIR}&quot;</code></pre>
+
+<p class="cli-note">模型應與定序化學版本、basecaller 與工具版本相容。模型不匹配可能降低效能，
+且未必觸發錯誤；請在執行前核對模型文件，並將設定記錄於 provenance。</p>
+
+<h3 id="檢查結果的合理性">檢查結果的合理性</h3>
+
+<p class="prose">取得 VCF 後，先進行以下基本合理性檢查：</p>
+
+<pre><code># 變異總數；典型高品質人類全基因體 callset 約為數百萬筆，實際值依篩選條件而異
+bcftools view -H out.vcf | wc -l
+
+# het 與 hom 的比例；實際值依族群、平台與篩選條件而異
+bcftools view -H -g het out.vcf | wc -l
+bcftools view -H -g hom out.vcf | wc -l
+
+# SNV 與 indel 的比例；實際值依平台與篩選條件而異
+bcftools view -H -v snps out.vcf | wc -l
+bcftools view -H -v indels out.vcf | wc -l</code></pre>
+
+<p class="prose">這些統計若明顯偏離同類資料的預期，可能提示 coverage、模型相容性、參數、過濾條件或樣本品質問題。
+請先檢查原因，再進行 phasing，以降低問題在後續流程中傳遞的風險。</p>
+
+<section class="quiz" data-quiz="m05"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+</section>
+
+    <nav class="pager" aria-label="模組導覽"><a class="prev" href="m04.html"><small>← 上一模組</small>資料格式讀寫能力</a><a class="next" href="m06.html"><small>下一模組 →</small>Phasing 與 haplotagging</a></nav>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>Clair3</dt><dd>以深度學習做 germline variant calling 的工具，長 read 上常用。</dd><dt>DeepVariant</dt><dd>Google 開發的 germline variant caller，把 pileup 轉成影像再用 CNN 分類。</dd><dt>F1</dt><dd>precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>haplotype（單倍型）</dt><dd>同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</dd><dt>precision（精確率）</dt><dd>所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</dd><dt>provenance（資料來源履歷）</dt><dd>記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。</dd><dt>recall（召回率）</dt><dd>在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</dd><dt>variant calling</dt><dd>從已比對 read 中判斷哪些位置具有足夠證據支持變異存在的過程，通常輸出 VCF。</dd></dl></section>
+  </main>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#變異檢測variant-calling從已比對-read-中判斷哪些位置具有足夠證據支持變異存在的過程-通常輸出-vcf-deciding-which-positions-genuinely-carry-variants-given-aligned-reads-outputs-a-vcf-完整條目-的判斷內容">變異檢測variant calling從已比對 read 中判斷哪些位置具有足夠證據支持變異存在的過程，通常輸出 VCF。Deciding which positions genuinely carry variants, given aligned reads. Outputs a VCF.完整條目 →的判斷內容</a></li><li class="lv3"><a href="#phasing-如何協助辨識定序雜訊">phasing 如何協助辨識定序雜訊</a></li><li class="lv3"><a href="#precision-與-recall-基礎概念">precision 與 recall：基礎概念</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行一次-germline-calling">執行一次 germline calling</a></li><li class="lv3"><a href="#檢查結果的合理性">檢查結果的合理性</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+</div>
+
+<footer class="site-footer">
+  本教材供中正大學資工系黃耀廷實驗室新進成員自學，聚焦
+  <code>LongPhase-S</code> 與 <code>LongPhase-TO</code> 的概念、證據與限制。
+</footer>
+
+<svg class="tw-defs" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+  </marker></defs></svg>
+<script src="assets/js/progress.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/glossary.js"></script>
+<script src="assets/js/quiz.js"></script>
+<script src="assets/data/quiz.data.js"></script>
+</body>
+</html>
