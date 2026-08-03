@@ -59,6 +59,14 @@
 .dia-svg .base.t { fill: var(--base-t); }
 .dia-svg .base.n { fill: var(--muted); }
 
+/* --- 檢體來源：人體剪影與試管 -------------------------------------------- */
+.dia-svg .body    { fill: var(--muted-fill); stroke: var(--rule-strong); stroke-width: 2;
+                    stroke-linejoin: round; }
+.dia-svg .organ   { fill: var(--paper); stroke: var(--rule-strong); stroke-width: 1.5; }
+.dia-svg .organ.somatic { fill: var(--somatic-fill); stroke: var(--somatic); stroke-width: 2; }
+.dia-svg .vial    { fill: var(--paper); stroke: var(--rule-strong); stroke-width: 2.5;
+                    stroke-linejoin: round; stroke-linecap: round; }
+
 /* --- 細胞 ---------------------------------------------------------------- */
 .dia-svg .cell { stroke-width: 2; }
 .dia-svg .cell.normal { fill: var(--muted-fill); stroke: var(--rule-strong); }
