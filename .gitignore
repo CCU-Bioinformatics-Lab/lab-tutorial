@@ -2,6 +2,10 @@
 *.pptx
 node_modules/
 dist/
+.next/
+next-env.d.ts
+public/
+app/site-pages.data.mjs
 .env
 .env.*
 !.env.example

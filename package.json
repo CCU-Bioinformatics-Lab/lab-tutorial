@@ -3,9 +3,16 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "build": "vite build"
+    "build": "node tools/prepare_sites_runtime.mjs && vinext build"
   },
   "devDependencies": {
-    "vite": "^7.0.0"
-  }
+    "@vitejs/plugin-rsc": "^0.5.32",
+    "vite": "^8.2.0"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "vinext": "^1.0.0-beta.4"
+  },
+  "type": "module"
 }
