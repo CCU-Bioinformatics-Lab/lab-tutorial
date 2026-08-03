@@ -13,7 +13,10 @@ window.TW = window.TW || {};
 
   /* ---------------------------------------------------------- widget 註冊 -- */
 
-  TW.widgets = Object.create(null);
+  /* 用 ||：萬一 core.js 被重複載入，不要把已註冊的 widget 清掉。
+     （曾經發生過：產生器的 $' 陷阱讓 shell 尾巴重複，core.js 被載入兩次，
+     第二次把註冊表洗掉，整頁 widget 全掛。） */
+  TW.widgets = TW.widgets || Object.create(null);
 
   /** 註冊一個 widget 型別。factory(root, cfg) 需回傳實作契約的物件。 */
   TW.define = function (name, factory) { TW.widgets[name] = factory; };

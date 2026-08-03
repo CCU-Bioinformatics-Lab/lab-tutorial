@@ -219,6 +219,31 @@ for (const f of [...html, path.join(SRC, 'data/quizzes.json'), path.join(SRC, 'd
   }
 }
 
+/* ── 10.5 頁面結構不得重複 ────────────────────────────────────────────
+   曾經發生過：內容裡的 grep 指令含有 `$'`，而 String.replace 的
+   *替換字串* 會把 $' 解讀成「插入比對位置之後的全部內容」，
+   於是整個 shell 尾巴被重新插了一次 —— core.js 被載入兩次，
+   第二次把 widget 註冊表清空，該頁所有互動元件靜默失效。
+   產生器已改用函式形式的替換，這裡是防回歸。                            */
+
+for (const f of html) {
+  const s = fs.readFileSync(f, 'utf8');
+  for (const [tag, re] of [['</body>', /<\/body>/g], ['</html>', /<\/html>/g],
+                           ['<!doctype', /<!doctype/gi]]) {
+    const n = (s.match(re) || []).length;
+    if (n > 1) fail(rel(f), `${tag} 出現 ${n} 次 —— 頁面結構重複（檢查替換字串裡的 $' 與 $\``);
+  }
+  const dupScript = {};
+  for (const m of s.matchAll(/<script src="([^"]+)"/g)) {
+    dupScript[m[1]] = (dupScript[m[1]] || 0) + 1;
+  }
+  const dups = Object.entries(dupScript).filter(([, n]) => n > 1);
+  if (dups.length) {
+    fail(rel(f), `同一支 JS 被載入多次：${dups.map(([k, n]) => `${k}×${n}`).join(', ')}` +
+                 ` —— core.js 重複載入會清空 widget 註冊表`);
+  }
+}
+
 /* ── 11. 十個「不要搞混」警告框必須全部就位 ──────────────────────────
    這十個處理的是新人一定會誤解、而且錯了會影響結論的地方。
    它們是本教材相對於原始素材最大的增值，改寫內容時很容易不小心刪掉 ——
