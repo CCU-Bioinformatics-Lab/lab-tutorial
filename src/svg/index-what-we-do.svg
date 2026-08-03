@@ -1,203 +1,195 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 668">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 762">
   <title>這個實驗室在寫什麼軟體</title>
-  <desc>由上而下三層。第一層是輸入：一管檢體裡同時有正常細胞與癌細胞，定序機把 DNA 打斷成片段逐條讀出，
-        得到一堆長得一樣的字串；字串本身沒有標記來源，也沒有標記哪個字母是機器讀錯的。
-        第二層是本實驗室開發的 C++ 軟體。第三層是輸出：每一條片段被判回它屬於哪一份 DNA，
-        哪些變異是癌細胞才有的，以及這管檢體裡癌細胞佔多少比例。</desc>
+  <desc>由上而下三層。第一層是輸入：從病人的腫瘤處取檢體，取到的細胞裡本來就同時有癌細胞與正常細胞；
+        定序機把裡面的 DNA 打斷成片段逐條讀出，得到一疊長得一樣的字串，字串本身沒有標記來源，
+        也沒有標記哪個字母是機器讀錯的。第二層是本實驗室開發的 C++ 軟體。
+        第三層是輸出：人的染色體是成對的，一條來自父親一條來自母親；
+        同樣那幾條片段被判回它來自哪一條，其中兩條帶有癌細胞才有的變異，
+        並可據此估算這個檢體裡癌細胞佔多少比例。
+        軟體只分得出這是兩條不同的染色體，要知道哪一條來自父親須另外定序父母。</desc>
 
-  <!-- ══════════ ① 輸入 ══════════ -->
-  <rect class="box" x="16" y="40" width="968" height="240" rx="10"/>
-  <text class="lbl bold zh" x="40" y="74">① 定序機丟給你的東西</text>
+  <!-- ══════════════════ ① 輸入 ══════════════════ -->
+  <rect class="box" x="16" y="40" width="968" height="304" rx="12"/>
+  <rect class="box plain" x="40" y="58" width="228" height="34" rx="17"/>
+  <text class="anno mid bold zh" x="154" y="81">① 定序機給你的東西</text>
 
-  <!-- 檢體 -->
-  <rect class="box plain" x="40" y="92" width="196" height="160" rx="10"/>
-  <text class="anno mid bold zh" x="138" y="120">一管檢體</text>
-  <circle class="cell normal" cx="74"  cy="156" r="14"/>
-  <circle class="cell tumor"  cx="110" cy="156" r="14"/>
-  <circle class="cell normal" cx="146" cy="156" r="14"/>
-  <circle class="cell normal" cx="182" cy="156" r="14"/>
-  <circle class="cell tumor"  cx="74"  cy="194" r="14"/>
-  <circle class="cell normal" cx="110" cy="194" r="14"/>
-  <circle class="cell tumor"  cx="146" cy="194" r="14"/>
-  <circle class="cell normal" cx="182" cy="194" r="14"/>
-  <text class="tick mid zh" x="138" y="234">正常細胞與癌細胞混在一起</text>
+  <!-- 病人 -->
+  <g transform="translate(48,104) scale(0.78)">
+    <circle class="body" cx="65" cy="24" r="22"/>
+    <path class="body" d="M65,48 C48,48 36,56 33,72 L20,146 C18,156 30,158 32,148
+                          L42,90 L42,158 L88,158 L88,90 L98,148 C100,158 112,156 110,146
+                          L97,72 C94,56 82,48 65,48 Z"/>
+    <path class="body" d="M44,156 L38,238 C37,248 53,249 54,239 L65,178
+                          L76,239 C77,249 93,248 92,238 L86,156 Z"/>
+    <ellipse class="organ somatic" cx="52" cy="100" rx="11" ry="9"/>
+  </g>
+  <path class="guide" d="M82,176 L58,150"/>
+  <text class="tick zh somatic bold end" x="55" y="146">腫瘤</text>
+  <text class="anno mid zh" x="99" y="322">病人</text>
 
-  <!-- 定序箭頭 -->
-  <path class="flow" d="M244,172 L286,172" marker-end="url(#arrow)"/>
-  <text class="tick mid zh" x="265" y="150">定序</text>
+  <path class="flow" d="M176,196 L222,196" marker-end="url(#arrow)"/>
+  <text class="tick mid zh" x="199" y="178">取檢體</text>
 
-  <!-- read 堆：所有 read 都是 hp0（來源未知） -->
-  <text class="anno zh" x="300" y="118">機器讀出來的片段</text>
+  <!-- 取到的細胞：癌細胞與正常細胞混在一起 -->
+  <circle class="cell tumor"  cx="300" cy="166" r="17"/><circle class="nucleus" cx="300" cy="166" r="6"/>
+  <circle class="cell normal" cx="272" cy="182" r="17"/><circle class="nucleus" cx="272" cy="182" r="6"/>
+  <circle class="cell tumor"  cx="328" cy="182" r="17"/><circle class="nucleus" cx="328" cy="182" r="6"/>
+  <circle class="cell tumor"  cx="300" cy="198" r="17"/><circle class="nucleus" cx="300" cy="198" r="6"/>
+  <circle class="cell normal" cx="272" cy="214" r="17"/><circle class="nucleus" cx="272" cy="214" r="6"/>
+  <circle class="cell normal" cx="328" cy="214" r="17"/><circle class="nucleus" cx="328" cy="214" r="6"/>
+  <circle class="cell tumor"  cx="300" cy="230" r="17"/><circle class="nucleus" cx="300" cy="230" r="6"/>
 
-  <rect class="read hp0" x="300" y="132" width="312" height="22" rx="6"/>
-  <text class="base a mono" x="313" y="148" font-size="15">A</text>
-  <text class="base t mono" x="339" y="148" font-size="15">T</text>
-  <text class="base g mono" x="365" y="148" font-size="15">G</text>
-  <text class="base a mono" x="391" y="148" font-size="15">A</text>
-  <text class="base c mono" x="417" y="148" font-size="15">C</text>
-  <text class="base t mono" x="443" y="148" font-size="15">T</text>
-  <text class="base g mono" x="469" y="148" font-size="15">G</text>
-  <text class="base a mono" x="495" y="148" font-size="15">A</text>
-  <text class="base c mono" x="521" y="148" font-size="15">C</text>
-  <text class="base t mono" x="547" y="148" font-size="15">T</text>
-  <text class="base g mono" x="573" y="148" font-size="15">G</text>
-  <text class="base a mono" x="599" y="148" font-size="15">A</text>
+  <text class="anno mid bold zh" x="300" y="274">取到的細胞</text>
+  <text class="tick mid zh" x="300" y="298">癌細胞與正常細胞混在一起</text>
 
-  <rect class="read hp0" x="300" y="160" width="312" height="22" rx="6"/>
-  <text class="base a mono" x="313" y="176" font-size="15">A</text>
-  <text class="base t mono" x="339" y="176" font-size="15">T</text>
-  <text class="base g mono" x="365" y="176" font-size="15">G</text>
-  <text class="base g mono" x="391" y="176" font-size="15">G</text>
-  <text class="base c mono" x="417" y="176" font-size="15">C</text>
-  <text class="base t mono" x="443" y="176" font-size="15">T</text>
-  <text class="base g mono" x="469" y="176" font-size="15">G</text>
-  <text class="base a mono" x="495" y="176" font-size="15">A</text>
-  <text class="base c mono" x="521" y="176" font-size="15">C</text>
-  <text class="base t mono" x="547" y="176" font-size="15">T</text>
-  <text class="base g mono" x="573" y="176" font-size="15">G</text>
-  <text class="base a mono" x="599" y="176" font-size="15">A</text>
+  <path class="flow" d="M360,196 L406,196" marker-end="url(#arrow)"/>
+  <text class="tick mid zh" x="383" y="178">定序</text>
 
-  <rect class="read hp0" x="300" y="188" width="312" height="22" rx="6"/>
-  <text class="base a mono" x="313" y="204" font-size="15">A</text>
-  <text class="base t mono" x="339" y="204" font-size="15">T</text>
-  <text class="base g mono" x="365" y="204" font-size="15">G</text>
-  <text class="base a mono" x="391" y="204" font-size="15">A</text>
-  <text class="base c mono" x="417" y="204" font-size="15">C</text>
-  <text class="base t mono" x="443" y="204" font-size="15">T</text>
-  <text class="base g mono" x="469" y="204" font-size="15">G</text>
-  <text class="base t mono" x="495" y="204" font-size="15">T</text>
-  <text class="base c mono" x="521" y="204" font-size="15">C</text>
-  <text class="base t mono" x="547" y="204" font-size="15">T</text>
-  <text class="base g mono" x="573" y="204" font-size="15">G</text>
-  <text class="base a mono" x="599" y="204" font-size="15">A</text>
+  <!-- 定序出來的 read：來源全部未知 -->
+  <text class="anno zh" x="428" y="124">機器讀出來的片段</text>
+  <path class="read hp0" d="M428,136 H714 L726,148 L714,160 H428 Z"/>
+  <path class="read hp0" d="M428,166 H714 L726,178 L714,190 H428 Z"/>
+  <path class="read hp0" d="M428,196 H714 L726,208 L714,220 H428 Z"/>
+  <path class="read hp0" d="M428,226 H714 L726,238 L714,250 H428 Z"/>
+  <path class="read hp0" d="M428,256 H714 L726,268 L714,280 H428 Z"/>
 
-  <rect class="read hp0" x="300" y="216" width="312" height="22" rx="6"/>
-  <text class="base a mono" x="313" y="232" font-size="15">A</text>
-  <text class="base t mono" x="339" y="232" font-size="15">T</text>
-  <text class="base g mono" x="365" y="232" font-size="15">G</text>
-  <text class="base g mono" x="391" y="232" font-size="15">G</text>
-  <text class="base c mono" x="417" y="232" font-size="15">C</text>
-  <text class="base t mono" x="443" y="232" font-size="15">T</text>
-  <text class="base g mono" x="469" y="232" font-size="15">G</text>
-  <text class="base a mono" x="495" y="232" font-size="15">A</text>
-  <text class="base c mono" x="521" y="232" font-size="15">C</text>
-  <text class="base c mono" x="547" y="232" font-size="15">C</text>
-  <text class="base g mono" x="573" y="232" font-size="15">G</text>
-  <text class="base a mono" x="599" y="232" font-size="15">A</text>
+  <g font-size="15">
+    <text class="base a mono" x="441" y="153">A</text><text class="base t mono" x="467" y="153">T</text>
+    <text class="base g mono" x="493" y="153">G</text><text class="base a mono" x="519" y="153">A</text>
+    <text class="base c mono" x="545" y="153">C</text><text class="base t mono" x="571" y="153">T</text>
+    <text class="base g mono" x="597" y="153">G</text><text class="base a mono" x="623" y="153">A</text>
+    <text class="base c mono" x="649" y="153">C</text><text class="base t mono" x="675" y="153">T</text>
+    <text class="base g mono" x="701" y="153">G</text>
 
-  <rect class="read hp0" x="300" y="244" width="312" height="22" rx="6"/>
-  <text class="base a mono" x="313" y="260" font-size="15">A</text>
-  <text class="base t mono" x="339" y="260" font-size="15">T</text>
-  <text class="base g mono" x="365" y="260" font-size="15">G</text>
-  <text class="base a mono" x="391" y="260" font-size="15">A</text>
-  <text class="base c mono" x="417" y="260" font-size="15">C</text>
-  <text class="base t mono" x="443" y="260" font-size="15">T</text>
-  <text class="base g mono" x="469" y="260" font-size="15">G</text>
-  <text class="base t mono" x="495" y="260" font-size="15">T</text>
-  <text class="base c mono" x="521" y="260" font-size="15">C</text>
-  <text class="base t mono" x="547" y="260" font-size="15">T</text>
-  <text class="base g mono" x="573" y="260" font-size="15">G</text>
-  <text class="base a mono" x="599" y="260" font-size="15">A</text>
+    <text class="base a mono" x="441" y="183">A</text><text class="base t mono" x="467" y="183">T</text>
+    <text class="base g mono" x="493" y="183">G</text><text class="base g mono" x="519" y="183">G</text>
+    <text class="base c mono" x="545" y="183">C</text><text class="base t mono" x="571" y="183">T</text>
+    <text class="base g mono" x="597" y="183">G</text><text class="base a mono" x="623" y="183">A</text>
+    <text class="base c mono" x="649" y="183">C</text><text class="base t mono" x="675" y="183">T</text>
+    <text class="base g mono" x="701" y="183">G</text>
 
-  <text class="anno zh bold" x="638" y="152">每一條長得都一樣。</text>
-  <text class="anno zh" x="638" y="184">哪些來自正常細胞、</text>
-  <text class="anno zh" x="638" y="212">哪些來自癌細胞、</text>
-  <text class="anno zh" x="638" y="240">哪個字母是機器讀錯的 ——</text>
-  <text class="anno zh bold bad" x="638" y="268">資料本身沒有標。</text>
+    <text class="base a mono" x="441" y="213">A</text><text class="base t mono" x="467" y="213">T</text>
+    <text class="base g mono" x="493" y="213">G</text><text class="base a mono" x="519" y="213">A</text>
+    <text class="base c mono" x="545" y="213">C</text><text class="base t mono" x="571" y="213">T</text>
+    <text class="base g mono" x="597" y="213">G</text><text class="base t mono" x="623" y="213">T</text>
+    <text class="base c mono" x="649" y="213">C</text><text class="base t mono" x="675" y="213">T</text>
+    <text class="base g mono" x="701" y="213">G</text>
 
-  <path class="flow" d="M500,282 L500,310" marker-end="url(#arrow)"/>
+    <text class="base a mono" x="441" y="243">A</text><text class="base t mono" x="467" y="243">T</text>
+    <text class="base g mono" x="493" y="243">G</text><text class="base g mono" x="519" y="243">G</text>
+    <text class="base c mono" x="545" y="243">C</text><text class="base t mono" x="571" y="243">T</text>
+    <text class="base g mono" x="597" y="243">G</text><text class="base a mono" x="623" y="243">A</text>
+    <text class="base c mono" x="649" y="243">C</text><text class="base c mono" x="675" y="243">C</text>
+    <text class="base g mono" x="701" y="243">G</text>
 
-  <!-- ══════════ ② 軟體 ══════════ -->
-  <rect class="box accent" x="16" y="314" width="968" height="82" rx="10"/>
-  <text class="lbl mid bold zh" x="500" y="348">② 這個實驗室寫的軟體</text>
-  <text class="anno mid zh" x="500" y="378">C++ 程式：從這堆字串反推出每一條的來源</text>
+    <text class="base a mono" x="441" y="273">A</text><text class="base t mono" x="467" y="273">T</text>
+    <text class="base g mono" x="493" y="273">G</text><text class="base a mono" x="519" y="273">A</text>
+    <text class="base c mono" x="545" y="273">C</text><text class="base t mono" x="571" y="273">T</text>
+    <text class="base g mono" x="597" y="273">G</text><text class="base t mono" x="623" y="273">T</text>
+    <text class="base c mono" x="649" y="273">C</text><text class="base t mono" x="675" y="273">T</text>
+    <text class="base g mono" x="701" y="273">G</text>
+  </g>
 
-  <path class="flow" d="M500,398 L500,426" marker-end="url(#arrow)"/>
+  <text class="anno zh bold" x="752" y="158">每一條長得都一樣。</text>
+  <text class="anno zh" x="752" y="194">哪些來自癌細胞、</text>
+  <text class="anno zh" x="752" y="222">哪個字母是機器讀錯的，</text>
+  <text class="anno zh bad bold" x="752" y="258">資料本身都沒有標。</text>
 
-  <!-- ══════════ ③ 輸出 ══════════ -->
-  <rect class="box ok" x="16" y="430" width="968" height="222" rx="10"/>
-  <text class="lbl bold zh" x="40" y="464">③ 軟體要算出來的東西</text>
+  <path class="flow" d="M500,348 L500,376" marker-end="url(#arrow)"/>
 
-  <text class="lbl bold hp1 zh" x="46" y="512">第 1 份 DNA</text>
-  <text class="lbl bold hp2 zh" x="46" y="600">第 2 份 DNA</text>
-  <text class="tick zh" x="46" y="634">編號只是標籤，沒有先後之分</text>
+  <!-- ══════════════════ ② 軟體 ══════════════════ -->
+  <rect class="box accent" x="16" y="380" width="968" height="96" rx="12"/>
+  <text class="lbl mid bold zh" x="500" y="416">② 這個實驗室開發的軟體</text>
+  <text class="anno mid zh" x="500" y="444">從這疊字串反推出每一條的來源</text>
+  <text class="tick mid mono" x="500" y="466">C++ · LongPhase / longphase-s / longphase-to</text>
 
-  <!-- 標出癌細胞才有的那一欄 -->
-  <rect class="region bad" x="482" y="514" width="26" height="56"/>
+  <path class="flow" d="M500,480 L500,508" marker-end="url(#arrow)"/>
 
-  <rect class="read hp1" x="300" y="486" width="312" height="22" rx="6"/>
-  <text class="base a mono" x="313" y="502" font-size="15">A</text>
-  <text class="base t mono" x="339" y="502" font-size="15">T</text>
-  <text class="base g mono" x="365" y="502" font-size="15">G</text>
-  <text class="base a mono" x="391" y="502" font-size="15">A</text>
-  <text class="base c mono" x="417" y="502" font-size="15">C</text>
-  <text class="base t mono" x="443" y="502" font-size="15">T</text>
-  <text class="base g mono" x="469" y="502" font-size="15">G</text>
-  <text class="base a mono" x="495" y="502" font-size="15">A</text>
-  <text class="base c mono" x="521" y="502" font-size="15">C</text>
-  <text class="base t mono" x="547" y="502" font-size="15">T</text>
-  <text class="base g mono" x="573" y="502" font-size="15">G</text>
-  <text class="base a mono" x="599" y="502" font-size="15">A</text>
+  <!-- ══════════════════ ③ 輸出 ══════════════════ -->
+  <!-- 同一批 read，只是被重新排序、標上來源；x 座標刻意與 ① 對齊，讓眼睛對得起來。
+       繪製順序：read 底 → 高亮欄 → 字母。高亮若畫在 read 之前會被 fill 蓋掉。 -->
+  <rect class="box ok" x="16" y="512" width="968" height="228" rx="12"/>
+  <rect class="box plain" x="40" y="530" width="244" height="34" rx="17"/>
+  <text class="anno mid bold zh" x="162" y="553">③ 軟體要算出來的東西</text>
 
-  <rect class="read hp1" x="300" y="514" width="312" height="22" rx="6"/>
-  <text class="base a mono" x="313" y="530" font-size="15">A</text>
-  <text class="base t mono" x="339" y="530" font-size="15">T</text>
-  <text class="base g mono" x="365" y="530" font-size="15">G</text>
-  <text class="base a mono" x="391" y="530" font-size="15">A</text>
-  <text class="base c mono" x="417" y="530" font-size="15">C</text>
-  <text class="base t mono" x="443" y="530" font-size="15">T</text>
-  <text class="base g mono" x="469" y="530" font-size="15">G</text>
-  <text class="base t mono" x="495" y="530" font-size="15">T</text>
-  <text class="base c mono" x="521" y="530" font-size="15">C</text>
-  <text class="base t mono" x="547" y="530" font-size="15">T</text>
-  <text class="base g mono" x="573" y="530" font-size="15">G</text>
-  <text class="base a mono" x="599" y="530" font-size="15">A</text>
+  <!-- 染色體畫成一對：人的每一條染色體都有兩份，一條來自父親、一條來自母親。
+       這比「第 1 份 / 第 2 份」直觀得多，而且它是事實。
+       但軟體只分得出「這是兩條不同的」，分不出哪一條來自誰 ——
+       所以下面那兩行註記不能拿掉，否則讀者會以為 HP 標籤帶有親源資訊。 -->
+  <g transform="translate(56,578) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <g transform="translate(88,578) scale(0.8)">
+    <path class="chr hp2" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp2" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <text class="anno zh" x="128" y="600">染色體是成對的</text>
+  <text class="tick zh" x="128" y="626">一條來自父親，一條來自母親</text>
 
-  <rect class="read hp1" x="300" y="542" width="312" height="22" rx="6"/>
-  <text class="base a mono" x="313" y="558" font-size="15">A</text>
-  <text class="base t mono" x="339" y="558" font-size="15">T</text>
-  <text class="base g mono" x="365" y="558" font-size="15">G</text>
-  <text class="base a mono" x="391" y="558" font-size="15">A</text>
-  <text class="base c mono" x="417" y="558" font-size="15">C</text>
-  <text class="base t mono" x="443" y="558" font-size="15">T</text>
-  <text class="base g mono" x="469" y="558" font-size="15">G</text>
-  <text class="base t mono" x="495" y="558" font-size="15">T</text>
-  <text class="base c mono" x="521" y="558" font-size="15">C</text>
-  <text class="base t mono" x="547" y="558" font-size="15">T</text>
-  <text class="base g mono" x="573" y="558" font-size="15">G</text>
-  <text class="base a mono" x="599" y="558" font-size="15">A</text>
+  <text class="tick zh" x="46" y="686">軟體分得出這是兩條不同的染色體，</text>
+  <text class="tick zh" x="46" y="710">但要知道哪一條來自父親，得另外定序父母。</text>
 
-  <rect class="read hp2" x="300" y="578" width="312" height="22" rx="6"/>
-  <text class="base a mono" x="313" y="594" font-size="15">A</text>
-  <text class="base t mono" x="339" y="594" font-size="15">T</text>
-  <text class="base g mono" x="365" y="594" font-size="15">G</text>
-  <text class="base g mono" x="391" y="594" font-size="15">G</text>
-  <text class="base c mono" x="417" y="594" font-size="15">C</text>
-  <text class="base t mono" x="443" y="594" font-size="15">T</text>
-  <text class="base g mono" x="469" y="594" font-size="15">G</text>
-  <text class="base a mono" x="495" y="594" font-size="15">A</text>
-  <text class="base c mono" x="521" y="594" font-size="15">C</text>
-  <text class="base t mono" x="547" y="594" font-size="15">T</text>
-  <text class="base g mono" x="573" y="594" font-size="15">G</text>
-  <text class="base a mono" x="599" y="594" font-size="15">A</text>
+  <text class="lbl bold hp1 zh end" x="404" y="600">父系</text>
+  <text class="lbl bold hp2 zh end" x="404" y="690">母系</text>
 
-  <rect class="read hp2" x="300" y="606" width="312" height="22" rx="6"/>
-  <text class="base a mono" x="313" y="622" font-size="15">A</text>
-  <text class="base t mono" x="339" y="622" font-size="15">T</text>
-  <text class="base g mono" x="365" y="622" font-size="15">G</text>
-  <text class="base g mono" x="391" y="622" font-size="15">G</text>
-  <text class="base c mono" x="417" y="622" font-size="15">C</text>
-  <text class="base t mono" x="443" y="622" font-size="15">T</text>
-  <text class="base g mono" x="469" y="622" font-size="15">G</text>
-  <text class="base a mono" x="495" y="622" font-size="15">A</text>
-  <text class="base c mono" x="521" y="622" font-size="15">C</text>
-  <text class="base c mono" x="547" y="622" font-size="15">C</text>
-  <text class="base g mono" x="573" y="622" font-size="15">G</text>
-  <text class="base a mono" x="599" y="622" font-size="15">A</text>
+  <path class="read hp1" d="M428,552 H714 L726,564 L714,576 H428 Z"/>
+  <path class="read hp1" d="M428,582 H714 L726,594 L714,606 H428 Z"/>
+  <path class="read hp1" d="M428,612 H714 L726,624 L714,636 H428 Z"/>
+  <path class="read hp2" d="M428,656 H714 L726,668 L714,680 H428 Z"/>
+  <path class="read hp2" d="M428,686 H714 L726,698 L714,710 H428 Z"/>
 
-  <text class="anno zh bold" x="638" y="492">同時算出三件事：</text>
-  <text class="tick zh" x="638" y="524">① 每一條片段屬於哪一份 DNA</text>
-  <text class="tick zh" x="638" y="552">② 哪個位置是癌細胞才有的</text>
-  <text class="tick zh" x="638" y="580">③ 這管檢體裡癌細胞佔多少</text>
-  <text class="tick zh" x="638" y="622">整份教材就是在拆解這三件事。</text>
+  <rect class="region bad" x="610" y="550" width="26" height="58"/>
+  <circle class="mark somatic" cx="623" cy="536" r="7"/>
+  <text class="tick zh somatic bold end" x="603" y="541">癌細胞才有的位置</text>
+
+  <g font-size="15">
+    <text class="base a mono" x="441" y="569">A</text><text class="base t mono" x="467" y="569">T</text>
+    <text class="base g mono" x="493" y="569">G</text><text class="base a mono" x="519" y="569">A</text>
+    <text class="base c mono" x="545" y="569">C</text><text class="base t mono" x="571" y="569">T</text>
+    <text class="base g mono" x="597" y="569">G</text><text class="base t mono" x="623" y="569">T</text>
+    <text class="base c mono" x="649" y="569">C</text><text class="base t mono" x="675" y="569">T</text>
+    <text class="base g mono" x="701" y="569">G</text>
+
+    <text class="base a mono" x="441" y="599">A</text><text class="base t mono" x="467" y="599">T</text>
+    <text class="base g mono" x="493" y="599">G</text><text class="base a mono" x="519" y="599">A</text>
+    <text class="base c mono" x="545" y="599">C</text><text class="base t mono" x="571" y="599">T</text>
+    <text class="base g mono" x="597" y="599">G</text><text class="base t mono" x="623" y="599">T</text>
+    <text class="base c mono" x="649" y="599">C</text><text class="base t mono" x="675" y="599">T</text>
+    <text class="base g mono" x="701" y="599">G</text>
+
+    <text class="base a mono" x="441" y="629">A</text><text class="base t mono" x="467" y="629">T</text>
+    <text class="base g mono" x="493" y="629">G</text><text class="base a mono" x="519" y="629">A</text>
+    <text class="base c mono" x="545" y="629">C</text><text class="base t mono" x="571" y="629">T</text>
+    <text class="base g mono" x="597" y="629">G</text><text class="base a mono" x="623" y="629">A</text>
+    <text class="base c mono" x="649" y="629">C</text><text class="base t mono" x="675" y="629">T</text>
+    <text class="base g mono" x="701" y="629">G</text>
+
+    <text class="base a mono" x="441" y="673">A</text><text class="base t mono" x="467" y="673">T</text>
+    <text class="base g mono" x="493" y="673">G</text><text class="base g mono" x="519" y="673">G</text>
+    <text class="base c mono" x="545" y="673">C</text><text class="base t mono" x="571" y="673">T</text>
+    <text class="base g mono" x="597" y="673">G</text><text class="base a mono" x="623" y="673">A</text>
+    <text class="base c mono" x="649" y="673">C</text><text class="base t mono" x="675" y="673">T</text>
+    <text class="base g mono" x="701" y="673">G</text>
+
+    <text class="base a mono" x="441" y="703">A</text><text class="base t mono" x="467" y="703">T</text>
+    <text class="base g mono" x="493" y="703">G</text><text class="base g mono" x="519" y="703">G</text>
+    <text class="base c mono" x="545" y="703">C</text><text class="base t mono" x="571" y="703">T</text>
+    <text class="base g mono" x="597" y="703">G</text><text class="base a mono" x="623" y="703">A</text>
+    <text class="base c mono" x="649" y="703">C</text><text class="base c mono" x="675" y="703">C</text>
+    <text class="base g mono" x="701" y="703">G</text>
+  </g>
+
+  <!-- 欄位框畫在字母之上，否則 10% 不透明度的底色在螢幕上幾乎看不出來 -->
+  <rect class="box ghost" x="610" y="550" width="26" height="58"/>
+
+  <text class="anno zh bold" x="752" y="566">軟體同時算出三件事</text>
+  <text class="tick zh" x="752" y="600">① 每條片段來自哪一條染色體</text>
+  <text class="tick zh" x="752" y="628">② 哪些位置是癌細胞才有的</text>
+  <text class="tick zh" x="752" y="656">③ 癌細胞在這個檢體佔多少</text>
+  <text class="tick zh" x="752" y="698">整份教材就是在拆解這三件事。</text>
 </svg>
