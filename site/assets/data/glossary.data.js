@@ -40,8 +40,7 @@ window.TW_GLOSSARY = {
   ],
   "slug": "genotype",
   "modules": [
-   "m02",
-   "m04"
+   "m02"
   ]
  },
  "haplotype": {
@@ -396,6 +395,18 @@ window.TW_GLOSSARY = {
   "slug": "reference-genome",
   "modules": [
    "m03",
+   "m04"
+  ]
+ },
+ "FASTA": {
+  "zh": "以文字保存 DNA 或 RNA 序列的格式；在本模組中，FASTA 主要用來提供比對所需的參考基因體序列。",
+  "en": "A text format for DNA or RNA sequences; here it mainly supplies the reference genome used for alignment.",
+  "see": [
+   "reference genome",
+   "FASTQ"
+  ],
+  "slug": "fasta",
+  "modules": [
    "m04"
   ]
  },

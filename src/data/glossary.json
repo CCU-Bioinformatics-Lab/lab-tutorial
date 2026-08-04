@@ -169,6 +169,11 @@
     "en": "The standard sequence everything is aligned to. All coordinates are relative to it, so changing build changes coordinates.",
     "see": ["locus", "BAM"]
   },
+  "FASTA": {
+    "zh": "以文字保存 DNA 或 RNA 序列的格式；在本模組中，FASTA 主要用來提供比對所需的參考基因體序列。",
+    "en": "A text format for DNA or RNA sequences; here it mainly supplies the reference genome used for alignment.",
+    "see": ["reference genome", "FASTQ"]
+  },
   "FASTQ": {
     "zh": "存放 read 序列與每個鹼基品質分數的文字格式；每筆紀錄由四行組成。",
     "en": "Text format holding read sequences plus per-base quality scores; four lines per record.",

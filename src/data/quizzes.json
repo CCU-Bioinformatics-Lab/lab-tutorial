@@ -331,37 +331,161 @@
   {
    "id": "m04.q1",
    "type": "single",
-   "stem_html": "CIGAR <code>60S40M</code> 的 read 覆蓋了參考基因體多少 bp？",
+   "stem_html": "下列哪一組最正確地描述 FASTA、FASTQ、BAM、VCF 的主要角色？",
    "choices": [
     {
-     "id": "a",
-     "html": "100 bp",
-     "correct": false,
-     "why": "100 是 read 的<b>長度</b>，不是它覆蓋的參考範圍。S 不消耗參考序列。"
+    "id": "a",
+     "html": "FASTA 是參考序列；FASTQ 是原始 read；BAM 是對齊後的 read；VCF 是位點變異紀錄",
+     "correct": true,
+     "why": "正確。四者依序對應參考、原始觀測、read-level 對齊紀錄與 site-level 變異紀錄。"
     },
     {
      "id": "b",
-     "html": "40 bp",
-     "correct": true,
-     "why": "正確。只有 M 消耗參考。那 60 bp 的 soft clip 仍在 read 裡，但沒有對上參考。"
+     "html": "FASTA 是原始 read；FASTQ 是參考；BAM 是變異位點；VCF 是品質分數",
+     "correct": false,
+     "why": "順序與資料粒度都反了：FASTQ 保存 read，BAM 保存對齊後的 read，VCF 才是位點層級的變異紀錄。"
     },
     {
      "id": "c",
-     "html": "60 bp",
+     "html": "BAM 與 VCF 都是一列一條 read，只是副檔名不同",
      "correct": false,
-     "why": "反了。60 是被 clip 掉的部分。"
+     "why": "BAM 通常一筆是一條 alignment record，但 VCF 一列通常是一個位點；兩者的 record 單位不同。"
     },
     {
      "id": "d",
-     "html": "無法判斷",
+     "html": "VCF 是比對 reference 所需的標準序列",
      "correct": false,
-     "why": "可以判斷：把消耗參考的操作碼加起來就是了。"
+     "why": "比對的標準序列放在 FASTA；VCF 保存的是由 read 證據提出的變異位點。"
     }
    ],
-   "explain_html": "若多條 read 在同一位置出現 clipping，可能提示結構變異斷點；彙整斷點位置可協助界定候選區間。此判讀仍需結合比對品質與其他證據。"
+   "explain_html": "先辨認檔案的資料粒度，再讀欄位；這是後續從 VCF 回到 BAM 的基礎。"
   },
   {
    "id": "m04.q2",
+   "type": "single",
+   "stem_html": "你想檢查 VCF 的 <code>chr7:105</code> 是否有 read 支持，最合理的下一步是什麼？",
+   "choices": [
+    {
+     "id": "a",
+     "html": "用 CHROM／POS 回到 BAM，查詢該座標附近的 alignment records",
+     "correct": true,
+     "why": "正確。VCF 是 site-level 紀錄；BAM 才保存每條 read 的位置、序列、CIGAR 與可用 tags。"
+    },
+    {
+     "id": "b",
+     "html": "只看 VCF 的 FILTER=PASS，不需要回看任何 read",
+     "correct": false,
+     "why": "PASS 只表示通過該流程的篩選；它不會告訴你每條 read 的 mapping quality、CIGAR 或序列。"
+    },
+    {
+     "id": "c",
+     "html": "回到 FASTQ，因為 FASTQ 已經包含參考座標",
+     "correct": false,
+     "why": "原始 FASTQ 的 read 尚未放回參考座標；位置資訊是在比對後的 BAM 中。"
+    },
+    {
+     "id": "d",
+     "html": "只讀 BAM 的檔案名稱，不必確認 reference build",
+     "correct": false,
+     "why": "VCF、BAM 與 reference 必須使用一致的座標系；不同 build 可能查到錯的區域。"
+    }
+   ]
+  },
+  {
+   "id": "m04.q3",
+   "type": "single",
+   "stem_html": "CIGAR <code>5M2I5M</code> 會消耗多少 read 與多少參考序列？",
+   "choices": [
+    {
+     "id": "a",
+     "html": "read 12 bp；參考 10 bp",
+     "correct": true,
+     "why": "正確。M 與 I 會消耗 read，所以 5+2+5=12；只有 M 消耗參考，所以 5+5=10。"
+    },
+    {
+     "id": "b",
+     "html": "read 10 bp；參考 12 bp",
+     "correct": false,
+     "why": "把 I 當成只消耗參考了；insertion 是 read 有、參考沒有。"
+    },
+    {
+     "id": "c",
+     "html": "read 12 bp；參考 12 bp",
+     "correct": false,
+     "why": "I 不消耗參考，因此參考長度只有兩段 M 的 10 bp。"
+    },
+    {
+     "id": "d",
+     "html": "無法由 CIGAR 判斷",
+     "correct": false,
+     "why": "可以判斷消耗長度；CIGAR 正是用來描述這種對齊操作的摘要。"
+    }
+   ]
+  },
+  {
+   "id": "m04.q4",
+   "type": "single",
+   "stem_html": "哪一句正確區分了 untagged read 與 <code>HP3</code>？",
+   "choices": [
+    {
+     "id": "a",
+     "html": "兩者都表示工具已確認 read 不屬於任何 haplotype",
+     "correct": false,
+     "why": "HP3 還多了一個條件：read 帶有 somatic signal，但來源 haplotype 未定；untagged 只是沒有 HP assignment。"
+    },
+    {
+     "id": "b",
+     "html": "untagged 是沒有 HP assignment；HP3 是有 somatic signal 但來源 haplotype 未定",
+     "correct": true,
+     "why": "正確。一般沒有 HP 的 read 不能因此直接改寫成 HP3。"
+    },
+    {
+     "id": "c",
+     "html": "只要沒有 HP tag，就一定是 HP3",
+     "correct": false,
+     "why": "HP3 不是「缺少 HP」的同義詞；它需要 somatic signal 加上來源未定。"
+    },
+    {
+     "id": "d",
+     "html": "HP3 是 VCF 的 FILTER 值",
+     "correct": false,
+     "why": "HP3 是 read-level 判讀概念，出現在 BAM tag／haplotype assignment 的脈絡，不是 VCF FILTER。"
+    }
+   ]
+  },
+  {
+   "id": "m04.q5",
+   "type": "single",
+   "stem_html": "VCF 的 sample 欄位是 <code>FORMAT=GT:PS</code>、值為 <code>0|1:105</code>。哪個解釋正確？",
+   "choices": [
+    {
+     "id": "a",
+     "html": "GT 表示 REF／ALT 的相位順序；PS=105 表示它屬於 phase set 105",
+     "correct": true,
+     "why": "正確。GT 的直線表示已提供相位順序；PS 是 phase set 編號，不是支持 read 數量。"
+    },
+    {
+     "id": "b",
+     "html": "GT=0|1 表示有一條 read 支持 REF、一條 read 支持 ALT",
+     "correct": false,
+     "why": "GT 是 genotype／相位欄位，不是 read 計數；支持數量要回到 BAM 或 pileup 查看。"
+    },
+    {
+     "id": "c",
+     "html": "PS=105 表示 BAM 的第 105 條 read",
+     "correct": false,
+     "why": "PS 是 VCF 中的 phase set 編號，不是 BAM read 編號。"
+    },
+    {
+     "id": "d",
+     "html": "直線只代表第一個 allele 一定來自父親",
+     "correct": false,
+     "why": "0|1 表示相位順序已被表示，不會單獨提供父系／母系來源。"
+    }
+   ]
+  },
+  {
+   "id": "m04.q6",
    "type": "single",
    "stem_html": "CIGAR 裡的 <code>M</code> 代表什麼？",
    "choices": [
@@ -369,25 +493,25 @@
      "id": "a",
      "html": "完全吻合（match）",
      "correct": false,
-     "why": "常見誤解。<code>M</code> 只代表「有對齊」，錯配（mismatch）在 CIGAR 上一樣是 <code>M</code>。"
+     "why": "常見誤解。<code>M</code> 只代表「有對齊」，錯配在 CIGAR 上也可能是 <code>M</code>。"
     },
     {
      "id": "b",
      "html": "有對齊，但可能吻合也可能錯配",
      "correct": true,
-     "why": "正確。要知道哪裡真的不一樣，得看 MD tag 或直接比對參考序列。想區分的話有 <code>=</code>（吻合）與 <code>X</code>（錯配）。"
+     "why": "正確。要知道哪裡真的不同，得看 MD tag 或直接比對 read 與參考序列。"
     },
     {
      "id": "c",
      "html": "methylation",
      "correct": false,
-     "why": "甲基化在 MM/ML tag 裡，不在 CIGAR。"
+     "why": "甲基化在 MM/ML tags 裡，不在 CIGAR。"
     },
     {
      "id": "d",
      "html": "缺失（missing）",
      "correct": false,
-     "why": "缺失是 <code>D</code>。"
+     "why": "相對於參考的 deletion 用 <code>D</code> 表示。"
     }
    ]
   }

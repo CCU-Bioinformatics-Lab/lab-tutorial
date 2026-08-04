@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>從參考序列與原始 reads 到變異紀錄的資料鏈</title>
+  <desc>由左至右展示四種常見的 NGS 資料層級：FASTA 提供參考序列，FASTQ 保存定序 reads，BAM 保存每條 read 與參考的對齊紀錄，VCF 保存以位點為單位的變異紀錄。下方提醒 BAM 是 read-level 資料，而 VCF 是 site-level 資料；兩者不能當成同一種表格。</desc>
+
+  <text class="ttl mid zh" x="500" y="38">同一個分析流程，會留下不同層級的檔案</text>
+  <text class="anno mid zh" x="500" y="66">先認出「這個檔案在描述什麼」，再讀它裡面的欄位</text>
+
+  <!-- 參考序列 -->
+  <rect class="box plain" x="18" y="96" width="208" height="270" rx="12"/>
+  <text class="lbl bold mid" x="122" y="132">FASTA</text>
+  <text class="anno mid zh" x="122" y="158">參考序列</text>
+  <rect class="box accent" x="38" y="184" width="168" height="72" rx="8"/>
+  <text class="tick mono" x="50" y="207">&gt;chr7</text>
+  <text class="tick mono" x="50" y="231">ACCTGATC...</text>
+  <line class="guide" x1="38" y1="277" x2="206" y2="277"/>
+  <text class="tick mid zh" x="122" y="304">比對時的座標基準</text>
+  <text class="tick mid zh" x="122" y="329">不是變異清單</text>
+
+  <path class="flow" d="M232,230 L258,230" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="245" y="211">搭配</text>
+
+  <!-- 原始 reads -->
+  <rect class="box plain" x="268" y="96" width="208" height="270" rx="12"/>
+  <text class="lbl bold mid" x="372" y="132">FASTQ</text>
+  <text class="anno mid zh" x="372" y="158">原始 read 觀測</text>
+  <rect class="box accent" x="288" y="184" width="168" height="72" rx="8"/>
+  <text class="tick mono" x="300" y="207">@read_001</text>
+  <text class="tick mono" x="300" y="231">ACCTGATC</text>
+  <text class="tick mono" x="300" y="251">IIIIIIII</text>
+  <line class="guide" x1="288" y1="277" x2="456" y2="277"/>
+  <text class="tick mid zh" x="372" y="304">序列＋每個鹼基的品質</text>
+  <text class="tick mid zh" x="372" y="329">還沒有參考座標</text>
+
+  <path class="flow" d="M482,230 L508,230" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="495" y="211">比對</text>
+
+  <!-- 對齊後的 reads -->
+  <rect class="box accent" x="518" y="96" width="208" height="270" rx="12"/>
+  <text class="lbl bold mid" x="622" y="132">BAM</text>
+  <text class="anno mid zh" x="622" y="158">read-level 對齊紀錄</text>
+  <rect class="box plain" x="538" y="184" width="168" height="72" rx="8"/>
+  <text class="tick mono" x="550" y="207">read_001  chr7  100</text>
+  <text class="tick mono" x="550" y="231">MAPQ 60  ...</text>
+  <text class="tick mono" x="550" y="251">HP:i:1  ...</text>
+  <line class="guide" x1="538" y1="277" x2="706" y2="277"/>
+  <text class="tick mid zh" x="622" y="304">一筆通常是一條對齊 read</text>
+  <text class="tick mid zh" x="622" y="329">含位置、欄位與 tags</text>
+
+  <path class="flow" d="M732,230 L758,230" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="745" y="211">判讀</text>
+
+  <!-- 變異位點 -->
+  <rect class="box plain" x="768" y="96" width="214" height="270" rx="12"/>
+  <text class="lbl bold mid" x="875" y="132">VCF</text>
+  <text class="anno mid zh" x="875" y="158">site-level 變異紀錄</text>
+  <rect class="box accent" x="788" y="184" width="174" height="72" rx="8"/>
+  <text class="tick mono" x="800" y="207">#CHROM POS REF ALT</text>
+  <text class="tick mono" x="800" y="231">chr7 105 A G</text>
+  <text class="tick mono" x="800" y="251">GT:PS 0|1:105</text>
+  <line class="guide" x1="788" y1="277" x2="962" y2="277"/>
+  <text class="tick mid zh" x="875" y="304">一列通常是一個位點</text>
+  <text class="tick mid zh" x="875" y="329">不是一條 read</text>
+
+  <rect class="box warn" x="18" y="402" width="964" height="112" rx="12"/>
+  <text class="lbl bold mid zh" x="500" y="437">閱讀順序：格式 → record → 欄位 → tag／FORMAT</text>
+  <text class="anno mid zh" x="500" y="468">BAM 回答「哪些 read 在哪裡、怎麼對齊」；VCF 回答「哪些位點被提出為變異候選」。</text>
+  <text class="tick mid zh" x="500" y="494">因此看到 VCF 位點時，可以用 CHROM／POS 回到 BAM，檢查支持它的 read 證據。</text>
+</svg>
