@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>資料格式讀寫能力 · 長讀癌症基因體學入門</title>
-<meta name="description" content="從 BAM 中的 read 觀測追溯到 VCF 紀錄，並使用 CIGAR 解碼器練習讀取對齊資訊。">
+<meta name="description" content="從 FASTA、FASTQ、BAM 到 VCF，先建立檔案層級與範例，再拆解 BAM 的 CIGAR、HP／MM/ML 與 VCF 的 GT／PS。">
 <link rel="stylesheet" href="assets/css/tokens.css">
 <link rel="stylesheet" href="assets/css/base.css">
 <link rel="stylesheet" href="assets/css/layout.css">
@@ -53,68 +53,212 @@
 
 <div class="wrap ">
   <main class="main" id="main">
-    <header class="mhead"><p class="mhead__kicker">模組 4 · Data literacy</p><h1>資料格式讀寫能力</h1><p class="mhead__sub">從 BAM 中的 read 觀測追溯到 VCF 紀錄，並使用 CIGAR 解碼器練習讀取對齊資訊。</p><p class="mhead__meta"><span class="chip">約 60 分鐘</span><a class="chip" href="m03.html">建議先修：定序</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說出從 FASTQ 到 VCF 的每一個中間檔案各自負責什麼</li><li>判讀一個 CIGAR 字串，並說出它消耗了多少參考序列與多少 read</li><li>解釋 soft clip 是什麼，以及為什麼大量集中的 clipping 可作為結構變異斷點的候選訊號</li><li>在 VCF 裡認出 GT、PS，並在 BAM 裡認出 HP 與 MM/ML tag</li><li>區分一般 untagged read 與帶有 somatic signal 但來源未定的 somatic haplotype HP3</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">模組 4 · Data literacy</p><h1>資料格式讀寫能力</h1><p class="mhead__sub">從 FASTA、FASTQ、BAM 到 VCF，先建立檔案層級與範例，再拆解 BAM 的 CIGAR、HP／MM/ML 與 VCF 的 GT／PS。</p><p class="mhead__meta"><span class="chip">約 60 分鐘</span><a class="chip" href="m03.html">建議先修：定序</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說出 FASTA、FASTQ、BAM、VCF 在 NGS 資料鏈中的角色，以及每種格式的一筆 record 代表什麼</li><li>用一個小型例子，從 FASTQ 的 read 追到 BAM 的 alignment record，再追到 VCF 的位點紀錄</li><li>區分檔案格式、record、欄位、BAM tag 與 VCF FORMAT，認出 GT、PS、HP 與 MM/ML</li><li>在知道 BAM 的角色後，判讀 CIGAR 字串並計算它消耗的參考序列與 read 長度</li><li>區分一般沒有 HP 的 untagged read，與帶有 somatic signal 但來源未定的 HP3</li></ul></section>
 
 <section data-part="why" class="part" id="part-why">
 <h2 data-num="①" id="為什麼重要">為什麼重要</h2>
 
-<p class="prose"><span class="term" data-term="CIGAR" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cigar-0">CIGAR<span class="term__pop" id="gd-cigar-0" role="tooltip"><b class="term__hd">CIGAR</b><span class="term__def" data-lang="zh">描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。</span><span class="term__def" data-lang="en">A compact string describing how read bases and reference positions are consumed by an alignment. For example, 5M1I5M has five alignment columns, one insertion, then five alignment columns; M may contain matches or mismatches.</span><a class="term__more" href="glossary.html#cigar">完整條目 →</a></span></span> 在正式課程中常被簡略帶過，但在判讀比對結果與變異證據時十分重要。
-本教材的兩個案例會使用 CIGAR：一個以 clipping 分布協助定位染色體結構變異的候選邊界，
-另一個將 CIGAR 編碼為影像供神經網路分析。理解 CIGAR 有助於解讀這些流程的輸入與限制。</p>
+<p class="prose">做 NGS 分析時，你不會只拿到一個「結果檔」。同一批 DNA 觀測會在流程中留下不同格式：有的檔案保存參考序列，有的保存原始 read，有的保存每條 read 如何對齊，有的則把許多 read 的證據整理成變異位點。</p>
 
-<p class="prose">本節以互動解碼與命令列操作為主，實作比例較高。</p>
+<p class="prose">所以本模組的第一個問題不是「CIGAR 怎麼解碼」，而是：<b>我現在看到的檔案正在描述哪一層資料？</b>先掌握 FASTA、FASTQ、BAM、VCF 的角色，再往下讀 record、欄位與 tag，最後才把 CIGAR 放回 BAM 的位置。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img">
+  <title>從參考序列與原始 reads 到變異紀錄的資料鏈</title>
+  <desc>由左至右展示四種常見的 NGS 資料層級：FASTA 提供參考序列，FASTQ 保存定序 reads，BAM 保存每條 read 與參考的對齊紀錄，VCF 保存以位點為單位的變異紀錄。下方提醒 BAM 是 read-level 資料，而 VCF 是 site-level 資料；兩者不能當成同一種表格。</desc>
+
+  <text class="ttl mid zh" x="500" y="38">同一個分析流程，會留下不同層級的檔案</text>
+  <text class="anno mid zh" x="500" y="66">先認出「這個檔案在描述什麼」，再讀它裡面的欄位</text>
+
+  <!-- 參考序列 -->
+  <rect class="box plain" x="18" y="96" width="208" height="270" rx="12"/>
+  <text class="lbl bold mid" x="122" y="132">FASTA</text>
+  <text class="anno mid zh" x="122" y="158">參考序列</text>
+  <rect class="box accent" x="38" y="184" width="168" height="72" rx="8"/>
+  <text class="tick mono" x="50" y="207">&gt;chr7</text>
+  <text class="tick mono" x="50" y="231">ACCTGATC...</text>
+  <line class="guide" x1="38" y1="277" x2="206" y2="277"/>
+  <text class="tick mid zh" x="122" y="304">比對時的座標基準</text>
+  <text class="tick mid zh" x="122" y="329">不是變異清單</text>
+
+  <path class="flow" d="M232,230 L258,230" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="245" y="211">搭配</text>
+
+  <!-- 原始 reads -->
+  <rect class="box plain" x="268" y="96" width="208" height="270" rx="12"/>
+  <text class="lbl bold mid" x="372" y="132">FASTQ</text>
+  <text class="anno mid zh" x="372" y="158">原始 read 觀測</text>
+  <rect class="box accent" x="288" y="184" width="168" height="72" rx="8"/>
+  <text class="tick mono" x="300" y="207">@read_001</text>
+  <text class="tick mono" x="300" y="231">ACCTGATC</text>
+  <text class="tick mono" x="300" y="251">IIIIIIII</text>
+  <line class="guide" x1="288" y1="277" x2="456" y2="277"/>
+  <text class="tick mid zh" x="372" y="304">序列＋每個鹼基的品質</text>
+  <text class="tick mid zh" x="372" y="329">還沒有參考座標</text>
+
+  <path class="flow" d="M482,230 L508,230" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="495" y="211">比對</text>
+
+  <!-- 對齊後的 reads -->
+  <rect class="box accent" x="518" y="96" width="208" height="270" rx="12"/>
+  <text class="lbl bold mid" x="622" y="132">BAM</text>
+  <text class="anno mid zh" x="622" y="158">read-level 對齊紀錄</text>
+  <rect class="box plain" x="538" y="184" width="168" height="72" rx="8"/>
+  <text class="tick mono" x="550" y="207">read_001  chr7  100</text>
+  <text class="tick mono" x="550" y="231">MAPQ 60  ...</text>
+  <text class="tick mono" x="550" y="251">HP:i:1  ...</text>
+  <line class="guide" x1="538" y1="277" x2="706" y2="277"/>
+  <text class="tick mid zh" x="622" y="304">一筆通常是一條對齊 read</text>
+  <text class="tick mid zh" x="622" y="329">含位置、欄位與 tags</text>
+
+  <path class="flow" d="M732,230 L758,230" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="745" y="211">判讀</text>
+
+  <!-- 變異位點 -->
+  <rect class="box plain" x="768" y="96" width="214" height="270" rx="12"/>
+  <text class="lbl bold mid" x="875" y="132">VCF</text>
+  <text class="anno mid zh" x="875" y="158">site-level 變異紀錄</text>
+  <rect class="box accent" x="788" y="184" width="174" height="72" rx="8"/>
+  <text class="tick mono" x="800" y="207">#CHROM POS REF ALT</text>
+  <text class="tick mono" x="800" y="231">chr7 105 A G</text>
+  <text class="tick mono" x="800" y="251">GT:PS 0|1:105</text>
+  <line class="guide" x1="788" y1="277" x2="962" y2="277"/>
+  <text class="tick mid zh" x="875" y="304">一列通常是一個位點</text>
+  <text class="tick mid zh" x="875" y="329">不是一條 read</text>
+
+  <rect class="box warn" x="18" y="402" width="964" height="112" rx="12"/>
+  <text class="lbl bold mid zh" x="500" y="437">閱讀順序：格式 → record → 欄位 → tag／FORMAT</text>
+  <text class="anno mid zh" x="500" y="468">BAM 回答「哪些 read 在哪裡、怎麼對齊」；VCF 回答「哪些位點被提出為變異候選」。</text>
+  <text class="tick mid zh" x="500" y="494">因此看到 VCF 位點時，可以用 CHROM／POS 回到 BAM，檢查支持它的 read 證據。</text>
+</svg><figcaption>從左到右是參考序列、原始 read、read-level 的對齊紀錄與 site-level 的變異紀錄。下方的閱讀順序是本模組的主線：先判斷檔案格式，再判斷一筆 record，接著讀欄位，最後才讀 BAM tag 或 VCF FORMAT。</figcaption></figure>
+
+<p class="prose">本節會用一個很小的 toy locus 貫穿範例。它不是可直接拿去分析的完整檔案，而是把同一個位置在不同資料層級的樣子並排，讓你能回答「這一列在記錄什麼」以及「我要回哪個檔案找證據」。</p>
 </section>
 
 
 <section data-part="concept" class="part" id="part-concept">
 <h2 data-num="②" id="概念與互動">概念與互動</h2>
 
-<h3 id="從樣本到變異的檔案鏈">從樣本到變異的檔案鏈</h3>
+<h3 id="一-先建立檔案地圖">一、先建立檔案地圖</h3>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>檔案</th><th>裝什麼</th><th>一筆記錄通常代表</th></tr></thead>
+<thead><tr><th>格式／檔案</th><th>它保存什麼</th><th>一筆 record 通常代表什麼</th><th>它回答的問題</th></tr></thead>
 <tbody>
-<tr><td><code>.fasta</code></td><td><span class="term" data-term="reference genome" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-reference-genome-1">reference genome<span class="term__pop" id="gd-reference-genome-1" role="tooltip"><b class="term__hd">reference genome <i>參考基因體</i></b><span class="term__def" data-lang="zh">用於比對的標準序列（人類資料常用 GRCh38）。所有座標均相對於指定版本；更換 build 會改變座標系，座標不可直接比較。</span><span class="term__def" data-lang="en">The standard sequence everything is aligned to. All coordinates are relative to it, so changing build changes coordinates.</span><a class="term__more" href="glossary.html#reference-genome">完整條目 →</a></span></span></td><td>一條染色體或 contig 的序列</td></tr>
-<tr><td><code><span class="term" data-term="FASTQ" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-fastq-2">.fastq<span class="term__pop" id="gd-fastq-2" role="tooltip"><b class="term__hd">FASTQ</b><span class="term__def" data-lang="zh">存放 read 序列與每個鹼基品質分數的文字格式；每筆紀錄由四行組成。</span><span class="term__def" data-lang="en">Text format holding read sequences plus per-base quality scores; four lines per record.</span><a class="term__more" href="glossary.html#fastq">完整條目 →</a></span></span></code></td><td>定序儀產生的 read</td><td>一筆 read 記錄（序列與品質）</td></tr>
-<tr><td><code><span class="term" data-term="BAM" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-bam-3">.bam<span class="term__pop" id="gd-bam-3" role="tooltip"><b class="term__hd">BAM</b><span class="term__def" data-lang="zh">已比對到參考基因體的 read 的二進位格式（SAM 的壓縮版）。每一列是一條 read，帶著它的位置、CIGAR、品質與各種 tag。</span><span class="term__def" data-lang="en">Binary format for reads aligned to the reference. One record per read, carrying position, CIGAR, quality and tags.</span><a class="term__more" href="glossary.html#bam">完整條目 →</a></span></span></code></td><td>已比對到參考的 read</td><td>一筆 alignment record，含位置、CIGAR、tag</td></tr>
-<tr><td><code><span class="term" data-term="VCF" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-vcf-4">.vcf<span class="term__pop" id="gd-vcf-4" role="tooltip"><b class="term__hd">VCF</b><span class="term__def" data-lang="zh">存放 variant 的文字格式。每一列是一個位點，記錄位置、ref/alt allele、品質、FILTER 與各種 FORMAT 欄位。</span><span class="term__def" data-lang="en">Text format for variants: one line per site with position, ref/alt alleles, quality, FILTER and FORMAT fields.</span><a class="term__more" href="glossary.html#vcf">完整條目 →</a></span></span></code></td><td>變異</td><td><b>一個位點</b>，含 ref/alt、FILTER、FORMAT</td></tr>
-<tr><td><code>.bed</code></td><td>區間</td><td>一段 chrom / start / end</td></tr>
+<tr><td><code><span class="term" data-term="FASTA" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-fasta-0">FASTA<span class="term__pop" id="gd-fasta-0" role="tooltip"><b class="term__hd">FASTA</b><span class="term__def" data-lang="zh">以文字保存 DNA 或 RNA 序列的格式；在本模組中，FASTA 主要用來提供比對所需的參考基因體序列。</span><span class="term__def" data-lang="en">A text format for DNA or RNA sequences; here it mainly supplies the reference genome used for alignment.</span><a class="term__more" href="glossary.html#fasta">完整條目 →</a></span></span></code></td><td><span class="term" data-term="reference genome" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-reference-genome-1">參考基因體<span class="term__pop" id="gd-reference-genome-1" role="tooltip"><b class="term__hd">reference genome <i>參考基因體</i></b><span class="term__def" data-lang="zh">用於比對的標準序列（人類資料常用 GRCh38）。所有座標均相對於指定版本；更換 build 會改變座標系，座標不可直接比較。</span><span class="term__def" data-lang="en">The standard sequence everything is aligned to. All coordinates are relative to it, so changing build changes coordinates.</span><a class="term__more" href="glossary.html#reference-genome">完整條目 →</a></span></span>序列</td><td>一條序列或 contig 的 header 與鹼基</td><td>參考座標上的標準序列是什麼？</td></tr>
+<tr><td><code><span class="term" data-term="FASTQ" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-fastq-2">FASTQ<span class="term__pop" id="gd-fastq-2" role="tooltip"><b class="term__hd">FASTQ</b><span class="term__def" data-lang="zh">存放 read 序列與每個鹼基品質分數的文字格式；每筆紀錄由四行組成。</span><span class="term__def" data-lang="en">Text format holding read sequences plus per-base quality scores; four lines per record.</span><a class="term__more" href="glossary.html#fastq">完整條目 →</a></span></span></code></td><td>定序儀產生的 read 序列與品質</td><td>四行 read record：名稱、序列、分隔線、品質</td><td>定序儀觀察到了哪些片段？</td></tr>
+<tr><td><code><span class="term" data-term="BAM" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-bam-3">BAM<span class="term__pop" id="gd-bam-3" role="tooltip"><b class="term__hd">BAM</b><span class="term__def" data-lang="zh">已比對到參考基因體的 read 的二進位格式（SAM 的壓縮版）。每一列是一條 read，帶著它的位置、CIGAR、品質與各種 tag。</span><span class="term__def" data-lang="en">Binary format for reads aligned to the reference. One record per read, carrying position, CIGAR, quality and tags.</span><a class="term__more" href="glossary.html#bam">完整條目 →</a></span></span></code></td><td>已對齊至參考的 read；它是 SAM 文字格式的二進位版本</td><td>一筆 alignment record，通常對應一條 read</td><td>這條 read 被放在參考的哪裡？對齊得怎樣？</td></tr>
+<tr><td><code>.bai</code></td><td>BAM 的索引，不是另一批生物學觀測</td><td>由座標建立的查詢索引</td><td>如何快速取出某個區間的 BAM records？</td></tr>
+<tr><td><code><span class="term" data-term="VCF" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-vcf-4">VCF<span class="term__pop" id="gd-vcf-4" role="tooltip"><b class="term__hd">VCF</b><span class="term__def" data-lang="zh">存放 variant 的文字格式。每一列是一個位點，記錄位置、ref/alt allele、品質、FILTER 與各種 FORMAT 欄位。</span><span class="term__def" data-lang="en">Text format for variants: one line per site with position, ref/alt alleles, quality, FILTER and FORMAT fields.</span><a class="term__more" href="glossary.html#vcf">完整條目 →</a></span></span></code></td><td>由 read 證據提出的變異紀錄</td><td>一列通常代表一個基因體位點</td><td>哪個位置被提出為 REF／ALT 變異候選？</td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">注意 BAM 與 VCF 的記錄單位不同：<b>BAM 以 alignment record 為單位，VCF 以變異位點為單位</b>。
-後續模組會反覆使用此區分；例如 LongPhase-S 將 <span class="term" data-term="somatic haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-somatic-haplotype-5">somatic haplotype<span class="term__pop" id="gd-somatic-haplotype-5" role="tooltip"><b class="term__hd">somatic haplotype</b><span class="term__def" data-lang="zh">在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</span><span class="term__def" data-lang="en">A sub-level beneath the germline haplotype: HP1-1 and HP2-1 carry somatic mutations derived from HP1 and HP2; HP3 is unassignable.</span><a class="term__more" href="glossary.html#somatic-haplotype">完整條目 →</a></span></span> assignment 寫在 BAM 的 read 上，
-而 LongPhase-TO 將判定寫在 VCF 的位點上。</p>
+<p class="prose"><b>FASTA 與 FASTQ 不是同一份資料的兩種副本。</b>FASTA 在這裡提供比對基準；FASTQ 保存尚未有參考座標的 read。把 FASTQ 與 FASTA 比對後，才會得到 BAM；再由 BAM 的多條 read 證據整理出 VCF。VCF 的一列也不等於一條 read，而且通常是 caller 提出的候選，不是脫離原始證據的事實宣告。</p>
 
-<h3 id="cigar-read-與參考序列的對齊表示">CIGAR：read 與參考序列的對齊表示</h3>
+<h3 id="二-用同一個小例子追過四種格式">二、用同一個小例子追過四種格式</h3>
 
-<p class="prose">CIGAR 是一串「數字＋字母」，描述 read 與參考序列的對應關係。
-可在下方元件輸入 CIGAR，查看各操作碼對參考序列與 read 的消耗方式。</p>
+<p class="prose">假設我們只看 <code>chr7</code> 上一小段 toy reference。為了讓字串短一點，下面的座標從 100 開始；真實檔案會有完整的 chromosome sequence、header 與更多欄位。</p>
 
-<figure class="widget" data-widget="cigar-decoder" data-wid="m04.cig" data-config='{"value":"5M1I5M"}'><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>請先使用預設按鈕；以 <code>10S8M</code> 為例，前 10 個鹼基<b>未與</b>參考序列對齊，屬於 soft clipping，但仍保留於 BAM。</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
+<h4>1. FASTA：比對的參考序列</h4>
+
+<pre><code>reference.fasta
+&gt;chr7
+ACCTGATC</code></pre>
+
+<p class="prose">這段序列的 <code>chr7:100–107</code> 依序是 <code>A C C T G A T C</code>。FASTA 告訴我們「參考是什麼」，但還沒有任何 sample read，也沒有變異結論。</p>
+
+<h4>2. FASTQ：尚未定位的 read 觀測</h4>
+
+<pre><code>reads.fastq
+@read_001
+ACCTGATC
++
+IIIIIIII
+@read_002
+ACCTGGTC
++
+IIIIIIII</code></pre>
+
+<p class="prose">每筆 FASTQ record 有四行：名稱、序列、<code>+</code> 分隔線、每個鹼基的品質字串。這裡的 <code>I</code> 只是 toy example 的品質字元；重點是 read 還沒有 <code>chr7:105</code> 這種參考座標。</p>
+
+<h4>3. BAM：把每條 read 放回參考座標</h4>
+
+<p class="prose">BAM 是二進位檔，不能像文字檔一樣直接讀出一整列。為了教學，下面用「從 SAM／<code>samtools view</code> 選出的欄位」簡化顯示；這不是 BAM 的二進位內容：</p>
+
+<pre><code>QNAME       RNAME POS  MAPQ CIGAR SEQ       TAGS
+read_001   chr7  100  60   8M    ACCTGATC  HP:i:1
+read_002   chr7  100  60   8M    ACCTGGTC  HP:i:2</code></pre>
+
+<p class="prose">這兩條 read 都從 <code>chr7:100</code> 開始，並各自跨過 <code>chr7:105</code>。第二條 read 在這個位置讀到 <code>G</code>，而 reference 是 <code>A</code>。此時我們仍在讀<b>每條 read 的觀測</b>；還沒有把它們壓縮成一列 VCF。</p>
+
+<h4>4. VCF：把同一位置整理成一列變異紀錄</h4>
+
+<pre><code>sample.vcf
+##fileformat=VCFv4.3
+#CHROM POS ID REF ALT QUAL FILTER INFO FORMAT sample
+chr7   105 .  A   G   60   PASS   .    GT:PS  0|1:105</code></pre>
+
+<p class="prose">VCF 這一列把前面的觀察摘要成：在 <code>chr7:105</code>，reference allele 是 <code>A</code>，alternate allele 是 <code>G</code>。<code>GT:PS</code> 是這個 sample 欄位的格式說明，後面的 <code>0|1:105</code> 才是對應值。真正要確認這一列是否由可靠 read 支持，仍要用 <code>CHROM</code> 與 <code>POS</code> 回到 BAM。</p>
+
+<h3 id="三-從檔案讀到細節-四個層級">三、從檔案讀到細節：四個層級</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>層級</th><th>先問什麼</th><th>本例</th></tr></thead>
+<tbody>
+<tr><td><b>檔案格式</b></td><td>這份檔案的資料模型是什麼？</td><td><code>FASTQ</code> 是 read；<code>BAM</code> 是對齊後的 read；<code>VCF</code> 是位點。</td></tr>
+<tr><td><b>record／row</b></td><td>一筆資料代表一個什麼東西？</td><td>BAM 的 <code>read_002</code> 是一條 alignment record；VCF 的 <code>chr7:105</code> 是一個位點 row。</td></tr>
+<tr><td><b>固定欄位</b></td><td>這筆資料的座標、序列或狀態放在哪一欄？</td><td>BAM 的 <code>POS</code>、<code>MAPQ</code>、<code>CIGAR</code>；VCF 的 <code>REF</code>、<code>ALT</code>、<code>FILTER</code>。</td></tr>
+<tr><td><b>tag／FORMAT</b></td><td>工具附加了什麼額外判讀？</td><td>BAM 的 <code>HP</code>、<code>MM</code>、<code>ML</code>；VCF 的 <code>GT</code>、<code>PS</code>。</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">BAM tag 與 VCF FORMAT 欄位都像短短的鍵值，但不要把它們混為一談：<b>HP 是寫在 read record 上的 BAM tag；GT 與 PS 是寫在 VCF sample 欄位中的 FORMAT 子欄位。</b>先辨認外層格式，才不會把一個 read 的標籤誤當成整個位點的結論。</p>
+
+<h3 id="四-先讀-vcf-的關鍵欄位">四、先讀 VCF 的關鍵欄位</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>VCF 部分</th><th>本例</th><th>初學者先記住什麼</th></tr></thead>
+<tbody>
+<tr><td><code>CHROM</code>／<code>POS</code></td><td><code>chr7</code>／<code>105</code></td><td>用來定位並回到 BAM 查詢；座標必須和 reference build 一致。</td></tr>
+<tr><td><code>REF</code>／<code>ALT</code></td><td><code>A</code>／<code>G</code></td><td>這一列比較的 reference allele 與 alternate allele。</td></tr>
+<tr><td><code>FILTER</code></td><td><code>PASS</code></td><td>表示通過該流程設定的篩選；不是「任何情況下都已證明為真」。</td></tr>
+<tr><td><code>GT</code></td><td><code>0/1</code> 或 <code>0|1</code></td><td><code>0</code> 是 REF、<code>1</code> 是第一個 ALT；斜線代表未定相，直線代表已提供相位順序。</td></tr>
+<tr><td><code><span class="term" data-term="PS tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ps-tag-5">PS<span class="term__pop" id="gd-ps-tag-5" role="tooltip"><b class="term__hd">PS tag <i>phase set</i></b><span class="term__def" data-lang="zh">標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</span><span class="term__def" data-lang="en">Phase set identifier grouping variants phased together. Haplotype orientation is only consistent within one PS.</span><a class="term__more" href="glossary.html#ps-tag">完整條目 →</a></span></span></code></td><td><code>105</code></td><td>同一個 PS 的位點屬於同一個 phase set；不同 PS 的 HP1／HP2 方向不可直接當成一致。</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose"><code>0|1</code> 只說明兩個 allele 的相位順序已被表示出來，不代表第一條一定是父系，也不代表這一列不需要回看 BAM。<code>PS</code> 是一個分組編號，不是支持 read 的數量。</p>
+
+<h3 id="五-再讀-bam-cigar-只是其中一個欄位">五、再讀 BAM：CIGAR 只是其中一個欄位</h3>
+
+<p class="prose">讀 BAM 時，可以把一筆 alignment record 想成一列「read 如何被放回參考」的資料。<code>POS</code> 告訴你從哪個參考座標開始，<code>MAPQ</code> 是比對位置的信心摘要，<code>SEQ</code> 是 read 序列；<code><span class="term" data-term="CIGAR" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cigar-6">CIGAR<span class="term__pop" id="gd-cigar-6" role="tooltip"><b class="term__hd">CIGAR</b><span class="term__def" data-lang="zh">描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。</span><span class="term__def" data-lang="en">A compact string describing how read bases and reference positions are consumed by an alignment. For example, 5M1I5M has five alignment columns, one insertion, then five alignment columns; M may contain matches or mismatches.</span><a class="term__more" href="glossary.html#cigar">完整條目 →</a></span></span></code> 則用一串數字與字母，描述 read 與參考序列之間各段如何對齊。</p>
+
+<p class="prose">先用固定規則讀 CIGAR：每個操作碼分別消耗「參考序列」或「read」。互動元件只做這一個局部任務；它不是另一種檔案格式。</p>
+
+<figure class="widget" data-widget="cigar-decoder" data-wid="m04.cig" data-config='{"value":"5M1I5M"}'><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>先看預設的 <code>5M1I5M</code>，再輸入較短的 <code>10S8M</code>。每一段都問自己：它消耗參考、消耗 read，還是兩邊都消耗？</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
 
 <div class="table-wrap">
 <table>
 <thead><tr><th>操作碼</th><th>意思</th><th>消耗參考</th><th>消耗 read</th></tr></thead>
 <tbody>
-<tr><td><code>M</code></td><td>對齊（可能吻合，也可能錯配）</td><td>✓</td><td>✓</td></tr>
+<tr><td><code>M</code></td><td>有對齊的欄位；可能吻合，也可能錯配</td><td>✓</td><td>✓</td></tr>
 <tr><td><code>I</code></td><td>insertion：read 有、參考沒有</td><td>✗</td><td>✓</td></tr>
 <tr><td><code>D</code></td><td>deletion：參考有、read 沒有</td><td>✓</td><td>✗</td></tr>
-<tr><td><code>S</code></td><td><span class="term" data-term="soft clipping" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-soft-clipping-6">soft clip<span class="term__pop" id="gd-soft-clipping-6" role="tooltip"><b class="term__hd">soft clipping</b><span class="term__def" data-lang="zh">read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</span><span class="term__def" data-lang="en">A read end that failed to align but is retained in the BAM (CIGAR S). Clipping clustered at one position may suggest a structural breakpoint and needs corroborating evidence.</span><a class="term__more" href="glossary.html#soft-clipping">完整條目 →</a></span></span>：read 保留但沒對上</td><td>✗</td><td>✓</td></tr>
-<tr><td><code>H</code></td><td>hard clip：該段序列未保留在 BAM 的 read 序列中</td><td>✗</td><td>✗</td></tr>
+<tr><td><code>S</code></td><td><span class="term" data-term="soft clipping" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-soft-clipping-7">soft clip<span class="term__pop" id="gd-soft-clipping-7" role="tooltip"><b class="term__hd">soft clipping</b><span class="term__def" data-lang="zh">read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</span><span class="term__def" data-lang="en">A read end that failed to align but is retained in the BAM (CIGAR S). Clipping clustered at one position may suggest a structural breakpoint and needs corroborating evidence.</span><a class="term__more" href="glossary.html#soft-clipping">完整條目 →</a></span></span>：read 保留，但這段沒有納入對齊</td><td>✗</td><td>✓</td></tr>
+<tr><td><code>H</code></td><td>hard clip：該段序列不保留在這筆 alignment record 中</td><td>✗</td><td>✗</td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">一個常見的誤解：<b><code>M</code> 不代表「吻合」</b>，它只代表「有對齊」。
-錯配（mismatch）在 CIGAR 上仍然是 <code>M</code>。若要判定實際鹼基差異，需查看 <code>MD</code> tag 或直接比對參考序列。</p>
+<p class="prose"><b><code>M</code> 不等於完全吻合。</b>如果要知道 <code>M</code> 中哪些鹼基真的不同，要一起看 read 序列、參考序列或 <code>MD</code> tag；不能只靠 CIGAR 的 <code>M</code> 判斷。</p>
 
-<h3 id="soft-clipping-的判讀意義">soft clipping 的判讀意義</h3>
+<h3 id="六-soft-clip-bam-對齊資訊的一個判讀例子">六、soft clip：BAM 對齊資訊的一個判讀例子</h3>
 
-<p class="prose">當 read 的一端無法可靠地與參考序列對齊時，比對演算法通常會將該端標記為
-<code>S</code>（soft clipping）。序列本身仍保留在 BAM 中，但不計入對齊區段。</p>
+<p class="prose">當 read 的一端無法可靠地對上參考時，比對器可能把那一端標成 <code>S</code>。soft-clipped 的序列仍保留在 BAM，所以它和 hard clip 不同；只是該段不消耗參考座標。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img">
   <title>soft clip：read 端部未可靠對齊參考序列時的示意</title>
@@ -238,132 +382,134 @@
   <rect class="box ghost" x="742" y="500" width="16" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
 
   <text class="tick zh bad bold" x="532" y="530">read 與參考序列的對齊可能不一致，需進一步確認</text>
-</svg><figcaption>最上一列是參考序列，每格一個字母。中間兩列是左端與右端 soft-clipped 的 read；<b>紅色虛線框表示未納入對齊的部分</b>，序列仍保留在檔案中，對應的 CIGAR 標示於下方。最底下比較兩種情況：clipping 可能分散於不同 read 的端部；若多條 read 的 clipping 位置集中，則可作為結構變異斷點候選，仍需結合其他證據確認。</figcaption></figure>
+</svg><figcaption>上方先對照參考與兩條 read 的端部 clipping；下方比較 clipping 分散與集中。集中在同一座標的 soft clip 可列為結構變異斷點候選，但也可能由低品質、重複序列或其他 alignment 問題造成，仍需其他證據確認。</figcaption></figure>
 
 <div class="guardrail guardrail--info">
-<p class="guardrail__hd">LongPhase-TO 如何利用 clipping 協助界定 CNV / BFB 區間</p>
-<p class="prose">LongPhase-TO 會統計 clipping 在基因體上的分布：<b>覆蓋度上升的位置</b>可能累積左端 soft clipping，
-<b>下降的位置</b>可能累積右端 soft clipping。一組上升與下降可形成事件區間候選，
-但仍需結合覆蓋度、序列脈絡與其他證據，確認該區段是否與參考基因體不同。</p>
-<p class="prose">此訊號可在不使用預先呼叫的變異資訊時，從 read 與參考序列的對齊模式取得結構變異候選；完整流程會在後續模組中說明。</p>
+<p class="guardrail__hd">把候選訊號當成候選，不要當成結論</p>
+<p class="prose">若多條 read 在相近位置、以相同方向出現 soft clip，這比單一 read 的 clipping 更值得檢查，因為它可能表示 sample 與 reference 在該處的結構不同。但「集中」本身不能排除重複序列、低 mapping quality、定序錯誤或比對器選擇；應搭配 coverage、read 序列與其他變異證據。</p>
 </div>
 
-<h3 id="vcf-與-bam-的關鍵欄位">VCF 與 BAM 的關鍵欄位</h3>
+<h3 id="七-bam-tags-hp-mm-ml-tag-與-somatic-haplotype">七、BAM tags：HP、MM/ML tag 與 somatic haplotype</h3>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>在哪</th><th>欄位</th><th>意思</th></tr></thead>
+<thead><tr><th>BAM tag</th><th>它描述什麼</th><th>本模組的判讀邊界</th></tr></thead>
 <tbody>
-<tr><td>VCF FORMAT</td><td><code>GT</code></td><td><span class="term" data-term="genotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-genotype-7">genotype<span class="term__pop" id="gd-genotype-7" role="tooltip"><b class="term__hd">genotype <i>基因型</i></b><span class="term__def" data-lang="zh">某個 locus 上觀察到的 allele 組合；對一般二倍體常染色體位點，通常是兩份 allele。VCF 裡寫成 <code>0/1</code>（未定相）或 <code>0|1</code>（已定相）。</span><span class="term__def" data-lang="en">The allele combination observed at a locus. At a typical diploid autosomal locus it has two copies; VCF writes these as 0/1 (unphased) or 0|1 (phased).</span><a class="term__more" href="glossary.html#genotype">完整條目 →</a></span></span>。<code>0/1</code> 未定相、<code>0|1</code> 已定相</td></tr>
-<tr><td>VCF FORMAT</td><td><code><span class="term" data-term="PS tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ps-tag-8">PS<span class="term__pop" id="gd-ps-tag-8" role="tooltip"><b class="term__hd">PS tag <i>phase set</i></b><span class="term__def" data-lang="zh">標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</span><span class="term__def" data-lang="en">Phase set identifier grouping variants phased together. Haplotype orientation is only consistent within one PS.</span><a class="term__more" href="glossary.html#ps-tag">完整條目 →</a></span></span></code></td><td>phase set 編號。<b>同一個 PS 內</b>的 haplotype 方向才一致</td></tr>
-<tr><td>VCF FILTER</td><td><code>PASS</code> 等</td><td>caller 或下游工具的判定；在特定 LongPhase-TO 版本／設定中可見 <code>LP_nonSomatic</code>、<code>LP_PON</code></td></tr>
-<tr><td>BAM tag</td><td><code><span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-hp-tag-9">HP<span class="term__pop" id="gd-hp-tag-9" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span></code></td><td>若存在，表示工具對此 read 的 haplotype assignment</td></tr>
-<tr><td>BAM tag</td><td><code><span class="term" data-term="MM/ML tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-mm-ml-tag-10">MM<span class="term__pop" id="gd-mm-ml-tag-10" role="tooltip"><b class="term__hd">MM/ML tag</b><span class="term__def" data-lang="zh">BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。</span><span class="term__def" data-lang="en">BAM tags carrying per-read methylation calls: MM for positions, ML for probabilities. Easily lost during processing.</span><a class="term__more" href="glossary.html#mm-ml-tag">完整條目 →</a></span></span></code> / <code>ML</code></td><td>甲基化的位置與機率</td></tr>
+<tr><td><code><span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-hp-tag-8">HP<span class="term__pop" id="gd-hp-tag-8" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span></code></td><td>工具對這條 read 的 haplotype assignment，例如 <code>HP:i:1</code> 或其他工具版本的 HP 值</td><td>HP1／HP2 是工具標籤，不自動代表父系／母系；沒有 HP 不代表 read 支持相反 allele。</td></tr>
+<tr><td><code>HP3</code></td><td>在 <span class="term" data-term="somatic haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-somatic-haplotype-9">somatic haplotype<span class="term__pop" id="gd-somatic-haplotype-9" role="tooltip"><b class="term__hd">somatic haplotype</b><span class="term__def" data-lang="zh">在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</span><span class="term__def" data-lang="en">A sub-level beneath the germline haplotype: HP1-1 and HP2-1 carry somatic mutations derived from HP1 and HP2; HP3 is unassignable.</span><a class="term__more" href="glossary.html#somatic-haplotype">完整條目 →</a></span></span> 分層中，帶有 somatic signal，但工具尚未可靠判定它源自哪一條 germline haplotype</td><td><b>HP3 不是「沒有 HP」。</b>一般 untagged read 只是沒有 HP assignment；只有同時有 somatic signal 且來源未定，才使用 HP3 這個概念。</td></tr>
+<tr><td><code><span class="term" data-term="MM/ML tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-mm-ml-tag-10">MM/ML<span class="term__pop" id="gd-mm-ml-tag-10" role="tooltip"><b class="term__hd">MM/ML tag</b><span class="term__def" data-lang="zh">BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。</span><span class="term__def" data-lang="en">BAM tags carrying per-read methylation calls: MM for positions, ML for probabilities. Easily lost during processing.</span><a class="term__more" href="glossary.html#mm-ml-tag">完整條目 →</a></span></span></code></td><td><code>MM</code> 記錄 read 上修飾的位置與類型；<code>ML</code> 提供相應的修飾機率／信心值</td><td>這些 tags 可能在 BAM→FASTQ→BAM 的轉換中遺失；看到欄位空白時先檢查流程，不要直接解讀成「沒有甲基化」。</td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose"><code>HP</code> tag 的 SAM 型別可能不同。LongPhase-S 的 germline <code>haplotag</code> 寫成整數
-<code>HP:i:1</code>，而其 <code>somatic_haplotag</code> 與 LongPhase-TO 的示例寫成字串 <code>HP:Z:1-1</code>。
-請依所用版本核對文件與實作；若沒有 HP tag 或標記為 HP3，表示工具未能可靠指派該 read 的 haplotype。</p>
+<p class="prose">這裡的 HP3 是一個「帶有 somatic signal、但來源未定」的工具分類；它不等於普通的未標籤 read，也不等於已經證明存在一個獨立的細胞族群。</p>
 </section>
 
 
 <section data-part="evidence" class="part" id="part-evidence">
-<h2 data-num="③" id="真實證據">真實證據</h2>
+<h2 data-num="③" id="真實資料與證據">真實資料與證據</h2>
 
-<h3 id="前處理指令示範">前處理指令示範</h3>
+<h3 id="把命令和它讀寫的格式對上">把命令和它讀寫的格式對上</h3>
 
-<p class="prose">以下示範一組前處理流程；請依所用版本文件、輸入路徑與分析平台調整參數後執行。</p>
+<p class="prose">下面不是一串需要盲目複製的指令，而是一張「哪個步驟讀哪個檔案、產生哪個檔案」的對照表。執行前仍需依平台、版本與路徑調整。</p>
 
-<pre><code># 參考基因體索引
+<pre><code># 1. 為參考 FASTA 建立索引；產生 reference.fasta.fai
 samtools faidx reference.fasta
 
-# 比對。--MD 會寫入 MD tag（某些下游工具需要）
+# 2. FASTQ + FASTA → SAM；--MD 讓輸出帶有 MD tag（若下游需要）
 minimap2 --MD -ax map-ont -t 10 reference.fasta reads.fastq -o alignment.sam
 
-# 排序與索引
+# 3. SAM → 排序後 BAM；再為 BAM 建立 .bai 索引
 samtools sort -@ 10 alignment.sam -o alignment.bam
 samtools index -@ 10 alignment.bam</code></pre>
 
-<h3 id="重比對時保留甲基化-tag">重比對時保留甲基化 tag</h3>
+<p class="cli-note"><code>.fai</code> 與 <code>.bai</code> 是讓工具快速依座標取資料的索引，不是新的 read 或新的變異結論。比對時使用的 reference FASTA 版本也要和後續查詢座標一致。</p>
 
-<p class="prose">如果 BAM 帶有 <code>MM</code>／<code>ML</code>（甲基化）tag，重比對時若未使用保留 tag 的選項，
-流程可能不會保留這些 tag。要保留它們，請明確處理：</p>
+<h3 id="把-vcf-位點回溯到-bam-read">把 VCF 位點回溯到 BAM read</h3>
 
-<pre><code># -T '*' 把所有 tag 帶進 FASTQ 的 header
+<p class="prose">假設 VCF 有一列 <code>chr7:105 A&gt;G</code>。先取出它的座標，再用同一個座標區間查 BAM；這個動作把「site-level 的候選」連回「read-level 的證據」。</p>
+
+<pre><code># 1. 先看 VCF 的非 header rows
+bcftools view -H sample.vcf | head -3
+
+# 2. 回到相同座標，看每一條 BAM alignment record
+samtools view alignment.bam chr7:105-105
+
+# 3. 用 reference FASTA 產生該位點的 pileup
+samtools mpileup -f reference.fasta -r chr7:105-105 alignment.bam
+
+# 4. 把 read 名稱、位置、MAPQ、CIGAR 與 tags 一起留下
+samtools view alignment.bam chr7:105-105 | cut -f 1,3,4,5,6,12-</code></pre>
+
+<p class="cli-note">若 VCF 與 BAM 使用不同的 reference build，座標可能看似合法卻查到錯的區域。若 CIGAR 型式、MAPQ 或 pileup 顯示不一致，先檢查 alignment 品質、重複序列與 indel 對齊歧義，再判斷生物學意義。</p>
+
+<h3 id="轉換-bam-時保留-mm-ml">轉換 BAM 時保留 MM/ML</h3>
+
+<p class="prose">如果原始 BAM 有甲基化 tags，轉成 FASTQ 再重比對時要明確把 tags 帶過去；否則輸出的 BAM 可能格式正常，卻沒有可用的 MM/ML。</p>
+
+<pre><code># -T '*' 把所有 tags 帶進 FASTQ header/comment
 samtools fastq -T '*' methylcall.raw.bam &gt; methylcall.raw.fastq
 
-# -y 讓 minimap2 把 FASTQ header 裡的 tag 寫回 BAM
+# -y 讓 minimap2 把 FASTQ header 裡的 tags 寫回 BAM
 minimap2 -ax map-ont -y reference.fasta methylcall.raw.fastq</code></pre>
 
-<p class="cli-note">若漏掉 <code>-T '*'</code> 或 <code>-y</code>，流程可能不會報錯，但輸出 BAM 的 MM/ML 欄位可能為空。
-請在重比對後檢查 tag 是否仍存在，避免將缺失的甲基化資訊誤認為生物學結果。</p>
+<p class="cli-note">重比對後請直接檢查 BAM 的 tags 是否仍存在。若漏掉 <code>-T '*'</code> 或 <code>-y</code>，流程可能不報錯，但後續需要 MM/ML 的分析會拿不到原始修飾資訊。</p>
 </section>
 
 
 <section data-part="predict" class="part" id="part-predict">
-<h2 data-num="④" id="判讀練習">判讀練習</h2>
+<h2 data-num="④" id="預測與結果檢視">預測與結果檢視</h2>
 
-<div class="reveal__q"><p class="prose">一條 read 的 CIGAR 是 <code>60S40M</code>，比對位置是 <code>chr7:1,000,000</code>。<br><br>
-這條 read 總共多長？它覆蓋了參考基因體的哪一段？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>read 長 100 bp</b>（60 + 40，soft clip 的序列仍在 read 裡）。</p>
-<p class="prose"><b>但它只覆蓋參考的 <code>chr7:1,000,000–1,000,039</code></b>，也就是 40 bp。
-因為 <code>S</code> 不消耗參考序列。</p>
-<p class="prose">此 read 顯示前 60 bp 未與參考序列可靠對齊，從 1,000,000 開始才進入對齊區段。
-若<b>多條 read 都在 1,000,000 出現相同方向的 clipping</b>，可將此位置列為結構變異斷點候選；
-被剪序列也可能與低品質、重複序列或其他比對問題有關，需結合其他證據確認。</p>
-<p class="prose">完整字串可能超出元件的顯示範圍；可輸入 <code>10S8M</code> 觀察相同的消耗規則。</p></div></details>
+<div class="reveal__q"><p class="prose">你看到 VCF 的一列：<code>chr7 105 A&gt;G PASS GT:PS 0|1:105</code>。如果你想知道這個候選是否真的有 read 支持，應先回哪一種檔案？<br><br>
+同時，這列中的 <code>0|1</code> 與 <code>PS=105</code> 各自告訴你什麼？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>先回 BAM。</b>用 VCF 的 <code>CHROM</code> 與 <code>POS</code> 查詢該區間，再查看每條 read 的序列、MAPQ、CIGAR 與可用 tags；需要時再對照 reference FASTA。FASTQ 是尚未放回座標的原始 read，不能直接回答哪條 read 覆蓋 <code>chr7:105</code>。</p>
+<p class="prose"><code>0|1</code> 表示 REF 與 ALT 的順序已被定相表示；<code>PS=105</code> 表示這個位點屬於編號為 105 的 phase set。它們都不等於支持 read 數量，也不會取代對 BAM 的檢查；HP1／HP2 也不因此自動帶有父系／母系意義。</p></div></details>
+
+<div class="reveal__q"><p class="prose">另一條 BAM record 的 CIGAR 是 <code>60S40M</code>。這條 read 總長多少？它消耗了多少參考序列？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>read 長 100 bp，參考涵蓋 40 bp。</b><code>S</code> 仍保留在 read，所以 <code>60+40=100</code>；但 <code>S</code> 不消耗參考，只有 <code>40M</code> 消耗 40 個參考位置。</p>
+<p class="prose">如果許多 read 在相近座標出現相同方向的 <code>S</code>，可把該處列為結構變異斷點候選；仍需結合其他證據，不能由單一 CIGAR 直接下結論。</p></div></details>
 </section>
 
 
 <section data-part="practice" class="part" id="part-practice">
 <h2 data-num="⑤" id="實作練習">實作練習</h2>
 
-<h3 id="由-bam-回溯-vcf-位點證據">由 BAM 回溯 VCF 位點證據</h3>
+<h3 id="練習一-從一列-vcf-開始追證據">練習一：從一列 VCF 開始追證據</h3>
 
-<p class="prose">此練習將 VCF 位點與 BAM 的 read-level 證據連結起來。挑選一個 VCF 變異，再回到 BAM 檢查其支持情況：</p>
+<p class="prose">選一列 VCF，先寫下 <code>CHROM</code>、<code>POS</code>、<code>REF</code>、<code>ALT</code>，再逐步回答：</p>
 
-<pre><code># 1. 從 VCF 挑一個位點
-bcftools view -H sample.vcf | head -3
+<ol class="prose">
+<li>它是一個 site-level row，還是一條 read？</li>
+<li>要回 BAM 查哪一個座標區間？</li>
+<li>在 BAM record 中，哪些固定欄位告訴你 read 的位置、對齊型式與品質？</li>
+<li>有哪些 HP、MM/ML tags？沒有 HP 時，能不能直接寫成 HP3？</li>
+</ol>
 
-# 2. 回到 BAM 看那個位置上的每一條 read
-samtools view aln.bam chr1:1000000-1000000
+<p class="prose">最後用 pileup 或 IGV 對照支持與反對的 read；不要只看 VCF 的 <code>FILTER=PASS</code> 就跳過 read-level 檢查。</p>
 
-# 3. 用 pileup 直接看每條 read 在那個位置的鹼基
-samtools mpileup -f reference.fasta -r chr1:1000000-1000000 aln.bam
+<h3 id="練習二-讀-cigar-的兩個總和">練習二：讀 CIGAR 的兩個總和</h3>
 
-# 4. 檢查該位置附近的 CIGAR 型式
-samtools view aln.bam chr1:1000000-1000000 | awk '{print $6}' | sort | uniq -c | sort -rn</code></pre>
-
-<p class="cli-note">第 4 步可用來檢查對齊型式：若同一位置的 CIGAR 型式高度多樣，可能表示重複序列或 indel 對齊不確定，
-應結合 mapping/base quality 與 pileup 謹慎評估；型式一致也不代表證據必然可靠。</p>
-
-<h3 id="cigar-讀法練習">CIGAR 讀法練習</h3>
-
-<p class="prose">請在上方解碼器輸入以下 CIGAR，先計算 read 與參考序列的消耗長度，再核對答案：</p>
+<p class="prose">對每個 CIGAR，分別把「消耗 read」與「消耗參考」的操作碼加總，再用上方解碼器核對：</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>CIGAR</th><th>read 長度</th><th>參考涵蓋長度（bp）</th></tr></thead>
+<thead><tr><th>CIGAR</th><th>read 長度</th><th>參考涵蓋長度</th><th>先看哪個規則？</th></tr></thead>
 <tbody>
-<tr><td><code>10M</code></td><td>10</td><td>10</td></tr>
-<tr><td><code>5M2I3M</code></td><td>10</td><td>8</td></tr>
-<tr><td><code>5M2D5M</code></td><td>10</td><td>12</td></tr>
-<tr><td><code>3S7M</code></td><td>10</td><td>7</td></tr>
+<tr><td><code>10M</code></td><td>10</td><td>10</td><td><code>M</code> 兩邊都消耗</td></tr>
+<tr><td><code>5M2I5M</code></td><td>12</td><td>10</td><td><code>I</code> 只消耗 read</td></tr>
+<tr><td><code>5M2D5M</code></td><td>10</td><td>12</td><td><code>D</code> 只消耗參考</td></tr>
+<tr><td><code>3S7M</code></td><td>10</td><td>7</td><td><code>S</code> 留在 read、不佔參考</td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">判讀時先掌握一項核心規則：<b>查看每個操作碼消耗哪一側的序列。</b><code>I</code> 與 <code>S</code>
-只消耗 read，<code>D</code> 只消耗參考序列，<code>M</code> 兩側都消耗。</p>
+<p class="prose">如果你只記得一句話：<b>先辨認檔案的資料粒度，再讀欄位；CIGAR 是 BAM 對齊欄位的解碼規則，不是 NGS 檔案鏈的起點。</b></p>
 
 <section class="quiz" data-quiz="m04"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m03.html"><small>← 上一模組</small>定序原理與長讀的分析價值</a><a class="next" href="m05.html"><small>下一模組 →</small>Germline variant calling：從證據到判定</a></nav>
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>BAM</dt><dd>已比對到參考基因體的 read 的二進位格式（SAM 的壓縮版）。每一列是一條 read，帶著它的位置、CIGAR、品質與各種 tag。</dd><dt>CIGAR</dt><dd>描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。</dd><dt>FASTQ</dt><dd>存放 read 序列與每個鹼基品質分數的文字格式；每筆紀錄由四行組成。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>MM/ML tag</dt><dd>BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。</dd><dt>PS tag（phase set）</dt><dd>標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</dd><dt>VCF</dt><dd>存放 variant 的文字格式。每一列是一個位點，記錄位置、ref/alt allele、品質、FILTER 與各種 FORMAT 欄位。</dd><dt>genotype（基因型）</dt><dd>某個 locus 上觀察到的 allele 組合；對一般二倍體常染色體位點，通常是兩份 allele。VCF 裡寫成 <code>0/1</code>（未定相）或 <code>0|1</code>（已定相）。</dd><dt>reference genome（參考基因體）</dt><dd>用於比對的標準序列（人類資料常用 GRCh38）。所有座標均相對於指定版本；更換 build 會改變座標系，座標不可直接比較。</dd><dt>soft clipping</dt><dd>read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>BAM</dt><dd>已比對到參考基因體的 read 的二進位格式（SAM 的壓縮版）。每一列是一條 read，帶著它的位置、CIGAR、品質與各種 tag。</dd><dt>CIGAR</dt><dd>描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。</dd><dt>FASTA</dt><dd>以文字保存 DNA 或 RNA 序列的格式；在本模組中，FASTA 主要用來提供比對所需的參考基因體序列。</dd><dt>FASTQ</dt><dd>存放 read 序列與每個鹼基品質分數的文字格式；每筆紀錄由四行組成。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>MM/ML tag</dt><dd>BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。</dd><dt>PS tag（phase set）</dt><dd>標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</dd><dt>VCF</dt><dd>存放 variant 的文字格式。每一列是一個位點，記錄位置、ref/alt allele、品質、FILTER 與各種 FORMAT 欄位。</dd><dt>reference genome（參考基因體）</dt><dd>用於比對的標準序列（人類資料常用 GRCh38）。所有座標均相對於指定版本；更換 build 會改變座標系，座標不可直接比較。</dd><dt>soft clipping</dt><dd>read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#從樣本到變異的檔案鏈">從樣本到變異的檔案鏈</a></li><li class="lv3"><a href="#cigar-read-與參考序列的對齊表示">CIGAR：read 與參考序列的對齊表示</a></li><li class="lv3"><a href="#soft-clipping-的判讀意義">soft clipping 的判讀意義</a></li><li class="lv3"><a href="#vcf-與-bam-的關鍵欄位">VCF 與 BAM 的關鍵欄位</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#前處理指令示範">前處理指令示範</a></li><li class="lv3"><a href="#重比對時保留甲基化-tag">重比對時保留甲基化 tag</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#由-bam-回溯-vcf-位點證據">由 BAM 回溯 VCF 位點證據</a></li><li class="lv3"><a href="#cigar-讀法練習">CIGAR 讀法練習</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#一-先建立檔案地圖">一、先建立檔案地圖</a></li><li class="lv3"><a href="#二-用同一個小例子追過四種格式">二、用同一個小例子追過四種格式</a></li><li class="lv3"><a href="#三-從檔案讀到細節-四個層級">三、從檔案讀到細節：四個層級</a></li><li class="lv3"><a href="#四-先讀-vcf-的關鍵欄位">四、先讀 VCF 的關鍵欄位</a></li><li class="lv3"><a href="#五-再讀-bam-cigar-只是其中一個欄位">五、再讀 BAM：CIGAR 只是其中一個欄位</a></li><li class="lv3"><a href="#六-soft-clip-bam-對齊資訊的一個判讀例子">六、soft clip：BAM 對齊資訊的一個判讀例子</a></li><li class="lv3"><a href="#七-bam-tags-hp-mm-ml-tag-與-somatic-haplotype">七、BAM tags：HP、MM/ML tag 與 somatic haplotype</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#把命令和它讀寫的格式對上">把命令和它讀寫的格式對上</a></li><li class="lv3"><a href="#把-vcf-位點回溯到-bam-read">把 VCF 位點回溯到 BAM read</a></li><li class="lv3"><a href="#轉換-bam-時保留-mm-ml">轉換 BAM 時保留 MM/ML</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#練習一-從一列-vcf-開始追證據">練習一：從一列 VCF 開始追證據</a></li><li class="lv3"><a href="#練習二-讀-cigar-的兩個總和">練習二：讀 CIGAR 的兩個總和</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">
@@ -371,7 +517,10 @@ samtools view aln.bam chr1:1000000-1000000 | awk '{print $6}' | sort | uniq -c |
   <code>LongPhase-S</code> 與 <code>LongPhase-TO</code> 的概念、證據與限制。
 </footer>
 
-
+<svg class="tw-defs" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="arrow-sm" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+  </marker></defs></svg>
 <script src="assets/js/progress.js"></script>
 <script src="assets/js/core.js"></script>
 <script src="assets/js/glossary.js"></script>

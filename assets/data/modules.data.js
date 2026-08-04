@@ -51,7 +51,7 @@ window.TW_MODULES = [
   "title_en": "Data literacy",
   "short": "資料格式",
   "q": "一筆變異紀錄，如何回溯到其原始資料？",
-  "sub": "從 BAM 中的 read 觀測追溯到 VCF 紀錄，並使用 CIGAR 解碼器練習讀取對齊資訊。",
+  "sub": "從 FASTA、FASTQ、BAM 到 VCF，先建立檔案層級與範例，再拆解 BAM 的 CIGAR、HP／MM/ML 與 VCF 的 GT／PS。",
   "est_min": 60,
   "group": "工具"
  },
