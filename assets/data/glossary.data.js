@@ -62,7 +62,8 @@ window.TW_GLOSSARY = {
   "modules": [
    "m01",
    "m02",
-   "m05"
+   "m05",
+   "m07"
   ]
  },
  "diploid": {
@@ -332,6 +333,7 @@ window.TW_GLOSSARY = {
    "m01",
    "m02",
    "m03",
+   "m08",
    "m12"
   ]
  },

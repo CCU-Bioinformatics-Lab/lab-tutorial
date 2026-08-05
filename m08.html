@@ -58,14 +58,384 @@
 <section data-part="why" class="part" id="part-why">
 <h2 data-num="①" id="為什麼重要">為什麼重要</h2>
 
-<p class="prose">本節用於檢驗腫瘤資料分析中的常見假設；這些概念也常在研究文獻中被混用或誤解。</p>
+<p class="prose">到目前為止，「腫瘤樣本」在流程裡就是一袋 read。但那袋 read 來自<b>一堆混在一起的細胞</b>：
+有癌細胞，也有正常細胞；癌細胞之間彼此也不完全相同；而且同一個位置在不同細胞裡可能有不同的 DNA 份數。</p>
 
-<p class="prose">核心訊息是：<b>腫瘤資料中的觀測值通常同時受多項潛在因素影響。</b></p>
+<p class="prose">結果就是：<b>同一個觀測到的數字，可以由好幾種不同的細胞組成算出來。</b>
+所以這一章的第一件事，是把 purity、copy number、multiplicity、CCF 這幾個名詞各自「在數什麼」講清楚 ——
+它們常被混用，而混用會直接讓結論出錯。</p>
 </section>
 
 
 <section data-part="concept" class="part" id="part-concept">
 <h2 data-num="②" id="概念與互動">概念與互動</h2>
+
+<h3 id="先把名詞跟-在數什麼-對起來">先把名詞跟「在數什麼」對起來</h3>
+
+<p class="prose">這些名詞看起來很多，但它們其實只做一件事：<b>在不同層級上數東西</b>。
+<span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-purity-0">purity<span class="term__pop" id="gd-tumour-purity-0" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span> 與 <span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cancer-cell-fraction-1">CCF<span class="term__pop" id="gd-cancer-cell-fraction-1" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span> 數的是<b>細胞</b>；
+<span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-copy-number-2">copy number<span class="term__pop" id="gd-copy-number-2" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span> 與 <span class="term" data-term="mutation multiplicity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-mutation-multiplicity-3">multiplicity<span class="term__pop" id="gd-mutation-multiplicity-3" role="tooltip"><b class="term__hd">mutation multiplicity</b><span class="term__def" data-lang="zh">在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</span><span class="term__def" data-lang="en">How many mutant-allele copies are present in a cell carrying the mutation; a necessary term when converting VAF to cancer cell fraction.</span><a class="term__more" href="glossary.html#mutation-multiplicity">完整條目 →</a></span></span> 數的是<b>一個細胞裡有幾份 DNA</b>；
+<span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-vaf-4">VAF<span class="term__pop" id="gd-vaf-4" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span> 數的是<b>read</b>。搞混它們，通常就是搞混了分母。</p>
+
+<p class="prose">下面用一個玩具檢體把三層對齊：10 個細胞，其中 6 個是腫瘤細胞，
+腫瘤細胞裡有 3 個帶著我們要看的那個突變，每個細胞在這個位置都有 2 份 DNA。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 726" class="dia-svg" role="img">
+  <title>purity、CCF、copy number、multiplicity 與 VAF 各自在數什麼</title>
+  <desc>用同一個玩具檢體（10 個細胞、每個細胞在這個位置有 2 份 DNA）把五個名詞對齊在三個計數層級上。
+        細胞層：purity 是腫瘤細胞佔全部細胞的比例，6 除以 10 等於 0.6；
+        CCF 是帶有這個突變的腫瘤細胞佔全部腫瘤細胞的比例，3 除以 6 等於 0.5，兩者的分母不同。
+        拷貝層：copy number 是一個細胞在這個位置有幾份 DNA，此例為 2；
+        multiplicity 是突變坐落在其中幾份，此例為 1；ploidy 是整個基因體平均的 copy number。
+        整個檢體在這個位置共 20 份 DNA，腫瘤細胞貢獻 12 份、正常細胞貢獻 8 份，其中 3 份帶突變。
+        read 層：VAF 是帶變異的 read 佔全部 read 的比例，3 除以 20 等於 0.15，
+        也是這五個數字中唯一可以由定序資料直接數出來的。
+        由上往下計算答案唯一，但由 VAF 往上反推並不唯一。
+        另外提醒：一條 read 是一個 DNA 分子，不是一個細胞，同一個細胞會給出很多條 read。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">這一章的名詞，其實是在三個不同層級上數東西</text>
+  <text class="tick zh" x="20" y="58">玩具檢體：10 個細胞，每個細胞在這個位置有 2 份 DNA</text>
+
+  <!-- ══════════════ ① 細胞層：數細胞 ══════════════ -->
+  <rect class="box plain" x="16" y="76" width="296" height="514" rx="10"/>
+  <text class="anno bold zh mid" x="164" y="106">① 細胞層</text>
+  <text class="tick mid zh" x="164" y="130">數的是「細胞」</text>
+
+  <rect class="box ghost" x="42" y="148" width="118" height="82" rx="8"/>
+  <circle class="cell tumor" cx="62" cy="170" r="15"/><circle class="nucleus" cx="62" cy="170" r="7"/>
+  <circle class="mark somatic" cx="62" cy="170" r="4"/>
+  <circle class="cell tumor" cx="100" cy="170" r="15"/><circle class="nucleus" cx="100" cy="170" r="7"/>
+  <circle class="mark somatic" cx="100" cy="170" r="4"/>
+  <circle class="cell tumor" cx="138" cy="170" r="15"/><circle class="nucleus" cx="138" cy="170" r="7"/>
+  <circle class="mark somatic" cx="138" cy="170" r="4"/>
+  <circle class="cell tumor" cx="62" cy="208" r="15"/><circle class="nucleus" cx="62" cy="208" r="7"/>
+  <circle class="cell tumor" cx="100" cy="208" r="15"/><circle class="nucleus" cx="100" cy="208" r="7"/>
+  <circle class="cell tumor" cx="138" cy="208" r="15"/><circle class="nucleus" cx="138" cy="208" r="7"/>
+  <rect class="box ghost" x="176" y="148" width="80" height="82" rx="8"/>
+  <circle class="cell normal" cx="196" cy="170" r="15"/><circle class="nucleus" cx="196" cy="170" r="7"/>
+  <circle class="cell normal" cx="234" cy="170" r="15"/><circle class="nucleus" cx="234" cy="170" r="7"/>
+  <circle class="cell normal" cx="196" cy="208" r="15"/><circle class="nucleus" cx="196" cy="208" r="7"/>
+  <circle class="cell normal" cx="234" cy="208" r="15"/><circle class="nucleus" cx="234" cy="208" r="7"/>
+  <text class="tick mid zh" x="101" y="250">腫瘤細胞 6 個</text>
+  <text class="tick mid zh" x="216" y="250">正常 4 個</text>
+  <text class="tick zh" x="36" y="276">實心小點＝帶有這個突變（3 個）</text>
+
+  <rect class="box accent" x="36" y="300" width="256" height="104" rx="8"/>
+  <text class="anno bold zh" x="56" y="328">purity 腫瘤純度</text>
+  <text class="tick zh" x="56" y="356">腫瘤細胞 ÷ 所有細胞</text>
+  <text class="tick mono bold" x="56" y="384">6 ÷ 10 = 0.6</text>
+
+  <rect class="box accent" x="36" y="416" width="256" height="104" rx="8"/>
+  <text class="anno bold zh" x="56" y="444">CCF 癌細胞比例</text>
+  <text class="tick zh" x="56" y="472">帶突變的腫瘤細胞 ÷ 腫瘤細胞</text>
+  <text class="tick mono bold" x="56" y="500">3 ÷ 6 = 0.5</text>
+
+  <text class="tick zh warn bold" x="36" y="552">兩個分數的分母不一樣</text>
+
+  <!-- ══════════════ ② 拷貝層：數 DNA 份數 ══════════════ -->
+  <rect class="box plain" x="352" y="76" width="296" height="514" rx="10"/>
+  <text class="anno bold zh mid" x="500" y="106">② 拷貝層</text>
+  <text class="tick mid zh" x="500" y="130">數的是「DNA 份數」</text>
+
+  <circle class="cell tumor" cx="400" cy="178" r="16"/><circle class="nucleus" cx="400" cy="178" r="7"/>
+  <circle class="mark somatic" cx="400" cy="178" r="4"/>
+  <path class="conn" d="M420,178 L442,178" marker-end="url(#arrow-sm)"/>
+  <g transform="translate(452,146) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark somatic" cx="460" cy="170" r="5"/>
+  <g transform="translate(486,146) scale(0.8)">
+    <path class="chr hp2" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp2" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark ref" cx="494" cy="170" r="5"/>
+  <text class="tick zh" x="372" y="228">一個細胞 2 份，1 份帶突變</text>
+
+  <!-- 整個檢體在這個位置的 20 份 DNA，其中 3 份帶突變 -->
+  <rect class="bar somatic" x="372" y="252" width="11" height="22"/>
+  <rect class="bar somatic" x="385" y="252" width="11" height="22"/>
+  <rect class="bar somatic" x="398" y="252" width="11" height="22"/>
+  <rect class="bar" x="411" y="252" width="11" height="22"/>
+  <rect class="bar" x="424" y="252" width="11" height="22"/>
+  <rect class="bar" x="437" y="252" width="11" height="22"/>
+  <rect class="bar" x="450" y="252" width="11" height="22"/>
+  <rect class="bar" x="463" y="252" width="11" height="22"/>
+  <rect class="bar" x="476" y="252" width="11" height="22"/>
+  <rect class="bar" x="489" y="252" width="11" height="22"/>
+  <rect class="bar" x="502" y="252" width="11" height="22"/>
+  <rect class="bar" x="515" y="252" width="11" height="22"/>
+  <rect class="bar" x="528" y="252" width="11" height="22"/>
+  <rect class="bar" x="541" y="252" width="11" height="22"/>
+  <rect class="bar" x="554" y="252" width="11" height="22"/>
+  <rect class="bar" x="567" y="252" width="11" height="22"/>
+  <rect class="bar" x="580" y="252" width="11" height="22"/>
+  <rect class="bar" x="593" y="252" width="11" height="22"/>
+  <rect class="bar" x="606" y="252" width="11" height="22"/>
+  <rect class="bar" x="619" y="252" width="11" height="22"/>
+  <path class="axis" d="M372,284 L526,284"/>
+  <path class="axis" d="M528,284 L630,284"/>
+  <text class="tick mid zh" x="449" y="304">腫瘤細胞 12 份</text>
+  <text class="tick mid zh" x="579" y="304">正常 8 份</text>
+  <text class="tick zh" x="372" y="330">整個檢體 20 份，3 份帶突變</text>
+
+  <rect class="box plain" x="372" y="350" width="256" height="62" rx="8"/>
+  <text class="anno bold zh" x="392" y="376">copy number 拷貝數</text>
+  <text class="tick zh" x="392" y="402">這個位置有幾份 → 這裡是 2</text>
+  <rect class="box plain" x="372" y="424" width="256" height="62" rx="8"/>
+  <text class="anno bold zh" x="392" y="450">multiplicity 佔幾份</text>
+  <text class="tick zh" x="392" y="476">突變在其中幾份 → 這裡是 1</text>
+  <rect class="box plain" x="372" y="498" width="256" height="62" rx="8"/>
+  <text class="anno bold zh" x="392" y="524">ploidy 倍性</text>
+  <text class="tick zh" x="392" y="550">整個基因體平均的拷貝數</text>
+
+  <!-- ══════════════ ③ read 層：數 read ══════════════ -->
+  <rect class="box plain" x="688" y="76" width="296" height="514" rx="10"/>
+  <text class="anno bold zh mid" x="836" y="106">③ read 層</text>
+  <text class="tick mid zh" x="836" y="130">數的是「read」</text>
+
+  <line class="guide" x1="767" y1="146" x2="767" y2="288"/>
+  <line class="guide" x1="893" y1="146" x2="893" y2="288"/>
+  <rect class="read" x="708" y="152" width="118" height="10" rx="5"/>
+  <circle class="mark somatic" cx="767" cy="157" r="4"/>
+  <rect class="read" x="708" y="165" width="118" height="10" rx="5"/>
+  <circle class="mark somatic" cx="767" cy="170" r="4"/>
+  <rect class="read" x="708" y="178" width="118" height="10" rx="5"/>
+  <circle class="mark somatic" cx="767" cy="183" r="4"/>
+  <rect class="read" x="708" y="191" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="196" r="4"/>
+  <rect class="read" x="708" y="204" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="209" r="4"/>
+  <rect class="read" x="708" y="217" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="222" r="4"/>
+  <rect class="read" x="708" y="230" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="235" r="4"/>
+  <rect class="read" x="708" y="243" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="248" r="4"/>
+  <rect class="read" x="708" y="256" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="261" r="4"/>
+  <rect class="read" x="708" y="269" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="274" r="4"/>
+  <rect class="read" x="834" y="152" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="157" r="4"/>
+  <rect class="read" x="834" y="165" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="170" r="4"/>
+  <rect class="read" x="834" y="178" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="183" r="4"/>
+  <rect class="read" x="834" y="191" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="196" r="4"/>
+  <rect class="read" x="834" y="204" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="209" r="4"/>
+  <rect class="read" x="834" y="217" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="222" r="4"/>
+  <rect class="read" x="834" y="230" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="235" r="4"/>
+  <rect class="read" x="834" y="243" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="248" r="4"/>
+  <rect class="read" x="834" y="256" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="261" r="4"/>
+  <rect class="read" x="834" y="269" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="274" r="4"/>
+  <text class="tick zh" x="708" y="308">20 條 read，3 條帶變異</text>
+  <text class="anno bold mono somatic" x="708" y="338">VAF = 3 ÷ 20 = 0.15</text>
+
+  <rect class="box accent" x="708" y="356" width="256" height="104" rx="8"/>
+  <text class="anno bold zh" x="728" y="384">VAF 變異等位基因頻率</text>
+  <text class="tick zh" x="728" y="410">帶變異的 read ÷ 全部 read</text>
+  <text class="tick zh bold" x="728" y="436">唯一能直接數出來的一層</text>
+
+  <rect class="box warn" x="708" y="472" width="256" height="104" rx="8"/>
+  <text class="anno bold zh warn" x="728" y="500">read 不等於細胞</text>
+  <text class="tick zh" x="728" y="526">一條 read 是一個 DNA 分子</text>
+  <text class="tick zh" x="728" y="552">同一個細胞會給出很多條</text>
+
+  <path class="flow" d="M320,320 L344,320" marker-end="url(#arrow)"/>
+  <path class="flow" d="M656,320 L680,320" marker-end="url(#arrow)"/>
+
+  <!-- ══════════════ 結論：方向不對稱 ══════════════ -->
+  <line class="axis" x1="20" y1="616" x2="980" y2="616"/>
+  <text class="lbl bold zh" x="20" y="648">由上往下算，答案唯一；由下往上反推，答案不唯一。</text>
+  <text class="anno zh" x="20" y="678">腫瘤佔 0.6、其中一半帶突變、每個細胞 2 份裡有 1 份帶突變 → VAF 一定是 0.15。</text>
+  <text class="anno zh" x="20" y="706">但只拿到 VAF = 0.15 時，上面兩層有很多組合都能算出同一個數字。</text>
+</svg><figcaption>同一個檢體、同一個位置，三層各自的分子與分母。
+注意 purity 的分母是<b>所有細胞</b>，CCF 的分母<b>只有腫瘤細胞</b> —— 這是最常被互換的一對。
+最右邊那層是唯一能從資料直接數出來的：20 條 read 裡有 3 條帶變異，VAF = 0.15。</figcaption></figure>
+
+<p class="prose">這張圖裡有兩件事值得停下來看。</p>
+
+<p class="prose">第一，<b>方向是不對稱的</b>。給定上面兩層，VAF 只有一個答案 ——
+腫瘤佔 0.6、其中一半帶突變、每個細胞 2 份裡帶 1 份，算出來就是 0.6 × 0.5 ÷ 2 = 0.15。
+但拿著 VAF = 0.15 往上反推，會有很多組合都成立。整章的難處都在這個不對稱上。</p>
+
+<p class="prose">第二，<b>read 不是細胞</b>。一條 read 是一個 DNA 分子，同一個細胞會貢獻很多條 read，
+而且哪一條 read 來自哪個細胞在 bulk 資料裡查不到。所以「數 read」永遠只是「數細胞」的間接代理。</p>
+
+<h3 id="copy-number-multiplicity-與-ploidy-一個位置有幾份">copy number、multiplicity 與 ploidy：一個位置有幾份</h3>
+
+<p class="prose">中間那層最容易被跳過，但它是後面所有推論的地基。三個詞的差別很小、影響很大：
+<b>copy number</b> 是「這一段在一個細胞裡有幾份」，<b>multiplicity</b> 是「其中幾份帶著這個突變」，
+<span class="term" data-term="ploidy" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ploidy-5">ploidy<span class="term__pop" id="gd-ploidy-5" role="tooltip"><b class="term__hd">ploidy <i>倍性</i></b><span class="term__def" data-lang="zh">細胞內染色體套數。多數正常常染色體為 2（diploid）；腫瘤可呈現 3、4 或其他非整倍體狀態。</span><span class="term__def" data-lang="en">The number of chromosome sets in a cell. Most normal autosomal regions are diploid (2); tumours may be triploid, tetraploid or otherwise non-diploid.</span><a class="term__more" href="glossary.html#ploidy">完整條目 →</a></span></span> 是「把整個基因體的 copy number 平均起來」。</p>
+
+<p class="prose">為什麼要分這麼細？因為同一個突變、同樣「每個腫瘤細胞都有」，
+只要拷貝狀態不同，VAF 就完全不同：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" class="dia-svg" role="img">
+  <title>copy number、multiplicity 與 ploidy 的差別，以及它們如何改變 VAF</title>
+  <desc>四格比較同一個位置在不同拷貝狀態下的樣子，四格都假設檢體全是腫瘤細胞且所有腫瘤細胞都帶有這個突變。
+        正常細胞：兩份，沒有突變。
+        腫瘤細胞情況一：兩份、突變佔一份，VAF 為二分之一。
+        腫瘤細胞情況二：帶突變的那一份被複製，變成三份、突變佔兩份，VAF 升為三分之二。
+        腫瘤細胞情況三：另一份整條遺失，只剩一份且帶突變，VAF 升到一，這就是 copy-loss LOH。
+        因此同一個突變在不同拷貝狀態下會給出完全不同的 VAF。
+        下半部說明 ploidy 與 copy number 的差別：
+        copy number 是某一段的份數，沿基因體會變動；ploidy 是把整個基因體的 copy number 平均起來的值。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">同一個突變，落在不同的拷貝狀態上，VAF 就不一樣</text>
+  <text class="tick zh" x="20" y="58">下面四格都假設：檢體全是腫瘤細胞，而且每個腫瘤細胞都帶有這個突變。差別只在拷貝狀態。</text>
+
+  <!-- ══════ A：正常細胞（對照） ══════ -->
+  <rect class="box plain" x="16" y="76" width="230" height="286" rx="10"/>
+  <text class="anno bold zh mid" x="131" y="106">正常細胞</text>
+
+  <g transform="translate(107,126) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark ref" cx="115" cy="150" r="5"/>
+  <g transform="translate(139,126) scale(0.8)">
+    <path class="chr hp2" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp2" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark ref" cx="147" cy="150" r="5"/>
+
+  <text class="tick mid mono" x="131" y="216">copy number = 2</text>
+  <text class="tick mid mono" x="131" y="242">multiplicity = 0</text>
+
+  <rect class="box plain" x="26" y="258" width="210" height="48" rx="8"/>
+  <text class="anno bold mid" x="131" y="288">VAF = 0</text>
+  <text class="tick mid zh" x="131" y="336">這個位置沒有突變</text>
+
+  <!-- ══════ B：CN 2 / mult 1 ══════ -->
+  <rect class="box plain" x="262" y="76" width="230" height="286" rx="10"/>
+  <text class="anno bold zh mid somatic" x="377" y="106">腫瘤細胞 ①</text>
+
+  <g transform="translate(353,126) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark somatic" cx="361" cy="150" r="5"/>
+  <g transform="translate(385,126) scale(0.8)">
+    <path class="chr hp2" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp2" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark ref" cx="393" cy="150" r="5"/>
+
+  <text class="tick mid mono" x="377" y="216">copy number = 2</text>
+  <text class="tick mid mono" x="377" y="242">multiplicity = 1</text>
+
+  <rect class="box accent" x="272" y="258" width="210" height="48" rx="8"/>
+  <text class="anno bold mid" x="377" y="288">VAF = 1 ÷ 2 = 0.50</text>
+  <text class="tick mid zh" x="377" y="336">最單純的情況</text>
+
+  <!-- ══════ C：CN 3 / mult 2 ══════ -->
+  <rect class="box plain" x="508" y="76" width="230" height="286" rx="10"/>
+  <text class="anno bold zh mid somatic" x="623" y="106">腫瘤細胞 ②</text>
+
+  <g transform="translate(583,126) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark somatic" cx="591" cy="150" r="5"/>
+  <g transform="translate(615,126) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark somatic" cx="623" cy="150" r="5"/>
+  <g transform="translate(647,126) scale(0.8)">
+    <path class="chr hp2" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp2" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark ref" cx="655" cy="150" r="5"/>
+
+  <text class="tick mid mono" x="623" y="216">copy number = 3</text>
+  <text class="tick mid mono" x="623" y="242">multiplicity = 2</text>
+
+  <rect class="box accent" x="518" y="258" width="210" height="48" rx="8"/>
+  <text class="anno bold mid" x="623" y="288">VAF = 2 ÷ 3 = 0.67</text>
+  <text class="tick mid zh" x="623" y="336">帶突變的那份被複製了</text>
+
+  <!-- ══════ D：CN 1 / mult 1（copy-loss LOH） ══════ -->
+  <rect class="box plain" x="754" y="76" width="230" height="286" rx="10"/>
+  <text class="anno bold zh mid somatic" x="869" y="106">腫瘤細胞 ③</text>
+
+  <g transform="translate(845,126) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark somatic" cx="853" cy="150" r="5"/>
+  <g transform="translate(877,126) scale(0.8)">
+    <path class="chr lost" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                              C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr lost" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                              C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <text class="tick mid zh" x="885" y="200">已遺失</text>
+
+  <text class="tick mid mono" x="869" y="216">copy number = 1</text>
+  <text class="tick mid mono" x="869" y="242">multiplicity = 1</text>
+
+  <rect class="box bad" x="764" y="258" width="210" height="48" rx="8"/>
+  <text class="anno bold mid bad" x="869" y="288">VAF = 1 ÷ 1 = 1.00</text>
+  <text class="tick mid zh" x="869" y="336">另一條整條掉了</text>
+
+  <!-- ══════ ploidy vs copy number ══════ -->
+  <line class="axis" x1="20" y1="386" x2="980" y2="386"/>
+  <text class="lbl bold zh" x="20" y="418">copy number 是「某一段」的份數；ploidy 是「整個基因體」的平均</text>
+  <text class="tick zh" x="40" y="444">沿著基因體看，每一段的 copy number 可能都不一樣：</text>
+
+  <!-- 沿基因體的拷貝數輪廓（高度 ∝ 拷貝數，一單位 12px，基線 y=520） -->
+  <rect class="bar" x="40"  y="496" width="300" height="24"/>
+  <rect class="bar" x="340" y="508" width="150" height="12"/>
+  <rect class="bar" x="490" y="484" width="200" height="36"/>
+  <rect class="bar" x="690" y="472" width="100" height="48"/>
+  <rect class="bar" x="790" y="496" width="150" height="24"/>
+  <line class="axis" x1="40" y1="520" x2="940" y2="520"/>
+
+  <text class="tick mid" x="190" y="540">2</text>
+  <text class="tick mid" x="415" y="540">1</text>
+  <text class="tick mid" x="590" y="540">3</text>
+  <text class="tick mid" x="740" y="540">4</text>
+  <text class="tick mid" x="865" y="540">2</text>
+  <text class="tick zh" x="40" y="562">← 基因體位置 →</text>
+
+  <text class="anno zh" x="40" y="596">把上面這條曲線沿長度平均起來 ≈ 2.3，這就是這個腫瘤的 ploidy（正常細胞是 2）。</text>
+</svg><figcaption>四格都假設檢體全是腫瘤細胞、而且每個細胞都帶有這個突變 ——
+唯一的差別是拷貝狀態。VAF 從 0.50 變成 0.67 或 1.00，不是因為突變變多了，
+是因為它所在的那份 DNA 被複製了，或另一份被丟掉了（那正是 copy-loss [[LOH]]）。
+下半部區分 copy number（某一段的份數）與 ploidy（整個基因體的平均）。</figcaption></figure>
+
+<p class="prose">把「腫瘤細胞佔多少」「一個細胞有幾份」「突變佔幾份」「多少腫瘤細胞帶著它」四件事寫進同一個式子，
+就是下一節的關係式。</p>
 
 <h3 id="vaf-的完整關係式">VAF 的完整關係式</h3>
 
@@ -82,10 +452,10 @@
 <table>
 <thead><tr><th>符號</th><th>意思</th><th>是否可直接觀測</th></tr></thead>
 <tbody>
-<tr><td><code>purity</code></td><td><span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-purity-0">腫瘤細胞比例<span class="term__pop" id="gd-tumour-purity-0" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span></td><td>通常需估計</td></tr>
-<tr><td><code>totalCN</code></td><td>該位置的 <span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-copy-number-1">總拷貝數<span class="term__pop" id="gd-copy-number-1" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span>（整體平均值即 <span class="term" data-term="ploidy" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ploidy-2">ploidy<span class="term__pop" id="gd-ploidy-2" role="tooltip"><b class="term__hd">ploidy <i>倍性</i></b><span class="term__def" data-lang="zh">細胞內染色體套數。多數正常常染色體為 2（diploid）；腫瘤可呈現 3、4 或其他非整倍體狀態。</span><span class="term__def" data-lang="en">The number of chromosome sets in a cell. Most normal autosomal regions are diploid (2); tumours may be triploid, tetraploid or otherwise non-diploid.</span><a class="term__more" href="glossary.html#ploidy">完整條目 →</a></span></span>）</td><td>通常需估計</td></tr>
-<tr><td><code>multiplicity</code></td><td><span class="term" data-term="mutation multiplicity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-mutation-multiplicity-3">突變佔了幾份拷貝<span class="term__pop" id="gd-mutation-multiplicity-3" role="tooltip"><b class="term__hd">mutation multiplicity</b><span class="term__def" data-lang="zh">在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</span><span class="term__def" data-lang="en">How many mutant-allele copies are present in a cell carrying the mutation; a necessary term when converting VAF to cancer cell fraction.</span><a class="term__more" href="glossary.html#mutation-multiplicity">完整條目 →</a></span></span></td><td>通常需推論</td></tr>
-<tr><td><code>CCF</code></td><td><span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cancer-cell-fraction-4">帶有此突變的腫瘤細胞比例<span class="term__pop" id="gd-cancer-cell-fraction-4" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span></td><td>通常是分析所要估計的目標</td></tr>
+<tr><td><code>purity</code></td><td><span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-purity-6">腫瘤細胞比例<span class="term__pop" id="gd-tumour-purity-6" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span></td><td>通常需估計</td></tr>
+<tr><td><code>totalCN</code></td><td>該位置的 <span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-copy-number-7">總拷貝數<span class="term__pop" id="gd-copy-number-7" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span>（整體平均值即 <span class="term" data-term="ploidy" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ploidy-8">ploidy<span class="term__pop" id="gd-ploidy-8" role="tooltip"><b class="term__hd">ploidy <i>倍性</i></b><span class="term__def" data-lang="zh">細胞內染色體套數。多數正常常染色體為 2（diploid）；腫瘤可呈現 3、4 或其他非整倍體狀態。</span><span class="term__def" data-lang="en">The number of chromosome sets in a cell. Most normal autosomal regions are diploid (2); tumours may be triploid, tetraploid or otherwise non-diploid.</span><a class="term__more" href="glossary.html#ploidy">完整條目 →</a></span></span>）</td><td>通常需估計</td></tr>
+<tr><td><code>multiplicity</code></td><td><span class="term" data-term="mutation multiplicity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-mutation-multiplicity-9">突變佔了幾份拷貝<span class="term__pop" id="gd-mutation-multiplicity-9" role="tooltip"><b class="term__hd">mutation multiplicity</b><span class="term__def" data-lang="zh">在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</span><span class="term__def" data-lang="en">How many mutant-allele copies are present in a cell carrying the mutation; a necessary term when converting VAF to cancer cell fraction.</span><a class="term__more" href="glossary.html#mutation-multiplicity">完整條目 →</a></span></span></td><td>通常需推論</td></tr>
+<tr><td><code>CCF</code></td><td><span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cancer-cell-fraction-10">帶有此突變的腫瘤細胞比例<span class="term__pop" id="gd-cancer-cell-fraction-10" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span></td><td>通常是分析所要估計的目標</td></tr>
 <tr><td><code>VAF</code></td><td>支持 alt 的 read 比例</td><td>可由 reads 估計</td></tr>
 </tbody>
 </table>
@@ -113,7 +483,7 @@
   <text class="tick zh" x="336" y="102">× 有多少比例的腫瘤細胞帶著它</text>
 
   <!-- 分隔線 -->
-  <line class="axis" x1="200" y1="126" x2="820" y2="126" stroke-width="3"/>
+  <line class="axis" x1="200" y1="126" x2="820" y2="126" style="stroke-width:3"/>
 
   <!-- 分母 -->
   <text class="anno bold zh" x="20" y="168">分母</text>
@@ -122,7 +492,7 @@
   <rect class="bar somatic" x="200" y="146" width="150" height="30" rx="4"/>
   <text class="tick mid zh" x="275" y="166">腫瘤細胞貢獻</text>
   <text class="anno mid" x="366" y="166">＋</text>
-  <rect class="bar" x="384" y="146" width="150" height="30" rx="4" fill="var(--muted-fill)" stroke="var(--rule-strong)"/>
+  <rect class="bar" x="384" y="146" width="150" height="30" rx="4"/>
   <text class="tick mid zh" x="459" y="166">正常細胞貢獻</text>
 
   <text class="tick zh" x="556" y="160">腫瘤那邊的份數取決於</text>
@@ -183,7 +553,7 @@
 
 <h3 id="loh-的常見機制及其可觀測差異">LOH 的常見機制及其可觀測差異</h3>
 
-<p class="prose"><span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-5">LOH<span class="term__pop" id="gd-loh-5" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 是「原本 heterozygous 的區域只剩下一種 allele」。
+<p class="prose"><span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-11">LOH<span class="term__pop" id="gd-loh-11" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 是「原本 heterozygous 的區域只剩下一種 allele」。
 但其形成機制不只一種；以下比較兩類常見情形：</p>
 
 <figure class="widget" data-widget="loh-sim" data-wid="m08.loh"><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>比較四種狀態，並特別觀察 <b>Copy-neutral LOH</b>：在理想示意中 coverage 近似正常，但 heterozygosity 降低。</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
@@ -207,7 +577,196 @@
 
 <h3 id="低-purity-對-somatic-variant-detection-的影響">低 purity 對 somatic variant detection 的影響</h3>
 
-<p class="prose">以下以數值示例說明：50× coverage、purity 0.2，以及一個 clonal 的 diploid somatic 變異：</p>
+<p class="prose">回到最上面那一層。purity 低的時候，突變本身沒有變少，但它在整池 DNA 裡被稀釋，
+落到 read 上就只剩幾條支持：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 550" class="dia-svg" role="img">
+  <title>tumor purity 越低，同一個突變在 read 上的訊號越淡</title>
+  <desc>五個檢體帶有同一個 clonal、diploid 的 somatic 變異，每個腫瘤細胞在這個位置的兩份 DNA 中有一份帶突變，
+        差別只在腫瘤細胞佔的比例。
+        由左到右腫瘤細胞比例為五分之一到五分之五，對應的 VAF 依序為 0.10、0.20、0.30、0.40、0.50。
+        在十條 read 的示意圖中，帶變異的 read 數依序為一到五條。
+        換算到 50 倍覆蓋度，期望的支持 read 數依序為 5、10、15、20、25 條。
+        最左側以紅色底標示：purity 0.2 時只期望看到約五條支持 read，
+        與隨機定序錯誤偶然湊出的支持數量同一個量級，因此過濾參數必須隨 purity 調整。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">purity 越低，同一個突變在 read 上的訊號就越淡</text>
+  <text class="tick zh" x="20" y="58">五個檢體帶有同一個 clonal 變異（腫瘤細胞的 2 份裡有 1 份帶突變），只有腫瘤細胞的比例不同。</text>
+
+  <!-- ══ purity 0.2 ══ -->
+  <rect class="box bad" x="36" y="76" width="160" height="340" rx="10"/>
+  <text class="anno bold mid" x="116" y="106">purity 0.2</text>
+  <circle class="cell tumor" cx="88" cy="150" r="13"/><circle class="nucleus" cx="88" cy="150" r="6"/>
+  <circle class="cell normal" cx="116" cy="150" r="13"/><circle class="nucleus" cx="116" cy="150" r="6"/>
+  <circle class="cell normal" cx="144" cy="150" r="13"/><circle class="nucleus" cx="144" cy="150" r="6"/>
+  <circle class="cell normal" cx="102" cy="124" r="13"/><circle class="nucleus" cx="102" cy="124" r="6"/>
+  <circle class="cell normal" cx="130" cy="124" r="13"/><circle class="nucleus" cx="130" cy="124" r="6"/>
+  <text class="tick mid zh" x="116" y="182">腫瘤 1 / 5 個</text>
+  <rect class="read" x="56" y="194" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="116" cy="199" r="4"/>
+  <rect class="read" x="56" y="207" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="212" r="4"/>
+  <rect class="read" x="56" y="220" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="225" r="4"/>
+  <rect class="read" x="56" y="233" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="238" r="4"/>
+  <rect class="read" x="56" y="246" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="251" r="4"/>
+  <rect class="read" x="56" y="259" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="264" r="4"/>
+  <rect class="read" x="56" y="272" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="277" r="4"/>
+  <rect class="read" x="56" y="285" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="290" r="4"/>
+  <rect class="read" x="56" y="298" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="303" r="4"/>
+  <rect class="read" x="56" y="311" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="316" r="4"/>
+  <text class="tick mid zh" x="116" y="338">帶變異 1 / 10 條</text>
+  <text class="anno bold mid mono somatic" x="116" y="366">VAF 0.10</text>
+  <text class="tick mid zh" x="116" y="398">50× 下約 5 條</text>
+
+  <!-- ══ purity 0.4 ══ -->
+  <rect class="box plain" x="228" y="76" width="160" height="340" rx="10"/>
+  <text class="anno bold mid" x="308" y="106">purity 0.4</text>
+  <circle class="cell tumor" cx="280" cy="150" r="13"/><circle class="nucleus" cx="280" cy="150" r="6"/>
+  <circle class="cell tumor" cx="308" cy="150" r="13"/><circle class="nucleus" cx="308" cy="150" r="6"/>
+  <circle class="cell normal" cx="336" cy="150" r="13"/><circle class="nucleus" cx="336" cy="150" r="6"/>
+  <circle class="cell normal" cx="294" cy="124" r="13"/><circle class="nucleus" cx="294" cy="124" r="6"/>
+  <circle class="cell normal" cx="322" cy="124" r="13"/><circle class="nucleus" cx="322" cy="124" r="6"/>
+  <text class="tick mid zh" x="308" y="182">腫瘤 2 / 5 個</text>
+  <rect class="read" x="248" y="194" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="308" cy="199" r="4"/>
+  <rect class="read" x="248" y="207" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="308" cy="212" r="4"/>
+  <rect class="read" x="248" y="220" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="225" r="4"/>
+  <rect class="read" x="248" y="233" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="238" r="4"/>
+  <rect class="read" x="248" y="246" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="251" r="4"/>
+  <rect class="read" x="248" y="259" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="264" r="4"/>
+  <rect class="read" x="248" y="272" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="277" r="4"/>
+  <rect class="read" x="248" y="285" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="290" r="4"/>
+  <rect class="read" x="248" y="298" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="303" r="4"/>
+  <rect class="read" x="248" y="311" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="316" r="4"/>
+  <text class="tick mid zh" x="308" y="338">帶變異 2 / 10 條</text>
+  <text class="anno bold mid mono somatic" x="308" y="366">VAF 0.20</text>
+  <text class="tick mid zh" x="308" y="398">50× 下約 10 條</text>
+
+  <!-- ══ purity 0.6 ══ -->
+  <rect class="box plain" x="420" y="76" width="160" height="340" rx="10"/>
+  <text class="anno bold mid" x="500" y="106">purity 0.6</text>
+  <circle class="cell tumor" cx="472" cy="150" r="13"/><circle class="nucleus" cx="472" cy="150" r="6"/>
+  <circle class="cell tumor" cx="500" cy="150" r="13"/><circle class="nucleus" cx="500" cy="150" r="6"/>
+  <circle class="cell tumor" cx="528" cy="150" r="13"/><circle class="nucleus" cx="528" cy="150" r="6"/>
+  <circle class="cell normal" cx="486" cy="124" r="13"/><circle class="nucleus" cx="486" cy="124" r="6"/>
+  <circle class="cell normal" cx="514" cy="124" r="13"/><circle class="nucleus" cx="514" cy="124" r="6"/>
+  <text class="tick mid zh" x="500" y="182">腫瘤 3 / 5 個</text>
+  <rect class="read" x="440" y="194" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="500" cy="199" r="4"/>
+  <rect class="read" x="440" y="207" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="500" cy="212" r="4"/>
+  <rect class="read" x="440" y="220" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="500" cy="225" r="4"/>
+  <rect class="read" x="440" y="233" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="238" r="4"/>
+  <rect class="read" x="440" y="246" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="251" r="4"/>
+  <rect class="read" x="440" y="259" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="264" r="4"/>
+  <rect class="read" x="440" y="272" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="277" r="4"/>
+  <rect class="read" x="440" y="285" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="290" r="4"/>
+  <rect class="read" x="440" y="298" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="303" r="4"/>
+  <rect class="read" x="440" y="311" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="316" r="4"/>
+  <text class="tick mid zh" x="500" y="338">帶變異 3 / 10 條</text>
+  <text class="anno bold mid mono somatic" x="500" y="366">VAF 0.30</text>
+  <text class="tick mid zh" x="500" y="398">50× 下約 15 條</text>
+
+  <!-- ══ purity 0.8 ══ -->
+  <rect class="box plain" x="612" y="76" width="160" height="340" rx="10"/>
+  <text class="anno bold mid" x="692" y="106">purity 0.8</text>
+  <circle class="cell tumor" cx="664" cy="150" r="13"/><circle class="nucleus" cx="664" cy="150" r="6"/>
+  <circle class="cell tumor" cx="692" cy="150" r="13"/><circle class="nucleus" cx="692" cy="150" r="6"/>
+  <circle class="cell tumor" cx="720" cy="150" r="13"/><circle class="nucleus" cx="720" cy="150" r="6"/>
+  <circle class="cell tumor" cx="678" cy="124" r="13"/><circle class="nucleus" cx="678" cy="124" r="6"/>
+  <circle class="cell normal" cx="706" cy="124" r="13"/><circle class="nucleus" cx="706" cy="124" r="6"/>
+  <text class="tick mid zh" x="692" y="182">腫瘤 4 / 5 個</text>
+  <rect class="read" x="632" y="194" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="692" cy="199" r="4"/>
+  <rect class="read" x="632" y="207" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="692" cy="212" r="4"/>
+  <rect class="read" x="632" y="220" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="692" cy="225" r="4"/>
+  <rect class="read" x="632" y="233" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="692" cy="238" r="4"/>
+  <rect class="read" x="632" y="246" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="692" cy="251" r="4"/>
+  <rect class="read" x="632" y="259" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="692" cy="264" r="4"/>
+  <rect class="read" x="632" y="272" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="692" cy="277" r="4"/>
+  <rect class="read" x="632" y="285" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="692" cy="290" r="4"/>
+  <rect class="read" x="632" y="298" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="692" cy="303" r="4"/>
+  <rect class="read" x="632" y="311" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="692" cy="316" r="4"/>
+  <text class="tick mid zh" x="692" y="338">帶變異 4 / 10 條</text>
+  <text class="anno bold mid mono somatic" x="692" y="366">VAF 0.40</text>
+  <text class="tick mid zh" x="692" y="398">50× 下約 20 條</text>
+
+  <!-- ══ purity 1.0 ══ -->
+  <rect class="box plain" x="804" y="76" width="160" height="340" rx="10"/>
+  <text class="anno bold mid" x="884" y="106">purity 1.0</text>
+  <circle class="cell tumor" cx="856" cy="150" r="13"/><circle class="nucleus" cx="856" cy="150" r="6"/>
+  <circle class="cell tumor" cx="884" cy="150" r="13"/><circle class="nucleus" cx="884" cy="150" r="6"/>
+  <circle class="cell tumor" cx="912" cy="150" r="13"/><circle class="nucleus" cx="912" cy="150" r="6"/>
+  <circle class="cell tumor" cx="870" cy="124" r="13"/><circle class="nucleus" cx="870" cy="124" r="6"/>
+  <circle class="cell tumor" cx="898" cy="124" r="13"/><circle class="nucleus" cx="898" cy="124" r="6"/>
+  <text class="tick mid zh" x="884" y="182">腫瘤 5 / 5 個</text>
+  <rect class="read" x="824" y="194" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="884" cy="199" r="4"/>
+  <rect class="read" x="824" y="207" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="884" cy="212" r="4"/>
+  <rect class="read" x="824" y="220" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="884" cy="225" r="4"/>
+  <rect class="read" x="824" y="233" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="884" cy="238" r="4"/>
+  <rect class="read" x="824" y="246" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="884" cy="251" r="4"/>
+  <rect class="read" x="824" y="259" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="884" cy="264" r="4"/>
+  <rect class="read" x="824" y="272" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="884" cy="277" r="4"/>
+  <rect class="read" x="824" y="285" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="884" cy="290" r="4"/>
+  <rect class="read" x="824" y="298" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="884" cy="303" r="4"/>
+  <rect class="read" x="824" y="311" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="884" cy="316" r="4"/>
+  <text class="tick mid zh" x="884" y="338">帶變異 5 / 10 條</text>
+  <text class="anno bold mid mono somatic" x="884" y="366">VAF 0.50</text>
+  <text class="tick mid zh" x="884" y="398">50× 下約 25 條</text>
+
+  <line class="axis" x1="20" y1="430" x2="980" y2="430"/>
+  <text class="lbl bold zh" x="20" y="462">低 purity 的難處不是訊號消失，是訊號縮到跟定序錯誤同一個量級</text>
+  <text class="anno zh" x="20" y="492">purity 0.2 時，50× 覆蓋度上只期望看到 5 條支持 read（上圖最左欄）。</text>
+  <text class="anno zh" x="20" y="520">隨機錯誤在同一個位置湊出 5 條的機會並不低 —— 這就是過濾參數必須跟著 purity 調整的原因。</text>
+</svg><figcaption>同一個 clonal 變異、同樣每個腫瘤細胞 2 份裡帶 1 份，
+只有腫瘤細胞比例不同。VAF 恰好是 purity 的一半，換到 50× 覆蓋度上就是 5、10、15、20、25 條支持 read。
+最左邊被標出來的原因見下方說明。</figcaption></figure>
+
+<p class="prose">以下把最左邊那一格算清楚：50× coverage、purity 0.2，以及一個 clonal 的 diploid somatic 變異：</p>
 
 <pre><code>預期 VAF   = 0.2 × 1 ÷ (0.2×2 + 0.8×2) = 0.10
 支持 read 數 = 50 × 0.10 = 5 條</code></pre>
@@ -308,9 +867,9 @@ bcftools view -H -g het sample.vcf | awk '{print $1, int($2/1000000)}' | \
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m07.html"><small>← 上一模組</small>Somatic variant calling：tumor–normal 與 tumor-only</a><a class="next" href="m09.html"><small>下一模組 →</small>甲基化入門</a></nav>
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>mutation multiplicity</dt><dd>在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</dd><dt>ploidy（倍性）</dt><dd>細胞內染色體套數。多數正常常染色體為 2（diploid）；腫瘤可呈現 3、4 或其他非整倍體狀態。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>VAF（變異等位基因頻率）</dt><dd>在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>mutation multiplicity</dt><dd>在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</dd><dt>ploidy（倍性）</dt><dd>細胞內染色體套數。多數正常常染色體為 2（diploid）；腫瘤可呈現 3、4 或其他非整倍體狀態。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#vaf-的完整關係式">VAF 的完整關係式</a></li><li class="lv3"><a href="#loh-的常見機制及其可觀測差異">LOH 的常見機制及其可觀測差異</a></li><li class="lv3"><a href="#低-purity-對-somatic-variant-detection-的影響">低 purity 對 somatic variant detection 的影響</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv2"><a href="#先提出預測-再查看解答">先提出預測，再查看解答</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#合成不同-dna-fraction-的混合樣本">合成不同 DNA fraction 的混合樣本</a></li><li class="lv3"><a href="#以-heterozygous-位點密度初步篩查-loh">以 heterozygous 位點密度初步篩查 LOH</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#先把名詞跟-在數什麼-對起來">先把名詞跟「在數什麼」對起來</a></li><li class="lv3"><a href="#copy-number-multiplicity-與-ploidy-一個位置有幾份">copy number、multiplicity 與 ploidy：一個位置有幾份</a></li><li class="lv3"><a href="#vaf-的完整關係式">VAF 的完整關係式</a></li><li class="lv3"><a href="#loh-的常見機制及其可觀測差異">LOH 的常見機制及其可觀測差異</a></li><li class="lv3"><a href="#低-purity-對-somatic-variant-detection-的影響">低 purity 對 somatic variant detection 的影響</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv2"><a href="#先提出預測-再查看解答">先提出預測，再查看解答</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#合成不同-dna-fraction-的混合樣本">合成不同 DNA fraction 的混合樣本</a></li><li class="lv3"><a href="#以-heterozygous-位點密度初步篩查-loh">以 heterozygous 位點密度初步篩查 LOH</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">
@@ -318,7 +877,13 @@ bcftools view -H -g het sample.vcf | awk '{print $1, int($2/1000000)}' | \
   <code>LongPhase-S</code> 與 <code>LongPhase-TO</code> 的概念、證據與限制。
 </footer>
 
-
+<svg class="tw-defs" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+  </marker><marker id="arrow-sm" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+  </marker></defs></svg>
 <script src="assets/js/progress.js"></script>
 <script src="assets/js/core.js"></script>
 <script src="assets/js/glossary.js"></script>
