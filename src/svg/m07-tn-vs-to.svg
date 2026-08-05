@@ -1,0 +1,279 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760">
+  <title>同一批腫瘤 read，有配對正常組織與只有腫瘤時的判定差別</title>
+  <desc>上下兩排的腫瘤 read 完全相同：六條 read、四個候選位置。位置 ① 與 ③ 是這個人天生就有的
+        germline 變異，② 是定序 artifact，④ 是真的 somatic 變異。
+        上排有配對的正常組織：① 與 ③ 在正常組織裡都看得到，所以都排除，輸出只剩 ④。
+        下排沒有正常組織，改查族群資料庫：① 的族群等位基因頻率 0.31，高於資料庫收錄門檻 0.001，
+        查得到所以排除；③ 的頻率只有 0.0002，低於門檻，資料庫裡沒有這一筆，因此被留下來成為假陽性。
+        兩排的差別只有一個位置，而那個位置的成因是「族群裡常見」與「這個人有」不是同一件事。
+        位置 ② 兩排都靠 read 的分布排除，與有沒有正常組織無關。</desc>
+
+  <!-- ══════════════════ 圖例 ══════════════════ -->
+  <circle class="mark germline" cx="28" cy="27" r="8"/>
+  <text class="tick zh" x="42" y="32">① ③ germline 變異（天生就有）</text>
+  <circle class="mark artifact" cx="330" cy="27" r="8"/>
+  <text class="tick zh" x="344" y="32">② 定序 artifact</text>
+  <circle class="mark somatic" cx="520" cy="27" r="8"/>
+  <text class="tick zh" x="534" y="32">④ 真 somatic 變異</text>
+  <text class="tick zh" x="700" y="32">顏色是給讀者看的答案，程式看不到</text>
+
+  <!-- ══════════════════ 上排：有配對正常組織 ══════════════════ -->
+  <text class="lbl bold zh ok" x="16" y="60">有配對的正常組織 —— tumour–normal（TN）</text>
+  <rect class="box ok" x="16" y="70" width="968" height="282" rx="10"/>
+
+  <!-- ─── ① 腫瘤 read ─── -->
+  <text class="anno bold zh" x="32" y="96">① 腫瘤樣本的 read</text>
+
+  <text class="tick mid" x="92"  y="118">①</text>
+  <text class="tick mid" x="162" y="118">②</text>
+  <text class="tick mid" x="232" y="118">③</text>
+  <text class="tick mid" x="302" y="118">④</text>
+
+  <circle class="mark germline" cx="92"  cy="138" r="8"/>
+  <circle class="mark artifact" cx="162" cy="138" r="8"/>
+  <circle class="mark germline" cx="232" cy="138" r="8"/>
+  <circle class="mark somatic"  cx="302" cy="138" r="8"/>
+
+  <rect class="box plain" x="44" y="150" width="300" height="16" rx="4"/>
+  <text class="tick end mono" x="42" y="163">ref</text>
+  <text class="base t mono" x="92"  y="163" font-size="14">T</text>
+  <text class="base a mono" x="162" y="163" font-size="14">A</text>
+  <text class="base g mono" x="232" y="163" font-size="14">G</text>
+  <text class="base g mono" x="302" y="163" font-size="14">G</text>
+
+  <rect class="read hp0" x="44" y="176" width="300" height="14" rx="7"/>
+  <rect class="read hp0" x="44" y="196" width="300" height="14" rx="7"/>
+  <rect class="read hp0" x="44" y="216" width="300" height="14" rx="7"/>
+  <rect class="read hp0" x="44" y="236" width="300" height="14" rx="7"/>
+  <rect class="read hp0" x="44" y="256" width="300" height="14" rx="7"/>
+  <rect class="read hp0" x="44" y="276" width="300" height="14" rx="7"/>
+
+  <!-- r1 -->
+  <text class="base g mono" x="92"  y="187" font-size="15">G</text>
+  <text class="base c mono" x="162" y="187" font-size="15">C</text>
+  <text class="base t mono" x="232" y="187" font-size="15">T</text>
+  <text class="base g mono" x="302" y="187" font-size="15">G</text>
+  <!-- r2 -->
+  <text class="base g mono" x="92"  y="207" font-size="15">G</text>
+  <text class="base a mono" x="162" y="207" font-size="15">A</text>
+  <text class="base t mono" x="232" y="207" font-size="15">T</text>
+  <text class="base a mono" x="302" y="207" font-size="15">A</text>
+  <!-- r3 -->
+  <text class="base g mono" x="92"  y="227" font-size="15">G</text>
+  <text class="base a mono" x="162" y="227" font-size="15">A</text>
+  <text class="base t mono" x="232" y="227" font-size="15">T</text>
+  <text class="base a mono" x="302" y="227" font-size="15">A</text>
+  <!-- r4 -->
+  <text class="base t mono" x="92"  y="247" font-size="15">T</text>
+  <text class="base a mono" x="162" y="247" font-size="15">A</text>
+  <text class="base g mono" x="232" y="247" font-size="15">G</text>
+  <text class="base g mono" x="302" y="247" font-size="15">G</text>
+  <!-- r5 -->
+  <text class="base t mono" x="92"  y="267" font-size="15">T</text>
+  <text class="base c mono" x="162" y="267" font-size="15">C</text>
+  <text class="base g mono" x="232" y="267" font-size="15">G</text>
+  <text class="base g mono" x="302" y="267" font-size="15">G</text>
+  <!-- r6 -->
+  <text class="base t mono" x="92"  y="287" font-size="15">T</text>
+  <text class="base a mono" x="162" y="287" font-size="15">A</text>
+  <text class="base g mono" x="232" y="287" font-size="15">G</text>
+  <text class="base g mono" x="302" y="287" font-size="15">G</text>
+
+  <text class="tick zh" x="32" y="312">四個位置都跟參考不一樣，全部列為候選。</text>
+  <text class="tick zh" x="32" y="334">①③ 長得一模一樣：各 3 條支持。</text>
+
+  <path class="flow" d="M356,220 L384,220" marker-end="url(#arrow)"/>
+
+  <!-- ─── ② 對照證據：配對正常組織 ─── -->
+  <text class="anno bold zh" x="400" y="96">② 對照：這個人自己的正常組織</text>
+  <rect class="box plain" x="392" y="110" width="316" height="206" rx="8"/>
+
+  <text class="tick mid" x="458" y="136">①</text>
+  <text class="tick mid" x="528" y="136">②</text>
+  <text class="tick mid" x="598" y="136">③</text>
+  <text class="tick mid" x="668" y="136">④</text>
+
+  <rect class="box plain" x="412" y="148" width="286" height="16" rx="4"/>
+  <text class="base t mono" x="458" y="161" font-size="14">T</text>
+  <text class="base a mono" x="528" y="161" font-size="14">A</text>
+  <text class="base g mono" x="598" y="161" font-size="14">G</text>
+  <text class="base g mono" x="668" y="161" font-size="14">G</text>
+
+  <rect class="read hp0" x="412" y="174" width="286" height="14" rx="7"/>
+  <rect class="read hp0" x="412" y="194" width="286" height="14" rx="7"/>
+  <rect class="read hp0" x="412" y="214" width="286" height="14" rx="7"/>
+  <rect class="read hp0" x="412" y="234" width="286" height="14" rx="7"/>
+
+  <text class="base g mono" x="458" y="185" font-size="15">G</text>
+  <text class="base a mono" x="528" y="185" font-size="15">A</text>
+  <text class="base t mono" x="598" y="185" font-size="15">T</text>
+  <text class="base g mono" x="668" y="185" font-size="15">G</text>
+
+  <text class="base g mono" x="458" y="205" font-size="15">G</text>
+  <text class="base a mono" x="528" y="205" font-size="15">A</text>
+  <text class="base t mono" x="598" y="205" font-size="15">T</text>
+  <text class="base g mono" x="668" y="205" font-size="15">G</text>
+
+  <text class="base t mono" x="458" y="225" font-size="15">T</text>
+  <text class="base a mono" x="528" y="225" font-size="15">A</text>
+  <text class="base g mono" x="598" y="225" font-size="15">G</text>
+  <text class="base g mono" x="668" y="225" font-size="15">G</text>
+
+  <text class="base t mono" x="458" y="245" font-size="15">T</text>
+  <text class="base a mono" x="528" y="245" font-size="15">A</text>
+  <text class="base g mono" x="598" y="245" font-size="15">G</text>
+  <text class="base g mono" x="668" y="245" font-size="15">G</text>
+
+  <text class="tick zh" x="412" y="274">① ③ 在這裡也看得到 → 兩個都排除</text>
+  <text class="tick zh" x="412" y="296">④ 在這裡一條都沒有 → 保留</text>
+
+  <path class="flow" d="M716,220 L744,220" marker-end="url(#arrow)"/>
+
+  <!-- ─── ③ 輸出 ─── -->
+  <text class="anno bold zh" x="756" y="96">③ 輸出</text>
+  <rect class="box ok" x="748" y="110" width="236" height="206" rx="8"/>
+
+  <text class="tick bold zh" x="766" y="140">留下來的候選</text>
+  <circle class="mark somatic" cx="778" cy="170" r="10"/>
+  <text class="tick zh" x="798" y="176">④ 真 somatic</text>
+
+  <line class="guide" x1="766" y1="200" x2="966" y2="200"/>
+
+  <text class="tick bold zh" x="766" y="226">已排除</text>
+  <circle class="mark germline" cx="778" cy="254" r="8" opacity="0.4"/>
+  <circle class="mark artifact" cx="806" cy="254" r="8" opacity="0.4"/>
+  <circle class="mark germline" cx="834" cy="254" r="8" opacity="0.4"/>
+  <text class="tick" x="852" y="260">① ② ③</text>
+
+  <text class="tick bold zh ok" x="766" y="296">輸出裡沒有假陽性</text>
+
+  <!-- ══════════════════ 下排：只有腫瘤樣本 ══════════════════ -->
+  <text class="lbl bold zh bad" x="16" y="382">沒有配對正常組織 —— tumour-only（TO）</text>
+  <rect class="box bad" x="16" y="392" width="968" height="282" rx="10"/>
+
+  <!-- ─── ① 完全相同的腫瘤 read ─── -->
+  <text class="anno bold zh" x="32" y="418">① 完全相同的腫瘤 read</text>
+
+  <text class="tick mid" x="92"  y="440">①</text>
+  <text class="tick mid" x="162" y="440">②</text>
+  <text class="tick mid" x="232" y="440">③</text>
+  <text class="tick mid" x="302" y="440">④</text>
+
+  <circle class="mark germline" cx="92"  cy="460" r="8"/>
+  <circle class="mark artifact" cx="162" cy="460" r="8"/>
+  <circle class="mark germline" cx="232" cy="460" r="8"/>
+  <circle class="mark somatic"  cx="302" cy="460" r="8"/>
+
+  <rect class="box plain" x="44" y="472" width="300" height="16" rx="4"/>
+  <text class="tick end mono" x="42" y="485">ref</text>
+  <text class="base t mono" x="92"  y="485" font-size="14">T</text>
+  <text class="base a mono" x="162" y="485" font-size="14">A</text>
+  <text class="base g mono" x="232" y="485" font-size="14">G</text>
+  <text class="base g mono" x="302" y="485" font-size="14">G</text>
+
+  <rect class="read hp0" x="44" y="498" width="300" height="14" rx="7"/>
+  <rect class="read hp0" x="44" y="518" width="300" height="14" rx="7"/>
+  <rect class="read hp0" x="44" y="538" width="300" height="14" rx="7"/>
+  <rect class="read hp0" x="44" y="558" width="300" height="14" rx="7"/>
+  <rect class="read hp0" x="44" y="578" width="300" height="14" rx="7"/>
+  <rect class="read hp0" x="44" y="598" width="300" height="14" rx="7"/>
+
+  <text class="base g mono" x="92"  y="509" font-size="15">G</text>
+  <text class="base c mono" x="162" y="509" font-size="15">C</text>
+  <text class="base t mono" x="232" y="509" font-size="15">T</text>
+  <text class="base g mono" x="302" y="509" font-size="15">G</text>
+
+  <text class="base g mono" x="92"  y="529" font-size="15">G</text>
+  <text class="base a mono" x="162" y="529" font-size="15">A</text>
+  <text class="base t mono" x="232" y="529" font-size="15">T</text>
+  <text class="base a mono" x="302" y="529" font-size="15">A</text>
+
+  <text class="base g mono" x="92"  y="549" font-size="15">G</text>
+  <text class="base a mono" x="162" y="549" font-size="15">A</text>
+  <text class="base t mono" x="232" y="549" font-size="15">T</text>
+  <text class="base a mono" x="302" y="549" font-size="15">A</text>
+
+  <text class="base t mono" x="92"  y="569" font-size="15">T</text>
+  <text class="base a mono" x="162" y="569" font-size="15">A</text>
+  <text class="base g mono" x="232" y="569" font-size="15">G</text>
+  <text class="base g mono" x="302" y="569" font-size="15">G</text>
+
+  <text class="base t mono" x="92"  y="589" font-size="15">T</text>
+  <text class="base c mono" x="162" y="589" font-size="15">C</text>
+  <text class="base g mono" x="232" y="589" font-size="15">G</text>
+  <text class="base g mono" x="302" y="589" font-size="15">G</text>
+
+  <text class="base t mono" x="92"  y="609" font-size="15">T</text>
+  <text class="base a mono" x="162" y="609" font-size="15">A</text>
+  <text class="base g mono" x="232" y="609" font-size="15">G</text>
+  <text class="base g mono" x="302" y="609" font-size="15">G</text>
+
+  <text class="tick zh" x="32" y="634">同一批 read、同一批候選。</text>
+  <text class="tick zh" x="32" y="656">唯一改變的是右邊拿什麼當對照。</text>
+
+  <path class="flow" d="M356,542 L384,542" marker-end="url(#arrow)"/>
+
+  <!-- ─── ② 對照證據：族群資料庫 ─── -->
+  <text class="anno bold zh" x="400" y="418">② 對照：公開族群資料庫</text>
+  <rect class="box warn" x="392" y="432" width="316" height="206" rx="8"/>
+
+  <text class="tick zh" x="400" y="456">每個候選在族群中的等位基因頻率</text>
+
+  <!-- 收錄門檻 -->
+  <line class="guide" x1="493" y1="464" x2="493" y2="576"/>
+
+  <!-- ① AF = 0.31，跨過門檻 -->
+  <text class="tick end" x="440" y="476">①</text>
+  <rect class="bar germline" x="444" y="466" width="171" height="12" rx="2"/>
+  <text class="tick zh ok" x="620" y="476">✓ 排除</text>
+
+  <!-- ② artifact -->
+  <text class="tick end" x="440" y="500">②</text>
+  <text class="tick zh" x="448" y="500">artifact 不在族群資料庫裡</text>
+
+  <!-- ③ AF = 0.0002，停在門檻左邊 -->
+  <text class="tick end" x="440" y="524">③</text>
+  <rect class="bar germline" x="444" y="514" width="15" height="12" rx="2"/>
+  <text class="tick zh bad" x="466" y="524">✗ 未收錄，留下來</text>
+
+  <!-- ④ somatic -->
+  <text class="tick end" x="440" y="548">④</text>
+  <text class="tick zh" x="448" y="548">somatic 也不在族群資料庫裡</text>
+
+  <!-- 座標軸 -->
+  <line class="axis" x1="444" y1="576" x2="640" y2="576"/>
+  <text class="tick mid" x="444" y="594">0.0001</text>
+  <text class="tick mid" x="493" y="594">0.001</text>
+  <text class="tick mid" x="542" y="594">0.01</text>
+  <text class="tick mid" x="591" y="594">0.1</text>
+  <text class="tick mid" x="640" y="594">1</text>
+  <text class="tick mid zh" x="546" y="620">虛線＝資料庫的收錄門檻（af-ge-0.001）</text>
+
+  <path class="flow" d="M716,542 L744,542" marker-end="url(#arrow)"/>
+
+  <!-- ─── ③ 輸出 ─── -->
+  <text class="anno bold zh" x="756" y="418">③ 輸出</text>
+  <rect class="box bad" x="748" y="432" width="236" height="206" rx="8"/>
+
+  <text class="tick bold zh" x="766" y="462">留下來的候選</text>
+  <circle class="mark somatic" cx="778" cy="490" r="10"/>
+  <text class="tick zh" x="798" y="496">④ 真 somatic</text>
+
+  <circle class="box ghost" cx="778" cy="520" r="15"/>
+  <circle class="mark germline" cx="778" cy="520" r="10"/>
+  <text class="tick zh bad" x="798" y="526">③ 私有 germline</text>
+
+  <line class="guide" x1="766" y1="548" x2="966" y2="548"/>
+
+  <text class="tick bold zh" x="766" y="572">已排除</text>
+  <circle class="mark germline" cx="778" cy="598" r="8" opacity="0.4"/>
+  <circle class="mark artifact" cx="806" cy="598" r="8" opacity="0.4"/>
+  <text class="tick" x="824" y="604">① ②</text>
+
+  <text class="tick bold zh bad" x="766" y="630">多了一個假陽性</text>
+
+  <!-- ══════════════════ 結論 ══════════════════ -->
+  <line class="axis" x1="20" y1="700" x2="980" y2="700"/>
+  <text class="anno zh bold" x="20" y="728">兩排的差別只有位置 ③ —— 它是這個人自己的 germline 變異，族群裡幾乎沒人有，所以查不到；</text>
+  <text class="anno zh" x="20" y="756">配對的正常組織查得到，因為那份對照就來自同一個人。位置 ② 兩排都靠 read 的分布排除，跟有沒有 normal 無關。</text>
+</svg>

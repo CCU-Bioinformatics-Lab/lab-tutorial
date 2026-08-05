@@ -2,10 +2,10 @@
 {
   "objectives": [
     "說明配對正常樣本提供了什麼，以及沒有它時失去什麼",
-    "區分本教材使用的 PON 與 GATK 語境中的 PoN，並說明兩者的限制",
-    "解釋 TINC 為什麼會讓直接以 tumor／normal VCF 差集判定的直覺失效",
-    "以一句話概括 tumor-only calling 的核心困難",
-    "說明 copy number 如何影響 VAF，並以簡化 triplet graph 示範分子連結證據"
+    "區分本教材使用的 PON 與 GATK 語境中的 PoN，並說明兩者共同的涵蓋缺口",
+    "說明為什麼 somatic 不等於「腫瘤 VCF 減掉正常 VCF」，並列出四個失準來源",
+    "解釋 TINC 為什麼讓「normal 有訊號就排除」的規則失效",
+    "說明 read-level 的 haplotype 分布為什麼可以在沒有正常樣本時提供替代證據"
   ]
 }
 -->
@@ -23,40 +23,40 @@
 <section data-part="concept">
 <h2>概念與互動</h2>
 
-<h3>配對正常樣本在做什麼</h3>
+<h3>同一批 read，兩種對照，兩種輸出</h3>
 
-<p class="prose">在 paired tumor–normal calling 中，[[somatic variant]] 候選通常指腫瘤中有支持、
-而 matching normal 未觀察到足夠支持的變異。判讀仍需考慮污染、coverage、copy number 與 caller uncertainty：</p>
+<p class="prose">先把整件事放在一張圖裡。下圖的上下兩排<b>腫瘤 read 完全相同</b>——
+同樣六條 read、同樣四個候選位置。唯一改變的是右邊拿什麼當對照：</p>
 
-<ul class="prose">
-<li>兩邊都有支持 → 優先考慮 [[germline variant]] 或其他 non-somatic，依品質與模型條件判斷</li>
-<li>只有腫瘤有支持 → 列為 somatic candidate，仍不是最終答案</li>
-</ul>
+{{svg:m07-tn-vs-to | [wide] 上排用這個病人自己的正常組織，下排改查公開族群資料庫。輸出的差別只有位置 ③ —— 那是這個人自己的 germline 變異，族群裡幾乎沒人有，所以資料庫查不到，於是被留下來變成假陽性。位置 ② 兩排都靠 read 的分布排除，跟有沒有正常樣本無關。圖上的顏色是給讀者看的答案，程式看不到。}}
 
-<p class="prose">caller 產生的是 [[candidate|候選變異]]，還不是最終答案；這是 <b>[[tumour-normal]]</b>（TN）模式的基本框架。
-本教材以 [[ClairS]]、[[DeepSomatic]] 作為 tumor–normal calling 範例，實際輸入與過濾流程請依版本文件確認。</p>
+<p class="prose">請注意這張圖真正的重點：位置 ① 與 ③ <b>都是</b>這個人天生就有的 [[germline variant]]，
+在腫瘤樣本裡長得一模一樣（各三條支持、VAF 都是 0.5）。它們的命運不同，
+不是因為變異本身有什麼差別，而是因為<b>資料庫知不知道它</b>。</p>
 
-<h3>沒有正常樣本的時候</h3>
-
-<p class="prose">在部分臨床或研究情境，matched normal 可能因成本、檢體量或取得條件而缺失。
-此時可採用 <b>[[tumour-only]]</b>（TO）分析，但可用的 germline 對照較少。</p>
+<p class="prose">位置 ④ 兩種模式都留得住，那是我們要的 [[somatic variant]]。
+caller 產生的是 [[candidate|候選變異]]，還不是最終答案；本教材以 [[ClairS]]、[[DeepSomatic]]
+作為 <b>[[tumour-normal]]</b>（TN）calling 的範例，[[tumour-only]]（TO）則以 ClairS-TO 為例，
+實際輸入與過濾流程請依版本文件確認。</p>
 
 <h3>沒有正常組織時，改用什麼當對照</h3>
 
-<p class="prose">替代方案可使用<b>公開的族群資料庫</b>，利用 allele frequency 與已知變異紀錄提供 germline 線索。
-符合指定頻率、品質與 annotation 條件的候選可作為排除依據，但不能無條件排除資料庫中的所有項目。</p>
+<p class="prose">在部分臨床或研究情境，matched normal 可能因成本、檢體量或取得條件而缺失。
+替代方案是<b>公開的族群資料庫</b>：利用 allele frequency 與已知變異紀錄提供 germline 線索。
+本教材在 LongPhase-TO／ClairS-TO 情境中將這組集合稱為 <b>[[PON]]</b>（population database set），
+它包含 1000 Genomes、gnomAD、dbSNP、CoLoRSdb 等來源。</p>
 
-<p class="prose">本教材在 LongPhase-TO／ClairS-TO 情境中將這組資料庫集合稱為 <b>[[PON]]</b>（population database set）。
-它包含 1000 Genomes、gnomAD、dbSNP 等來源；在 GATK Mutect2 語境，PoN 通常指由多個正常樣本建立的 recurrent-artifact panel，兩者需明確區分。</p>
+<p class="prose">上圖下排的橫軸就是這件事的關鍵。資料庫有一個<b>收錄門檻</b>——
+實際下載的檔名裡寫著 <code>af-ge-0.001</code>，意思是只收頻率 0.001 以上的位點。
+位置 ① 的族群頻率 0.31，遠高於門檻，查得到；位置 ③ 只有 0.0002，落在門檻左邊，
+資料庫裡根本沒有這一筆。「族群常見」與「這個人有」不是同一件事，缺口就從這裡來。</p>
 
-<p class="prose">問題出在「族群常見」與「這個人有」不是同一件事。下圖把兩種做法並排比較：</p>
+<p class="prose">在 GATK Mutect2 語境，PoN 通常指由多個正常樣本建立的 recurrent-artifact panel。
+名稱相同、內容不同 —— 而且更重要的是，這<b>兩種</b>資料各守住一個方向，中間會留下一格：</p>
 
-{{svg:m07-pon-filter | [wide] 上排是有配對正常組織的情況：對照資料<b>來自同一個人</b>，通常能提高個體特異 germline 的辨識能力，但仍受 coverage、污染與 caller sensitivity 限制。下排是使用 population databases：符合條件的常見變異可作為排除依據；未被資料庫涵蓋的 private germline 或 artifact 可能保留為額外候選，需再以獨立證據評估。}}
+{{svg:m07-pon-two-axes | [wide] 橫軸是族群頻率，縱軸是在多份正常樣本中反覆出現的程度。族群資料庫排除右半邊，GATK 的 recurrent-artifact PoN 排除上半邊，左下角那一格兩者都涵蓋不到 —— 而那一格裡同時住著這個人私有的 germline、沒見過的 artifact，以及我們真正要找的 somatic 變異。因為三者在這兩個軸上座標一樣，再多加幾個資料庫也不會把它們分開。}}
 
-<p class="prose">下排右側的驚嘆號示意 tumor-only 可能保留的額外候選，其中部分可能是 false positive。
-來源可能包括未被資料庫涵蓋的 private germline、未見 artifact，以及 coverage 或模型差異；不能預先將每個候選定義為假陽性。</p>
-
-<p class="prose">下方元件示範兩種對照方式的過濾結果差異：</p>
+<p class="prose">下方元件用同一組候選點數一次數量，看 precision 怎麼掉下來：</p>
 
 {{widget:tn-vs-to #switch | 注意<b>不是所有候選都受到同樣影響</b>。符合資料庫條件的常見 germline 變異通常仍可被標記；private germline 與未被收錄的 artifact 可能保留為額外候選，需以其他證據判讀。}}
 
@@ -69,6 +69,7 @@
 <tr><td>來源</td><td>由多個正常樣本建立的統計</td><td>直接下載的族群資料庫集合</td></tr>
 <tr><td>內容</td><td>反覆出現的<b>技術性 artifact</b></td><td>族群中常見的 <b>germline 變異</b></td></tr>
 <tr><td>實際檔案</td><td>自建</td><td>1000G、CoLoRSdb、dbSNP、gnomAD</td></tr>
+<tr><td>對應上圖的哪一半</td><td>上半邊（高反覆出現）</td><td>右半邊（高族群頻率）</td></tr>
 </tbody>
 </table>
 </div>
@@ -77,47 +78,63 @@
 <li>無法保證辨識某個病人<b>私有的</b> germline 變異（族群中罕見，資料庫可能未收錄）</li>
 <li>無法保證辨識<b>尚未觀察過的</b>技術性 artifact</li>
 </ul>
-<p class="prose">上述候選可能被誤判為 somatic，讓輸出裡混進一批不是真的 somatic 變異。
-後續方法會加入 phasing 與 read-level 結構訊號，作為資料庫之外的補充證據。</p>
+<p class="prose">上述候選可能被誤判為 somatic，讓輸出裡混進一批不是真的 somatic 變異。</p>
 {{/guard}}
 
-<h3>TN calling 的實務限制</h3>
+<h3>TN calling 也不是把兩個 VCF 相減</h3>
 
-<p class="prose">前述 TN 流程是簡化描述；實務上不能只以兩個 VCF 的差集判定 somatic。</p>
+<p class="prose">前面那張圖為了講清楚缺口，把 TN 流程畫得很乾淨：normal 有訊號就排除。
+實務上不能這樣做，而且失準的地方在<b>有</b>配對正常樣本時就已經發生：</p>
+
+{{svg:m07-not-a-subtraction | [wide] 四個失準來源。① 正常組織裡本來就混了一點腫瘤細胞，真 somatic 在 normal 也會有低頻支持。② 正常樣本的深度通常只有腫瘤的一半；就算真有低頻訊號，25× 下期望只有 0.5 條 read，看到 0 條的機率約六成。③ germline 的 VAF 不是固定 0.5，copy number 會把它推上去或拉下來。④ 兩邊的 caller 各自都會漏報。共同點是：「有沒有訊號」是二元的，底下的證據卻是連續的。}}
 
 {{guard:6 | matched-normal calling 不是把兩個 VCF 相減}}
-<p class="prose">以下因素都可能使直接差集判定失準：</p>
+<p class="prose">上圖四項對應四個具體概念：</p>
 <ul class="prose">
 <li><b>[[TINC]]</b>（tumour-in-normal contamination）—— matched normal 中存在腫瘤來源訊號。
 真正的 somatic 變異可能在 normal 中呈現低頻支持；若採用「normal 有訊號即排除」的規則，可能誤刪候選。</li>
-<li><b>coverage 不對等</b> —— 若 normal coverage 較低（例如約 25×），somatic 變異在 normal 中未被觀察到，
-可能只是深度不足，不代表它不存在。</li>
+<li><b>coverage 不對等</b> —— 本教材引用的資料就是腫瘤 50×、正常 25×。
+somatic 變異在 normal 中未被觀察到，可能只是深度不足，不代表它不存在。</li>
 <li><b>[[copy number]] 造成的 allelic imbalance</b> —— 讓 VAF 偏離預期，判斷門檻要跟著調。</li>
 <li><b>caller 本身的不確定性</b> —— 兩邊的 caller 都可能漏掉或多報。</li>
 </ul>
-<p class="prose">第一項可用下圖示意，提醒 paired normal 仍可能因污染而誤判：</p>
-
-{{svg:m07-tinc | [wide] 左：示意 matched normal 未觀察到腫瘤來源訊號；右：normal 中含有少量腫瘤來源 DNA，使同一位置出現低頻支持。若採用「normal 有訊號即排除」的簡化規則，可能誤刪 genuine somatic candidate；實際 VAF 取決於 depth、污染比例、copy number 與 variant multiplicity。}}
-
-<p class="prose">VAF 可作為輔助訊息：簡單 diploid heterozygous germline 變異常接近 0.5，污染訊號可能較低；
-但實際值取決於 purity、copy number、zygosity、multiplicity、clonality 與 depth。
-因此不能只用「有沒有訊號」或固定門檻判定。</p>
-
-<p class="prose">即使有配對正常樣本，仍需要結合多項品質與模型過濾條件。</p>
 {{/guard}}
+
+<h3>TINC：normal 裡的訊號強度說明三種不同的事</h3>
+
+<p class="prose">第一項值得單獨看一次，因為它最容易被寫成錯的規則。下圖三欄的<b>腫瘤樣本完全相同</b>
+（24 條 read、6 條帶變異、VAF 都是 0.25），差別只在配對正常樣本裡有幾條：</p>
+
+{{svg:m07-tinc | [wide] normal VAF 0.00 是最單純的 somatic；0.04 是正常組織裡混進了腫瘤細胞，變異<b>仍然是</b> somatic；0.50 才是 heterozygous germline 該有的樣子。所以判斷依據不是「normal 有沒有訊號」，而是「訊號有多強」—— 需要一個門檻，而門檻放太低會刪掉被污染樣本裡的真 somatic，放太高會留下 germline。}}
+
+<p class="prose">VAF 可作為輔助訊息，但實際值取決於 purity、copy number、zygosity、multiplicity、
+clonality 與 depth（完整關係式見 M8）。因此不能只用「有沒有訊號」或單一固定門檻判定。</p>
+
+<h3>沒有正常組織時，還剩下什麼證據</h3>
+
+<p class="prose">回到那張 [[PON]] 涵蓋不到的左下角。要把住在同一格裡的三種東西分開，
+必須換一個問法：不再問「這個位置別人有沒有」，而是問<b>「支持它的那些 read，彼此的結構像不像一次真的突變」</b>。</p>
+
+<p class="prose">真的變異一定是從某一條既有的 [[haplotype]] 上長出來的，所以支持它的 read
+應該<b>集中在一條</b> haplotype 上。如果同一個「變異」的支持 read 分散在兩條染色體上，
+那等於同一個位置各獨立突變了一次 —— 機率極低，更像比對或定序造成的問題：</p>
+
+{{svg:m07-read-level-evidence | [wide] 兩欄的支持 read <b>總數刻意設成一樣</b>（12 條裡 4 條，VAF 都是 0.33），因為重點正是「光看數量分不出來」。左欄 4 條全在 HP1；右欄 2 條在 HP1、2 條在 HP2。這個判準不需要配對正常樣本，只需要 read 夠長到同時蓋住 germline 錨點與候選位置 —— 所以它是 long read 才拿得到的證據。}}
+
+<p class="prose">這個想法在兩個工具裡有不同的實作：LongPhase-S 做成 read-level 與 haplotype origin
+兩個過濾器（四個過濾器與各自的門檻見 M12）；LongPhase-TO 把它擴展成三個位點的
+[[triplet graph]]，用路徑結構判斷（見 M13）。</p>
 
 <h3>一句話總結</h3>
 
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">tumor-only 的核心困難</p>
-<p class="prose">配對正常樣本提供病人的 germline 對照；population database set
-主要提供族群層級的 germline 證據。未涵蓋的 private germline 或尚未觀察到的 artifact
-可能保留為額外候選，其中部分會成為 false positive，需結合其他證據判讀。</p>
+<p class="prose">配對正常樣本提供的是<b>這個人</b>的 germline 對照；population database set
+提供的是<b>族群</b>層級的 germline 證據。兩者不能互換：族群裡罕見的私有 germline
+與尚未觀察到的 artifact 會落在資料庫的涵蓋範圍之外，成為額外候選，其中部分是 false positive。
+補救的方向不是再加資料庫，而是改用 read-level 的連結結構、copy number、LOH 與品質等
+不依賴「別人有沒有」的證據 —— 但這些都是補充證據，系統性 artifact 或 phasing error 仍會造成例外。</p>
 </div>
-
-<p class="prose">資料庫無法涵蓋所有個體特異變異，因此可加入 read-level phase／連結結構、
-copy number、LOH 與品質等補充證據。在理想化的 [[triplet graph]] 示例中，這些資訊可能呈現
-不同 pattern；但系統性 artifact 或 phasing error 仍可能造成例外，因此此結構只能作為補充證據，不能單獨定案。</p>
 </section>
 
 
@@ -145,21 +162,24 @@ docker run \
 
 {{cli}}
 mkdir PoN
-wget -P PoN http://www.bio8.cs.hku.hk/clairs-to/databases/gnomad.r2.1.af-ge-0.001.sites.vcf.gz
-wget -P PoN http://www.bio8.cs.hku.hk/clairs-to/databases/dbsnp.b138.non-somatic.sites.vcf.gz
-wget -P PoN http://www.bio8.cs.hku.hk/clairs-to/databases/1000g-pon.sites.vcf.gz
-wget -P PoN http://www.bio8.cs.hku.hk/clairs-to/databases/CoLoRSdb.GRCh38.v1.1.0.deepvariant.glnexus.af-ge-0.001.vcf.gz
+BASE=http://www.bio8.cs.hku.hk/clairs-to/databases
+wget -P PoN $BASE/gnomad.r2.1.af-ge-0.001.sites.vcf.gz
+wget -P PoN $BASE/dbsnp.b138.non-somatic.sites.vcf.gz
+wget -P PoN $BASE/1000g-pon.sites.vcf.gz
+wget -P PoN $BASE/CoLoRSdb.GRCh38.v1.1.0.deepvariant.glnexus.af-ge-0.001.vcf.gz
 {{/cli}}
 
-<p class="cli-note"><b>注意</b>：請勿將 shell 的 PATH 作為資料夾變數，例如
-<code>PATH="PoN"</code> 再使用 <code>$PATH</code>；這會覆寫可執行檔搜尋路徑。
-請改用 <code>PON_DIR</code>、<code>BASE</code> 等名稱，並依工具版本文件核對。</p>
-
-{{fig:d-s31-haplotype-aware}}
+<p class="cli-note"><b>注意</b>：有些文件把資料夾變數寫成 <code>PATH="PoN"</code> 再使用
+<code>$PATH</code>；這會<b>覆寫 shell 的可執行檔搜尋路徑</b>。此處改用 <code>BASE</code>，
+實際參數仍應依工具版本文件核對。</p>
 
 <p class="prose">四個檔案名稱（<code>gnomad</code>、<code>dbsnp</code>、<code>1000g</code>、
 <code>CoLoRSdb</code>）都指向<b>族群 germline 資料庫</b>，與本教材的
-population database set 定義一致；它不同於 GATK Mutect2 所稱的 recurrent-artifact PoN。</p>
+population database set 定義一致；它不同於 GATK Mutect2 所稱的 recurrent-artifact PoN。
+其中兩個檔名帶著 <code>af-ge-0.001</code> —— 那就是前面那張圖裡的收錄門檻，
+低於這個頻率的位點不在檔案裡，所以查不到。</p>
+
+{{fig:d-s31-haplotype-aware}}
 </section>
 
 
@@ -175,8 +195,9 @@ population database set 定義一致；它不同於 GATK Mutect2 所稱的 recur
 <p class="prose">在簡化的 diploid、單拷貝模型下，somatic VAF 可近似為 purity／2；
 較一般的模型還受 purity、multiplicity 與 total copy number 影響，並會受到 normal DNA、
 clonality、mapping bias 與 depth 影響，因此不能單獨依 VAF 分類。</p>
-<p class="prose">應再檢查 read-level phase／連結結構、copy number、LOH、品質與獨立證據。
-[[triplet graph]] 中的三種 pattern 是理想化示例，實務資料未必能完全區分，
+<p class="prose">接著檢查<b>支持 read 的 haplotype 分布</b>：如果 4 條支持 read 全在同一條
+haplotype 上，與 somatic 相容；如果分散在兩條上，更像 artifact。此外還要看 copy number、
+LOH、品質與獨立證據。[[triplet graph]] 中的三種 pattern 是理想化示例，實務資料未必能完全區分，
 系統性 artifact 或 phasing error 也可能造成例外。</p>
 {{/ask}}
 </section>
@@ -184,38 +205,6 @@ clonality、mapping bias 與 depth 影響，因此不能單獨依 VAF 分類。<
 
 <section data-part="practice">
 <h2>實作練習</h2>
-
-<h3>配對模式</h3>
-
-{{cli}}
-docker run \
-  -v ${INPUT_BAM_DIR}:${INPUT_BAM_DIR} \
-  -v ${OUTPUT_DIR}:${OUTPUT_DIR} \
-  -u $(id -u):$(id -g) \
-  hkubal/clairs:v0.4.1 \
-  /opt/bin/run_clairs \
-  --normal_bam_fn ${INPUT_BAM_DIR}/normal.bam \
-  --tumor_bam_fn  ${INPUT_BAM_DIR}/tumor.bam \
-  --ref_fn ${INPUT_REF_DIR}/reference.fasta \
-  --threads 64 \
-  --platform ont_r10_dorado_sup_5khz_ssrs \
-  --output_dir ${OUTPUT_DIR}
-{{/cli}}
-
-<h3>僅腫瘤模式：準備 population database set</h3>
-
-{{cli}}
-mkdir PoN
-BASE=http://www.bio8.cs.hku.hk/clairs-to/databases
-wget -P PoN $BASE/gnomad.r2.1.af-ge-0.001.sites.vcf.gz
-wget -P PoN $BASE/dbsnp.b138.non-somatic.sites.vcf.gz
-wget -P PoN $BASE/1000g-pon.sites.vcf.gz
-wget -P PoN $BASE/CoLoRSdb.GRCh38.v1.1.0.deepvariant.glnexus.af-ge-0.001.vcf.gz
-{{/cli}}
-
-<p class="cli-note"><b>注意</b>：有些文件把資料夾變數寫成 <code>PATH="PoN"</code> 再使用
-<code>$PATH</code>，這會<b>覆寫 shell 的 PATH 環境變數</b>。此處改用
-<code>BASE</code>，實際參數仍應依工具版本文件核對。</p>
 
 <h3>比較兩種 calling 設計的結果</h3>
 
@@ -228,14 +217,30 @@ bcftools isec -C paired.vcf.gz tumoronly.vcf.gz | wc -l
 
 # 僅腫瘤模式多出的候選（可能包含 private germline、artifact 或 paired caller 漏報）
 bcftools isec -C tumoronly.vcf.gz paired.vcf.gz | wc -l
-
-# 查詢多出候選在 normal 中的 VAF
-# VAF 接近 0.5 時，可優先檢查 private germline 的可能性
 {{/cli}}
 
-<p class="prose">最後一步是檢查多出的候選在正常樣本中的 VAF，並同時查看 depth、copy number、
-purity、mapping／base quality 與 caller evidence。VAF 接近 0.5 可提示 private germline，
-但仍需排除污染、比對偏差與其他模型不確定性，不能僅依此一項證據定案。</p>
+<h3>檢查多出來的候選是什麼</h3>
+
+<p class="prose">上面第二條指令的輸出，就是本模組那張圖裡的位置 ③。逐項檢查它們：</p>
+
+{{cli}}
+# 1) 在配對正常樣本裡的 VAF —— 接近 0.5 提示 private germline
+bcftools mpileup -f reference.fasta -r chr1:1000000 normal.bam | less
+
+# 2) 支持 read 落在哪一條 haplotype 上
+#    haplotag 過的 BAM 裡直接數 HP 標籤；兩邊都有支持就要提高疑慮
+samtools view tumor.haplotagged.bam chr1:1000000-1000000 \
+  | grep -o 'HP:Z:[12]' | sort | uniq -c
+{{/cli}}
+
+<p class="cli-note"><b>注意</b>：<code>HP</code> 標籤的型別依工具而異。
+<code>longphase-s haplotag</code> 寫的是整數 <code>HP:i:</code>，
+<code>somatic_haplotag</code> 與整個 <code>longphase-to</code> 寫的是字串 <code>HP:Z:</code>；
+上面的 <code>grep</code> 請依實際輸出調整。</p>
+
+<p class="prose">兩項要合起來看。VAF 接近 0.5 可提示 private germline，
+但仍需排除污染、比對偏差與其他模型不確定性；haplotype 分布可提示 artifact，
+但真的兩次獨立突變或 phasing error 都會造成例外。<b>沒有單一證據可以定案。</b></p>
 
 {{quiz:m07}}
 </section>

@@ -1,62 +1,267 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400">
-  <title>正常樣本被腫瘤細胞污染時，判斷會出什麼錯</title>
-  <desc>左側：簡化示例中，正常樣本未觀察到腫瘤來源，因此該位置沒有支持訊號。
-        右側：正常樣本含少量腫瘤來源，腫瘤候選在 normal 中也出現低頻支持；
-        若使用「normal 有支持即排除」的規則，可能誤刪 genuine somatic candidate。
-        訊號強度僅作示例：germline 與污染訊號的 VAF 仍受 purity、coverage 與 copy number 等因素影響。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
+  <title>同一個位置，在配對正常樣本裡看到訊號，有三種完全不同的意思</title>
+  <desc>三欄的腫瘤樣本完全相同：24 條 read 裡有 6 條帶變異，VAF 都是 0.25。
+        差別只在配對正常樣本。左欄正常樣本一條都沒有，這是最單純的 somatic。
+        中欄正常樣本有 1 條，VAF 0.04 —— 這是正常組織裡混進了腫瘤細胞（tumour-in-normal
+        contamination），變異仍然是 somatic，但「normal 有訊號就排除」的規則會把它刪掉。
+        右欄正常樣本有 12 條，VAF 0.50，那是 heterozygous germline 該有的樣子，應該排除。
+        所以判斷依據不是「normal 有沒有訊號」，而是「訊號有多強」，需要一個門檻；
+        門檻放得太低會刪掉被污染樣本裡的真 somatic，放得太高會留下 germline。</desc>
 
-  <!-- ══ 左：乾淨的正常樣本 ══ -->
-  <rect class="box ok" x="16" y="16" width="472" height="368" rx="10"/>
-  <text class="lbl bold zh" x="36" y="46">示例：normal 未觀察到腫瘤來源</text>
+  <text class="lbl bold zh" x="16" y="36">同一個位置，normal 裡的訊號強度說明三種不同的事</text>
 
-  <text class="anno zh" x="36" y="80">正常樣本的細胞組成</text>
-  <circle class="cell normal" cx="56"  cy="110" r="15"/>
-  <circle class="cell normal" cx="90"  cy="110" r="15"/>
-  <circle class="cell normal" cx="124" cy="110" r="15"/>
-  <circle class="cell normal" cx="158" cy="110" r="15"/>
-  <circle class="cell normal" cx="192" cy="110" r="15"/>
-  <circle class="cell normal" cx="226" cy="110" r="15"/>
-  <text class="tick zh" x="252" y="115">normal 細胞示例</text>
+  <!-- ① 乾淨的正常樣本 -->
+  <rect class="box plain" x="20" y="56" width="304" height="374" rx="10"/>
+  <text class="anno bold zh" x="38" y="86">① 乾淨的正常樣本</text>
+  <text class="anno zh" x="38" y="108">normal 完全沒有訊號</text>
 
-  <text class="anno zh" x="36" y="160">在腫瘤變異的位置上看 read</text>
-  <rect class="read hp0" x="36" y="178" width="180" height="12" rx="6"/>
-  <rect class="read hp0" x="36" y="196" width="180" height="12" rx="6"/>
-  <rect class="read hp0" x="36" y="214" width="180" height="12" rx="6"/>
-  <rect class="read hp0" x="36" y="232" width="180" height="12" rx="6"/>
-  <rect class="read hp0" x="36" y="250" width="180" height="12" rx="6"/>
-  <text class="anno zh ok bold" x="230" y="218">未觀察到支持</text>
+  <text class="tick zh" x="42" y="142">腫瘤樣本　24 條 read</text>
+  <rect class="read" x="42" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="53" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="64" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="75" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="86" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="97" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="108" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="119" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="130" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="141" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="152" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="163" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="174" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="185" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="196" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="207" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="218" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="229" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="240" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="251" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="262" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="273" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="284" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="295" y="152" width="8" height="18" rx="4"/>
+  <circle class="mark somatic" cx="57" cy="161" r="4"/>
+  <circle class="mark somatic" cx="90" cy="161" r="4"/>
+  <circle class="mark somatic" cx="101" cy="161" r="4"/>
+  <circle class="mark somatic" cx="167" cy="161" r="4"/>
+  <circle class="mark somatic" cx="222" cy="161" r="4"/>
+  <circle class="mark somatic" cx="266" cy="161" r="4"/>
+  <text class="tick" x="42" y="196">tumour VAF = 6/24 = 0.25</text>
 
-  <text class="anno mid" x="252" y="300">示例 normal VAF = 0.00</text>
-  <rect class="box plain" x="120" y="318" width="264" height="48" rx="8"/>
-  <text class="anno mid zh bold ok" x="252" y="348">可保留為 somatic candidate</text>
+  <line class="guide" x1="38" y1="216" x2="306" y2="216"/>
+  <text class="tick zh" x="42" y="244">配對正常樣本　24 條 read</text>
+  <rect class="read" x="42" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="53" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="64" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="75" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="86" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="97" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="108" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="119" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="130" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="141" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="152" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="163" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="174" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="185" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="196" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="207" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="218" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="229" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="240" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="251" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="262" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="273" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="284" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="295" y="254" width="8" height="18" rx="4"/>
+  <text class="tick bold" x="42" y="298">normal VAF = 0/24 = 0.00</text>
 
-  <!-- ══ 右：被污染的正常樣本 ══ -->
-  <rect class="box bad" x="512" y="16" width="472" height="368" rx="10"/>
-  <text class="lbl bold zh" x="532" y="46">示例：normal 含少量腫瘤來源</text>
+  <rect class="box ok" x="40" y="316" width="264" height="44" rx="8"/>
+  <text class="anno mid bold zh ok" x="172" y="344">保留為 somatic 候選</text>
+  <text class="tick zh" x="42" y="384">腫瘤有、正常沒有 ——</text>
+  <text class="tick zh" x="42" y="406">這是最單純的情況</text>
 
-  <text class="anno zh" x="532" y="80">正常樣本的細胞組成</text>
-  <circle class="cell normal" cx="552" cy="110" r="15"/>
-  <circle class="cell normal" cx="586" cy="110" r="15"/>
-  <circle class="cell normal" cx="620" cy="110" r="15"/>
-  <circle class="cell normal" cx="654" cy="110" r="15"/>
-  <circle class="cell tumor"  cx="688" cy="110" r="15"/>
-  <circle class="cell normal" cx="722" cy="110" r="15"/>
-  <text class="tick zh somatic" x="748" y="105">含少量</text>
-  <text class="tick zh somatic" x="748" y="123">腫瘤來源</text>
+  <!-- ② 正常樣本被腫瘤污染 -->
+  <rect class="box plain" x="346" y="56" width="304" height="374" rx="10"/>
+  <text class="anno bold zh" x="364" y="86">② 正常樣本被腫瘤污染</text>
+  <text class="anno zh" x="364" y="108">normal 有一點訊號</text>
 
-  <text class="anno zh" x="532" y="160">在同一個位置上看 read</text>
-  <rect class="read hp0" x="532" y="178" width="180" height="12" rx="6"/>
-  <rect class="read hp0" x="532" y="196" width="180" height="12" rx="6"/>
-  <rect class="read hp0" x="532" y="214" width="180" height="12" rx="6"/>
-  <rect class="read hp2" x="532" y="232" width="180" height="12" rx="6"/>
-  <circle class="mark somatic" cx="622" cy="238" r="6"/>
-  <rect class="read hp0" x="532" y="250" width="180" height="12" rx="6"/>
-  <text class="anno zh bad bold" x="726" y="243">觀察到低頻支持</text>
+  <text class="tick zh" x="368" y="142">腫瘤樣本　24 條 read</text>
+  <rect class="read" x="368" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="379" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="390" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="401" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="412" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="423" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="434" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="445" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="456" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="467" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="478" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="489" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="500" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="511" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="522" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="533" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="544" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="555" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="566" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="577" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="588" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="599" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="610" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="621" y="152" width="8" height="18" rx="4"/>
+  <circle class="mark somatic" cx="383" cy="161" r="4"/>
+  <circle class="mark somatic" cx="416" cy="161" r="4"/>
+  <circle class="mark somatic" cx="427" cy="161" r="4"/>
+  <circle class="mark somatic" cx="493" cy="161" r="4"/>
+  <circle class="mark somatic" cx="548" cy="161" r="4"/>
+  <circle class="mark somatic" cx="592" cy="161" r="4"/>
+  <text class="tick" x="368" y="196">tumour VAF = 6/24 = 0.25</text>
 
-  <text class="anno mid" x="748" y="300">示例 normal VAF = 0.04</text>
-  <rect class="box plain" x="616" y="318" width="264" height="48" rx="8"/>
-  <text class="anno mid zh bold bad" x="748" y="348">簡化規則可能誤刪候選</text>
+  <line class="guide" x1="364" y1="216" x2="632" y2="216"/>
+  <text class="tick zh" x="368" y="244">配對正常樣本　24 條 read</text>
+  <rect class="read" x="368" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="379" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="390" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="401" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="412" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="423" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="434" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="445" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="456" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="467" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="478" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="489" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="500" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="511" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="522" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="533" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="544" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="555" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="566" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="577" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="588" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="599" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="610" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="621" y="254" width="8" height="18" rx="4"/>
+  <circle class="mark somatic" cx="493" cy="263" r="4"/>
+  <text class="tick bold" x="368" y="298">normal VAF = 1/24 = 0.04</text>
 
-  <!-- 中間箭頭 -->
-  <path class="conn" d="M492,200 L508,200" marker-end="url(#arrow)" stroke="var(--bad)"/>
+  <rect class="box ok" x="366" y="316" width="264" height="44" rx="8"/>
+  <text class="anno mid bold zh ok" x="498" y="344">仍然是 somatic</text>
+  <text class="tick zh" x="368" y="384">0.04 遠低於 germline 的 0.5</text>
+  <text class="tick zh" x="368" y="406">這是污染，不是遺傳</text>
+
+  <!-- ③ 這其實是 germline -->
+  <rect class="box plain" x="672" y="56" width="304" height="374" rx="10"/>
+  <text class="anno bold zh" x="690" y="86">③ 這其實是 germline</text>
+  <text class="anno zh" x="690" y="108">normal 有一半訊號</text>
+
+  <text class="tick zh" x="694" y="142">腫瘤樣本　24 條 read</text>
+  <rect class="read" x="694" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="705" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="716" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="727" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="738" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="749" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="760" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="771" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="782" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="793" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="804" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="815" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="826" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="837" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="848" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="859" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="870" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="881" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="892" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="903" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="914" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="925" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="936" y="152" width="8" height="18" rx="4"/>
+  <rect class="read" x="947" y="152" width="8" height="18" rx="4"/>
+  <circle class="mark somatic" cx="709" cy="161" r="4"/>
+  <circle class="mark somatic" cx="742" cy="161" r="4"/>
+  <circle class="mark somatic" cx="753" cy="161" r="4"/>
+  <circle class="mark somatic" cx="819" cy="161" r="4"/>
+  <circle class="mark somatic" cx="874" cy="161" r="4"/>
+  <circle class="mark somatic" cx="918" cy="161" r="4"/>
+  <text class="tick" x="694" y="196">tumour VAF = 6/24 = 0.25</text>
+
+  <line class="guide" x1="690" y1="216" x2="958" y2="216"/>
+  <text class="tick zh" x="694" y="244">配對正常樣本　24 條 read</text>
+  <rect class="read" x="694" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="705" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="716" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="727" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="738" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="749" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="760" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="771" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="782" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="793" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="804" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="815" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="826" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="837" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="848" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="859" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="870" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="881" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="892" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="903" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="914" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="925" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="936" y="254" width="8" height="18" rx="4"/>
+  <rect class="read" x="947" y="254" width="8" height="18" rx="4"/>
+  <circle class="mark somatic" cx="698" cy="263" r="4"/>
+  <circle class="mark somatic" cx="720" cy="263" r="4"/>
+  <circle class="mark somatic" cx="731" cy="263" r="4"/>
+  <circle class="mark somatic" cx="764" cy="263" r="4"/>
+  <circle class="mark somatic" cx="786" cy="263" r="4"/>
+  <circle class="mark somatic" cx="797" cy="263" r="4"/>
+  <circle class="mark somatic" cx="830" cy="263" r="4"/>
+  <circle class="mark somatic" cx="852" cy="263" r="4"/>
+  <circle class="mark somatic" cx="863" cy="263" r="4"/>
+  <circle class="mark somatic" cx="896" cy="263" r="4"/>
+  <circle class="mark somatic" cx="918" cy="263" r="4"/>
+  <circle class="mark somatic" cx="951" cy="263" r="4"/>
+  <text class="tick bold" x="694" y="298">normal VAF = 12/24 = 0.50</text>
+
+  <rect class="box bad" x="692" y="316" width="264" height="44" rx="8"/>
+  <text class="anno mid bold zh bad" x="824" y="344">判為 germline，排除</text>
+  <text class="tick zh" x="694" y="384">0.50 就是 heterozygous</text>
+  <text class="tick zh" x="694" y="406">germline 該有的樣子</text>
+
+  <!-- 把三個 normal VAF 放到同一條軸上 -->
+  <text class="anno bold zh" x="20" y="458">判斷依據不是「有沒有」，是「有多強」</text>
+
+  <!-- 區域先畫，才不會被軸與標記蓋掉 -->
+  <rect class="region"     x="120" y="496" width="114" height="28"/>
+  <rect class="region bad" x="234" y="496" width="646" height="28"/>
+  <line class="axis" x1="120" y1="524" x2="880" y2="524"/>
+  <line class="guide" x1="234" y1="470" x2="234" y2="534"/>
+
+  <circle class="mark somatic" cx="120" cy="510" r="7"/>
+  <circle class="mark somatic" cx="150" cy="510" r="7"/>
+  <circle class="mark somatic" cx="500" cy="510" r="7"/>
+  <text class="tick mid" x="120" y="492">①</text>
+  <text class="tick mid" x="150" y="492">②</text>
+  <text class="tick mid" x="500" y="492">③</text>
+
+  <text class="tick mid" x="120" y="544">0</text>
+  <text class="tick mid" x="310" y="544">0.25</text>
+  <text class="tick mid" x="500" y="544">0.5</text>
+  <text class="tick mid" x="690" y="544">0.75</text>
+  <text class="tick mid" x="880" y="544">1</text>
+  <text class="tick mid zh" x="500" y="566">normal 樣本在這個位置的 VAF</text>
+  <text class="tick mid zh bold" x="234" y="480">門檻 T</text>
+  <text class="tick end zh" x="228" y="516">保留</text>
+  <text class="tick zh" x="240" y="516">排除</text>
+
+  <line class="axis" x1="20" y1="580" x2="980" y2="580"/>
+  <text class="anno zh bold" x="20" y="608">門檻放在哪裡是取捨：放太低會刪掉被污染樣本裡的真 somatic，放太高會留下 germline。</text>
 </svg>

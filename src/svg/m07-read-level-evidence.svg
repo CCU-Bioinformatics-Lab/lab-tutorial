@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700">
+  <title>沒有正常組織時，改看支持 read 落在哪一條 haplotype 上</title>
+  <desc>兩欄的支持 read 總數刻意設成完全一樣：12 條 read 裡有 4 條帶著這個候選變異，
+        VAF 都是 0.33。光看數量分不出來，要看這 4 條落在哪裡。
+        左欄的 4 條全部同時帶著 HP1 的 germline allele，也就是這個變異只出現在一條染色體上 ——
+        跟「一次體細胞突變從一條既有 haplotype 長出來」相容。
+        右欄的 4 條有 2 條帶 HP1 的 allele、2 條帶 HP2 的 allele，等於同一個位置在兩條染色體上
+        各獨立發生了一次一樣的突變，機率極低，更像比對或定序造成的問題。
+        這個判準不需要配對正常樣本，只需要同一條 read 上同時看得到 germline 錨點與候選位置，
+        所以它是 long read 才拿得到的證據。但它有例外：真的發生兩次獨立突變，或 phasing 本身出錯時，
+        判斷都會失效，因此只能作為補充證據。</desc>
+
+  <text class="lbl bold zh" x="16" y="36">兩邊的支持 read 一樣多 —— 分得出來的是它們的分布</text>
+  <text class="anno zh" x="16" y="60">同一條 long read 上同時看得到 germline 錨點與候選位置，才問得出「這個變異在哪一條上」。</text>
+
+  <!-- 真的 somatic 變異 -->
+  <rect class="box ok" x="20" y="76" width="470" height="484" rx="10"/>
+  <text class="anno bold zh somatic" x="44" y="106">真的 somatic 變異</text>
+  <text class="anno zh" x="44" y="128">4 條支持 read 全在 HP1</text>
+  <circle class="mark somatic" cx="265" cy="140" r="8"/>
+  <text class="tick mid zh" x="170" y="164">germline 錨點</text>
+  <text class="tick mid zh" x="265" y="164">候選位置</text>
+  <text class="tick mid zh" x="360" y="164">germline 錨點</text>
+  <rect class="read hp1" x="110" y="190" width="310" height="12" rx="6"/>
+  <rect class="read hp1" x="110" y="207" width="310" height="12" rx="6"/>
+  <rect class="read hp1" x="110" y="224" width="310" height="12" rx="6"/>
+  <rect class="read hp1" x="110" y="241" width="310" height="12" rx="6"/>
+  <rect class="read hp1" x="110" y="258" width="310" height="12" rx="6"/>
+  <rect class="read hp1" x="110" y="275" width="310" height="12" rx="6"/>
+  <line class="guide" x1="44" y1="290" x2="466" y2="290"/>
+  <rect class="read hp2" x="110" y="298" width="310" height="12" rx="6"/>
+  <rect class="read hp2" x="110" y="315" width="310" height="12" rx="6"/>
+  <rect class="read hp2" x="110" y="332" width="310" height="12" rx="6"/>
+  <rect class="read hp2" x="110" y="349" width="310" height="12" rx="6"/>
+  <rect class="read hp2" x="110" y="366" width="310" height="12" rx="6"/>
+  <rect class="read hp2" x="110" y="383" width="310" height="12" rx="6"/>
+  <rect class="region" x="253" y="184" width="24" height="211"/>
+  <rect class="box ghost" x="253" y="184" width="24" height="211" rx="4"/>
+  <text class="base t mono" x="170" y="200" font-size="14">T</text>
+  <text class="base a mono" x="265" y="200" font-size="14">A</text>
+  <text class="base c mono" x="360" y="200" font-size="14">C</text>
+  <text class="base t mono" x="170" y="217" font-size="14">T</text>
+  <text class="base a mono" x="265" y="217" font-size="14">A</text>
+  <text class="base c mono" x="360" y="217" font-size="14">C</text>
+  <text class="base t mono" x="170" y="234" font-size="14">T</text>
+  <text class="base a mono" x="265" y="234" font-size="14">A</text>
+  <text class="base c mono" x="360" y="234" font-size="14">C</text>
+  <text class="base t mono" x="170" y="251" font-size="14">T</text>
+  <text class="base a mono" x="265" y="251" font-size="14">A</text>
+  <text class="base c mono" x="360" y="251" font-size="14">C</text>
+  <text class="base t mono" x="170" y="268" font-size="14">T</text>
+  <text class="base g mono" x="265" y="268" font-size="14">G</text>
+  <text class="base c mono" x="360" y="268" font-size="14">C</text>
+  <text class="base t mono" x="170" y="285" font-size="14">T</text>
+  <text class="base g mono" x="265" y="285" font-size="14">G</text>
+  <text class="base c mono" x="360" y="285" font-size="14">C</text>
+  <text class="base g mono" x="170" y="308" font-size="14">G</text>
+  <text class="base g mono" x="265" y="308" font-size="14">G</text>
+  <text class="base a mono" x="360" y="308" font-size="14">A</text>
+  <text class="base g mono" x="170" y="325" font-size="14">G</text>
+  <text class="base g mono" x="265" y="325" font-size="14">G</text>
+  <text class="base a mono" x="360" y="325" font-size="14">A</text>
+  <text class="base g mono" x="170" y="342" font-size="14">G</text>
+  <text class="base g mono" x="265" y="342" font-size="14">G</text>
+  <text class="base a mono" x="360" y="342" font-size="14">A</text>
+  <text class="base g mono" x="170" y="359" font-size="14">G</text>
+  <text class="base g mono" x="265" y="359" font-size="14">G</text>
+  <text class="base a mono" x="360" y="359" font-size="14">A</text>
+  <text class="base g mono" x="170" y="376" font-size="14">G</text>
+  <text class="base g mono" x="265" y="376" font-size="14">G</text>
+  <text class="base a mono" x="360" y="376" font-size="14">A</text>
+  <text class="base g mono" x="170" y="393" font-size="14">G</text>
+  <text class="base g mono" x="265" y="393" font-size="14">G</text>
+  <text class="base a mono" x="360" y="393" font-size="14">A</text>
+  <text class="tick end bold hp1" x="102" y="238">HP1</text>
+  <text class="tick end bold hp2" x="102" y="346">HP2</text>
+  <text class="tick end zh" x="102" y="260">6 條</text>
+  <text class="tick end zh" x="102" y="368">6 條</text>
+  <text class="tick zh" x="44" y="418">支持這個候選的 read：4 條，VAF = 4/12 = 0.33</text>
+  <text class="tick zh bold" x="44" y="440">其中 HP1：4 條　　HP2：0 條</text>
+  <rect class="box ok" x="44" y="456" width="422" height="48" rx="8"/>
+  <text class="anno mid bold zh ok" x="255" y="486">所有支持 read 都在同一條 haplotype 上</text>
+  <text class="tick zh" x="44" y="526">一次體細胞突變只會發生在一條染色體上，</text>
+  <text class="tick zh" x="44" y="548">所以這個分布跟真的 somatic 相容。</text>
+
+  <!-- 定序或比對造成的 artifact -->
+  <rect class="box bad" x="510" y="76" width="470" height="484" rx="10"/>
+  <text class="anno bold zh artifact" x="534" y="106">定序或比對造成的 artifact</text>
+  <text class="anno zh" x="534" y="128">4 條支持 read 分散在兩條上</text>
+  <circle class="mark artifact" cx="755" cy="140" r="8"/>
+  <text class="tick mid zh" x="660" y="164">germline 錨點</text>
+  <text class="tick mid zh" x="755" y="164">候選位置</text>
+  <text class="tick mid zh" x="850" y="164">germline 錨點</text>
+  <rect class="read hp1" x="600" y="190" width="310" height="12" rx="6"/>
+  <rect class="read hp1" x="600" y="207" width="310" height="12" rx="6"/>
+  <rect class="read hp1" x="600" y="224" width="310" height="12" rx="6"/>
+  <rect class="read hp1" x="600" y="241" width="310" height="12" rx="6"/>
+  <rect class="read hp1" x="600" y="258" width="310" height="12" rx="6"/>
+  <rect class="read hp1" x="600" y="275" width="310" height="12" rx="6"/>
+  <line class="guide" x1="534" y1="290" x2="956" y2="290"/>
+  <rect class="read hp2" x="600" y="298" width="310" height="12" rx="6"/>
+  <rect class="read hp2" x="600" y="315" width="310" height="12" rx="6"/>
+  <rect class="read hp2" x="600" y="332" width="310" height="12" rx="6"/>
+  <rect class="read hp2" x="600" y="349" width="310" height="12" rx="6"/>
+  <rect class="read hp2" x="600" y="366" width="310" height="12" rx="6"/>
+  <rect class="read hp2" x="600" y="383" width="310" height="12" rx="6"/>
+  <rect class="region" x="743" y="184" width="24" height="211"/>
+  <rect class="box ghost" x="743" y="184" width="24" height="211" rx="4"/>
+  <text class="base t mono" x="660" y="200" font-size="14">T</text>
+  <text class="base a mono" x="755" y="200" font-size="14">A</text>
+  <text class="base c mono" x="850" y="200" font-size="14">C</text>
+  <text class="base t mono" x="660" y="217" font-size="14">T</text>
+  <text class="base g mono" x="755" y="217" font-size="14">G</text>
+  <text class="base c mono" x="850" y="217" font-size="14">C</text>
+  <text class="base t mono" x="660" y="234" font-size="14">T</text>
+  <text class="base g mono" x="755" y="234" font-size="14">G</text>
+  <text class="base c mono" x="850" y="234" font-size="14">C</text>
+  <text class="base t mono" x="660" y="251" font-size="14">T</text>
+  <text class="base a mono" x="755" y="251" font-size="14">A</text>
+  <text class="base c mono" x="850" y="251" font-size="14">C</text>
+  <text class="base t mono" x="660" y="268" font-size="14">T</text>
+  <text class="base g mono" x="755" y="268" font-size="14">G</text>
+  <text class="base c mono" x="850" y="268" font-size="14">C</text>
+  <text class="base t mono" x="660" y="285" font-size="14">T</text>
+  <text class="base g mono" x="755" y="285" font-size="14">G</text>
+  <text class="base c mono" x="850" y="285" font-size="14">C</text>
+  <text class="base g mono" x="660" y="308" font-size="14">G</text>
+  <text class="base g mono" x="755" y="308" font-size="14">G</text>
+  <text class="base a mono" x="850" y="308" font-size="14">A</text>
+  <text class="base g mono" x="660" y="325" font-size="14">G</text>
+  <text class="base a mono" x="755" y="325" font-size="14">A</text>
+  <text class="base a mono" x="850" y="325" font-size="14">A</text>
+  <text class="base g mono" x="660" y="342" font-size="14">G</text>
+  <text class="base g mono" x="755" y="342" font-size="14">G</text>
+  <text class="base a mono" x="850" y="342" font-size="14">A</text>
+  <text class="base g mono" x="660" y="359" font-size="14">G</text>
+  <text class="base g mono" x="755" y="359" font-size="14">G</text>
+  <text class="base a mono" x="850" y="359" font-size="14">A</text>
+  <text class="base g mono" x="660" y="376" font-size="14">G</text>
+  <text class="base a mono" x="755" y="376" font-size="14">A</text>
+  <text class="base a mono" x="850" y="376" font-size="14">A</text>
+  <text class="base g mono" x="660" y="393" font-size="14">G</text>
+  <text class="base g mono" x="755" y="393" font-size="14">G</text>
+  <text class="base a mono" x="850" y="393" font-size="14">A</text>
+  <text class="tick end bold hp1" x="592" y="238">HP1</text>
+  <text class="tick end bold hp2" x="592" y="346">HP2</text>
+  <text class="tick end zh" x="592" y="260">6 條</text>
+  <text class="tick end zh" x="592" y="368">6 條</text>
+  <text class="tick zh" x="534" y="418">支持這個候選的 read：4 條，VAF = 4/12 = 0.33</text>
+  <text class="tick zh bold" x="534" y="440">其中 HP1：2 條　　HP2：2 條</text>
+  <rect class="box bad" x="534" y="456" width="422" height="48" rx="8"/>
+  <text class="anno mid bold zh bad" x="745" y="486">同一個變異同時出現在兩條 haplotype 上</text>
+  <text class="tick zh" x="534" y="526">同一個位置在兩條染色體上各突變一次的機率極低，</text>
+  <text class="tick zh" x="534" y="548">更像是比對或定序造成的問題。</text>
+
+  <line class="axis" x1="20" y1="592" x2="980" y2="592"/>
+  <text class="anno zh bold" x="20" y="620">這個判準不需要配對正常樣本，只需要 read 夠長 —— 所以它是 tumour-only 拿得到的替代證據。</text>
+  <text class="anno zh" x="20" y="648">但它有例外：真的發生兩次獨立突變，或 phasing 本身出錯時都會失效，所以只能當補充證據。</text>
+  <text class="anno zh" x="20" y="676">LongPhase-S 把它實作成 read-level 與 haplotype origin 兩個過濾器，門檻與細節見 M12。</text>
+</svg>

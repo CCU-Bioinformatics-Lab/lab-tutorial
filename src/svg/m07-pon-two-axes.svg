@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530">
+  <title>兩種叫做 PON 的資料各守一個方向，中間留下一格涵蓋不到</title>
+  <desc>把候選變異放在兩個軸上：橫軸是這個變異在族群中的等位基因頻率，縱軸是它在多份正常樣本中
+        反覆出現的程度。族群資料庫（1000G、gnomAD、dbSNP、CoLoRSdb）能排除的是右半邊：族群中常見的
+        germline 變異。GATK Mutect2 的 recurrent-artifact PoN 能排除的是上半邊：在很多正常樣本裡
+        反覆出現的技術性 artifact。左下角那一格兩者都涵蓋不到，而那一格裡同時住著三種東西 ——
+        這個人私有的 germline 變異、沒見過的 artifact，以及我們真正想找的 somatic 變異。
+        因為它們在這兩個軸上的座標一樣，任何靠查表的方法都分不出來。</desc>
+
+  <text class="lbl bold zh" x="16" y="36">兩種叫做「PON」的資料，各守住一個方向</text>
+
+  <!-- ══════════ 二維平面 ══════════ -->
+  <!-- 涵蓋區（先畫，避免蓋掉點與文字） -->
+  <rect class="region"     x="380" y="90" width="180" height="310"/>
+  <rect class="region loh" x="120" y="90" width="440" height="90"/>
+
+  <!-- 涵蓋不到的那一格 -->
+  <rect class="box ghost" x="120" y="180" width="260" height="220"/>
+
+  <!-- 分界 -->
+  <line class="guide" x1="380" y1="90"  x2="380" y2="400"/>
+  <line class="guide" x1="120" y1="180" x2="560" y2="180"/>
+
+  <!-- 座標軸 -->
+  <line class="axis" x1="120" y1="400" x2="576" y2="400" marker-end="url(#arrow-sm)"/>
+  <line class="axis" x1="120" y1="400" x2="120" y2="82"  marker-end="url(#arrow-sm)"/>
+
+  <text class="tick mid zh" x="150" y="422">罕見</text>
+  <text class="tick mid zh" x="540" y="422">常見</text>
+  <text class="anno mid zh" x="348" y="448">橫軸：這個變異在<tspan class="bold">族群</tspan>中的等位基因頻率</text>
+  <text class="anno zh" transform="rotate(-90 100 245)" x="100" y="245" text-anchor="middle">縱軸：在多份正常樣本中反覆出現的程度</text>
+
+  <!-- 涵蓋區標籤 -->
+  <text class="tick mid zh bold" x="250" y="110">GATK PoN 涵蓋</text>
+  <text class="tick mid zh" x="250" y="132">（反覆出現的技術性 artifact）</text>
+  <text class="tick mid zh bold" x="470" y="366">族群資料庫涵蓋</text>
+  <text class="tick mid zh" x="470" y="388">（常見 germline）</text>
+
+  <text class="tick zh bold bad" x="130" y="204">兩種資料都涵蓋不到</text>
+
+  <!-- 資料點 -->
+  <circle class="pt fp" cx="230" cy="146" r="9"/>
+  <text class="tick zh" x="244" y="152">反覆出現的 artifact</text>
+
+  <circle class="pt gl" cx="470" cy="330" r="9"/>
+  <text class="tick mid zh" x="470" y="312">族群常見 germline</text>
+
+  <circle class="pt gl" cx="190" cy="300" r="9"/>
+  <text class="tick zh" x="204" y="306">這個人私有的 germline</text>
+
+  <circle class="pt fp" cx="300" cy="336" r="9"/>
+  <text class="tick end zh" x="286" y="342">沒見過的 artifact</text>
+
+  <circle class="pt tp" cx="230" cy="250" r="9"/>
+  <text class="tick zh" x="244" y="256">真的 somatic 變異</text>
+
+  <!-- ══════════ 右側：那一格裡有什麼 ══════════ -->
+  <rect class="box bad" x="600" y="82" width="384" height="318" rx="10"/>
+  <text class="lbl bold zh" x="618" y="116">左下角那一格裡有三種東西</text>
+
+  <circle class="pt gl" cx="630" cy="152" r="9"/>
+  <text class="anno zh" x="650" y="158">這個人私有的 germline</text>
+  <text class="tick zh" x="650" y="180">族群裡幾乎沒人有，所以資料庫沒收錄</text>
+
+  <circle class="pt fp" cx="630" cy="212" r="9"/>
+  <text class="anno zh" x="650" y="218">沒見過的 artifact</text>
+  <text class="tick zh" x="650" y="240">沒有人統計過它，所以 PoN 裡也沒有</text>
+
+  <circle class="pt tp" cx="630" cy="272" r="9"/>
+  <text class="anno zh somatic" x="650" y="278">真的 somatic 變異</text>
+  <text class="tick zh" x="650" y="300">它是新長出來的，本來就不會在任何資料庫裡</text>
+
+  <line class="guide" x1="618" y1="326" x2="966" y2="326"/>
+  <text class="anno zh bold" x="618" y="356">三者在這兩個軸上的座標一樣。</text>
+  <text class="anno zh" x="618" y="384">所以「再多加幾個資料庫」不會把它們分開。</text>
+
+  <!-- ══════════ 結論 ══════════ -->
+  <line class="axis" x1="20" y1="470" x2="980" y2="470"/>
+  <text class="anno zh bold" x="20" y="498">要把這一格拆開，必須換一個軸 —— 不再問「這個位置別人有沒有」，</text>
+  <text class="anno zh" x="20" y="526">而是問「支持它的那些 read，彼此的結構是否像一次真的突變」。這就是 read-level 證據要做的事。</text>
+</svg>

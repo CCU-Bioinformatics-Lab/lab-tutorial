@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 570">
+  <title>為什麼 somatic 不等於「腫瘤 VCF 減掉正常 VCF」</title>
+  <desc>四種機制會讓「兩個 VCF 相減」的直覺失準。
+        一、正常樣本裡混進了腫瘤 DNA，真的 somatic 變異在正常樣本中也會出現低頻支持，
+        照「有訊號就刪」的規則會刪掉真答案。
+        二、正常樣本的深度通常比腫瘤低；就算真有低頻訊號，25× 下期望只有 0.5 條 read，
+        看到 0 條的機率約六成，所以「沒看到」多半只是深度不夠。
+        三、germline 變異的 VAF 不是固定 0.5：少一份拷貝會往上偏，多一份會往下偏，
+        所以不能用固定門檻判斷是不是 germline。
+        四、兩邊的 caller 各自都會漏報；正常樣本漏掉一個 heterozygous 位點，差集就會多留一個 germline。</desc>
+
+  <!-- ══════════ 那個錯誤的等式 ══════════ -->
+  <text class="lbl bold zh" x="20" y="50">常見但不成立的直覺</text>
+
+  <rect class="box plain" x="230" y="22" width="140" height="44" rx="6"/>
+  <text class="anno mid zh" x="300" y="50">腫瘤 VCF</text>
+  <text class="lbl mid" x="388" y="52">−</text>
+  <rect class="box plain" x="406" y="22" width="140" height="44" rx="6"/>
+  <text class="anno mid zh" x="476" y="50">正常 VCF</text>
+  <text class="lbl mid" x="564" y="52">=</text>
+  <rect class="box plain" x="582" y="22" width="140" height="44" rx="6"/>
+  <text class="anno mid" x="652" y="50">somatic</text>
+
+  <path class="conn thick" d="M552,34 L576,58 M576,34 L552,58" style="stroke:var(--bad)"/>
+  <text class="anno zh bold bad" x="740" y="50">這個等式不成立</text>
+
+  <text class="anno zh" x="20" y="98">下面四件事都會讓它失準 —— 而且前兩件在<tspan class="bold">有</tspan>配對正常樣本時就已經發生：</text>
+
+  <!-- ══════════ ① TINC ══════════ -->
+  <rect class="box plain" x="20" y="120" width="228" height="350" rx="10"/>
+  <text class="anno bold zh" x="36" y="150">① normal 有訊號</text>
+  <text class="anno bold zh bad" x="36" y="172">≠ 不是 somatic</text>
+
+  <rect class="read hp0" x="40" y="198" width="170" height="12" rx="6"/>
+  <rect class="read hp0" x="40" y="216" width="170" height="12" rx="6"/>
+  <rect class="read hp0" x="40" y="234" width="170" height="12" rx="6"/>
+  <rect class="read hp0" x="40" y="252" width="170" height="12" rx="6"/>
+  <rect class="read hp0" x="40" y="270" width="170" height="12" rx="6"/>
+  <rect class="read hp0" x="40" y="288" width="170" height="12" rx="6"/>
+  <circle class="mark somatic" cx="125" cy="258" r="5"/>
+  <text class="tick zh" x="40" y="318">少數 read 也帶了這個變異</text>
+  <text class="tick zh" x="40" y="346">因為正常組織裡本來就混了</text>
+  <text class="tick zh" x="40" y="368">一點腫瘤細胞（TINC）</text>
+
+  <line class="guide" x1="36" y1="398" x2="232" y2="398"/>
+  <text class="tick zh bad" x="36" y="424">照「有訊號就刪」</text>
+  <text class="tick zh bad" x="36" y="446">會刪掉真的 somatic</text>
+
+  <!-- ══════════ ② coverage ══════════ -->
+  <rect class="box plain" x="264" y="120" width="228" height="350" rx="10"/>
+  <text class="anno bold zh" x="280" y="150">② normal 沒訊號</text>
+  <text class="anno bold zh bad" x="280" y="172">≠ 真的沒有</text>
+
+  <text class="tick zh" x="280" y="198">兩邊的深度本來就不一樣</text>
+  <rect class="bar somatic" x="336" y="212" width="110" height="14" rx="2"/>
+  <text class="tick end zh" x="330" y="223">腫瘤</text>
+  <rect class="bar germline" x="336" y="240" width="55" height="14" rx="2"/>
+  <text class="tick end zh" x="330" y="251">正常</text>
+  <text class="tick" x="452" y="223">50×</text>
+  <text class="tick" x="397" y="251">25×</text>
+
+  <text class="tick zh" x="280" y="288">若正常樣本混入 4% 腫瘤 DNA：</text>
+  <text class="tick" x="280" y="312">somatic 的 normal VAF ≈ 0.02</text>
+  <text class="tick" x="280" y="336">25× × 0.02 ≈ 0.5 條 read</text>
+  <text class="tick zh bad" x="280" y="360">看到 0 條的機率約 60%</text>
+
+  <line class="guide" x1="280" y1="398" x2="476" y2="398"/>
+  <text class="tick zh bad" x="280" y="424">「沒看到」多半只是</text>
+  <text class="tick zh bad" x="280" y="446">深度不夠，不是證據</text>
+
+  <!-- ══════════ ③ copy number ══════════ -->
+  <rect class="box plain" x="508" y="120" width="228" height="350" rx="10"/>
+  <text class="anno bold zh" x="524" y="150">③ VAF 不是 0.5</text>
+  <text class="anno bold zh bad" x="524" y="172">≠ 不是 germline</text>
+
+  <text class="tick zh" x="524" y="200">同一個 germline 變異：</text>
+
+  <line class="guide" x1="673" y1="216" x2="673" y2="306"/>
+
+  <text class="tick end zh" x="612" y="232">兩份都在</text>
+  <rect class="bar germline" x="618" y="222" width="55" height="12" rx="2"/>
+
+  <text class="tick end zh" x="612" y="264">少一份</text>
+  <rect class="bar germline" x="618" y="254" width="94" height="12" rx="2"/>
+
+  <text class="tick end zh" x="612" y="296">多一份</text>
+  <rect class="bar germline" x="618" y="286" width="36" height="12" rx="2"/>
+
+  <line class="axis" x1="618" y1="308" x2="728" y2="308"/>
+  <text class="tick mid" x="618" y="326">0</text>
+  <text class="tick mid" x="673" y="326">0.5</text>
+  <text class="tick mid" x="728" y="326">1</text>
+  <text class="tick mid zh" x="622" y="352">VAF</text>
+  <text class="tick zh" x="524" y="378">少一份＝LOH；多一份＝擴增</text>
+
+  <line class="guide" x1="524" y1="398" x2="720" y2="398"/>
+  <text class="tick zh bad" x="524" y="424">固定門檻會把偏掉的</text>
+  <text class="tick zh bad" x="524" y="446">germline 誤判成 somatic</text>
+
+  <!-- ══════════ ④ caller ══════════ -->
+  <rect class="box plain" x="752" y="120" width="228" height="350" rx="10"/>
+  <text class="anno bold zh" x="768" y="150">④ 兩邊的 caller</text>
+  <text class="anno bold zh bad" x="768" y="172">都可能漏報</text>
+
+  <text class="tick zh" x="768" y="208">腫瘤 VCF</text>
+  <rect class="box plain" x="768" y="216" width="188" height="12" rx="3"/>
+  <rect class="box plain" x="768" y="232" width="188" height="12" rx="3"/>
+  <rect class="box plain" x="768" y="248" width="188" height="12" rx="3"/>
+
+  <text class="tick zh" x="768" y="284">正常 VCF</text>
+  <rect class="box plain" x="768" y="292" width="188" height="12" rx="3"/>
+  <rect class="box plain" x="768" y="308" width="188" height="12" rx="3"/>
+  <rect class="box ghost" x="768" y="324" width="188" height="12" rx="3"/>
+
+  <text class="tick zh bad" x="768" y="358">虛線那一行是漏掉的</text>
+  <text class="tick zh bad" x="768" y="380">heterozygous 位點</text>
+
+  <line class="guide" x1="768" y1="398" x2="964" y2="398"/>
+  <text class="tick zh bad" x="768" y="424">差集就會多留一個</text>
+  <text class="tick zh bad" x="768" y="446">germline 當成 somatic</text>
+
+  <!-- ══════════ 結論 ══════════ -->
+  <line class="axis" x1="20" y1="502" x2="980" y2="502"/>
+  <text class="anno zh bold" x="20" y="530">四件事的共同點：「有沒有訊號」是二元的，但底下的證據是連續的。</text>
+  <text class="anno zh" x="20" y="558">所以配對模式仍然需要一整套機率與品質過濾，而不是一個減法。</text>
+</svg>
