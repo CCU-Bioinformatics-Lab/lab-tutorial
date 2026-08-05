@@ -1,94 +1,114 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
-  <title>phasing 基本圖模型：位點作為節點、read 支持作為邊</title>
-  <desc>上半部：每個可區分兩條染色體的位置變成圖上的一個節點。
-        兩個節點之間如果有 read 同時跨過，就連一條邊，
-        邊的粗細代表有幾條 read 支持這個連結。
-        中間：三種邊的狀況 —— 支持一致的強邊、read 證據互相衝突的弱邊，以及沒有 read 跨過的斷邊。
-        下半部：在圖上尋找彼此一致的指派，連通區段形成一個 phase block。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 710">
+  <title>一條邊的方向與去留，由四個加權計數決定</title>
+  <desc>兩個變異之間的一條邊，其實是四個加權計數。每條跨過兩個位置的 read
+        會落進 rr、ra、ar、aa 之一：rr 表示兩邊都看到 ref，aa 表示兩邊都看到 alt，
+        依此類推。程式把它們併成兩個數字 —— para = rr + aa（平行），cross = ra + ar（交叉），
+        再算 ESR = 兩者的小除以大。para 大就平行連接，cross 大就交叉連接。
+        ESR 越小代表兩種組合差得越開、證據越乾淨；ESR 大到超過 edgeThreshold（預設 0.7）
+        就代表兩種組合幾乎一樣多，這條邊會被整個丟掉，不參與後面的定相。
+        另外兩條規則：任一端的 base quality 低於 baseQuality（預設 12）時，該條 read
+        只算 edgeWeight（預設 0.1）而不是 1；SNP 與甲基化之間的邊門檻收緊到 0.3。</desc>
 
-  <!-- ══ 步驟 1：把位點變成節點 ══ -->
-  <text class="lbl bold zh" x="20" y="32">① 每個可區分兩條染色體的位置 → 一個節點</text>
+  <text class="lbl bold zh" x="16" y="34">一條邊其實是四個計數</text>
 
-  <!-- read 層 -->
-  <line class="guide" x1="180" y1="48" x2="180" y2="118"/>
-  <line class="guide" x1="340" y1="48" x2="340" y2="118"/>
-  <line class="guide" x1="500" y1="48" x2="500" y2="118"/>
-  <line class="guide" x1="660" y1="48" x2="660" y2="118"/>
-  <line class="guide" x1="820" y1="48" x2="820" y2="118"/>
+  <!-- 左上：read 怎麼落進 rr / ra / ar / aa -->
+  <rect class="box plain" x="16" y="52" width="470" height="310" rx="10"/>
+  <text class="anno bold zh" x="34" y="82">① 每條跨過兩個位置的 read 投進一個格子</text>
+  <text class="tick mid zh" x="120" y="108">位置 i</text>
+  <text class="tick mid zh" x="330" y="108">位置 j</text>
+  <circle class="mark ref" cx="120" cy="130" r="9"/>
+  <circle class="mark ref" cx="330" cy="130" r="9"/>
+  <rect class="read hp0" x="80" y="158" width="290" height="14" rx="7"/>
+  <rect class="read hp0" x="80" y="182" width="290" height="14" rx="7"/>
+  <rect class="read hp0" x="80" y="206" width="290" height="14" rx="7"/>
+  <rect class="read hp0" x="80" y="230" width="290" height="14" rx="7"/>
+  <text class="tick mid mono" x="120" y="169">0</text>
+  <text class="tick mid mono" x="330" y="169">0</text>
+  <text class="tick mono bold" x="384" y="169">rr</text>
+  <text class="tick mid mono" x="120" y="193">1</text>
+  <text class="tick mid mono" x="330" y="193">1</text>
+  <text class="tick mono bold" x="384" y="193">aa</text>
+  <text class="tick mid mono" x="120" y="217">0</text>
+  <text class="tick mid mono" x="330" y="217">1</text>
+  <text class="tick mono bold" x="384" y="217">ra</text>
+  <text class="tick mid mono" x="120" y="241">1</text>
+  <text class="tick mid mono" x="330" y="241">0</text>
+  <text class="tick mono bold" x="384" y="241">ar</text>
+  <text class="tick zh" x="34" y="268">rr／aa ＝ 兩邊一致 → 支持<tspan class="bold">平行</tspan></text>
+  <text class="tick zh" x="34" y="288">ra／ar ＝ 兩邊相反 → 支持<tspan class="bold">交叉</tspan></text>
+  <rect class="box warn" x="34" y="302" width="434" height="48" rx="6"/>
+  <text class="tick zh" x="48" y="324">任一端 base quality &lt; 12（-p）時，</text>
+  <text class="tick zh" x="48" y="344">這條 read 只算 0.1（-e），不算 1</text>
 
-  <rect class="read hp0" x="140" y="56" width="240" height="12" rx="6"/>
-  <rect class="read hp0" x="300" y="72" width="240" height="12" rx="6"/>
-  <rect class="read hp0" x="460" y="88" width="240" height="12" rx="6"/>
-  <rect class="read hp0" x="620" y="104" width="240" height="12" rx="6"/>
-  <text class="tick zh" x="20" y="86">多條互相重疊的 read</text>
+  <!-- 右上：para / cross / ESR -->
+  <rect class="box accent" x="502" y="52" width="482" height="310" rx="10"/>
+  <text class="anno bold zh" x="520" y="82">② 併成兩個數字，再看它們差多少</text>
+  <text class="lbl mono" x="520" y="126">para  = rr + aa</text>
+  <text class="tick zh" x="520" y="150">平行的證據量</text>
+  <text class="lbl mono" x="520" y="192">cross = ra + ar</text>
+  <text class="tick zh" x="520" y="216">交叉的證據量</text>
+  <line class="guide" x1="520" y1="240" x2="966" y2="240"/>
+  <text class="lbl mono bold" x="520" y="278">ESR = min / max</text>
+  <text class="tick zh" x="520" y="306">ESR 小 ＝ 兩種組合差得開 ＝ 證據乾淨</text>
+  <text class="tick zh" x="520" y="330">ESR 大 ＝ 兩種組合差不多 ＝ 分不出來</text>
 
-  <!-- 節點層 -->
-  <circle class="mark germline" cx="180" cy="152" r="13"/>
-  <circle class="mark germline" cx="340" cy="152" r="13"/>
-  <circle class="mark germline" cx="500" cy="152" r="13"/>
-  <circle class="mark germline" cx="660" cy="152" r="13"/>
-  <circle class="mark germline" cx="820" cy="152" r="13"/>
-  <text class="tick mid" x="180" y="182">①</text>
-  <text class="tick mid" x="340" y="182">②</text>
-  <text class="tick mid" x="500" y="182">③</text>
-  <text class="tick mid" x="660" y="182">④</text>
-  <text class="tick mid" x="820" y="182">⑤</text>
+  <!-- 下半：同一條邊在三種證據強度下的結果 -->
+  <text class="anno bold zh" x="16" y="400">③ 三種證據強度，三種結果</text>
 
-  <path class="guide" d="M180,124 L180,136" marker-end="url(#arrow-sm)"/>
-  <path class="guide" d="M340,124 L340,136" marker-end="url(#arrow-sm)"/>
-  <path class="guide" d="M500,124 L500,136" marker-end="url(#arrow-sm)"/>
-  <path class="guide" d="M660,124 L660,136" marker-end="url(#arrow-sm)"/>
-  <path class="guide" d="M820,124 L820,136" marker-end="url(#arrow-sm)"/>
+  <rect class="box ok" x="16" y="416" width="308" height="228" rx="10"/>
+  <text class="anno bold zh" x="34" y="444">證據乾淨</text>
+  <text class="tick mid mono" x="76" y="474">rr</text>
+  <text class="tick mid mono" x="126" y="474">aa</text>
+  <text class="tick mid mono" x="194" y="474">ra</text>
+  <text class="tick mid mono" x="244" y="474">ar</text>
+  <text class="lbl mid mono bold" x="76" y="502">9</text>
+  <text class="lbl mid mono bold" x="126" y="502">8</text>
+  <text class="lbl mid mono bold" x="194" y="502">0</text>
+  <text class="lbl mid mono bold" x="244" y="502">1</text>
+  <text class="tick mid zh" x="101" y="524">para = 17</text>
+  <text class="tick mid zh" x="219" y="524">cross = 1</text>
+  <line class="guide" x1="34" y1="538" x2="306" y2="538"/>
+  <text class="mono bold ok" x="34" y="568" font-size="20">ESR = 0.06</text>
+  <text class="anno bold zh ok" x="34" y="596">平行連接</text>
+  <text class="tick zh" x="34" y="620">ESR ≤ 0.1 → 這一票的權重</text>
+  <text class="tick zh" x="34" y="640">拉到 20（正常是 1）</text>
 
-  <!-- ══ 步驟 2：邊的三種狀況 ══ -->
-  <line class="axis" x1="20" y1="206" x2="980" y2="206"/>
-  <text class="lbl bold zh" x="20" y="238">② 有 read 跨過兩個節點 → 連一條邊，粗細代表證據強度</text>
+  <rect class="box plain" x="340" y="416" width="308" height="228" rx="10"/>
+  <text class="anno bold zh" x="358" y="444">證據普通</text>
+  <text class="tick mid mono" x="400" y="474">rr</text>
+  <text class="tick mid mono" x="450" y="474">aa</text>
+  <text class="tick mid mono" x="518" y="474">ra</text>
+  <text class="tick mid mono" x="568" y="474">ar</text>
+  <text class="lbl mid mono bold" x="400" y="502">7</text>
+  <text class="lbl mid mono bold" x="450" y="502">6</text>
+  <text class="lbl mid mono bold" x="518" y="502">3</text>
+  <text class="lbl mid mono bold" x="568" y="502">3</text>
+  <text class="tick mid zh" x="425" y="524">para = 13</text>
+  <text class="tick mid zh" x="543" y="524">cross = 6</text>
+  <line class="guide" x1="358" y1="538" x2="630" y2="538"/>
+  <text class="mono bold " x="358" y="568" font-size="20">ESR = 0.46</text>
+  <text class="anno bold zh " x="358" y="596">平行連接</text>
+  <text class="tick zh" x="358" y="620">ESR 沒有低到 0.1，</text>
+  <text class="tick zh" x="358" y="640">這一票權重就是 1</text>
 
-  <!-- 強邊 -->
-  <rect class="box ok" x="20" y="256" width="306" height="130" rx="8"/>
-  <circle class="mark germline" cx="80" cy="300" r="12"/>
-  <circle class="mark germline" cx="266" cy="300" r="12"/>
-  <line class="conn thick ok" x1="92" y1="300" x2="254" y2="300" style="stroke-width:7"/>
-  <text class="anno mid bold zh ok" x="173" y="336">強邊</text>
-  <text class="tick mid zh" x="173" y="360">多條 read 支持一致</text>
-  <text class="tick mid zh" x="173" y="378">方向明確</text>
+  <rect class="box bad" x="664" y="416" width="308" height="228" rx="10"/>
+  <text class="anno bold zh" x="682" y="444">兩種組合差不多</text>
+  <text class="tick mid mono" x="724" y="474">rr</text>
+  <text class="tick mid mono" x="774" y="474">aa</text>
+  <text class="tick mid mono" x="842" y="474">ra</text>
+  <text class="tick mid mono" x="892" y="474">ar</text>
+  <text class="lbl mid mono bold" x="724" y="502">6</text>
+  <text class="lbl mid mono bold" x="774" y="502">5</text>
+  <text class="lbl mid mono bold" x="842" y="502">5</text>
+  <text class="lbl mid mono bold" x="892" y="502">5</text>
+  <text class="tick mid zh" x="749" y="524">para = 11</text>
+  <text class="tick mid zh" x="867" y="524">cross = 10</text>
+  <line class="guide" x1="682" y1="538" x2="954" y2="538"/>
+  <text class="mono bold bad" x="682" y="568" font-size="20">ESR = 0.91</text>
+  <text class="anno bold zh bad" x="682" y="596">整條邊丟掉</text>
+  <text class="tick zh" x="682" y="620">ESR 超過門檻 0.7（-1）→</text>
+  <text class="tick zh" x="682" y="640">分不出來，不參與定相</text>
 
-  <!-- 弱邊 -->
-  <rect class="box warn" x="346" y="256" width="306" height="130" rx="8"/>
-  <circle class="mark germline" cx="406" cy="300" r="12"/>
-  <circle class="mark germline" cx="592" cy="300" r="12"/>
-  <line class="conn warn" x1="418" y1="300" x2="580" y2="300" stroke-dasharray="6 4"/>
-  <text class="anno mid bold zh warn" x="499" y="336">弱邊</text>
-  <text class="tick mid zh" x="499" y="360">read 證據彼此衝突</text>
-  <text class="tick mid zh" x="499" y="378">可能有定序錯誤</text>
-
-  <!-- 斷邊 -->
-  <rect class="box bad" x="672" y="256" width="308" height="130" rx="8"/>
-  <circle class="mark germline" cx="732" cy="300" r="12"/>
-  <circle class="mark germline" cx="920" cy="300" r="12"/>
-  <text class="lbl mid bad bold" x="826" y="308">✕</text>
-  <text class="anno mid bold zh bad" x="826" y="336">沒有邊</text>
-  <text class="tick mid zh" x="826" y="360">沒有任何 read 同時跨過</text>
-  <text class="tick mid zh" x="826" y="378">phase block 在這裡斷開</text>
-
-  <!-- ══ 步驟 3：找一致的指派 ══ -->
-  <line class="axis" x1="20" y1="408" x2="980" y2="408"/>
-  <text class="lbl bold zh" x="20" y="440">③ 在圖上尋找彼此一致的指派 —— 連通區段形成一個 phase block</text>
-
-  <circle class="mark hp1" cx="180" cy="480" r="13"/>
-  <circle class="mark hp1" cx="340" cy="480" r="13"/>
-  <circle class="mark hp1" cx="500" cy="480" r="13"/>
-  <line class="conn hp1" x1="193" y1="480" x2="327" y2="480" style="stroke-width:5"/>
-  <line class="conn hp1" x1="353" y1="480" x2="487" y2="480" style="stroke-width:5"/>
-
-  <text class="lbl bad bold" x="570" y="488">✕</text>
-
-  <circle class="mark hp2" cx="660" cy="480" r="13"/>
-  <circle class="mark hp2" cx="820" cy="480" r="13"/>
-  <line class="conn hp2" x1="673" y1="480" x2="807" y2="480" style="stroke-width:5"/>
-
-  <rect class="region" x="150" y="458" width="380" height="44" rx="6"/>
-  <rect class="region" x="630" y="458" width="220" height="44" rx="6"/>
-  <text class="tick mid zh bold" x="340" y="514">phase block 1</text>
-  <text class="tick mid zh bold" x="740" y="514">phase block 2</text>
+  <line class="axis" x1="16" y1="668" x2="984" y2="668"/>
+  <text class="anno zh" x="16" y="698">SNP 與甲基化之間的邊門檻另外收緊到 0.3 —— 甲基化訊號比較吵，要求更乾淨才採信。</text>
 </svg>

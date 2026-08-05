@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600">
+  <title>最後兩道信心門檻：哪些 read 拿得到 HP，哪些變異留得住 PS</title>
+  <desc>圖定好相之後還有一步：把結果反過來檢查一次。
+        左邊先決定每條 read 屬於哪一條 haplotype —— 數這條 read 上有多少 allele 站 HP1、
+        多少站 HP2，比例要超過 readConfidence（預設 0.65）而且總數大於 1，才寫 HP 標籤；
+        否則這條 read 的 HP 就是空的，這是 BAM 裡有些 read 沒有 HP 的直接原因。
+        indel 的 allele 在這裡只算 0.1，不算 1。
+        右邊再用「已經標好 HP 的 read」回頭重算每個變異：兩種指派的支持數比例要超過
+        snpConfidence（預設 0.75）才保留，否則這個變異的 PS 會被<b>刪掉</b> ——
+        所以 VCF 裡有些 heterozygous 位點雖然 phasing 跑完了卻沒有 PS，並不是程式沒跑到，
+        而是它自己判斷證據不足而收回。</desc>
+
+  <text class="lbl bold zh" x="16" y="34">圖定好相之後，還要反過來檢查一次</text>
+
+  <!-- 左：每條 read 該不該拿到 HP -->
+  <rect class="box plain" x="16" y="52" width="470" height="440" rx="10"/>
+  <text class="anno bold zh" x="34" y="82">① 這條 read 屬於哪一條 haplotype？</text>
+  <text class="tick zh" x="34" y="106">數這條 read 上的 allele 各站哪一邊</text>
+
+  <rect class="read hp0" x="52" y="150" width="400" height="14" rx="7"/>
+  <circle class="mark hp1" cx="72" cy="157" r="7"/>
+  <circle class="mark hp1" cx="118" cy="157" r="7"/>
+  <circle class="mark hp1" cx="164" cy="157" r="7"/>
+  <circle class="mark hp1" cx="210" cy="157" r="7"/>
+  <circle class="mark hp1" cx="256" cy="157" r="7"/>
+  <circle class="mark hp1" cx="302" cy="157" r="7"/>
+  <circle class="mark hp1" cx="348" cy="157" r="7"/>
+  <circle class="mark hp2" cx="394" cy="157" r="7"/>
+  <text class="tick zh hp1" x="52" y="188">站 HP1：7 個</text>
+  <text class="tick zh hp2" x="230" y="188">站 HP2：1 個</text>
+  <rect class="box ok" x="52" y="202" width="400" height="40" rx="6"/>
+  <text class="tick zh ok" x="66" y="227">7 ÷ 8 = 0.88 &gt; 0.65 → 標上 HP</text>
+  <text class="tick mono bold ok" x="52" y="260">→ HP:i:1</text>
+
+  <rect class="read hp0" x="52" y="296" width="400" height="14" rx="7"/>
+  <circle class="mark hp1" cx="72" cy="303" r="7"/>
+  <circle class="mark hp1" cx="118" cy="303" r="7"/>
+  <circle class="mark hp1" cx="164" cy="303" r="7"/>
+  <circle class="mark hp1" cx="210" cy="303" r="7"/>
+  <circle class="mark hp2" cx="256" cy="303" r="7"/>
+  <circle class="mark hp2" cx="302" cy="303" r="7"/>
+  <circle class="mark hp2" cx="348" cy="303" r="7"/>
+  <text class="tick zh hp1" x="52" y="334">站 HP1：4 個</text>
+  <text class="tick zh hp2" x="230" y="334">站 HP2：3 個</text>
+  <rect class="box bad" x="52" y="348" width="400" height="40" rx="6"/>
+  <text class="tick zh bad" x="66" y="373">4 ÷ 7 = 0.57 &lt; 0.65 → 不標</text>
+  <text class="tick mono bold bad" x="52" y="406">→ 沒有 HP</text>
+  <text class="tick zh" x="34" y="464">indel 的 allele 在這一步只算 0.1，不算 1。</text>
+
+  <!-- 右：每個變異的 PS 留不留 -->
+  <rect class="box plain" x="502" y="52" width="482" height="440" rx="10"/>
+  <text class="anno bold zh" x="520" y="82">② 用標好的 read 回頭重算每個變異</text>
+  <text class="tick zh" x="520" y="106">兩種指派各有多少 read 支持</text>
+  <rect class="box plain" x="520" y="122" width="446" height="120" rx="6"/>
+  <text class="tick mid zh" x="640" y="146">看到 ref</text>
+  <text class="tick mid zh" x="800" y="146">看到 alt</text>
+  <text class="tick end zh bold hp1" x="600" y="180">HP1 的 read</text>
+  <text class="tick end zh bold hp2" x="600" y="216">HP2 的 read</text>
+  <text class="lbl mid mono bold" x="640" y="180">12</text>
+  <text class="lbl mid mono bold" x="800" y="180">1</text>
+  <text class="lbl mid mono bold" x="640" y="216">2</text>
+  <text class="lbl mid mono bold" x="800" y="216">11</text>
+  <text class="mono" x="520" y="272">指派 A：HP1=ref、HP2=alt → 12 + 11 = 23</text>
+  <text class="mono" x="520" y="298">指派 B：HP1=alt、HP2=ref →  1 +  2 = 3</text>
+  <line class="guide" x1="520" y1="314" x2="966" y2="314"/>
+  <text class="mono bold ok" x="520" y="344" font-size="20">23 ÷ 26 = 0.88 &gt; 0.75</text>
+  <rect class="box ok" x="520" y="358" width="446" height="40" rx="6"/>
+  <text class="tick zh ok" x="534" y="383">超過 snpConfidence → 這個變異保留 PS 與定相的 GT</text>
+  <rect class="box bad" x="520" y="414" width="446" height="62" rx="6"/>
+  <text class="tick zh bad" x="534" y="440">若比例沒過 0.75 → 這個變異的 <tspan class="mono">PS</tspan> 被<tspan class="bold">刪掉</tspan></text>
+  <text class="tick zh" x="534" y="464">VCF 裡有 het 位點沒有 PS，多半是這裡收回的</text>
+
+  <line class="axis" x1="16" y1="524" x2="984" y2="524"/>
+  <text class="anno zh bold" x="16" y="552">兩道門檻各自對應一個你會在輸出裡直接看到的現象：</text>
+  <text class="anno zh" x="16" y="580">read 沒有 <tspan class="mono">HP</tspan> ← 0.65 那道；het 位點沒有 <tspan class="mono">PS</tspan> ← 0.75 那道。兩者都不是錯誤，是程式主動說「證據不足」。</text>
+</svg>

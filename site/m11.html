@@ -53,13 +53,16 @@
 
 <div class="wrap ">
   <main class="main" id="main">
-    <header class="mhead"><p class="mhead__kicker">模組 11 · LongPhase core</p><h1>LongPhase：核心 phasing 流程</h1><p class="mhead__sub">介紹 phase graph、phase set 與 haplotagging，以及主要失效情境與診斷方法。</p><p class="mhead__meta"><span class="chip">約 45 分鐘</span><a class="chip" href="m06.html">建議先修：Phasing</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說出 LongPhase 的輸入與輸出各是什麼</li><li>描述 phase graph 的節點與邊各自代表什麼</li><li>說出三種會讓 phasing 失敗的情況</li><li>跑一個最小的 LongPhase 範例並解讀輸出</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">模組 11 · LongPhase core</p><h1>LongPhase：核心 phasing 流程</h1><p class="mhead__sub">介紹 phase graph、phase set 與 haplotagging，以及主要失效情境與診斷方法。</p><p class="mhead__meta"><span class="chip">約 45 分鐘</span><a class="chip" href="m06.html">建議先修：Phasing</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說出 LongPhase 的輸入與輸出各是什麼</li><li>說明四種變異為什麼放進同一張圖一起定相，而不是各自分開處理</li><li>描述圖的節點與邊各自代表什麼，並用四個計數說明一條邊的方向與去留怎麼決定</li><li>說明加權投票如何決定每個變異，以及 PS 為什麼會換號</li><li>說出兩道信心門檻分別對應輸出裡的哪個現象</li><li>跑一個最小的 LongPhase 範例並解讀輸出</li></ul></section>
 
 <section data-part="why" class="part" id="part-why">
 <h2 data-num="①" id="為什麼重要">為什麼重要</h2>
 
 <p class="prose"><span class="term" data-term="LongPhase" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-longphase-0">LongPhase<span class="term__pop" id="gd-longphase-0" role="tooltip"><b class="term__hd">LongPhase</b><span class="term__def" data-lang="zh">實驗室開發的長 read phasing 工具，是後續所有工具的共同基礎。輸出 germline haplotype。</span><span class="term__def" data-lang="en">The lab's long-read phasing tool and the common foundation for everything else. Produces germline haplotypes.</span><a class="term__more" href="glossary.html#longphase">完整條目 →</a></span></span> 是本教材後續工具共用的基礎，處理的是<b>一般（非腫瘤）樣本</b>的 phasing。
 開始分析腫瘤資料前，先掌握這個基本流程。</p>
+
+<p class="prose">它值得看清楚內部機制，原因是：後面 LongPhase-S 與 LongPhase-TO 的腫瘤專用處理，
+都是接在這張圖與這套投票之上。不知道圖長什麼樣，就看不出腫瘤版改了什麼。</p>
 </section>
 
 
@@ -72,9 +75,9 @@
 <table>
 <thead><tr><th>子命令</th><th>輸入</th><th>輸出</th></tr></thead>
 <tbody>
-<tr><td><code>phase</code></td><td>germline SNP VCF ＋ BAM ＋ reference</td><td>含以 <code>|</code> 表示相位的 <code>GT</code> 與 <code><span class="term" data-term="PS tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ps-tag-1">PS<span class="term__pop" id="gd-ps-tag-1" role="tooltip"><b class="term__hd">PS tag <i>phase set</i></b><span class="term__def" data-lang="zh">標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</span><span class="term__def" data-lang="en">Phase set identifier grouping variants phased together. Haplotype orientation is only consistent within one PS.</span><a class="term__more" href="glossary.html#ps-tag">完整條目 →</a></span></span></code> 的 phased VCF</td></tr>
+<tr><td><code>phase</code></td><td>germline SNP VCF ＋ BAM ＋ reference；可另外加 SV VCF、甲基化 VCF</td><td>含以 <code>|</code> 表示相位的 <code>GT</code> 與 <code><span class="term" data-term="PS tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ps-tag-1">PS<span class="term__pop" id="gd-ps-tag-1" role="tooltip"><b class="term__hd">PS tag <i>phase set</i></b><span class="term__def" data-lang="zh">標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</span><span class="term__def" data-lang="en">Phase set identifier grouping variants phased together. Haplotype orientation is only consistent within one PS.</span><a class="term__more" href="glossary.html#ps-tag">完整條目 →</a></span></span></code> 的 phased VCF（每種變異各自一份）</td></tr>
 <tr><td><code>haplotag</code></td><td>已 phase 的 VCF ＋ BAM ＋ reference</td><td>每條 read 帶 <code><span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-hp-tag-2">HP<span class="term__pop" id="gd-hp-tag-2" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span></code> tag 的 BAM</td></tr>
-<tr><td><code>modcall</code></td><td>帶甲基化的 BAM ＋ reference</td><td>甲基化的 VCF；是否可供後續 phase 請依目前版本文件確認</td></tr>
+<tr><td><code>modcall</code></td><td>帶甲基化的 BAM ＋ reference</td><td>甲基化位點的 VCF，可再餵回 <code>phase</code> 的 <code>--mod-file</code></td></tr>
 </tbody>
 </table>
 </div>
@@ -82,114 +85,459 @@
 <p class="prose">注意這個順序：<b>先 call variant，再 phase，最後 haplotag。</b>
 LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位點當錨點。</p>
 
-<h3 id="phase-graph-的基本概念">phase graph 的基本概念</h3>
+<h3 id="四種變異-一張圖">四種變異，一張圖</h3>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" class="dia-svg" role="img">
-  <title>phasing 基本圖模型：位點作為節點、read 支持作為邊</title>
-  <desc>上半部：每個可區分兩條染色體的位置變成圖上的一個節點。
-        兩個節點之間如果有 read 同時跨過，就連一條邊，
-        邊的粗細代表有幾條 read 支持這個連結。
-        中間：三種邊的狀況 —— 支持一致的強邊、read 證據互相衝突的弱邊，以及沒有 read 跨過的斷邊。
-        下半部：在圖上尋找彼此一致的指派，連通區段形成一個 phase block。</desc>
+<p class="prose">LongPhase 最關鍵的設計選擇，是把四種變異放進<b>同一張圖</b>一起定相，
+官方文件稱為 <b>co-phasing</b>。理由來自長讀本身：一條 read 可能同時跨過一個 SNP、
+一個甲基化位點、一個小的 indel 與一個 SV —— 這四件事被同一個分子綁在一起，
+分開 phasing 就把這個證據丟掉了。</p>
 
-  <!-- ══ 步驟 1：把位點變成節點 ══ -->
-  <text class="lbl bold zh" x="20" y="32">① 每個可區分兩條染色體的位置 → 一個節點</text>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" class="dia-svg" role="img">
+  <title>四種變異進同一張圖：LongPhase 的 co-phasing 圖模型</title>
+  <desc>LongPhase 把四種輸入放進同一張圖：SNP（-s，必要）、小的 indel（--indels）、
+        結構變異（--sv-file）、以及甲基化位點（--mod-file，由 longphase modcall 產生）。
+        上半部是同一段基因體上的六個位置與五條 read；第二條 read 同時跨過 SNP、甲基化、
+        indel 與 SV 四種類型，所以它一條就能把四種變異連在一起 —— 這是長讀才做得到的事，
+        也是把它們放進同一張圖（而不是各自分開 phasing）的理由。
+        下半部是對應的圖：每個位置拆成兩個 sub-node（allele 0 與 allele 1），
+        read 的證據變成 sub-node 之間的邊。邊只有兩種形狀 —— 平行（0 接 0、1 接 1）
+        或交叉（0 接 1、1 接 0）；沒有 read 跨過時就沒有邊，phase block 在那裡斷開。</desc>
 
-  <!-- read 層 -->
-  <line class="guide" x1="180" y1="48" x2="180" y2="118"/>
-  <line class="guide" x1="340" y1="48" x2="340" y2="118"/>
-  <line class="guide" x1="500" y1="48" x2="500" y2="118"/>
-  <line class="guide" x1="660" y1="48" x2="660" y2="118"/>
-  <line class="guide" x1="820" y1="48" x2="820" y2="118"/>
+  <text class="lbl bold zh" x="16" y="34">四種變異進同一張圖 —— 這是 co-phasing 的意思</text>
+  <text class="anno zh" x="16" y="60">節點的形狀代表變異類型，顏色一律中性；顏色留給後面的 haplotype 指派。</text>
 
-  <rect class="read hp0" x="140" y="56" width="240" height="12" rx="6"/>
-  <rect class="read hp0" x="300" y="72" width="240" height="12" rx="6"/>
-  <rect class="read hp0" x="460" y="88" width="240" height="12" rx="6"/>
-  <rect class="read hp0" x="620" y="104" width="240" height="12" rx="6"/>
-  <text class="tick zh" x="20" y="86">多條互相重疊的 read</text>
+  <!-- ① 四個輸入檔 -->
+  <text class="anno bold zh" x="20" y="88">① 四個輸入</text>
+  <rect class="box plain" x="20" y="100" width="196" height="42" rx="6"/>
+  <text class="tick" x="34" y="118">SNP VCF</text>
+  <text class="tick mono" x="34" y="136">-s（必要）</text>
+  <rect class="box plain" x="20" y="150" width="196" height="42" rx="6"/>
+  <text class="tick" x="34" y="168">small indel</text>
+  <text class="tick mono" x="34" y="186">--indels</text>
+  <rect class="box plain" x="20" y="200" width="196" height="42" rx="6"/>
+  <text class="tick" x="34" y="218">SV VCF</text>
+  <text class="tick mono" x="34" y="236">--sv-file</text>
+  <rect class="box plain" x="20" y="250" width="196" height="42" rx="6"/>
+  <text class="tick" x="34" y="268">methylation VCF</text>
+  <text class="tick mono" x="34" y="286">--mod-file</text>
+  <text class="tick zh" x="20" y="322">四個都進<tspan class="bold">同一張</tspan>圖，</text>
+  <text class="tick zh" x="20" y="344">不是各自分開 phasing。</text>
+  <path class="flow" d="M224,200 L248,200" marker-end="url(#arrow)"/>
 
-  <!-- 節點層 -->
-  <circle class="mark germline" cx="180" cy="152" r="13"/>
-  <circle class="mark germline" cx="340" cy="152" r="13"/>
-  <circle class="mark germline" cx="500" cy="152" r="13"/>
-  <circle class="mark germline" cx="660" cy="152" r="13"/>
-  <circle class="mark germline" cx="820" cy="152" r="13"/>
-  <text class="tick mid" x="180" y="182">①</text>
-  <text class="tick mid" x="340" y="182">②</text>
-  <text class="tick mid" x="500" y="182">③</text>
-  <text class="tick mid" x="660" y="182">④</text>
-  <text class="tick mid" x="820" y="182">⑤</text>
+  <!-- ② 同一段基因體上的六個位置與五條 read -->
+  <text class="anno bold zh" x="262" y="88">② 一條 read 可以同時跨過不同類型的位置</text>
+  <text class="tick mid" x="300" y="106">SNP</text>
+  <text class="tick mid" x="425" y="106">MOD</text>
+  <text class="tick mid" x="550" y="106">INDEL</text>
+  <text class="tick mid" x="675" y="106">SNP</text>
+  <text class="tick mid" x="800" y="106">SV</text>
+  <text class="tick mid" x="925" y="106">MOD</text>
+  <circle class="mark ref" cx="300" cy="126" r="9"/>
+  <circle class="cpg met" cx="425" cy="126" r="8"/>
+  <polygon class="mark ref" points="550,116 560,126 550,136 540,126"/>
+  <circle class="mark ref" cx="675" cy="126" r="9"/>
+  <rect class="mark ref" x="786" y="119" width="28" height="13" rx="3"/>
+  <circle class="cpg met" cx="925" cy="126" r="8"/>
+  <line class="axis" x1="262" y1="140" x2="962" y2="140"/>
+  <rect class="read hp0" x="268" y="150" width="439" height="14" rx="7"/>
+  <rect class="read hp0" x="268" y="175" width="564" height="14" rx="7"/>
+  <rect class="read hp0" x="393" y="200" width="564" height="14" rx="7"/>
+  <rect class="read hp0" x="268" y="225" width="314" height="14" rx="7"/>
+  <rect class="read hp0" x="518" y="250" width="439" height="14" rx="7"/>
+  <text class="tick mid mono" x="300" y="161">0</text>
+  <text class="tick mid mono" x="425" y="161">1</text>
+  <text class="tick mid mono" x="550" y="161">0</text>
+  <text class="tick mid mono" x="675" y="161">1</text>
+  <text class="tick mid mono" x="300" y="186">1</text>
+  <text class="tick mid mono" x="425" y="186">0</text>
+  <text class="tick mid mono" x="550" y="186">1</text>
+  <text class="tick mid mono" x="675" y="186">0</text>
+  <text class="tick mid mono" x="800" y="186">0</text>
+  <text class="tick mid mono" x="425" y="211">1</text>
+  <text class="tick mid mono" x="550" y="211">0</text>
+  <text class="tick mid mono" x="675" y="211">1</text>
+  <text class="tick mid mono" x="800" y="211">1</text>
+  <text class="tick mid mono" x="925" y="211">0</text>
+  <text class="tick mid mono" x="300" y="236">1</text>
+  <text class="tick mid mono" x="425" y="236">0</text>
+  <text class="tick mid mono" x="550" y="236">1</text>
+  <text class="tick mid mono" x="550" y="261">0</text>
+  <text class="tick mid mono" x="675" y="261">1</text>
+  <text class="tick mid mono" x="800" y="261">1</text>
+  <text class="tick mid mono" x="925" y="261">0</text>
+  <text class="tick zh" x="262" y="290">每格數字是這條 read 在該位置看到的 allele（0＝ref、1＝alt）。</text>
+  <text class="tick zh bold" x="262" y="312">第 2 條 read 一次跨過 SNP、MOD、INDEL、SNP、SV ——</text>
+  <text class="tick zh" x="262" y="334">四種類型被同一個分子綁在一起，這是長讀才給得到的證據。</text>
 
-  <path class="guide" d="M180,124 L180,136" marker-end="url(#arrow-sm)"/>
-  <path class="guide" d="M340,124 L340,136" marker-end="url(#arrow-sm)"/>
-  <path class="guide" d="M500,124 L500,136" marker-end="url(#arrow-sm)"/>
-  <path class="guide" d="M660,124 L660,136" marker-end="url(#arrow-sm)"/>
-  <path class="guide" d="M820,124 L820,136" marker-end="url(#arrow-sm)"/>
+  <!-- ③ 對應的圖：每個位置兩個 sub-node，x 座標與上面刻意對齊 -->
+  <line class="guide" x1="20" y1="374" x2="980" y2="374"/>
+  <text class="anno bold zh" x="20" y="404">③ 對應的圖：每個位置拆成兩個 sub-node</text>
+  <text class="tick end mono" x="286" y="461">allele 0</text>
+  <text class="tick end mono" x="286" y="551">allele 1</text>
+  <line class="conn" x1="316" y1="456" x2="409" y2="456"/>
+  <line class="conn" x1="316" y1="546" x2="409" y2="546"/>
+  <text class="tick mid zh" x="362" y="588">平行</text>
+  <line class="conn" x1="441" y1="456" x2="534" y2="456"/>
+  <line class="conn" x1="441" y1="546" x2="534" y2="546"/>
+  <text class="tick mid zh" x="487" y="588">平行</text>
+  <line class="conn" x1="566" y1="456" x2="659" y2="546"/>
+  <line class="conn" x1="566" y1="546" x2="659" y2="456"/>
+  <text class="tick mid zh" x="612" y="588">交叉</text>
+  <line class="conn" x1="691" y1="456" x2="784" y2="456"/>
+  <line class="conn" x1="691" y1="546" x2="784" y2="546"/>
+  <text class="tick mid zh" x="737" y="588">平行</text>
+  <line class="guide" x1="816" y1="456" x2="909" y2="456"/>
+  <line class="guide" x1="816" y1="546" x2="909" y2="546"/>
+  <text class="tick mid zh bad" x="862" y="588">沒有 read 跨過</text>
+  <circle class="mark ref" cx="300" cy="456" r="9"/>
+  <circle class="cpg met" cx="425" cy="456" r="8"/>
+  <polygon class="mark ref" points="550,446 560,456 550,466 540,456"/>
+  <circle class="mark ref" cx="675" cy="456" r="9"/>
+  <rect class="mark ref" x="786" y="449" width="28" height="13" rx="3"/>
+  <circle class="cpg met" cx="925" cy="456" r="8"/>
+  <circle class="mark ref" cx="300" cy="546" r="9"/>
+  <circle class="cpg met" cx="425" cy="546" r="8"/>
+  <polygon class="mark ref" points="550,536 560,546 550,556 540,546"/>
+  <circle class="mark ref" cx="675" cy="546" r="9"/>
+  <rect class="mark ref" x="786" y="539" width="28" height="13" rx="3"/>
+  <circle class="cpg met" cx="925" cy="546" r="8"/>
+  <text class="tick zh" x="20" y="630">邊只有兩種形狀：<tspan class="bold">平行</tspan>（0 接 0、1 接 1）或<tspan class="bold">交叉</tspan>（0 接 1、1 接 0）。</text>
+  <text class="tick zh" x="20" y="652">要選哪一種、以及這條邊該不該留下來，由下一張圖的四個計數決定。</text>
+  <text class="tick zh bad" x="20" y="674">最右邊沒有 read 跨過 → 沒有邊 → phase block 在這裡斷開。</text>
+</svg><figcaption>上半部是同一段基因體上的六個位置與五條 read；第 2 條一次跨過 SNP、甲基化、indel 與 SV 四種類型。下半部是對應的圖：每個位置拆成<b>兩個 sub-node</b>（allele 0 與 allele 1），read 的證據變成 sub-node 之間的邊，而邊只有平行與交叉兩種形狀。上下兩排的 x 座標刻意對齊，方便對照同一個位置。</figcaption></figure>
 
-  <!-- ══ 步驟 2：邊的三種狀況 ══ -->
-  <line class="axis" x1="20" y1="206" x2="980" y2="206"/>
-  <text class="lbl bold zh" x="20" y="238">② 有 read 跨過兩個節點 → 連一條邊，粗細代表證據強度</text>
+<p class="prose">程式內部給每個節點記一個型別，原始碼裡的註解就寫著
+<code>0=SNP 1=SV 2=MOD 3=INDEL 4=tandem repeat INDEL</code>。
+型別不只是標籤，它會改變後面的判斷 —— 例如串聯重複區的 indel（型別 4）投票權重被降到 0.1，
+因為那類位置的定序錯誤率特別高。</p>
 
-  <!-- 強邊 -->
-  <rect class="box ok" x="20" y="256" width="306" height="130" rx="8"/>
-  <circle class="mark germline" cx="80" cy="300" r="12"/>
-  <circle class="mark germline" cx="266" cy="300" r="12"/>
-  <line class="conn thick ok" x1="92" y1="300" x2="254" y2="300" style="stroke-width:7"/>
-  <text class="anno mid bold zh ok" x="173" y="336">強邊</text>
-  <text class="tick mid zh" x="173" y="360">多條 read 支持一致</text>
-  <text class="tick mid zh" x="173" y="378">方向明確</text>
+<h3 id="一條邊怎麼決定方向-又怎麼被丟掉">一條邊怎麼決定方向，又怎麼被丟掉</h3>
 
-  <!-- 弱邊 -->
-  <rect class="box warn" x="346" y="256" width="306" height="130" rx="8"/>
-  <circle class="mark germline" cx="406" cy="300" r="12"/>
-  <circle class="mark germline" cx="592" cy="300" r="12"/>
-  <line class="conn warn" x1="418" y1="300" x2="580" y2="300" stroke-dasharray="6 4"/>
-  <text class="anno mid bold zh warn" x="499" y="336">弱邊</text>
-  <text class="tick mid zh" x="499" y="360">read 證據彼此衝突</text>
-  <text class="tick mid zh" x="499" y="378">可能有定序錯誤</text>
+<p class="prose">邊不是「有」或「沒有」，而是<b>四個加權計數</b>。跨過兩個位置的每一條 read，
+依它在兩邊看到的 allele 落進 rr、ra、ar、aa 之一：</p>
 
-  <!-- 斷邊 -->
-  <rect class="box bad" x="672" y="256" width="308" height="130" rx="8"/>
-  <circle class="mark germline" cx="732" cy="300" r="12"/>
-  <circle class="mark germline" cx="920" cy="300" r="12"/>
-  <text class="lbl mid bad bold" x="826" y="308">✕</text>
-  <text class="anno mid bold zh bad" x="826" y="336">沒有邊</text>
-  <text class="tick mid zh" x="826" y="360">沒有任何 read 同時跨過</text>
-  <text class="tick mid zh" x="826" y="378">phase block 在這裡斷開</text>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 710" class="dia-svg" role="img">
+  <title>一條邊的方向與去留，由四個加權計數決定</title>
+  <desc>兩個變異之間的一條邊，其實是四個加權計數。每條跨過兩個位置的 read
+        會落進 rr、ra、ar、aa 之一：rr 表示兩邊都看到 ref，aa 表示兩邊都看到 alt，
+        依此類推。程式把它們併成兩個數字 —— para = rr + aa（平行），cross = ra + ar（交叉），
+        再算 ESR = 兩者的小除以大。para 大就平行連接，cross 大就交叉連接。
+        ESR 越小代表兩種組合差得越開、證據越乾淨；ESR 大到超過 edgeThreshold（預設 0.7）
+        就代表兩種組合幾乎一樣多，這條邊會被整個丟掉，不參與後面的定相。
+        另外兩條規則：任一端的 base quality 低於 baseQuality（預設 12）時，該條 read
+        只算 edgeWeight（預設 0.1）而不是 1；SNP 與甲基化之間的邊門檻收緊到 0.3。</desc>
 
-  <!-- ══ 步驟 3：找一致的指派 ══ -->
-  <line class="axis" x1="20" y1="408" x2="980" y2="408"/>
-  <text class="lbl bold zh" x="20" y="440">③ 在圖上尋找彼此一致的指派 —— 連通區段形成一個 phase block</text>
+  <text class="lbl bold zh" x="16" y="34">一條邊其實是四個計數</text>
 
-  <circle class="mark hp1" cx="180" cy="480" r="13"/>
-  <circle class="mark hp1" cx="340" cy="480" r="13"/>
-  <circle class="mark hp1" cx="500" cy="480" r="13"/>
-  <line class="conn hp1" x1="193" y1="480" x2="327" y2="480" style="stroke-width:5"/>
-  <line class="conn hp1" x1="353" y1="480" x2="487" y2="480" style="stroke-width:5"/>
+  <!-- 左上：read 怎麼落進 rr / ra / ar / aa -->
+  <rect class="box plain" x="16" y="52" width="470" height="310" rx="10"/>
+  <text class="anno bold zh" x="34" y="82">① 每條跨過兩個位置的 read 投進一個格子</text>
+  <text class="tick mid zh" x="120" y="108">位置 i</text>
+  <text class="tick mid zh" x="330" y="108">位置 j</text>
+  <circle class="mark ref" cx="120" cy="130" r="9"/>
+  <circle class="mark ref" cx="330" cy="130" r="9"/>
+  <rect class="read hp0" x="80" y="158" width="290" height="14" rx="7"/>
+  <rect class="read hp0" x="80" y="182" width="290" height="14" rx="7"/>
+  <rect class="read hp0" x="80" y="206" width="290" height="14" rx="7"/>
+  <rect class="read hp0" x="80" y="230" width="290" height="14" rx="7"/>
+  <text class="tick mid mono" x="120" y="169">0</text>
+  <text class="tick mid mono" x="330" y="169">0</text>
+  <text class="tick mono bold" x="384" y="169">rr</text>
+  <text class="tick mid mono" x="120" y="193">1</text>
+  <text class="tick mid mono" x="330" y="193">1</text>
+  <text class="tick mono bold" x="384" y="193">aa</text>
+  <text class="tick mid mono" x="120" y="217">0</text>
+  <text class="tick mid mono" x="330" y="217">1</text>
+  <text class="tick mono bold" x="384" y="217">ra</text>
+  <text class="tick mid mono" x="120" y="241">1</text>
+  <text class="tick mid mono" x="330" y="241">0</text>
+  <text class="tick mono bold" x="384" y="241">ar</text>
+  <text class="tick zh" x="34" y="268">rr／aa ＝ 兩邊一致 → 支持<tspan class="bold">平行</tspan></text>
+  <text class="tick zh" x="34" y="288">ra／ar ＝ 兩邊相反 → 支持<tspan class="bold">交叉</tspan></text>
+  <rect class="box warn" x="34" y="302" width="434" height="48" rx="6"/>
+  <text class="tick zh" x="48" y="324">任一端 base quality &lt; 12（-p）時，</text>
+  <text class="tick zh" x="48" y="344">這條 read 只算 0.1（-e），不算 1</text>
 
-  <text class="lbl bad bold" x="570" y="488">✕</text>
+  <!-- 右上：para / cross / ESR -->
+  <rect class="box accent" x="502" y="52" width="482" height="310" rx="10"/>
+  <text class="anno bold zh" x="520" y="82">② 併成兩個數字，再看它們差多少</text>
+  <text class="lbl mono" x="520" y="126">para  = rr + aa</text>
+  <text class="tick zh" x="520" y="150">平行的證據量</text>
+  <text class="lbl mono" x="520" y="192">cross = ra + ar</text>
+  <text class="tick zh" x="520" y="216">交叉的證據量</text>
+  <line class="guide" x1="520" y1="240" x2="966" y2="240"/>
+  <text class="lbl mono bold" x="520" y="278">ESR = min / max</text>
+  <text class="tick zh" x="520" y="306">ESR 小 ＝ 兩種組合差得開 ＝ 證據乾淨</text>
+  <text class="tick zh" x="520" y="330">ESR 大 ＝ 兩種組合差不多 ＝ 分不出來</text>
 
-  <circle class="mark hp2" cx="660" cy="480" r="13"/>
-  <circle class="mark hp2" cx="820" cy="480" r="13"/>
-  <line class="conn hp2" x1="673" y1="480" x2="807" y2="480" style="stroke-width:5"/>
+  <!-- 下半：同一條邊在三種證據強度下的結果 -->
+  <text class="anno bold zh" x="16" y="400">③ 三種證據強度，三種結果</text>
 
-  <rect class="region" x="150" y="458" width="380" height="44" rx="6"/>
-  <rect class="region" x="630" y="458" width="220" height="44" rx="6"/>
-  <text class="tick mid zh bold" x="340" y="514">phase block 1</text>
-  <text class="tick mid zh bold" x="740" y="514">phase block 2</text>
-</svg><figcaption>三個步驟。① 將可區分兩條染色體的位置表示為節點。② 若 read 同時跨過兩個節點，就建立一條邊；邊的粗細表示支持強度 —— allele 組合一致時較強、互相衝突時較弱、沒有 read 跨過時不建立邊。③ 依一致性選擇相位指派，<b>各連通部分形成一個 phase block</b>。</figcaption></figure>
+  <rect class="box ok" x="16" y="416" width="308" height="228" rx="10"/>
+  <text class="anno bold zh" x="34" y="444">證據乾淨</text>
+  <text class="tick mid mono" x="76" y="474">rr</text>
+  <text class="tick mid mono" x="126" y="474">aa</text>
+  <text class="tick mid mono" x="194" y="474">ra</text>
+  <text class="tick mid mono" x="244" y="474">ar</text>
+  <text class="lbl mid mono bold" x="76" y="502">9</text>
+  <text class="lbl mid mono bold" x="126" y="502">8</text>
+  <text class="lbl mid mono bold" x="194" y="502">0</text>
+  <text class="lbl mid mono bold" x="244" y="502">1</text>
+  <text class="tick mid zh" x="101" y="524">para = 17</text>
+  <text class="tick mid zh" x="219" y="524">cross = 1</text>
+  <line class="guide" x1="34" y1="538" x2="306" y2="538"/>
+  <text class="mono bold ok" x="34" y="568" font-size="20">ESR = 0.06</text>
+  <text class="anno bold zh ok" x="34" y="596">平行連接</text>
+  <text class="tick zh" x="34" y="620">ESR ≤ 0.1 → 這一票的權重</text>
+  <text class="tick zh" x="34" y="640">拉到 20（正常是 1）</text>
 
-<p class="prose">可將每個 heterozygous 位點表示為圖上的一個節點。兩個節點之間若有 read 同時跨過，
-就建立一條邊；邊的權重代表<b>支持強度</b>：</p>
+  <rect class="box plain" x="340" y="416" width="308" height="228" rx="10"/>
+  <text class="anno bold zh" x="358" y="444">證據普通</text>
+  <text class="tick mid mono" x="400" y="474">rr</text>
+  <text class="tick mid mono" x="450" y="474">aa</text>
+  <text class="tick mid mono" x="518" y="474">ra</text>
+  <text class="tick mid mono" x="568" y="474">ar</text>
+  <text class="lbl mid mono bold" x="400" y="502">7</text>
+  <text class="lbl mid mono bold" x="450" y="502">6</text>
+  <text class="lbl mid mono bold" x="518" y="502">3</text>
+  <text class="lbl mid mono bold" x="568" y="502">3</text>
+  <text class="tick mid zh" x="425" y="524">para = 13</text>
+  <text class="tick mid zh" x="543" y="524">cross = 6</text>
+  <line class="guide" x1="358" y1="538" x2="630" y2="538"/>
+  <text class="mono bold " x="358" y="568" font-size="20">ESR = 0.46</text>
+  <text class="anno bold zh " x="358" y="596">平行連接</text>
+  <text class="tick zh" x="358" y="620">ESR 沒有低到 0.1，</text>
+  <text class="tick zh" x="358" y="640">這一票權重就是 1</text>
+
+  <rect class="box bad" x="664" y="416" width="308" height="228" rx="10"/>
+  <text class="anno bold zh" x="682" y="444">兩種組合差不多</text>
+  <text class="tick mid mono" x="724" y="474">rr</text>
+  <text class="tick mid mono" x="774" y="474">aa</text>
+  <text class="tick mid mono" x="842" y="474">ra</text>
+  <text class="tick mid mono" x="892" y="474">ar</text>
+  <text class="lbl mid mono bold" x="724" y="502">6</text>
+  <text class="lbl mid mono bold" x="774" y="502">5</text>
+  <text class="lbl mid mono bold" x="842" y="502">5</text>
+  <text class="lbl mid mono bold" x="892" y="502">5</text>
+  <text class="tick mid zh" x="749" y="524">para = 11</text>
+  <text class="tick mid zh" x="867" y="524">cross = 10</text>
+  <line class="guide" x1="682" y1="538" x2="954" y2="538"/>
+  <text class="mono bold bad" x="682" y="568" font-size="20">ESR = 0.91</text>
+  <text class="anno bold zh bad" x="682" y="596">整條邊丟掉</text>
+  <text class="tick zh" x="682" y="620">ESR 超過門檻 0.7（-1）→</text>
+  <text class="tick zh" x="682" y="640">分不出來，不參與定相</text>
+
+  <line class="axis" x1="16" y1="668" x2="984" y2="668"/>
+  <text class="anno zh" x="16" y="698">SNP 與甲基化之間的邊門檻另外收緊到 0.3 —— 甲基化訊號比較吵，要求更乾淨才採信。</text>
+</svg><figcaption>四個計數併成 para（＝rr+aa，平行的證據）與 cross（＝ra+ar，交叉的證據），再算 ESR ＝ 兩者的小除以大。para 大就平行連接、cross 大就交叉連接；ESR 大到超過 <code>edgeThreshold</code>（預設 0.7）就代表兩種組合幾乎一樣多，這條邊會被<b>整個丟掉</b>。反過來，ESR ≤ 0.1 的乾淨邊，它那一票的權重會從 1 拉到 20。</figcaption></figure>
+
+<p class="prose">兩個細節值得記住，因為它們解釋了很多「為什麼這裡沒接起來」：</p>
 
 <ul class="prose">
-<li>多條 read 支持 A–C 與 G–T 的 allele 組合 → 強邊，方向較明確</li>
-<li>read 支持的 allele 組合互相衝突（有些支持 A–C、有些支持 A–T）→ 弱邊，可能有定序錯誤或比對問題</li>
-<li>完全沒有 read 跨過 → 沒有邊，<span class="term" data-term="phase block" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-phase-block-3">phase block<span class="term__pop" id="gd-phase-block-3" role="tooltip"><b class="term__hd">phase block</b><span class="term__def" data-lang="zh">一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</span><span class="term__def" data-lang="en">A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.</span><a class="term__more" href="glossary.html#phase-block">完整條目 →</a></span></span> 在這裡斷開</li>
+<li><b>低品質的鹼基會被打折。</b>邊的任一端 base quality 低於 <code>--baseQuality</code>（預設 12）時，
+那條 read 對這條邊只貢獻 <code>--edgeWeight</code>（預設 0.1），而不是 1。</li>
+<li><b>甲基化的門檻更嚴。</b>SNP 與甲基化位點之間的邊，門檻從 0.7 收緊到 0.3 ——
+甲基化訊號比較吵，要求證據更乾淨才採信。</li>
 </ul>
 
-<p class="prose">Phasing 會依據 read 支持的 allele 組合，選擇加權一致性較高的指派。
-各連通部分形成一個 <b>phase set</b>，VCF 用 <code>PS</code> 標示。</p>
+<h3 id="heuristic-phasing-加權投票">heuristic phasing：加權投票</h3>
+
+<p class="prose">圖建好之後，LongPhase <b>不求全域最佳解</b>。它沿著座標從左往右掃，
+一次決定一個變異：前面最多 <code>--connectAdjacent</code>（預設 35）個變異各投一票，
+票的權重就是上面那個 20 / 1 / 0.1，兩邊加總大的一邊贏。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 730" class="dia-svg" role="img">
+  <title>heuristic phasing：前面的變異加權投票，決定下一個變異接在哪一條上</title>
+  <desc>LongPhase 不是求全域最佳解，而是從左往右逐一決定。決定第 k 個變異時，
+        前面最多 35 個變異（connectAdjacent）各投一票；每票的權重來自它那條邊有多乾淨 ——
+        乾淨的邊（ESR 很小）權重 20，普通的 1，串聯重複區的 indel 只有 0.1。
+        兩邊權重加總，大的一邊贏，這個變異就接到那條 haplotype 上。
+        如果兩邊加總剛好相等，程式無法決定方向，就在這裡<b>開一個新的 phase block</b>，
+        PS 換號 —— 這正是 phase block 斷開的直接原因。
+        最下面是一個特別的保護機制：如果很多票其實都靠同一條長 read 撐著，
+        那條 read 一旦有系統性錯誤就會一路投錯票。程式偵測到超過三票各自只有一條 read
+        支持時，會改用只採信乾淨且非 indel 的票重新計算。</desc>
+
+  <text class="lbl bold zh" x="16" y="34">從左往右一個一個決定，不求全域最佳解</text>
+
+  <!-- ① 前面的變異加權投票 -->
+  <rect class="box plain" x="16" y="52" width="968" height="286" rx="10"/>
+  <text class="anno bold zh" x="34" y="82">① 決定第 k 個變異：前面最多 35 個變異各投一票</text>
+  <text class="tick mid zh" x="290" y="108">已經定好相位的變異</text>
+  <text class="tick mid mono bold" x="90" y="134">20</text>
+  <text class="tick mid zh" x="90" y="152">邊很乾淨</text>
+  <text class="tick mid mono bold" x="190" y="134">20</text>
+  <text class="tick mid zh" x="190" y="152">邊很乾淨</text>
+  <text class="tick mid mono bold" x="290" y="134">1</text>
+  <text class="tick mid zh" x="290" y="152">普通</text>
+  <text class="tick mid mono bold" x="390" y="134">1</text>
+  <text class="tick mid zh" x="390" y="152">普通</text>
+  <text class="tick mid mono bold" x="490" y="134">0.1</text>
+  <text class="tick mid zh" x="490" y="152">重複區 indel</text>
+  <circle class="mark ref" cx="90" cy="176" r="10"/>
+  <circle class="mark ref" cx="190" cy="176" r="10"/>
+  <circle class="mark ref" cx="290" cy="176" r="10"/>
+  <circle class="mark ref" cx="390" cy="176" r="10"/>
+  <circle class="mark ref" cx="490" cy="176" r="10"/>
+  <text class="tick mid zh bold" x="760" y="152">待決定</text>
+  <circle class="box ghost" cx="760" cy="176" r="17"/>
+  <circle class="mark ref" cx="760" cy="176" r="10"/>
+  <rect class="box accent" x="640" y="218" width="150" height="42" rx="6"/>
+  <text class="tick mid zh bold hp1" x="715" y="244">HP1 得票 41</text>
+  <rect class="box accent" x="810" y="218" width="150" height="42" rx="6"/>
+  <text class="tick mid zh bold hp2" x="885" y="244">HP2 得票 1.1</text>
+  <path class="conn hp1" d="M90,188 Q402,212 715,216" marker-end="url(#arrow-sm)"/>
+  <path class="conn hp1" d="M190,188 Q452,212 715,216" marker-end="url(#arrow-sm)"/>
+  <path class="conn hp2" d="M290,188 Q587,212 885,216" marker-end="url(#arrow-sm)"/>
+  <path class="conn hp1" d="M390,188 Q552,212 715,216" marker-end="url(#arrow-sm)"/>
+  <path class="conn hp2" d="M490,188 Q687,212 885,216" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh" x="34" y="288">每一票的權重來自那條邊有多乾淨：ESR ≤ 0.1 → <tspan class="bold">20</tspan>；普通 → <tspan class="bold">1</tspan>；串聯重複區的 indel → <tspan class="bold">0.1</tspan>。</text>
+  <text class="tick zh bold ok" x="34" y="318">41 &gt; 1.1 → 這個變異接到 HP1。距離超過 300 kb（-d）的變異不投票。</text>
+
+  <!-- ② h1 == h2 → 新 block -->
+  <rect class="box bad" x="16" y="354" width="470" height="234" rx="10"/>
+  <text class="anno bold zh" x="34" y="384">② 兩邊得票相等 → phase block 在這裡斷開</text>
+  <rect class="box plain" x="34" y="402" width="200" height="40" rx="6"/>
+  <text class="tick mid zh hp1" x="134" y="427">HP1 得票 3</text>
+  <rect class="box plain" x="252" y="402" width="200" height="40" rx="6"/>
+  <text class="tick mid zh hp2" x="352" y="427">HP2 得票 3</text>
+  <text class="lbl mid bold bad" x="243" y="474">平手 → 無法決定方向</text>
+  <line class="axis" x1="46" y1="528" x2="440" y2="528"/>
+  <circle class="mark ref" cx="70" cy="528" r="7"/>
+  <circle class="mark ref" cx="110" cy="528" r="7"/>
+  <circle class="mark ref" cx="150" cy="528" r="7"/>
+  <circle class="mark ref" cx="190" cy="528" r="7"/>
+  <circle class="mark ref" cx="280" cy="528" r="7"/>
+  <circle class="mark ref" cx="320" cy="528" r="7"/>
+  <circle class="mark ref" cx="360" cy="528" r="7"/>
+  <circle class="mark ref" cx="400" cy="528" r="7"/>
+  <line class="guide" x1="235" y1="498" x2="235" y2="552"/>
+  <text class="tick mid mono" x="130" y="556">PS = 10521</text>
+  <text class="tick mid mono" x="340" y="556">PS = 88014</text>
+  <text class="tick zh bold bad" x="34" y="580">同一條染色體上出現很多 PS，多半就是一路平手出來的。</text>
+
+  <!-- ③ Onelongcase：一條長 read 重複投錯票 -->
+  <rect class="box warn" x="502" y="354" width="482" height="234" rx="10"/>
+  <text class="anno bold zh" x="520" y="384">③ 一條長 read 不能一路投錯票</text>
+  <text class="tick zh" x="520" y="408">一條很長的 read 同時跨過下面每一個位置：</text>
+  <rect class="read hp0" x="520" y="418" width="440" height="14" rx="7"/>
+  <circle class="mark ref" cx="560" cy="466" r="8"/>
+  <path class="conn" d="M560,436 L560,456" marker-end="url(#arrow-sm)"/>
+  <circle class="mark ref" cx="630" cy="466" r="8"/>
+  <path class="conn" d="M630,436 L630,456" marker-end="url(#arrow-sm)"/>
+  <circle class="mark ref" cx="700" cy="466" r="8"/>
+  <path class="conn" d="M700,436 L700,456" marker-end="url(#arrow-sm)"/>
+  <circle class="mark ref" cx="770" cy="466" r="8"/>
+  <path class="conn" d="M770,436 L770,456" marker-end="url(#arrow-sm)"/>
+  <circle class="mark ref" cx="840" cy="466" r="8"/>
+  <path class="conn" d="M840,436 L840,456" marker-end="url(#arrow-sm)"/>
+  <circle class="mark ref" cx="910" cy="466" r="8"/>
+  <path class="conn" d="M910,436 L910,456" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh" x="520" y="496">每條邊都只有<tspan class="bold">這一條</tspan> read 撐著（para + cross ≤ 1）。</text>
+  <text class="tick zh" x="520" y="516">它要是有系統性錯誤，就會一路投出一致但錯的票。</text>
+  <rect class="box plain" x="520" y="530" width="440" height="52" rx="6"/>
+  <text class="tick zh" x="534" y="552">超過三票各自只有一條 read 支持時 →</text>
+  <text class="tick zh" x="534" y="572">只採信 ESR &lt; 0.2 且非 indel 的票重算</text>
+
+  <line class="axis" x1="16" y1="620" x2="984" y2="620"/>
+  <text class="anno zh bold" x="16" y="648">這一整套都是 heuristic：沿著座標往前掃、用加權投票決定，沒有回頭修正也不求全域最佳解。</text>
+  <text class="anno zh" x="16" y="676">好處是快、而且在長讀上通常夠準；代價是它對「證據剛好平手」與「單一 read 主導」很敏感 ——</text>
+  <text class="anno zh" x="16" y="704">所以程式才需要 ③ 這種特例保護，以及下一張圖的兩道信心門檻。</text>
+</svg><figcaption>① 加權投票決定當前變異接到哪一條 haplotype。② 兩邊得票<b>剛好相等</b>時程式無法決定方向，就在這裡開一個新的 phase block —— 這是 <code>PS</code> 換號最直接的原因。③ 一個特例保護：如果很多票其實都靠同一條長 read 撐著（每條邊只有一條 read，para＋cross ≤ 1），那條 read 一旦有系統性錯誤就會一路投錯票；程式偵測到超過三票是這種情況時，會改成只採信乾淨（ESR &lt; 0.2）且非 indel 的票重算。</figcaption></figure>
+
+<p class="prose">這是一個典型的 heuristic：快、在長讀上通常夠準，但代價是它對兩件事敏感 ——
+<b>證據剛好平手</b>，以及<b>單一 read 主導</b>。③ 那個特例保護就是為了後者而存在的。
+另外，距離超過 <code>--distance</code>（預設 300000，約一個 centromere 的長度）的兩個變異不互相投票。</p>
+
+<h3 id="最後兩道信心門檻">最後兩道信心門檻</h3>
+
+<p class="prose">圖定好相之後還有一步，程式把結果<b>反過來檢查一次</b>：先用變異的相位決定每條 read
+屬於哪條 haplotype，再用已標好的 read 回頭重算每個變異。兩步各有一道門檻：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" class="dia-svg" role="img">
+  <title>最後兩道信心門檻：哪些 read 拿得到 HP，哪些變異留得住 PS</title>
+  <desc>圖定好相之後還有一步：把結果反過來檢查一次。
+        左邊先決定每條 read 屬於哪一條 haplotype —— 數這條 read 上有多少 allele 站 HP1、
+        多少站 HP2，比例要超過 readConfidence（預設 0.65）而且總數大於 1，才寫 HP 標籤；
+        否則這條 read 的 HP 就是空的，這是 BAM 裡有些 read 沒有 HP 的直接原因。
+        indel 的 allele 在這裡只算 0.1，不算 1。
+        右邊再用「已經標好 HP 的 read」回頭重算每個變異：兩種指派的支持數比例要超過
+        snpConfidence（預設 0.75）才保留，否則這個變異的 PS 會被<b>刪掉</b> ——
+        所以 VCF 裡有些 heterozygous 位點雖然 phasing 跑完了卻沒有 PS，並不是程式沒跑到，
+        而是它自己判斷證據不足而收回。</desc>
+
+  <text class="lbl bold zh" x="16" y="34">圖定好相之後，還要反過來檢查一次</text>
+
+  <!-- 左：每條 read 該不該拿到 HP -->
+  <rect class="box plain" x="16" y="52" width="470" height="440" rx="10"/>
+  <text class="anno bold zh" x="34" y="82">① 這條 read 屬於哪一條 haplotype？</text>
+  <text class="tick zh" x="34" y="106">數這條 read 上的 allele 各站哪一邊</text>
+
+  <rect class="read hp0" x="52" y="150" width="400" height="14" rx="7"/>
+  <circle class="mark hp1" cx="72" cy="157" r="7"/>
+  <circle class="mark hp1" cx="118" cy="157" r="7"/>
+  <circle class="mark hp1" cx="164" cy="157" r="7"/>
+  <circle class="mark hp1" cx="210" cy="157" r="7"/>
+  <circle class="mark hp1" cx="256" cy="157" r="7"/>
+  <circle class="mark hp1" cx="302" cy="157" r="7"/>
+  <circle class="mark hp1" cx="348" cy="157" r="7"/>
+  <circle class="mark hp2" cx="394" cy="157" r="7"/>
+  <text class="tick zh hp1" x="52" y="188">站 HP1：7 個</text>
+  <text class="tick zh hp2" x="230" y="188">站 HP2：1 個</text>
+  <rect class="box ok" x="52" y="202" width="400" height="40" rx="6"/>
+  <text class="tick zh ok" x="66" y="227">7 ÷ 8 = 0.88 &gt; 0.65 → 標上 HP</text>
+  <text class="tick mono bold ok" x="52" y="260">→ HP:i:1</text>
+
+  <rect class="read hp0" x="52" y="296" width="400" height="14" rx="7"/>
+  <circle class="mark hp1" cx="72" cy="303" r="7"/>
+  <circle class="mark hp1" cx="118" cy="303" r="7"/>
+  <circle class="mark hp1" cx="164" cy="303" r="7"/>
+  <circle class="mark hp1" cx="210" cy="303" r="7"/>
+  <circle class="mark hp2" cx="256" cy="303" r="7"/>
+  <circle class="mark hp2" cx="302" cy="303" r="7"/>
+  <circle class="mark hp2" cx="348" cy="303" r="7"/>
+  <text class="tick zh hp1" x="52" y="334">站 HP1：4 個</text>
+  <text class="tick zh hp2" x="230" y="334">站 HP2：3 個</text>
+  <rect class="box bad" x="52" y="348" width="400" height="40" rx="6"/>
+  <text class="tick zh bad" x="66" y="373">4 ÷ 7 = 0.57 &lt; 0.65 → 不標</text>
+  <text class="tick mono bold bad" x="52" y="406">→ 沒有 HP</text>
+  <text class="tick zh" x="34" y="464">indel 的 allele 在這一步只算 0.1，不算 1。</text>
+
+  <!-- 右：每個變異的 PS 留不留 -->
+  <rect class="box plain" x="502" y="52" width="482" height="440" rx="10"/>
+  <text class="anno bold zh" x="520" y="82">② 用標好的 read 回頭重算每個變異</text>
+  <text class="tick zh" x="520" y="106">兩種指派各有多少 read 支持</text>
+  <rect class="box plain" x="520" y="122" width="446" height="120" rx="6"/>
+  <text class="tick mid zh" x="640" y="146">看到 ref</text>
+  <text class="tick mid zh" x="800" y="146">看到 alt</text>
+  <text class="tick end zh bold hp1" x="600" y="180">HP1 的 read</text>
+  <text class="tick end zh bold hp2" x="600" y="216">HP2 的 read</text>
+  <text class="lbl mid mono bold" x="640" y="180">12</text>
+  <text class="lbl mid mono bold" x="800" y="180">1</text>
+  <text class="lbl mid mono bold" x="640" y="216">2</text>
+  <text class="lbl mid mono bold" x="800" y="216">11</text>
+  <text class="mono" x="520" y="272">指派 A：HP1=ref、HP2=alt → 12 + 11 = 23</text>
+  <text class="mono" x="520" y="298">指派 B：HP1=alt、HP2=ref →  1 +  2 = 3</text>
+  <line class="guide" x1="520" y1="314" x2="966" y2="314"/>
+  <text class="mono bold ok" x="520" y="344" font-size="20">23 ÷ 26 = 0.88 &gt; 0.75</text>
+  <rect class="box ok" x="520" y="358" width="446" height="40" rx="6"/>
+  <text class="tick zh ok" x="534" y="383">超過 snpConfidence → 這個變異保留 PS 與定相的 GT</text>
+  <rect class="box bad" x="520" y="414" width="446" height="62" rx="6"/>
+  <text class="tick zh bad" x="534" y="440">若比例沒過 0.75 → 這個變異的 <tspan class="mono">PS</tspan> 被<tspan class="bold">刪掉</tspan></text>
+  <text class="tick zh" x="534" y="464">VCF 裡有 het 位點沒有 PS，多半是這裡收回的</text>
+
+  <line class="axis" x1="16" y1="524" x2="984" y2="524"/>
+  <text class="anno zh bold" x="16" y="552">兩道門檻各自對應一個你會在輸出裡直接看到的現象：</text>
+  <text class="anno zh" x="16" y="580">read 沒有 <tspan class="mono">HP</tspan> ← 0.65 那道；het 位點沒有 <tspan class="mono">PS</tspan> ← 0.75 那道。兩者都不是錯誤，是程式主動說「證據不足」。</text>
+</svg><figcaption>① read 上的 allele 站 HP1 與 HP2 的比例要超過 <code>--readConfidence</code>（預設 0.65）且總數大於 1，才寫 <code>HP</code> 標籤；沒過的 read 就沒有 HP。② 再用標好的 read 重算每個變異，兩種指派的支持比例要超過 <code>--snpConfidence</code>（預設 0.75）才保留，沒過的話這個變異的 <code>PS</code> 會被<b>刪掉</b>。</figcaption></figure>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">沒有 HP、沒有 PS，多半不是錯誤</p>
+<p class="prose">這兩道門檻各自對應一個你會在輸出裡直接看到的現象：
+BAM 裡有 read 沒有 <code>HP</code>，來自 0.65 那道；VCF 裡有 heterozygous 位點沒有 <code>PS</code>，
+來自 0.75 那道。兩者都不是程式漏跑，而是它主動判斷證據不足而<b>收回</b>。
+所以看到這些空缺時，要問的是「證據為什麼不足」，而不是「程式是不是壞了」。</p>
+</div>
 
 <h3 id="三種失敗模式">三種失敗模式</h3>
 
@@ -278,16 +626,16 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>失敗</th><th>原因</th><th>徵兆</th></tr></thead>
+<thead><tr><th>失敗</th><th>對應到上面的哪一步</th><th>徵兆</th></tr></thead>
 <tbody>
-<tr><td><b><span class="term" data-term="phase block" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-phase-block-4">phase block<span class="term__pop" id="gd-phase-block-4" role="tooltip"><b class="term__hd">phase block</b><span class="term__def" data-lang="zh">一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</span><span class="term__def" data-lang="en">A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.</span><a class="term__more" href="glossary.html#phase-block">完整條目 →</a></span></span> 斷裂</b></td><td>read 太短，或中間沒有 het 位點</td><td>同一條染色體上出現很多不同的 <code>PS</code> 值</td></tr>
-<tr><td><b><span class="term" data-term="switch error" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-switch-error-5">switch error<span class="term__pop" id="gd-switch-error-5" role="tooltip"><b class="term__hd">switch error</b><span class="term__def" data-lang="zh">phasing 結果自某一位置起將兩條 haplotype 的方向對調，是常見的 phasing 錯誤類型。</span><span class="term__def" data-lang="en">A phasing error in which the two haplotype labels swap from some point onward; a common phasing error mode.</span><a class="term__more" href="glossary.html#switch-error">完整條目 →</a></span></span></b></td><td>某處證據太弱，兩條 haplotype 被對調</td><td>與 truth 比對時，錯誤從某一點之後系統性地發生</td></tr>
-<tr><td><b>大量 read 未標記</b></td><td><span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-6">LOH<span class="term__pop" id="gd-loh-6" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span>、低 coverage、mapping quality 太低</td><td>haplotag 後很多 read 沒有 <code>HP</code></td></tr>
+<tr><td><b><span class="term" data-term="phase block" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-phase-block-3">phase block<span class="term__pop" id="gd-phase-block-3" role="tooltip"><b class="term__hd">phase block</b><span class="term__def" data-lang="zh">一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</span><span class="term__def" data-lang="en">A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.</span><a class="term__more" href="glossary.html#phase-block">完整條目 →</a></span></span> 斷裂</b></td><td>投票平手，或沒有 read 跨過（沒有邊）</td><td>同一條染色體上出現很多不同的 <code>PS</code> 值</td></tr>
+<tr><td><b><span class="term" data-term="switch error" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-switch-error-4">switch error<span class="term__pop" id="gd-switch-error-4" role="tooltip"><b class="term__hd">switch error</b><span class="term__def" data-lang="zh">phasing 結果自某一位置起將兩條 haplotype 的方向對調，是常見的 phasing 錯誤類型。</span><span class="term__def" data-lang="en">A phasing error in which the two haplotype labels swap from some point onward; a common phasing error mode.</span><a class="term__more" href="glossary.html#switch-error">完整條目 →</a></span></span></b></td><td>某條邊的 ESR 偏高卻仍勉強過關，方向選錯</td><td>與 truth 比對時，錯誤從某一點之後系統性地發生</td></tr>
+<tr><td><b>大量 read 未標記</b></td><td>沒過 <code>--readConfidence</code>（0.65）</td><td>haplotag 後很多 read 沒有 <code>HP</code></td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">第一項與第三項在<b>腫瘤</b>樣本上可能更明顯，因為 LOH 與 copy number 異常會減少可用的 phasing 錨點。
+<p class="prose">第一項與第三項在<b>腫瘤</b>樣本上可能更明顯，因為 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-5">LOH<span class="term__pop" id="gd-loh-5" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 與 copy number 異常會減少可用的 phasing 錨點。
 LongPhase-S 與 LongPhase-TO 都針對這些腫瘤資料情境提供額外處理。</p>
 </section>
 
@@ -322,6 +670,43 @@ longphase-s haplotag \
   -t 8 \
   -o tagged</code></pre>
 
+<h3 id="co-phasing-把其他三種變異一起帶進去">co-phasing：把其他三種變異一起帶進去</h3>
+
+<pre><code># 甲基化要先用 modcall 產生 VCF，才能餵給 phase
+longphase-s modcall \
+  -b aln.bam \
+  -r reference.fasta \
+  -t 8 \
+  -o modcall
+
+# 四種一起 co-phase；每種變異會各自輸出一份 phased VCF
+longphase-s phase \
+  -s SNP.vcf \
+  -b aln.bam \
+  -r reference.fasta \
+  --indels \
+  --sv-file SV.vcf \
+  --mod-file modcall.vcf \
+  -t 8 \
+  -o phased \
+  --ont</code></pre>
+
+<p class="cli-note"><b>注意</b>：<code>modcall</code> 的 help 顯示 <code>-b, --bam-file</code>，
+但選項表註冊的長選項其實是 <code>--methylbamfile</code>；短選項 <code>-b</code> 兩者都通。
+同理 <code>phase</code> 的 help 寫 <code>--sv-window</code> 與 <code>--sv-threshold</code>，
+選項表註冊的是 <code>--svWindow</code> 與 <code>--svThreshold</code>。</p>
+
+<h3 id="把圖直接印出來看">把圖直接印出來看</h3>
+
+<p class="prose">前面那三張圖不必只當示意圖 —— <code>--dot</code> 會為每一條染色體輸出一個
+dot 檔，裡面就是實際建出來的邊：</p>
+
+<pre><code>longphase-s phase -s SNP.vcf -b aln.bam -r reference.fasta --ont --dot -o phased
+
+# 每一行是一條邊：&lt;位置&gt;.&lt;allele&gt; -&gt; &lt;位置&gt;.&lt;allele&gt;
+# allele 相同 = 平行連接，相反 = 交叉連接
+head -20 phased.chr20.dot</code></pre>
+
 <h3 id="如何驗證輸出">如何驗證輸出</h3>
 
 <pre><code># 在已定相的 heterozygous records 檢查 | 與 PS
@@ -334,28 +719,59 @@ samtools view tagged.bam | grep -o 'HP:i:[12]' | sort | uniq -c
 samtools view -c tagged.bam
 samtools view tagged.bam | grep -c 'HP:i:'</code></pre>
 
-<p class="cli-note">最後兩行的差可用來估算未標記的 read 數。請將差值除以總 read 數，
-再依資料品質與分析目標判讀；比例偏高時，回到 M6 的排查清單。</p>
+<p class="cli-note">最後兩行的差就是沒過 <code>--readConfidence</code>（0.65）那道門檻的 read。
+請將差值除以總 read 數，再依資料品質與分析目標判讀；比例偏高時，回到 M6 的排查清單。</p>
 
-<h3 id="常見參數注意事項">常見參數注意事項</h3>
+<h3 id="參數對應到哪一步">參數對應到哪一步</h3>
+
+<p class="prose">參數很多，但每一個都落在前面某一張圖上。按階段記比按字母記容易得多：</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>細節</th><th>說明</th></tr></thead>
+<thead><tr><th>階段</th><th>參數</th><th>預設</th><th>它在做什麼</th></tr></thead>
 <tbody>
-<tr><td><code>--ont</code> / <code>--pb</code></td><td>LongPhase-S 的 <code>phase</code> 需指定平台。LongPhase-TO 目前僅支援 ONT；即使接受平台旗標，也不會改變其處理方式。</td></tr>
-<tr><td><code>-q</code> 預設值不一致</td><td><code>haplotag</code> 是 1，<code>estimate_purity</code> 是 20；同一份資料可能因子命令不同而產生不同結果。</td></tr>
-<tr><td><code>--sv-window</code></td><td>部分版本的 help 與實際註冊選項不同，實際選項可能是 <code>--svWindow</code>；執行前請核對版本。</td></tr>
-<tr><td><code>modcall</code> 的 <code>-b</code></td><td>部分版本的 help 顯示 <code>--bam-file</code>，實際選項可能是 <code>--methylbamfile</code>；請以目前版本為準。</td></tr>
+<tr><td rowspan="3">讀 BAM</td><td><code>-q, --mappingQuality</code></td><td>1</td><td>比對品質低於此值的 alignment 直接丟掉</td></tr>
+<tr><td><code>-x, --mismatchRate</code></td><td>3</td><td>錯配率過高的 read 標為不可信</td></tr>
+<tr><td><code>-L, --overlapThreshold</code></td><td>0.2</td><td>同一條 read 的多段比對若重疊超過此比例，只留較長的那段</td></tr>
+<tr><td rowspan="4">建邊</td><td><code>-d, --distance</code></td><td>300000</td><td>距離超過此值的兩個變異不連邊</td></tr>
+<tr><td><code>-a, --connectAdjacent</code></td><td>35</td><td>每個變異往後連接幾個變異（也就是投票的範圍）</td></tr>
+<tr><td><code>-p, --baseQuality</code></td><td>12</td><td>低於此值的鹼基，其 read 對這條邊只算 <code>--edgeWeight</code></td></tr>
+<tr><td><code>-e, --edgeWeight</code></td><td>0.1</td><td>打折後的權重</td></tr>
+<tr><td>定邊方向</td><td><code>-1, --edgeThreshold</code></td><td>0.7</td><td>ESR 超過此值 → 兩種組合太像，丟掉這條邊</td></tr>
+<tr><td rowspan="2">收尾檢查</td><td><code>-m, --readConfidence</code></td><td>0.65</td><td>read 要多一致才寫 <code>HP</code></td></tr>
+<tr><td><code>-n, --snpConfidence</code></td><td>0.75</td><td>變異要多一致才保留 <code>PS</code></td></tr>
+<tr><td rowspan="2">SV 專用</td><td><code>-w, --svWindow</code></td><td>20</td><td>評估斷點周圍 CIGAR 的視窗大小</td></tr>
+<tr><td><code>-h, --svThreshold</code></td><td>0.10</td><td>read 要多支持才算支持這個 SV</td></tr>
 </tbody>
 </table>
 </div>
 
 <div class="guardrail guardrail--info">
-<p class="guardrail__hd">遇到不一致時的處理</p>
-<p class="prose">以上差異是在特定版本觀察到的 help、文件與程式選項不一致。
-請以目前版本的 <code>src/phase/Phasing.cpp</code> 中 <code>longopts</code> 表為準，並記錄版本。
-使用新參數前，先檢索該表確認名稱。</p>
+<p class="guardrail__hd"><code>-h</code> 不是 help</p>
+<p class="prose">在 <code>phase</code> 與 <code>haplotag</code> 的選項表裡，
+<code>-h</code> 綁的是 <code>--svThreshold</code>（需要一個參數），
+而 help <b>只有長選項</b> <code>--help</code>，沒有對應的短選項。
+所以想看說明就要寫完整的 <code>--help</code>：</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>想做的事</th><th>寫法</th></tr></thead>
+<tbody>
+<tr><td>看說明</td><td><code>longphase-s phase --help</code></td></tr>
+<tr><td>調 SV 支持門檻</td><td><code>-h 0.15</code> 或 <code>--svThreshold 0.15</code></td></tr>
+</tbody>
+</table>
+</div>
+<p class="prose">同一張表裡 <code>-1</code> 是 <code>--edgeThreshold</code>、
+<code>-L</code> 是 <code>--overlapThreshold</code> —— 短選項的字母跟參數名稱沒有明顯關聯，
+所以指令寫長一點反而不容易記錯。</p>
+</div>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">遇到 help 與實際不一致時</p>
+<p class="prose">以上差異都是在原始碼裡核對過的：help 字串與 <code>longopts</code> 註冊表<b>本來就不完全一致</b>。
+權威是原始碼裡的 <code>longopts</code> 表 —— 在 twolinin/longphase 的 repo 根目錄，
+<code>phase</code> 看 <code>Phasing.cpp</code>、<code>haplotag</code> 看 <code>Haplotag.cpp</code>、
+<code>modcall</code> 看 <code>ModCall.cpp</code>。使用新參數前先檢索該表確認名稱，並記錄版本。</p>
 </div>
 </section>
 
@@ -365,17 +781,20 @@ samtools view tagged.bam | grep -c 'HP:i:'</code></pre>
 
 <div class="reveal__q"><p class="prose">你在一條染色體上完成 phasing，發現輸出的 VCF 裡有 <b>將近 200 個不同的 <code>PS</code> 值</b>。<br><br>
 這正常嗎？該從哪裡查起？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>數量偏高，建議檢查。</b>在 read 長度與 heterozygous 位點密度足夠時，長讀通常可形成較大的 phase blocks；實際數量仍取決於資料品質與參數設定。</p>
-<p class="prose">排查順序：</p>
+<p class="prose">回到投票那張圖：新的 <code>PS</code> 只在<b>兩邊得票相等</b>時產生。
+所以問題一定是「為什麼投票投不出結果」，可能的來源有三個層次：</p>
 <ol class="prose">
-<li><b>先看 read 長度分布。</b><code>samtools stats</code> 看平均與 N50。
-如果 read 只有 2–3 kb，block 破碎可能是預期結果，不一定代表程式錯誤。</li>
-<li><b>再看 het 位點密度。</b>如果 VCF 裡的 het 位點本來就稀疏（例如樣本本身雜合度低，
-或這條染色體有大段 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-7">LOH<span class="term__pop" id="gd-loh-7" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span>），可用錨點就會減少。</li>
-<li><b>看斷點的位置分布。</b>如果斷點<b>集中在特定區段</b>，那多半是該區段有問題
-（LOH、重複序列、低 coverage）。如果<b>均勻散布</b>，那是全域性的 read 長度或參數問題。</li>
-<li><b>檢查 <code>-d</code>（distance）參數。</b>若目前版本預設為 300000，距離超過此值時就不嘗試連接。
-如果資料 read 特別長，可依版本文件評估是否調大。</li>
+<li><b>沒有票可投。</b>先看 read 長度分布（<code>samtools stats</code> 的平均與 N50）。
+如果 read 只有 2–3 kb，跨不過兩個 het 位點的邊本來就少，block 破碎可能是預期結果。</li>
+<li><b>可投票的位點太稀疏。</b>如果 VCF 裡的 het 位點本來就少（樣本雜合度低，
+或這條染色體有大段 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-6">LOH<span class="term__pop" id="gd-loh-6" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span>），可用錨點就會減少。</li>
+<li><b>票都被丟掉了。</b>邊的 ESR 若普遍偏高（兩種組合都差不多），
+就會大量觸發 <code>--edgeThreshold</code> 而整條邊被丟掉。這通常伴隨較高的錯配率
+或比對問題，可用 <code>--dot</code> 把圖印出來直接看有多少邊真的存在。</li>
 </ol>
+<p class="prose">再看斷點的<b>位置分布</b>：集中在特定區段多半是該區段有問題（LOH、重複序列、低 coverage）；
+均勻散布則是全域性的 read 長度或參數問題。<code>-d</code>（預設 300000）與
+<code>-a</code>（預設 35）都會限制投票範圍，資料 read 特別長時可依版本文件評估是否調整。</p>
 <p class="prose">腫瘤樣本中，LOH 是造成這種現象的常見可能性之一：該區域的兩條染色體變得難以區分，
 可用錨點可能大幅減少。腫瘤專用工具因此需要額外處理 LOH 區域，否則 phase blocks 可能變得零碎。</p></div></details>
 </section>
@@ -405,27 +824,33 @@ longphase-s haplotag \
   -t 8 \
   -o tagged</code></pre>
 
-<h3 id="保存參數設定">保存參數設定</h3>
+<h3 id="把兩道門檻的效果量出來">把兩道門檻的效果量出來</h3>
 
-<p class="prose">執行前請確認目前版本可接受的長選項，因為 help 訊息與實際接受的長選項
-<b>不一定一致</b>：</p>
+<p class="prose">這個練習把前面那張「兩道信心門檻」的圖變成實際數字。
+調鬆 <code>--readConfidence</code>，看有多少 read 從沒有 <code>HP</code> 變成有：</p>
 
-<pre><code># 確認目前版本接受的長選項
+<pre><code># 預設 0.65
+longphase-s phase -s SNP.vcf -b aln.bam -r reference.fasta --ont -o strict
+# 調鬆到 0.55
+longphase-s phase -s SNP.vcf -b aln.bam -r reference.fasta --ont -m 0.55 -o loose
+
+# 各自 haplotag 之後比較 HP 標記率
+for p in strict loose; do
+  total=$(samtools view -c ${p}.tagged.bam)
+  tagged=$(samtools view ${p}.tagged.bam | grep -c 'HP:i:')
+  echo &quot;${p}: ${tagged} / ${total}&quot;
+done</code></pre>
+
+<p class="prose">標記率會上升 —— 但那不代表結果更好。<b>放寬門檻是把不確定的 read 也貼上標籤</b>，
+標記率與正確率是兩件事，要用有 truth 的資料才分得出來（見 M10）。</p>
+
+<h3 id="確認參數名稱">確認參數名稱</h3>
+
+<pre><code># 看目前版本接受的長選項
 longphase-s phase --help
 
-# 如果 help 與實際行為不符，查閱原始碼裡的選項表
-grep -A40 'static struct option' src/phase/Phasing.cpp</code></pre>
-
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd">目前版本的已知差異</p>
-<ul class="prose">
-<li>部分版本的 help 寫 <code>--sv-window</code>，實際註冊的是 <code>--svWindow</code>；請核對版本後再執行。</li>
-<li><code>modcall</code> 的 help 可能寫 <code>--bam-file</code>，實際選項可能是 <code>--methylbamfile</code>；請以版本為準。</li>
-<li><code>-q</code> 的預設值在不同子命令不一樣（<code>haplotag</code> 是 1、
-純度估計是 20）。同一份資料用不同子命令會得到不同結果。</li>
-</ul>
-<p class="prose">遇到不一致時，請以目前版本原始碼的選項表為準。</p>
-</div>
+# help 與實際行為不符時，以選項表為準（檔案在 repo 根目錄）
+grep -A40 'static const struct option longopts' Phasing.cpp</code></pre>
 
 <section class="quiz" data-quiz="m11"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
 </section>
@@ -433,7 +858,7 @@ grep -A40 'static struct option' src/phase/Phasing.cpp</code></pre>
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m10.html"><small>← 上一模組</small>證據、驗證與效能評估</a><a class="next" href="m12.html"><small>下一模組 →</small>LongPhase-S（配對 tumor–normal）</a></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>LongPhase</dt><dd>實驗室開發的長 read phasing 工具，是後續所有工具的共同基礎。輸出 germline haplotype。</dd><dt>PS tag（phase set）</dt><dd>標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>switch error</dt><dd>phasing 結果自某一位置起將兩條 haplotype 的方向對調，是常見的 phasing 錯誤類型。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#輸入與輸出">輸入與輸出</a></li><li class="lv3"><a href="#phase-graph-的基本概念">phase graph 的基本概念</a></li><li class="lv3"><a href="#三種失敗模式">三種失敗模式</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#最小可跑範例">最小可跑範例</a></li><li class="lv3"><a href="#如何驗證輸出">如何驗證輸出</a></li><li class="lv3"><a href="#常見參數注意事項">常見參數注意事項</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行最小流程">執行最小流程</a></li><li class="lv3"><a href="#保存參數設定">保存參數設定</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#輸入與輸出">輸入與輸出</a></li><li class="lv3"><a href="#四種變異-一張圖">四種變異，一張圖</a></li><li class="lv3"><a href="#一條邊怎麼決定方向-又怎麼被丟掉">一條邊怎麼決定方向，又怎麼被丟掉</a></li><li class="lv3"><a href="#heuristic-phasing-加權投票">heuristic phasing：加權投票</a></li><li class="lv3"><a href="#最後兩道信心門檻">最後兩道信心門檻</a></li><li class="lv3"><a href="#三種失敗模式">三種失敗模式</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#最小可跑範例">最小可跑範例</a></li><li class="lv3"><a href="#co-phasing-把其他三種變異一起帶進去">co-phasing：把其他三種變異一起帶進去</a></li><li class="lv3"><a href="#把圖直接印出來看">把圖直接印出來看</a></li><li class="lv3"><a href="#如何驗證輸出">如何驗證輸出</a></li><li class="lv3"><a href="#參數對應到哪一步">參數對應到哪一步</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行最小流程">執行最小流程</a></li><li class="lv3"><a href="#把兩道門檻的效果量出來">把兩道門檻的效果量出來</a></li><li class="lv3"><a href="#確認參數名稱">確認參數名稱</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">
@@ -441,7 +866,10 @@ grep -A40 'static struct option' src/phase/Phasing.cpp</code></pre>
   <code>LongPhase-S</code> 與 <code>LongPhase-TO</code> 的概念、證據與限制。
 </footer>
 
-<svg class="tw-defs" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="arrow-sm" viewBox="0 0 10 10" refX="9" refY="5"
+<svg class="tw-defs" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+  </marker><marker id="arrow-sm" viewBox="0 0 10 10" refX="9" refY="5"
           markerWidth="5" markerHeight="5" orient="auto-start-reverse">
     <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
   </marker></defs></svg>

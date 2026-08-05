@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 730">
+  <title>heuristic phasing：前面的變異加權投票，決定下一個變異接在哪一條上</title>
+  <desc>LongPhase 不是求全域最佳解，而是從左往右逐一決定。決定第 k 個變異時，
+        前面最多 35 個變異（connectAdjacent）各投一票；每票的權重來自它那條邊有多乾淨 ——
+        乾淨的邊（ESR 很小）權重 20，普通的 1，串聯重複區的 indel 只有 0.1。
+        兩邊權重加總，大的一邊贏，這個變異就接到那條 haplotype 上。
+        如果兩邊加總剛好相等，程式無法決定方向，就在這裡<b>開一個新的 phase block</b>，
+        PS 換號 —— 這正是 phase block 斷開的直接原因。
+        最下面是一個特別的保護機制：如果很多票其實都靠同一條長 read 撐著，
+        那條 read 一旦有系統性錯誤就會一路投錯票。程式偵測到超過三票各自只有一條 read
+        支持時，會改用只採信乾淨且非 indel 的票重新計算。</desc>
+
+  <text class="lbl bold zh" x="16" y="34">從左往右一個一個決定，不求全域最佳解</text>
+
+  <!-- ① 前面的變異加權投票 -->
+  <rect class="box plain" x="16" y="52" width="968" height="286" rx="10"/>
+  <text class="anno bold zh" x="34" y="82">① 決定第 k 個變異：前面最多 35 個變異各投一票</text>
+  <text class="tick mid zh" x="290" y="108">已經定好相位的變異</text>
+  <text class="tick mid mono bold" x="90" y="134">20</text>
+  <text class="tick mid zh" x="90" y="152">邊很乾淨</text>
+  <text class="tick mid mono bold" x="190" y="134">20</text>
+  <text class="tick mid zh" x="190" y="152">邊很乾淨</text>
+  <text class="tick mid mono bold" x="290" y="134">1</text>
+  <text class="tick mid zh" x="290" y="152">普通</text>
+  <text class="tick mid mono bold" x="390" y="134">1</text>
+  <text class="tick mid zh" x="390" y="152">普通</text>
+  <text class="tick mid mono bold" x="490" y="134">0.1</text>
+  <text class="tick mid zh" x="490" y="152">重複區 indel</text>
+  <circle class="mark ref" cx="90" cy="176" r="10"/>
+  <circle class="mark ref" cx="190" cy="176" r="10"/>
+  <circle class="mark ref" cx="290" cy="176" r="10"/>
+  <circle class="mark ref" cx="390" cy="176" r="10"/>
+  <circle class="mark ref" cx="490" cy="176" r="10"/>
+  <text class="tick mid zh bold" x="760" y="152">待決定</text>
+  <circle class="box ghost" cx="760" cy="176" r="17"/>
+  <circle class="mark ref" cx="760" cy="176" r="10"/>
+  <rect class="box accent" x="640" y="218" width="150" height="42" rx="6"/>
+  <text class="tick mid zh bold hp1" x="715" y="244">HP1 得票 41</text>
+  <rect class="box accent" x="810" y="218" width="150" height="42" rx="6"/>
+  <text class="tick mid zh bold hp2" x="885" y="244">HP2 得票 1.1</text>
+  <path class="conn hp1" d="M90,188 Q402,212 715,216" marker-end="url(#arrow-sm)"/>
+  <path class="conn hp1" d="M190,188 Q452,212 715,216" marker-end="url(#arrow-sm)"/>
+  <path class="conn hp2" d="M290,188 Q587,212 885,216" marker-end="url(#arrow-sm)"/>
+  <path class="conn hp1" d="M390,188 Q552,212 715,216" marker-end="url(#arrow-sm)"/>
+  <path class="conn hp2" d="M490,188 Q687,212 885,216" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh" x="34" y="288">每一票的權重來自那條邊有多乾淨：ESR ≤ 0.1 → <tspan class="bold">20</tspan>；普通 → <tspan class="bold">1</tspan>；串聯重複區的 indel → <tspan class="bold">0.1</tspan>。</text>
+  <text class="tick zh bold ok" x="34" y="318">41 &gt; 1.1 → 這個變異接到 HP1。距離超過 300 kb（-d）的變異不投票。</text>
+
+  <!-- ② h1 == h2 → 新 block -->
+  <rect class="box bad" x="16" y="354" width="470" height="234" rx="10"/>
+  <text class="anno bold zh" x="34" y="384">② 兩邊得票相等 → phase block 在這裡斷開</text>
+  <rect class="box plain" x="34" y="402" width="200" height="40" rx="6"/>
+  <text class="tick mid zh hp1" x="134" y="427">HP1 得票 3</text>
+  <rect class="box plain" x="252" y="402" width="200" height="40" rx="6"/>
+  <text class="tick mid zh hp2" x="352" y="427">HP2 得票 3</text>
+  <text class="lbl mid bold bad" x="243" y="474">平手 → 無法決定方向</text>
+  <line class="axis" x1="46" y1="528" x2="440" y2="528"/>
+  <circle class="mark ref" cx="70" cy="528" r="7"/>
+  <circle class="mark ref" cx="110" cy="528" r="7"/>
+  <circle class="mark ref" cx="150" cy="528" r="7"/>
+  <circle class="mark ref" cx="190" cy="528" r="7"/>
+  <circle class="mark ref" cx="280" cy="528" r="7"/>
+  <circle class="mark ref" cx="320" cy="528" r="7"/>
+  <circle class="mark ref" cx="360" cy="528" r="7"/>
+  <circle class="mark ref" cx="400" cy="528" r="7"/>
+  <line class="guide" x1="235" y1="498" x2="235" y2="552"/>
+  <text class="tick mid mono" x="130" y="556">PS = 10521</text>
+  <text class="tick mid mono" x="340" y="556">PS = 88014</text>
+  <text class="tick zh bold bad" x="34" y="580">同一條染色體上出現很多 PS，多半就是一路平手出來的。</text>
+
+  <!-- ③ Onelongcase：一條長 read 重複投錯票 -->
+  <rect class="box warn" x="502" y="354" width="482" height="234" rx="10"/>
+  <text class="anno bold zh" x="520" y="384">③ 一條長 read 不能一路投錯票</text>
+  <text class="tick zh" x="520" y="408">一條很長的 read 同時跨過下面每一個位置：</text>
+  <rect class="read hp0" x="520" y="418" width="440" height="14" rx="7"/>
+  <circle class="mark ref" cx="560" cy="466" r="8"/>
+  <path class="conn" d="M560,436 L560,456" marker-end="url(#arrow-sm)"/>
+  <circle class="mark ref" cx="630" cy="466" r="8"/>
+  <path class="conn" d="M630,436 L630,456" marker-end="url(#arrow-sm)"/>
+  <circle class="mark ref" cx="700" cy="466" r="8"/>
+  <path class="conn" d="M700,436 L700,456" marker-end="url(#arrow-sm)"/>
+  <circle class="mark ref" cx="770" cy="466" r="8"/>
+  <path class="conn" d="M770,436 L770,456" marker-end="url(#arrow-sm)"/>
+  <circle class="mark ref" cx="840" cy="466" r="8"/>
+  <path class="conn" d="M840,436 L840,456" marker-end="url(#arrow-sm)"/>
+  <circle class="mark ref" cx="910" cy="466" r="8"/>
+  <path class="conn" d="M910,436 L910,456" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh" x="520" y="496">每條邊都只有<tspan class="bold">這一條</tspan> read 撐著（para + cross ≤ 1）。</text>
+  <text class="tick zh" x="520" y="516">它要是有系統性錯誤，就會一路投出一致但錯的票。</text>
+  <rect class="box plain" x="520" y="530" width="440" height="52" rx="6"/>
+  <text class="tick zh" x="534" y="552">超過三票各自只有一條 read 支持時 →</text>
+  <text class="tick zh" x="534" y="572">只採信 ESR &lt; 0.2 且非 indel 的票重算</text>
+
+  <line class="axis" x1="16" y1="620" x2="984" y2="620"/>
+  <text class="anno zh bold" x="16" y="648">這一整套都是 heuristic：沿著座標往前掃、用加權投票決定，沒有回頭修正也不求全域最佳解。</text>
+  <text class="anno zh" x="16" y="676">好處是快、而且在長讀上通常夠準；代價是它對「證據剛好平手」與「單一 read 主導」很敏感 ——</text>
+  <text class="anno zh" x="16" y="704">所以程式才需要 ③ 這種特例保護，以及下一張圖的兩道信心門檻。</text>
+</svg>

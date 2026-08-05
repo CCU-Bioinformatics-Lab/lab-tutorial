@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700">
+  <title>四種變異進同一張圖：LongPhase 的 co-phasing 圖模型</title>
+  <desc>LongPhase 把四種輸入放進同一張圖：SNP（-s，必要）、小的 indel（--indels）、
+        結構變異（--sv-file）、以及甲基化位點（--mod-file，由 longphase modcall 產生）。
+        上半部是同一段基因體上的六個位置與五條 read；第二條 read 同時跨過 SNP、甲基化、
+        indel 與 SV 四種類型，所以它一條就能把四種變異連在一起 —— 這是長讀才做得到的事，
+        也是把它們放進同一張圖（而不是各自分開 phasing）的理由。
+        下半部是對應的圖：每個位置拆成兩個 sub-node（allele 0 與 allele 1），
+        read 的證據變成 sub-node 之間的邊。邊只有兩種形狀 —— 平行（0 接 0、1 接 1）
+        或交叉（0 接 1、1 接 0）；沒有 read 跨過時就沒有邊，phase block 在那裡斷開。</desc>
+
+  <text class="lbl bold zh" x="16" y="34">四種變異進同一張圖 —— 這是 co-phasing 的意思</text>
+  <text class="anno zh" x="16" y="60">節點的形狀代表變異類型，顏色一律中性；顏色留給後面的 haplotype 指派。</text>
+
+  <!-- ① 四個輸入檔 -->
+  <text class="anno bold zh" x="20" y="88">① 四個輸入</text>
+  <rect class="box plain" x="20" y="100" width="196" height="42" rx="6"/>
+  <text class="tick" x="34" y="118">SNP VCF</text>
+  <text class="tick mono" x="34" y="136">-s（必要）</text>
+  <rect class="box plain" x="20" y="150" width="196" height="42" rx="6"/>
+  <text class="tick" x="34" y="168">small indel</text>
+  <text class="tick mono" x="34" y="186">--indels</text>
+  <rect class="box plain" x="20" y="200" width="196" height="42" rx="6"/>
+  <text class="tick" x="34" y="218">SV VCF</text>
+  <text class="tick mono" x="34" y="236">--sv-file</text>
+  <rect class="box plain" x="20" y="250" width="196" height="42" rx="6"/>
+  <text class="tick" x="34" y="268">methylation VCF</text>
+  <text class="tick mono" x="34" y="286">--mod-file</text>
+  <text class="tick zh" x="20" y="322">四個都進<tspan class="bold">同一張</tspan>圖，</text>
+  <text class="tick zh" x="20" y="344">不是各自分開 phasing。</text>
+  <path class="flow" d="M224,200 L248,200" marker-end="url(#arrow)"/>
+
+  <!-- ② 同一段基因體上的六個位置與五條 read -->
+  <text class="anno bold zh" x="262" y="88">② 一條 read 可以同時跨過不同類型的位置</text>
+  <text class="tick mid" x="300" y="106">SNP</text>
+  <text class="tick mid" x="425" y="106">MOD</text>
+  <text class="tick mid" x="550" y="106">INDEL</text>
+  <text class="tick mid" x="675" y="106">SNP</text>
+  <text class="tick mid" x="800" y="106">SV</text>
+  <text class="tick mid" x="925" y="106">MOD</text>
+  <circle class="mark ref" cx="300" cy="126" r="9"/>
+  <circle class="cpg met" cx="425" cy="126" r="8"/>
+  <polygon class="mark ref" points="550,116 560,126 550,136 540,126"/>
+  <circle class="mark ref" cx="675" cy="126" r="9"/>
+  <rect class="mark ref" x="786" y="119" width="28" height="13" rx="3"/>
+  <circle class="cpg met" cx="925" cy="126" r="8"/>
+  <line class="axis" x1="262" y1="140" x2="962" y2="140"/>
+  <rect class="read hp0" x="268" y="150" width="439" height="14" rx="7"/>
+  <rect class="read hp0" x="268" y="175" width="564" height="14" rx="7"/>
+  <rect class="read hp0" x="393" y="200" width="564" height="14" rx="7"/>
+  <rect class="read hp0" x="268" y="225" width="314" height="14" rx="7"/>
+  <rect class="read hp0" x="518" y="250" width="439" height="14" rx="7"/>
+  <text class="tick mid mono" x="300" y="161">0</text>
+  <text class="tick mid mono" x="425" y="161">1</text>
+  <text class="tick mid mono" x="550" y="161">0</text>
+  <text class="tick mid mono" x="675" y="161">1</text>
+  <text class="tick mid mono" x="300" y="186">1</text>
+  <text class="tick mid mono" x="425" y="186">0</text>
+  <text class="tick mid mono" x="550" y="186">1</text>
+  <text class="tick mid mono" x="675" y="186">0</text>
+  <text class="tick mid mono" x="800" y="186">0</text>
+  <text class="tick mid mono" x="425" y="211">1</text>
+  <text class="tick mid mono" x="550" y="211">0</text>
+  <text class="tick mid mono" x="675" y="211">1</text>
+  <text class="tick mid mono" x="800" y="211">1</text>
+  <text class="tick mid mono" x="925" y="211">0</text>
+  <text class="tick mid mono" x="300" y="236">1</text>
+  <text class="tick mid mono" x="425" y="236">0</text>
+  <text class="tick mid mono" x="550" y="236">1</text>
+  <text class="tick mid mono" x="550" y="261">0</text>
+  <text class="tick mid mono" x="675" y="261">1</text>
+  <text class="tick mid mono" x="800" y="261">1</text>
+  <text class="tick mid mono" x="925" y="261">0</text>
+  <text class="tick zh" x="262" y="290">每格數字是這條 read 在該位置看到的 allele（0＝ref、1＝alt）。</text>
+  <text class="tick zh bold" x="262" y="312">第 2 條 read 一次跨過 SNP、MOD、INDEL、SNP、SV ——</text>
+  <text class="tick zh" x="262" y="334">四種類型被同一個分子綁在一起，這是長讀才給得到的證據。</text>
+
+  <!-- ③ 對應的圖：每個位置兩個 sub-node，x 座標與上面刻意對齊 -->
+  <line class="guide" x1="20" y1="374" x2="980" y2="374"/>
+  <text class="anno bold zh" x="20" y="404">③ 對應的圖：每個位置拆成兩個 sub-node</text>
+  <text class="tick end mono" x="286" y="461">allele 0</text>
+  <text class="tick end mono" x="286" y="551">allele 1</text>
+  <line class="conn" x1="316" y1="456" x2="409" y2="456"/>
+  <line class="conn" x1="316" y1="546" x2="409" y2="546"/>
+  <text class="tick mid zh" x="362" y="588">平行</text>
+  <line class="conn" x1="441" y1="456" x2="534" y2="456"/>
+  <line class="conn" x1="441" y1="546" x2="534" y2="546"/>
+  <text class="tick mid zh" x="487" y="588">平行</text>
+  <line class="conn" x1="566" y1="456" x2="659" y2="546"/>
+  <line class="conn" x1="566" y1="546" x2="659" y2="456"/>
+  <text class="tick mid zh" x="612" y="588">交叉</text>
+  <line class="conn" x1="691" y1="456" x2="784" y2="456"/>
+  <line class="conn" x1="691" y1="546" x2="784" y2="546"/>
+  <text class="tick mid zh" x="737" y="588">平行</text>
+  <line class="guide" x1="816" y1="456" x2="909" y2="456"/>
+  <line class="guide" x1="816" y1="546" x2="909" y2="546"/>
+  <text class="tick mid zh bad" x="862" y="588">沒有 read 跨過</text>
+  <circle class="mark ref" cx="300" cy="456" r="9"/>
+  <circle class="cpg met" cx="425" cy="456" r="8"/>
+  <polygon class="mark ref" points="550,446 560,456 550,466 540,456"/>
+  <circle class="mark ref" cx="675" cy="456" r="9"/>
+  <rect class="mark ref" x="786" y="449" width="28" height="13" rx="3"/>
+  <circle class="cpg met" cx="925" cy="456" r="8"/>
+  <circle class="mark ref" cx="300" cy="546" r="9"/>
+  <circle class="cpg met" cx="425" cy="546" r="8"/>
+  <polygon class="mark ref" points="550,536 560,546 550,556 540,546"/>
+  <circle class="mark ref" cx="675" cy="546" r="9"/>
+  <rect class="mark ref" x="786" y="539" width="28" height="13" rx="3"/>
+  <circle class="cpg met" cx="925" cy="546" r="8"/>
+  <text class="tick zh" x="20" y="630">邊只有兩種形狀：<tspan class="bold">平行</tspan>（0 接 0、1 接 1）或<tspan class="bold">交叉</tspan>（0 接 1、1 接 0）。</text>
+  <text class="tick zh" x="20" y="652">要選哪一種、以及這條邊該不該留下來，由下一張圖的四個計數決定。</text>
+  <text class="tick zh bad" x="20" y="674">最右邊沒有 read 跨過 → 沒有邊 → phase block 在這裡斷開。</text>
+</svg>

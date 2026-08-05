@@ -2,8 +2,10 @@
 {
   "objectives": [
     "說出 LongPhase 的輸入與輸出各是什麼",
-    "描述 phase graph 的節點與邊各自代表什麼",
-    "說出三種會讓 phasing 失敗的情況",
+    "說明四種變異為什麼放進同一張圖一起定相，而不是各自分開處理",
+    "描述圖的節點與邊各自代表什麼，並用四個計數說明一條邊的方向與去留怎麼決定",
+    "說明加權投票如何決定每個變異，以及 PS 為什麼會換號",
+    "說出兩道信心門檻分別對應輸出裡的哪個現象",
     "跑一個最小的 LongPhase 範例並解讀輸出"
   ]
 }
@@ -14,6 +16,9 @@
 
 <p class="prose">[[LongPhase]] 是本教材後續工具共用的基礎，處理的是<b>一般（非腫瘤）樣本</b>的 phasing。
 開始分析腫瘤資料前，先掌握這個基本流程。</p>
+
+<p class="prose">它值得看清楚內部機制，原因是：後面 LongPhase-S 與 LongPhase-TO 的腫瘤專用處理，
+都是接在這張圖與這套投票之上。不知道圖長什麼樣，就看不出腫瘤版改了什麼。</p>
 </section>
 
 
@@ -26,9 +31,9 @@
 <table>
 <thead><tr><th>子命令</th><th>輸入</th><th>輸出</th></tr></thead>
 <tbody>
-<tr><td><code>phase</code></td><td>germline SNP VCF ＋ BAM ＋ reference</td><td>含以 <code>|</code> 表示相位的 <code>GT</code> 與 <code>[[PS tag|PS]]</code> 的 phased VCF</td></tr>
+<tr><td><code>phase</code></td><td>germline SNP VCF ＋ BAM ＋ reference；可另外加 SV VCF、甲基化 VCF</td><td>含以 <code>|</code> 表示相位的 <code>GT</code> 與 <code>[[PS tag|PS]]</code> 的 phased VCF（每種變異各自一份）</td></tr>
 <tr><td><code>haplotag</code></td><td>已 phase 的 VCF ＋ BAM ＋ reference</td><td>每條 read 帶 <code>[[HP tag|HP]]</code> tag 的 BAM</td></tr>
-<tr><td><code>modcall</code></td><td>帶甲基化的 BAM ＋ reference</td><td>甲基化的 VCF；是否可供後續 phase 請依目前版本文件確認</td></tr>
+<tr><td><code>modcall</code></td><td>帶甲基化的 BAM ＋ reference</td><td>甲基化位點的 VCF，可再餵回 <code>phase</code> 的 <code>--mod-file</code></td></tr>
 </tbody>
 </table>
 </div>
@@ -36,21 +41,62 @@
 <p class="prose">注意這個順序：<b>先 call variant，再 phase，最後 haplotag。</b>
 LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位點當錨點。</p>
 
-<h3>phase graph 的基本概念</h3>
+<h3>四種變異，一張圖</h3>
 
-{{svg:m11-phase-graph | [wide] 三個步驟。① 將可區分兩條染色體的位置表示為節點。② 若 read 同時跨過兩個節點，就建立一條邊；邊的粗細表示支持強度 —— allele 組合一致時較強、互相衝突時較弱、沒有 read 跨過時不建立邊。③ 依一致性選擇相位指派，<b>各連通部分形成一個 phase block</b>。}}
+<p class="prose">LongPhase 最關鍵的設計選擇，是把四種變異放進<b>同一張圖</b>一起定相，
+官方文件稱為 <b>co-phasing</b>。理由來自長讀本身：一條 read 可能同時跨過一個 SNP、
+一個甲基化位點、一個小的 indel 與一個 SV —— 這四件事被同一個分子綁在一起，
+分開 phasing 就把這個證據丟掉了。</p>
 
-<p class="prose">可將每個 heterozygous 位點表示為圖上的一個節點。兩個節點之間若有 read 同時跨過，
-就建立一條邊；邊的權重代表<b>支持強度</b>：</p>
+{{svg:m11-cophasing-graph | [wide] 上半部是同一段基因體上的六個位置與五條 read；第 2 條一次跨過 SNP、甲基化、indel 與 SV 四種類型。下半部是對應的圖：每個位置拆成<b>兩個 sub-node</b>（allele 0 與 allele 1），read 的證據變成 sub-node 之間的邊，而邊只有平行與交叉兩種形狀。上下兩排的 x 座標刻意對齊，方便對照同一個位置。}}
+
+<p class="prose">程式內部給每個節點記一個型別，原始碼裡的註解就寫著
+<code>0=SNP 1=SV 2=MOD 3=INDEL 4=tandem repeat INDEL</code>。
+型別不只是標籤，它會改變後面的判斷 —— 例如串聯重複區的 indel（型別 4）投票權重被降到 0.1，
+因為那類位置的定序錯誤率特別高。</p>
+
+<h3>一條邊怎麼決定方向，又怎麼被丟掉</h3>
+
+<p class="prose">邊不是「有」或「沒有」，而是<b>四個加權計數</b>。跨過兩個位置的每一條 read，
+依它在兩邊看到的 allele 落進 rr、ra、ar、aa 之一：</p>
+
+{{svg:m11-phase-graph | [wide] 四個計數併成 para（＝rr+aa，平行的證據）與 cross（＝ra+ar，交叉的證據），再算 ESR ＝ 兩者的小除以大。para 大就平行連接、cross 大就交叉連接；ESR 大到超過 <code>edgeThreshold</code>（預設 0.7）就代表兩種組合幾乎一樣多，這條邊會被<b>整個丟掉</b>。反過來，ESR ≤ 0.1 的乾淨邊，它那一票的權重會從 1 拉到 20。}}
+
+<p class="prose">兩個細節值得記住，因為它們解釋了很多「為什麼這裡沒接起來」：</p>
 
 <ul class="prose">
-<li>多條 read 支持 A–C 與 G–T 的 allele 組合 → 強邊，方向較明確</li>
-<li>read 支持的 allele 組合互相衝突（有些支持 A–C、有些支持 A–T）→ 弱邊，可能有定序錯誤或比對問題</li>
-<li>完全沒有 read 跨過 → 沒有邊，[[phase block]] 在這裡斷開</li>
+<li><b>低品質的鹼基會被打折。</b>邊的任一端 base quality 低於 <code>--baseQuality</code>（預設 12）時，
+那條 read 對這條邊只貢獻 <code>--edgeWeight</code>（預設 0.1），而不是 1。</li>
+<li><b>甲基化的門檻更嚴。</b>SNP 與甲基化位點之間的邊，門檻從 0.7 收緊到 0.3 ——
+甲基化訊號比較吵，要求證據更乾淨才採信。</li>
 </ul>
 
-<p class="prose">Phasing 會依據 read 支持的 allele 組合，選擇加權一致性較高的指派。
-各連通部分形成一個 <b>phase set</b>，VCF 用 <code>PS</code> 標示。</p>
+<h3>heuristic phasing：加權投票</h3>
+
+<p class="prose">圖建好之後，LongPhase <b>不求全域最佳解</b>。它沿著座標從左往右掃，
+一次決定一個變異：前面最多 <code>--connectAdjacent</code>（預設 35）個變異各投一票，
+票的權重就是上面那個 20 / 1 / 0.1，兩邊加總大的一邊贏。</p>
+
+{{svg:m11-voting | [wide] ① 加權投票決定當前變異接到哪一條 haplotype。② 兩邊得票<b>剛好相等</b>時程式無法決定方向，就在這裡開一個新的 phase block —— 這是 <code>PS</code> 換號最直接的原因。③ 一個特例保護：如果很多票其實都靠同一條長 read 撐著（每條邊只有一條 read，para＋cross ≤ 1），那條 read 一旦有系統性錯誤就會一路投錯票；程式偵測到超過三票是這種情況時，會改成只採信乾淨（ESR &lt; 0.2）且非 indel 的票重算。}}
+
+<p class="prose">這是一個典型的 heuristic：快、在長讀上通常夠準，但代價是它對兩件事敏感 ——
+<b>證據剛好平手</b>，以及<b>單一 read 主導</b>。③ 那個特例保護就是為了後者而存在的。
+另外，距離超過 <code>--distance</code>（預設 300000，約一個 centromere 的長度）的兩個變異不互相投票。</p>
+
+<h3>最後兩道信心門檻</h3>
+
+<p class="prose">圖定好相之後還有一步，程式把結果<b>反過來檢查一次</b>：先用變異的相位決定每條 read
+屬於哪條 haplotype，再用已標好的 read 回頭重算每個變異。兩步各有一道門檻：</p>
+
+{{svg:m11-read-correction | [wide] ① read 上的 allele 站 HP1 與 HP2 的比例要超過 <code>--readConfidence</code>（預設 0.65）且總數大於 1，才寫 <code>HP</code> 標籤；沒過的 read 就沒有 HP。② 再用標好的 read 重算每個變異，兩種指派的支持比例要超過 <code>--snpConfidence</code>（預設 0.75）才保留，沒過的話這個變異的 <code>PS</code> 會被<b>刪掉</b>。}}
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">沒有 HP、沒有 PS，多半不是錯誤</p>
+<p class="prose">這兩道門檻各自對應一個你會在輸出裡直接看到的現象：
+BAM 裡有 read 沒有 <code>HP</code>，來自 0.65 那道；VCF 裡有 heterozygous 位點沒有 <code>PS</code>，
+來自 0.75 那道。兩者都不是程式漏跑，而是它主動判斷證據不足而<b>收回</b>。
+所以看到這些空缺時，要問的是「證據為什麼不足」，而不是「程式是不是壞了」。</p>
+</div>
 
 <h3>三種失敗模式</h3>
 
@@ -58,16 +104,16 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>失敗</th><th>原因</th><th>徵兆</th></tr></thead>
+<thead><tr><th>失敗</th><th>對應到上面的哪一步</th><th>徵兆</th></tr></thead>
 <tbody>
-<tr><td><b>[[phase block]] 斷裂</b></td><td>read 太短，或中間沒有 het 位點</td><td>同一條染色體上出現很多不同的 <code>PS</code> 值</td></tr>
-<tr><td><b>[[switch error]]</b></td><td>某處證據太弱，兩條 haplotype 被對調</td><td>與 truth 比對時，錯誤從某一點之後系統性地發生</td></tr>
-<tr><td><b>大量 read 未標記</b></td><td>[[LOH]]、低 coverage、mapping quality 太低</td><td>haplotag 後很多 read 沒有 <code>HP</code></td></tr>
+<tr><td><b>[[phase block]] 斷裂</b></td><td>投票平手，或沒有 read 跨過（沒有邊）</td><td>同一條染色體上出現很多不同的 <code>PS</code> 值</td></tr>
+<tr><td><b>[[switch error]]</b></td><td>某條邊的 ESR 偏高卻仍勉強過關，方向選錯</td><td>與 truth 比對時，錯誤從某一點之後系統性地發生</td></tr>
+<tr><td><b>大量 read 未標記</b></td><td>沒過 <code>--readConfidence</code>（0.65）</td><td>haplotag 後很多 read 沒有 <code>HP</code></td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">第一項與第三項在<b>腫瘤</b>樣本上可能更明顯，因為 LOH 與 copy number 異常會減少可用的 phasing 錨點。
+<p class="prose">第一項與第三項在<b>腫瘤</b>樣本上可能更明顯，因為 [[LOH]] 與 copy number 異常會減少可用的 phasing 錨點。
 LongPhase-S 與 LongPhase-TO 都針對這些腫瘤資料情境提供額外處理。</p>
 </section>
 
@@ -104,6 +150,47 @@ longphase-s haplotag \
   -o tagged
 {{/cli}}
 
+<h3>co-phasing：把其他三種變異一起帶進去</h3>
+
+{{cli}}
+# 甲基化要先用 modcall 產生 VCF，才能餵給 phase
+longphase-s modcall \
+  -b aln.bam \
+  -r reference.fasta \
+  -t 8 \
+  -o modcall
+
+# 四種一起 co-phase；每種變異會各自輸出一份 phased VCF
+longphase-s phase \
+  -s SNP.vcf \
+  -b aln.bam \
+  -r reference.fasta \
+  --indels \
+  --sv-file SV.vcf \
+  --mod-file modcall.vcf \
+  -t 8 \
+  -o phased \
+  --ont
+{{/cli}}
+
+<p class="cli-note"><b>注意</b>：<code>modcall</code> 的 help 顯示 <code>-b, --bam-file</code>，
+但選項表註冊的長選項其實是 <code>--methylbamfile</code>；短選項 <code>-b</code> 兩者都通。
+同理 <code>phase</code> 的 help 寫 <code>--sv-window</code> 與 <code>--sv-threshold</code>，
+選項表註冊的是 <code>--svWindow</code> 與 <code>--svThreshold</code>。</p>
+
+<h3>把圖直接印出來看</h3>
+
+<p class="prose">前面那三張圖不必只當示意圖 —— <code>--dot</code> 會為每一條染色體輸出一個
+dot 檔，裡面就是實際建出來的邊：</p>
+
+{{cli}}
+longphase-s phase -s SNP.vcf -b aln.bam -r reference.fasta --ont --dot -o phased
+
+# 每一行是一條邊：<位置>.<allele> -> <位置>.<allele>
+# allele 相同 = 平行連接，相反 = 交叉連接
+head -20 phased.chr20.dot
+{{/cli}}
+
 <h3>如何驗證輸出</h3>
 
 {{cli}}
@@ -118,28 +205,59 @@ samtools view -c tagged.bam
 samtools view tagged.bam | grep -c 'HP:i:'
 {{/cli}}
 
-<p class="cli-note">最後兩行的差可用來估算未標記的 read 數。請將差值除以總 read 數，
-再依資料品質與分析目標判讀；比例偏高時，回到 M6 的排查清單。</p>
+<p class="cli-note">最後兩行的差就是沒過 <code>--readConfidence</code>（0.65）那道門檻的 read。
+請將差值除以總 read 數，再依資料品質與分析目標判讀；比例偏高時，回到 M6 的排查清單。</p>
 
-<h3>常見參數注意事項</h3>
+<h3>參數對應到哪一步</h3>
+
+<p class="prose">參數很多，但每一個都落在前面某一張圖上。按階段記比按字母記容易得多：</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>細節</th><th>說明</th></tr></thead>
+<thead><tr><th>階段</th><th>參數</th><th>預設</th><th>它在做什麼</th></tr></thead>
 <tbody>
-<tr><td><code>--ont</code> / <code>--pb</code></td><td>LongPhase-S 的 <code>phase</code> 需指定平台。LongPhase-TO 目前僅支援 ONT；即使接受平台旗標，也不會改變其處理方式。</td></tr>
-<tr><td><code>-q</code> 預設值不一致</td><td><code>haplotag</code> 是 1，<code>estimate_purity</code> 是 20；同一份資料可能因子命令不同而產生不同結果。</td></tr>
-<tr><td><code>--sv-window</code></td><td>部分版本的 help 與實際註冊選項不同，實際選項可能是 <code>--svWindow</code>；執行前請核對版本。</td></tr>
-<tr><td><code>modcall</code> 的 <code>-b</code></td><td>部分版本的 help 顯示 <code>--bam-file</code>，實際選項可能是 <code>--methylbamfile</code>；請以目前版本為準。</td></tr>
+<tr><td rowspan="3">讀 BAM</td><td><code>-q, --mappingQuality</code></td><td>1</td><td>比對品質低於此值的 alignment 直接丟掉</td></tr>
+<tr><td><code>-x, --mismatchRate</code></td><td>3</td><td>錯配率過高的 read 標為不可信</td></tr>
+<tr><td><code>-L, --overlapThreshold</code></td><td>0.2</td><td>同一條 read 的多段比對若重疊超過此比例，只留較長的那段</td></tr>
+<tr><td rowspan="4">建邊</td><td><code>-d, --distance</code></td><td>300000</td><td>距離超過此值的兩個變異不連邊</td></tr>
+<tr><td><code>-a, --connectAdjacent</code></td><td>35</td><td>每個變異往後連接幾個變異（也就是投票的範圍）</td></tr>
+<tr><td><code>-p, --baseQuality</code></td><td>12</td><td>低於此值的鹼基，其 read 對這條邊只算 <code>--edgeWeight</code></td></tr>
+<tr><td><code>-e, --edgeWeight</code></td><td>0.1</td><td>打折後的權重</td></tr>
+<tr><td>定邊方向</td><td><code>-1, --edgeThreshold</code></td><td>0.7</td><td>ESR 超過此值 → 兩種組合太像，丟掉這條邊</td></tr>
+<tr><td rowspan="2">收尾檢查</td><td><code>-m, --readConfidence</code></td><td>0.65</td><td>read 要多一致才寫 <code>HP</code></td></tr>
+<tr><td><code>-n, --snpConfidence</code></td><td>0.75</td><td>變異要多一致才保留 <code>PS</code></td></tr>
+<tr><td rowspan="2">SV 專用</td><td><code>-w, --svWindow</code></td><td>20</td><td>評估斷點周圍 CIGAR 的視窗大小</td></tr>
+<tr><td><code>-h, --svThreshold</code></td><td>0.10</td><td>read 要多支持才算支持這個 SV</td></tr>
 </tbody>
 </table>
 </div>
 
 <div class="guardrail guardrail--info">
-<p class="guardrail__hd">遇到不一致時的處理</p>
-<p class="prose">以上差異是在特定版本觀察到的 help、文件與程式選項不一致。
-請以目前版本的 <code>src/phase/Phasing.cpp</code> 中 <code>longopts</code> 表為準，並記錄版本。
-使用新參數前，先檢索該表確認名稱。</p>
+<p class="guardrail__hd"><code>-h</code> 不是 help</p>
+<p class="prose">在 <code>phase</code> 與 <code>haplotag</code> 的選項表裡，
+<code>-h</code> 綁的是 <code>--svThreshold</code>（需要一個參數），
+而 help <b>只有長選項</b> <code>--help</code>，沒有對應的短選項。
+所以想看說明就要寫完整的 <code>--help</code>：</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>想做的事</th><th>寫法</th></tr></thead>
+<tbody>
+<tr><td>看說明</td><td><code>longphase-s phase --help</code></td></tr>
+<tr><td>調 SV 支持門檻</td><td><code>-h 0.15</code> 或 <code>--svThreshold 0.15</code></td></tr>
+</tbody>
+</table>
+</div>
+<p class="prose">同一張表裡 <code>-1</code> 是 <code>--edgeThreshold</code>、
+<code>-L</code> 是 <code>--overlapThreshold</code> —— 短選項的字母跟參數名稱沒有明顯關聯，
+所以指令寫長一點反而不容易記錯。</p>
+</div>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">遇到 help 與實際不一致時</p>
+<p class="prose">以上差異都是在原始碼裡核對過的：help 字串與 <code>longopts</code> 註冊表<b>本來就不完全一致</b>。
+權威是原始碼裡的 <code>longopts</code> 表 —— 在 twolinin/longphase 的 repo 根目錄，
+<code>phase</code> 看 <code>Phasing.cpp</code>、<code>haplotag</code> 看 <code>Haplotag.cpp</code>、
+<code>modcall</code> 看 <code>ModCall.cpp</code>。使用新參數前先檢索該表確認名稱，並記錄版本。</p>
 </div>
 </section>
 
@@ -152,17 +270,20 @@ samtools view tagged.bam | grep -c 'HP:i:'
 這正常嗎？該從哪裡查起？</p>
 {{reveal}}
 <p class="prose"><b>數量偏高，建議檢查。</b>在 read 長度與 heterozygous 位點密度足夠時，長讀通常可形成較大的 phase blocks；實際數量仍取決於資料品質與參數設定。</p>
-<p class="prose">排查順序：</p>
+<p class="prose">回到投票那張圖：新的 <code>PS</code> 只在<b>兩邊得票相等</b>時產生。
+所以問題一定是「為什麼投票投不出結果」，可能的來源有三個層次：</p>
 <ol class="prose">
-<li><b>先看 read 長度分布。</b><code>samtools stats</code> 看平均與 N50。
-如果 read 只有 2–3 kb，block 破碎可能是預期結果，不一定代表程式錯誤。</li>
-<li><b>再看 het 位點密度。</b>如果 VCF 裡的 het 位點本來就稀疏（例如樣本本身雜合度低，
+<li><b>沒有票可投。</b>先看 read 長度分布（<code>samtools stats</code> 的平均與 N50）。
+如果 read 只有 2–3 kb，跨不過兩個 het 位點的邊本來就少，block 破碎可能是預期結果。</li>
+<li><b>可投票的位點太稀疏。</b>如果 VCF 裡的 het 位點本來就少（樣本雜合度低，
 或這條染色體有大段 [[LOH]]），可用錨點就會減少。</li>
-<li><b>看斷點的位置分布。</b>如果斷點<b>集中在特定區段</b>，那多半是該區段有問題
-（LOH、重複序列、低 coverage）。如果<b>均勻散布</b>，那是全域性的 read 長度或參數問題。</li>
-<li><b>檢查 <code>-d</code>（distance）參數。</b>若目前版本預設為 300000，距離超過此值時就不嘗試連接。
-如果資料 read 特別長，可依版本文件評估是否調大。</li>
+<li><b>票都被丟掉了。</b>邊的 ESR 若普遍偏高（兩種組合都差不多），
+就會大量觸發 <code>--edgeThreshold</code> 而整條邊被丟掉。這通常伴隨較高的錯配率
+或比對問題，可用 <code>--dot</code> 把圖印出來直接看有多少邊真的存在。</li>
 </ol>
+<p class="prose">再看斷點的<b>位置分布</b>：集中在特定區段多半是該區段有問題（LOH、重複序列、低 coverage）；
+均勻散布則是全域性的 read 長度或參數問題。<code>-d</code>（預設 300000）與
+<code>-a</code>（預設 35）都會限制投票範圍，資料 read 特別長時可依版本文件評估是否調整。</p>
 <p class="prose">腫瘤樣本中，LOH 是造成這種現象的常見可能性之一：該區域的兩條染色體變得難以區分，
 可用錨點可能大幅減少。腫瘤專用工具因此需要額外處理 LOH 區域，否則 phase blocks 可能變得零碎。</p>
 {{/ask}}
@@ -195,29 +316,37 @@ longphase-s haplotag \
   -o tagged
 {{/cli}}
 
-<h3>保存參數設定</h3>
+<h3>把兩道門檻的效果量出來</h3>
 
-<p class="prose">執行前請確認目前版本可接受的長選項，因為 help 訊息與實際接受的長選項
-<b>不一定一致</b>：</p>
+<p class="prose">這個練習把前面那張「兩道信心門檻」的圖變成實際數字。
+調鬆 <code>--readConfidence</code>，看有多少 read 從沒有 <code>HP</code> 變成有：</p>
 
 {{cli}}
-# 確認目前版本接受的長選項
-longphase-s phase --help
+# 預設 0.65
+longphase-s phase -s SNP.vcf -b aln.bam -r reference.fasta --ont -o strict
+# 調鬆到 0.55
+longphase-s phase -s SNP.vcf -b aln.bam -r reference.fasta --ont -m 0.55 -o loose
 
-# 如果 help 與實際行為不符，查閱原始碼裡的選項表
-grep -A40 'static struct option' src/phase/Phasing.cpp
+# 各自 haplotag 之後比較 HP 標記率
+for p in strict loose; do
+  total=$(samtools view -c ${p}.tagged.bam)
+  tagged=$(samtools view ${p}.tagged.bam | grep -c 'HP:i:')
+  echo "${p}: ${tagged} / ${total}"
+done
 {{/cli}}
 
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd">目前版本的已知差異</p>
-<ul class="prose">
-<li>部分版本的 help 寫 <code>--sv-window</code>，實際註冊的是 <code>--svWindow</code>；請核對版本後再執行。</li>
-<li><code>modcall</code> 的 help 可能寫 <code>--bam-file</code>，實際選項可能是 <code>--methylbamfile</code>；請以版本為準。</li>
-<li><code>-q</code> 的預設值在不同子命令不一樣（<code>haplotag</code> 是 1、
-純度估計是 20）。同一份資料用不同子命令會得到不同結果。</li>
-</ul>
-<p class="prose">遇到不一致時，請以目前版本原始碼的選項表為準。</p>
-</div>
+<p class="prose">標記率會上升 —— 但那不代表結果更好。<b>放寬門檻是把不確定的 read 也貼上標籤</b>，
+標記率與正確率是兩件事，要用有 truth 的資料才分得出來（見 M10）。</p>
+
+<h3>確認參數名稱</h3>
+
+{{cli}}
+# 看目前版本接受的長選項
+longphase-s phase --help
+
+# help 與實際行為不符時，以選項表為準（檔案在 repo 根目錄）
+grep -A40 'static const struct option longopts' Phasing.cpp
+{{/cli}}
 
 {{quiz:m11}}
 </section>
