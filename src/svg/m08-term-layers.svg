@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 726">
+  <title>purity、CCF、copy number、multiplicity 與 VAF 各自在數什麼</title>
+  <desc>用同一個玩具檢體（10 個細胞、每個細胞在這個位置有 2 份 DNA）把五個名詞對齊在三個計數層級上。
+        細胞層：purity 是腫瘤細胞佔全部細胞的比例，6 除以 10 等於 0.6；
+        CCF 是帶有這個突變的腫瘤細胞佔全部腫瘤細胞的比例，3 除以 6 等於 0.5，兩者的分母不同。
+        拷貝層：copy number 是一個細胞在這個位置有幾份 DNA，此例為 2；
+        multiplicity 是突變坐落在其中幾份，此例為 1；ploidy 是整個基因體平均的 copy number。
+        整個檢體在這個位置共 20 份 DNA，腫瘤細胞貢獻 12 份、正常細胞貢獻 8 份，其中 3 份帶突變。
+        read 層：VAF 是帶變異的 read 佔全部 read 的比例，3 除以 20 等於 0.15，
+        也是這五個數字中唯一可以由定序資料直接數出來的。
+        由上往下計算答案唯一，但由 VAF 往上反推並不唯一。
+        另外提醒：一條 read 是一個 DNA 分子，不是一個細胞，同一個細胞會給出很多條 read。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">這一章的名詞，其實是在三個不同層級上數東西</text>
+  <text class="tick zh" x="20" y="58">玩具檢體：10 個細胞，每個細胞在這個位置有 2 份 DNA</text>
+
+  <!-- ══════════════ ① 細胞層：數細胞 ══════════════ -->
+  <rect class="box plain" x="16" y="76" width="296" height="514" rx="10"/>
+  <text class="anno bold zh mid" x="164" y="106">① 細胞層</text>
+  <text class="tick mid zh" x="164" y="130">數的是「細胞」</text>
+
+  <rect class="box ghost" x="42" y="148" width="118" height="82" rx="8"/>
+  <circle class="cell tumor" cx="62" cy="170" r="15"/><circle class="nucleus" cx="62" cy="170" r="7"/>
+  <circle class="mark somatic" cx="62" cy="170" r="4"/>
+  <circle class="cell tumor" cx="100" cy="170" r="15"/><circle class="nucleus" cx="100" cy="170" r="7"/>
+  <circle class="mark somatic" cx="100" cy="170" r="4"/>
+  <circle class="cell tumor" cx="138" cy="170" r="15"/><circle class="nucleus" cx="138" cy="170" r="7"/>
+  <circle class="mark somatic" cx="138" cy="170" r="4"/>
+  <circle class="cell tumor" cx="62" cy="208" r="15"/><circle class="nucleus" cx="62" cy="208" r="7"/>
+  <circle class="cell tumor" cx="100" cy="208" r="15"/><circle class="nucleus" cx="100" cy="208" r="7"/>
+  <circle class="cell tumor" cx="138" cy="208" r="15"/><circle class="nucleus" cx="138" cy="208" r="7"/>
+  <rect class="box ghost" x="176" y="148" width="80" height="82" rx="8"/>
+  <circle class="cell normal" cx="196" cy="170" r="15"/><circle class="nucleus" cx="196" cy="170" r="7"/>
+  <circle class="cell normal" cx="234" cy="170" r="15"/><circle class="nucleus" cx="234" cy="170" r="7"/>
+  <circle class="cell normal" cx="196" cy="208" r="15"/><circle class="nucleus" cx="196" cy="208" r="7"/>
+  <circle class="cell normal" cx="234" cy="208" r="15"/><circle class="nucleus" cx="234" cy="208" r="7"/>
+  <text class="tick mid zh" x="101" y="250">腫瘤細胞 6 個</text>
+  <text class="tick mid zh" x="216" y="250">正常 4 個</text>
+  <text class="tick zh" x="36" y="276">實心小點＝帶有這個突變（3 個）</text>
+
+  <rect class="box accent" x="36" y="300" width="256" height="104" rx="8"/>
+  <text class="anno bold zh" x="56" y="328">purity 腫瘤純度</text>
+  <text class="tick zh" x="56" y="356">腫瘤細胞 ÷ 所有細胞</text>
+  <text class="tick mono bold" x="56" y="384">6 ÷ 10 = 0.6</text>
+
+  <rect class="box accent" x="36" y="416" width="256" height="104" rx="8"/>
+  <text class="anno bold zh" x="56" y="444">CCF 癌細胞比例</text>
+  <text class="tick zh" x="56" y="472">帶突變的腫瘤細胞 ÷ 腫瘤細胞</text>
+  <text class="tick mono bold" x="56" y="500">3 ÷ 6 = 0.5</text>
+
+  <text class="tick zh warn bold" x="36" y="552">兩個分數的分母不一樣</text>
+
+  <!-- ══════════════ ② 拷貝層：數 DNA 份數 ══════════════ -->
+  <rect class="box plain" x="352" y="76" width="296" height="514" rx="10"/>
+  <text class="anno bold zh mid" x="500" y="106">② 拷貝層</text>
+  <text class="tick mid zh" x="500" y="130">數的是「DNA 份數」</text>
+
+  <circle class="cell tumor" cx="400" cy="178" r="16"/><circle class="nucleus" cx="400" cy="178" r="7"/>
+  <circle class="mark somatic" cx="400" cy="178" r="4"/>
+  <path class="conn" d="M420,178 L442,178" marker-end="url(#arrow-sm)"/>
+  <g transform="translate(452,146) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark somatic" cx="460" cy="170" r="5"/>
+  <g transform="translate(486,146) scale(0.8)">
+    <path class="chr hp2" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp2" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark ref" cx="494" cy="170" r="5"/>
+  <text class="tick zh" x="372" y="228">一個細胞 2 份，1 份帶突變</text>
+
+  <!-- 整個檢體在這個位置的 20 份 DNA，其中 3 份帶突變 -->
+  <rect class="bar somatic" x="372" y="252" width="11" height="22"/>
+  <rect class="bar somatic" x="385" y="252" width="11" height="22"/>
+  <rect class="bar somatic" x="398" y="252" width="11" height="22"/>
+  <rect class="bar" x="411" y="252" width="11" height="22"/>
+  <rect class="bar" x="424" y="252" width="11" height="22"/>
+  <rect class="bar" x="437" y="252" width="11" height="22"/>
+  <rect class="bar" x="450" y="252" width="11" height="22"/>
+  <rect class="bar" x="463" y="252" width="11" height="22"/>
+  <rect class="bar" x="476" y="252" width="11" height="22"/>
+  <rect class="bar" x="489" y="252" width="11" height="22"/>
+  <rect class="bar" x="502" y="252" width="11" height="22"/>
+  <rect class="bar" x="515" y="252" width="11" height="22"/>
+  <rect class="bar" x="528" y="252" width="11" height="22"/>
+  <rect class="bar" x="541" y="252" width="11" height="22"/>
+  <rect class="bar" x="554" y="252" width="11" height="22"/>
+  <rect class="bar" x="567" y="252" width="11" height="22"/>
+  <rect class="bar" x="580" y="252" width="11" height="22"/>
+  <rect class="bar" x="593" y="252" width="11" height="22"/>
+  <rect class="bar" x="606" y="252" width="11" height="22"/>
+  <rect class="bar" x="619" y="252" width="11" height="22"/>
+  <path class="axis" d="M372,284 L526,284"/>
+  <path class="axis" d="M528,284 L630,284"/>
+  <text class="tick mid zh" x="449" y="304">腫瘤細胞 12 份</text>
+  <text class="tick mid zh" x="579" y="304">正常 8 份</text>
+  <text class="tick zh" x="372" y="330">整個檢體 20 份，3 份帶突變</text>
+
+  <rect class="box plain" x="372" y="350" width="256" height="62" rx="8"/>
+  <text class="anno bold zh" x="392" y="376">copy number 拷貝數</text>
+  <text class="tick zh" x="392" y="402">這個位置有幾份 → 這裡是 2</text>
+  <rect class="box plain" x="372" y="424" width="256" height="62" rx="8"/>
+  <text class="anno bold zh" x="392" y="450">multiplicity 佔幾份</text>
+  <text class="tick zh" x="392" y="476">突變在其中幾份 → 這裡是 1</text>
+  <rect class="box plain" x="372" y="498" width="256" height="62" rx="8"/>
+  <text class="anno bold zh" x="392" y="524">ploidy 倍性</text>
+  <text class="tick zh" x="392" y="550">整個基因體平均的拷貝數</text>
+
+  <!-- ══════════════ ③ read 層：數 read ══════════════ -->
+  <rect class="box plain" x="688" y="76" width="296" height="514" rx="10"/>
+  <text class="anno bold zh mid" x="836" y="106">③ read 層</text>
+  <text class="tick mid zh" x="836" y="130">數的是「read」</text>
+
+  <line class="guide" x1="767" y1="146" x2="767" y2="288"/>
+  <line class="guide" x1="893" y1="146" x2="893" y2="288"/>
+  <rect class="read" x="708" y="152" width="118" height="10" rx="5"/>
+  <circle class="mark somatic" cx="767" cy="157" r="4"/>
+  <rect class="read" x="708" y="165" width="118" height="10" rx="5"/>
+  <circle class="mark somatic" cx="767" cy="170" r="4"/>
+  <rect class="read" x="708" y="178" width="118" height="10" rx="5"/>
+  <circle class="mark somatic" cx="767" cy="183" r="4"/>
+  <rect class="read" x="708" y="191" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="196" r="4"/>
+  <rect class="read" x="708" y="204" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="209" r="4"/>
+  <rect class="read" x="708" y="217" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="222" r="4"/>
+  <rect class="read" x="708" y="230" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="235" r="4"/>
+  <rect class="read" x="708" y="243" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="248" r="4"/>
+  <rect class="read" x="708" y="256" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="261" r="4"/>
+  <rect class="read" x="708" y="269" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="767" cy="274" r="4"/>
+  <rect class="read" x="834" y="152" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="157" r="4"/>
+  <rect class="read" x="834" y="165" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="170" r="4"/>
+  <rect class="read" x="834" y="178" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="183" r="4"/>
+  <rect class="read" x="834" y="191" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="196" r="4"/>
+  <rect class="read" x="834" y="204" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="209" r="4"/>
+  <rect class="read" x="834" y="217" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="222" r="4"/>
+  <rect class="read" x="834" y="230" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="235" r="4"/>
+  <rect class="read" x="834" y="243" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="248" r="4"/>
+  <rect class="read" x="834" y="256" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="261" r="4"/>
+  <rect class="read" x="834" y="269" width="118" height="10" rx="5"/>
+  <circle class="mark ref" cx="893" cy="274" r="4"/>
+  <text class="tick zh" x="708" y="308">20 條 read，3 條帶變異</text>
+  <text class="anno bold mono somatic" x="708" y="338">VAF = 3 ÷ 20 = 0.15</text>
+
+  <rect class="box accent" x="708" y="356" width="256" height="104" rx="8"/>
+  <text class="anno bold zh" x="728" y="384">VAF 變異等位基因頻率</text>
+  <text class="tick zh" x="728" y="410">帶變異的 read ÷ 全部 read</text>
+  <text class="tick zh bold" x="728" y="436">唯一能直接數出來的一層</text>
+
+  <rect class="box warn" x="708" y="472" width="256" height="104" rx="8"/>
+  <text class="anno bold zh warn" x="728" y="500">read 不等於細胞</text>
+  <text class="tick zh" x="728" y="526">一條 read 是一個 DNA 分子</text>
+  <text class="tick zh" x="728" y="552">同一個細胞會給出很多條</text>
+
+  <path class="flow" d="M320,320 L344,320" marker-end="url(#arrow)"/>
+  <path class="flow" d="M656,320 L680,320" marker-end="url(#arrow)"/>
+
+  <!-- ══════════════ 結論：方向不對稱 ══════════════ -->
+  <line class="axis" x1="20" y1="616" x2="980" y2="616"/>
+  <text class="lbl bold zh" x="20" y="648">由上往下算，答案唯一；由下往上反推，答案不唯一。</text>
+  <text class="anno zh" x="20" y="678">腫瘤佔 0.6、其中一半帶突變、每個細胞 2 份裡有 1 份帶突變 → VAF 一定是 0.15。</text>
+  <text class="anno zh" x="20" y="706">但只拿到 VAF = 0.15 時，上面兩層有很多組合都能算出同一個數字。</text>
+</svg>

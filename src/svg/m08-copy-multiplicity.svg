@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
+  <title>copy number、multiplicity 與 ploidy 的差別，以及它們如何改變 VAF</title>
+  <desc>四格比較同一個位置在不同拷貝狀態下的樣子，四格都假設檢體全是腫瘤細胞且所有腫瘤細胞都帶有這個突變。
+        正常細胞：兩份，沒有突變。
+        腫瘤細胞情況一：兩份、突變佔一份，VAF 為二分之一。
+        腫瘤細胞情況二：帶突變的那一份被複製，變成三份、突變佔兩份，VAF 升為三分之二。
+        腫瘤細胞情況三：另一份整條遺失，只剩一份且帶突變，VAF 升到一，這就是 copy-loss LOH。
+        因此同一個突變在不同拷貝狀態下會給出完全不同的 VAF。
+        下半部說明 ploidy 與 copy number 的差別：
+        copy number 是某一段的份數，沿基因體會變動；ploidy 是把整個基因體的 copy number 平均起來的值。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">同一個突變，落在不同的拷貝狀態上，VAF 就不一樣</text>
+  <text class="tick zh" x="20" y="58">下面四格都假設：檢體全是腫瘤細胞，而且每個腫瘤細胞都帶有這個突變。差別只在拷貝狀態。</text>
+
+  <!-- ══════ A：正常細胞（對照） ══════ -->
+  <rect class="box plain" x="16" y="76" width="230" height="286" rx="10"/>
+  <text class="anno bold zh mid" x="131" y="106">正常細胞</text>
+
+  <g transform="translate(107,126) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark ref" cx="115" cy="150" r="5"/>
+  <g transform="translate(139,126) scale(0.8)">
+    <path class="chr hp2" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp2" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark ref" cx="147" cy="150" r="5"/>
+
+  <text class="tick mid mono" x="131" y="216">copy number = 2</text>
+  <text class="tick mid mono" x="131" y="242">multiplicity = 0</text>
+
+  <rect class="box plain" x="26" y="258" width="210" height="48" rx="8"/>
+  <text class="anno bold mid" x="131" y="288">VAF = 0</text>
+  <text class="tick mid zh" x="131" y="336">這個位置沒有突變</text>
+
+  <!-- ══════ B：CN 2 / mult 1 ══════ -->
+  <rect class="box plain" x="262" y="76" width="230" height="286" rx="10"/>
+  <text class="anno bold zh mid somatic" x="377" y="106">腫瘤細胞 ①</text>
+
+  <g transform="translate(353,126) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark somatic" cx="361" cy="150" r="5"/>
+  <g transform="translate(385,126) scale(0.8)">
+    <path class="chr hp2" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp2" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark ref" cx="393" cy="150" r="5"/>
+
+  <text class="tick mid mono" x="377" y="216">copy number = 2</text>
+  <text class="tick mid mono" x="377" y="242">multiplicity = 1</text>
+
+  <rect class="box accent" x="272" y="258" width="210" height="48" rx="8"/>
+  <text class="anno bold mid" x="377" y="288">VAF = 1 ÷ 2 = 0.50</text>
+  <text class="tick mid zh" x="377" y="336">最單純的情況</text>
+
+  <!-- ══════ C：CN 3 / mult 2 ══════ -->
+  <rect class="box plain" x="508" y="76" width="230" height="286" rx="10"/>
+  <text class="anno bold zh mid somatic" x="623" y="106">腫瘤細胞 ②</text>
+
+  <g transform="translate(583,126) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark somatic" cx="591" cy="150" r="5"/>
+  <g transform="translate(615,126) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark somatic" cx="623" cy="150" r="5"/>
+  <g transform="translate(647,126) scale(0.8)">
+    <path class="chr hp2" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp2" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark ref" cx="655" cy="150" r="5"/>
+
+  <text class="tick mid mono" x="623" y="216">copy number = 3</text>
+  <text class="tick mid mono" x="623" y="242">multiplicity = 2</text>
+
+  <rect class="box accent" x="518" y="258" width="210" height="48" rx="8"/>
+  <text class="anno bold mid" x="623" y="288">VAF = 2 ÷ 3 = 0.67</text>
+  <text class="tick mid zh" x="623" y="336">帶突變的那份被複製了</text>
+
+  <!-- ══════ D：CN 1 / mult 1（copy-loss LOH） ══════ -->
+  <rect class="box plain" x="754" y="76" width="230" height="286" rx="10"/>
+  <text class="anno bold zh mid somatic" x="869" y="106">腫瘤細胞 ③</text>
+
+  <g transform="translate(845,126) scale(0.8)">
+    <path class="chr hp1" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                             C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr hp1" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                             C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <circle class="mark somatic" cx="853" cy="150" r="5"/>
+  <g transform="translate(877,126) scale(0.8)">
+    <path class="chr lost" d="M10,2 C4,2 3,10 3,18 L3,34 C3,38 6,39 10,40
+                              C14,39 17,38 17,34 L17,18 C17,10 16,2 10,2 Z"/>
+    <path class="chr lost" d="M10,78 C4,78 3,70 3,62 L3,46 C3,42 6,41 10,40
+                              C14,41 17,42 17,46 L17,62 C17,70 16,78 10,78 Z"/>
+  </g>
+  <text class="tick mid zh" x="885" y="200">已遺失</text>
+
+  <text class="tick mid mono" x="869" y="216">copy number = 1</text>
+  <text class="tick mid mono" x="869" y="242">multiplicity = 1</text>
+
+  <rect class="box bad" x="764" y="258" width="210" height="48" rx="8"/>
+  <text class="anno bold mid bad" x="869" y="288">VAF = 1 ÷ 1 = 1.00</text>
+  <text class="tick mid zh" x="869" y="336">另一條整條掉了</text>
+
+  <!-- ══════ ploidy vs copy number ══════ -->
+  <line class="axis" x1="20" y1="386" x2="980" y2="386"/>
+  <text class="lbl bold zh" x="20" y="418">copy number 是「某一段」的份數；ploidy 是「整個基因體」的平均</text>
+  <text class="tick zh" x="40" y="444">沿著基因體看，每一段的 copy number 可能都不一樣：</text>
+
+  <!-- 沿基因體的拷貝數輪廓（高度 ∝ 拷貝數，一單位 12px，基線 y=520） -->
+  <rect class="bar" x="40"  y="496" width="300" height="24"/>
+  <rect class="bar" x="340" y="508" width="150" height="12"/>
+  <rect class="bar" x="490" y="484" width="200" height="36"/>
+  <rect class="bar" x="690" y="472" width="100" height="48"/>
+  <rect class="bar" x="790" y="496" width="150" height="24"/>
+  <line class="axis" x1="40" y1="520" x2="940" y2="520"/>
+
+  <text class="tick mid" x="190" y="540">2</text>
+  <text class="tick mid" x="415" y="540">1</text>
+  <text class="tick mid" x="590" y="540">3</text>
+  <text class="tick mid" x="740" y="540">4</text>
+  <text class="tick mid" x="865" y="540">2</text>
+  <text class="tick zh" x="40" y="562">← 基因體位置 →</text>
+
+  <text class="anno zh" x="40" y="596">把上面這條曲線沿長度平均起來 ≈ 2.3，這就是這個腫瘤的 ploidy（正常細胞是 2）。</text>
+</svg>

@@ -12,14 +12,57 @@
 <section data-part="why">
 <h2>為什麼重要</h2>
 
-<p class="prose">本節用於檢驗腫瘤資料分析中的常見假設；這些概念也常在研究文獻中被混用或誤解。</p>
+<p class="prose">到目前為止，「腫瘤樣本」在流程裡就是一袋 read。但那袋 read 來自<b>一堆混在一起的細胞</b>：
+有癌細胞，也有正常細胞；癌細胞之間彼此也不完全相同；而且同一個位置在不同細胞裡可能有不同的 DNA 份數。</p>
 
-<p class="prose">核心訊息是：<b>腫瘤資料中的觀測值通常同時受多項潛在因素影響。</b></p>
+<p class="prose">結果就是：<b>同一個觀測到的數字，可以由好幾種不同的細胞組成算出來。</b>
+所以這一章的第一件事，是把 purity、copy number、multiplicity、CCF 這幾個名詞各自「在數什麼」講清楚 ——
+它們常被混用，而混用會直接讓結論出錯。</p>
 </section>
 
 
 <section data-part="concept">
 <h2>概念與互動</h2>
+
+<h3>先把名詞跟「在數什麼」對起來</h3>
+
+<p class="prose">這些名詞看起來很多，但它們其實只做一件事：<b>在不同層級上數東西</b>。
+[[tumour purity|purity]] 與 [[cancer cell fraction|CCF]] 數的是<b>細胞</b>；
+[[copy number]] 與 [[mutation multiplicity|multiplicity]] 數的是<b>一個細胞裡有幾份 DNA</b>；
+[[VAF]] 數的是<b>read</b>。搞混它們，通常就是搞混了分母。</p>
+
+<p class="prose">下面用一個玩具檢體把三層對齊：10 個細胞，其中 6 個是腫瘤細胞，
+腫瘤細胞裡有 3 個帶著我們要看的那個突變，每個細胞在這個位置都有 2 份 DNA。</p>
+
+{{svg:m08-term-layers | [wide] 同一個檢體、同一個位置，三層各自的分子與分母。
+注意 purity 的分母是<b>所有細胞</b>，CCF 的分母<b>只有腫瘤細胞</b> —— 這是最常被互換的一對。
+最右邊那層是唯一能從資料直接數出來的：20 條 read 裡有 3 條帶變異，VAF = 0.15。}}
+
+<p class="prose">這張圖裡有兩件事值得停下來看。</p>
+
+<p class="prose">第一，<b>方向是不對稱的</b>。給定上面兩層，VAF 只有一個答案 ——
+腫瘤佔 0.6、其中一半帶突變、每個細胞 2 份裡帶 1 份，算出來就是 0.6 × 0.5 ÷ 2 = 0.15。
+但拿著 VAF = 0.15 往上反推，會有很多組合都成立。整章的難處都在這個不對稱上。</p>
+
+<p class="prose">第二，<b>read 不是細胞</b>。一條 read 是一個 DNA 分子，同一個細胞會貢獻很多條 read，
+而且哪一條 read 來自哪個細胞在 bulk 資料裡查不到。所以「數 read」永遠只是「數細胞」的間接代理。</p>
+
+<h3>copy number、multiplicity 與 ploidy：一個位置有幾份</h3>
+
+<p class="prose">中間那層最容易被跳過，但它是後面所有推論的地基。三個詞的差別很小、影響很大：
+<b>copy number</b> 是「這一段在一個細胞裡有幾份」，<b>multiplicity</b> 是「其中幾份帶著這個突變」，
+[[ploidy]] 是「把整個基因體的 copy number 平均起來」。</p>
+
+<p class="prose">為什麼要分這麼細？因為同一個突變、同樣「每個腫瘤細胞都有」，
+只要拷貝狀態不同，VAF 就完全不同：</p>
+
+{{svg:m08-copy-multiplicity | [wide] 四格都假設檢體全是腫瘤細胞、而且每個細胞都帶有這個突變 ——
+唯一的差別是拷貝狀態。VAF 從 0.50 變成 0.67 或 1.00，不是因為突變變多了，
+是因為它所在的那份 DNA 被複製了，或另一份被丟掉了（那正是 copy-loss [[LOH]]）。
+下半部區分 copy number（某一段的份數）與 ploidy（整個基因體的平均）。}}
+
+<p class="prose">把「腫瘤細胞佔多少」「一個細胞有幾份」「突變佔幾份」「多少腫瘤細胞帶著它」四件事寫進同一個式子，
+就是下一節的關係式。</p>
 
 <h3>VAF 的完整關係式</h3>
 
@@ -104,7 +147,14 @@
 
 <h3>低 purity 對 somatic variant detection 的影響</h3>
 
-<p class="prose">以下以數值示例說明：50× coverage、purity 0.2，以及一個 clonal 的 diploid somatic 變異：</p>
+<p class="prose">回到最上面那一層。purity 低的時候，突變本身沒有變少，但它在整池 DNA 裡被稀釋，
+落到 read 上就只剩幾條支持：</p>
+
+{{svg:m08-purity-ladder | [wide] 同一個 clonal 變異、同樣每個腫瘤細胞 2 份裡帶 1 份，
+只有腫瘤細胞比例不同。VAF 恰好是 purity 的一半，換到 50× 覆蓋度上就是 5、10、15、20、25 條支持 read。
+最左邊被標出來的原因見下方說明。}}
+
+<p class="prose">以下把最左邊那一格算清楚：50× coverage、purity 0.2，以及一個 clonal 的 diploid somatic 變異：</p>
 
 <pre><code>預期 VAF   = 0.2 × 1 ÷ (0.2×2 + 0.8×2) = 0.10
 支持 read 數 = 50 × 0.10 = 5 條</code></pre>

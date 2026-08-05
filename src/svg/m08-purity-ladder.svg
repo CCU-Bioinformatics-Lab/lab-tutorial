@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 550">
+  <title>tumor purity 越低，同一個突變在 read 上的訊號越淡</title>
+  <desc>五個檢體帶有同一個 clonal、diploid 的 somatic 變異，每個腫瘤細胞在這個位置的兩份 DNA 中有一份帶突變，
+        差別只在腫瘤細胞佔的比例。
+        由左到右腫瘤細胞比例為五分之一到五分之五，對應的 VAF 依序為 0.10、0.20、0.30、0.40、0.50。
+        在十條 read 的示意圖中，帶變異的 read 數依序為一到五條。
+        換算到 50 倍覆蓋度，期望的支持 read 數依序為 5、10、15、20、25 條。
+        最左側以紅色底標示：purity 0.2 時只期望看到約五條支持 read，
+        與隨機定序錯誤偶然湊出的支持數量同一個量級，因此過濾參數必須隨 purity 調整。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">purity 越低，同一個突變在 read 上的訊號就越淡</text>
+  <text class="tick zh" x="20" y="58">五個檢體帶有同一個 clonal 變異（腫瘤細胞的 2 份裡有 1 份帶突變），只有腫瘤細胞的比例不同。</text>
+
+  <!-- ══ purity 0.2 ══ -->
+  <rect class="box bad" x="36" y="76" width="160" height="340" rx="10"/>
+  <text class="anno bold mid" x="116" y="106">purity 0.2</text>
+  <circle class="cell tumor" cx="88" cy="150" r="13"/><circle class="nucleus" cx="88" cy="150" r="6"/>
+  <circle class="cell normal" cx="116" cy="150" r="13"/><circle class="nucleus" cx="116" cy="150" r="6"/>
+  <circle class="cell normal" cx="144" cy="150" r="13"/><circle class="nucleus" cx="144" cy="150" r="6"/>
+  <circle class="cell normal" cx="102" cy="124" r="13"/><circle class="nucleus" cx="102" cy="124" r="6"/>
+  <circle class="cell normal" cx="130" cy="124" r="13"/><circle class="nucleus" cx="130" cy="124" r="6"/>
+  <text class="tick mid zh" x="116" y="182">腫瘤 1 / 5 個</text>
+  <rect class="read" x="56" y="194" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="116" cy="199" r="4"/>
+  <rect class="read" x="56" y="207" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="212" r="4"/>
+  <rect class="read" x="56" y="220" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="225" r="4"/>
+  <rect class="read" x="56" y="233" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="238" r="4"/>
+  <rect class="read" x="56" y="246" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="251" r="4"/>
+  <rect class="read" x="56" y="259" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="264" r="4"/>
+  <rect class="read" x="56" y="272" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="277" r="4"/>
+  <rect class="read" x="56" y="285" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="290" r="4"/>
+  <rect class="read" x="56" y="298" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="303" r="4"/>
+  <rect class="read" x="56" y="311" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="116" cy="316" r="4"/>
+  <text class="tick mid zh" x="116" y="338">帶變異 1 / 10 條</text>
+  <text class="anno bold mid mono somatic" x="116" y="366">VAF 0.10</text>
+  <text class="tick mid zh" x="116" y="398">50× 下約 5 條</text>
+
+  <!-- ══ purity 0.4 ══ -->
+  <rect class="box plain" x="228" y="76" width="160" height="340" rx="10"/>
+  <text class="anno bold mid" x="308" y="106">purity 0.4</text>
+  <circle class="cell tumor" cx="280" cy="150" r="13"/><circle class="nucleus" cx="280" cy="150" r="6"/>
+  <circle class="cell tumor" cx="308" cy="150" r="13"/><circle class="nucleus" cx="308" cy="150" r="6"/>
+  <circle class="cell normal" cx="336" cy="150" r="13"/><circle class="nucleus" cx="336" cy="150" r="6"/>
+  <circle class="cell normal" cx="294" cy="124" r="13"/><circle class="nucleus" cx="294" cy="124" r="6"/>
+  <circle class="cell normal" cx="322" cy="124" r="13"/><circle class="nucleus" cx="322" cy="124" r="6"/>
+  <text class="tick mid zh" x="308" y="182">腫瘤 2 / 5 個</text>
+  <rect class="read" x="248" y="194" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="308" cy="199" r="4"/>
+  <rect class="read" x="248" y="207" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="308" cy="212" r="4"/>
+  <rect class="read" x="248" y="220" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="225" r="4"/>
+  <rect class="read" x="248" y="233" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="238" r="4"/>
+  <rect class="read" x="248" y="246" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="251" r="4"/>
+  <rect class="read" x="248" y="259" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="264" r="4"/>
+  <rect class="read" x="248" y="272" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="277" r="4"/>
+  <rect class="read" x="248" y="285" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="290" r="4"/>
+  <rect class="read" x="248" y="298" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="303" r="4"/>
+  <rect class="read" x="248" y="311" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="308" cy="316" r="4"/>
+  <text class="tick mid zh" x="308" y="338">帶變異 2 / 10 條</text>
+  <text class="anno bold mid mono somatic" x="308" y="366">VAF 0.20</text>
+  <text class="tick mid zh" x="308" y="398">50× 下約 10 條</text>
+
+  <!-- ══ purity 0.6 ══ -->
+  <rect class="box plain" x="420" y="76" width="160" height="340" rx="10"/>
+  <text class="anno bold mid" x="500" y="106">purity 0.6</text>
+  <circle class="cell tumor" cx="472" cy="150" r="13"/><circle class="nucleus" cx="472" cy="150" r="6"/>
+  <circle class="cell tumor" cx="500" cy="150" r="13"/><circle class="nucleus" cx="500" cy="150" r="6"/>
+  <circle class="cell tumor" cx="528" cy="150" r="13"/><circle class="nucleus" cx="528" cy="150" r="6"/>
+  <circle class="cell normal" cx="486" cy="124" r="13"/><circle class="nucleus" cx="486" cy="124" r="6"/>
+  <circle class="cell normal" cx="514" cy="124" r="13"/><circle class="nucleus" cx="514" cy="124" r="6"/>
+  <text class="tick mid zh" x="500" y="182">腫瘤 3 / 5 個</text>
+  <rect class="read" x="440" y="194" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="500" cy="199" r="4"/>
+  <rect class="read" x="440" y="207" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="500" cy="212" r="4"/>
+  <rect class="read" x="440" y="220" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="500" cy="225" r="4"/>
+  <rect class="read" x="440" y="233" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="238" r="4"/>
+  <rect class="read" x="440" y="246" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="251" r="4"/>
+  <rect class="read" x="440" y="259" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="264" r="4"/>
+  <rect class="read" x="440" y="272" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="277" r="4"/>
+  <rect class="read" x="440" y="285" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="290" r="4"/>
+  <rect class="read" x="440" y="298" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="303" r="4"/>
+  <rect class="read" x="440" y="311" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="500" cy="316" r="4"/>
+  <text class="tick mid zh" x="500" y="338">帶變異 3 / 10 條</text>
+  <text class="anno bold mid mono somatic" x="500" y="366">VAF 0.30</text>
+  <text class="tick mid zh" x="500" y="398">50× 下約 15 條</text>
+
+  <!-- ══ purity 0.8 ══ -->
+  <rect class="box plain" x="612" y="76" width="160" height="340" rx="10"/>
+  <text class="anno bold mid" x="692" y="106">purity 0.8</text>
+  <circle class="cell tumor" cx="664" cy="150" r="13"/><circle class="nucleus" cx="664" cy="150" r="6"/>
+  <circle class="cell tumor" cx="692" cy="150" r="13"/><circle class="nucleus" cx="692" cy="150" r="6"/>
+  <circle class="cell tumor" cx="720" cy="150" r="13"/><circle class="nucleus" cx="720" cy="150" r="6"/>
+  <circle class="cell tumor" cx="678" cy="124" r="13"/><circle class="nucleus" cx="678" cy="124" r="6"/>
+  <circle class="cell normal" cx="706" cy="124" r="13"/><circle class="nucleus" cx="706" cy="124" r="6"/>
+  <text class="tick mid zh" x="692" y="182">腫瘤 4 / 5 個</text>
+  <rect class="read" x="632" y="194" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="692" cy="199" r="4"/>
+  <rect class="read" x="632" y="207" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="692" cy="212" r="4"/>
+  <rect class="read" x="632" y="220" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="692" cy="225" r="4"/>
+  <rect class="read" x="632" y="233" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="692" cy="238" r="4"/>
+  <rect class="read" x="632" y="246" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="692" cy="251" r="4"/>
+  <rect class="read" x="632" y="259" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="692" cy="264" r="4"/>
+  <rect class="read" x="632" y="272" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="692" cy="277" r="4"/>
+  <rect class="read" x="632" y="285" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="692" cy="290" r="4"/>
+  <rect class="read" x="632" y="298" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="692" cy="303" r="4"/>
+  <rect class="read" x="632" y="311" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="692" cy="316" r="4"/>
+  <text class="tick mid zh" x="692" y="338">帶變異 4 / 10 條</text>
+  <text class="anno bold mid mono somatic" x="692" y="366">VAF 0.40</text>
+  <text class="tick mid zh" x="692" y="398">50× 下約 20 條</text>
+
+  <!-- ══ purity 1.0 ══ -->
+  <rect class="box plain" x="804" y="76" width="160" height="340" rx="10"/>
+  <text class="anno bold mid" x="884" y="106">purity 1.0</text>
+  <circle class="cell tumor" cx="856" cy="150" r="13"/><circle class="nucleus" cx="856" cy="150" r="6"/>
+  <circle class="cell tumor" cx="884" cy="150" r="13"/><circle class="nucleus" cx="884" cy="150" r="6"/>
+  <circle class="cell tumor" cx="912" cy="150" r="13"/><circle class="nucleus" cx="912" cy="150" r="6"/>
+  <circle class="cell tumor" cx="870" cy="124" r="13"/><circle class="nucleus" cx="870" cy="124" r="6"/>
+  <circle class="cell tumor" cx="898" cy="124" r="13"/><circle class="nucleus" cx="898" cy="124" r="6"/>
+  <text class="tick mid zh" x="884" y="182">腫瘤 5 / 5 個</text>
+  <rect class="read" x="824" y="194" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="884" cy="199" r="4"/>
+  <rect class="read" x="824" y="207" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="884" cy="212" r="4"/>
+  <rect class="read" x="824" y="220" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="884" cy="225" r="4"/>
+  <rect class="read" x="824" y="233" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="884" cy="238" r="4"/>
+  <rect class="read" x="824" y="246" width="120" height="10" rx="5"/>
+  <circle class="mark somatic" cx="884" cy="251" r="4"/>
+  <rect class="read" x="824" y="259" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="884" cy="264" r="4"/>
+  <rect class="read" x="824" y="272" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="884" cy="277" r="4"/>
+  <rect class="read" x="824" y="285" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="884" cy="290" r="4"/>
+  <rect class="read" x="824" y="298" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="884" cy="303" r="4"/>
+  <rect class="read" x="824" y="311" width="120" height="10" rx="5"/>
+  <circle class="mark ref" cx="884" cy="316" r="4"/>
+  <text class="tick mid zh" x="884" y="338">帶變異 5 / 10 條</text>
+  <text class="anno bold mid mono somatic" x="884" y="366">VAF 0.50</text>
+  <text class="tick mid zh" x="884" y="398">50× 下約 25 條</text>
+
+  <line class="axis" x1="20" y1="430" x2="980" y2="430"/>
+  <text class="lbl bold zh" x="20" y="462">低 purity 的難處不是訊號消失，是訊號縮到跟定序錯誤同一個量級</text>
+  <text class="anno zh" x="20" y="492">purity 0.2 時，50× 覆蓋度上只期望看到 5 條支持 read（上圖最左欄）。</text>
+  <text class="anno zh" x="20" y="520">隨機錯誤在同一個位置湊出 5 條的機會並不低 —— 這就是過濾參數必須跟著 purity 調整的原因。</text>
+</svg>
