@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 486">
+  <title>甲基化資料在程式裡的形狀：read × CpG 的 0／1 表</title>
+  <desc>左：一個區域內的六條 read，每條 read 在五個 CpG 位點上各有一個甲基化狀態，
+        實心表示已甲基化、空心表示未甲基化。
+        中：同一份資料寫成矩陣，列是 read、欄是 CpG 位點，實心記為 1、空心記為 0。
+        右：把每條 read 看成一個 0／1 向量後，可以計算兩條 read 之間的差異，
+        得到 read 對 read 的距離矩陣，再用一般的階層式分群把 read 分成兩群。
+        本圖說明後面兩種用法共用同一份資料形狀，
+        而分群這一步是純粹的向量距離計算，與基因體座標無關。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">在程式裡，甲基化就是一張 0／1 表</text>
+  <text class="tick zh" x="20" y="58">一列是一條 read，一欄是一個 CpG 位點。實心＝已甲基化（1），空心＝未甲基化（0）。</text>
+
+  <!-- ① 定序資料 -->
+  <rect class="box plain" x="16" y="76" width="300" height="284" rx="10"/>
+  <text class="anno bold zh mid" x="166" y="106">① read 上的甲基化</text>
+  <text class="tick mid mono" x="70" y="132">C1</text>
+  <text class="tick mid mono" x="115" y="132">C2</text>
+  <text class="tick mid mono" x="160" y="132">C3</text>
+  <text class="tick mid mono" x="205" y="132">C4</text>
+  <text class="tick mid mono" x="250" y="132">C5</text>
+  <text class="tick end mono" x="44" y="149">R1</text>
+  <rect class="read" x="50" y="140" width="220" height="11" rx="5.5"/>
+  <circle class="cpg met" cx="70" cy="158" r="5"/>
+  <circle class="cpg met" cx="115" cy="158" r="5"/>
+  <circle class="cpg met" cx="160" cy="158" r="5"/>
+  <circle class="cpg unmet" cx="205" cy="158" r="5"/>
+  <circle class="cpg met" cx="250" cy="158" r="5"/>
+  <text class="tick end mono" x="44" y="179">R2</text>
+  <rect class="read" x="50" y="170" width="220" height="11" rx="5.5"/>
+  <circle class="cpg met" cx="70" cy="188" r="5"/>
+  <circle class="cpg met" cx="115" cy="188" r="5"/>
+  <circle class="cpg met" cx="160" cy="188" r="5"/>
+  <circle class="cpg met" cx="205" cy="188" r="5"/>
+  <circle class="cpg met" cx="250" cy="188" r="5"/>
+  <text class="tick end mono" x="44" y="209">R3</text>
+  <rect class="read" x="50" y="200" width="220" height="11" rx="5.5"/>
+  <circle class="cpg met" cx="70" cy="218" r="5"/>
+  <circle class="cpg unmet" cx="115" cy="218" r="5"/>
+  <circle class="cpg met" cx="160" cy="218" r="5"/>
+  <circle class="cpg met" cx="205" cy="218" r="5"/>
+  <circle class="cpg met" cx="250" cy="218" r="5"/>
+  <text class="tick end mono" x="44" y="239">R4</text>
+  <rect class="read" x="50" y="230" width="220" height="11" rx="5.5"/>
+  <circle class="cpg unmet" cx="70" cy="248" r="5"/>
+  <circle class="cpg unmet" cx="115" cy="248" r="5"/>
+  <circle class="cpg met" cx="160" cy="248" r="5"/>
+  <circle class="cpg unmet" cx="205" cy="248" r="5"/>
+  <circle class="cpg unmet" cx="250" cy="248" r="5"/>
+  <text class="tick end mono" x="44" y="269">R5</text>
+  <rect class="read" x="50" y="260" width="220" height="11" rx="5.5"/>
+  <circle class="cpg unmet" cx="70" cy="278" r="5"/>
+  <circle class="cpg unmet" cx="115" cy="278" r="5"/>
+  <circle class="cpg unmet" cx="160" cy="278" r="5"/>
+  <circle class="cpg met" cx="205" cy="278" r="5"/>
+  <circle class="cpg unmet" cx="250" cy="278" r="5"/>
+  <text class="tick end mono" x="44" y="299">R6</text>
+  <rect class="read" x="50" y="290" width="220" height="11" rx="5.5"/>
+  <circle class="cpg unmet" cx="70" cy="308" r="5"/>
+  <circle class="cpg unmet" cx="115" cy="308" r="5"/>
+  <circle class="cpg unmet" cx="160" cy="308" r="5"/>
+  <circle class="cpg unmet" cx="205" cy="308" r="5"/>
+  <circle class="cpg met" cx="250" cy="308" r="5"/>
+  <text class="tick zh" x="36" y="336">6 條 read × 5 個 CpG（點在 read 下方）</text>
+
+  <!-- ② 寫成矩陣 -->
+  <rect class="box plain" x="352" y="76" width="300" height="284" rx="10"/>
+  <text class="anno bold zh mid" x="502" y="106">② 寫成 0／1 矩陣</text>
+  <text class="tick mid mono" x="425" y="132">C1</text>
+  <text class="tick mid mono" x="461" y="132">C2</text>
+  <text class="tick mid mono" x="497" y="132">C3</text>
+  <text class="tick mid mono" x="533" y="132">C4</text>
+  <text class="tick mid mono" x="569" y="132">C5</text>
+  <text class="tick end mono" x="404" y="156">R1</text>
+  <rect class="box accent" x="410" y="140" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="425" y="156">1</text>
+  <rect class="box accent" x="446" y="140" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="461" y="156">1</text>
+  <rect class="box accent" x="482" y="140" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="497" y="156">1</text>
+  <rect class="box plain" x="518" y="140" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="533" y="156">0</text>
+  <rect class="box accent" x="554" y="140" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="569" y="156">1</text>
+  <text class="tick end mono" x="404" y="182">R2</text>
+  <rect class="box accent" x="410" y="166" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="425" y="182">1</text>
+  <rect class="box accent" x="446" y="166" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="461" y="182">1</text>
+  <rect class="box accent" x="482" y="166" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="497" y="182">1</text>
+  <rect class="box accent" x="518" y="166" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="533" y="182">1</text>
+  <rect class="box accent" x="554" y="166" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="569" y="182">1</text>
+  <text class="tick end mono" x="404" y="208">R3</text>
+  <rect class="box accent" x="410" y="192" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="425" y="208">1</text>
+  <rect class="box plain" x="446" y="192" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="461" y="208">0</text>
+  <rect class="box accent" x="482" y="192" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="497" y="208">1</text>
+  <rect class="box accent" x="518" y="192" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="533" y="208">1</text>
+  <rect class="box accent" x="554" y="192" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="569" y="208">1</text>
+  <text class="tick end mono" x="404" y="234">R4</text>
+  <rect class="box plain" x="410" y="218" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="425" y="234">0</text>
+  <rect class="box plain" x="446" y="218" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="461" y="234">0</text>
+  <rect class="box accent" x="482" y="218" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="497" y="234">1</text>
+  <rect class="box plain" x="518" y="218" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="533" y="234">0</text>
+  <rect class="box plain" x="554" y="218" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="569" y="234">0</text>
+  <text class="tick end mono" x="404" y="260">R5</text>
+  <rect class="box plain" x="410" y="244" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="425" y="260">0</text>
+  <rect class="box plain" x="446" y="244" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="461" y="260">0</text>
+  <rect class="box plain" x="482" y="244" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="497" y="260">0</text>
+  <rect class="box accent" x="518" y="244" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="533" y="260">1</text>
+  <rect class="box plain" x="554" y="244" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="569" y="260">0</text>
+  <text class="tick end mono" x="404" y="286">R6</text>
+  <rect class="box plain" x="410" y="270" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="425" y="286">0</text>
+  <rect class="box plain" x="446" y="270" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="461" y="286">0</text>
+  <rect class="box plain" x="482" y="270" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="497" y="286">0</text>
+  <rect class="box plain" x="518" y="270" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="533" y="286">0</text>
+  <rect class="box accent" x="554" y="270" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="569" y="286">1</text>
+  <text class="tick zh" x="372" y="336">到這一步已經跟基因體座標無關</text>
+
+  <!-- ③ read 間距離 → 分群 -->
+  <rect class="box plain" x="688" y="76" width="296" height="284" rx="10"/>
+  <text class="anno bold zh mid" x="836" y="106">③ 算距離、分群</text>
+  <text class="tick mid mono" x="762" y="140" style="font-size:12px">R1</text>
+  <text class="tick mid mono" x="786" y="140" style="font-size:12px">R2</text>
+  <text class="tick mid mono" x="810" y="140" style="font-size:12px">R3</text>
+  <text class="tick mid mono" x="834" y="140" style="font-size:12px">R4</text>
+  <text class="tick mid mono" x="858" y="140" style="font-size:12px">R5</text>
+  <text class="tick mid mono" x="882" y="140" style="font-size:12px">R6</text>
+  <text class="tick end mono" x="748" y="162" style="font-size:12px">R1</text>
+  <rect class="cellv" x="751" y="146" width="22" height="22" fill-opacity="0.00"/>
+  <rect class="cellv" x="775" y="146" width="22" height="22" fill-opacity="0.20"/>
+  <rect class="cellv" x="799" y="146" width="22" height="22" fill-opacity="0.20"/>
+  <rect class="cellv" x="823" y="146" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="847" y="146" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="871" y="146" width="22" height="22" fill-opacity="0.80"/>
+  <text class="tick end mono" x="748" y="186" style="font-size:12px">R2</text>
+  <rect class="cellv" x="751" y="170" width="22" height="22" fill-opacity="0.20"/>
+  <rect class="cellv" x="775" y="170" width="22" height="22" fill-opacity="0.00"/>
+  <rect class="cellv" x="799" y="170" width="22" height="22" fill-opacity="0.40"/>
+  <rect class="cellv" x="823" y="170" width="22" height="22" fill-opacity="0.90"/>
+  <rect class="cellv" x="847" y="170" width="22" height="22" fill-opacity="0.90"/>
+  <rect class="cellv" x="871" y="170" width="22" height="22" fill-opacity="0.90"/>
+  <text class="tick end mono" x="748" y="210" style="font-size:12px">R3</text>
+  <rect class="cellv" x="751" y="194" width="22" height="22" fill-opacity="0.20"/>
+  <rect class="cellv" x="775" y="194" width="22" height="22" fill-opacity="0.40"/>
+  <rect class="cellv" x="799" y="194" width="22" height="22" fill-opacity="0.00"/>
+  <rect class="cellv" x="823" y="194" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="847" y="194" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="871" y="194" width="22" height="22" fill-opacity="0.70"/>
+  <text class="tick end mono" x="748" y="234" style="font-size:12px">R4</text>
+  <rect class="cellv" x="751" y="218" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="775" y="218" width="22" height="22" fill-opacity="0.90"/>
+  <rect class="cellv" x="799" y="218" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="823" y="218" width="22" height="22" fill-opacity="0.00"/>
+  <rect class="cellv" x="847" y="218" width="22" height="22" fill-opacity="0.30"/>
+  <rect class="cellv" x="871" y="218" width="22" height="22" fill-opacity="0.30"/>
+  <text class="tick end mono" x="748" y="258" style="font-size:12px">R5</text>
+  <rect class="cellv" x="751" y="242" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="775" y="242" width="22" height="22" fill-opacity="0.90"/>
+  <rect class="cellv" x="799" y="242" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="823" y="242" width="22" height="22" fill-opacity="0.30"/>
+  <rect class="cellv" x="847" y="242" width="22" height="22" fill-opacity="0.00"/>
+  <rect class="cellv" x="871" y="242" width="22" height="22" fill-opacity="0.20"/>
+  <text class="tick end mono" x="748" y="282" style="font-size:12px">R6</text>
+  <rect class="cellv" x="751" y="266" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="775" y="266" width="22" height="22" fill-opacity="0.90"/>
+  <rect class="cellv" x="799" y="266" width="22" height="22" fill-opacity="0.70"/>
+  <rect class="cellv" x="823" y="266" width="22" height="22" fill-opacity="0.30"/>
+  <rect class="cellv" x="847" y="266" width="22" height="22" fill-opacity="0.20"/>
+  <rect class="cellv" x="871" y="266" width="22" height="22" fill-opacity="0.00"/>
+  <path class="axis" d="M708,148 L708,214"/>
+  <path class="axis" d="M708,220 L708,286"/>
+  <text class="tick zh" x="708" y="312">群 1：R1 R2 R3</text>
+  <text class="tick zh" x="708" y="334">群 2：R4 R5 R6</text>
+
+  <path class="flow" d="M322,214 L346,214" marker-end="url(#arrow)"/>
+  <path class="flow" d="M658,214 L682,214" marker-end="url(#arrow)"/>
+
+  <line class="axis" x1="20" y1="386" x2="980" y2="386"/>
+  <text class="lbl bold zh" x="20" y="418">後面兩種用法，用的都是這張表。</text>
+  <text class="anno zh" x="20" y="448">兩條 read 的距離＝兩個 0／1 向量的差異；分群用一般的階層式方法，這一步不需要任何生物學。</text>
+  <text class="anno zh" x="20" y="476">差別只在：<tspan class="bold">分出來的群要拿去做什麼</tspan>。</text>
+</svg>

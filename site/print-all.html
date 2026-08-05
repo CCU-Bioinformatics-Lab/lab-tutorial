@@ -5775,11 +5775,13 @@ bcftools view -H -g het sample.vcf | awk '{print $1, int($2/1000000)}' | \
 <section data-part="why" class="part" id="m09__part-why">
 <h2 data-num="①" id="m09__為什麼重要">為什麼重要</h2>
 
-<p class="prose">甲基化是本實驗室兩項分析任務的共同資料層；以下補充理解這些任務所需的背景。</p>
+<p class="prose">一條 ONT read 除了序列，還帶著一串「這個 C 有沒有被加上甲基」的紀錄。
+這件事的用處不只是「多一種資料」：<b>同一群細胞的甲基化模式會比較像</b>，
+所以甲基化其實是一個關於「這條 read 來自哪一群細胞」的線索 —— 而 bulk 資料本來查不到這件事。</p>
 
-<p class="prose">更重要的是：這兩項任務<b>使用甲基化的方式不同</b> ——
-一個把它當成判斷依據，另一個刻意不讓它影響判斷。
-若未區分兩種角色，學習者可能混淆分析流程並產生循環論證。</p>
+<p class="prose">實驗室有兩個題目用到這個線索，但<b>用法剛好相反</b>：
+一個把它當成判斷依據（會影響結果），另一個刻意不讓它影響判斷（只當事後註記）。
+這一章先講清楚兩個題目各自在做什麼，再談為什麼其中一個要刻意不用。</p>
 </section>
 
 
@@ -5893,34 +5895,552 @@ bcftools view -H -g het sample.vcf | awk '{print $1, int($2/1000000)}' | \
   <text class="anno zh bold" x="20" y="392">序列與修飾資訊可在同一分子上配對，便能比較帶有與不帶有變異的分子之甲基化模式。</text>
 </svg><figcaption>上方區分序列與甲基化資訊；示意中的修飾標記位於 C 後接 G 的 CpG 位點，且不改變序列字母。下方示範同一分子可同時關聯變異與修飾狀態。</figcaption></figure>
 
-<h3 id="m09__甲基化資訊的儲存方式">甲基化資訊的儲存方式</h3>
+<h3 id="m09__這些資料在程式裡是什麼形狀">這些資料在程式裡是什麼形狀</h3>
 
-<p class="prose">甲基化資訊存在 BAM 的兩個 tag 裡：</p>
+<p class="prose">先把資料結構看清楚，後面兩種用法就都好懂了。
+一條 read 在一個區域內會經過好幾個 CpG 位點，每個位點上它是 methylated 或 unmethylated ——
+所以<b>一條 read 就是一個 0／1 向量</b>，一個區域就是一張 read × CpG 的表。</p>
 
-<div class="table-wrap">
-<table>
-<thead><tr><th>tag</th><th>內容</th></tr></thead>
-<tbody>
-<tr><td><code><span class="term" data-term="MM/ML tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="m09__gd-mm-ml-tag-3">MM<span class="term__pop" id="m09__gd-mm-ml-tag-3" role="tooltip"><b class="term__hd">MM/ML tag</b><span class="term__def" data-lang="zh">BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。</span><span class="term__def" data-lang="en">BAM tags carrying per-read methylation calls: MM for positions, ML for probabilities. Easily lost during processing.</span><a class="term__more" href="glossary.html#mm-ml-tag">完整條目 →</a></span></span></code></td><td>修飾類型及其相對於 read 上標準鹼基的位置與跳過規則</td></tr>
-<tr><td><code>ML</code></td><td>與 MM 項目對應的修飾機率或信心，以 0–255 的位元組值編碼</td></tr>
-</tbody>
-</table>
-</div>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 486" class="dia-svg" role="img">
+  <title>甲基化資料在程式裡的形狀：read × CpG 的 0／1 表</title>
+  <desc>左：一個區域內的六條 read，每條 read 在五個 CpG 位點上各有一個甲基化狀態，
+        實心表示已甲基化、空心表示未甲基化。
+        中：同一份資料寫成矩陣，列是 read、欄是 CpG 位點，實心記為 1、空心記為 0。
+        右：把每條 read 看成一個 0／1 向量後，可以計算兩條 read 之間的差異，
+        得到 read 對 read 的距離矩陣，再用一般的階層式分群把 read 分成兩群。
+        本圖說明後面兩種用法共用同一份資料形狀，
+        而分群這一步是純粹的向量距離計算，與基因體座標無關。</desc>
 
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd">重新比對可能遺失 MM/ML 標籤</p>
-<p class="prose">若未明確傳遞 SAM tags，將帶有甲基化的 BAM 轉成 FASTQ 再重新比對時，通常不會保留 MM/ML。
-結果可能是格式正常、但修飾欄位空白的 BAM；工具是否發出警告取決於實作與版本。</p>
-<p class="prose">在以下 samtools→minimap2 流程中，需同時保留 tags 並啟用相應選項：</p>
-<pre><code>samtools fastq -T '*' methylcall.raw.bam &gt; raw.fastq
-minimap2 -ax map-ont -y reference.fasta raw.fastq</code></pre>
-<p class="prose"><code>-T '*'</code> 將 tags 帶入 FASTQ comment，<code>-y</code> 讓 minimap2 將其寫回 BAM。
-請確認工具版本及 FASTQ comment 未被其他步驟改寫；缺少 tags 時，後續需要 MM/ML 的分析將無法取得修飾資訊。</p>
-</div>
+  <text class="lbl bold zh" x="20" y="32">在程式裡，甲基化就是一張 0／1 表</text>
+  <text class="tick zh" x="20" y="58">一列是一條 read，一欄是一個 CpG 位點。實心＝已甲基化（1），空心＝未甲基化（0）。</text>
 
-<h3 id="m09__甲基化的兩種分析角色">甲基化的兩種分析角色</h3>
+  <!-- ① 定序資料 -->
+  <rect class="box plain" x="16" y="76" width="300" height="284" rx="10"/>
+  <text class="anno bold zh mid" x="166" y="106">① read 上的甲基化</text>
+  <text class="tick mid mono" x="70" y="132">C1</text>
+  <text class="tick mid mono" x="115" y="132">C2</text>
+  <text class="tick mid mono" x="160" y="132">C3</text>
+  <text class="tick mid mono" x="205" y="132">C4</text>
+  <text class="tick mid mono" x="250" y="132">C5</text>
+  <text class="tick end mono" x="44" y="149">R1</text>
+  <rect class="read" x="50" y="140" width="220" height="11" rx="5.5"/>
+  <circle class="cpg met" cx="70" cy="158" r="5"/>
+  <circle class="cpg met" cx="115" cy="158" r="5"/>
+  <circle class="cpg met" cx="160" cy="158" r="5"/>
+  <circle class="cpg unmet" cx="205" cy="158" r="5"/>
+  <circle class="cpg met" cx="250" cy="158" r="5"/>
+  <text class="tick end mono" x="44" y="179">R2</text>
+  <rect class="read" x="50" y="170" width="220" height="11" rx="5.5"/>
+  <circle class="cpg met" cx="70" cy="188" r="5"/>
+  <circle class="cpg met" cx="115" cy="188" r="5"/>
+  <circle class="cpg met" cx="160" cy="188" r="5"/>
+  <circle class="cpg met" cx="205" cy="188" r="5"/>
+  <circle class="cpg met" cx="250" cy="188" r="5"/>
+  <text class="tick end mono" x="44" y="209">R3</text>
+  <rect class="read" x="50" y="200" width="220" height="11" rx="5.5"/>
+  <circle class="cpg met" cx="70" cy="218" r="5"/>
+  <circle class="cpg unmet" cx="115" cy="218" r="5"/>
+  <circle class="cpg met" cx="160" cy="218" r="5"/>
+  <circle class="cpg met" cx="205" cy="218" r="5"/>
+  <circle class="cpg met" cx="250" cy="218" r="5"/>
+  <text class="tick end mono" x="44" y="239">R4</text>
+  <rect class="read" x="50" y="230" width="220" height="11" rx="5.5"/>
+  <circle class="cpg unmet" cx="70" cy="248" r="5"/>
+  <circle class="cpg unmet" cx="115" cy="248" r="5"/>
+  <circle class="cpg met" cx="160" cy="248" r="5"/>
+  <circle class="cpg unmet" cx="205" cy="248" r="5"/>
+  <circle class="cpg unmet" cx="250" cy="248" r="5"/>
+  <text class="tick end mono" x="44" y="269">R5</text>
+  <rect class="read" x="50" y="260" width="220" height="11" rx="5.5"/>
+  <circle class="cpg unmet" cx="70" cy="278" r="5"/>
+  <circle class="cpg unmet" cx="115" cy="278" r="5"/>
+  <circle class="cpg unmet" cx="160" cy="278" r="5"/>
+  <circle class="cpg met" cx="205" cy="278" r="5"/>
+  <circle class="cpg unmet" cx="250" cy="278" r="5"/>
+  <text class="tick end mono" x="44" y="299">R6</text>
+  <rect class="read" x="50" y="290" width="220" height="11" rx="5.5"/>
+  <circle class="cpg unmet" cx="70" cy="308" r="5"/>
+  <circle class="cpg unmet" cx="115" cy="308" r="5"/>
+  <circle class="cpg unmet" cx="160" cy="308" r="5"/>
+  <circle class="cpg unmet" cx="205" cy="308" r="5"/>
+  <circle class="cpg met" cx="250" cy="308" r="5"/>
+  <text class="tick zh" x="36" y="336">6 條 read × 5 個 CpG（點在 read 下方）</text>
 
-<p class="prose">本節的核心區分是：兩項任務都使用甲基化，但甲基化在流程中的角色不同：</p>
+  <!-- ② 寫成矩陣 -->
+  <rect class="box plain" x="352" y="76" width="300" height="284" rx="10"/>
+  <text class="anno bold zh mid" x="502" y="106">② 寫成 0／1 矩陣</text>
+  <text class="tick mid mono" x="425" y="132">C1</text>
+  <text class="tick mid mono" x="461" y="132">C2</text>
+  <text class="tick mid mono" x="497" y="132">C3</text>
+  <text class="tick mid mono" x="533" y="132">C4</text>
+  <text class="tick mid mono" x="569" y="132">C5</text>
+  <text class="tick end mono" x="404" y="156">R1</text>
+  <rect class="box accent" x="410" y="140" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="425" y="156">1</text>
+  <rect class="box accent" x="446" y="140" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="461" y="156">1</text>
+  <rect class="box accent" x="482" y="140" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="497" y="156">1</text>
+  <rect class="box plain" x="518" y="140" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="533" y="156">0</text>
+  <rect class="box accent" x="554" y="140" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="569" y="156">1</text>
+  <text class="tick end mono" x="404" y="182">R2</text>
+  <rect class="box accent" x="410" y="166" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="425" y="182">1</text>
+  <rect class="box accent" x="446" y="166" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="461" y="182">1</text>
+  <rect class="box accent" x="482" y="166" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="497" y="182">1</text>
+  <rect class="box accent" x="518" y="166" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="533" y="182">1</text>
+  <rect class="box accent" x="554" y="166" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="569" y="182">1</text>
+  <text class="tick end mono" x="404" y="208">R3</text>
+  <rect class="box accent" x="410" y="192" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="425" y="208">1</text>
+  <rect class="box plain" x="446" y="192" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="461" y="208">0</text>
+  <rect class="box accent" x="482" y="192" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="497" y="208">1</text>
+  <rect class="box accent" x="518" y="192" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="533" y="208">1</text>
+  <rect class="box accent" x="554" y="192" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="569" y="208">1</text>
+  <text class="tick end mono" x="404" y="234">R4</text>
+  <rect class="box plain" x="410" y="218" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="425" y="234">0</text>
+  <rect class="box plain" x="446" y="218" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="461" y="234">0</text>
+  <rect class="box accent" x="482" y="218" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="497" y="234">1</text>
+  <rect class="box plain" x="518" y="218" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="533" y="234">0</text>
+  <rect class="box plain" x="554" y="218" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="569" y="234">0</text>
+  <text class="tick end mono" x="404" y="260">R5</text>
+  <rect class="box plain" x="410" y="244" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="425" y="260">0</text>
+  <rect class="box plain" x="446" y="244" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="461" y="260">0</text>
+  <rect class="box plain" x="482" y="244" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="497" y="260">0</text>
+  <rect class="box accent" x="518" y="244" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="533" y="260">1</text>
+  <rect class="box plain" x="554" y="244" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="569" y="260">0</text>
+  <text class="tick end mono" x="404" y="286">R6</text>
+  <rect class="box plain" x="410" y="270" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="425" y="286">0</text>
+  <rect class="box plain" x="446" y="270" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="461" y="286">0</text>
+  <rect class="box plain" x="482" y="270" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="497" y="286">0</text>
+  <rect class="box plain" x="518" y="270" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="533" y="286">0</text>
+  <rect class="box accent" x="554" y="270" width="30" height="22" rx="4"/>
+  <text class="tick mid mono bold" x="569" y="286">1</text>
+  <text class="tick zh" x="372" y="336">到這一步已經跟基因體座標無關</text>
+
+  <!-- ③ read 間距離 → 分群 -->
+  <rect class="box plain" x="688" y="76" width="296" height="284" rx="10"/>
+  <text class="anno bold zh mid" x="836" y="106">③ 算距離、分群</text>
+  <text class="tick mid mono" x="762" y="140" style="font-size:12px">R1</text>
+  <text class="tick mid mono" x="786" y="140" style="font-size:12px">R2</text>
+  <text class="tick mid mono" x="810" y="140" style="font-size:12px">R3</text>
+  <text class="tick mid mono" x="834" y="140" style="font-size:12px">R4</text>
+  <text class="tick mid mono" x="858" y="140" style="font-size:12px">R5</text>
+  <text class="tick mid mono" x="882" y="140" style="font-size:12px">R6</text>
+  <text class="tick end mono" x="748" y="162" style="font-size:12px">R1</text>
+  <rect class="cellv" x="751" y="146" width="22" height="22" fill-opacity="0.00"/>
+  <rect class="cellv" x="775" y="146" width="22" height="22" fill-opacity="0.20"/>
+  <rect class="cellv" x="799" y="146" width="22" height="22" fill-opacity="0.20"/>
+  <rect class="cellv" x="823" y="146" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="847" y="146" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="871" y="146" width="22" height="22" fill-opacity="0.80"/>
+  <text class="tick end mono" x="748" y="186" style="font-size:12px">R2</text>
+  <rect class="cellv" x="751" y="170" width="22" height="22" fill-opacity="0.20"/>
+  <rect class="cellv" x="775" y="170" width="22" height="22" fill-opacity="0.00"/>
+  <rect class="cellv" x="799" y="170" width="22" height="22" fill-opacity="0.40"/>
+  <rect class="cellv" x="823" y="170" width="22" height="22" fill-opacity="0.90"/>
+  <rect class="cellv" x="847" y="170" width="22" height="22" fill-opacity="0.90"/>
+  <rect class="cellv" x="871" y="170" width="22" height="22" fill-opacity="0.90"/>
+  <text class="tick end mono" x="748" y="210" style="font-size:12px">R3</text>
+  <rect class="cellv" x="751" y="194" width="22" height="22" fill-opacity="0.20"/>
+  <rect class="cellv" x="775" y="194" width="22" height="22" fill-opacity="0.40"/>
+  <rect class="cellv" x="799" y="194" width="22" height="22" fill-opacity="0.00"/>
+  <rect class="cellv" x="823" y="194" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="847" y="194" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="871" y="194" width="22" height="22" fill-opacity="0.70"/>
+  <text class="tick end mono" x="748" y="234" style="font-size:12px">R4</text>
+  <rect class="cellv" x="751" y="218" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="775" y="218" width="22" height="22" fill-opacity="0.90"/>
+  <rect class="cellv" x="799" y="218" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="823" y="218" width="22" height="22" fill-opacity="0.00"/>
+  <rect class="cellv" x="847" y="218" width="22" height="22" fill-opacity="0.30"/>
+  <rect class="cellv" x="871" y="218" width="22" height="22" fill-opacity="0.30"/>
+  <text class="tick end mono" x="748" y="258" style="font-size:12px">R5</text>
+  <rect class="cellv" x="751" y="242" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="775" y="242" width="22" height="22" fill-opacity="0.90"/>
+  <rect class="cellv" x="799" y="242" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="823" y="242" width="22" height="22" fill-opacity="0.30"/>
+  <rect class="cellv" x="847" y="242" width="22" height="22" fill-opacity="0.00"/>
+  <rect class="cellv" x="871" y="242" width="22" height="22" fill-opacity="0.20"/>
+  <text class="tick end mono" x="748" y="282" style="font-size:12px">R6</text>
+  <rect class="cellv" x="751" y="266" width="22" height="22" fill-opacity="0.80"/>
+  <rect class="cellv" x="775" y="266" width="22" height="22" fill-opacity="0.90"/>
+  <rect class="cellv" x="799" y="266" width="22" height="22" fill-opacity="0.70"/>
+  <rect class="cellv" x="823" y="266" width="22" height="22" fill-opacity="0.30"/>
+  <rect class="cellv" x="847" y="266" width="22" height="22" fill-opacity="0.20"/>
+  <rect class="cellv" x="871" y="266" width="22" height="22" fill-opacity="0.00"/>
+  <path class="axis" d="M708,148 L708,214"/>
+  <path class="axis" d="M708,220 L708,286"/>
+  <text class="tick zh" x="708" y="312">群 1：R1 R2 R3</text>
+  <text class="tick zh" x="708" y="334">群 2：R4 R5 R6</text>
+
+  <path class="flow" d="M322,214 L346,214" marker-end="url(#arrow)"/>
+  <path class="flow" d="M658,214 L682,214" marker-end="url(#arrow)"/>
+
+  <line class="axis" x1="20" y1="386" x2="980" y2="386"/>
+  <text class="lbl bold zh" x="20" y="418">後面兩種用法，用的都是這張表。</text>
+  <text class="anno zh" x="20" y="448">兩條 read 的距離＝兩個 0／1 向量的差異；分群用一般的階層式方法，這一步不需要任何生物學。</text>
+  <text class="anno zh" x="20" y="476">差別只在：<tspan class="bold">分出來的群要拿去做什麼</tspan>。</text>
+</svg><figcaption>從 read 上的實心／空心點，到 0／1 矩陣，到 read 之間的距離與分群。
+最後一步只是<b>向量之間的差異</b>加上一般的階層式分群，不需要任何生物學知識 ——
+兩種用法的差別不在這裡，而在<b>分出來的群要拿去做什麼</b>。</figcaption></figure>
+
+<h3 id="m09__用法一-當作證據-判斷一個候選是不是-somatic">用法一：當作證據 —— 判斷一個候選是不是 somatic</h3>
+
+<p class="prose">第一個題目是 tumor-only 的 somatic 變異判讀：手上有一堆候選位置，要決定哪些是真的 somatic 變異。
+甲基化在這裡派上用場的理由很具體 ——
+<b>somatic 變異只存在腫瘤細胞裡，所以帶著它的那些 read 全部來自同一群細胞</b>，
+而不帶它的 read 則來自腫瘤與正常細胞的混合。兩側的甲基化組成因此會不一樣。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 690" class="dia-svg" role="img">
+  <title>甲基化當作證據：用來判斷候選變異來自哪一群細胞</title>
+  <desc>三格比較同一個候選位置的三種可能身分。
+        若候選是 somatic，帶變異的 ALT read 只會來自腫瘤細胞，因此這一側的甲基化模式偏向一致；
+        不帶變異的 REF read 同時來自腫瘤與正常細胞，因此偏向混合。
+        若候選是 germline，兩側都同時來自腫瘤與正常細胞，兩側都是混合。
+        若候選只是定序錯誤，帶變異的 read 只是全部 read 的隨機子集，兩側組成看起來相同。
+        因此兩側甲基化組成的差異可以量化成數值特徵，交給分類器判斷候選要保留或丟棄。
+        在這種用法下，甲基化參與了判斷。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">用法一：甲基化當作證據</text>
+  <text class="tick zh" x="20" y="58">關鍵直覺：甲基化模式像是「這條 read 來自哪一群細胞」的指紋。read 上的圓＝這個位置是什麼，read 下的點＝甲基化。</text>
+
+  <!-- ══ 候選是 somatic ══ -->
+  <rect class="box plain" x="16" y="76" width="296" height="436" rx="10"/>
+  <text class="anno bold zh mid" x="164" y="106">候選是 somatic</text>
+  <text class="tick mid zh" x="164" y="130">只有腫瘤細胞帶著它</text>
+  <text class="tick zh bold" x="36" y="158">ALT read（帶變異）</text>
+  <rect class="read" x="36" y="170" width="216" height="11" rx="5.5"/>
+  <circle class="mark somatic" cx="66" cy="175" r="5.5"/>
+  <circle class="cpg met" cx="136" cy="187" r="4.5"/>
+  <circle class="cpg met" cx="180" cy="187" r="4.5"/>
+  <circle class="cpg met" cx="224" cy="187" r="4.5"/>
+  <rect class="read" x="36" y="198" width="216" height="11" rx="5.5"/>
+  <circle class="mark somatic" cx="66" cy="203" r="5.5"/>
+  <circle class="cpg met" cx="136" cy="215" r="4.5"/>
+  <circle class="cpg met" cx="180" cy="215" r="4.5"/>
+  <circle class="cpg met" cx="224" cy="215" r="4.5"/>
+  <rect class="read" x="36" y="226" width="216" height="11" rx="5.5"/>
+  <circle class="mark somatic" cx="66" cy="231" r="5.5"/>
+  <circle class="cpg met" cx="136" cy="243" r="4.5"/>
+  <circle class="cpg met" cx="180" cy="243" r="4.5"/>
+  <circle class="cpg met" cx="224" cy="243" r="4.5"/>
+  <text class="tick zh bold" x="36" y="282">REF read（沒有變異）</text>
+  <rect class="read" x="36" y="294" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="66" cy="299" r="5.5"/>
+  <circle class="cpg met" cx="136" cy="311" r="4.5"/>
+  <circle class="cpg met" cx="180" cy="311" r="4.5"/>
+  <circle class="cpg met" cx="224" cy="311" r="4.5"/>
+  <rect class="read" x="36" y="322" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="66" cy="327" r="5.5"/>
+  <circle class="cpg met" cx="136" cy="339" r="4.5"/>
+  <circle class="cpg met" cx="180" cy="339" r="4.5"/>
+  <circle class="cpg met" cx="224" cy="339" r="4.5"/>
+  <rect class="read" x="36" y="350" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="66" cy="355" r="5.5"/>
+  <circle class="cpg unmet" cx="136" cy="367" r="4.5"/>
+  <circle class="cpg unmet" cx="180" cy="367" r="4.5"/>
+  <circle class="cpg unmet" cx="224" cy="367" r="4.5"/>
+  <rect class="read" x="36" y="378" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="66" cy="383" r="5.5"/>
+  <circle class="cpg unmet" cx="136" cy="395" r="4.5"/>
+  <circle class="cpg unmet" cx="180" cy="395" r="4.5"/>
+  <circle class="cpg unmet" cx="224" cy="395" r="4.5"/>
+  <rect class="box accent" x="36" y="428" width="256" height="72" rx="8"/>
+  <text class="tick zh" x="52" y="452">ALT 側：全部來自腫瘤細胞</text>
+  <text class="tick zh" x="52" y="474">→ 甲基化模式一致（單一）</text>
+  <text class="tick zh" x="52" y="496">REF 側：腫瘤＋正常混在一起</text>
+
+  <!-- ══ 候選是 germline ══ -->
+  <rect class="box plain" x="352" y="76" width="296" height="436" rx="10"/>
+  <text class="anno bold zh mid" x="500" y="106">候選是 germline</text>
+  <text class="tick mid zh" x="500" y="130">所有細胞都帶著它</text>
+  <text class="tick zh bold" x="372" y="158">ALT read（帶變異）</text>
+  <rect class="read" x="372" y="170" width="216" height="11" rx="5.5"/>
+  <circle class="mark germline" cx="402" cy="175" r="5.5"/>
+  <circle class="cpg met" cx="472" cy="187" r="4.5"/>
+  <circle class="cpg met" cx="516" cy="187" r="4.5"/>
+  <circle class="cpg met" cx="560" cy="187" r="4.5"/>
+  <rect class="read" x="372" y="198" width="216" height="11" rx="5.5"/>
+  <circle class="mark germline" cx="402" cy="203" r="5.5"/>
+  <circle class="cpg unmet" cx="472" cy="215" r="4.5"/>
+  <circle class="cpg unmet" cx="516" cy="215" r="4.5"/>
+  <circle class="cpg unmet" cx="560" cy="215" r="4.5"/>
+  <rect class="read" x="372" y="226" width="216" height="11" rx="5.5"/>
+  <circle class="mark germline" cx="402" cy="231" r="5.5"/>
+  <circle class="cpg met" cx="472" cy="243" r="4.5"/>
+  <circle class="cpg met" cx="516" cy="243" r="4.5"/>
+  <circle class="cpg unmet" cx="560" cy="243" r="4.5"/>
+  <text class="tick zh bold" x="372" y="282">REF read（沒有變異）</text>
+  <rect class="read" x="372" y="294" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="402" cy="299" r="5.5"/>
+  <circle class="cpg met" cx="472" cy="311" r="4.5"/>
+  <circle class="cpg met" cx="516" cy="311" r="4.5"/>
+  <circle class="cpg met" cx="560" cy="311" r="4.5"/>
+  <rect class="read" x="372" y="322" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="402" cy="327" r="5.5"/>
+  <circle class="cpg unmet" cx="472" cy="339" r="4.5"/>
+  <circle class="cpg unmet" cx="516" cy="339" r="4.5"/>
+  <circle class="cpg unmet" cx="560" cy="339" r="4.5"/>
+  <rect class="read" x="372" y="350" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="402" cy="355" r="5.5"/>
+  <circle class="cpg unmet" cx="472" cy="367" r="4.5"/>
+  <circle class="cpg met" cx="516" cy="367" r="4.5"/>
+  <circle class="cpg unmet" cx="560" cy="367" r="4.5"/>
+  <rect class="read" x="372" y="378" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="402" cy="383" r="5.5"/>
+  <circle class="cpg met" cx="472" cy="395" r="4.5"/>
+  <circle class="cpg unmet" cx="516" cy="395" r="4.5"/>
+  <circle class="cpg met" cx="560" cy="395" r="4.5"/>
+  <rect class="box plain" x="372" y="428" width="256" height="72" rx="8"/>
+  <text class="tick zh" x="388" y="452">ALT 側：腫瘤與正常都有</text>
+  <text class="tick zh" x="388" y="474">→ 甲基化模式也是混合</text>
+  <text class="tick zh" x="388" y="496">REF 側：一樣是混合</text>
+
+  <!-- ══ 候選是定序錯誤 ══ -->
+  <rect class="box plain" x="688" y="76" width="296" height="436" rx="10"/>
+  <text class="anno bold zh mid" x="836" y="106">候選是定序錯誤</text>
+  <text class="tick mid zh" x="836" y="130">隨機落在任何 read 上</text>
+  <text class="tick zh bold" x="708" y="158">ALT read（帶變異）</text>
+  <rect class="read" x="708" y="170" width="216" height="11" rx="5.5"/>
+  <circle class="mark artifact" cx="738" cy="175" r="5.5"/>
+  <circle class="cpg met" cx="808" cy="187" r="4.5"/>
+  <circle class="cpg unmet" cx="852" cy="187" r="4.5"/>
+  <circle class="cpg met" cx="896" cy="187" r="4.5"/>
+  <rect class="read" x="708" y="198" width="216" height="11" rx="5.5"/>
+  <circle class="mark artifact" cx="738" cy="203" r="5.5"/>
+  <circle class="cpg unmet" cx="808" cy="215" r="4.5"/>
+  <circle class="cpg met" cx="852" cy="215" r="4.5"/>
+  <circle class="cpg unmet" cx="896" cy="215" r="4.5"/>
+  <rect class="read" x="708" y="226" width="216" height="11" rx="5.5"/>
+  <circle class="mark artifact" cx="738" cy="231" r="5.5"/>
+  <circle class="cpg met" cx="808" cy="243" r="4.5"/>
+  <circle class="cpg met" cx="852" cy="243" r="4.5"/>
+  <circle class="cpg unmet" cx="896" cy="243" r="4.5"/>
+  <text class="tick zh bold" x="708" y="282">REF read（沒有變異）</text>
+  <rect class="read" x="708" y="294" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="738" cy="299" r="5.5"/>
+  <circle class="cpg met" cx="808" cy="311" r="4.5"/>
+  <circle class="cpg unmet" cx="852" cy="311" r="4.5"/>
+  <circle class="cpg met" cx="896" cy="311" r="4.5"/>
+  <rect class="read" x="708" y="322" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="738" cy="327" r="5.5"/>
+  <circle class="cpg unmet" cx="808" cy="339" r="4.5"/>
+  <circle class="cpg met" cx="852" cy="339" r="4.5"/>
+  <circle class="cpg met" cx="896" cy="339" r="4.5"/>
+  <rect class="read" x="708" y="350" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="738" cy="355" r="5.5"/>
+  <circle class="cpg met" cx="808" cy="367" r="4.5"/>
+  <circle class="cpg met" cx="852" cy="367" r="4.5"/>
+  <circle class="cpg unmet" cx="896" cy="367" r="4.5"/>
+  <rect class="read" x="708" y="378" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="738" cy="383" r="5.5"/>
+  <circle class="cpg unmet" cx="808" cy="395" r="4.5"/>
+  <circle class="cpg unmet" cx="852" cy="395" r="4.5"/>
+  <circle class="cpg met" cx="896" cy="395" r="4.5"/>
+  <rect class="box plain" x="708" y="428" width="256" height="72" rx="8"/>
+  <text class="tick zh" x="724" y="452">ALT 側：只是 REF 的隨機子集</text>
+  <text class="tick zh" x="724" y="474">→ 兩側的組成看起來一樣</text>
+  <text class="tick zh" x="724" y="496">沒有「只屬於一群細胞」的痕跡</text>
+
+  <line class="axis" x1="20" y1="538" x2="980" y2="538"/>
+  <text class="lbl bold zh" x="20" y="570">分類器只是把這些「組成」算成數字再組合起來</text>
+  <text class="anno zh" x="20" y="600">實際用的特徵例如：REF 與 ALT 兩側各自的甲基化覆蓋量、兩側的差距、</text>
+  <text class="anno zh" x="20" y="628">以及每一側「單一」與「混合」各佔多少比例。這些數字進 XGBoost，輸出保留或丟棄。</text>
+  <text class="anno zh bold warn" x="20" y="664">注意：這種用法下甲基化已經參與判斷，所以它不能再拿來驗證同一個判斷。</text>
+</svg><figcaption>同一個候選位置的三種可能身分。真 somatic 的 ALT 側來源單一、REF 側是混合；
+germline 的兩側都是混合；定序錯誤的 ALT 側只是 REF 的隨機子集，兩側看起來一樣。
+這些「組成」被算成數值特徵送進分類器 —— 也就是說，<b>甲基化在這裡參與了判斷</b>。</figcaption></figure>
+
+<p class="prose">實際的特徵有三類：兩側各自的<b>甲基化覆蓋量</b>與其差距、每一側是<b>單一還是混合</b>的比例，
+以及把兩側的平均甲基化程度畫成散布圖後的<b>形狀差異</b>。
+分類器（XGBoost）本身不懂生物學，它只是學會「這幾個數字長這樣時，候選通常是真的」。</p>
+
+<h3 id="m09__用法二要用到的任務-subclone-重建在做什麼">用法二要用到的任務：subclone 重建在做什麼</h3>
+
+<p class="prose">第二個題目常被術語擋住，但它的核心其實是一個很單純的組合問題。</p>
+
+<p class="prose">腫瘤細胞一代一代分裂，過程中<b>只會多拿到突變，不會把突變還回去</b>。
+所以拿一個小區域、看其中 k 個 somatic 位置，每個細胞在這 k 個位置上就是一個 0／1 向量；
+一個細胞分裂出的後代，向量只會多出幾個 1。</p>
+
+<p class="prose">bulk 定序給你的每一條 read，就是這些向量的一次取樣（read 夠長才能同時覆蓋好幾個位置）。
+於是問題變成：<b>已知看到了哪些向量，什麼樣的「一次翻一個 0→1」的路徑能最省步數地產生它們？</b>
+那條路徑就是這個區域的候選演化順序。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 636" class="dia-svg" role="img">
+  <title>subclone 重建在做什麼：把 read 變成 0／1 向量，再找最短的突變路徑</title>
+  <desc>以一個區域內的兩個 somatic 位置 S1 與 S2 為例。
+        左：腫瘤細胞一代一代累積突變，只會多拿到突變、不會退回去，
+        因此細胞的狀態從 00 變成 10，再變成 11。
+        中：bulk 定序後，每條 read 在這兩個位置上就是一個 0／1 向量，
+        R 記為 0、A 記為 1，觀測到的狀態集合是 00、10、11。
+        右：重建就是在所有狀態組成的方格上，找一條從 00 出發、
+        每一步只把一個 0 翻成 1、能走到所有觀測狀態、且步數最少的樹。
+        本例選出 00 到 10 再到 11；經過未觀測狀態 01 的路徑需要多假設一個沒看到的狀態。
+        讀法是：先有 S1 的細胞群是 clone，之後其中一部分又拿到 S2，那一支就是 subclone。
+        輸出是單一區域內的候選拓撲，不是整個腫瘤的全基因體演化樹，
+        且最小成本並列時全部保留。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">用法二要用到的任務：subclone 重建在做什麼？</text>
+  <text class="tick zh" x="20" y="58">以一個區域內的 2 個 somatic 位置為例（S1、S2）。R＝沒有變異＝0，A＝有變異＝1。</text>
+
+  <!-- ① 細胞一代一代累積突變 -->
+  <rect class="box plain" x="16" y="76" width="300" height="360" rx="10"/>
+  <text class="anno bold zh mid" x="166" y="106">① 突變只會累加</text>
+  <circle class="cell tumor" cx="96" cy="146" r="20"/><circle class="nucleus" cx="96" cy="146" r="9"/>
+  <rect class="bar" x="80" y="170" width="14" height="14" rx="3"/>
+  <rect class="bar" x="98" y="170" width="14" height="14" rx="3"/>
+  <text class="tick mono bold" x="122" y="151">00</text>
+  <text class="tick zh" x="150" y="156">腫瘤起源</text>
+  <path class="conn somatic" d="M96,186 L96,212" marker-end="url(#arrow-sm)"/>
+  <text class="tick somatic mono" x="104" y="206">+S1</text>
+  <circle class="cell tumor" cx="96" cy="240" r="20"/><circle class="nucleus" cx="96" cy="240" r="9"/>
+  <rect class="bar somatic" x="80" y="264" width="14" height="14" rx="3"/>
+  <rect class="bar" x="98" y="264" width="14" height="14" rx="3"/>
+  <text class="tick mono bold" x="122" y="245">10</text>
+  <text class="tick zh" x="150" y="250">clone</text>
+  <path class="conn somatic" d="M96,280 L96,306" marker-end="url(#arrow-sm)"/>
+  <text class="tick somatic mono" x="104" y="300">+S2</text>
+  <circle class="cell tumor" cx="96" cy="334" r="20"/><circle class="nucleus" cx="96" cy="334" r="9"/>
+  <rect class="bar somatic" x="80" y="358" width="14" height="14" rx="3"/>
+  <rect class="bar somatic" x="98" y="358" width="14" height="14" rx="3"/>
+  <text class="tick mono bold" x="122" y="339">11</text>
+  <text class="tick zh" x="150" y="344">subclone</text>
+  <text class="tick zh" x="36" y="398">小方塊：左＝S1、右＝S2</text>
+  <text class="tick zh" x="36" y="420">實心＝已經帶有這個突變</text>
+
+  <!-- ② 每條 read 是一個 0/1 向量 -->
+  <rect class="box plain" x="352" y="76" width="300" height="360" rx="10"/>
+  <text class="anno bold zh mid" x="502" y="106">② read 變成向量</text>
+  <text class="tick mid mono somatic" x="470" y="132">S1</text>
+  <text class="tick mid mono somatic" x="514" y="132">S2</text>
+  <rect class="read" x="372" y="142" width="200" height="14" rx="7"/>
+  <rect class="bar" x="459" y="140" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="470" y="154">R</text>
+  <rect class="bar" x="503" y="140" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="514" y="154">R</text>
+  <text class="tick mono" x="586" y="154">00</text>
+  <rect class="read" x="372" y="172" width="200" height="14" rx="7"/>
+  <rect class="bar" x="459" y="170" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="470" y="184">R</text>
+  <rect class="bar" x="503" y="170" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="514" y="184">R</text>
+  <text class="tick mono" x="586" y="184">00</text>
+  <rect class="read" x="372" y="202" width="200" height="14" rx="7"/>
+  <rect class="bar somatic" x="459" y="200" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="470" y="214">A</text>
+  <rect class="bar" x="503" y="200" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="514" y="214">R</text>
+  <text class="tick mono" x="586" y="214">10</text>
+  <rect class="read" x="372" y="232" width="200" height="14" rx="7"/>
+  <rect class="bar somatic" x="459" y="230" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="470" y="244">A</text>
+  <rect class="bar" x="503" y="230" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="514" y="244">R</text>
+  <text class="tick mono" x="586" y="244">10</text>
+  <rect class="read" x="372" y="262" width="200" height="14" rx="7"/>
+  <rect class="bar somatic" x="459" y="260" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="470" y="274">A</text>
+  <rect class="bar" x="503" y="260" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="514" y="274">R</text>
+  <text class="tick mono" x="586" y="274">10</text>
+  <rect class="read" x="372" y="292" width="200" height="14" rx="7"/>
+  <rect class="bar somatic" x="459" y="290" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="470" y="304">A</text>
+  <rect class="bar somatic" x="503" y="290" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="514" y="304">A</text>
+  <text class="tick mono" x="586" y="304">11</text>
+  <text class="tick zh" x="372" y="352">看到的狀態：00 兩條、10 三條、11 一條</text>
+  <text class="tick zh bold" x="372" y="380">觀測狀態集合 = { 00, 10, 11 }</text>
+
+  <!-- ③ 在狀態方格上找最少步數的樹 -->
+  <rect class="box plain" x="688" y="76" width="296" height="360" rx="10"/>
+  <text class="anno bold zh mid" x="836" y="106">③ 找最少步數的樹</text>
+  <path class="guide" d="M836,168 L766,232 M836,168 L906,232 M766,232 L836,296 M906,232 L836,296"/>
+  <circle class="box plain" cx="836" cy="168" r="20"/>
+  <text class="tick mid mono bold" x="836" y="173">00</text>
+  <circle class="box plain" cx="766" cy="232" r="20"/>
+  <text class="tick mid mono bold" x="766" y="237">10</text>
+  <circle class="box ghost" cx="906" cy="232" r="20"/>
+  <text class="tick mid mono" x="906" y="237">01</text>
+  <circle class="box plain" cx="836" cy="296" r="20"/>
+  <text class="tick mid mono bold" x="836" y="301">11</text>
+  <path class="conn somatic thick" d="M822,184 L780,216" marker-end="url(#arrow-sm)"/>
+  <path class="conn somatic thick" d="M780,248 L822,280" marker-end="url(#arrow-sm)"/>
+  <text class="tick somatic mono end" x="770" y="192">+S1</text>
+  <text class="tick somatic mono end" x="770" y="288">+S2</text>
+  <text class="tick zh" x="708" y="336">實線圈＝有 read 看到的狀態</text>
+  <text class="tick zh" x="708" y="358">虛線圈＝沒看到，走它就要多假設一個狀態</text>
+  <text class="tick zh bold" x="708" y="386">成本＝用掉幾個箭頭，本例 2 步</text>
+
+  <path class="flow" d="M322,240 L346,240" marker-end="url(#arrow)"/>
+  <path class="flow" d="M658,240 L682,240" marker-end="url(#arrow)"/>
+
+  <line class="axis" x1="20" y1="462" x2="980" y2="462"/>
+  <text class="lbl bold zh" x="20" y="494">這棵樹讀起來就是一句話</text>
+  <text class="anno zh" x="20" y="524">「先有 S1 的那群細胞是 clone；之後其中一部分又拿到 S2，那一支就是 subclone。」</text>
+  <text class="anno zh" x="20" y="554">clone 指整個腫瘤群體共有的組合，subclone 指後來才長出來、只占一部分腫瘤細胞的分支。</text>
+  <text class="anno zh bold warn" x="20" y="590">限制：這是<tspan class="bold">單一區域</tspan>內 read 覆蓋得到的局部順序，不是整個腫瘤的演化樹；</text>
+  <text class="anno zh bold warn" x="20" y="618">最小成本並列時全部保留，不強行選一個。</text>
+</svg><figcaption>以一個區域內的兩個 somatic 位置為例。
+左：細胞的狀態只會從 00 走向 10、再走向 11。中：每條 read 在這兩個位置上是一個 0／1 向量，
+於是觀測到的狀態就是 00、10、11 三種。右：在所有狀態組成的方格上找步數最少、
+又能走到所有觀測狀態的樹。<b>clone</b> 是整個腫瘤群體共有的那段路徑，
+<b>subclone</b> 是後來才長出來、只占一部分腫瘤細胞的分支。</figcaption></figure>
+
+<p class="prose">這樣看的話，<b>subclone 重建的輸出就是「這個區域內、突變發生順序的候選解」</b>，
+而不是一棵完整的腫瘤演化樹。也因為是最小成本解，<b>並列的候選會全部保留</b>，不強行選一個。</p>
+
+<h3 id="m09__同一個狀態裡-read-還能再分群">同一個狀態裡，read 還能再分群</h3>
+
+<p class="prose">現在把甲基化接回第二個題目。假設一群 read 的 haplotype 相同、在每個 somatic 位置上的
+0／1 向量也完全相同 —— 依序列來看它們是「同一個狀態」，無法再分。
+但它們的甲基化模式可能明顯分成兩群：</p>
+
+<div class="note"><b>互動元件</b>（列印版保留說明；數位版可操作）<br>「原始順序」通常呈現為近似隨機的排列；依 haplotype 排序未必出現明顯結構。<b>依 allele 排序</b>可觀察 ALT 與 REF 的差異；依<b>甲基化群組</b>排序後，可進一步觀察 read-level 分群。</div>
+
+<p class="prose">可觀察到：<b>ALT reads 仍可再分成兩群</b>。
+它們的 allele 與 haplotype 相同，僅依序列無法區分，但甲基化模式可能不同。</p>
+
+<p class="prose">這個現象稱為 <b>within-ALT residual structure</b>；研究依其統計定義，在七個資料集中將其量化為主要殘餘變異來源（51.2%–80.4%）。
+換句話說：<b>固定 haplotype 與 allele 後，仍可觀察到額外的 read-level 甲基化分群。</b></p>
+
+<p class="prose">它的意義是：上一節那棵樹的<b>一個節點裡，可能還藏著更細的分群</b> ——
+序列證據已經用完了，但資料還沒說完。這正是甲基化在第二個題目裡的位置：
+它<b>標記</b>已經建好的節點，而不參與建樹。</p>
+
+<aside class="guardrail" id="m09__guard-8"><p class="guardrail__hd">重要區分 #8：甲基化的相關性不是因果</p><p class="prose">即使觀察到帶有突變的 reads 甲基化程度較高，也不宜直接推論「該突變造成甲基化改變」。</p>
+<p class="prose">研究將此結果描述為同一區域中的<b>伴隨差異</b>，不解讀為突變直接造成甲基化改變。</p>
+<p class="prose">仍有多項替代解釋：兩群 reads 可能來自不同的細胞族群，且各自具有不同的甲基化背景；也可能受到 coverage、批次效應或區域基因組脈絡影響。</p></aside>
+
+<h3 id="m09__兩種角色的對照">兩種角色的對照</h3>
+
+<p class="prose">兩個題目用的是同一份 read × CpG 表，但甲基化在流程裡的位置完全不同：</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" class="dia-svg" role="img">
   <title>甲基化的兩種分析角色：模型輸入或推論後描述</title>
@@ -5984,36 +6504,21 @@ minimap2 -ax map-ont -y reference.fasta raw.fastq</code></pre>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th></th><th>甲基化感知的方法：當作<b>證據</b></th><th>subclone 重建：當作<b>註記</b></th></tr></thead>
+<thead><tr><th></th><th>用法一　somatic 判讀：當作<b>證據</b></th><th>用法二　subclone 重建：當作<b>註記</b></th></tr></thead>
 <tbody>
-<tr><td>用途</td><td>將甲基化轉為 XGBoost 分類器的輸入特徵</td><td>候選拓撲完成<b>之後</b>才附加描述</td></tr>
+<tr><td>在流程的哪一步進來</td><td>判斷之前 —— 成為分類器的輸入特徵</td><td>候選拓撲完成<b>之後</b>才附加</td></tr>
 <tr><td>會影響結果嗎</td><td><b>會</b> —— 它可影響候選是否保留</td><td><b>在此實作中不會</b> —— 不參與搜尋、成本或排序</td></tr>
 <tr><td>是否可作為獨立驗證</td><td>同一資料流程中不宜宣稱為獨立驗證</td><td>若未參與推論，可作為獨立觀察</td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">為避免角色混淆，請區分以下原則：「在此 subclone 重建實作中，甲基化是重建完成後的補充標記，
-<b>不參與搜尋、成本或排序</b>」。</p>
+<p class="prose">為什麼用法二要刻意不用？因為那個題目最想知道的，正是「這棵樹對不對」。
+如果甲基化已經幫忙選過樹，再拿甲基化差異來說「看，這棵樹的分支確實有甲基化差異」，
+那只是把自己的輸入念一次而已 —— 這是<b>循環論證</b>。</p>
 
-<p class="prose">若甲基化已納入同一資料流程的推論，便不宜再宣稱它是獨立驗證；
-應改用未參與訓練或搜尋的資料評估，以避免循環論證。</p>
-
-<h3 id="m09__同一狀態內的-read-level-異質性">同一狀態內的 read-level 異質性</h3>
-
-<p class="prose">下面的熱圖呈現一個區域內的 read × CpG 資料；比較不同排序方式對結構可見性的影響：</p>
-
-<div class="note"><b>互動元件</b>（列印版保留說明；數位版可操作）<br>「原始順序」通常呈現為近似隨機的排列；依 haplotype 排序未必出現明顯結構。<b>依 allele 排序</b>可觀察 ALT 與 REF 的差異；依<b>甲基化群組</b>排序後，可進一步觀察 read-level 分群。</div>
-
-<p class="prose">可觀察到：<b>ALT reads 仍可再分成兩群</b>。
-它們的 allele 與 haplotype 相同，僅依序列無法區分，但甲基化模式可能不同。</p>
-
-<p class="prose">這個現象稱為 <b>within-ALT residual structure</b>；研究依其統計定義，在七個資料集中將其量化為主要殘餘變異來源（51.2%–80.4%）。
-換句話說：<b>固定 haplotype 與 allele 後，仍可觀察到額外的 read-level 甲基化分群。</b></p>
-
-<aside class="guardrail" id="m09__guard-8"><p class="guardrail__hd">重要區分 #8：甲基化的相關性不是因果</p><p class="prose">即使觀察到帶有突變的 reads 甲基化程度較高，也不宜直接推論「該突變造成甲基化改變」。</p>
-<p class="prose">研究將此結果描述為同一區域中的<b>伴隨差異</b>，不解讀為突變直接造成甲基化改變。</p>
-<p class="prose">仍有多項替代解釋：兩群 reads 可能來自不同的細胞族群，且各自具有不同的甲基化背景；也可能受到 coverage、批次效應或區域基因組脈絡影響。</p></aside>
+<p class="prose">同一個原則也適用於用法一：那裡的甲基化已經進了模型，所以評估模型效能時
+必須用<b>沒有參與訓練的資料</b>，不能拿甲基化特徵本身當成「模型是對的」的證據。</p>
 </section>
 
 
@@ -6057,6 +6562,34 @@ COLO829 為 9.5%、H2009 為 35.4%，資料集間差異明顯。不可評估的�
 
 <section data-part="practice" class="part" id="m09__part-practice">
 <h2 data-num="⑤" id="m09__實作練習">實作練習</h2>
+
+<h3 id="m09__甲基化資訊存在-bam-的哪裡">甲基化資訊存在 BAM 的哪裡</h3>
+
+<p class="prose">前面那張 0／1 表不是憑空來的，它從 BAM 的兩個 tag 讀出來：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>tag</th><th>內容</th></tr></thead>
+<tbody>
+<tr><td><code><span class="term" data-term="MM/ML tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="m09__gd-mm-ml-tag-3">MM<span class="term__pop" id="m09__gd-mm-ml-tag-3" role="tooltip"><b class="term__hd">MM/ML tag</b><span class="term__def" data-lang="zh">BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。</span><span class="term__def" data-lang="en">BAM tags carrying per-read methylation calls: MM for positions, ML for probabilities. Easily lost during processing.</span><a class="term__more" href="glossary.html#mm-ml-tag">完整條目 →</a></span></span></code></td><td>修飾類型及其相對於 read 上標準鹼基的位置與跳過規則</td></tr>
+<tr><td><code>ML</code></td><td>與 MM 項目對應的修飾機率或信心，以 0–255 的位元組值編碼</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">注意 <code>ML</code> 是<b>機率</b>而不是 0／1：要得到前面那張表，還需要一個門檻把機率二值化，
+或直接保留機率值。門檻怎麼定會影響分群結果，屬於分析選擇而非資料本身。</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">重新比對可能遺失 MM/ML 標籤</p>
+<p class="prose">若未明確傳遞 SAM tags，將帶有甲基化的 BAM 轉成 FASTQ 再重新比對時，通常不會保留 MM/ML。
+結果可能是格式正常、但修飾欄位空白的 BAM；工具是否發出警告取決於實作與版本。</p>
+<p class="prose">在以下 samtools→minimap2 流程中，需同時保留 tags 並啟用相應選項：</p>
+<pre><code>samtools fastq -T '*' methylcall.raw.bam &gt; raw.fastq
+minimap2 -ax map-ont -y reference.fasta raw.fastq</code></pre>
+<p class="prose"><code>-T '*'</code> 將 tags 帶入 FASTQ comment，<code>-y</code> 讓 minimap2 將其寫回 BAM。
+請確認工具版本及 FASTQ comment 未被其他步驟改寫；缺少 tags 時，後續需要 MM/ML 的分析將無法取得修飾資訊。</p>
+</div>
 
 <h3 id="m09__確認-bam-是否包含甲基化資料">確認 BAM 是否包含甲基化資料</h3>
 

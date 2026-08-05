@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 690">
+  <title>甲基化當作證據：用來判斷候選變異來自哪一群細胞</title>
+  <desc>三格比較同一個候選位置的三種可能身分。
+        若候選是 somatic，帶變異的 ALT read 只會來自腫瘤細胞，因此這一側的甲基化模式偏向一致；
+        不帶變異的 REF read 同時來自腫瘤與正常細胞，因此偏向混合。
+        若候選是 germline，兩側都同時來自腫瘤與正常細胞，兩側都是混合。
+        若候選只是定序錯誤，帶變異的 read 只是全部 read 的隨機子集，兩側組成看起來相同。
+        因此兩側甲基化組成的差異可以量化成數值特徵，交給分類器判斷候選要保留或丟棄。
+        在這種用法下，甲基化參與了判斷。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">用法一：甲基化當作證據</text>
+  <text class="tick zh" x="20" y="58">關鍵直覺：甲基化模式像是「這條 read 來自哪一群細胞」的指紋。read 上的圓＝這個位置是什麼，read 下的點＝甲基化。</text>
+
+  <!-- ══ 候選是 somatic ══ -->
+  <rect class="box plain" x="16" y="76" width="296" height="436" rx="10"/>
+  <text class="anno bold zh mid" x="164" y="106">候選是 somatic</text>
+  <text class="tick mid zh" x="164" y="130">只有腫瘤細胞帶著它</text>
+  <text class="tick zh bold" x="36" y="158">ALT read（帶變異）</text>
+  <rect class="read" x="36" y="170" width="216" height="11" rx="5.5"/>
+  <circle class="mark somatic" cx="66" cy="175" r="5.5"/>
+  <circle class="cpg met" cx="136" cy="187" r="4.5"/>
+  <circle class="cpg met" cx="180" cy="187" r="4.5"/>
+  <circle class="cpg met" cx="224" cy="187" r="4.5"/>
+  <rect class="read" x="36" y="198" width="216" height="11" rx="5.5"/>
+  <circle class="mark somatic" cx="66" cy="203" r="5.5"/>
+  <circle class="cpg met" cx="136" cy="215" r="4.5"/>
+  <circle class="cpg met" cx="180" cy="215" r="4.5"/>
+  <circle class="cpg met" cx="224" cy="215" r="4.5"/>
+  <rect class="read" x="36" y="226" width="216" height="11" rx="5.5"/>
+  <circle class="mark somatic" cx="66" cy="231" r="5.5"/>
+  <circle class="cpg met" cx="136" cy="243" r="4.5"/>
+  <circle class="cpg met" cx="180" cy="243" r="4.5"/>
+  <circle class="cpg met" cx="224" cy="243" r="4.5"/>
+  <text class="tick zh bold" x="36" y="282">REF read（沒有變異）</text>
+  <rect class="read" x="36" y="294" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="66" cy="299" r="5.5"/>
+  <circle class="cpg met" cx="136" cy="311" r="4.5"/>
+  <circle class="cpg met" cx="180" cy="311" r="4.5"/>
+  <circle class="cpg met" cx="224" cy="311" r="4.5"/>
+  <rect class="read" x="36" y="322" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="66" cy="327" r="5.5"/>
+  <circle class="cpg met" cx="136" cy="339" r="4.5"/>
+  <circle class="cpg met" cx="180" cy="339" r="4.5"/>
+  <circle class="cpg met" cx="224" cy="339" r="4.5"/>
+  <rect class="read" x="36" y="350" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="66" cy="355" r="5.5"/>
+  <circle class="cpg unmet" cx="136" cy="367" r="4.5"/>
+  <circle class="cpg unmet" cx="180" cy="367" r="4.5"/>
+  <circle class="cpg unmet" cx="224" cy="367" r="4.5"/>
+  <rect class="read" x="36" y="378" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="66" cy="383" r="5.5"/>
+  <circle class="cpg unmet" cx="136" cy="395" r="4.5"/>
+  <circle class="cpg unmet" cx="180" cy="395" r="4.5"/>
+  <circle class="cpg unmet" cx="224" cy="395" r="4.5"/>
+  <rect class="box accent" x="36" y="428" width="256" height="72" rx="8"/>
+  <text class="tick zh" x="52" y="452">ALT 側：全部來自腫瘤細胞</text>
+  <text class="tick zh" x="52" y="474">→ 甲基化模式一致（單一）</text>
+  <text class="tick zh" x="52" y="496">REF 側：腫瘤＋正常混在一起</text>
+
+  <!-- ══ 候選是 germline ══ -->
+  <rect class="box plain" x="352" y="76" width="296" height="436" rx="10"/>
+  <text class="anno bold zh mid" x="500" y="106">候選是 germline</text>
+  <text class="tick mid zh" x="500" y="130">所有細胞都帶著它</text>
+  <text class="tick zh bold" x="372" y="158">ALT read（帶變異）</text>
+  <rect class="read" x="372" y="170" width="216" height="11" rx="5.5"/>
+  <circle class="mark germline" cx="402" cy="175" r="5.5"/>
+  <circle class="cpg met" cx="472" cy="187" r="4.5"/>
+  <circle class="cpg met" cx="516" cy="187" r="4.5"/>
+  <circle class="cpg met" cx="560" cy="187" r="4.5"/>
+  <rect class="read" x="372" y="198" width="216" height="11" rx="5.5"/>
+  <circle class="mark germline" cx="402" cy="203" r="5.5"/>
+  <circle class="cpg unmet" cx="472" cy="215" r="4.5"/>
+  <circle class="cpg unmet" cx="516" cy="215" r="4.5"/>
+  <circle class="cpg unmet" cx="560" cy="215" r="4.5"/>
+  <rect class="read" x="372" y="226" width="216" height="11" rx="5.5"/>
+  <circle class="mark germline" cx="402" cy="231" r="5.5"/>
+  <circle class="cpg met" cx="472" cy="243" r="4.5"/>
+  <circle class="cpg met" cx="516" cy="243" r="4.5"/>
+  <circle class="cpg unmet" cx="560" cy="243" r="4.5"/>
+  <text class="tick zh bold" x="372" y="282">REF read（沒有變異）</text>
+  <rect class="read" x="372" y="294" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="402" cy="299" r="5.5"/>
+  <circle class="cpg met" cx="472" cy="311" r="4.5"/>
+  <circle class="cpg met" cx="516" cy="311" r="4.5"/>
+  <circle class="cpg met" cx="560" cy="311" r="4.5"/>
+  <rect class="read" x="372" y="322" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="402" cy="327" r="5.5"/>
+  <circle class="cpg unmet" cx="472" cy="339" r="4.5"/>
+  <circle class="cpg unmet" cx="516" cy="339" r="4.5"/>
+  <circle class="cpg unmet" cx="560" cy="339" r="4.5"/>
+  <rect class="read" x="372" y="350" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="402" cy="355" r="5.5"/>
+  <circle class="cpg unmet" cx="472" cy="367" r="4.5"/>
+  <circle class="cpg met" cx="516" cy="367" r="4.5"/>
+  <circle class="cpg unmet" cx="560" cy="367" r="4.5"/>
+  <rect class="read" x="372" y="378" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="402" cy="383" r="5.5"/>
+  <circle class="cpg met" cx="472" cy="395" r="4.5"/>
+  <circle class="cpg unmet" cx="516" cy="395" r="4.5"/>
+  <circle class="cpg met" cx="560" cy="395" r="4.5"/>
+  <rect class="box plain" x="372" y="428" width="256" height="72" rx="8"/>
+  <text class="tick zh" x="388" y="452">ALT 側：腫瘤與正常都有</text>
+  <text class="tick zh" x="388" y="474">→ 甲基化模式也是混合</text>
+  <text class="tick zh" x="388" y="496">REF 側：一樣是混合</text>
+
+  <!-- ══ 候選是定序錯誤 ══ -->
+  <rect class="box plain" x="688" y="76" width="296" height="436" rx="10"/>
+  <text class="anno bold zh mid" x="836" y="106">候選是定序錯誤</text>
+  <text class="tick mid zh" x="836" y="130">隨機落在任何 read 上</text>
+  <text class="tick zh bold" x="708" y="158">ALT read（帶變異）</text>
+  <rect class="read" x="708" y="170" width="216" height="11" rx="5.5"/>
+  <circle class="mark artifact" cx="738" cy="175" r="5.5"/>
+  <circle class="cpg met" cx="808" cy="187" r="4.5"/>
+  <circle class="cpg unmet" cx="852" cy="187" r="4.5"/>
+  <circle class="cpg met" cx="896" cy="187" r="4.5"/>
+  <rect class="read" x="708" y="198" width="216" height="11" rx="5.5"/>
+  <circle class="mark artifact" cx="738" cy="203" r="5.5"/>
+  <circle class="cpg unmet" cx="808" cy="215" r="4.5"/>
+  <circle class="cpg met" cx="852" cy="215" r="4.5"/>
+  <circle class="cpg unmet" cx="896" cy="215" r="4.5"/>
+  <rect class="read" x="708" y="226" width="216" height="11" rx="5.5"/>
+  <circle class="mark artifact" cx="738" cy="231" r="5.5"/>
+  <circle class="cpg met" cx="808" cy="243" r="4.5"/>
+  <circle class="cpg met" cx="852" cy="243" r="4.5"/>
+  <circle class="cpg unmet" cx="896" cy="243" r="4.5"/>
+  <text class="tick zh bold" x="708" y="282">REF read（沒有變異）</text>
+  <rect class="read" x="708" y="294" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="738" cy="299" r="5.5"/>
+  <circle class="cpg met" cx="808" cy="311" r="4.5"/>
+  <circle class="cpg unmet" cx="852" cy="311" r="4.5"/>
+  <circle class="cpg met" cx="896" cy="311" r="4.5"/>
+  <rect class="read" x="708" y="322" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="738" cy="327" r="5.5"/>
+  <circle class="cpg unmet" cx="808" cy="339" r="4.5"/>
+  <circle class="cpg met" cx="852" cy="339" r="4.5"/>
+  <circle class="cpg met" cx="896" cy="339" r="4.5"/>
+  <rect class="read" x="708" y="350" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="738" cy="355" r="5.5"/>
+  <circle class="cpg met" cx="808" cy="367" r="4.5"/>
+  <circle class="cpg met" cx="852" cy="367" r="4.5"/>
+  <circle class="cpg unmet" cx="896" cy="367" r="4.5"/>
+  <rect class="read" x="708" y="378" width="216" height="11" rx="5.5"/>
+  <circle class="mark ref" cx="738" cy="383" r="5.5"/>
+  <circle class="cpg unmet" cx="808" cy="395" r="4.5"/>
+  <circle class="cpg unmet" cx="852" cy="395" r="4.5"/>
+  <circle class="cpg met" cx="896" cy="395" r="4.5"/>
+  <rect class="box plain" x="708" y="428" width="256" height="72" rx="8"/>
+  <text class="tick zh" x="724" y="452">ALT 側：只是 REF 的隨機子集</text>
+  <text class="tick zh" x="724" y="474">→ 兩側的組成看起來一樣</text>
+  <text class="tick zh" x="724" y="496">沒有「只屬於一群細胞」的痕跡</text>
+
+  <line class="axis" x1="20" y1="538" x2="980" y2="538"/>
+  <text class="lbl bold zh" x="20" y="570">分類器只是把這些「組成」算成數字再組合起來</text>
+  <text class="anno zh" x="20" y="600">實際用的特徵例如：REF 與 ALT 兩側各自的甲基化覆蓋量、兩側的差距、</text>
+  <text class="anno zh" x="20" y="628">以及每一側「單一」與「混合」各佔多少比例。這些數字進 XGBoost，輸出保留或丟棄。</text>
+  <text class="anno zh bold warn" x="20" y="664">注意：這種用法下甲基化已經參與判斷，所以它不能再拿來驗證同一個判斷。</text>
+</svg>

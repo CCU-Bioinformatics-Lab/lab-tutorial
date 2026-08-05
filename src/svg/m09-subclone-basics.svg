@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 636">
+  <title>subclone 重建在做什麼：把 read 變成 0／1 向量，再找最短的突變路徑</title>
+  <desc>以一個區域內的兩個 somatic 位置 S1 與 S2 為例。
+        左：腫瘤細胞一代一代累積突變，只會多拿到突變、不會退回去，
+        因此細胞的狀態從 00 變成 10，再變成 11。
+        中：bulk 定序後，每條 read 在這兩個位置上就是一個 0／1 向量，
+        R 記為 0、A 記為 1，觀測到的狀態集合是 00、10、11。
+        右：重建就是在所有狀態組成的方格上，找一條從 00 出發、
+        每一步只把一個 0 翻成 1、能走到所有觀測狀態、且步數最少的樹。
+        本例選出 00 到 10 再到 11；經過未觀測狀態 01 的路徑需要多假設一個沒看到的狀態。
+        讀法是：先有 S1 的細胞群是 clone，之後其中一部分又拿到 S2，那一支就是 subclone。
+        輸出是單一區域內的候選拓撲，不是整個腫瘤的全基因體演化樹，
+        且最小成本並列時全部保留。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">用法二要用到的任務：subclone 重建在做什麼？</text>
+  <text class="tick zh" x="20" y="58">以一個區域內的 2 個 somatic 位置為例（S1、S2）。R＝沒有變異＝0，A＝有變異＝1。</text>
+
+  <!-- ① 細胞一代一代累積突變 -->
+  <rect class="box plain" x="16" y="76" width="300" height="360" rx="10"/>
+  <text class="anno bold zh mid" x="166" y="106">① 突變只會累加</text>
+  <circle class="cell tumor" cx="96" cy="146" r="20"/><circle class="nucleus" cx="96" cy="146" r="9"/>
+  <rect class="bar" x="80" y="170" width="14" height="14" rx="3"/>
+  <rect class="bar" x="98" y="170" width="14" height="14" rx="3"/>
+  <text class="tick mono bold" x="122" y="151">00</text>
+  <text class="tick zh" x="150" y="156">腫瘤起源</text>
+  <path class="conn somatic" d="M96,186 L96,212" marker-end="url(#arrow-sm)"/>
+  <text class="tick somatic mono" x="104" y="206">+S1</text>
+  <circle class="cell tumor" cx="96" cy="240" r="20"/><circle class="nucleus" cx="96" cy="240" r="9"/>
+  <rect class="bar somatic" x="80" y="264" width="14" height="14" rx="3"/>
+  <rect class="bar" x="98" y="264" width="14" height="14" rx="3"/>
+  <text class="tick mono bold" x="122" y="245">10</text>
+  <text class="tick zh" x="150" y="250">clone</text>
+  <path class="conn somatic" d="M96,280 L96,306" marker-end="url(#arrow-sm)"/>
+  <text class="tick somatic mono" x="104" y="300">+S2</text>
+  <circle class="cell tumor" cx="96" cy="334" r="20"/><circle class="nucleus" cx="96" cy="334" r="9"/>
+  <rect class="bar somatic" x="80" y="358" width="14" height="14" rx="3"/>
+  <rect class="bar somatic" x="98" y="358" width="14" height="14" rx="3"/>
+  <text class="tick mono bold" x="122" y="339">11</text>
+  <text class="tick zh" x="150" y="344">subclone</text>
+  <text class="tick zh" x="36" y="398">小方塊：左＝S1、右＝S2</text>
+  <text class="tick zh" x="36" y="420">實心＝已經帶有這個突變</text>
+
+  <!-- ② 每條 read 是一個 0/1 向量 -->
+  <rect class="box plain" x="352" y="76" width="300" height="360" rx="10"/>
+  <text class="anno bold zh mid" x="502" y="106">② read 變成向量</text>
+  <text class="tick mid mono somatic" x="470" y="132">S1</text>
+  <text class="tick mid mono somatic" x="514" y="132">S2</text>
+  <rect class="read" x="372" y="142" width="200" height="14" rx="7"/>
+  <rect class="bar" x="459" y="140" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="470" y="154">R</text>
+  <rect class="bar" x="503" y="140" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="514" y="154">R</text>
+  <text class="tick mono" x="586" y="154">00</text>
+  <rect class="read" x="372" y="172" width="200" height="14" rx="7"/>
+  <rect class="bar" x="459" y="170" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="470" y="184">R</text>
+  <rect class="bar" x="503" y="170" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="514" y="184">R</text>
+  <text class="tick mono" x="586" y="184">00</text>
+  <rect class="read" x="372" y="202" width="200" height="14" rx="7"/>
+  <rect class="bar somatic" x="459" y="200" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="470" y="214">A</text>
+  <rect class="bar" x="503" y="200" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="514" y="214">R</text>
+  <text class="tick mono" x="586" y="214">10</text>
+  <rect class="read" x="372" y="232" width="200" height="14" rx="7"/>
+  <rect class="bar somatic" x="459" y="230" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="470" y="244">A</text>
+  <rect class="bar" x="503" y="230" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="514" y="244">R</text>
+  <text class="tick mono" x="586" y="244">10</text>
+  <rect class="read" x="372" y="262" width="200" height="14" rx="7"/>
+  <rect class="bar somatic" x="459" y="260" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="470" y="274">A</text>
+  <rect class="bar" x="503" y="260" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="514" y="274">R</text>
+  <text class="tick mono" x="586" y="274">10</text>
+  <rect class="read" x="372" y="292" width="200" height="14" rx="7"/>
+  <rect class="bar somatic" x="459" y="290" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="470" y="304">A</text>
+  <rect class="bar somatic" x="503" y="290" width="22" height="18" rx="3"/>
+  <text class="tick mid mono bold" x="514" y="304">A</text>
+  <text class="tick mono" x="586" y="304">11</text>
+  <text class="tick zh" x="372" y="352">看到的狀態：00 兩條、10 三條、11 一條</text>
+  <text class="tick zh bold" x="372" y="380">觀測狀態集合 = { 00, 10, 11 }</text>
+
+  <!-- ③ 在狀態方格上找最少步數的樹 -->
+  <rect class="box plain" x="688" y="76" width="296" height="360" rx="10"/>
+  <text class="anno bold zh mid" x="836" y="106">③ 找最少步數的樹</text>
+  <path class="guide" d="M836,168 L766,232 M836,168 L906,232 M766,232 L836,296 M906,232 L836,296"/>
+  <circle class="box plain" cx="836" cy="168" r="20"/>
+  <text class="tick mid mono bold" x="836" y="173">00</text>
+  <circle class="box plain" cx="766" cy="232" r="20"/>
+  <text class="tick mid mono bold" x="766" y="237">10</text>
+  <circle class="box ghost" cx="906" cy="232" r="20"/>
+  <text class="tick mid mono" x="906" y="237">01</text>
+  <circle class="box plain" cx="836" cy="296" r="20"/>
+  <text class="tick mid mono bold" x="836" y="301">11</text>
+  <path class="conn somatic thick" d="M822,184 L780,216" marker-end="url(#arrow-sm)"/>
+  <path class="conn somatic thick" d="M780,248 L822,280" marker-end="url(#arrow-sm)"/>
+  <text class="tick somatic mono end" x="770" y="192">+S1</text>
+  <text class="tick somatic mono end" x="770" y="288">+S2</text>
+  <text class="tick zh" x="708" y="336">實線圈＝有 read 看到的狀態</text>
+  <text class="tick zh" x="708" y="358">虛線圈＝沒看到，走它就要多假設一個狀態</text>
+  <text class="tick zh bold" x="708" y="386">成本＝用掉幾個箭頭，本例 2 步</text>
+
+  <path class="flow" d="M322,240 L346,240" marker-end="url(#arrow)"/>
+  <path class="flow" d="M658,240 L682,240" marker-end="url(#arrow)"/>
+
+  <line class="axis" x1="20" y1="462" x2="980" y2="462"/>
+  <text class="lbl bold zh" x="20" y="494">這棵樹讀起來就是一句話</text>
+  <text class="anno zh" x="20" y="524">「先有 S1 的那群細胞是 clone；之後其中一部分又拿到 S2，那一支就是 subclone。」</text>
+  <text class="anno zh" x="20" y="554">clone 指整個腫瘤群體共有的組合，subclone 指後來才長出來、只占一部分腫瘤細胞的分支。</text>
+  <text class="anno zh bold warn" x="20" y="590">限制：這是<tspan class="bold">單一區域</tspan>內 read 覆蓋得到的局部順序，不是整個腫瘤的演化樹；</text>
+  <text class="anno zh bold warn" x="20" y="618">最小成本並列時全部保留，不強行選一個。</text>
+</svg>
