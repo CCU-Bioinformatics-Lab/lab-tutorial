@@ -34,13 +34,13 @@ jobs:
     name: 四支工具＋site/ 同步檢查
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # 本專案零依賴：只需要 node 與 python，沒有 npm install
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: '20'
-      - uses: actions/setup-python@v5
+          node-version: '22'
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
@@ -70,7 +70,7 @@ jobs:
       - name: 4／SVG 文字重疊／超出畫布
         run: python3 tools/check_svg_layout.py
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
@@ -85,4 +85,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
