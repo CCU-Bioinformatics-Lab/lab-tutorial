@@ -234,3 +234,26 @@ python3 tools/check_svg_layout.py # SVG 文字重疊與超出畫布
 
 最後那一支特別值得跑：**CJK 字形是滿高滿寬的**，18px 的中文需要約 26px 行距才不會擠在一起，
 但這件事在原始碼上完全看不出來，要算 bounding box 才會發現。
+
+## 發布
+
+**push 到 `main` 就會自動發布**，不需要另外做什麼。
+
+`.github/workflows/deploy.yml` 會跑上面四支工具，然後把 `site/` 發布到
+<https://ccu-bioinformatics-lab.github.io/lab-tutorial/>。任何一支沒過就不會發布。
+
+它還會多做一件事：**比對 commit 進來的 `site/` 與 `src/` 重建出來的結果**。
+`site/` 是 committed 的交付物（學生直接用 `file://` 打開），所以改了 `src/`
+卻忘記重新建置時，repo 裡的 `site/` 會跟 `src/` 不一致 —— 這種落後沒有任何錯誤訊息。
+所以請養成習慣：
+
+```bash
+node tools/build.mjs          # 改完 src/ 一定要重建
+git add src site              # site/ 要跟著一起 commit
+```
+
+Pull request 只跑檢查，不發布。
+
+> 早期的發布方式是手動把 `site/` 推到 `gh-pages` 分支，也就是「push 兩次」。
+> 忘了第二步線上版本就會悄悄落後，所以改成 workflow。`gh-pages` 分支已經不再使用
+> （留著當回溯點，可以隨時刪）。
