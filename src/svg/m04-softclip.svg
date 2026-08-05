@@ -37,7 +37,7 @@
 
   <g>
     <!-- 被剪掉的部分：虛線紅框 -->
-    <rect class="box ghost" x="198" y="120" width="96" height="28" rx="3" stroke="var(--artifact)" stroke-dasharray="5 3"/>
+    <rect class="box ghost artifact" x="198" y="120" width="96" height="28" rx="3" style="stroke-dasharray:5 3"/>
     <text class="mono mid artifact" x="246" y="140" font-size="15">GCT…</text>
     <!-- 對上的部分 -->
     <rect class="box plain" x="300" y="120" width="28" height="28" rx="3"/><text class="base a mono mid" x="314" y="141" font-size="17">A</text>
@@ -75,7 +75,7 @@
     <rect class="box plain" x="470" y="236" width="28" height="28" rx="3"/><text class="base g mono mid" x="484" y="257" font-size="17">G</text>
     <rect class="box plain" x="504" y="236" width="28" height="28" rx="3"/><text class="base c mono mid" x="518" y="257" font-size="17">C</text>
     <rect class="box plain" x="538" y="236" width="28" height="28" rx="3"/><text class="base t mono mid" x="552" y="257" font-size="17">T</text>
-    <rect class="box ghost" x="572" y="236" width="96" height="28" rx="3" stroke="var(--artifact)" stroke-dasharray="5 3"/>
+    <rect class="box ghost artifact" x="572" y="236" width="96" height="28" rx="3" style="stroke-dasharray:5 3"/>
     <text class="mono mid artifact" x="620" y="256" font-size="15">AGC…</text>
   </g>
 
@@ -92,13 +92,13 @@
   <text class="anno bold zh ok" x="42" y="420">位置分散：可見於一般現象</text>
 
   <rect class="read hp0" x="60" y="436" width="150" height="11" rx="5.5"/>
-  <rect class="box ghost" x="46" y="436" width="14" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="box ghost artifact" x="46" y="436" width="14" height="11" rx="2" style="stroke-dasharray:3 2"/>
   <rect class="read hp0" x="140" y="452" width="160" height="11" rx="5.5"/>
   <rect class="read hp0" x="90" y="468" width="170" height="11" rx="5.5"/>
-  <rect class="box ghost" x="260" y="468" width="14" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="box ghost artifact" x="260" y="468" width="14" height="11" rx="2" style="stroke-dasharray:3 2"/>
   <rect class="read hp0" x="200" y="484" width="180" height="11" rx="5.5"/>
   <rect class="read hp0" x="120" y="500" width="200" height="11" rx="5.5"/>
-  <rect class="box ghost" x="320" y="500" width="14" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="box ghost artifact" x="320" y="500" width="14" height="11" rx="2" style="stroke-dasharray:3 2"/>
 
   <text class="tick zh" x="42" y="530">clipping 可分散於不同 read 的端部</text>
 
@@ -106,18 +106,18 @@
   <rect class="box bad" x="510" y="392" width="470" height="148" rx="8"/>
   <text class="anno bold zh bad" x="532" y="420">位置集中：結構變異斷點候選</text>
 
-  <line class="axis" x1="742" y1="428" x2="742" y2="516" stroke="var(--bad)" stroke-width="3"/>
+  <line class="axis bad" x1="742" y1="428" x2="742" y2="516" style="stroke-width:3"/>
 
   <rect class="read hp0" x="592" y="436" width="150" height="11" rx="5.5"/>
-  <rect class="box ghost" x="742" y="436" width="16" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="box ghost artifact" x="742" y="436" width="16" height="11" rx="2" style="stroke-dasharray:3 2"/>
   <rect class="read hp0" x="576" y="452" width="166" height="11" rx="5.5"/>
-  <rect class="box ghost" x="742" y="452" width="16" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="box ghost artifact" x="742" y="452" width="16" height="11" rx="2" style="stroke-dasharray:3 2"/>
   <rect class="read hp0" x="604" y="468" width="138" height="11" rx="5.5"/>
-  <rect class="box ghost" x="742" y="468" width="16" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="box ghost artifact" x="742" y="468" width="16" height="11" rx="2" style="stroke-dasharray:3 2"/>
   <rect class="read hp0" x="586" y="484" width="156" height="11" rx="5.5"/>
-  <rect class="box ghost" x="742" y="484" width="16" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="box ghost artifact" x="742" y="484" width="16" height="11" rx="2" style="stroke-dasharray:3 2"/>
   <rect class="read hp0" x="598" y="500" width="144" height="11" rx="5.5"/>
-  <rect class="box ghost" x="742" y="500" width="16" height="11" rx="2" stroke="var(--artifact)" stroke-dasharray="3 2"/>
+  <rect class="box ghost artifact" x="742" y="500" width="16" height="11" rx="2" style="stroke-dasharray:3 2"/>
 
   <text class="tick zh bad bold" x="532" y="530">read 與參考序列的對齊可能不一致，需進一步確認</text>
 </svg>

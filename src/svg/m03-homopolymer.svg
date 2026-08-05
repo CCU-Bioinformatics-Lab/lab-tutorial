@@ -24,10 +24,9 @@
 
   <text class="tick zh" x="38" y="116">電流訊號</text>
   <line class="axis" x1="120" y1="180" x2="460" y2="180"/>
-  <path class="conn thick" d="M120,150 L146,150 L146,120 L178,120 L178,164 L210,164
+  <path class="conn thick ok" d="M120,150 L146,150 L146,120 L178,120 L178,164 L210,164
                               L210,134 L242,134 L242,156 L274,156 L274,126 L306,126
-                              L306,170 L338,170 L338,140 L370,140 L370,158 L460,158"
-        stroke="var(--ok)" stroke-width="3" fill="none"/>
+                              L306,170 L338,170 L338,140 L370,140 L370,158 L460,158" style="stroke-width:3"/>
   <text class="tick zh ok bold" x="38" y="204">每個鹼基造成明顯的高低變化 → 容易數</text>
 
   <!-- ══ 下：homopolymer ══ -->
@@ -47,8 +46,7 @@
 
   <text class="tick zh" x="534" y="116">電流訊號</text>
   <line class="axis" x1="616" y1="180" x2="956" y2="180"/>
-  <path class="conn thick" d="M616,158 L640,158 L640,132 L840,132 L840,158 L956,158"
-        stroke="var(--bad)" stroke-width="3" fill="none"/>
+  <path class="conn thick bad" d="M616,158 L640,158 L640,132 L840,132 L840,158 L956,158" style="stroke-width:3"/>
   <text class="tick mid zh" x="740" y="124">一路維持在同一個平台</text>
   <text class="tick zh bad bold" x="534" y="204">六個與七個差異可能很小 → 容易數錯</text>
 
@@ -83,7 +81,7 @@
     <text class="base t artifact" x="448" y="352">T</text>
     <text class="base g" x="480" y="352">G</text>
   </g>
-  <rect class="box ghost" x="436" y="334" width="26" height="24" rx="3" stroke="var(--artifact)" stroke-dasharray="4 2"/>
+  <rect class="box ghost artifact" x="436" y="334" width="26" height="24" rx="3" style="stroke-dasharray:4 2"/>
   <text class="tick zh artifact bold" x="520" y="352">多數了一個 → 報成一個「插入」</text>
 
   <rect class="box warn" x="20" y="380" width="960" height="66" rx="8"/>

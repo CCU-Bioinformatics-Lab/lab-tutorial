@@ -77,7 +77,7 @@
     <rect class="read hp2" x="430" y="386" width="300" height="11" rx="5.5"/>
     <rect class="read hp1" x="430" y="401" width="300" height="11" rx="5.5"/>
 
-    <line class="axis" x1="420" y1="380" x2="420" y2="418" stroke="var(--bad)" stroke-width="3"/>
+    <line class="axis bad" x1="420" y1="380" x2="420" y2="418" style="stroke-width:3"/>
     <text class="tick zh bad bold" x="428" y="378">此處起相位標籤可能反轉</text>
     <text class="tick zh" x="750" y="401">switch 後的標籤可能持續錯置</text>
   </g>

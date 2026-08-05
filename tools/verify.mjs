@@ -275,7 +275,68 @@ if (guardsMissing.length) {
   }
 }
 
-/* ── 12. 大小預算 ────────────────────────────────────────────────────── */
+/* ── 12. presentation attribute 不得跟 diagram.css 的宣告撞名 ──────────
+   踩過才加的一項。CSS 有一條反直覺的規則：<b>樣式表裡的宣告一律贏過
+   presentation attribute</b>（後者相當於 specificity 0），跟寫在哪裡無關。
+   所以這一行畫出來是灰色，不是紅色：
+
+     <line class="conn" stroke="var(--bad)"/>       ← stroke 被 .conn 蓋掉
+
+   而且它<b>不會有任何錯誤訊息</b> —— 顏色就是靜靜地錯了。全專案曾經有
+   78 處這種寫法。正確作法二選一：
+     · 有語意的狀態色 → 在 diagram.css 開一個 class（.conn.bad …）
+     · 一次性的數值   → 寫進 style=""（inline style 才贏得過樣式表）   */
+
+const diagCss = fs.readFileSync(path.join(SITE, 'assets', 'css', 'diagram.css'), 'utf8')
+  .replace(/\/\*[\s\S]*?\*\//g, '');
+
+/* selector → 它宣告了哪些 property */
+const cssRules = [];
+for (const m of diagCss.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+  const props = new Set(
+    m[2].split(';').filter((d) => d.includes(':')).map((d) => d.split(':')[0].trim()));
+  for (const one of m[1].split(',')) {
+    const sel = one.trim();
+    if (!sel.startsWith('.dia-svg')) continue;
+    const cls = [...sel.replace('.dia-svg', '').matchAll(/\.([\w-]+)/g)].map((x) => x[1]);
+    if (cls.length) cssRules.push([cls, props]);
+  }
+}
+
+const PRESENTATION = new Set([
+  'fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'opacity',
+  'font-size', 'font-weight', 'font-family', 'text-anchor',
+]);
+
+for (const f of fs.existsSync(path.join(SRC, 'svg'))
+  ? fs.readdirSync(path.join(SRC, 'svg')).filter((x) => x.endsWith('.svg') && !x.startsWith('_'))
+  : []) {
+  const s = fs.readFileSync(path.join(SRC, 'svg', f), 'utf8')
+    .replace(/<!--[\s\S]*?-->/g, '');
+  for (const el of s.matchAll(/<(\w+)((?:[^>"]|"[^"]*")*?)>/g)) {
+    const attrs = el[2];
+    const cm = attrs.match(/class="([^"]*)"/);
+    if (!cm) continue;
+    const classes = cm[1].split(/\s+/).filter(Boolean);
+    const styled = new Set();
+    for (const [need, props] of cssRules) {
+      if (need.every((c) => classes.includes(c))) for (const p of props) styled.add(p);
+    }
+    const sm = attrs.match(/style="([^"]*)"/);
+    const inStyle = new Set(sm
+      ? sm[1].split(';').filter((d) => d.includes(':')).map((d) => d.split(':')[0].trim())
+      : []);
+    for (const am of attrs.matchAll(/\s([a-z-]+)="([^"]*)"/g)) {
+      const [, prop, val] = am;
+      if (!PRESENTATION.has(prop) || !styled.has(prop) || inStyle.has(prop)) continue;
+      fail(`src/svg/${f}`, `<${el[1]} class="${cm[1]}"> 的 ${prop}="${val}"` +
+        ` 會被 diagram.css 蓋掉（樣式表贏過 presentation attribute）` +
+        ` —— 改成 class 或寫進 style=""`);
+    }
+  }
+}
+
+/* ── 13. 大小預算 ────────────────────────────────────────────────────── */
 
 let total = 0;
 for (const f of files) total += fs.statSync(f).size;

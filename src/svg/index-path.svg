@@ -41,7 +41,7 @@
   <path class="flow" d="M786,98 L800,98" marker-end="url(#arrow-sm)"/>
 
   <!-- 上方：起點標示 -->
-  <path class="conn somatic" d="M108,44 L108,26" marker-start="url(#arrow-sm)" stroke-width="3"/>
+  <path class="conn somatic" d="M108,44 L108,26" marker-start="url(#arrow-sm)" style="stroke-width:3"/>
   <text class="anno mid zh bold somatic" x="108" y="20">從這裡開始</text>
 
   <!-- 下方：兩個轉折 -->

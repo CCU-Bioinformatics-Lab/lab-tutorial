@@ -15,8 +15,7 @@
 
   <!-- 覆蓋度階梯 -->
   <path class="conn thick" d="M120,140 L240,140 L240,108 L400,108 L400,140 L470,140
-                              L540,76 L610,140 L680,140 L680,104 L840,104 L840,140 L900,140"
-        stroke="var(--rule-strong)" stroke-width="3" fill="none"/>
+                              L540,76 L610,140 L680,140 L680,104 L840,104 L840,140 L900,140" style="stroke-width:3"/>
 
   <!-- 上升處：左端被剪（up clipping） -->
   <g>
@@ -42,9 +41,9 @@
 
   <!-- 框出的區間 -->
   <text class="tick end zh" x="112" y="212">框出的區間</text>
-  <line class="axis" x1="240" y1="206" x2="400" y2="206" stroke-width="5"/>
-  <line class="axis" x1="470" y1="206" x2="610" y2="206" stroke-width="5"/>
-  <line class="axis" x1="680" y1="206" x2="840" y2="206" stroke-width="5"/>
+  <line class="axis" x1="240" y1="206" x2="400" y2="206" style="stroke-width:5"/>
+  <line class="axis" x1="470" y1="206" x2="610" y2="206" style="stroke-width:5"/>
+  <line class="axis" x1="680" y1="206" x2="840" y2="206" style="stroke-width:5"/>
   <text class="tick mid zh" x="320" y="230">一個事件</text>
   <text class="tick mid zh" x="540" y="230">一個事件</text>
   <text class="tick mid zh" x="760" y="230">一個事件</text>
@@ -61,10 +60,9 @@
   <line class="axis" x1="120" y1="450" x2="910" y2="450"/>
 
   <!-- 階梯：低=LOH，中間兩個小島偏高 -->
-  <path class="conn thick" d="M120,370 L240,370 L240,440 L400,440 L400,365 L470,365
+  <path class="conn thick somatic" d="M120,370 L240,370 L240,440 L400,440 L400,365 L470,365
                               L470,440 L610,440 L610,360 L680,360 L680,440 L840,440
-                              L840,370 L900,370"
-        stroke="var(--somatic)" stroke-width="3" fill="none"/>
+                              L840,370 L900,370" style="stroke-width:3"/>
 
   <!-- 兩個小島標成問題 -->
   <text class="lbl bold bad mid" x="435" y="352">✗</text>
@@ -86,15 +84,14 @@
   <line class="guide" x1="120" y1="612" x2="910" y2="612"/>
   <line class="axis" x1="120" y1="646" x2="910" y2="646"/>
 
-  <path class="conn thick" d="M120,620 L240,620 L240,640 L840,640 L840,620 L900,620"
-        stroke="var(--ok)" stroke-width="4" fill="none"/>
+  <path class="conn thick ok" d="M120,620 L240,620 L240,640 L840,640 L840,620 L900,620"/>
 
   <!-- 跳過的小事件用虛線弧標示 -->
-  <path class="guide" d="M400,640 Q435,618 470,640" stroke="var(--muted)"/>
-  <path class="guide" d="M610,640 Q645,618 680,640" stroke="var(--muted)"/>
+  <path class="guide muted" d="M400,640 Q435,618 470,640"/>
+  <path class="guide muted" d="M610,640 Q645,618 680,640"/>
   <text class="tick mid zh" x="435" y="634">跳過</text>
   <text class="tick mid zh" x="645" y="634">跳過</text>
 
-  <line class="axis" x1="240" y1="664" x2="840" y2="664" stroke-width="6" stroke="var(--ok)"/>
+  <line class="axis ok" x1="240" y1="664" x2="840" y2="664" style="stroke-width:6"/>
   <text class="anno mid zh bold ok" x="540" y="690">較大範圍的染色體層級 LOH 候選</text>
 </svg>

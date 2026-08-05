@@ -53,7 +53,7 @@
   <text class="tick mid zh" x="640" y="286">常見的 → 較易排除</text>
   <text class="tick mid zh bad" x="640" y="306">獨有的 → 較難辨識</text>
 
-  <path class="conn" d="M742,288 L780,288" marker-end="url(#arrow-sm)" stroke="var(--bad)"/>
+  <path class="conn bad" d="M742,288 L780,288" marker-end="url(#arrow-sm)"/>
 
   <rect class="box bad" x="786" y="262" width="172" height="52" rx="6"/>
   <text class="tick mid zh bad bold" x="872" y="286">會殘留誤判</text>

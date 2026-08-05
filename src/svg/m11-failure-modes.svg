@@ -43,7 +43,7 @@
   <rect class="read hp2" x="370" y="114" width="130" height="12" rx="6"/>
   <rect class="read hp2" x="506" y="96" width="130" height="12" rx="6"/>
   <rect class="read hp1" x="506" y="114" width="130" height="12" rx="6"/>
-  <line class="axis" x1="503" y1="90" x2="503" y2="132" stroke="var(--bad)" stroke-width="3"/>
+  <line class="axis bad" x1="503" y1="90" x2="503" y2="132" style="stroke-width:3"/>
   <text class="tick zh bad bold" x="370" y="150">從該點之後可能整體錯置</text>
 
   <text class="tick bold zh" x="370" y="188">原因</text>

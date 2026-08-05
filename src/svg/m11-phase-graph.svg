@@ -48,7 +48,7 @@
   <rect class="box ok" x="20" y="256" width="306" height="130" rx="8"/>
   <circle class="mark germline" cx="80" cy="300" r="12"/>
   <circle class="mark germline" cx="266" cy="300" r="12"/>
-  <line class="conn thick" x1="92" y1="300" x2="254" y2="300" stroke="var(--ok)" stroke-width="7"/>
+  <line class="conn thick ok" x1="92" y1="300" x2="254" y2="300" style="stroke-width:7"/>
   <text class="anno mid bold zh ok" x="173" y="336">強邊</text>
   <text class="tick mid zh" x="173" y="360">多條 read 支持一致</text>
   <text class="tick mid zh" x="173" y="378">方向明確</text>
@@ -57,7 +57,7 @@
   <rect class="box warn" x="346" y="256" width="306" height="130" rx="8"/>
   <circle class="mark germline" cx="406" cy="300" r="12"/>
   <circle class="mark germline" cx="592" cy="300" r="12"/>
-  <line class="conn" x1="418" y1="300" x2="580" y2="300" stroke="var(--warn)" stroke-width="2" stroke-dasharray="6 4"/>
+  <line class="conn warn" x1="418" y1="300" x2="580" y2="300" stroke-dasharray="6 4"/>
   <text class="anno mid bold zh warn" x="499" y="336">弱邊</text>
   <text class="tick mid zh" x="499" y="360">read 證據彼此衝突</text>
   <text class="tick mid zh" x="499" y="378">可能有定序錯誤</text>
@@ -78,14 +78,14 @@
   <circle class="mark hp1" cx="180" cy="480" r="13"/>
   <circle class="mark hp1" cx="340" cy="480" r="13"/>
   <circle class="mark hp1" cx="500" cy="480" r="13"/>
-  <line class="conn hp1" x1="193" y1="480" x2="327" y2="480" stroke-width="5"/>
-  <line class="conn hp1" x1="353" y1="480" x2="487" y2="480" stroke-width="5"/>
+  <line class="conn hp1" x1="193" y1="480" x2="327" y2="480" style="stroke-width:5"/>
+  <line class="conn hp1" x1="353" y1="480" x2="487" y2="480" style="stroke-width:5"/>
 
   <text class="lbl bad bold" x="570" y="488">✕</text>
 
   <circle class="mark hp2" cx="660" cy="480" r="13"/>
   <circle class="mark hp2" cx="820" cy="480" r="13"/>
-  <line class="conn hp2" x1="673" y1="480" x2="807" y2="480" stroke-width="5"/>
+  <line class="conn hp2" x1="673" y1="480" x2="807" y2="480" style="stroke-width:5"/>
 
   <rect class="region" x="150" y="458" width="380" height="44" rx="6"/>
   <rect class="region" x="630" y="458" width="220" height="44" rx="6"/>

@@ -20,7 +20,7 @@
   <text class="tick zh" x="336" y="102">× 有多少比例的腫瘤細胞帶著它</text>
 
   <!-- 分隔線 -->
-  <line class="axis" x1="200" y1="126" x2="820" y2="126" stroke-width="3"/>
+  <line class="axis" x1="200" y1="126" x2="820" y2="126" style="stroke-width:3"/>
 
   <!-- 分母 -->
   <text class="anno bold zh" x="20" y="168">分母</text>
@@ -29,7 +29,7 @@
   <rect class="bar somatic" x="200" y="146" width="150" height="30" rx="4"/>
   <text class="tick mid zh" x="275" y="166">腫瘤細胞貢獻</text>
   <text class="anno mid" x="366" y="166">＋</text>
-  <rect class="bar" x="384" y="146" width="150" height="30" rx="4" fill="var(--muted-fill)" stroke="var(--rule-strong)"/>
+  <rect class="bar" x="384" y="146" width="150" height="30" rx="4"/>
   <text class="tick mid zh" x="459" y="166">正常細胞貢獻</text>
 
   <text class="tick zh" x="556" y="160">腫瘤那邊的份數取決於</text>

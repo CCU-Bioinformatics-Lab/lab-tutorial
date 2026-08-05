@@ -4,6 +4,14 @@
    所有 SVG 圖只寫 class，不寫顏色。改一次 token，35 張圖同步更新。
    build.mjs 會拒絕 _defs.svg 以外任何字面色碼。
 
+   ★ presentation attribute 一律輸給 class（踩過才知道）★
+     <line class="conn" stroke="var(--bad)"> 畫出來是灰的，不是紅的 ——
+     樣式表裡的宣告比 presentation attribute 優先，跟 specificity 無關。
+     所以凡是這裡有宣告的 property，SVG 就不能用同名的 attribute 去改：
+       · 有語意的（某個狀態色）→ 在這裡開一個 class
+       · 一次性的數值（stroke-width / stroke-dasharray）→ 寫在 style="" 裡
+     verify.mjs 第 12 項會擋住寫成 attribute 的情況。
+
    ★ 色相不撞規則（第 22 張圖時你會忘記，所以寫在這裡）★
      read 本體  → haplotype 色 (.read.hp1 / .hp2 / .hp0)
      鹼基字母    → base 色      (.base.a / .c / .g / .t)
@@ -102,11 +110,18 @@
 
 /* --- 線條 / 座標軸 / 導引線 --------------------------------------------- */
 .dia-svg .axis  { stroke: var(--rule-strong); stroke-width: 2; fill: none; }
+.dia-svg .axis.ok  { stroke: var(--ok); }
+.dia-svg .axis.bad { stroke: var(--bad); }
 .dia-svg .guide { stroke: var(--rule); stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; }
+.dia-svg .guide.muted { stroke: var(--muted); }
 .dia-svg .conn  { stroke: var(--rule-strong); stroke-width: 2; fill: none; }
 .dia-svg .conn.hp1 { stroke: var(--hp1); }
 .dia-svg .conn.hp2 { stroke: var(--hp2); }
 .dia-svg .conn.somatic { stroke: var(--somatic); }
+.dia-svg .conn.ok   { stroke: var(--ok); }
+.dia-svg .conn.warn { stroke: var(--warn); }
+.dia-svg .conn.bad  { stroke: var(--bad); }
+.dia-svg .conn.met  { stroke: var(--met); }
 .dia-svg .conn.thick { stroke-width: 4; }
 .dia-svg .flow  { stroke: var(--accent); stroke-width: 2.5; fill: none; }
 
@@ -122,6 +137,9 @@
 .dia-svg .box.warn    { fill: var(--warn-fill);stroke: var(--warn); }
 .dia-svg .box.plain   { fill: var(--paper);    stroke: var(--rule); }
 .dia-svg .box.ghost   { fill: none; stroke: var(--rule); stroke-dasharray: 6 4; }
+.dia-svg .box.sunken  { fill: var(--muted-fill); stroke: var(--rule); }
+.dia-svg .box.ghost.artifact { fill: none; stroke: var(--artifact); }
+.dia-svg .box.ghost.bad      { fill: none; stroke: var(--bad); }
 
 /* --- 區域高亮 ------------------------------------------------------------ */
 .dia-svg .region      { fill: var(--accent); opacity: .1; }
@@ -141,6 +159,9 @@
 .dia-svg .bar.hp2      { fill: var(--hp2-fill); stroke: var(--hp2); }
 .dia-svg .bar.somatic  { fill: var(--somatic-fill); stroke: var(--somatic); }
 .dia-svg .bar.artifact { fill: var(--artifact-fill); stroke: var(--artifact); }
+.dia-svg .bar.ok       { fill: var(--ok-fill);   stroke: var(--ok); }
+.dia-svg .bar.warn     { fill: var(--warn-fill); stroke: var(--warn); }
+.dia-svg .bar.bad      { fill: var(--bad-fill);  stroke: var(--bad); }
 
 /* --- 數值格：熱圖／張量通道用，深淺＝數值大小 ---------------------------
    刻意是中性的 ink 而非任何語意色 —— 這裡的深淺代表「數值大」，

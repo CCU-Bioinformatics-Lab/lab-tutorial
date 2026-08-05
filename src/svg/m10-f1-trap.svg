@@ -18,15 +18,15 @@
   <text class="tick mid zh accent bold" x="700" y="64">所報候選</text>
 
   <!-- 三個區塊 -->
-  <rect class="bar" x="150" y="92" width="196" height="80" rx="4" fill="var(--warn-fill)" stroke="var(--warn)"/>
+  <rect class="bar warn" x="150" y="92" width="196" height="80" rx="4"/>
   <text class="anno mid bold zh warn" x="248" y="128">假陰性</text>
   <text class="tick mid mono" x="248" y="154">FN</text>
 
-  <rect class="bar" x="376" y="92" width="164" height="80" rx="4" fill="var(--ok-fill)" stroke="var(--ok)"/>
+  <rect class="bar ok" x="376" y="92" width="164" height="80" rx="4"/>
   <text class="anno mid bold zh ok" x="458" y="128">真陽性</text>
   <text class="tick mid mono" x="458" y="154">TP</text>
 
-  <rect class="bar" x="570" y="92" width="152" height="80" rx="4" fill="var(--bad-fill)" stroke="var(--bad)"/>
+  <rect class="bar bad" x="570" y="92" width="152" height="80" rx="4"/>
   <text class="anno mid bold zh bad" x="646" y="128">假陽性</text>
   <text class="tick mid mono" x="646" y="154">FP</text>
 
@@ -45,11 +45,11 @@
 
   <!-- 過濾前 -->
   <text class="tick end zh" x="112" y="342">過濾前</text>
-  <rect class="bar" x="120" y="322" width="268" height="30" rx="4" fill="var(--warn-fill)" stroke="var(--warn)"/>
+  <rect class="bar warn" x="120" y="322" width="268" height="30" rx="4"/>
   <text class="tick mid zh" x="254" y="342">FN 335</text>
-  <rect class="bar" x="392" y="322" width="330" height="30" rx="4" fill="var(--ok-fill)" stroke="var(--ok)"/>
+  <rect class="bar ok" x="392" y="322" width="330" height="30" rx="4"/>
   <text class="tick mid zh" x="557" y="342">TP 412</text>
-  <rect class="bar" x="726" y="322" width="70" height="30" rx="4" fill="var(--bad-fill)" stroke="var(--bad)"/>
+  <rect class="bar bad" x="726" y="322" width="70" height="30" rx="4"/>
   <text class="tick mid zh" x="761" y="342">FP 88</text>
 
   <text class="tick mono" x="820" y="336">precision 0.824</text>
@@ -57,13 +57,13 @@
 
   <!-- 過濾後 -->
   <text class="tick end zh" x="112" y="404">過濾後</text>
-  <rect class="bar" x="120" y="384" width="268" height="30" rx="4" fill="var(--warn-fill)" stroke="var(--warn)"/>
+  <rect class="bar warn" x="120" y="384" width="268" height="30" rx="4"/>
   <text class="tick mid zh" x="254" y="404">FN 335（本示例維持不變）</text>
-  <rect class="bar" x="392" y="384" width="330" height="30" rx="4" fill="var(--ok-fill)" stroke="var(--ok)"/>
+  <rect class="bar ok" x="392" y="384" width="330" height="30" rx="4"/>
   <text class="tick mid zh" x="557" y="404">TP 412</text>
-  <rect class="bar" x="726" y="384" width="35" height="30" rx="4" fill="var(--bad-fill)" stroke="var(--bad)"/>
+  <rect class="bar bad" x="726" y="384" width="35" height="30" rx="4"/>
   <text class="tick mid zh" x="743" y="404">FP 44</text>
-  <rect class="box ghost" x="761" y="384" width="35" height="30" rx="4" stroke="var(--bad)" stroke-dasharray="4 3"/>
+  <rect class="box ghost bad" x="761" y="384" width="35" height="30" rx="4" style="stroke-dasharray:4 3"/>
 
   <text class="tick mono ok bold" x="820" y="398">precision 0.904</text>
   <text class="tick mono bad" x="820" y="418">F1 　　　0.685</text>
