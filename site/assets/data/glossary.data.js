@@ -527,6 +527,7 @@ window.TW_GLOSSARY = {
   "slug": "phasing",
   "modules": [
    "m02",
+   "m05",
    "m06",
    "m12"
   ]
@@ -906,6 +907,7 @@ window.TW_GLOSSARY = {
   "modules": [
    "capstone",
    "m02",
+   "m05",
    "m06",
    "m08",
    "m11",
@@ -937,8 +939,6 @@ window.TW_GLOSSARY = {
   "slug": "precision",
   "modules": [
    "capstone",
-   "m05",
-   "m07",
    "m10"
   ]
  },
@@ -958,7 +958,6 @@ window.TW_GLOSSARY = {
   "modules": [
    "capstone",
    "m03",
-   "m05",
    "m10",
    "m12"
   ]
@@ -973,7 +972,6 @@ window.TW_GLOSSARY = {
   "slug": "f1",
   "modules": [
    "capstone",
-   "m05",
    "m10"
   ]
  },

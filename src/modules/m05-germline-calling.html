@@ -4,7 +4,7 @@
     "說明 variant caller 在做什麼判斷，以及為什麼它不是單純數 read",
     "說明 phasing 資訊如何作為辨識定序錯誤的輔助證據",
     "說出 Clair3 與 DeepVariant 在流程中的位置",
-    "建立 precision、recall 與 F1 的基本概念，並說明三項指標各自衡量的內容"
+    "說明為什麼 phasing 與 calling 是來回兩次，而不是單向的一次"
   ]
 }
 -->
@@ -15,8 +15,8 @@
 <p class="prose">本課程後續工具多以 caller 輸出的候選變異為輸入，進一步進行篩選或校正。
 因此需要先理解 caller 的輸出內容與限制。</p>
 
-<p class="prose">germline calling 的情境相對單純。本節先建立 [[precision]] 與 [[recall]] 的基本直覺，
-再於 M07 延伸到 somatic calling 的額外因素。</p>
+<p class="prose">germline calling 的情境相對單純：一個人只有兩條染色體，變異要嘛在其中一條、要嘛兩條都有。
+本節在這個單純的情境下把 caller 的判斷方式講清楚，M07 再處理腫瘤帶來的額外因素。</p>
 </section>
 
 
@@ -41,52 +41,31 @@ Clair3 則先用輕量模型掃過所有位置，只把信心不足的少數位�
 
 {{svg:m05-caller-pipeline | [wide] 上：caller 吃 BAM 與參考序列，吐出 germline VCF，供後續 phasing 使用。中：DeepVariant 的三個步驟。下：Clair3 的兩段式設計 —— 把昂貴的計算只花在難判的少數位置上。步驟名稱與門檻依版本而異。}}
 
-<h3>phasing 如何協助辨識定序雜訊</h3>
+<h3>把 read 先分成兩群，判斷就變簡單了</h3>
 
-<p class="prose">以下示範 read-level phasing 如何作為辨識候選變異的輔助證據：</p>
+<p class="prose">前面那張畫面還有一個沒用上的線索：這些 read 分別來自哪一條染色體。
+一個人的每個位置有兩條染色體，一條來自父親、一條來自母親。
+把 read 依這兩條分成兩群（也就是 [[phasing]]），同一個畫面會變得好判斷得多：</p>
 
-<ul class="prose">
-<li><b>一般 heterozygous germline 變異</b>：在 phasing 與 mapping 品質可靠的簡化情境下，支持 read 往往較集中於同一條 [[haplotype]]。</li>
-<li><b>隨機定序錯誤</b>：通常較分散於 HP1 與 HP2；但系統性錯誤、mapping bias、copy-number／LOH 或 phasing 錯誤可能不符合此模式。</li>
-</ul>
+{{svg:m05-phasing-helps-calling | [wide] ① 六條 read 混在一起時，其中三個位置各看得到兩種鹼基，分不出哪些是真的。② 分成兩群之後：位置 1 與位置 3 在同一群裡每條 read 都一致，與真的 heterozygous 變異相容；位置 2 只是兩群各零星一條，與定序錯誤相容。③ 因此流程是來回兩次：先 call 出可靠的 het 位點 → 用它們 phasing → 帶著 HP 標籤再判一次。④ 位置 2 被移除，不寫進 VCF。}}
+
+<p class="prose">關鍵在<b>一致性</b>，不在數量。真的 heterozygous 變異只存在於其中一條染色體上，
+所以那一群的每一條 read 都應該帶著它；隨機的定序錯誤沒有這個約束，會零星散落在兩群裡。
+這個判準對錯誤率較高的平台（例如部分 ONT 資料）特別有用 —— 那正是單看計數最不可靠的情形。</p>
+
+<p class="prose">這也解釋了一個看起來矛盾的地方：明明要先有變異才能 phasing，怎麼又說 phasing 幫助 calling？
+因為兩者是<b>來回兩次</b>：先用最有把握的位點做一次 calling，用它們把 read 分群，
+再把 [[HP tag|HP 標籤]]當成模型的額外輸入重判一次。Clair3 的 full-alignment 階段與
+PEPPER-Margin-DeepVariant 都採用這個順序。</p>
+
+<p class="prose">同一個「集中或分散」的線索在腫瘤資料裡會再出現一次，只是那時要判斷的不只是真假，
+還包括這個變異長在哪一條 [[haplotype]] 上 —— 需要的證據也更多。以下這張圖先把最重要的陷阱說清楚：
+<b>兩種情況的支持 read 總數可以幾乎一樣</b>，所以不能靠數量判斷。</p>
 
 {{svg:m05-consistent-vs-chaotic | [wide] 兩邊示意同一種畫面：中間是待判斷的候選位置，左右各有一個已知參考位點，將 read 分成兩個 haplotype 群組。左邊示意支持 read 集中於一群；右邊示意支持 read 分布於兩群。兩邊的<b>總數相近</b>，因此僅依數量難以區分，仍需整合品質與比對證據。}}
 
-<p class="prose">換句話說，「這個候選的支持 read 是否集中在單一 haplotype 上」可作為重要的輔助特徵。
-後續模組會在不同情境中再次使用這項訊息：</p>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>應用情境</th><th>用途</th></tr></thead>
-<tbody>
-<tr><td>germline calling（本節）</td><td>支持 read 分布分散 → 可列為定序錯誤的候選訊號</td></tr>
-<tr><td>LongPhase-S 的 read-level filter</td><td>somatic read 若同時帶有 HP1 與 HP2 的 germline allele → 可疑</td></tr>
-<tr><td>LongPhase-S 的 haplotype origin filter</td><td>若資料可可靠建立 haplotype origin，somatic-supporting read 的分布可作為來源判定的輔助證據；CN／LOH 等情況需另行評估</td></tr>
-<tr><td>LongPhase-TO / D 的 triplet graph</td><td>候選點與左右兩個 germline 位點的連結樣態</td></tr>
-</tbody>
-</table>
-</div>
-
-<p class="prose">在本節示例中，<b>「分布集中或分散」是重要線索之一</b>，但不能取代品質、比對與 copy-number 等證據。</p>
-
-<h3>precision 與 recall：基礎概念</h3>
-
-<p class="prose">評估 caller 時，至少應同時查看 precision 與 recall。假設 benchmark 標示某區域有 100 個真變異，
-而 caller 報告 90 個，其中 80 個為真變異：</p>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>指標</th><th>計算方式</th><th>這個例子</th><th>解讀問題</th></tr></thead>
-<tbody>
-<tr><td>[[precision]]</td><td>TP ÷（TP + FP）</td><td>80 ÷ 90 = <b>0.89</b></td><td>報告的候選中有多少為真變異？</td></tr>
-<tr><td>[[recall]]</td><td>TP ÷（TP + FN）</td><td>80 ÷ 100 = <b>0.80</b></td><td>所有真變異中有多少被找出？</td></tr>
-<tr><td>[[F1]]</td><td>兩者的調和平均</td><td><b>0.84</b></td><td>同時摘要 precision 與 recall</td></tr>
-</tbody>
-</table>
-</div>
-
-<p class="prose">調整判定門檻通常會改變 precision–recall trade-off：放寬門檻可能提高 recall，收緊門檻可能提高 precision，
-但實際方向與幅度取決於資料與模型。M10 的滑桿示範：<b>precision 增加時，F1 不一定同步增加相同幅度。</b></p>
+<p class="prose">要注意這個判準有邊界：系統性錯誤、mapping bias，以及腫瘤裡的 copy-number 變化或
+[[LOH]]，都可能讓分布不符合上述的簡化模式。它是重要線索，不是單獨的判定依據。</p>
 </section>
 
 

@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
+  <title>先把 read 分成兩群，再判定變異：haplotype 資訊如何幫助 germline calling</title>
+  <desc>① 六條 read、四個位置；其中三個位置各出現了兩種鹼基，但看不出哪些是真的變異、哪些是錯誤。
+        ② phasing 把 read 分成兩群之後，位置 1 與位置 3 的差異在同一群裡每一條 read 都一致，
+        與真的 heterozygous 變異相容；位置 2 的差異則是兩群各零星一條，與定序錯誤相容。
+        ③ 因此實際流程是來回兩次：先做一次 calling 取得可靠的 heterozygous 位點，
+        用它們把 read 分成 HP1 與 HP2，再把 haplotype 標籤當成模型的額外輸入重判一次。
+        ④ 最終判定中，位置 1 與位置 3 保留為 heterozygous 變異，位置 2 被判為錯誤而移除。</desc>
+
+  <!-- ══════════════ ① 混在一起的 read ══════════════ -->
+  <text class="lbl bold zh" x="16" y="48">① 定序後的 read：混在一起</text>
+  <rect class="box plain" x="16" y="64" width="454" height="246" rx="10"/>
+
+  <rect class="read hp0" x="56" y="96" width="390" height="14" rx="7"/>
+  <rect class="read hp0" x="56" y="124" width="390" height="14" rx="7"/>
+  <rect class="read hp0" x="56" y="152" width="390" height="14" rx="7"/>
+  <rect class="read hp0" x="56" y="180" width="390" height="14" rx="7"/>
+  <rect class="read hp0" x="56" y="208" width="390" height="14" rx="7"/>
+  <rect class="read hp0" x="56" y="236" width="390" height="14" rx="7"/>
+
+  <!-- r1(HP1) -->
+  <text class="base g mono" x="120" y="107" font-size="15">G</text>
+  <text class="base t mono" x="215" y="107" font-size="15">T</text>
+  <text class="base t mono" x="310" y="107" font-size="15">T</text>
+  <text class="base a mono" x="405" y="107" font-size="15">A</text>
+  <!-- r3(HP2) -->
+  <text class="base a mono" x="120" y="135" font-size="15">A</text>
+  <text class="base t mono" x="215" y="135" font-size="15">T</text>
+  <text class="base c mono" x="310" y="135" font-size="15">C</text>
+  <text class="base a mono" x="405" y="135" font-size="15">A</text>
+  <!-- r2(HP1，帶一個錯誤) -->
+  <text class="base g mono" x="120" y="163" font-size="15">G</text>
+  <text class="base c mono" x="215" y="163" font-size="15">C</text>
+  <text class="base t mono" x="310" y="163" font-size="15">T</text>
+  <text class="base a mono" x="405" y="163" font-size="15">A</text>
+  <!-- r6(HP2) -->
+  <text class="base a mono" x="120" y="191" font-size="15">A</text>
+  <text class="base t mono" x="215" y="191" font-size="15">T</text>
+  <text class="base c mono" x="310" y="191" font-size="15">C</text>
+  <text class="base a mono" x="405" y="191" font-size="15">A</text>
+  <!-- r4(HP1) -->
+  <text class="base g mono" x="120" y="219" font-size="15">G</text>
+  <text class="base t mono" x="215" y="219" font-size="15">T</text>
+  <text class="base t mono" x="310" y="219" font-size="15">T</text>
+  <text class="base a mono" x="405" y="219" font-size="15">A</text>
+  <!-- r5(HP2，帶一個錯誤) -->
+  <text class="base a mono" x="120" y="247" font-size="15">A</text>
+  <text class="base c mono" x="215" y="247" font-size="15">C</text>
+  <text class="base c mono" x="310" y="247" font-size="15">C</text>
+  <text class="base a mono" x="405" y="247" font-size="15">A</text>
+
+  <text class="tick zh" x="36" y="278">六條 read、四個位置；其中三個位置出現兩種鹼基。</text>
+  <text class="tick zh" x="36" y="300">哪些是真的變異、哪些是錯誤？這樣排看不出來。</text>
+
+  <path class="flow" d="M478,180 L522,180" marker-end="url(#arrow)"/>
+
+  <!-- ══════════════ ② phasing 後 ══════════════ -->
+  <text class="lbl bold zh" x="530" y="48">② phasing：把 read 分成兩群</text>
+  <rect class="box plain" x="530" y="64" width="454" height="246" rx="10"/>
+
+  <circle class="mark germline" cx="634" cy="88" r="6"/>
+  <circle class="mark artifact" cx="729" cy="88" r="6"/>
+  <circle class="mark germline" cx="824" cy="88" r="6"/>
+
+  <rect class="read hp1" x="570" y="104" width="390" height="14" rx="7"/>
+  <rect class="read hp1" x="570" y="132" width="390" height="14" rx="7"/>
+  <rect class="read hp1" x="570" y="160" width="390" height="14" rx="7"/>
+
+  <line class="guide" x1="550" y1="186" x2="964" y2="186"/>
+
+  <rect class="read hp2" x="570" y="196" width="390" height="14" rx="7"/>
+  <rect class="read hp2" x="570" y="224" width="390" height="14" rx="7"/>
+  <rect class="read hp2" x="570" y="252" width="390" height="14" rx="7"/>
+
+  <text class="tick end bold hp1" x="566" y="143">HP1</text>
+  <text class="tick end bold hp2" x="566" y="235">HP2</text>
+
+  <!-- HP1 群：位置 1 全是 G、位置 3 全是 T；位置 2 只有中間那條是 C -->
+  <text class="base g mono" x="634" y="115" font-size="15">G</text>
+  <text class="base t mono" x="729" y="115" font-size="15">T</text>
+  <text class="base t mono" x="824" y="115" font-size="15">T</text>
+  <text class="base a mono" x="919" y="115" font-size="15">A</text>
+
+  <text class="base g mono" x="634" y="143" font-size="15">G</text>
+  <text class="base c mono" x="729" y="143" font-size="15">C</text>
+  <text class="base t mono" x="824" y="143" font-size="15">T</text>
+  <text class="base a mono" x="919" y="143" font-size="15">A</text>
+
+  <text class="base g mono" x="634" y="171" font-size="15">G</text>
+  <text class="base t mono" x="729" y="171" font-size="15">T</text>
+  <text class="base t mono" x="824" y="171" font-size="15">T</text>
+  <text class="base a mono" x="919" y="171" font-size="15">A</text>
+
+  <!-- HP2 群：位置 1 全是 A、位置 3 全是 C；位置 2 只有最後那條是 C -->
+  <text class="base a mono" x="634" y="207" font-size="15">A</text>
+  <text class="base t mono" x="729" y="207" font-size="15">T</text>
+  <text class="base c mono" x="824" y="207" font-size="15">C</text>
+  <text class="base a mono" x="919" y="207" font-size="15">A</text>
+
+  <text class="base a mono" x="634" y="235" font-size="15">A</text>
+  <text class="base t mono" x="729" y="235" font-size="15">T</text>
+  <text class="base c mono" x="824" y="235" font-size="15">C</text>
+  <text class="base a mono" x="919" y="235" font-size="15">A</text>
+
+  <text class="base a mono" x="634" y="263" font-size="15">A</text>
+  <text class="base c mono" x="729" y="263" font-size="15">C</text>
+  <text class="base c mono" x="824" y="263" font-size="15">C</text>
+  <text class="base a mono" x="919" y="263" font-size="15">A</text>
+
+  <circle class="mark germline" cx="556" cy="279" r="5"/>
+  <text class="tick zh" x="570" y="284">位置 1、3：同一群內每條都一致 → 像真的變異</text>
+  <circle class="mark artifact" cx="556" cy="301" r="5"/>
+  <text class="tick zh" x="570" y="306">位置 2：兩群各零星一條 → 像定序錯誤</text>
+
+  <!-- ══════════════ ③ 來回兩次的流程 ══════════════ -->
+  <text class="lbl bold zh" x="16" y="340">③ 所以實際流程是來回兩次</text>
+  <rect class="box plain" x="16" y="356" width="660" height="180" rx="10"/>
+
+  <rect class="box accent" x="36" y="392" width="190" height="76" rx="6"/>
+  <text class="tick mid zh bold" x="131" y="418">第一次 calling</text>
+  <text class="tick mid zh" x="131" y="440">還沒有 haplotype</text>
+  <text class="tick mid zh" x="131" y="458">取得可靠的 het 位點</text>
+
+  <path class="flow" d="M230,430 L242,430" marker-end="url(#arrow)"/>
+
+  <rect class="box accent" x="246" y="392" width="190" height="76" rx="6"/>
+  <text class="tick mid zh bold" x="341" y="418">用這些位點 phasing</text>
+  <text class="tick mid zh" x="341" y="440">把 read 分成</text>
+  <text class="tick mid zh" x="341" y="458">HP1 與 HP2</text>
+
+  <path class="flow" d="M440,430 L452,430" marker-end="url(#arrow)"/>
+
+  <rect class="box ok" x="456" y="392" width="190" height="76" rx="6"/>
+  <text class="tick mid zh bold" x="551" y="418">帶著 HP 再判一次</text>
+  <text class="tick mid zh" x="551" y="440">haplotype 成為</text>
+  <text class="tick mid zh" x="551" y="458">模型的額外輸入</text>
+
+  <text class="tick zh" x="36" y="500">難判的位置在第二次才定案；容易的位置第一次就結束了。</text>
+
+  <path class="flow" d="M684,430 L706,430" marker-end="url(#arrow)"/>
+
+  <!-- ══════════════ ④ 最終判定 ══════════════ -->
+  <text class="lbl bold zh" x="716" y="340">④ 最終判定</text>
+  <rect class="box plain" x="716" y="356" width="268" height="180" rx="10"/>
+
+  <text class="tick zh" x="736" y="386">兩條染色體各自的鹼基</text>
+
+  <line class="axis" x1="736" y1="410" x2="964" y2="410"/>
+  <line class="axis" x1="736" y1="458" x2="964" y2="458"/>
+
+  <text class="tick end bold hp1" x="762" y="405">HP1</text>
+  <text class="tick end bold hp2" x="762" y="480">HP2</text>
+
+  <text class="base g mono" x="800" y="405" font-size="16">G</text>
+  <text class="base a mono" x="800" y="480" font-size="16">A</text>
+  <circle class="mark germline" cx="800" cy="434" r="6"/>
+
+  <path class="conn thick" d="M842,420 L866,448 M866,420 L842,448"/>
+
+  <text class="base t mono" x="906" y="405" font-size="16">T</text>
+  <text class="base c mono" x="906" y="480" font-size="16">C</text>
+  <circle class="mark germline" cx="906" cy="434" r="6"/>
+
+  <text class="tick zh" x="736" y="512">位置 2 被判為錯誤，不寫進 VCF。</text>
+
+  <!-- ══════════════ 結論 ══════════════ -->
+  <line class="axis" x1="20" y1="556" x2="980" y2="556"/>
+  <text class="anno zh bold" x="20" y="588">「先 call 再 phase」與「phase 幫助 call」並不衝突：先用最有把握的 het 位點做 phasing，</text>
+  <text class="anno zh" x="20" y="616">再把 haplotype 資訊餵回模型重判一次 —— Clair3 與 PEPPER-Margin-DeepVariant 都是這樣做。</text>
+</svg>
