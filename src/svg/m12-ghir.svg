@@ -1,132 +1,92 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 546">
-  <title>GHIR 示意：haplotype 比例如何提供腫瘤 DNA fraction 的估計訊號</title>
-  <desc>在簡化、無系統性偏差且拷貝數條件相近的示意下，上排三格比較兩條 haplotype 的 read 比例。
-        正常情況下兩條 haplotype 的 read 各佔一半，比值 0.5。
-        當腫瘤細胞在其中一條上發生突變，那部分 read 就被歸到新的分支，
-        使原本兩條的比值偏離 0.5；在其他條件相近時，腫瘤 DNA fraction 越高，偏離可能越明顯。
-        下排：把整個基因體所有位點的比值畫成直方圖，
-        分布可能隨腫瘤 DNA fraction 改變而向右移動；此分布特徵可作為回歸模型的估計訊號之一。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600">
+  <title>GHIR 的定義：一個候選位點上兩條 germline haplotype 的 read 有多偏</title>
+  <desc>GHIR 的定義是在一個候選 somatic 位點上，
+        取 HP1 與 HP2 兩個 read 數的較大者，除以這兩者的總和。
+        因此 0.5 表示兩條完全平衡，1.0 表示 read 全部偏向其中一條。
+        三格由左到右示意 purity 由低到高：
+        沒有腫瘤突變時 HP1 與 HP2 各三條，比值 0.5；
+        少部分細胞帶突變時，帶突變的 read 被改標成 HP2-1、不再算進 HP2，比值升為 0.75；
+        腫瘤細胞比例很高時 HP2 幾乎只剩 HP2-1，比值接近 1.0。
+        下半部提醒第二個造成偏移的來源：腫瘤本身的拷貝數變化、LOH 與 aneuploidy
+        也會讓某一條 haplotype 變多或消失，同樣把比值推向 1，
+        因此需要先用 normal 樣本當基準把這類位點濾掉。</desc>
 
-  <!-- ══ 上排：三種平衡狀態 ══ -->
-  <text class="lbl bold zh" x="20" y="28">單一位點上，兩條 haplotype 的 read 比例</text>
+  <text class="lbl bold zh" x="20" y="32">GHIR：兩條 germline haplotype 的 read 有多偏</text>
 
-  <!-- 情況 1：平衡 -->
-  <rect class="box plain" x="20" y="44" width="300" height="180" rx="8"/>
-  <text class="anno mid bold zh" x="170" y="70">沒有腫瘤突變</text>
+  <rect class="box accent" x="20" y="50" width="960" height="70" rx="8"/>
+  <text class="anno bold mono" x="44" y="80">GHIR = max(HP1 read 數, HP2 read 數) ÷ (HP1 read 數 + HP2 read 數)</text>
+  <text class="tick zh" x="44" y="106">在每一個候選 somatic 位點上各算一次。0.5 ＝ 兩條完全平衡；1.0 ＝ read 全部偏向其中一條。</text>
 
-  <rect class="read hp1" x="46" y="88" width="120" height="14" rx="7"/>
-  <rect class="read hp1" x="46" y="108" width="120" height="14" rx="7"/>
-  <rect class="read hp1" x="46" y="128" width="120" height="14" rx="7"/>
-  <text class="tick hp1 bold" x="174" y="118">HP1</text>
+  <!-- ══ 沒有腫瘤突變 ══ -->
+  <rect class="box plain" x="16" y="140" width="304" height="290" rx="10"/>
+  <text class="anno bold zh mid" x="168" y="170">沒有腫瘤突變</text>
+  <rect class="read hp1" x="56" y="186" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="214" y="198">HP1</text>
+  <rect class="read hp1" x="56" y="210" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="214" y="222">HP1</text>
+  <rect class="read hp1" x="56" y="234" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="214" y="246">HP1</text>
+  <rect class="read hp2" x="56" y="258" width="150" height="14" rx="7"/>
+  <text class="tick hp2" x="214" y="270">HP2</text>
+  <rect class="read hp2" x="56" y="282" width="150" height="14" rx="7"/>
+  <text class="tick hp2" x="214" y="294">HP2</text>
+  <rect class="read hp2" x="56" y="306" width="150" height="14" rx="7"/>
+  <text class="tick hp2" x="214" y="318">HP2</text>
+  <text class="tick zh" x="56" y="356">HP1 = 3　HP2 = 3</text>
+  <text class="tick mono" x="56" y="380">GHIR = 3 ÷ (3+3)</text>
+  <text class="lbl bold mid ok" x="168" y="414">0.50</text>
+  <text class="tick mid zh ok" x="266" y="414">平衡</text>
 
-  <rect class="read hp2" x="46" y="156" width="120" height="14" rx="7"/>
-  <rect class="read hp2" x="46" y="176" width="120" height="14" rx="7"/>
-  <rect class="read hp2" x="46" y="196" width="120" height="14" rx="7"/>
-  <text class="tick hp2 bold" x="174" y="186">HP2</text>
+  <!-- ══ 少部分細胞帶突變 ══ -->
+  <rect class="box plain" x="348" y="140" width="304" height="290" rx="10"/>
+  <text class="anno bold zh mid" x="500" y="170">少部分細胞帶突變</text>
+  <rect class="read hp1" x="388" y="186" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="546" y="198">HP1</text>
+  <rect class="read hp1" x="388" y="210" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="546" y="222">HP1</text>
+  <rect class="read hp1" x="388" y="234" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="546" y="246">HP1</text>
+  <rect class="read hp2" x="388" y="258" width="150" height="14" rx="7"/>
+  <text class="tick hp2" x="546" y="270">HP2</text>
+  <rect class="read hp2" x="388" y="282" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="463" cy="289" r="5"/>
+  <text class="tick somatic" x="546" y="294">HP2-1</text>
+  <rect class="read hp2" x="388" y="306" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="463" cy="313" r="5"/>
+  <text class="tick somatic" x="546" y="318">HP2-1</text>
+  <text class="tick zh" x="388" y="356">HP1 = 3　HP2 = 1</text>
+  <text class="tick mono" x="388" y="380">GHIR = 3 ÷ (3+1)</text>
+  <text class="lbl bold mid warn" x="500" y="414">0.75</text>
+  <text class="tick mid zh warn" x="598" y="414">開始偏</text>
 
-  <text class="lbl mid bold ok" x="258" y="146">0.50</text>
-  <text class="tick mid zh" x="258" y="168">平衡</text>
+  <!-- ══ 腫瘤細胞比例很高 ══ -->
+  <rect class="box plain" x="680" y="140" width="304" height="290" rx="10"/>
+  <text class="anno bold zh mid" x="832" y="170">腫瘤細胞比例很高</text>
+  <rect class="read hp1" x="720" y="186" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="878" y="198">HP1</text>
+  <rect class="read hp1" x="720" y="210" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="878" y="222">HP1</text>
+  <rect class="read hp1" x="720" y="234" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="878" y="246">HP1</text>
+  <rect class="read hp2" x="720" y="258" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="795" cy="265" r="5"/>
+  <text class="tick somatic" x="878" y="270">HP2-1</text>
+  <rect class="read hp2" x="720" y="282" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="795" cy="289" r="5"/>
+  <text class="tick somatic" x="878" y="294">HP2-1</text>
+  <rect class="read hp2" x="720" y="306" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="795" cy="313" r="5"/>
+  <text class="tick somatic" x="878" y="318">HP2-1</text>
+  <text class="tick zh" x="720" y="356">HP1 = 3　HP2 = 0</text>
+  <text class="tick mono" x="720" y="380">GHIR = 3 ÷ (3+0)</text>
+  <text class="lbl bold mid bad" x="832" y="414">1.00</text>
+  <text class="tick mid zh bad" x="930" y="414">完全偏一邊</text>
 
-  <!-- 情況 2：部分失衡 -->
-  <rect class="box plain" x="348" y="44" width="300" height="180" rx="8"/>
-  <text class="anno mid bold zh" x="498" y="70">少部分細胞突變</text>
+  <text class="tick zh somatic" x="20" y="452">帶 somatic allele 的 read 被改標成 HP2-1，就不再算進 HP2 —— 兩條的比例因此失衡。</text>
 
-  <rect class="read hp1" x="374" y="88" width="120" height="14" rx="7"/>
-  <rect class="read hp1" x="374" y="108" width="120" height="14" rx="7"/>
-  <rect class="read hp1" x="374" y="128" width="120" height="14" rx="7"/>
-  <text class="tick hp1 bold" x="502" y="118">HP1</text>
-
-  <rect class="read hp2" x="374" y="156" width="120" height="14" rx="7"/>
-  <rect class="read hp2" x="374" y="176" width="120" height="14" rx="7"/>
-  <text class="tick hp2 bold" x="502" y="176">HP2</text>
-  <rect class="read hp2" x="374" y="196" width="120" height="14" rx="7"/>
-  <circle class="mark somatic" cx="434" cy="203" r="6"/>
-  <text class="tick somatic bold" x="502" y="208">HP2-1</text>
-
-  <text class="lbl mid bold warn" x="586" y="146">0.60</text>
-  <text class="tick mid zh" x="586" y="168">開始偏離</text>
-
-  <!-- 情況 3：極度失衡 -->
-  <rect class="box plain" x="676" y="44" width="300" height="180" rx="8"/>
-  <text class="anno mid bold zh" x="826" y="70">腫瘤訊號占比較高</text>
-
-  <rect class="read hp1" x="702" y="88" width="120" height="14" rx="7"/>
-  <rect class="read hp1" x="702" y="108" width="120" height="14" rx="7"/>
-  <rect class="read hp1" x="702" y="128" width="120" height="14" rx="7"/>
-  <text class="tick hp1 bold" x="830" y="118">HP1</text>
-
-  <rect class="read hp2" x="702" y="156" width="120" height="14" rx="7"/>
-  <circle class="mark somatic" cx="762" cy="163" r="6"/>
-  <rect class="read hp2" x="702" y="176" width="120" height="14" rx="7"/>
-  <circle class="mark somatic" cx="762" cy="183" r="6"/>
-  <rect class="read hp2" x="702" y="196" width="120" height="14" rx="7"/>
-  <circle class="mark somatic" cx="762" cy="203" r="6"/>
-  <text class="tick somatic bold" x="830" y="183">HP2-1</text>
-
-  <text class="lbl mid bold bad" x="914" y="146">1.00</text>
-  <text class="tick mid zh" x="914" y="168">HP1 佔優勢</text>
-
-  <text class="anno zh" x="20" y="248">突變 read 被歸到新的分支後，不再計入原本分支；在此示意下，比值因此偏離 0.5。</text>
-
-  <!-- ══ 下排：整個基因體的分布 ══ -->
-  <line class="axis" x1="20" y1="272" x2="980" y2="272"/>
-  <text class="lbl bold zh" x="20" y="302">把整個基因體所有位點的比值畫成直方圖</text>
-
-  <!-- 三個直方圖 -->
-  <g>
-    <!-- 低腫瘤比例 -->
-    <text class="anno mid zh" x="180" y="330">腫瘤比例低</text>
-    <path class="axis" d="M60,440 L300,440"/>
-    <rect class="bar hp1" x="70"  y="424" width="22" height="16"/>
-    <rect class="bar hp1" x="96"  y="400" width="22" height="40"/>
-    <rect class="bar hp1" x="122" y="356" width="22" height="84"/>
-    <rect class="bar hp1" x="148" y="344" width="22" height="96"/>
-    <rect class="bar hp1" x="174" y="368" width="22" height="72"/>
-    <rect class="bar hp1" x="200" y="412" width="22" height="28"/>
-    <rect class="bar hp1" x="226" y="428" width="22" height="12"/>
-    <rect class="bar hp1" x="252" y="432" width="22" height="8"/>
-    <rect class="bar hp1" x="278" y="430" width="22" height="10"/>
-    <text class="tick mid" x="60"  y="460">0.5</text>
-    <text class="tick mid" x="300" y="460">1.0</text>
-    <text class="tick mid zh" x="180" y="484">集中在 0.5 附近</text>
-    <text class="tick mid zh" x="180" y="504">跟正常樣本很像</text>
-  </g>
-
-  <g>
-    <!-- 中等 -->
-    <text class="anno mid zh" x="500" y="330">腫瘤比例中等</text>
-    <path class="axis" d="M380,440 L620,440"/>
-    <rect class="bar hp1" x="390" y="430" width="22" height="10"/>
-    <rect class="bar hp1" x="416" y="416" width="22" height="24"/>
-    <rect class="bar hp1" x="442" y="392" width="22" height="48"/>
-    <rect class="bar hp1" x="468" y="376" width="22" height="64"/>
-    <rect class="bar hp1" x="494" y="368" width="22" height="72"/>
-    <rect class="bar hp1" x="520" y="372" width="22" height="68"/>
-    <rect class="bar hp1" x="546" y="384" width="22" height="56"/>
-    <rect class="bar hp1" x="572" y="396" width="22" height="44"/>
-    <rect class="bar hp1" x="598" y="404" width="22" height="36"/>
-    <text class="tick mid" x="380" y="460">0.5</text>
-    <text class="tick mid" x="620" y="460">1.0</text>
-    <text class="tick mid zh" x="500" y="484">分布可能向右移動</text>
-  </g>
-
-  <g>
-    <!-- 高 -->
-    <text class="anno mid zh" x="820" y="330">腫瘤比例高</text>
-    <path class="axis" d="M700,440 L940,440"/>
-    <rect class="bar somatic" x="710" y="434" width="22" height="6"/>
-    <rect class="bar somatic" x="736" y="432" width="22" height="8"/>
-    <rect class="bar somatic" x="762" y="428" width="22" height="12"/>
-    <rect class="bar somatic" x="788" y="420" width="22" height="20"/>
-    <rect class="bar somatic" x="814" y="408" width="22" height="32"/>
-    <rect class="bar somatic" x="840" y="388" width="22" height="52"/>
-    <rect class="bar somatic" x="866" y="360" width="22" height="80"/>
-    <rect class="bar somatic" x="892" y="336" width="22" height="104"/>
-    <rect class="bar somatic" x="918" y="328" width="22" height="112"/>
-    <text class="tick mid" x="700" y="460">0.5</text>
-    <text class="tick mid" x="940" y="460">1.0</text>
-    <text class="tick mid zh" x="820" y="484">向 1.0 偏移</text>
-  </g>
-
-  <text class="anno zh bold" x="20" y="536">分布位移可作為估計腫瘤 DNA fraction 的特徵之一；實際關係需由驗證資料與模型定義。</text>
+  <line class="axis" x1="20" y1="476" x2="980" y2="476"/>
+  <text class="lbl bold zh" x="20" y="508">但失衡不只有一個來源。</text>
+  <text class="anno zh" x="20" y="538">腫瘤本身的拷貝數變化、LOH 與 aneuploidy 也會讓某一條 haplotype 變多或整條消失，</text>
+  <text class="anno zh" x="20" y="566">同樣把 GHIR 推向 1。所以要先用 <tspan class="bold">normal 樣本</tspan>當基準，把「本來就已經失衡」的位點濾掉。</text>
+  <text class="anno zh bold warn" x="20" y="594">這個過濾步驟叫 LCVF，它決定了 GHIR 分布乾不乾淨。</text>
 </svg>

@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 690">
+  <title>somatic haplotagging：每條 tumor read 為什麼被貼上 HP1、HP2、HP1-1、HP2-1 或 HP3</title>
+  <desc>示意 somatic haplotagging 的判斷過程。
+        第一步先用 normal 樣本已定相的 germline 變異，建立兩條 germline haplotype 的骨架：
+        HP1 在兩個 germline 位點上是 T 與 C，HP2 是 A 與 G。
+        第二步把 tumor 的 read 拿進來，此時每條 read 還沒有標籤。
+        第三步依兩件事貼標籤：read 上的 germline allele 屬於哪一條，以及它在候選位置上有沒有帶 somatic allele。
+        只帶 germline allele 的 read 標成 HP1 或 HP2；
+        同時帶 germline 與 somatic allele、且來源可判定的標成 HP1-1 或 HP2-1；
+        帶 somatic allele 但沒有 germline 錨點可比對的（例如太短的 read）暫時標成 HP3。
+        因此 HP1-1 的名字本身就記錄了它的來源：HP1 的 somatic 後代。
+        HP3 不是第三條染色體，而是「證據不足以判斷來源」的暫時標籤。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">somatic haplotagging：一條 read 為什麼被貼上某個標籤</text>
+  <text class="tick zh" x="20" y="58">判斷只用兩件事：read 上的 germline allele 屬於哪一條，以及它有沒有帶 somatic allele。</text>
+
+  <!-- 三個欄位的位置：全圖共用，上下對齊 -->
+  <text class="tick mid zh" x="330" y="92">germline 位點①</text>
+  <text class="tick mid zh" x="470" y="92">germline 位點②</text>
+  <text class="tick mid zh somatic bold" x="610" y="92">候選 somatic 位點</text>
+  <line class="guide" x1="330" y1="100" x2="330" y2="608"/>
+  <line class="guide" x1="470" y1="100" x2="470" y2="608"/>
+  <line class="guide" x1="610" y1="100" x2="610" y2="608" style="stroke-dasharray:2 3"/>
+
+  <!-- ① 來自 normal 的 germline 骨架 -->
+  <text class="anno bold zh" x="20" y="132">① germline 骨架</text>
+  <text class="tick zh" x="20" y="156">來自 normal 樣本、</text>
+  <text class="tick zh" x="20" y="178">已經定相的 germline 變異</text>
+  <text class="tick end hp1 bold" x="232" y="140">HP1</text>
+  <rect class="read hp1" x="240" y="128" width="520" height="15" rx="7.5"/>
+  <text class="base t mono mid" x="330" y="140.5" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="470" y="140.5" style="font-size:15px">C</text>
+  <text class="tick end hp2 bold" x="232" y="168">HP2</text>
+  <rect class="read hp2" x="240" y="156" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="168.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="168.5" style="font-size:15px">G</text>
+  <text class="tick zh" x="780" y="140">這一條是 T–C</text>
+  <text class="tick zh" x="780" y="168">這一條是 A–G</text>
+
+  <line class="axis" x1="20" y1="196" x2="980" y2="196"/>
+  <text class="anno bold zh" x="20" y="228">② tumor 的 read</text>
+  <text class="tick zh" x="20" y="252">還沒有標籤</text>
+  <text class="tick zh" x="20" y="274">（灰色虛線）</text>
+  <rect class="read hp0" x="240" y="220" width="520" height="15" rx="7.5"/>
+  <text class="base t mono mid" x="330" y="232.5" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="470" y="232.5" style="font-size:15px">C</text>
+  <circle class="mark ref" cx="610" cy="227.5" r="5.5"/>
+  <rect class="read hp0" x="240" y="248" width="520" height="15" rx="7.5"/>
+  <text class="base t mono mid" x="330" y="260.5" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="470" y="260.5" style="font-size:15px">C</text>
+  <circle class="mark somatic" cx="610" cy="255.5" r="5.5"/>
+  <rect class="read hp0" x="240" y="276" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="288.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="288.5" style="font-size:15px">G</text>
+  <circle class="mark ref" cx="610" cy="283.5" r="5.5"/>
+  <rect class="read hp0" x="240" y="304" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="316.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="316.5" style="font-size:15px">G</text>
+  <circle class="mark somatic" cx="610" cy="311.5" r="5.5"/>
+  <rect class="read hp0" x="240" y="332" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="344.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="344.5" style="font-size:15px">G</text>
+  <circle class="mark somatic" cx="610" cy="339.5" r="5.5"/>
+  <rect class="read hp0" x="540" y="360" width="220" height="15" rx="7.5"/>
+  <circle class="mark somatic" cx="610" cy="367.5" r="5.5"/>
+  <text class="tick zh" x="780" y="372">這條太短，</text>
+  <text class="tick zh" x="780" y="392">沒蓋到 germline 位點</text>
+  <text class="tick mid somatic" x="610" y="212">↓ 有沒有帶 somatic allele</text>
+
+  <line class="axis" x1="20" y1="410" x2="980" y2="410"/>
+  <text class="anno bold zh" x="20" y="442">③ 貼上標籤</text>
+  <text class="tick zh" x="20" y="466">同樣一批 read，</text>
+  <text class="tick zh" x="20" y="488">只是重新排序與著色</text>
+  <rect class="read hp1" x="240" y="436" width="520" height="15" rx="7.5"/>
+  <text class="base t mono mid" x="330" y="448.5" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="470" y="448.5" style="font-size:15px">C</text>
+  <circle class="mark ref" cx="610" cy="443.5" r="5.5"/>
+  <text class="tick end hp1 bold" x="232" y="448">HP1</text>
+  <text class="tick zh" x="780" y="448">只有 germline → 屬 HP1</text>
+  <rect class="read hp2" x="240" y="464" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="476.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="476.5" style="font-size:15px">G</text>
+  <circle class="mark ref" cx="610" cy="471.5" r="5.5"/>
+  <text class="tick end hp2 bold" x="232" y="476">HP2</text>
+  <text class="tick zh" x="780" y="476">只有 germline → 屬 HP2</text>
+  <rect class="read hp1" x="240" y="500" width="520" height="15" rx="7.5"/>
+  <text class="base t mono mid" x="330" y="512.5" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="470" y="512.5" style="font-size:15px">C</text>
+  <circle class="mark somatic" cx="610" cy="507.5" r="5.5"/>
+  <text class="tick end somatic bold" x="232" y="512">HP1-1</text>
+  <text class="tick zh" x="780" y="512">帶 somatic，來源可判定</text>
+  <rect class="read hp2" x="240" y="528" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="540.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="540.5" style="font-size:15px">G</text>
+  <circle class="mark somatic" cx="610" cy="535.5" r="5.5"/>
+  <text class="tick end somatic bold" x="232" y="540">HP2-1</text>
+  <text class="tick zh" x="780" y="540">帶 somatic，來源可判定</text>
+  <rect class="read hp2" x="240" y="556" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="568.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="568.5" style="font-size:15px">G</text>
+  <circle class="mark somatic" cx="610" cy="563.5" r="5.5"/>
+  <rect class="read hp0" x="540" y="584" width="220" height="15" rx="7.5"/>
+  <circle class="mark somatic" cx="610" cy="591.5" r="5.5"/>
+  <text class="tick end somatic bold" x="232" y="596">HP3</text>
+  <text class="tick zh" x="780" y="596">帶 somatic，無錨點</text>
+
+  <line class="axis" x1="20" y1="622" x2="980" y2="622"/>
+  <text class="lbl bold zh" x="20" y="654">HP1-1 的意思就是「HP1 的 somatic 後代」——名字本身記錄了來源。</text>
+  <text class="anno zh" x="20" y="682">HP3 不是第三條染色體，是「證據還不足以判斷來源」的暫時標籤。</text>
+</svg>

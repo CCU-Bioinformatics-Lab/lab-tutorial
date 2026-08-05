@@ -14,6 +14,7 @@ check_svg_layout.py — 抓 SVG 圖裡的文字重疊與超出邊界
 import pathlib
 import re
 import sys
+import xml.etree.ElementTree as ET
 
 SVG_DIR = pathlib.Path("src/svg")
 
@@ -46,6 +47,19 @@ def main():
             continue
         src = f.read_text(encoding="utf-8")
         src_nc = re.sub(r"<!--[\s\S]*?-->", "", src)
+
+        # ── XML 必須 well-formed ─────────────────────────────────────────
+        # 實際踩到才加的：漏一個 </text> 時，build.mjs 只是把整段字串 inline
+        # 進 HTML，而 HTML parser 很寬容 —— 頁面照樣渲染，只是後面所有元素
+        # 都被吞進那個沒關的 <text> 裡。沒有錯誤、沒有警告，圖悄悄壞掉。
+        # 而 .svg 檔要能獨立開啟（見 CLAUDE.md §7），瀏覽器用 XML parser
+        # 讀它時反而會直接拒絕整個檔案。
+        try:
+            ET.fromstring(src)
+        except ET.ParseError as e:
+            print(f"  {f.name}: XML 不合法 —— {e}")
+            problems += 1
+            continue
 
         vb = re.search(r'viewBox="0 0 (\d+) (\d+)"', src_nc)
         if not vb:

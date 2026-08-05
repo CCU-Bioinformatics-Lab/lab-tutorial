@@ -7725,321 +7725,808 @@ grep -A40 'static const struct option longopts' Phasing.cpp</code></pre>
   </article>
 <hr>
 <article class="module" id="m12">
-    <header class="mhead"><p class="mhead__kicker">模組 12 · LongPhase-S: matched tumour–normal</p><h1>LongPhase-S（配對 tumor–normal）</h1><p class="mhead__sub">依序說明 GHIR、LCVF、purity 迴歸、purity-aware 過濾與最終 somatic haplotagging，並標示模型假設與限制。</p><p class="mhead__meta"><span class="chip">約 80 分鐘</span><a class="chip" href="m08.html">建議先修：腫瘤混合體</a><a class="chip" href="m10.html">建議先修：評估</a><a class="chip" href="m11.html">建議先修：LongPhase</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>畫出 LongPhase-S 的五個階段，並說明為什麼 purity 估計必須排在過濾之前</li><li>解釋 GHIR 是什麼，以及它為什麼能反映 tumor purity</li><li>說出四個 somatic variant filter 各自在偵測什麼樣的假陽性</li><li>在 BAM 裡找到 somatic haplotype 的標籤，並知道 purity 被寫到哪裡</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">模組 12 · LongPhase-S: matched tumour–normal</p><h1>LongPhase-S（配對 tumor–normal）</h1><p class="mhead__sub">依序說明 GHIR、LCVF、purity 迴歸、purity-aware 過濾與最終 somatic haplotagging，並標示模型假設與限制。</p><p class="mhead__meta"><span class="chip">約 80 分鐘</span><a class="chip" href="m08.html">建議先修：腫瘤混合體</a><a class="chip" href="m10.html">建議先修：評估</a><a class="chip" href="m11.html">建議先修：LongPhase</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說明一條 tumor read 為什麼被標成 HP1、HP2、HP1-1、HP2-1 或 HP3</li><li>畫出 LongPhase-S 的四個階段，並說明為什麼 purity 估計必須排在過濾之前</li><li>寫出 GHIR 的算式，並說明造成失衡的兩個來源</li><li>說出四個 somatic variant filter 各自在偵測什麼樣的假陽性</li><li>在 BAM 裡找到 somatic haplotype 的標籤，並知道 purity 被寫到哪裡</li></ul></section>
 
 <section data-part="why" class="part" id="m12__part-why">
 <h2 data-num="①" id="m12__為什麼重要">為什麼重要</h2>
 
-<p class="prose">這是 <span class="term" data-term="LongPhase-S" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-longphase-s-0">LongPhase-S<span class="term__pop" id="m12__gd-longphase-s-0" role="tooltip"><b class="term__hd">LongPhase-S</b><span class="term__def" data-lang="zh">配對 tumor–normal 版本。做 tumor purity 估計、purity 感知的 somatic variant 過濾，以及 somatic haplotagging。</span><span class="term__def" data-lang="en">The matched tumour–normal version: purity estimation, purity-aware somatic filtering, and somatic haplotagging.</span><a class="term__more" href="glossary.html#longphase-s">完整條目 →</a></span></span> 的完整流程，也是 tumor–normal 分析支線的基礎。
-後續的 somatic indel CNN 方法與 subclone 重建都會使用它的輸出。</p>
+<p class="prose">前面幾章的 phasing 都假設「一個人只有兩條染色體拷貝」。腫瘤樣本不成立：
+裡面混著正常細胞與好幾群癌細胞，某些區段還多了或少了拷貝。
+在這個前提下，把 read 分成 HP1／HP2 兩堆已經不夠用。</p>
 
-<p class="prose">前面模組介紹的相關概念，會在本節整合使用。</p>
+<p class="prose"><span class="term" data-term="LongPhase-S" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-longphase-s-0">LongPhase-S<span class="term__pop" id="m12__gd-longphase-s-0" role="tooltip"><b class="term__hd">LongPhase-S</b><span class="term__def" data-lang="zh">配對 tumor–normal 版本。做 tumor purity 估計、purity 感知的 somatic variant 過濾，以及 somatic haplotagging。</span><span class="term__def" data-lang="en">The matched tumour–normal version: purity estimation, purity-aware somatic filtering, and somatic haplotagging.</span><a class="term__more" href="glossary.html#longphase-s">完整條目 →</a></span></span> 的做法是<b>多做一層</b>：除了兩條 germline haplotype，
+再把「帶著 somatic 變異的那些 read」單獨拉成它們的後代分支。
+這一層做出來之後有三個連帶好處 —— 可以直接估 <span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-tumour-purity-1">purity<span class="term__pop" id="m12__gd-tumour-purity-1" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span>、
+可以用來重新判斷變異真假、也可以看出哪些 read 屬於同一個癌細胞群。</p>
 </section>
 
 
 <section data-part="concept" class="part" id="m12__part-concept">
 <h2 data-num="②" id="m12__概念與互動">概念與互動</h2>
 
-<h3 id="m12__五個階段">五個階段</h3>
+<h3 id="m12__先看懂-somatic-haplotagging-本身">先看懂 somatic haplotagging 本身</h3>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430" class="dia-svg" role="img">
-  <title>LongPhase-S 的五個階段</title>
-  <desc>從 tumor 與 normal 的定序資料開始，依序經過初步 variant calling、
-        normal variant phasing、初步 somatic haplotagging、tumor purity 估計、
-        purity 感知的 somatic variant 過濾，最後產生 germline 與 somatic haplotype。
-        圖中特別標出 purity 估計排在 variant 過濾之前，因為過濾參數會參考 purity。</desc>
+<p class="prose">整章的其他東西都建立在這一步上：<b><span class="term" data-term="somatic haplotagging" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-somatic-haplotagging-2">somatic haplotagging<span class="term__pop" id="m12__gd-somatic-haplotagging-2" role="tooltip"><b class="term__hd">somatic haplotagging</b><span class="term__def" data-lang="zh">把帶有 somatic 突變的 read 指派到它們源自的 germline haplotype。這是 LongPhase-S 的核心產出。</span><span class="term__def" data-lang="en">Assigning somatic-mutation-bearing reads to the germline haplotype they arose from. The core output of LongPhase-S.</span><a class="term__more" href="glossary.html#somatic-haplotagging">完整條目 →</a></span></span> 就是給每條 tumor read 貼一個標籤</b>。
+判斷只用兩件事 —— 這條 read 上的 germline allele 屬於哪一條，以及它有沒有帶 somatic allele。</p>
 
-  <!-- 輸入 -->
-  <rect class="box plain" x="20" y="60" width="150" height="52" rx="8"/>
-  <text class="anno mid" x="95" y="82">Tumor BAM</text>
-  <text class="tick mid" x="95" y="102">50×</text>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 690" class="dia-svg" role="img">
+  <title>somatic haplotagging：每條 tumor read 為什麼被貼上 HP1、HP2、HP1-1、HP2-1 或 HP3</title>
+  <desc>示意 somatic haplotagging 的判斷過程。
+        第一步先用 normal 樣本已定相的 germline 變異，建立兩條 germline haplotype 的骨架：
+        HP1 在兩個 germline 位點上是 T 與 C，HP2 是 A 與 G。
+        第二步把 tumor 的 read 拿進來，此時每條 read 還沒有標籤。
+        第三步依兩件事貼標籤：read 上的 germline allele 屬於哪一條，以及它在候選位置上有沒有帶 somatic allele。
+        只帶 germline allele 的 read 標成 HP1 或 HP2；
+        同時帶 germline 與 somatic allele、且來源可判定的標成 HP1-1 或 HP2-1；
+        帶 somatic allele 但沒有 germline 錨點可比對的（例如太短的 read）暫時標成 HP3。
+        因此 HP1-1 的名字本身就記錄了它的來源：HP1 的 somatic 後代。
+        HP3 不是第三條染色體，而是「證據不足以判斷來源」的暫時標籤。</desc>
 
-  <rect class="box plain" x="20" y="130" width="150" height="52" rx="8"/>
-  <text class="anno mid" x="95" y="152">Normal BAM</text>
-  <text class="tick mid" x="95" y="172">25×</text>
+  <text class="lbl bold zh" x="20" y="32">somatic haplotagging：一條 read 為什麼被貼上某個標籤</text>
+  <text class="tick zh" x="20" y="58">判斷只用兩件事：read 上的 germline allele 屬於哪一條，以及它有沒有帶 somatic allele。</text>
 
-  <!-- 階段 1 -->
-  <path class="flow" d="M172,86 L206,86" marker-end="url(#arrow)"/>
-  <path class="flow" d="M172,156 L206,156" marker-end="url(#arrow)"/>
-  <rect class="box" x="208" y="52" width="146" height="68" rx="8"/>
-  <text class="tick mid bold" x="281" y="78">ClairS</text>
-  <text class="tick mid zh" x="281" y="98">tumor variants</text>
-  <text class="tick mid" x="281" y="114">①</text>
+  <!-- 三個欄位的位置：全圖共用，上下對齊 -->
+  <text class="tick mid zh" x="330" y="92">germline 位點①</text>
+  <text class="tick mid zh" x="470" y="92">germline 位點②</text>
+  <text class="tick mid zh somatic bold" x="610" y="92">候選 somatic 位點</text>
+  <line class="guide" x1="330" y1="100" x2="330" y2="608"/>
+  <line class="guide" x1="470" y1="100" x2="470" y2="608"/>
+  <line class="guide" x1="610" y1="100" x2="610" y2="608" style="stroke-dasharray:2 3"/>
 
-  <rect class="box" x="208" y="130" width="146" height="68" rx="8"/>
-  <text class="tick mid bold" x="281" y="156">Clair3</text>
-  <text class="tick mid zh" x="281" y="176">normal variants</text>
-  <text class="tick mid" x="281" y="192">①</text>
+  <!-- ① 來自 normal 的 germline 骨架 -->
+  <text class="anno bold zh" x="20" y="132">① germline 骨架</text>
+  <text class="tick zh" x="20" y="156">來自 normal 樣本、</text>
+  <text class="tick zh" x="20" y="178">已經定相的 germline 變異</text>
+  <text class="tick end hp1 bold" x="232" y="140">HP1</text>
+  <rect class="read hp1" x="240" y="128" width="520" height="15" rx="7.5"/>
+  <text class="base t mono mid" x="330" y="140.5" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="470" y="140.5" style="font-size:15px">C</text>
+  <text class="tick end hp2 bold" x="232" y="168">HP2</text>
+  <rect class="read hp2" x="240" y="156" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="168.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="168.5" style="font-size:15px">G</text>
+  <text class="tick zh" x="780" y="140">這一條是 T–C</text>
+  <text class="tick zh" x="780" y="168">這一條是 A–G</text>
 
-  <!-- 階段 2 -->
-  <path class="flow" d="M356,164 L392,164" marker-end="url(#arrow)"/>
-  <rect class="box" x="394" y="130" width="150" height="68" rx="8"/>
-  <text class="tick mid bold zh" x="469" y="156">Normal phasing</text>
-  <text class="tick mid zh" x="469" y="176">建立 HP1 / HP2</text>
-  <text class="tick mid" x="469" y="192">②</text>
+  <line class="axis" x1="20" y1="196" x2="980" y2="196"/>
+  <text class="anno bold zh" x="20" y="228">② tumor 的 read</text>
+  <text class="tick zh" x="20" y="252">還沒有標籤</text>
+  <text class="tick zh" x="20" y="274">（灰色虛線）</text>
+  <rect class="read hp0" x="240" y="220" width="520" height="15" rx="7.5"/>
+  <text class="base t mono mid" x="330" y="232.5" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="470" y="232.5" style="font-size:15px">C</text>
+  <circle class="mark ref" cx="610" cy="227.5" r="5.5"/>
+  <rect class="read hp0" x="240" y="248" width="520" height="15" rx="7.5"/>
+  <text class="base t mono mid" x="330" y="260.5" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="470" y="260.5" style="font-size:15px">C</text>
+  <circle class="mark somatic" cx="610" cy="255.5" r="5.5"/>
+  <rect class="read hp0" x="240" y="276" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="288.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="288.5" style="font-size:15px">G</text>
+  <circle class="mark ref" cx="610" cy="283.5" r="5.5"/>
+  <rect class="read hp0" x="240" y="304" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="316.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="316.5" style="font-size:15px">G</text>
+  <circle class="mark somatic" cx="610" cy="311.5" r="5.5"/>
+  <rect class="read hp0" x="240" y="332" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="344.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="344.5" style="font-size:15px">G</text>
+  <circle class="mark somatic" cx="610" cy="339.5" r="5.5"/>
+  <rect class="read hp0" x="540" y="360" width="220" height="15" rx="7.5"/>
+  <circle class="mark somatic" cx="610" cy="367.5" r="5.5"/>
+  <text class="tick zh" x="780" y="372">這條太短，</text>
+  <text class="tick zh" x="780" y="392">沒蓋到 germline 位點</text>
+  <text class="tick mid somatic" x="610" y="212">↓ 有沒有帶 somatic allele</text>
 
-  <!-- 階段 3 -->
-  <path class="flow" d="M356,86 L580,86 L580,120" marker-end="url(#arrow)"/>
-  <path class="flow" d="M546,164 L580,164 L580,140" marker-end="url(#arrow)"/>
-  <rect class="box accent" x="506" y="204" width="150" height="68" rx="8"/>
-  <text class="tick mid bold zh" x="581" y="230">初步 somatic</text>
-  <text class="tick mid bold zh" x="581" y="248">haplotagging</text>
-  <text class="tick mid" x="581" y="264">③</text>
-  <path class="flow" d="M580,140 L580,200" marker-end="url(#arrow)"/>
+  <line class="axis" x1="20" y1="410" x2="980" y2="410"/>
+  <text class="anno bold zh" x="20" y="442">③ 貼上標籤</text>
+  <text class="tick zh" x="20" y="466">同樣一批 read，</text>
+  <text class="tick zh" x="20" y="488">只是重新排序與著色</text>
+  <rect class="read hp1" x="240" y="436" width="520" height="15" rx="7.5"/>
+  <text class="base t mono mid" x="330" y="448.5" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="470" y="448.5" style="font-size:15px">C</text>
+  <circle class="mark ref" cx="610" cy="443.5" r="5.5"/>
+  <text class="tick end hp1 bold" x="232" y="448">HP1</text>
+  <text class="tick zh" x="780" y="448">只有 germline → 屬 HP1</text>
+  <rect class="read hp2" x="240" y="464" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="476.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="476.5" style="font-size:15px">G</text>
+  <circle class="mark ref" cx="610" cy="471.5" r="5.5"/>
+  <text class="tick end hp2 bold" x="232" y="476">HP2</text>
+  <text class="tick zh" x="780" y="476">只有 germline → 屬 HP2</text>
+  <rect class="read hp1" x="240" y="500" width="520" height="15" rx="7.5"/>
+  <text class="base t mono mid" x="330" y="512.5" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="470" y="512.5" style="font-size:15px">C</text>
+  <circle class="mark somatic" cx="610" cy="507.5" r="5.5"/>
+  <text class="tick end somatic bold" x="232" y="512">HP1-1</text>
+  <text class="tick zh" x="780" y="512">帶 somatic，來源可判定</text>
+  <rect class="read hp2" x="240" y="528" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="540.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="540.5" style="font-size:15px">G</text>
+  <circle class="mark somatic" cx="610" cy="535.5" r="5.5"/>
+  <text class="tick end somatic bold" x="232" y="540">HP2-1</text>
+  <text class="tick zh" x="780" y="540">帶 somatic，來源可判定</text>
+  <rect class="read hp2" x="240" y="556" width="520" height="15" rx="7.5"/>
+  <text class="base a mono mid" x="330" y="568.5" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="470" y="568.5" style="font-size:15px">G</text>
+  <circle class="mark somatic" cx="610" cy="563.5" r="5.5"/>
+  <rect class="read hp0" x="540" y="584" width="220" height="15" rx="7.5"/>
+  <circle class="mark somatic" cx="610" cy="591.5" r="5.5"/>
+  <text class="tick end somatic bold" x="232" y="596">HP3</text>
+  <text class="tick zh" x="780" y="596">帶 somatic，無錨點</text>
 
-  <!-- 階段 4：purity -->
-  <path class="flow" d="M658,238 L694,238" marker-end="url(#arrow)"/>
-  <rect class="box accent" x="696" y="204" width="150" height="68" rx="8"/>
-  <text class="tick mid bold" x="771" y="228">GHIR → 迴歸</text>
-  <text class="tick mid bold zh somatic" x="771" y="248">估計 purity</text>
-  <text class="tick mid" x="771" y="264">④</text>
-
-  <!-- purity 回饋到過濾 -->
-  <path class="conn somatic thick" d="M771,200 L771,150 L700,150" marker-end="url(#arrow)"/>
-  <text class="tick zh somatic bold" x="704" y="128">purity 用於調整</text>
-  <text class="tick zh somatic bold" x="704" y="144">過濾有多嚴格</text>
-
-  <!-- 階段 5：過濾 -->
-  <rect class="box" x="530" y="20" width="166" height="110" rx="8"/>
-  <text class="tick mid bold zh" x="613" y="44">purity 感知過濾</text>
-  <text class="tick mid" x="613" y="66">TINC filter</text>
-  <text class="tick mid" x="613" y="84">read-level filter</text>
-  <text class="tick mid" x="613" y="102">haplotype origin</text>
-  <text class="tick mid" x="613" y="120">variant cluster　⑤</text>
-
-  <!-- 輸出 -->
-  <path class="flow" d="M698,75 L860,75 L860,200" marker-end="url(#arrow)"/>
-  <rect class="box ok" x="850" y="290" width="130" height="100" rx="8"/>
-  <text class="tick mid bold zh" x="915" y="314">輸出</text>
-  <text class="tick mid hp1" x="915" y="336">HP1 / HP2</text>
-  <text class="tick mid somatic" x="915" y="356">HP1-1 / HP2-1</text>
-  <text class="tick mid" x="915" y="376">tumor purity</text>
-  <path class="flow" d="M860,200 L860,286" marker-end="url(#arrow)"/>
-
-  <!-- 重點註記 -->
-  <line class="guide" x1="20" y1="300" x2="820" y2="300"/>
-  <text class="anno bold zh" x="20" y="330">為什麼順序是這樣？</text>
-  <text class="tick zh" x="20" y="356">在低 purity 樣本中，真 somatic 變異的支持 read 可能較少。</text>
-  <text class="tick zh" x="20" y="378">固定門檻可能增加漏檢風險，仍需以驗證資料評估。</text>
-  <text class="tick zh somatic bold" x="20" y="400">因此先估 purity，再依設定調整過濾參數。</text>
-</svg><figcaption>紅色回饋線表示 <b>purity 估計值用於調整過濾門檻</b>。流程順序與理由如下。</figcaption></figure>
+  <line class="axis" x1="20" y1="622" x2="980" y2="622"/>
+  <text class="lbl bold zh" x="20" y="654">HP1-1 的意思就是「HP1 的 somatic 後代」——名字本身記錄了來源。</text>
+  <text class="anno zh" x="20" y="682">HP3 不是第三條染色體，是「證據還不足以判斷來源」的暫時標籤。</text>
+</svg><figcaption>同一批 read，先用 normal 的 phased germline 變異當骨架，再依兩個問題貼標籤。
+<b>HP1-1 讀作「HP1 的 somatic 後代」</b>；<code>HP3</code> 不是第三條染色體，而是「證據還不足以判斷來源」的暫時標籤。</figcaption></figure>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>階段</th><th>做什麼</th></tr></thead>
+<thead><tr><th>標籤</th><th>這條 read 的情況</th></tr></thead>
 <tbody>
-<tr><td>①</td><td><span class="term" data-term="ClairS" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-clairs-1">ClairS<span class="term__pop" id="m12__gd-clairs-1" role="tooltip"><b class="term__hd">ClairS</b><span class="term__def" data-lang="zh">配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</span><span class="term__def" data-lang="en">A somatic variant caller for matched tumour–normal data; ClairS-TO is the tumour-only version.</span><a class="term__more" href="glossary.html#clairs">完整條目 →</a></span></span> 產生 tumor variants、<span class="term" data-term="Clair3" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-clair3-2">Clair3<span class="term__pop" id="m12__gd-clair3-2" role="tooltip"><b class="term__hd">Clair3</b><span class="term__def" data-lang="zh">以深度學習做 germline variant calling 的工具，長 read 上常用。</span><span class="term__def" data-lang="en">A deep-learning germline variant caller widely used for long reads.</span><a class="term__more" href="glossary.html#clair3">完整條目 →</a></span></span> 產生 normal variants</td></tr>
-<tr><td>②</td><td>把 normal variants <span class="term" data-term="phasing" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-phasing-3">phase<span class="term__pop" id="m12__gd-phasing-3" role="tooltip"><b class="term__hd">phasing <i>定相</i></b><span class="term__def" data-lang="zh">為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。</span><span class="term__def" data-lang="en">Determining which variants lie on the same physical chromosome, turning 0/1 into 0|1. Long reads provide direct molecular evidence.</span><a class="term__more" href="glossary.html#phasing">完整條目 →</a></span></span> 起來，建立 HP1／HP2 骨架</td></tr>
-<tr><td>③</td><td>初步 <span class="term" data-term="somatic haplotagging" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-somatic-haplotagging-4">somatic haplotagging<span class="term__pop" id="m12__gd-somatic-haplotagging-4" role="tooltip"><b class="term__hd">somatic haplotagging</b><span class="term__def" data-lang="zh">把帶有 somatic 突變的 read 指派到它們源自的 germline haplotype。這是 LongPhase-S 的核心產出。</span><span class="term__def" data-lang="en">Assigning somatic-mutation-bearing reads to the germline haplotype they arose from. The core output of LongPhase-S.</span><a class="term__more" href="glossary.html#somatic-haplotagging">完整條目 →</a></span></span>：把 tumor read 分到 HP1-1／HP2-1</td></tr>
-<tr><td>④</td><td>用 <span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-ghir-5">GHIR<span class="term__pop" id="m12__gd-ghir-5" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</span><span class="term__def" data-lang="en">Germline Haplotype Imbalance Ratio: the normalized balance of reads assigned to HP1 and HP2 at a germline site. Under the tutorial's illustrative definition, an ideal unbiased sample is near 0.5. It is not a direct purity measurement; somatic branches, LOH/CNV, TINC, phasing errors, mapping bias and sparse sampling can all shift it. LongPhase-S estimates purity from its distribution only after filtering and model calibration.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span> ＋ 多項式迴歸估計 <span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-tumour-purity-6">tumour purity<span class="term__pop" id="m12__gd-tumour-purity-6" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span></td></tr>
-<tr><td>⑤</td><td>依 purity 動態調整門檻，跑四個 filter，最後重建 somatic haplotype</td></tr>
+<tr><td><code>HP1</code> / <code>HP2</code></td><td>只帶 germline allele，可判定屬於哪一條 haplotype</td></tr>
+<tr><td><code>HP1-1</code> / <code>HP2-1</code></td><td>同時帶 germline 與 somatic allele，且來源可判定</td></tr>
+<tr><td><code>HP3</code></td><td>帶 somatic allele，但沒有可比對的 germline 錨點（例如 read 太短、或該區段沒有 het 位點）</td></tr>
 </tbody>
 </table>
 </div>
+
+<p class="prose">這個標籤系統帶來一個一般 phasing 工具做不到的事：
+在一條 haplotype 整條遺失的 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-loh-3">LOH<span class="term__pop" id="m12__gd-loh-3" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 區域裡，帶 somatic 變異的 read 仍會被標成 <code>HP1-1</code>，
+而不是被硬塞進剩下那條 germline haplotype。</p>
+
+<h3 id="m12__四個階段">四個階段</h3>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img">
+  <title>LongPhase-S 的四個階段與 purity 回饋</title>
+  <desc>流程從左到右分成四個階段。
+        輸入是 tumor 與 normal 的長讀資料：normal 用來呼叫 germline 變異並定相成 HP1 與 HP2，
+        tumor 用來呼叫 somatic 候選變異。
+        階段一做初步 somatic haplotagging，讓每條 read 先拿到一個暫時標籤。
+        階段二用全基因體的 germline haplotype 失衡分布估計 tumor purity。
+        階段三用估到的 purity 決定四個過濾器的門檻鬆緊，重新校準 somatic 變異。
+        階段四用校準後的變異重建 germline 與 somatic haplotype，並處理沒有 germline 錨點的 read。
+        圖中紅色回饋線標出關鍵順序：purity 必須先估出來，才能決定過濾要多嚴格。
+        原因是低 purity 樣本裡真變異的支持 read 很少，固定門檻會把它濾掉。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">LongPhase-S 的四個階段</text>
+  <text class="tick zh" x="20" y="58">輸入是 tumor 與 normal 兩邊的長讀資料與變異；輸出是 read 層級的 germline 與 somatic haplotype。</text>
+
+  <rect class="box plain" x="16" y="96" width="196" height="68" rx="8"/>
+  <text class="tick bold" x="34" y="122">Tumor BAM</text>
+  <text class="tick zh" x="34" y="146">＋ somatic 候選變異</text>
+  <rect class="box plain" x="16" y="180" width="196" height="86" rx="8"/>
+  <text class="tick bold" x="34" y="206">Normal BAM</text>
+  <text class="tick zh" x="34" y="230">＋ germline 變異</text>
+  <text class="tick zh hp1" x="34" y="254">先定相成 HP1／HP2</text>
+
+  <rect class="box accent" x="232" y="96" width="172" height="170" rx="10"/>
+  <text class="anno bold mid" x="318" y="126">①</text>
+  <text class="anno bold zh mid" x="318" y="152">初步 haplotagging</text>
+  <text class="tick zh" x="248" y="182">每條 read 先拿到</text>
+  <text class="tick zh" x="248" y="206">暫時的 HP 標籤</text>
+  <text class="tick zh" x="248" y="230">（含 HP1-1／HP3）</text>
+
+  <rect class="box accent" x="420" y="96" width="172" height="170" rx="10"/>
+  <text class="anno bold mid" x="506" y="126">②</text>
+  <text class="anno bold zh mid" x="506" y="152">purity 估計</text>
+  <text class="tick zh" x="436" y="182">全基因體 GHIR 分布</text>
+  <text class="tick zh" x="436" y="206">→ median 與 IQR</text>
+  <text class="tick zh" x="436" y="230">→ 一個 purity 值</text>
+
+  <rect class="box warn" x="608" y="96" width="172" height="170" rx="10"/>
+  <text class="anno bold mid" x="694" y="126">③</text>
+  <text class="anno bold zh mid" x="694" y="152">變異重校準</text>
+  <text class="tick zh" x="624" y="182">四個過濾器</text>
+  <text class="tick zh" x="624" y="206">門檻依 purity 調整</text>
+  <text class="tick zh" x="624" y="230">→ somatic VCF</text>
+
+  <rect class="box ok" x="796" y="96" width="172" height="170" rx="10"/>
+  <text class="anno bold mid" x="882" y="126">④</text>
+  <text class="anno bold zh mid" x="882" y="152">整合重建</text>
+  <text class="tick zh" x="812" y="182">重新 haplotag</text>
+  <text class="tick zh" x="812" y="206">HP3 依一致性繼承</text>
+  <text class="tick zh" x="812" y="230">→ 最終 HP 標籤</text>
+
+  <path class="flow" d="M214,130 L226,130" marker-end="url(#arrow)"/>
+  <path class="flow" d="M214,222 L226,222" marker-end="url(#arrow)"/>
+  <path class="flow" d="M404,180 L418,180" marker-end="url(#arrow)"/>
+  <path class="flow" d="M592,180 L606,180" marker-end="url(#arrow)"/>
+  <path class="flow" d="M780,180 L794,180" marker-end="url(#arrow)"/>
+
+  <path class="conn somatic thick" d="M506,270 L506,300 L694,300 L694,272" marker-end="url(#arrow)"/>
+  <text class="tick mid zh somatic bold" x="600" y="322">② 估到的 purity 決定 ③ 的門檻鬆緊</text>
+
+  <path class="flow" d="M882,270 L882,344" marker-end="url(#arrow)"/>
+  <rect class="box ok" x="700" y="348" width="284" height="96" rx="8"/>
+  <text class="tick bold zh" x="718" y="374">最終輸出</text>
+  <text class="tick" x="718" y="398">BAM: HP:Z:1-1 / 2-1 / 3（字串）</text>
+  <text class="tick zh" x="718" y="422">purity 文字檔、重校準後的 VCF</text>
+
+  <line class="guide" x1="20" y1="348" x2="680" y2="348"/>
+  <text class="anno bold zh" x="20" y="378">為什麼 purity 一定要排在過濾之前？</text>
+  <text class="tick zh" x="20" y="404">purity 0.2、50× 覆蓋度時，一個 clonal somatic 變異只有約 5 條支持 read。</text>
+  <text class="tick zh" x="20" y="428">套用適合純腫瘤的嚴格門檻會把它一起濾掉；一律放寬又會讓高 purity 樣本多出假陽性。</text>
+  <text class="tick zh somatic bold" x="20" y="452">所以門檻不是一組固定數字，而是每個 purity 級距各有一組。</text>
+</svg><figcaption>四個階段從左到右。紅色回饋線是整個設計的關鍵順序：
+<b>purity 必須先估出來，才能決定過濾要多嚴格</b>。</figcaption></figure>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>階段</th><th>做什麼</th><th>產出</th></tr></thead>
+<tbody>
+<tr><td>①</td><td>初步 somatic haplotagging（上一節那張圖）</td><td>每條 read 一個暫時標籤</td></tr>
+<tr><td>②</td><td>算全基因體的 <span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-ghir-4">GHIR<span class="term__pop" id="m12__gd-ghir-4" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</span><span class="term__def" data-lang="en">Germline Haplotype Imbalance Ratio: the normalized balance of reads assigned to HP1 and HP2 at a germline site. Under the tutorial's illustrative definition, an ideal unbiased sample is near 0.5. It is not a direct purity measurement; somatic branches, LOH/CNV, TINC, phasing errors, mapping bias and sparse sampling can all shift it. LongPhase-S estimates purity from its distribution only after filtering and model calibration.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span> 分布、過濾低信心位點、迴歸估 purity</td><td>一個 purity 數值</td></tr>
+<tr><td>③</td><td>依 purity 調整門檻，跑四個過濾器重新校準候選變異</td><td>高信心的 somatic VCF</td></tr>
+<tr><td>④</td><td>用校準後的變異重新 haplotag，並處理 <code>HP3</code></td><td>最終 HP 標籤</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">變異呼叫本身不在這四個階段裡：tumor 的候選變異由 <span class="term" data-term="ClairS" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-clairs-5">ClairS<span class="term__pop" id="m12__gd-clairs-5" role="tooltip"><b class="term__hd">ClairS</b><span class="term__def" data-lang="zh">配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</span><span class="term__def" data-lang="en">A somatic variant caller for matched tumour–normal data; ClairS-TO is the tumour-only version.</span><a class="term__more" href="glossary.html#clairs">完整條目 →</a></span></span> 或 DeepSomatic 提供，
+normal 的 germline 變異由 <span class="term" data-term="Clair3" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-clair3-6">Clair3<span class="term__pop" id="m12__gd-clair3-6" role="tooltip"><b class="term__hd">Clair3</b><span class="term__def" data-lang="zh">以深度學習做 germline variant calling 的工具，長 read 上常用。</span><span class="term__def" data-lang="en">A deep-learning germline variant caller widely used for long reads.</span><a class="term__more" href="glossary.html#clair3">完整條目 →</a></span></span> 或 DeepVariant 提供，並先 <span class="term" data-term="phasing" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-phasing-7">phase<span class="term__pop" id="m12__gd-phasing-7" role="tooltip"><b class="term__hd">phasing <i>定相</i></b><span class="term__def" data-lang="zh">為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。</span><span class="term__def" data-lang="en">Determining which variants lie on the same physical chromosome, turning 0/1 into 0|1. Long reads provide direct molecular evidence.</span><a class="term__more" href="glossary.html#phasing">完整條目 →</a></span></span> 成 HP1／HP2 骨架。
+LongPhase-S 是接在它們後面的一層。</p>
 
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">為何 purity 估計先於過濾</p>
 <p class="prose">回到 M8 的合成示例：purity 0.2（此處與 tumor DNA fraction 相等）、50× coverage，一個 clonal somatic 變異
 只有<b>約 5 條 read</b> 支持。</p>
-<p class="prose">若套用適合 purity 1.0 的嚴格門檻，真變異可能被當成雜訊而漏掉，<span class="term" data-term="recall" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-recall-7">recall<span class="term__pop" id="m12__gd-recall-7" role="tooltip"><b class="term__hd">recall <i>召回率</i></b><span class="term__def" data-lang="zh">在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</span><span class="term__def" data-lang="en">Within a stated evaluation scope, the fraction of true positives that were found: TP / (TP + FN). With a fixed caller candidate set, post-filtering can preserve or lower recall but cannot recover variants the caller never emitted; report the candidate-set scope explicitly.</span><a class="term__more" href="glossary.html#recall">完整條目 →</a></span></span> 下降。
+<p class="prose">若套用適合 purity 1.0 的嚴格門檻，真變異可能被當成雜訊而漏掉，<span class="term" data-term="recall" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-recall-8">recall<span class="term__pop" id="m12__gd-recall-8" role="tooltip"><b class="term__hd">recall <i>召回率</i></b><span class="term__def" data-lang="zh">在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</span><span class="term__def" data-lang="en">Within a stated evaluation scope, the fraction of true positives that were found: TP / (TP + FN). With a fixed caller candidate set, post-filtering can preserve or lower recall but cannot recover variants the caller never emitted; report the candidate-set scope explicitly.</span><a class="term__more" href="glossary.html#recall">完整條目 →</a></span></span> 下降。
 若一律放寬，高 purity 樣本的偽陽性則可能增加。</p>
-<p class="prose">因此此流程先估計 purity，再依估計值調整過濾門檻。</p>
+<p class="prose">因此門檻不是一組固定數字：流程先估 purity，再依 purity 級距選用對應的那組參數。</p>
 </div>
 
-<h3 id="m12__ghir-用失衡程度估計模型定義的-purity">GHIR：用失衡程度估計模型定義的 purity</h3>
+<h3 id="m12__ghir-兩條-germline-haplotype-的-read-有多偏">GHIR：兩條 germline haplotype 的 read 有多偏</h3>
 
-<p class="prose"><span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-ghir-8">GHIR<span class="term__pop" id="m12__gd-ghir-8" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</span><span class="term__def" data-lang="en">Germline Haplotype Imbalance Ratio: the normalized balance of reads assigned to HP1 and HP2 at a germline site. Under the tutorial's illustrative definition, an ideal unbiased sample is near 0.5. It is not a direct purity measurement; somatic branches, LOH/CNV, TINC, phasing errors, mapping bias and sparse sampling can all shift it. LongPhase-S estimates purity from its distribution only after filtering and model calibration.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span>（Germline Haplotype Imbalance Ratio）的基本原理如下：</p>
+<p class="prose"><span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-ghir-9">GHIR<span class="term__pop" id="m12__gd-ghir-9" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</span><span class="term__def" data-lang="en">Germline Haplotype Imbalance Ratio: the normalized balance of reads assigned to HP1 and HP2 at a germline site. Under the tutorial's illustrative definition, an ideal unbiased sample is near 0.5. It is not a direct purity measurement; somatic branches, LOH/CNV, TINC, phasing errors, mapping bias and sparse sampling can all shift it. LongPhase-S estimates purity from its distribution only after filtering and model calibration.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span>（Germline Haplotype Imbalance Ratio）在<b>每一個候選 somatic 位點上各算一次</b>：</p>
 
-<ul class="prose">
-<li>在理想且無系統性偏差的<b>正常</b>細胞裡，某個 germline 位點的 HP1 與 HP2 read 預期接近 50:50，GHIR ≈ 0.5</li>
-<li>若腫瘤細胞在 HP2 上發生 somatic 突變，部分 read 會被分到 HP2-1，
-因此不再計入原本 HP2 分支的比例</li>
-<li>在其他條件相近時，<b>tumor DNA fraction（此模型中的 purity）越高，失衡訊號通常越明顯</b></li>
-</ul>
+<pre><code>GHIR = max(HP1 read 數, HP2 read 數) ÷ (HP1 read 數 + HP2 read 數)</code></pre>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 546" class="dia-svg" role="img">
-  <title>GHIR 示意：haplotype 比例如何提供腫瘤 DNA fraction 的估計訊號</title>
-  <desc>在簡化、無系統性偏差且拷貝數條件相近的示意下，上排三格比較兩條 haplotype 的 read 比例。
-        正常情況下兩條 haplotype 的 read 各佔一半，比值 0.5。
-        當腫瘤細胞在其中一條上發生突變，那部分 read 就被歸到新的分支，
-        使原本兩條的比值偏離 0.5；在其他條件相近時，腫瘤 DNA fraction 越高，偏離可能越明顯。
-        下排：把整個基因體所有位點的比值畫成直方圖，
-        分布可能隨腫瘤 DNA fraction 改變而向右移動；此分布特徵可作為回歸模型的估計訊號之一。</desc>
+<p class="prose">所以它的範圍是 0.5 到 1：<b>0.5 表示兩條完全平衡，1.0 表示 read 全部偏向其中一條。</b>
+分母只算被分到 HP1 或 HP2 的 read —— 這是關鍵，因為帶 somatic allele 的 read 會被改標成
+<code>HP1-1</code>／<code>HP2-1</code>，就<b>不再算進</b>原本那條的計數。</p>
 
-  <!-- ══ 上排：三種平衡狀態 ══ -->
-  <text class="lbl bold zh" x="20" y="28">單一位點上，兩條 haplotype 的 read 比例</text>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" class="dia-svg" role="img">
+  <title>GHIR 的定義：一個候選位點上兩條 germline haplotype 的 read 有多偏</title>
+  <desc>GHIR 的定義是在一個候選 somatic 位點上，
+        取 HP1 與 HP2 兩個 read 數的較大者，除以這兩者的總和。
+        因此 0.5 表示兩條完全平衡，1.0 表示 read 全部偏向其中一條。
+        三格由左到右示意 purity 由低到高：
+        沒有腫瘤突變時 HP1 與 HP2 各三條，比值 0.5；
+        少部分細胞帶突變時，帶突變的 read 被改標成 HP2-1、不再算進 HP2，比值升為 0.75；
+        腫瘤細胞比例很高時 HP2 幾乎只剩 HP2-1，比值接近 1.0。
+        下半部提醒第二個造成偏移的來源：腫瘤本身的拷貝數變化、LOH 與 aneuploidy
+        也會讓某一條 haplotype 變多或消失，同樣把比值推向 1，
+        因此需要先用 normal 樣本當基準把這類位點濾掉。</desc>
 
-  <!-- 情況 1：平衡 -->
-  <rect class="box plain" x="20" y="44" width="300" height="180" rx="8"/>
-  <text class="anno mid bold zh" x="170" y="70">沒有腫瘤突變</text>
+  <text class="lbl bold zh" x="20" y="32">GHIR：兩條 germline haplotype 的 read 有多偏</text>
 
-  <rect class="read hp1" x="46" y="88" width="120" height="14" rx="7"/>
-  <rect class="read hp1" x="46" y="108" width="120" height="14" rx="7"/>
-  <rect class="read hp1" x="46" y="128" width="120" height="14" rx="7"/>
-  <text class="tick hp1 bold" x="174" y="118">HP1</text>
+  <rect class="box accent" x="20" y="50" width="960" height="70" rx="8"/>
+  <text class="anno bold mono" x="44" y="80">GHIR = max(HP1 read 數, HP2 read 數) ÷ (HP1 read 數 + HP2 read 數)</text>
+  <text class="tick zh" x="44" y="106">在每一個候選 somatic 位點上各算一次。0.5 ＝ 兩條完全平衡；1.0 ＝ read 全部偏向其中一條。</text>
 
-  <rect class="read hp2" x="46" y="156" width="120" height="14" rx="7"/>
-  <rect class="read hp2" x="46" y="176" width="120" height="14" rx="7"/>
-  <rect class="read hp2" x="46" y="196" width="120" height="14" rx="7"/>
-  <text class="tick hp2 bold" x="174" y="186">HP2</text>
+  <!-- ══ 沒有腫瘤突變 ══ -->
+  <rect class="box plain" x="16" y="140" width="304" height="290" rx="10"/>
+  <text class="anno bold zh mid" x="168" y="170">沒有腫瘤突變</text>
+  <rect class="read hp1" x="56" y="186" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="214" y="198">HP1</text>
+  <rect class="read hp1" x="56" y="210" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="214" y="222">HP1</text>
+  <rect class="read hp1" x="56" y="234" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="214" y="246">HP1</text>
+  <rect class="read hp2" x="56" y="258" width="150" height="14" rx="7"/>
+  <text class="tick hp2" x="214" y="270">HP2</text>
+  <rect class="read hp2" x="56" y="282" width="150" height="14" rx="7"/>
+  <text class="tick hp2" x="214" y="294">HP2</text>
+  <rect class="read hp2" x="56" y="306" width="150" height="14" rx="7"/>
+  <text class="tick hp2" x="214" y="318">HP2</text>
+  <text class="tick zh" x="56" y="356">HP1 = 3　HP2 = 3</text>
+  <text class="tick mono" x="56" y="380">GHIR = 3 ÷ (3+3)</text>
+  <text class="lbl bold mid ok" x="168" y="414">0.50</text>
+  <text class="tick mid zh ok" x="266" y="414">平衡</text>
 
-  <text class="lbl mid bold ok" x="258" y="146">0.50</text>
-  <text class="tick mid zh" x="258" y="168">平衡</text>
+  <!-- ══ 少部分細胞帶突變 ══ -->
+  <rect class="box plain" x="348" y="140" width="304" height="290" rx="10"/>
+  <text class="anno bold zh mid" x="500" y="170">少部分細胞帶突變</text>
+  <rect class="read hp1" x="388" y="186" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="546" y="198">HP1</text>
+  <rect class="read hp1" x="388" y="210" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="546" y="222">HP1</text>
+  <rect class="read hp1" x="388" y="234" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="546" y="246">HP1</text>
+  <rect class="read hp2" x="388" y="258" width="150" height="14" rx="7"/>
+  <text class="tick hp2" x="546" y="270">HP2</text>
+  <rect class="read hp2" x="388" y="282" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="463" cy="289" r="5"/>
+  <text class="tick somatic" x="546" y="294">HP2-1</text>
+  <rect class="read hp2" x="388" y="306" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="463" cy="313" r="5"/>
+  <text class="tick somatic" x="546" y="318">HP2-1</text>
+  <text class="tick zh" x="388" y="356">HP1 = 3　HP2 = 1</text>
+  <text class="tick mono" x="388" y="380">GHIR = 3 ÷ (3+1)</text>
+  <text class="lbl bold mid warn" x="500" y="414">0.75</text>
+  <text class="tick mid zh warn" x="598" y="414">開始偏</text>
 
-  <!-- 情況 2：部分失衡 -->
-  <rect class="box plain" x="348" y="44" width="300" height="180" rx="8"/>
-  <text class="anno mid bold zh" x="498" y="70">少部分細胞突變</text>
+  <!-- ══ 腫瘤細胞比例很高 ══ -->
+  <rect class="box plain" x="680" y="140" width="304" height="290" rx="10"/>
+  <text class="anno bold zh mid" x="832" y="170">腫瘤細胞比例很高</text>
+  <rect class="read hp1" x="720" y="186" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="878" y="198">HP1</text>
+  <rect class="read hp1" x="720" y="210" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="878" y="222">HP1</text>
+  <rect class="read hp1" x="720" y="234" width="150" height="14" rx="7"/>
+  <text class="tick hp1" x="878" y="246">HP1</text>
+  <rect class="read hp2" x="720" y="258" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="795" cy="265" r="5"/>
+  <text class="tick somatic" x="878" y="270">HP2-1</text>
+  <rect class="read hp2" x="720" y="282" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="795" cy="289" r="5"/>
+  <text class="tick somatic" x="878" y="294">HP2-1</text>
+  <rect class="read hp2" x="720" y="306" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="795" cy="313" r="5"/>
+  <text class="tick somatic" x="878" y="318">HP2-1</text>
+  <text class="tick zh" x="720" y="356">HP1 = 3　HP2 = 0</text>
+  <text class="tick mono" x="720" y="380">GHIR = 3 ÷ (3+0)</text>
+  <text class="lbl bold mid bad" x="832" y="414">1.00</text>
+  <text class="tick mid zh bad" x="930" y="414">完全偏一邊</text>
 
-  <rect class="read hp1" x="374" y="88" width="120" height="14" rx="7"/>
-  <rect class="read hp1" x="374" y="108" width="120" height="14" rx="7"/>
-  <rect class="read hp1" x="374" y="128" width="120" height="14" rx="7"/>
-  <text class="tick hp1 bold" x="502" y="118">HP1</text>
+  <text class="tick zh somatic" x="20" y="452">帶 somatic allele 的 read 被改標成 HP2-1，就不再算進 HP2 —— 兩條的比例因此失衡。</text>
 
-  <rect class="read hp2" x="374" y="156" width="120" height="14" rx="7"/>
-  <rect class="read hp2" x="374" y="176" width="120" height="14" rx="7"/>
-  <text class="tick hp2 bold" x="502" y="176">HP2</text>
-  <rect class="read hp2" x="374" y="196" width="120" height="14" rx="7"/>
-  <circle class="mark somatic" cx="434" cy="203" r="6"/>
-  <text class="tick somatic bold" x="502" y="208">HP2-1</text>
+  <line class="axis" x1="20" y1="476" x2="980" y2="476"/>
+  <text class="lbl bold zh" x="20" y="508">但失衡不只有一個來源。</text>
+  <text class="anno zh" x="20" y="538">腫瘤本身的拷貝數變化、LOH 與 aneuploidy 也會讓某一條 haplotype 變多或整條消失，</text>
+  <text class="anno zh" x="20" y="566">同樣把 GHIR 推向 1。所以要先用 <tspan class="bold">normal 樣本</tspan>當基準，把「本來就已經失衡」的位點濾掉。</text>
+  <text class="anno zh bold warn" x="20" y="594">這個過濾步驟叫 LCVF，它決定了 GHIR 分布乾不乾淨。</text>
+</svg><figcaption>三格由左到右是同一個位點在 purity 由低到高時的樣子。
+腫瘤細胞越多，被拉去 HP2-1 的 read 就越多，HP2 剩下的越少，比值就越接近 1。
+下半部提醒第二個來源：腫瘤自己的拷貝數變化與 LOH 也會造成失衡，所以需要先用 normal 當基準過濾。</figcaption></figure>
 
-  <text class="lbl mid bold warn" x="586" y="146">0.60</text>
-  <text class="tick mid zh" x="586" y="168">開始偏離</text>
+<p class="prose">失衡有<b>兩個</b>來源，這點很容易只記住一個：</p>
 
-  <!-- 情況 3：極度失衡 -->
-  <rect class="box plain" x="676" y="44" width="300" height="180" rx="8"/>
-  <text class="anno mid bold zh" x="826" y="70">腫瘤訊號占比較高</text>
+<ol class="prose">
+<li><b>somatic 變異把 read 拉走</b>。purity 越高，被拉走的比例越大 —— 這是我們想量的訊號。</li>
+<li><b>腫瘤本身的拷貝數變化、LOH 與 aneuploidy</b>。某條 haplotype 被放大或整條刪掉，
+一樣會讓比值接近 1 —— 這是雜訊，而且它跟 purity 沒有關係。</li>
+</ol>
 
-  <rect class="read hp1" x="702" y="88" width="120" height="14" rx="7"/>
-  <rect class="read hp1" x="702" y="108" width="120" height="14" rx="7"/>
-  <rect class="read hp1" x="702" y="128" width="120" height="14" rx="7"/>
-  <text class="tick hp1 bold" x="830" y="118">HP1</text>
+<p class="prose">第 2 項的處理方式是拿<b>配對的 normal 樣本當基準</b>：normal 裡就已經失衡的位點，
+失衡顯然不是腫瘤造成的，直接排除。這就是下一節 LCVF 的工作。</p>
 
-  <rect class="read hp2" x="702" y="156" width="120" height="14" rx="7"/>
-  <circle class="mark somatic" cx="762" cy="163" r="6"/>
-  <rect class="read hp2" x="702" y="176" width="120" height="14" rx="7"/>
-  <circle class="mark somatic" cx="762" cy="183" r="6"/>
-  <rect class="read hp2" x="702" y="196" width="120" height="14" rx="7"/>
-  <circle class="mark somatic" cx="762" cy="203" r="6"/>
-  <text class="tick somatic bold" x="830" y="183">HP2-1</text>
+<h3 id="m12__lcvf-先把不能用的位點濾掉">LCVF：先把不能用的位點濾掉</h3>
 
-  <text class="lbl mid bold bad" x="914" y="146">1.00</text>
-  <text class="tick mid zh" x="914" y="168">HP1 佔優勢</text>
-
-  <text class="anno zh" x="20" y="248">突變 read 被歸到新的分支後，不再計入原本分支；在此示意下，比值因此偏離 0.5。</text>
-
-  <!-- ══ 下排：整個基因體的分布 ══ -->
-  <line class="axis" x1="20" y1="272" x2="980" y2="272"/>
-  <text class="lbl bold zh" x="20" y="302">把整個基因體所有位點的比值畫成直方圖</text>
-
-  <!-- 三個直方圖 -->
-  <g>
-    <!-- 低腫瘤比例 -->
-    <text class="anno mid zh" x="180" y="330">腫瘤比例低</text>
-    <path class="axis" d="M60,440 L300,440"/>
-    <rect class="bar hp1" x="70"  y="424" width="22" height="16"/>
-    <rect class="bar hp1" x="96"  y="400" width="22" height="40"/>
-    <rect class="bar hp1" x="122" y="356" width="22" height="84"/>
-    <rect class="bar hp1" x="148" y="344" width="22" height="96"/>
-    <rect class="bar hp1" x="174" y="368" width="22" height="72"/>
-    <rect class="bar hp1" x="200" y="412" width="22" height="28"/>
-    <rect class="bar hp1" x="226" y="428" width="22" height="12"/>
-    <rect class="bar hp1" x="252" y="432" width="22" height="8"/>
-    <rect class="bar hp1" x="278" y="430" width="22" height="10"/>
-    <text class="tick mid" x="60"  y="460">0.5</text>
-    <text class="tick mid" x="300" y="460">1.0</text>
-    <text class="tick mid zh" x="180" y="484">集中在 0.5 附近</text>
-    <text class="tick mid zh" x="180" y="504">跟正常樣本很像</text>
-  </g>
-
-  <g>
-    <!-- 中等 -->
-    <text class="anno mid zh" x="500" y="330">腫瘤比例中等</text>
-    <path class="axis" d="M380,440 L620,440"/>
-    <rect class="bar hp1" x="390" y="430" width="22" height="10"/>
-    <rect class="bar hp1" x="416" y="416" width="22" height="24"/>
-    <rect class="bar hp1" x="442" y="392" width="22" height="48"/>
-    <rect class="bar hp1" x="468" y="376" width="22" height="64"/>
-    <rect class="bar hp1" x="494" y="368" width="22" height="72"/>
-    <rect class="bar hp1" x="520" y="372" width="22" height="68"/>
-    <rect class="bar hp1" x="546" y="384" width="22" height="56"/>
-    <rect class="bar hp1" x="572" y="396" width="22" height="44"/>
-    <rect class="bar hp1" x="598" y="404" width="22" height="36"/>
-    <text class="tick mid" x="380" y="460">0.5</text>
-    <text class="tick mid" x="620" y="460">1.0</text>
-    <text class="tick mid zh" x="500" y="484">分布可能向右移動</text>
-  </g>
-
-  <g>
-    <!-- 高 -->
-    <text class="anno mid zh" x="820" y="330">腫瘤比例高</text>
-    <path class="axis" d="M700,440 L940,440"/>
-    <rect class="bar somatic" x="710" y="434" width="22" height="6"/>
-    <rect class="bar somatic" x="736" y="432" width="22" height="8"/>
-    <rect class="bar somatic" x="762" y="428" width="22" height="12"/>
-    <rect class="bar somatic" x="788" y="420" width="22" height="20"/>
-    <rect class="bar somatic" x="814" y="408" width="22" height="32"/>
-    <rect class="bar somatic" x="840" y="388" width="22" height="52"/>
-    <rect class="bar somatic" x="866" y="360" width="22" height="80"/>
-    <rect class="bar somatic" x="892" y="336" width="22" height="104"/>
-    <rect class="bar somatic" x="918" y="328" width="22" height="112"/>
-    <text class="tick mid" x="700" y="460">0.5</text>
-    <text class="tick mid" x="940" y="460">1.0</text>
-    <text class="tick mid zh" x="820" y="484">向 1.0 偏移</text>
-  </g>
-
-  <text class="anno zh bold" x="20" y="536">分布位移可作為估計腫瘤 DNA fraction 的特徵之一；實際關係需由驗證資料與模型定義。</text>
-</svg><figcaption>上排：在此比值定義下，突變 read 被分到新的分支後不再計入原 haplotype，因此比值偏離 0.5；在其他條件相近時，tumor DNA fraction 越高，偏移通常可能越明顯。下排：將全基因體位點的比值畫成直方圖；在此資料與定義下，分布可能向較高比值移動。</figcaption></figure>
-
-<p class="prose">可量化這個分布的位置（例如取<b>中位數與四分位距</b>），
-再以驗證資料建立「分布特徵 → 模型定義的 purity」的迴歸關係，估計樣本的 purity。</p>
-
-<h3 id="m12__實際分布與-lcvf">實際分布與 LCVF</h3>
-
-<p class="prose">真實資料的 GHIR 分布可能受到低信心位點干擾。因此 LongPhase-S 設計了
-<b>LCVF</b>（Low-Confidence Variant Filtering），以四個條件過濾：</p>
+<p class="prose">這一步存在的理由很實際。研究團隊發現，落在<b>低信心區域</b>的假變異會把 GHIR 分布弄糊；
+但已知的高信心區域清單（例如 HCC1395 的 SEQC2）<b>只適用於那一個細胞株</b>，
+沒辦法拿去套用在別的樣本上。所以他們改用一組看得到、算得出來的條件來取代那份清單，
+稱為 <b>LCVF</b>（Low-Confidence Variant Filtering）。四個條件<b>全部通過</b>才留下：</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>Filter</th><th>排除什麼</th></tr></thead>
+<thead><tr><th>條件</th><th>判準</th><th>排除什麼</th></tr></thead>
 <tbody>
-<tr><td>Germline Haplotype Imbalance</td><td>在 <b>normal</b> 樣本裡就已經失衡的位點（多半是 <span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-copy-number-9">CNV<span class="term__pop" id="m12__gd-copy-number-9" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span> 造成）</td></tr>
-<tr><td>Germline Haplotype Read Ratio</td><td>大量 read 沒被分配到任何 haplotype 的位點（例如大片段 deletion）</td></tr>
-<tr><td>Read Count（static）</td><td>read 數太少的位點 —— 分母太小，GHIR 會亂跳</td></tr>
-<tr><td>Read Count（dynamic）</td><td>用 <b>bimodal valley thresholding</b> 自動找雙峰之間的谷點當門檻</td></tr>
+<tr><td>Minimum haplotagging</td><td>normal 與 tumor <b>兩邊</b>都至少要有 1 條被標到 HP1／HP2 的 read</td><td>根本算不出 GHIR 的位點</td></tr>
+<tr><td>Germline haplotype imbalance</td><td><b>normal</b> 的 GHIR 必須低於門檻</td><td>本來就已經失衡的位點（多為 germline 結構變異或 <span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-copy-number-10">CNV<span class="term__pop" id="m12__gd-copy-number-10" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span>）</td></tr>
+<tr><td>Germline haplotype read ratio</td><td>normal 中「有被標到 haplotype 的 read ÷ 總深度」必須高於門檻</td><td>大量 read 標不上任何 haplotype 的位點 —— 通常是比對有問題</td></tr>
+<tr><td>Germline haplotype read count</td><td>支持 read 數必須高於門檻，而門檻由<b>資料分布</b>決定</td><td>read 數太少的位點 —— 分母太小，GHIR 會亂跳</td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">最後一項不是固定單一數字，而是依<b>資料分布形狀</b>決定門檻 ——
-先高斯平滑、找兩個主峰，再取中間的谷點。此作法可降低對固定門檻的依賴；穩健性仍需由驗證資料評估。</p>
+<p class="prose">最後一項值得多看一眼。固定一個「至少幾條 read」的數字看起來最簡單，
+但那個數字在 purity 0.2 與 purity 1.0 的樣本上不可能同時適用。
+實際觀察到高信心與低信心變異的 read 數呈<b>雙峰分布</b>，
+於是做法改成：<b>先把直方圖平滑化、找出兩個主峰、取中間的谷點當門檻</b>。
+門檻因此會隨著樣本自己移動。</p>
+
+<h3 id="m12__從分布到一個數字-迴歸模型">從分布到一個數字：迴歸模型</h3>
+
+<p class="prose">濾乾淨之後，全基因體的 GHIR 分布就可以用來估 purity 了。
+做法刻意簡單：<b>整個分布只取兩個數字</b> —— 中位數與四分位距 —— 再用二次多項式迴歸對上 purity。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 590" class="dia-svg" role="img">
+  <title>從 GHIR 分布估計 tumor purity：兩個特徵與一條迴歸曲線</title>
+  <desc>上排是五個已知 purity 的合成樣本，各自把全基因體所有候選位點的 GHIR 畫成直方圖。
+        purity 0.2 時分布集中在 0.5 附近；purity 越高，中位數往 1 移動；
+        中間的 purity 分布最分散，purity 1.0 時又重新集中在接近 1 的高值。
+        中排說明只從每個分布取兩個數字當特徵：中位數與四分位距。
+        下排把這兩個數字送進二次多項式迴歸，輸出一個 purity 估計值。
+        模型用七個資料集訓練、一個資料集測試，並以 leave-k-out 交叉驗證評估，
+        報告的平均 R 平方約 0.96。
+        限制是這條曲線只在訓練資料涵蓋的範圍內可信，
+        換癌別、換 basecaller 或換覆蓋度都可能落在訓練分布之外。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">從 GHIR 分布，變成一個 purity 數字</text>
+  <text class="tick zh" x="20" y="58">下面五個樣本的 purity 是已知的（用純腫瘤與正常 BAM 依比例混出來的），拿來當訓練資料。</text>
+
+  <!-- purity 0.2 -->
+  <rect class="box plain" x="16" y="76" width="176" height="176" rx="8"/>
+  <text class="anno bold mid" x="104" y="102">purity 0.2</text>
+  <rect class="bar hp1" x="32" y="206" width="10" height="16"/>
+  <rect class="bar hp1" x="44" y="150" width="10" height="72"/>
+  <rect class="bar hp1" x="56" y="126" width="10" height="96"/>
+  <rect class="bar hp1" x="68" y="166" width="10" height="56"/>
+  <rect class="bar hp1" x="80" y="198" width="10" height="24"/>
+  <rect class="bar hp1" x="92" y="206" width="10" height="16"/>
+  <rect class="bar hp1" x="104" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="116" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="128" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="140" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="152" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="164" y="206" width="10" height="16"/>
+  <line class="axis" x1="28" y1="222" x2="180" y2="222"/>
+  <text class="tick" x="28" y="242" style="font-size:12px">0.5</text>
+  <text class="tick end" x="180" y="242" style="font-size:12px">1.0</text>
+
+  <!-- purity 0.4 -->
+  <rect class="box plain" x="212" y="76" width="176" height="176" rx="8"/>
+  <text class="anno bold mid" x="300" y="102">purity 0.4</text>
+  <rect class="bar hp1" x="228" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="240" y="182" width="10" height="40"/>
+  <rect class="bar hp1" x="252" y="150" width="10" height="72"/>
+  <rect class="bar hp1" x="264" y="142" width="10" height="80"/>
+  <rect class="bar hp1" x="276" y="166" width="10" height="56"/>
+  <rect class="bar hp1" x="288" y="190" width="10" height="32"/>
+  <rect class="bar hp1" x="300" y="198" width="10" height="24"/>
+  <rect class="bar hp1" x="312" y="206" width="10" height="16"/>
+  <rect class="bar hp1" x="324" y="206" width="10" height="16"/>
+  <rect class="bar hp1" x="336" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="348" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="360" y="206" width="10" height="16"/>
+  <line class="axis" x1="224" y1="222" x2="376" y2="222"/>
+  <text class="tick" x="224" y="242" style="font-size:12px">0.5</text>
+  <text class="tick end" x="376" y="242" style="font-size:12px">1.0</text>
+
+  <!-- purity 0.6 -->
+  <rect class="box plain" x="408" y="76" width="176" height="176" rx="8"/>
+  <text class="anno bold mid" x="496" y="102">purity 0.6</text>
+  <rect class="bar hp1" x="424" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="436" y="206" width="10" height="16"/>
+  <rect class="bar hp1" x="448" y="190" width="10" height="32"/>
+  <rect class="bar hp1" x="460" y="174" width="10" height="48"/>
+  <rect class="bar hp1" x="472" y="166" width="10" height="56"/>
+  <rect class="bar hp1" x="484" y="166" width="10" height="56"/>
+  <rect class="bar hp1" x="496" y="174" width="10" height="48"/>
+  <rect class="bar hp1" x="508" y="182" width="10" height="40"/>
+  <rect class="bar hp1" x="520" y="190" width="10" height="32"/>
+  <rect class="bar hp1" x="532" y="198" width="10" height="24"/>
+  <rect class="bar hp1" x="544" y="198" width="10" height="24"/>
+  <rect class="bar hp1" x="556" y="190" width="10" height="32"/>
+  <line class="axis" x1="420" y1="222" x2="572" y2="222"/>
+  <text class="tick" x="420" y="242" style="font-size:12px">0.5</text>
+  <text class="tick end" x="572" y="242" style="font-size:12px">1.0</text>
+
+  <!-- purity 0.8 -->
+  <rect class="box plain" x="604" y="76" width="176" height="176" rx="8"/>
+  <text class="anno bold mid" x="692" y="102">purity 0.8</text>
+  <rect class="bar hp1" x="620" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="632" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="644" y="206" width="10" height="16"/>
+  <rect class="bar hp1" x="656" y="198" width="10" height="24"/>
+  <rect class="bar hp1" x="668" y="190" width="10" height="32"/>
+  <rect class="bar hp1" x="680" y="182" width="10" height="40"/>
+  <rect class="bar hp1" x="692" y="174" width="10" height="48"/>
+  <rect class="bar hp1" x="704" y="166" width="10" height="56"/>
+  <rect class="bar hp1" x="716" y="158" width="10" height="64"/>
+  <rect class="bar hp1" x="728" y="158" width="10" height="64"/>
+  <rect class="bar hp1" x="740" y="166" width="10" height="56"/>
+  <rect class="bar hp1" x="752" y="174" width="10" height="48"/>
+  <line class="axis" x1="616" y1="222" x2="768" y2="222"/>
+  <text class="tick" x="616" y="242" style="font-size:12px">0.5</text>
+  <text class="tick end" x="768" y="242" style="font-size:12px">1.0</text>
+
+  <!-- purity 1.0 -->
+  <rect class="box plain" x="800" y="76" width="176" height="176" rx="8"/>
+  <text class="anno bold mid" x="888" y="102">purity 1.0</text>
+  <rect class="bar hp1" x="816" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="828" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="840" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="852" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="864" y="214" width="10" height="8"/>
+  <rect class="bar hp1" x="876" y="206" width="10" height="16"/>
+  <rect class="bar hp1" x="888" y="206" width="10" height="16"/>
+  <rect class="bar hp1" x="900" y="198" width="10" height="24"/>
+  <rect class="bar hp1" x="912" y="190" width="10" height="32"/>
+  <rect class="bar hp1" x="924" y="166" width="10" height="56"/>
+  <rect class="bar hp1" x="936" y="134" width="10" height="88"/>
+  <rect class="bar hp1" x="948" y="126" width="10" height="96"/>
+  <line class="axis" x1="812" y1="222" x2="964" y2="222"/>
+  <text class="tick" x="812" y="242" style="font-size:12px">0.5</text>
+  <text class="tick end" x="964" y="242" style="font-size:12px">1.0</text>
+
+  <text class="tick zh" x="20" y="272">橫軸是 GHIR（0.5～1.0），縱軸是有多少個位點落在該區間。</text>
+  <text class="tick zh bold somatic" x="600" y="272">purity 越高，整個分布越往右。</text>
+
+  <rect class="box accent" x="16" y="292" width="452" height="170" rx="10"/>
+  <text class="anno bold zh" x="40" y="320">每個分布只取兩個數字當特徵</text>
+  <text class="tick mid zh bold" x="180" y="356">中位數</text>
+  <rect class="box plain" x="130" y="362" width="100" height="36" rx="4"/>
+  <line class="axis" x1="180" y1="362" x2="180" y2="398" style="stroke-width:3"/>
+  <line class="axis" x1="80" y1="380" x2="130" y2="380"/>
+  <line class="axis" x1="230" y1="380" x2="280" y2="380"/>
+  <text class="tick mid zh" x="180" y="420">四分位距（盒子的寬度）</text>
+  <text class="tick zh" x="40" y="448">中位數說「整體偏到哪」，四分位距說「有多分散」。</text>
+
+  <rect class="box accent" x="490" y="292" width="494" height="170" rx="10"/>
+  <text class="anno bold zh" x="514" y="320">二次多項式迴歸</text>
+  <text class="tick mono" x="514" y="348">purity = f( median, IQR )</text>
+  <text class="tick zh" x="514" y="386">兩個特徵進去，</text>
+  <text class="tick zh" x="514" y="410">一個 purity 值出來。</text>
+  <line class="axis" x1="740" y1="432" x2="740" y2="352"/>
+  <line class="axis" x1="740" y1="432" x2="962" y2="432"/>
+  <path class="flow" d="M746,426 C790,414 820,388 848,370 C876,356 912,354 956,356"/>
+  <circle class="pt tp" cx="780" cy="408" r="4"/>
+  <circle class="pt tp" cx="820" cy="384" r="4"/>
+  <circle class="pt tp" cx="860" cy="366" r="4"/>
+  <circle class="pt tp" cx="908" cy="356" r="4"/>
+  <circle class="pt tp" cx="950" cy="354" r="4"/>
+  <text class="tick zh" x="748" y="346">↑ purity</text>
+  <text class="tick mid zh" x="850" y="452">GHIR 特徵 →</text>
+
+  <line class="axis" x1="20" y1="486" x2="980" y2="486"/>
+  <text class="anno bold zh" x="20" y="516">模型怎麼訓練、能信到哪裡</text>
+  <text class="tick zh" x="20" y="542">七個資料集訓練、一個資料集測試，並以 leave-k-out 交叉驗證；報告的平均 R² 約 0.96。</text>
+  <text class="tick zh warn bold" x="20" y="566">但曲線只在訓練資料涵蓋的範圍內可信：換癌別、換 basecaller、換覆蓋度都可能落在分布之外。</text>
+</svg><figcaption>五個 purity 已知的合成樣本各有一個 GHIR 分布；
+purity 越高整個分布越往右。每個分布只取<b>中位數</b>（偏到哪）與<b>四分位距</b>（多分散）兩個特徵，
+送進二次多項式迴歸得到 purity。最下方是訓練方式與外推的界線。</figcaption></figure>
+
+<p class="prose">為什麼只用兩個特徵就夠？因為要學的是一條單調的關係，不是分類問題；
+特徵少也讓模型不容易在八個資料集上過擬合。
+代價是這條曲線只在<b>訓練資料涵蓋的範圍內</b>可信 ——
+這也是後面「判讀練習」要處理的問題。</p>
 
 <h3 id="m12__四個-somatic-variant-filter">四個 somatic variant filter</h3>
 
-<p class="prose">purity 估好之後，用它動態調整門檻，跑四個過濾器：</p>
+<p class="prose">purity 估好之後進入第三階段。四個過濾器各看一種證據，<b>任何一個沒過就丟掉</b>：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 780" class="dia-svg" role="img">
+  <title>purity 感知的四個重校準過濾器</title>
+  <desc>四個過濾器各看一種證據。
+        第一個 TINC 過濾器看這個位點在 normal 樣本裡的變異頻率：真 somatic 幾乎是零，
+        偏高的多半是 germline 變異，門檻隨 purity 調整。
+        第二個 read 一致性過濾器看每條支持 read 兩側的 germline allele：
+        若一條 read 同時帶有 HP1 與 HP2 的 allele，就是混合 read，混合比例太高就丟掉。
+        第三個 haplotype 背景過濾器統計支持 read 分別來自哪一條 germline haplotype：
+        真變異集中在其中一邊，兩邊都超過門檻就丟掉。
+        第四個變異叢集過濾器看密集區間內的變異是否共同出現在同一批 read 上，
+        需要同時滿足低變異頻率、低支持數、區間內變異數足夠多與統計異常四個條件才丟掉。
+        四個過濾器的門檻都不是固定值，而是在每個 purity 級距上各自搜出一組。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">四個過濾器，各看一種證據</text>
+  <text class="tick zh" x="20" y="58">共同點：都在問「支持這個候選的 read，來源夠不夠一致」。任何一個沒過就丟掉。</text>
+
+  <rect class="box plain" x="16" y="80" width="480" height="290" rx="10"/>
+  <text class="anno bold zh" x="40" y="110">① TINC 過濾器</text>
+  <text class="tick zh" x="40" y="134">看這個位點在 <tspan class="bold">normal 樣本</tspan>裡的 VAF</text>
+  <line class="axis" x1="60" y1="250" x2="452" y2="250"/>
+  <text class="tick" x="60" y="272">0</text>
+  <text class="tick mid" x="256" y="272">0.25</text>
+  <text class="tick end" x="452" y="272">0.5</text>
+  <circle class="pt tp" cx="66" cy="236" r="5"/>
+  <circle class="pt tp" cx="72" cy="236" r="5"/>
+  <circle class="pt tp" cx="78" cy="236" r="5"/>
+  <circle class="pt tp" cx="86" cy="212" r="5"/>
+  <circle class="pt tp" cx="94" cy="224" r="5"/>
+  <circle class="pt tp" cx="100" cy="224" r="5"/>
+  <circle class="pt fp" cx="300" cy="236" r="5"/>
+  <circle class="pt fp" cx="330" cy="216" r="5"/>
+  <circle class="pt fp" cx="352" cy="236" r="5"/>
+  <circle class="pt fp" cx="380" cy="236" r="5"/>
+  <circle class="pt fp" cx="408" cy="236" r="5"/>
+  <circle class="pt fp" cx="436" cy="236" r="5"/>
+  <line class="guide" x1="180" y1="164" x2="180" y2="250" style="stroke-dasharray:6 4"/>
+  <text class="tick zh somatic bold" x="190" y="178">門檻（隨 purity 動）</text>
+  <text class="tick zh somatic" x="60" y="300">真 somatic：normal 幾乎沒有</text>
+  <text class="tick zh artifact" x="60" y="324">偏高的多半是 germline</text>
+  <text class="tick zh bold" x="60" y="352">normal VAF 低於門檻 → 留下</text>
+
+  <rect class="box plain" x="504" y="80" width="480" height="290" rx="10"/>
+  <text class="anno bold zh" x="528" y="110">② read 一致性過濾器</text>
+  <text class="tick zh" x="528" y="134">看支持 read 兩側的 germline allele</text>
+  <text class="tick zh ok bold" x="528" y="164">真變異：每條 read 只帶一邊的 allele</text>
+  <rect class="read hp1" x="548" y="176" width="180" height="13" rx="6.5"/>
+  <text class="base t mono mid" x="574" y="186" style="font-size:13px">T</text>
+  <text class="base c mono mid" x="702" y="186" style="font-size:13px">C</text>
+  <circle class="mark somatic" cx="638" cy="182.5" r="5"/>
+  <rect class="read hp1" x="548" y="198" width="180" height="13" rx="6.5"/>
+  <text class="base t mono mid" x="574" y="208" style="font-size:13px">T</text>
+  <text class="base c mono mid" x="702" y="208" style="font-size:13px">C</text>
+  <circle class="mark somatic" cx="638" cy="204.5" r="5"/>
+  <rect class="read hp1" x="548" y="220" width="180" height="13" rx="6.5"/>
+  <text class="base t mono mid" x="574" y="230" style="font-size:13px">T</text>
+  <text class="base c mono mid" x="702" y="230" style="font-size:13px">C</text>
+  <circle class="mark somatic" cx="638" cy="226.5" r="5"/>
+  <text class="tick mono ok" x="742" y="200">Rmix ≈ 0</text>
+  <text class="tick zh bad bold" x="528" y="268">假訊號：同一條 read 兩邊的 allele 都有</text>
+  <rect class="read hp0" x="548" y="280" width="180" height="13" rx="6.5"/>
+  <text class="base t mono mid" x="574" y="290" style="font-size:13px">T</text>
+  <text class="base g mono mid" x="702" y="290" style="font-size:13px">G</text>
+  <circle class="mark artifact" cx="638" cy="286.5" r="5"/>
+  <rect class="read hp0" x="548" y="302" width="180" height="13" rx="6.5"/>
+  <text class="base t mono mid" x="574" y="312" style="font-size:13px">T</text>
+  <text class="base g mono mid" x="702" y="312" style="font-size:13px">G</text>
+  <circle class="mark artifact" cx="638" cy="308.5" r="5"/>
+  <rect class="read hp0" x="548" y="324" width="180" height="13" rx="6.5"/>
+  <text class="base t mono mid" x="574" y="334" style="font-size:13px">T</text>
+  <text class="base g mono mid" x="702" y="334" style="font-size:13px">G</text>
+  <circle class="mark artifact" cx="638" cy="330.5" r="5"/>
+  <text class="tick mono bad" x="742" y="304">Rmix 很高</text>
+  <text class="tick zh bold" x="528" y="352">混合 read 的比例低於門檻 → 留下</text>
+
+  <rect class="box plain" x="16" y="390" width="480" height="300" rx="10"/>
+  <text class="anno bold zh" x="40" y="420">③ haplotype 背景過濾器</text>
+  <text class="tick zh" x="40" y="444">支持 read 分別來自哪一條 germline haplotype</text>
+  <line class="axis" x1="120" y1="640" x2="330" y2="640"/>
+  <line class="axis" x1="120" y1="640" x2="120" y2="470"/>
+  <text class="tick zh hp1" x="180" y="662">來自 HP1 的支持數 →</text>
+  <text class="tick zh hp2" x="40" y="466">↑ 來自 HP2</text>
+  <line class="guide" x1="120" y1="560" x2="330" y2="560" style="stroke-dasharray:6 4"/>
+  <line class="guide" x1="220" y1="470" x2="220" y2="640" style="stroke-dasharray:6 4"/>
+  <circle class="pt tp" cx="150" cy="634" r="5"/>
+  <circle class="pt tp" cx="180" cy="630" r="5"/>
+  <circle class="pt tp" cx="210" cy="636" r="5"/>
+  <circle class="pt tp" cx="260" cy="632" r="5"/>
+  <circle class="pt tp" cx="300" cy="628" r="5"/>
+  <circle class="pt tp" cx="126" cy="600" r="5"/>
+  <circle class="pt tp" cx="128" cy="560" r="5"/>
+  <circle class="pt tp" cx="126" cy="520" r="5"/>
+  <circle class="pt tp" cx="130" cy="490" r="5"/>
+  <circle class="pt fp" cx="256" cy="540" r="5"/>
+  <circle class="pt fp" cx="280" cy="512" r="5"/>
+  <circle class="pt fp" cx="300" cy="530" r="5"/>
+  <circle class="pt fp" cx="270" cy="496" r="5"/>
+  <text class="tick zh ok" x="350" y="620">真變異貼在軸上：</text>
+  <text class="tick zh ok" x="350" y="644">只有一邊有支持</text>
+  <text class="tick zh bad" x="350" y="520">假訊號落在中間：</text>
+  <text class="tick zh bad" x="350" y="544">兩邊都有支持</text>
+  <text class="tick zh bold" x="40" y="686">兩邊都超過門檻 → 丟掉</text>
+
+  <rect class="box plain" x="504" y="390" width="480" height="300" rx="10"/>
+  <text class="anno bold zh" x="528" y="420">④ 變異叢集過濾器</text>
+  <text class="tick zh" x="528" y="444">看密集區間內的變異是否擠在同一批 read 上</text>
+  <line class="axis" x1="548" y1="612" x2="944" y2="612"/>
+  <text class="tick mid zh" x="686" y="634">同一個密集區間（預設 100 bp 內）</text>
+  <rect class="read hp0" x="548" y="470" width="300" height="13" rx="6.5"/>
+  <circle class="mark artifact" cx="620" cy="476.5" r="4.5"/>
+  <circle class="mark artifact" cx="680" cy="476.5" r="4.5"/>
+  <circle class="mark artifact" cx="740" cy="476.5" r="4.5"/>
+  <rect class="read hp0" x="548" y="492" width="300" height="13" rx="6.5"/>
+  <circle class="mark artifact" cx="620" cy="498.5" r="4.5"/>
+  <circle class="mark artifact" cx="680" cy="498.5" r="4.5"/>
+  <circle class="mark artifact" cx="740" cy="498.5" r="4.5"/>
+  <rect class="read hp0" x="548" y="514" width="300" height="13" rx="6.5"/>
+  <circle class="mark artifact" cx="620" cy="520.5" r="4.5"/>
+  <circle class="mark artifact" cx="680" cy="520.5" r="4.5"/>
+  <circle class="mark artifact" cx="740" cy="520.5" r="4.5"/>
+  <rect class="read hp0" x="548" y="536" width="300" height="13" rx="6.5"/>
+  <circle class="mark artifact" cx="620" cy="542.5" r="4.5"/>
+  <circle class="mark artifact" cx="680" cy="542.5" r="4.5"/>
+  <circle class="mark artifact" cx="740" cy="542.5" r="4.5"/>
+  <text class="tick zh bad" x="864" y="490">同一批 read 上</text>
+  <text class="tick zh bad" x="864" y="514">同時帶好幾個</text>
+  <rect class="read hp1" x="548" y="566" width="300" height="13" rx="6.5"/>
+  <circle class="mark somatic" cx="680" cy="572.5" r="4.5"/>
+  <rect class="read hp1" x="568" y="588" width="300" height="13" rx="6.5"/>
+  <circle class="mark somatic" cx="680" cy="594.5" r="4.5"/>
+  <text class="tick zh ok" x="878" y="578">真變異散在</text>
+  <text class="tick zh ok" x="878" y="602">不同 read 上</text>
+  <rect class="region bad" x="596" y="462" width="180" height="150" rx="4"/>
+  <text class="tick zh bold" x="528" y="660">四個條件同時成立才丟：VAF 低、支持數少、</text>
+  <text class="tick zh bold" x="528" y="684">區間內變異夠多、共現統計異常</text>
+
+  <line class="axis" x1="20" y1="712" x2="980" y2="712"/>
+  <text class="lbl bold zh" x="20" y="744">四個門檻都不是固定值。</text>
+  <text class="anno zh" x="20" y="772">每個 purity 級距各自搜一組：先全域隨機取樣找大概位置，再用網格搜尋在附近細調。</text>
+</svg><figcaption>四個過濾器與各自的判準。四個都在問同一個問題的不同面向：
+<b>支持這個候選的 read，來源夠不夠一致</b>。最下方是門檻的來源 —— 不是公式算出來的，
+是在每個 purity 級距上分別搜出來的。</figcaption></figure>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>Filter</th><th>偽陽性訊號</th><th>判斷依據</th></tr></thead>
+<thead><tr><th>Filter</th><th>看什麼</th><th>怎麼判斷</th></tr></thead>
 <tbody>
-<tr><td><b>TINC</b></td><td>可能是 germline，或 normal 含有腫瘤污染</td><td>檢查該位點在 <b>normal</b> 樣本的 <span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-vaf-10">VAF<span class="term__pop" id="m12__gd-vaf-10" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span>；較高時增加 germline/TINC 疑慮</td></tr>
-<tr><td><b>Read-level</b></td><td>比對或 read 證據混亂造成的可疑訊號</td><td>帶變異的 read 若<b>同時</b>帶有 HP1 與 HP2 的 germline allele → 提高疑慮</td></tr>
-<tr><td><b>Haplotype origin</b></td><td>同一問題的整體統計</td><td>支持 read 若多來自<b>同一條</b> germline haplotype，則增加來源一致性的支持</td></tr>
-<tr><td><b>Variant cluster</b></td><td>密集 read pattern 造成的可疑訊號</td><td>檢查變異是否集中於<b>同一群 read</b>；以 z-score 識別異常模式，仍需配合其他證據</td></tr>
+<tr><td><b>TINC</b></td><td>該位點在 <b>normal</b> 樣本的 <span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-vaf-11">VAF<span class="term__pop" id="m12__gd-vaf-11" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span></td><td>真 somatic 在 normal 幾乎為 0；偏高的多半是 germline。低於門檻才留</td></tr>
+<tr><td><b>Read consistency</b></td><td>每條支持 read 兩側的 germline allele</td><td>一條 read 同時帶 HP1 與 HP2 的 allele 就是「混合 read」；混合比例低於門檻才留</td></tr>
+<tr><td><b>Haplotagging background</b></td><td>支持 read 分別來自哪一條 haplotype</td><td>真變異集中在其中一邊；<b>兩邊都超過門檻</b>就丟掉</td></tr>
+<tr><td><b>Variant cluster</b></td><td>密集區間（預設 100 bp）內的變異是否擠在同一批 read 上</td><td>要 VAF 低、支持數少、區間內變異夠多、共現統計異常<b>四項同時成立</b>才丟掉</td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">這四個 filter 都檢查<b>haplotype 來源的一致性或 read pattern 的異常</b>，
-但各自的指標與閾值不同，應合併判讀。</p>
+<p class="prose">門檻怎麼來的？<b>不是公式算出來的，是搜出來的。</b>
+每個 purity 級距各做一次獨立的參數最佳化：先在合理範圍內隨機取樣做全域搜尋，
+再對表現最好的區域做網格細搜。所以「purity 感知」的具體意思是
+<b>「查表拿出這個 purity 對應的那組門檻」</b>，而不是把 purity 代進某個公式。</p>
 
-<h3 id="m12__hp3-的後續指派">HP3 的後續指派</h3>
+<h3 id="m12__hp3-怎麼補上來源">HP3 怎麼補上來源</h3>
 
-<p class="prose">重建 somatic haplotype 時，未涵蓋 germline 錨點的 read
-會先標為 <code>HP3</code>。之後再依其攜帶的 somatic 變異證據，嘗試指派到對應的 somatic haplotype
-（見 M6 的下半部示意）。</p>
+<p class="prose">第四階段重建時，沒有 germline 錨點的 read 仍然只能先標成 <code>HP3</code>。
+補救的方式是去看<b>其他也帶同一個 somatic allele 的 read</b>屬於哪個背景 ——
+但規則很嚴格：<b>只有在那些 read 全部指向同一個背景時才繼承</b>。</p>
 
-<p class="prose">並非所有 HP3 都能完成指派。如果某個 somatic 變異的支持 read
-<b>同時來自兩條 germline haplotype</b>，來源證據互相衝突，則保留為不可指派。</p>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" class="dia-svg" role="img">
+  <title>HP3 的繼承規則：只有在其他 read 一致時才補上來源</title>
+  <desc>一條 read 帶有 somatic allele，但沒有覆蓋到任何 germline 變異，所以初步只能標成 HP3。
+        補救方式是去看其他也帶同一個 somatic allele 的 read 各自屬於哪一個 somatic haplotype 背景。
+        三種結果：若那些 read 全部一致指向同一個背景，這條 HP3 就繼承該背景；
+        若那些 read 有的指向 HP1-1、有的指向 HP2-1，證據互相衝突，保留為 HP3；
+        若其他 read 也全都是 HP3，沒有可繼承的來源，同樣保留為 HP3。
+        論文的 read 層級評估顯示 HP1-1 與 HP2-1 的 F1 常在 0.98 以上，而 HP3 明顯較低，
+        且低的原因主要是 recall 而不是 precision，
+        表示這個機制寧可不指派，也不亂猜一個來源。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">HP3 怎麼補上來源：只有在其他 read 一致時才繼承</text>
+  <text class="tick zh" x="20" y="58">HP3 的問題不是「它屬於第三條染色體」，而是「這條 read 上沒有 germline 錨點可以比對」。</text>
+
+  <rect class="box plain" x="150" y="80" width="270" height="130" rx="10"/>
+  <text class="anno bold zh mid" x="285" y="108">一條 HP3 read</text>
+  <rect class="read hp0" x="180" y="128" width="210" height="14" rx="7"/>
+  <circle class="mark somatic" cx="285" cy="135" r="5.5"/>
+  <text class="tick mid zh" x="285" y="170">帶 somatic allele，</text>
+  <text class="tick mid zh" x="285" y="192">但沒有 germline allele</text>
+  <path class="flow" d="M424,145 L470,145" marker-end="url(#arrow)"/>
+  <rect class="box accent" x="474" y="80" width="330" height="130" rx="10"/>
+  <text class="anno bold zh mid" x="639" y="112">去看其他帶同一個</text>
+  <text class="anno bold zh mid" x="639" y="138">somatic allele 的 read</text>
+  <text class="tick mid zh" x="639" y="172">它們各自屬於哪一個</text>
+  <text class="tick mid zh" x="639" y="194">somatic haplotype 背景？</text>
+  <path class="flow" d="M639,214 L639,228"/>
+  <path class="conn" d="M166,228 L834,228"/>
+  <path class="flow" d="M166,228 L166,240" marker-end="url(#arrow)"/>
+  <path class="flow" d="M500,228 L500,240" marker-end="url(#arrow)"/>
+  <path class="flow" d="M834,228 L834,240" marker-end="url(#arrow)"/>
+
+  <rect class="box ok" x="16" y="244" width="300" height="188" rx="10"/>
+  <text class="anno bold zh mid" x="166" y="274">① 全部一致</text>
+  <rect class="read hp1" x="46" y="292" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="126" cy="298.0" r="4.5"/>
+  <text class="tick somatic" x="216" y="303" style="font-size:13px">HP1-1</text>
+  <rect class="read hp1" x="46" y="316" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="126" cy="322.0" r="4.5"/>
+  <text class="tick somatic" x="216" y="327" style="font-size:13px">HP1-1</text>
+  <rect class="read hp1" x="46" y="340" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="126" cy="346.0" r="4.5"/>
+  <text class="tick somatic" x="216" y="351" style="font-size:13px">HP1-1</text>
+  <text class="tick mid zh bold ok" x="166" y="386">繼承成 HP1-1</text>
+  <text class="tick mid zh" x="166" y="414">所有 read 都指向同一邊</text>
+
+  <rect class="box bad" x="350" y="244" width="300" height="188" rx="10"/>
+  <text class="anno bold zh mid" x="500" y="274">② 互相衝突</text>
+  <rect class="read hp1" x="380" y="292" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="460" cy="298.0" r="4.5"/>
+  <text class="tick somatic" x="550" y="303" style="font-size:13px">HP1-1</text>
+  <rect class="read hp2" x="380" y="316" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="460" cy="322.0" r="4.5"/>
+  <text class="tick somatic" x="550" y="327" style="font-size:13px">HP2-1</text>
+  <rect class="read hp1" x="380" y="340" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="460" cy="346.0" r="4.5"/>
+  <text class="tick somatic" x="550" y="351" style="font-size:13px">HP1-1</text>
+  <text class="tick mid zh bold bad" x="500" y="386">不繼承，留 HP3</text>
+  <text class="tick mid zh" x="500" y="414">證據互相打架</text>
+
+  <rect class="box bad" x="684" y="244" width="300" height="188" rx="10"/>
+  <text class="anno bold zh mid" x="834" y="274">③ 沒有來源可繼承</text>
+  <rect class="read hp0" x="714" y="292" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="794" cy="298.0" r="4.5"/>
+  <text class="tick " x="884" y="303" style="font-size:13px">HP3</text>
+  <rect class="read hp0" x="714" y="316" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="794" cy="322.0" r="4.5"/>
+  <text class="tick " x="884" y="327" style="font-size:13px">HP3</text>
+  <rect class="read hp0" x="714" y="340" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="794" cy="346.0" r="4.5"/>
+  <text class="tick " x="884" y="351" style="font-size:13px">HP3</text>
+  <text class="tick mid zh bold bad" x="834" y="386">不繼承，留 HP3</text>
+  <text class="tick mid zh" x="834" y="414">其他 read 也都沒有錨點</text>
+
+  <line class="axis" x1="20" y1="456" x2="980" y2="456"/>
+  <text class="lbl bold zh" x="20" y="488">這個保守規則的代價，看評估數字就知道</text>
+  <text class="anno zh" x="20" y="518">HP1-1／HP2-1 的 read 層級 F1 多在 0.98 以上；HP3 明顯較低（例如 0.75 對 0.93）。</text>
+  <text class="anno zh" x="20" y="546">但三類的 precision 都很高（≥0.98）—— 掉的是 recall。</text>
+  <text class="anno zh bold ok" x="20" y="576">意思是：它寧可不指派，也不亂猜一個來源。這是刻意的取捨，不是 bug。</text>
+  <text class="anno zh warn" x="20" y="606">代價是低 purity 時 HP3 更多，可用的 somatic haplotype 資訊也更少。</text>
+</svg><figcaption>三種結果：全部一致才繼承；證據互相衝突、或其他 read 也都沒有錨點，就保留為 <code>HP3</code>。
+最下方是這個保守規則的代價 —— <code>HP3</code> 的 recall 明顯較低，但 precision 仍高，
+表示它寧可不指派也不亂猜。</figcaption></figure>
 </section>
 
 
@@ -8112,19 +8599,48 @@ longphase-s somatic_haplotag \
 
 <h3 id="m12__結果摘要">結果摘要</h3>
 
+<p class="prose">研究在<b>八個資料集、六個癌症細胞株</b>上評估，並用合成混合樣本製造已知的 purity 梯度。
+把 recall 與 precision 分開看，才看得出這個方法實際上做了什麼：</p>
+
 <div class="table-wrap">
 <table>
-<thead><tr><th>面向</th><th>LongPhase-S 的結論</th></tr></thead>
+<thead><tr><th>面向</th><th>報告的結果</th></tr></thead>
 <tbody>
-<tr><td>purity 估計</td><td>在所報告的 benchmark 與評估設定中，低 purity 區段優於 ASCAT；leave-k-out 的 MAE 約 4%、R² 約 0.95</td></tr>
-<tr><td>somatic SNV calling</td><td>部分 cell line 有明顯提升，其餘持平或略降</td></tr>
-<tr><td>somatic haplotagging</td><td>有明確 germline 來源的 read 指派穩定；<code>HP3</code> 這類則相對不穩</td></tr>
+<tr><td>purity 估計</td><td>在低 purity 區段明顯優於 ASCAT（ASCAT 在多個資料集把 0.2 預測成 1.0）；leave-k-out 交叉驗證平均 R² 約 0.96</td></tr>
+<tr><td>接在 ClairS 之後（SNV）</td><td><b>recall 平均 +4.5%</b>（最多 +14.4%），precision 平均 −1.3%，淨效果 F1 平均 +1.9%（8 個資料集中 6 個變好）</td></tr>
+<tr><td>接在 ClairS 之後（indel）</td><td><b>recall 平均 +14.7%</b>，precision 平均 −11.9%，F1 平均 +7.1%（8 個中 7 個變好）</td></tr>
+<tr><td>接在 DeepSomatic 之後</td><td>方向相反：主要是 <b>precision</b> 上升（SNV 平均 +3.1%），recall 略降，F1 只有小幅變化（+1.2% / +0.5%）</td></tr>
+<tr><td>somatic haplotagging</td><td><code>HP1-1</code>／<code>HP2-1</code> 的 read 層級 F1 在 8 個資料集中有 6 個 ≥0.98；<code>HP3</code> 明顯較低</td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">最後一列列出明確限制：<b>HP3 的分類不穩定。</b>
-閱讀結果時，應將此限制納入解讀，不由自陳內容推論檢查充分。</p>
+<p class="prose">兩件事值得停下來看。</p>
+
+<p class="prose">第一，<b>同一個工具接在不同 caller 後面，改善的方向不一樣</b>。
+接 ClairS 主要補 recall（把原本被濾掉的真變異救回來），接 DeepSomatic 主要補 precision（把假的濾掉）。
+這代表改善量取決於前一級 caller 原本偏保守還是偏寬鬆，不是一個固定的「加成」。</p>
+
+<p class="prose">第二，<b>recall 漲很多不等於 F1 漲很多</b>。indel 那一列 recall +14.7% 但 precision −11.9%，
+淨值只有 +7.1%；而 COLO829_ONT 甚至因為 precision 掉太多（0.82 → 0.49）讓 F1 略降。
+看到「提升」兩個字時，要先問是哪一個指標提升。</p>
+
+<p class="prose"><code>HP3</code> 的限制在上一節已經量化過：低的是 recall 而不是 precision。
+報告結果時應同時說明這一點，不要只說「haplotagging 準確」。</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">這些數字的成立條件</p>
+<p class="prose">全部來自<b>細胞株與合成混合樣本</b>。合成樣本提供了已知的 purity（這是真實檢體給不了的），
+代價是它不會有真實腫瘤的纖維組織混雜、空間異質性與更複雜的次族群結構。</p>
+<p class="prose">研究本身也把這點列為限制，並指出 subclonal 的 CNV、LOH 與 aneuploidy
+可能造成部分模仿 purity 效果的等位失衡。</p>
+</div>
+
+<h3 id="m12__原始文獻與程式碼">原始文獻與程式碼</h3>
+
+<p class="prose">本章的方法對應 LongPhase-S 的預印本（bioRxiv, 2025，doi 10.1101/2025.11.20.689492），
+程式碼在 <code>github.com/CCU-Bioinformatics-Lab/longphase-s</code>。
+上面的階段名稱與參數判準以<b>原始碼</b>為準；文件與論文用字若有出入，請以 <code>longopts</code> 表為準。</p>
 </section>
 
 
@@ -8134,13 +8650,17 @@ longphase-s somatic_haplotag \
 <div class="reveal__q"><p class="prose">執行 <code>estimate_purity</code> 後得到 0.95，但外部資料估計這個檢體只有大約 40% 的腫瘤細胞。<br><br>
 可能出了什麼問題？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose">依可能性排序：</p>
 <ol class="prose">
-<li><b>大範圍的 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-loh-11">LOH<span class="term__pop" id="m12__gd-loh-11" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 或 <span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-copy-number-12">CNV<span class="term__pop" id="m12__gd-copy-number-12" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span></b>。GHIR 量的是 haplotype 失衡，
-LOH 與 somatic 突變可能造成相似的失衡訊號。若未被 LCVF 充分過濾，模型可能高估 purity。</li>
+<li><b>大範圍的 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-loh-12">LOH<span class="term__pop" id="m12__gd-loh-12" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 或 <span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-copy-number-13">CNV<span class="term__pop" id="m12__gd-copy-number-13" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span></b>。GHIR 量的是 haplotype 失衡，
+而 LOH 與 aneuploidy 造成的失衡跟 purity 無關 —— 若沒被 LCVF 濾掉，就會被誤讀成高 purity。
+值得注意的是：<b>研究實際觀察到的結果沒有出現這個問題</b>，
+即使資料集中有帶染色體規模 LOH 的細胞株（例如 HCC1395），估計仍未受影響；
+論文推測原因是這個估計本身是 phase-aware 的，而以等位比例或拷貝數為基礎的方法更容易被這類事件帶偏。
+所以這一項要當成「先檢查 LCVF 有沒有正常工作」，而不是預設它一定出錯。</li>
 <li><b>輸入的 normal VCF 沒有正確 phase</b>。GHIR 依賴 HP1／HP2 的分群；
 若 phasing 錯誤，比例便失去解釋力。先檢查 phased VCF 裡的 <code>PS</code> 是否合理。</li>
-<li><b><span class="term" data-term="TINC" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-tinc-13">TINC<span class="term__pop" id="m12__gd-tinc-13" role="tooltip"><b class="term__hd">TINC <i>腫瘤污染正常樣本</i></b><span class="term__def" data-lang="zh">Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。</span><span class="term__def" data-lang="en">Tumour-in-normal contamination: tumour cells present in the matched normal, causing true somatic variants to produce signal there as well.</span><a class="term__more" href="glossary.html#tinc">完整條目 →</a></span></span></b>。如果 normal 樣本含有腫瘤 DNA 污染，germline 基準線可能發生偏移。</li>
+<li><b><span class="term" data-term="TINC" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-tinc-14">TINC<span class="term__pop" id="m12__gd-tinc-14" role="tooltip"><b class="term__hd">TINC <i>腫瘤污染正常樣本</i></b><span class="term__def" data-lang="zh">Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。</span><span class="term__def" data-lang="en">Tumour-in-normal contamination: tumour cells present in the matched normal, causing true somatic variants to produce signal there as well.</span><a class="term__more" href="glossary.html#tinc">完整條目 →</a></span></span></b>。如果 normal 樣本含有腫瘤 DNA 污染，germline 基準線可能發生偏移。</li>
 <li><b>模型外推</b>。迴歸是在六個細胞株的合成樣本上訓練的。
-如果你的樣本在某個維度上不像那批訓練資料（不同癌別、不同 <span class="term" data-term="basecalling" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-basecalling-14">basecaller<span class="term__pop" id="m12__gd-basecalling-14" role="tooltip"><b class="term__hd">basecalling <i>鹼基判讀</i></b><span class="term__def" data-lang="zh">把定序儀的原始訊號（ONT 是電流）轉成 A/C/G/T 字母的步驟。不同 basecaller 版本會產生不同的錯誤特性 —— 所以「同一個細胞株、不同 basecaller」是兩份不同的資料集。</span><span class="term__def" data-lang="en">Converting raw sequencer signal into A/C/G/T. Different basecallers yield different error profiles.</span><a class="term__more" href="glossary.html#basecalling">完整條目 →</a></span></span>、不同 coverage），
+如果你的樣本在某個維度上不像那批訓練資料（不同癌別、不同 <span class="term" data-term="basecalling" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-basecalling-15">basecaller<span class="term__pop" id="m12__gd-basecalling-15" role="tooltip"><b class="term__hd">basecalling <i>鹼基判讀</i></b><span class="term__def" data-lang="zh">把定序儀的原始訊號（ONT 是電流）轉成 A/C/G/T 字母的步驟。不同 basecaller 版本會產生不同的錯誤特性 —— 所以「同一個細胞株、不同 basecaller」是兩份不同的資料集。</span><span class="term__def" data-lang="en">Converting raw sequencer signal into A/C/G/T. Different basecallers yield different error profiles.</span><a class="term__more" href="glossary.html#basecalling">完整條目 →</a></span></span>、不同 coverage），
 預測可能不可靠。</li>
 </ol>
 <p class="prose">建議的排查順序是：先以 IGV 檢視多個區域的 phasing 品質，

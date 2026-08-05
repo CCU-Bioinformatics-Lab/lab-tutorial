@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
+  <title>HP3 的繼承規則：只有在其他 read 一致時才補上來源</title>
+  <desc>一條 read 帶有 somatic allele，但沒有覆蓋到任何 germline 變異，所以初步只能標成 HP3。
+        補救方式是去看其他也帶同一個 somatic allele 的 read 各自屬於哪一個 somatic haplotype 背景。
+        三種結果：若那些 read 全部一致指向同一個背景，這條 HP3 就繼承該背景；
+        若那些 read 有的指向 HP1-1、有的指向 HP2-1，證據互相衝突，保留為 HP3；
+        若其他 read 也全都是 HP3，沒有可繼承的來源，同樣保留為 HP3。
+        論文的 read 層級評估顯示 HP1-1 與 HP2-1 的 F1 常在 0.98 以上，而 HP3 明顯較低，
+        且低的原因主要是 recall 而不是 precision，
+        表示這個機制寧可不指派，也不亂猜一個來源。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">HP3 怎麼補上來源：只有在其他 read 一致時才繼承</text>
+  <text class="tick zh" x="20" y="58">HP3 的問題不是「它屬於第三條染色體」，而是「這條 read 上沒有 germline 錨點可以比對」。</text>
+
+  <rect class="box plain" x="150" y="80" width="270" height="130" rx="10"/>
+  <text class="anno bold zh mid" x="285" y="108">一條 HP3 read</text>
+  <rect class="read hp0" x="180" y="128" width="210" height="14" rx="7"/>
+  <circle class="mark somatic" cx="285" cy="135" r="5.5"/>
+  <text class="tick mid zh" x="285" y="170">帶 somatic allele，</text>
+  <text class="tick mid zh" x="285" y="192">但沒有 germline allele</text>
+  <path class="flow" d="M424,145 L470,145" marker-end="url(#arrow)"/>
+  <rect class="box accent" x="474" y="80" width="330" height="130" rx="10"/>
+  <text class="anno bold zh mid" x="639" y="112">去看其他帶同一個</text>
+  <text class="anno bold zh mid" x="639" y="138">somatic allele 的 read</text>
+  <text class="tick mid zh" x="639" y="172">它們各自屬於哪一個</text>
+  <text class="tick mid zh" x="639" y="194">somatic haplotype 背景？</text>
+  <path class="flow" d="M639,214 L639,228"/>
+  <path class="conn" d="M166,228 L834,228"/>
+  <path class="flow" d="M166,228 L166,240" marker-end="url(#arrow)"/>
+  <path class="flow" d="M500,228 L500,240" marker-end="url(#arrow)"/>
+  <path class="flow" d="M834,228 L834,240" marker-end="url(#arrow)"/>
+
+  <rect class="box ok" x="16" y="244" width="300" height="188" rx="10"/>
+  <text class="anno bold zh mid" x="166" y="274">① 全部一致</text>
+  <rect class="read hp1" x="46" y="292" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="126" cy="298.0" r="4.5"/>
+  <text class="tick somatic" x="216" y="303" style="font-size:13px">HP1-1</text>
+  <rect class="read hp1" x="46" y="316" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="126" cy="322.0" r="4.5"/>
+  <text class="tick somatic" x="216" y="327" style="font-size:13px">HP1-1</text>
+  <rect class="read hp1" x="46" y="340" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="126" cy="346.0" r="4.5"/>
+  <text class="tick somatic" x="216" y="351" style="font-size:13px">HP1-1</text>
+  <text class="tick mid zh bold ok" x="166" y="386">繼承成 HP1-1</text>
+  <text class="tick mid zh" x="166" y="414">所有 read 都指向同一邊</text>
+
+  <rect class="box bad" x="350" y="244" width="300" height="188" rx="10"/>
+  <text class="anno bold zh mid" x="500" y="274">② 互相衝突</text>
+  <rect class="read hp1" x="380" y="292" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="460" cy="298.0" r="4.5"/>
+  <text class="tick somatic" x="550" y="303" style="font-size:13px">HP1-1</text>
+  <rect class="read hp2" x="380" y="316" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="460" cy="322.0" r="4.5"/>
+  <text class="tick somatic" x="550" y="327" style="font-size:13px">HP2-1</text>
+  <rect class="read hp1" x="380" y="340" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="460" cy="346.0" r="4.5"/>
+  <text class="tick somatic" x="550" y="351" style="font-size:13px">HP1-1</text>
+  <text class="tick mid zh bold bad" x="500" y="386">不繼承，留 HP3</text>
+  <text class="tick mid zh" x="500" y="414">證據互相打架</text>
+
+  <rect class="box bad" x="684" y="244" width="300" height="188" rx="10"/>
+  <text class="anno bold zh mid" x="834" y="274">③ 沒有來源可繼承</text>
+  <rect class="read hp0" x="714" y="292" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="794" cy="298.0" r="4.5"/>
+  <text class="tick " x="884" y="303" style="font-size:13px">HP3</text>
+  <rect class="read hp0" x="714" y="316" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="794" cy="322.0" r="4.5"/>
+  <text class="tick " x="884" y="327" style="font-size:13px">HP3</text>
+  <rect class="read hp0" x="714" y="340" width="160" height="12" rx="6"/>
+  <circle class="mark somatic" cx="794" cy="346.0" r="4.5"/>
+  <text class="tick " x="884" y="351" style="font-size:13px">HP3</text>
+  <text class="tick mid zh bold bad" x="834" y="386">不繼承，留 HP3</text>
+  <text class="tick mid zh" x="834" y="414">其他 read 也都沒有錨點</text>
+
+  <line class="axis" x1="20" y1="456" x2="980" y2="456"/>
+  <text class="lbl bold zh" x="20" y="488">這個保守規則的代價，看評估數字就知道</text>
+  <text class="anno zh" x="20" y="518">HP1-1／HP2-1 的 read 層級 F1 多在 0.98 以上；HP3 明顯較低（例如 0.75 對 0.93）。</text>
+  <text class="anno zh" x="20" y="546">但三類的 precision 都很高（≥0.98）—— 掉的是 recall。</text>
+  <text class="anno zh bold ok" x="20" y="576">意思是：它寧可不指派，也不亂猜一個來源。這是刻意的取捨，不是 bug。</text>
+  <text class="anno zh warn" x="20" y="606">代價是低 purity 時 HP3 更多，可用的 somatic haplotype 資訊也更少。</text>
+</svg>

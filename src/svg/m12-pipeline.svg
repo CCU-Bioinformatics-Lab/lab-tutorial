@@ -1,81 +1,72 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430">
-  <title>LongPhase-S 的五個階段</title>
-  <desc>從 tumor 與 normal 的定序資料開始，依序經過初步 variant calling、
-        normal variant phasing、初步 somatic haplotagging、tumor purity 估計、
-        purity 感知的 somatic variant 過濾，最後產生 germline 與 somatic haplotype。
-        圖中特別標出 purity 估計排在 variant 過濾之前，因為過濾參數會參考 purity。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <title>LongPhase-S 的四個階段與 purity 回饋</title>
+  <desc>流程從左到右分成四個階段。
+        輸入是 tumor 與 normal 的長讀資料：normal 用來呼叫 germline 變異並定相成 HP1 與 HP2，
+        tumor 用來呼叫 somatic 候選變異。
+        階段一做初步 somatic haplotagging，讓每條 read 先拿到一個暫時標籤。
+        階段二用全基因體的 germline haplotype 失衡分布估計 tumor purity。
+        階段三用估到的 purity 決定四個過濾器的門檻鬆緊，重新校準 somatic 變異。
+        階段四用校準後的變異重建 germline 與 somatic haplotype，並處理沒有 germline 錨點的 read。
+        圖中紅色回饋線標出關鍵順序：purity 必須先估出來，才能決定過濾要多嚴格。
+        原因是低 purity 樣本裡真變異的支持 read 很少，固定門檻會把它濾掉。</desc>
 
-  <!-- 輸入 -->
-  <rect class="box plain" x="20" y="60" width="150" height="52" rx="8"/>
-  <text class="anno mid" x="95" y="82">Tumor BAM</text>
-  <text class="tick mid" x="95" y="102">50×</text>
+  <text class="lbl bold zh" x="20" y="32">LongPhase-S 的四個階段</text>
+  <text class="tick zh" x="20" y="58">輸入是 tumor 與 normal 兩邊的長讀資料與變異；輸出是 read 層級的 germline 與 somatic haplotype。</text>
 
-  <rect class="box plain" x="20" y="130" width="150" height="52" rx="8"/>
-  <text class="anno mid" x="95" y="152">Normal BAM</text>
-  <text class="tick mid" x="95" y="172">25×</text>
+  <rect class="box plain" x="16" y="96" width="196" height="68" rx="8"/>
+  <text class="tick bold" x="34" y="122">Tumor BAM</text>
+  <text class="tick zh" x="34" y="146">＋ somatic 候選變異</text>
+  <rect class="box plain" x="16" y="180" width="196" height="86" rx="8"/>
+  <text class="tick bold" x="34" y="206">Normal BAM</text>
+  <text class="tick zh" x="34" y="230">＋ germline 變異</text>
+  <text class="tick zh hp1" x="34" y="254">先定相成 HP1／HP2</text>
 
-  <!-- 階段 1 -->
-  <path class="flow" d="M172,86 L206,86" marker-end="url(#arrow)"/>
-  <path class="flow" d="M172,156 L206,156" marker-end="url(#arrow)"/>
-  <rect class="box" x="208" y="52" width="146" height="68" rx="8"/>
-  <text class="tick mid bold" x="281" y="78">ClairS</text>
-  <text class="tick mid zh" x="281" y="98">tumor variants</text>
-  <text class="tick mid" x="281" y="114">①</text>
+  <rect class="box accent" x="232" y="96" width="172" height="170" rx="10"/>
+  <text class="anno bold mid" x="318" y="126">①</text>
+  <text class="anno bold zh mid" x="318" y="152">初步 haplotagging</text>
+  <text class="tick zh" x="248" y="182">每條 read 先拿到</text>
+  <text class="tick zh" x="248" y="206">暫時的 HP 標籤</text>
+  <text class="tick zh" x="248" y="230">（含 HP1-1／HP3）</text>
 
-  <rect class="box" x="208" y="130" width="146" height="68" rx="8"/>
-  <text class="tick mid bold" x="281" y="156">Clair3</text>
-  <text class="tick mid zh" x="281" y="176">normal variants</text>
-  <text class="tick mid" x="281" y="192">①</text>
+  <rect class="box accent" x="420" y="96" width="172" height="170" rx="10"/>
+  <text class="anno bold mid" x="506" y="126">②</text>
+  <text class="anno bold zh mid" x="506" y="152">purity 估計</text>
+  <text class="tick zh" x="436" y="182">全基因體 GHIR 分布</text>
+  <text class="tick zh" x="436" y="206">→ median 與 IQR</text>
+  <text class="tick zh" x="436" y="230">→ 一個 purity 值</text>
 
-  <!-- 階段 2 -->
-  <path class="flow" d="M356,164 L392,164" marker-end="url(#arrow)"/>
-  <rect class="box" x="394" y="130" width="150" height="68" rx="8"/>
-  <text class="tick mid bold zh" x="469" y="156">Normal phasing</text>
-  <text class="tick mid zh" x="469" y="176">建立 HP1 / HP2</text>
-  <text class="tick mid" x="469" y="192">②</text>
+  <rect class="box warn" x="608" y="96" width="172" height="170" rx="10"/>
+  <text class="anno bold mid" x="694" y="126">③</text>
+  <text class="anno bold zh mid" x="694" y="152">變異重校準</text>
+  <text class="tick zh" x="624" y="182">四個過濾器</text>
+  <text class="tick zh" x="624" y="206">門檻依 purity 調整</text>
+  <text class="tick zh" x="624" y="230">→ somatic VCF</text>
 
-  <!-- 階段 3 -->
-  <path class="flow" d="M356,86 L580,86 L580,120" marker-end="url(#arrow)"/>
-  <path class="flow" d="M546,164 L580,164 L580,140" marker-end="url(#arrow)"/>
-  <rect class="box accent" x="506" y="204" width="150" height="68" rx="8"/>
-  <text class="tick mid bold zh" x="581" y="230">初步 somatic</text>
-  <text class="tick mid bold zh" x="581" y="248">haplotagging</text>
-  <text class="tick mid" x="581" y="264">③</text>
-  <path class="flow" d="M580,140 L580,200" marker-end="url(#arrow)"/>
+  <rect class="box ok" x="796" y="96" width="172" height="170" rx="10"/>
+  <text class="anno bold mid" x="882" y="126">④</text>
+  <text class="anno bold zh mid" x="882" y="152">整合重建</text>
+  <text class="tick zh" x="812" y="182">重新 haplotag</text>
+  <text class="tick zh" x="812" y="206">HP3 依一致性繼承</text>
+  <text class="tick zh" x="812" y="230">→ 最終 HP 標籤</text>
 
-  <!-- 階段 4：purity -->
-  <path class="flow" d="M658,238 L694,238" marker-end="url(#arrow)"/>
-  <rect class="box accent" x="696" y="204" width="150" height="68" rx="8"/>
-  <text class="tick mid bold" x="771" y="228">GHIR → 迴歸</text>
-  <text class="tick mid bold zh somatic" x="771" y="248">估計 purity</text>
-  <text class="tick mid" x="771" y="264">④</text>
+  <path class="flow" d="M214,130 L226,130" marker-end="url(#arrow)"/>
+  <path class="flow" d="M214,222 L226,222" marker-end="url(#arrow)"/>
+  <path class="flow" d="M404,180 L418,180" marker-end="url(#arrow)"/>
+  <path class="flow" d="M592,180 L606,180" marker-end="url(#arrow)"/>
+  <path class="flow" d="M780,180 L794,180" marker-end="url(#arrow)"/>
 
-  <!-- purity 回饋到過濾 -->
-  <path class="conn somatic thick" d="M771,200 L771,150 L700,150" marker-end="url(#arrow)"/>
-  <text class="tick zh somatic bold" x="704" y="128">purity 用於調整</text>
-  <text class="tick zh somatic bold" x="704" y="144">過濾有多嚴格</text>
+  <path class="conn somatic thick" d="M506,270 L506,300 L694,300 L694,272" marker-end="url(#arrow)"/>
+  <text class="tick mid zh somatic bold" x="600" y="322">② 估到的 purity 決定 ③ 的門檻鬆緊</text>
 
-  <!-- 階段 5：過濾 -->
-  <rect class="box" x="530" y="20" width="166" height="110" rx="8"/>
-  <text class="tick mid bold zh" x="613" y="44">purity 感知過濾</text>
-  <text class="tick mid" x="613" y="66">TINC filter</text>
-  <text class="tick mid" x="613" y="84">read-level filter</text>
-  <text class="tick mid" x="613" y="102">haplotype origin</text>
-  <text class="tick mid" x="613" y="120">variant cluster　⑤</text>
+  <path class="flow" d="M882,270 L882,344" marker-end="url(#arrow)"/>
+  <rect class="box ok" x="700" y="348" width="284" height="96" rx="8"/>
+  <text class="tick bold zh" x="718" y="374">最終輸出</text>
+  <text class="tick" x="718" y="398">BAM: HP:Z:1-1 / 2-1 / 3（字串）</text>
+  <text class="tick zh" x="718" y="422">purity 文字檔、重校準後的 VCF</text>
 
-  <!-- 輸出 -->
-  <path class="flow" d="M698,75 L860,75 L860,200" marker-end="url(#arrow)"/>
-  <rect class="box ok" x="850" y="290" width="130" height="100" rx="8"/>
-  <text class="tick mid bold zh" x="915" y="314">輸出</text>
-  <text class="tick mid hp1" x="915" y="336">HP1 / HP2</text>
-  <text class="tick mid somatic" x="915" y="356">HP1-1 / HP2-1</text>
-  <text class="tick mid" x="915" y="376">tumor purity</text>
-  <path class="flow" d="M860,200 L860,286" marker-end="url(#arrow)"/>
-
-  <!-- 重點註記 -->
-  <line class="guide" x1="20" y1="300" x2="820" y2="300"/>
-  <text class="anno bold zh" x="20" y="330">為什麼順序是這樣？</text>
-  <text class="tick zh" x="20" y="356">在低 purity 樣本中，真 somatic 變異的支持 read 可能較少。</text>
-  <text class="tick zh" x="20" y="378">固定門檻可能增加漏檢風險，仍需以驗證資料評估。</text>
-  <text class="tick zh somatic bold" x="20" y="400">因此先估 purity，再依設定調整過濾參數。</text>
+  <line class="guide" x1="20" y1="348" x2="680" y2="348"/>
+  <text class="anno bold zh" x="20" y="378">為什麼 purity 一定要排在過濾之前？</text>
+  <text class="tick zh" x="20" y="404">purity 0.2、50× 覆蓋度時，一個 clonal somatic 變異只有約 5 條支持 read。</text>
+  <text class="tick zh" x="20" y="428">套用適合純腫瘤的嚴格門檻會把它一起濾掉；一律放寬又會讓高 purity 樣本多出假陽性。</text>
+  <text class="tick zh somatic bold" x="20" y="452">所以門檻不是一組固定數字，而是每個 purity 級距各有一組。</text>
 </svg>
