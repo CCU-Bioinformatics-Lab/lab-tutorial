@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400">
+  <title>variant caller 在流程中的位置，以及兩個常用工具的內部步驟</title>
+  <desc>上方是輸入與輸出：比對後的 BAM 與參考序列進入 variant caller，
+        輸出 germline VCF，再供後續的 phasing 工具使用。
+        中間列出 DeepVariant 的三個步驟：先把每個候選位置的 read 堆疊做成多層數值，
+        再由神經網路輸出基因型機率，最後寫成 VCF。
+        下方列出 Clair3 的兩段式設計：先用較輕量的模型掃過所有候選位置，
+        大多數位置在這一步就定案，只有少數信心不足的位置再交給看完整比對的模型重判。
+        兩者的步驟名稱與細節依版本而異。</desc>
+
+  <!-- ══════════════ 上：輸入 → caller → 輸出 ══════════════ -->
+  <rect class="box plain" x="16" y="56" width="214" height="32" rx="6"/>
+  <text class="tick mid zh" x="123" y="77">aln.bam（比對後的 read）</text>
+  <rect class="box plain" x="16" y="94" width="214" height="32" rx="6"/>
+  <text class="tick mid zh" x="123" y="115">reference.fasta（參考序列）</text>
+
+  <path class="flow" d="M236,91 L246,91" marker-end="url(#arrow)"/>
+
+  <rect class="box accent" x="252" y="56" width="216" height="70" rx="8"/>
+  <text class="anno mid bold zh" x="360" y="84">variant caller</text>
+  <text class="tick mid" x="360" y="108">Clair3 ／ DeepVariant</text>
+
+  <path class="flow" d="M474,91 L504,91" marker-end="url(#arrow)"/>
+
+  <rect class="box plain" x="510" y="56" width="216" height="70" rx="8"/>
+  <text class="anno mid bold zh" x="618" y="84">germline VCF</text>
+  <text class="tick mid zh" x="618" y="108">位置＋基因型＋品質分數</text>
+
+  <path class="flow" d="M732,91 L762,91" marker-end="url(#arrow)"/>
+
+  <rect class="box plain" x="768" y="56" width="212" height="70" rx="8"/>
+  <text class="anno mid bold zh" x="874" y="84">後續 phasing</text>
+  <text class="tick mid zh" x="874" y="108">用其中的 het 位點當錨點</text>
+
+  <!-- ══════════════ 中：DeepVariant 的三步 ══════════════ -->
+  <rect class="box plain" x="16" y="150" width="968" height="100" rx="10"/>
+  <text class="anno bold zh" x="36" y="180">DeepVariant：三個步驟</text>
+
+  <rect class="box accent" x="36" y="190" width="290" height="48" rx="6"/>
+  <text class="tick mid mono bold" x="181" y="210">make_examples</text>
+  <text class="tick mid zh" x="181" y="230">把 read 堆疊做成多層數值</text>
+
+  <path class="flow" d="M330,214 L342,214" marker-end="url(#arrow)"/>
+
+  <rect class="box accent" x="346" y="190" width="290" height="48" rx="6"/>
+  <text class="tick mid mono bold" x="491" y="210">call_variants</text>
+  <text class="tick mid zh" x="491" y="230">神經網路輸出基因型機率</text>
+
+  <path class="flow" d="M640,214 L652,214" marker-end="url(#arrow)"/>
+
+  <rect class="box accent" x="656" y="190" width="290" height="48" rx="6"/>
+  <text class="tick mid mono bold" x="801" y="210">postprocess_variants</text>
+  <text class="tick mid zh" x="801" y="230">整理成 VCF</text>
+
+  <!-- ══════════════ 下：Clair3 的兩段式 ══════════════ -->
+  <rect class="box plain" x="16" y="266" width="968" height="128" rx="10"/>
+  <text class="anno bold zh" x="36" y="296">Clair3：先快掃一遍，難判的才細看</text>
+
+  <rect class="box accent" x="36" y="306" width="210" height="48" rx="6"/>
+  <text class="tick mid zh bold" x="141" y="326">輕量模型掃全部位置</text>
+  <text class="tick mid zh" x="141" y="346">用每欄的摘要統計</text>
+
+  <path class="flow" d="M250,330 L266,330" marker-end="url(#arrow)"/>
+
+  <rect class="box ok" x="276" y="306" width="210" height="48" rx="6"/>
+  <text class="tick mid zh bold" x="381" y="326">多數位置在此定案</text>
+  <text class="tick mid zh" x="381" y="346">機率明確，不必再算</text>
+
+  <path class="flow" d="M490,330 L506,330" marker-end="url(#arrow)"/>
+
+  <rect class="box warn" x="516" y="306" width="210" height="48" rx="6"/>
+  <text class="tick mid zh bold" x="621" y="326">少數位置信心不足</text>
+  <text class="tick mid zh" x="621" y="346">留給下一步重判</text>
+
+  <path class="flow" d="M730,330 L746,330" marker-end="url(#arrow)"/>
+
+  <rect class="box accent" x="756" y="306" width="210" height="48" rx="6"/>
+  <text class="tick mid zh bold" x="861" y="326">完整比對模型再判</text>
+  <text class="tick mid zh" x="861" y="346">看整段比對的細節</text>
+
+  <text class="tick zh" x="36" y="382">兩段式的用意：把昂貴的計算只花在難判的少數位置上。實際步驟名稱與門檻依版本而異。</text>
+</svg>

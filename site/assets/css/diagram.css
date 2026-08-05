@@ -136,10 +136,17 @@
 
 /* --- 長條 ---------------------------------------------------------------- */
 .dia-svg .bar          { fill: var(--muted-fill); stroke: var(--rule-strong); stroke-width: 1; }
+.dia-svg .bar.germline { fill: var(--germline-fill); stroke: var(--germline); }
 .dia-svg .bar.hp1      { fill: var(--hp1-fill); stroke: var(--hp1); }
 .dia-svg .bar.hp2      { fill: var(--hp2-fill); stroke: var(--hp2); }
 .dia-svg .bar.somatic  { fill: var(--somatic-fill); stroke: var(--somatic); }
 .dia-svg .bar.artifact { fill: var(--artifact-fill); stroke: var(--artifact); }
+
+/* --- 數值格：熱圖／張量通道用，深淺＝數值大小 ---------------------------
+   刻意是中性的 ink 而非任何語意色 —— 這裡的深淺代表「數值大」，
+   不代表 haplotype、variant class 或 methylation，不能跟那三套編碼混用。
+   個別格子的數值用 fill-opacity 屬性帶（不要用 opacity，會被 CSS 蓋掉）。 */
+.dia-svg .cellv { fill: var(--ink); stroke: var(--paper); stroke-width: 1; }
 
 /* --- 動畫（尊重 reduced-motion，由 base.css 全域關掉） ------------------ */
 @keyframes dash-flow { to { stroke-dashoffset: -24; } }

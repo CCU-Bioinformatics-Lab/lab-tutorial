@@ -1,0 +1,209 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+  <title>同樣是 30 比 28，畫面可以完全不同</title>
+  <desc>兩邊的計數完全一樣：30 條 read 支持參考鹼基 A、28 條支持 G。
+        左半部畫出一種與真 heterozygous 相容的畫面：支持 G 的 read 正反股都有，
+        鹼基品質高，附近序列沒有對齊困難。右半部畫出另一種畫面：支持 G 的 read 全部落在同一股，
+        鹼基品質低，而且候選位置緊鄰一段同型多聚體。兩者的支持數相同，
+        因此僅依數量無法區分，必須看每個觀測本身帶的品質與比對資訊。</desc>
+
+  <!-- ══════════════ 左：與真變異相容的畫面 ══════════════ -->
+  <text class="lbl bold zh" x="16" y="44">同一組計數，畫面 A</text>
+  <rect class="box ok" x="16" y="60" width="472" height="326" rx="10"/>
+
+  <rect class="bar" x="40" y="84" width="180" height="22" rx="4"/>
+  <text class="tick mid bold" x="130" y="100">30 條支持 A</text>
+  <rect class="bar" x="40" y="112" width="168" height="22" rx="4"/>
+  <text class="tick mid bold" x="124" y="128">28 條支持 G</text>
+  <text class="tick zh" x="240" y="100">計數 30 : 28</text>
+  <text class="tick zh" x="240" y="126">兩邊完全一樣</text>
+
+  <line class="guide" x1="40" y1="146" x2="464" y2="146"/>
+
+  <!-- 高亮候選欄（畫在 read 之後、字母之前） -->
+  <text class="tick mid ok bold" x="198" y="164">候選位置</text>
+
+  <rect class="read hp0" x="112" y="176" width="320" height="14" rx="7"/>
+  <rect class="read hp0" x="112" y="198" width="320" height="14" rx="7"/>
+  <rect class="read hp0" x="112" y="220" width="320" height="14" rx="7"/>
+  <rect class="read hp0" x="112" y="242" width="320" height="14" rx="7"/>
+  <rect class="read hp0" x="112" y="264" width="320" height="14" rx="7"/>
+  <rect class="read hp0" x="112" y="286" width="320" height="14" rx="7"/>
+
+  <rect class="region" x="184" y="172" width="28" height="122"/>
+  <rect class="box ghost" x="184" y="172" width="28" height="122" rx="4"/>
+
+  <text class="tick end" x="106" y="188">＋</text>
+  <text class="tick end" x="106" y="210">－</text>
+  <text class="tick end" x="106" y="232">＋</text>
+  <text class="tick end" x="106" y="254">－</text>
+  <text class="tick end" x="106" y="276">＋</text>
+  <text class="tick end" x="106" y="298">－</text>
+
+  <text class="base c mono" x="130" y="188" font-size="14">C</text>
+  <text class="base t mono" x="164" y="188" font-size="14">T</text>
+  <text class="base g mono" x="198" y="188" font-size="14">G</text>
+  <text class="base c mono" x="232" y="188" font-size="14">C</text>
+  <text class="base t mono" x="266" y="188" font-size="14">T</text>
+  <text class="base a mono" x="300" y="188" font-size="14">A</text>
+  <text class="base c mono" x="334" y="188" font-size="14">C</text>
+  <text class="base g mono" x="368" y="188" font-size="14">G</text>
+  <text class="base t mono" x="402" y="188" font-size="14">T</text>
+
+  <text class="base c mono" x="130" y="210" font-size="14">C</text>
+  <text class="base t mono" x="164" y="210" font-size="14">T</text>
+  <text class="base a mono" x="198" y="210" font-size="14">A</text>
+  <text class="base c mono" x="232" y="210" font-size="14">C</text>
+  <text class="base t mono" x="266" y="210" font-size="14">T</text>
+  <text class="base a mono" x="300" y="210" font-size="14">A</text>
+  <text class="base c mono" x="334" y="210" font-size="14">C</text>
+  <text class="base g mono" x="368" y="210" font-size="14">G</text>
+  <text class="base t mono" x="402" y="210" font-size="14">T</text>
+
+  <text class="base c mono" x="130" y="232" font-size="14">C</text>
+  <text class="base t mono" x="164" y="232" font-size="14">T</text>
+  <text class="base g mono" x="198" y="232" font-size="14">G</text>
+  <text class="base c mono" x="232" y="232" font-size="14">C</text>
+  <text class="base t mono" x="266" y="232" font-size="14">T</text>
+  <text class="base a mono" x="300" y="232" font-size="14">A</text>
+  <text class="base c mono" x="334" y="232" font-size="14">C</text>
+  <text class="base g mono" x="368" y="232" font-size="14">G</text>
+  <text class="base t mono" x="402" y="232" font-size="14">T</text>
+
+  <text class="base c mono" x="130" y="254" font-size="14">C</text>
+  <text class="base t mono" x="164" y="254" font-size="14">T</text>
+  <text class="base a mono" x="198" y="254" font-size="14">A</text>
+  <text class="base c mono" x="232" y="254" font-size="14">C</text>
+  <text class="base t mono" x="266" y="254" font-size="14">T</text>
+  <text class="base a mono" x="300" y="254" font-size="14">A</text>
+  <text class="base c mono" x="334" y="254" font-size="14">C</text>
+  <text class="base g mono" x="368" y="254" font-size="14">G</text>
+  <text class="base t mono" x="402" y="254" font-size="14">T</text>
+
+  <text class="base c mono" x="130" y="276" font-size="14">C</text>
+  <text class="base t mono" x="164" y="276" font-size="14">T</text>
+  <text class="base g mono" x="198" y="276" font-size="14">G</text>
+  <text class="base c mono" x="232" y="276" font-size="14">C</text>
+  <text class="base t mono" x="266" y="276" font-size="14">T</text>
+  <text class="base a mono" x="300" y="276" font-size="14">A</text>
+  <text class="base c mono" x="334" y="276" font-size="14">C</text>
+  <text class="base g mono" x="368" y="276" font-size="14">G</text>
+  <text class="base t mono" x="402" y="276" font-size="14">T</text>
+
+  <text class="base c mono" x="130" y="298" font-size="14">C</text>
+  <text class="base t mono" x="164" y="298" font-size="14">T</text>
+  <text class="base a mono" x="198" y="298" font-size="14">A</text>
+  <text class="base c mono" x="232" y="298" font-size="14">C</text>
+  <text class="base t mono" x="266" y="298" font-size="14">T</text>
+  <text class="base a mono" x="300" y="298" font-size="14">A</text>
+  <text class="base c mono" x="334" y="298" font-size="14">C</text>
+  <text class="base g mono" x="368" y="298" font-size="14">G</text>
+  <text class="base t mono" x="402" y="298" font-size="14">T</text>
+
+  <rect class="box ok" x="40" y="310" width="424" height="64" rx="8"/>
+  <text class="tick bold zh" x="58" y="334">支持 G 的 read：正反股都有、鹼基品質高</text>
+  <text class="tick zh" x="58" y="360">鄰近序列沒有重複片段，比對位置明確</text>
+
+  <!-- ══════════════ 右：與錯誤堆積相容的畫面 ══════════════ -->
+  <text class="lbl bold zh" x="512" y="44">同一組計數，畫面 B</text>
+  <rect class="box bad" x="512" y="60" width="472" height="326" rx="10"/>
+
+  <rect class="bar" x="536" y="84" width="180" height="22" rx="4"/>
+  <text class="tick mid bold" x="626" y="100">30 條支持 A</text>
+  <rect class="bar" x="536" y="112" width="168" height="22" rx="4"/>
+  <text class="tick mid bold" x="620" y="128">28 條支持 G</text>
+  <text class="tick zh" x="736" y="100">計數 30 : 28</text>
+  <text class="tick zh" x="736" y="126">跟左邊一模一樣</text>
+
+  <line class="guide" x1="536" y1="146" x2="960" y2="146"/>
+
+  <text class="tick mid bad bold" x="694" y="164">候選位置</text>
+
+  <rect class="read hp0" x="608" y="176" width="320" height="14" rx="7"/>
+  <rect class="read hp0" x="608" y="198" width="320" height="14" rx="7"/>
+  <rect class="read hp0" x="608" y="220" width="320" height="14" rx="7"/>
+  <rect class="read hp0" x="608" y="242" width="320" height="14" rx="7"/>
+  <rect class="read hp0" x="608" y="264" width="320" height="14" rx="7"/>
+  <rect class="read hp0" x="608" y="286" width="320" height="14" rx="7"/>
+
+  <rect class="region bad" x="680" y="172" width="28" height="122"/>
+  <rect class="box ghost" x="680" y="172" width="28" height="122" rx="4"/>
+  <rect class="region loh" x="748" y="172" width="130" height="122"/>
+
+  <text class="tick end" x="602" y="188">＋</text>
+  <text class="tick end" x="602" y="210">＋</text>
+  <text class="tick end" x="602" y="232">＋</text>
+  <text class="tick end" x="602" y="254">－</text>
+  <text class="tick end" x="602" y="276">－</text>
+  <text class="tick end" x="602" y="298">－</text>
+
+  <text class="base c mono" x="626" y="188" font-size="14">C</text>
+  <text class="base t mono" x="660" y="188" font-size="14">T</text>
+  <text class="base g mono" x="694" y="188" font-size="14" opacity="0.45">G</text>
+  <text class="base c mono" x="728" y="188" font-size="14">C</text>
+  <text class="base a mono" x="762" y="188" font-size="14">A</text>
+  <text class="base a mono" x="796" y="188" font-size="14">A</text>
+  <text class="base a mono" x="830" y="188" font-size="14">A</text>
+  <text class="base a mono" x="864" y="188" font-size="14">A</text>
+  <text class="base t mono" x="898" y="188" font-size="14">T</text>
+
+  <text class="base c mono" x="626" y="210" font-size="14">C</text>
+  <text class="base t mono" x="660" y="210" font-size="14">T</text>
+  <text class="base g mono" x="694" y="210" font-size="14" opacity="0.45">G</text>
+  <text class="base c mono" x="728" y="210" font-size="14">C</text>
+  <text class="base a mono" x="762" y="210" font-size="14">A</text>
+  <text class="base a mono" x="796" y="210" font-size="14">A</text>
+  <text class="base a mono" x="830" y="210" font-size="14">A</text>
+  <text class="base t mono" x="864" y="210" font-size="14">T</text>
+  <text class="base t mono" x="898" y="210" font-size="14">T</text>
+
+  <text class="base c mono" x="626" y="232" font-size="14">C</text>
+  <text class="base t mono" x="660" y="232" font-size="14">T</text>
+  <text class="base g mono" x="694" y="232" font-size="14" opacity="0.45">G</text>
+  <text class="base c mono" x="728" y="232" font-size="14">C</text>
+  <text class="base a mono" x="762" y="232" font-size="14">A</text>
+  <text class="base a mono" x="796" y="232" font-size="14">A</text>
+  <text class="base a mono" x="830" y="232" font-size="14">A</text>
+  <text class="base a mono" x="864" y="232" font-size="14">A</text>
+  <text class="base t mono" x="898" y="232" font-size="14">T</text>
+
+  <text class="base c mono" x="626" y="254" font-size="14">C</text>
+  <text class="base t mono" x="660" y="254" font-size="14">T</text>
+  <text class="base a mono" x="694" y="254" font-size="14">A</text>
+  <text class="base c mono" x="728" y="254" font-size="14">C</text>
+  <text class="base a mono" x="762" y="254" font-size="14">A</text>
+  <text class="base a mono" x="796" y="254" font-size="14">A</text>
+  <text class="base a mono" x="830" y="254" font-size="14">A</text>
+  <text class="base a mono" x="864" y="254" font-size="14">A</text>
+  <text class="base t mono" x="898" y="254" font-size="14">T</text>
+
+  <text class="base c mono" x="626" y="276" font-size="14">C</text>
+  <text class="base t mono" x="660" y="276" font-size="14">T</text>
+  <text class="base a mono" x="694" y="276" font-size="14">A</text>
+  <text class="base c mono" x="728" y="276" font-size="14">C</text>
+  <text class="base a mono" x="762" y="276" font-size="14">A</text>
+  <text class="base a mono" x="796" y="276" font-size="14">A</text>
+  <text class="base a mono" x="830" y="276" font-size="14">A</text>
+  <text class="base a mono" x="864" y="276" font-size="14">A</text>
+  <text class="base t mono" x="898" y="276" font-size="14">T</text>
+
+  <text class="base c mono" x="626" y="298" font-size="14">C</text>
+  <text class="base t mono" x="660" y="298" font-size="14">T</text>
+  <text class="base a mono" x="694" y="298" font-size="14">A</text>
+  <text class="base c mono" x="728" y="298" font-size="14">C</text>
+  <text class="base a mono" x="762" y="298" font-size="14">A</text>
+  <text class="base a mono" x="796" y="298" font-size="14">A</text>
+  <text class="base a mono" x="830" y="298" font-size="14">A</text>
+  <text class="base a mono" x="864" y="298" font-size="14">A</text>
+  <text class="base t mono" x="898" y="298" font-size="14">T</text>
+
+  <text class="tick mid artifact" x="813" y="170">同型多聚體</text>
+
+  <rect class="box bad" x="536" y="310" width="424" height="64" rx="8"/>
+  <text class="tick bold zh" x="554" y="334">支持 G 的 read：全部同一股、鹼基品質低（淡字）</text>
+  <text class="tick zh" x="554" y="360">右側是一段連續 A，比對位置本身就有歧義</text>
+
+  <!-- ══════════════ 結論 ══════════════ -->
+  <line class="axis" x1="20" y1="406" x2="980" y2="406"/>
+  <text class="anno zh bold" x="20" y="438">數量一樣，畫面不一樣 —— caller 判斷的是後者。</text>
+  <text class="anno zh" x="20" y="466">所以 30 比 28 只能提出候選；每一個觀測還帶著品質、股向與鄰近序列，這些才是判定的依據。</text>
+</svg>

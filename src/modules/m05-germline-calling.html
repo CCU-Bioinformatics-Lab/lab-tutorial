@@ -25,13 +25,21 @@
 
 <h3>[[variant calling|變異檢測]]的判斷內容</h3>
 
-<p class="prose">僅依 read 計數時，某個位置有 30 條 read 支持 <code>A</code>、28 條支持 <code>G</code>，
-可提出 heterozygous 候選，但不能單獨判定為真變異。錯誤率較高的平台（例如部分 ONT 資料）可能在支持數中包含定序錯誤。</p>
+<p class="prose">某個位置有 30 條 read 支持 <code>A</code>、28 條支持 <code>G</code>。這組數字可以提出 heterozygous 候選，
+但不能單獨定案 —— 因為<b>同樣的 30 比 28，畫面可以完全不同</b>：</p>
 
-<p class="prose">以 [[Clair3]] 與 [[DeepVariant]] 為例，caller 使用深度學習模型整合多種 read、品質與比對特徵；
-不同 caller 的模型與特徵並不完全相同：</p>
+{{svg:m05-count-not-enough | [wide] 兩邊的計數一模一樣。左邊支持 <code>G</code> 的 read 正反股都有、鹼基品質高，鄰近序列也沒有對齊困難。右邊支持 <code>G</code> 的 read 全部落在同一股、鹼基品質低（畫成淡字），而且緊鄰一段連續的 <code>A</code>，比對位置本身就有歧義。數量分不出這兩者。}}
 
-{{svg:m05-caller-features | [wide] 左：僅依 read 計數時，30 比 28 只能提出候選，不能單獨定案；其中部分支持可能來自讀取錯誤。右：示意模型可整合多類 read、品質與比對特徵，再輸出候選類別與信心分數。}}
+<p class="prose">所以 caller 讀的不是兩個數字，而是這個位置的整張畫面 ——
+把覆蓋此處的 read 排成一張表（一列一條 read、一欄一個位置，這種排法叫 <b>pileup</b>），
+再把表上每個格子的資訊編碼成好幾層數值送進模型。[[Clair3]] 與 [[DeepVariant]] 都是這種做法：</p>
+
+{{svg:m05-pileup-tensor | [wide] ① 候選位置周圍的 read 堆疊。② 同一張表被編碼成多層數值：鹼基種類、鹼基品質、比對品質、read 落在哪一股，深淺代表數值大小。③ 這疊數值送進神經網路，輸出三種基因型（<code>0/0</code>、<code>0/1</code>、<code>1/1</code>）的機率。實際通道定義與模型結構依 caller 與版本而異。}}
+
+<p class="prose">兩個工具的內部步驟不同：DeepVariant 把「做數值」「跑模型」「寫 VCF」拆成三個程式；
+Clair3 則先用輕量模型掃過所有位置，只把信心不足的少數位置交給看完整比對的模型重判。</p>
+
+{{svg:m05-caller-pipeline | [wide] 上：caller 吃 BAM 與參考序列，吐出 germline VCF，供後續 phasing 使用。中：DeepVariant 的三個步驟。下：Clair3 的兩段式設計 —— 把昂貴的計算只花在難判的少數位置上。步驟名稱與門檻依版本而異。}}
 
 <h3>phasing 如何協助辨識定序雜訊</h3>
 

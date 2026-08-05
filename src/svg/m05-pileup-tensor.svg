@@ -1,0 +1,239 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+  <title>caller 把一個位置的 read 堆疊變成多層數值，再由模型判定基因型</title>
+  <desc>由左而右三步。第一步：把候選位置周圍的參考序列與覆蓋此處的 read 排成一張表，
+        每一列是一條 read，每一欄是一個位置，中間那一欄是待判定的候選。
+        第二步：同一張表被編碼成好幾層數值，每一層記錄一種資訊 ——
+        鹼基種類、鹼基品質、比對品質、read 落在哪一股；深淺代表數值大小。
+        第三步：這疊數值送進神經網路，輸出三種基因型的機率：
+        兩條都是參考、一條有變異、兩條都有變異。此例的機率集中在一條有變異，即 heterozygous。
+        不同 caller 的通道定義與模型結構並不相同，此圖為示意。</desc>
+
+  <!-- ══════════════ ① read 堆疊 ══════════════ -->
+  <text class="lbl bold zh" x="16" y="44">① 這個位置的 read 堆疊</text>
+  <rect class="box plain" x="16" y="60" width="324" height="310" rx="10"/>
+
+  <text class="tick mid somatic bold" x="208" y="86">候選</text>
+  <text class="tick end zh" x="112" y="112">參考</text>
+
+  <rect class="read hp0" x="118" y="126" width="204" height="14" rx="7"/>
+  <rect class="read hp0" x="118" y="150" width="204" height="14" rx="7"/>
+  <rect class="read hp0" x="118" y="174" width="204" height="14" rx="7"/>
+  <rect class="read hp0" x="118" y="198" width="204" height="14" rx="7"/>
+  <rect class="read hp0" x="118" y="222" width="204" height="14" rx="7"/>
+  <rect class="read hp0" x="118" y="246" width="204" height="14" rx="7"/>
+  <rect class="read hp0" x="118" y="270" width="204" height="14" rx="7"/>
+  <rect class="read hp0" x="118" y="294" width="204" height="14" rx="7"/>
+
+  <rect class="region" x="194" y="96" width="28" height="216"/>
+  <rect class="box ghost" x="194" y="96" width="28" height="216" rx="4"/>
+
+  <!-- 參考序列 -->
+  <text class="base c mono" x="124" y="112" font-size="14">C</text>
+  <text class="base t mono" x="152" y="112" font-size="14">T</text>
+  <text class="base a mono" x="180" y="112" font-size="14">A</text>
+  <text class="base a mono" x="208" y="112" font-size="14">A</text>
+  <text class="base g mono" x="236" y="112" font-size="14">G</text>
+  <text class="base c mono" x="264" y="112" font-size="14">C</text>
+  <text class="base t mono" x="292" y="112" font-size="14">T</text>
+
+  <!-- 八條 read：奇數列帶 G（alt），偶數列與參考相同 -->
+  <text class="base c mono" x="124" y="138" font-size="14">C</text>
+  <text class="base t mono" x="152" y="138" font-size="14">T</text>
+  <text class="base a mono" x="180" y="138" font-size="14">A</text>
+  <text class="base g mono" x="208" y="138" font-size="14">G</text>
+  <text class="base g mono" x="236" y="138" font-size="14">G</text>
+  <text class="base c mono" x="264" y="138" font-size="14">C</text>
+  <text class="base t mono" x="292" y="138" font-size="14">T</text>
+
+  <text class="base c mono" x="124" y="162" font-size="14">C</text>
+  <text class="base t mono" x="152" y="162" font-size="14">T</text>
+  <text class="base a mono" x="180" y="162" font-size="14">A</text>
+  <text class="base a mono" x="208" y="162" font-size="14">A</text>
+  <text class="base g mono" x="236" y="162" font-size="14">G</text>
+  <text class="base c mono" x="264" y="162" font-size="14">C</text>
+  <text class="base t mono" x="292" y="162" font-size="14">T</text>
+
+  <text class="base c mono" x="124" y="186" font-size="14">C</text>
+  <text class="base t mono" x="152" y="186" font-size="14">T</text>
+  <text class="base a mono" x="180" y="186" font-size="14">A</text>
+  <text class="base g mono" x="208" y="186" font-size="14">G</text>
+  <text class="base g mono" x="236" y="186" font-size="14">G</text>
+  <text class="base c mono" x="264" y="186" font-size="14">C</text>
+  <text class="base t mono" x="292" y="186" font-size="14">T</text>
+
+  <text class="base c mono" x="124" y="210" font-size="14">C</text>
+  <text class="base t mono" x="152" y="210" font-size="14">T</text>
+  <text class="base a mono" x="180" y="210" font-size="14">A</text>
+  <text class="base a mono" x="208" y="210" font-size="14">A</text>
+  <text class="base g mono" x="236" y="210" font-size="14">G</text>
+  <text class="base c mono" x="264" y="210" font-size="14">C</text>
+  <text class="base t mono" x="292" y="210" font-size="14">T</text>
+
+  <text class="base c mono" x="124" y="234" font-size="14">C</text>
+  <text class="base t mono" x="152" y="234" font-size="14">T</text>
+  <text class="base a mono" x="180" y="234" font-size="14">A</text>
+  <text class="base g mono" x="208" y="234" font-size="14">G</text>
+  <text class="base g mono" x="236" y="234" font-size="14">G</text>
+  <text class="base c mono" x="264" y="234" font-size="14">C</text>
+  <text class="base t mono" x="292" y="234" font-size="14">T</text>
+
+  <text class="base c mono" x="124" y="258" font-size="14">C</text>
+  <text class="base t mono" x="152" y="258" font-size="14">T</text>
+  <text class="base a mono" x="180" y="258" font-size="14">A</text>
+  <text class="base a mono" x="208" y="258" font-size="14">A</text>
+  <text class="base g mono" x="236" y="258" font-size="14">G</text>
+  <text class="base c mono" x="264" y="258" font-size="14">C</text>
+  <text class="base t mono" x="292" y="258" font-size="14">T</text>
+
+  <text class="base c mono" x="124" y="282" font-size="14">C</text>
+  <text class="base t mono" x="152" y="282" font-size="14">T</text>
+  <text class="base a mono" x="180" y="282" font-size="14">A</text>
+  <text class="base g mono" x="208" y="282" font-size="14">G</text>
+  <text class="base g mono" x="236" y="282" font-size="14">G</text>
+  <text class="base c mono" x="264" y="282" font-size="14">C</text>
+  <text class="base t mono" x="292" y="282" font-size="14">T</text>
+
+  <text class="base c mono" x="124" y="306" font-size="14">C</text>
+  <text class="base t mono" x="152" y="306" font-size="14">T</text>
+  <text class="base a mono" x="180" y="306" font-size="14">A</text>
+  <text class="base a mono" x="208" y="306" font-size="14">A</text>
+  <text class="base g mono" x="236" y="306" font-size="14">G</text>
+  <text class="base c mono" x="264" y="306" font-size="14">C</text>
+  <text class="base t mono" x="292" y="306" font-size="14">T</text>
+
+  <text class="tick zh" x="34" y="336">一列是一條 read，一欄是一個位置</text>
+  <text class="tick zh" x="34" y="358">每個格子還帶著品質與股向</text>
+
+  <path class="flow" d="M344,214 L364,214" marker-end="url(#arrow)"/>
+
+  <!-- ══════════════ ② 多層數值 ══════════════ -->
+  <text class="lbl bold zh" x="372" y="44">② 編碼成多層數值</text>
+  <rect class="box accent" x="372" y="60" width="308" height="310" rx="10"/>
+
+  <!-- 通道 1：鹼基種類 -->
+  <text class="tick bold zh" x="390" y="90">鹼基種類</text>
+  <rect class="cellv" x="390" y="98" width="18" height="12" fill-opacity="0.30"/>
+  <rect class="cellv" x="410" y="98" width="18" height="12" fill-opacity="0.55"/>
+  <rect class="cellv" x="430" y="98" width="18" height="12" fill-opacity="0.20"/>
+  <rect class="cellv" x="450" y="98" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="470" y="98" width="18" height="12" fill-opacity="0.40"/>
+  <rect class="cellv" x="490" y="98" width="18" height="12" fill-opacity="0.30"/>
+  <rect class="cellv" x="390" y="112" width="18" height="12" fill-opacity="0.30"/>
+  <rect class="cellv" x="410" y="112" width="18" height="12" fill-opacity="0.55"/>
+  <rect class="cellv" x="430" y="112" width="18" height="12" fill-opacity="0.20"/>
+  <rect class="cellv" x="450" y="112" width="18" height="12" fill-opacity="0.20"/>
+  <rect class="cellv" x="470" y="112" width="18" height="12" fill-opacity="0.40"/>
+  <rect class="cellv" x="490" y="112" width="18" height="12" fill-opacity="0.30"/>
+  <rect class="cellv" x="390" y="126" width="18" height="12" fill-opacity="0.30"/>
+  <rect class="cellv" x="410" y="126" width="18" height="12" fill-opacity="0.55"/>
+  <rect class="cellv" x="430" y="126" width="18" height="12" fill-opacity="0.20"/>
+  <rect class="cellv" x="450" y="126" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="470" y="126" width="18" height="12" fill-opacity="0.40"/>
+  <rect class="cellv" x="490" y="126" width="18" height="12" fill-opacity="0.30"/>
+  <rect class="box ghost" x="448" y="96" width="22" height="44" rx="3"/>
+
+  <!-- 通道 2：鹼基品質 -->
+  <text class="tick bold zh" x="546" y="90">鹼基品質</text>
+  <rect class="cellv" x="546" y="98" width="18" height="12" fill-opacity="0.75"/>
+  <rect class="cellv" x="566" y="98" width="18" height="12" fill-opacity="0.80"/>
+  <rect class="cellv" x="586" y="98" width="18" height="12" fill-opacity="0.65"/>
+  <rect class="cellv" x="606" y="98" width="18" height="12" fill-opacity="0.90"/>
+  <rect class="cellv" x="626" y="98" width="18" height="12" fill-opacity="0.70"/>
+  <rect class="cellv" x="646" y="98" width="18" height="12" fill-opacity="0.80"/>
+  <rect class="cellv" x="546" y="112" width="18" height="12" fill-opacity="0.60"/>
+  <rect class="cellv" x="566" y="112" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="586" y="112" width="18" height="12" fill-opacity="0.75"/>
+  <rect class="cellv" x="606" y="112" width="18" height="12" fill-opacity="0.35"/>
+  <rect class="cellv" x="626" y="112" width="18" height="12" fill-opacity="0.80"/>
+  <rect class="cellv" x="646" y="112" width="18" height="12" fill-opacity="0.65"/>
+  <rect class="cellv" x="546" y="126" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="566" y="126" width="18" height="12" fill-opacity="0.70"/>
+  <rect class="cellv" x="586" y="126" width="18" height="12" fill-opacity="0.80"/>
+  <rect class="cellv" x="606" y="126" width="18" height="12" fill-opacity="0.88"/>
+  <rect class="cellv" x="626" y="126" width="18" height="12" fill-opacity="0.60"/>
+  <rect class="cellv" x="646" y="126" width="18" height="12" fill-opacity="0.75"/>
+  <rect class="box ghost" x="604" y="96" width="22" height="44" rx="3"/>
+
+  <!-- 通道 3：比對品質 -->
+  <text class="tick bold zh" x="390" y="176">比對品質</text>
+  <rect class="cellv" x="390" y="184" width="18" height="12" fill-opacity="0.90"/>
+  <rect class="cellv" x="410" y="184" width="18" height="12" fill-opacity="0.90"/>
+  <rect class="cellv" x="430" y="184" width="18" height="12" fill-opacity="0.90"/>
+  <rect class="cellv" x="450" y="184" width="18" height="12" fill-opacity="0.90"/>
+  <rect class="cellv" x="470" y="184" width="18" height="12" fill-opacity="0.90"/>
+  <rect class="cellv" x="490" y="184" width="18" height="12" fill-opacity="0.90"/>
+  <rect class="cellv" x="390" y="198" width="18" height="12" fill-opacity="0.45"/>
+  <rect class="cellv" x="410" y="198" width="18" height="12" fill-opacity="0.45"/>
+  <rect class="cellv" x="430" y="198" width="18" height="12" fill-opacity="0.45"/>
+  <rect class="cellv" x="450" y="198" width="18" height="12" fill-opacity="0.45"/>
+  <rect class="cellv" x="470" y="198" width="18" height="12" fill-opacity="0.45"/>
+  <rect class="cellv" x="490" y="198" width="18" height="12" fill-opacity="0.45"/>
+  <rect class="cellv" x="390" y="212" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="410" y="212" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="430" y="212" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="450" y="212" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="470" y="212" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="490" y="212" width="18" height="12" fill-opacity="0.85"/>
+  <text class="tick" x="514" y="209">整條 read 一個值</text>
+
+  <!-- 通道 4：正反股 -->
+  <text class="tick bold zh" x="390" y="262">read 落在哪一股</text>
+  <rect class="cellv" x="390" y="270" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="410" y="270" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="430" y="270" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="450" y="270" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="470" y="270" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="490" y="270" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="390" y="284" width="18" height="12" fill-opacity="0.20"/>
+  <rect class="cellv" x="410" y="284" width="18" height="12" fill-opacity="0.20"/>
+  <rect class="cellv" x="430" y="284" width="18" height="12" fill-opacity="0.20"/>
+  <rect class="cellv" x="450" y="284" width="18" height="12" fill-opacity="0.20"/>
+  <rect class="cellv" x="470" y="284" width="18" height="12" fill-opacity="0.20"/>
+  <rect class="cellv" x="490" y="284" width="18" height="12" fill-opacity="0.20"/>
+  <rect class="cellv" x="390" y="298" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="410" y="298" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="430" y="298" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="450" y="298" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="470" y="298" width="18" height="12" fill-opacity="0.85"/>
+  <rect class="cellv" x="490" y="298" width="18" height="12" fill-opacity="0.85"/>
+  <text class="tick" x="514" y="295">深＝正股　淺＝反股</text>
+
+  <text class="tick zh" x="390" y="336">深淺＝數值大小。實際通道數與定義</text>
+  <text class="tick zh" x="390" y="358">依 caller 與版本而異，這裡只取四層示意</text>
+
+  <path class="flow" d="M684,214 L704,214" marker-end="url(#arrow)"/>
+
+  <!-- ══════════════ ③ 模型判定 ══════════════ -->
+  <text class="lbl bold zh" x="712" y="44">③ 模型輸出基因型機率</text>
+  <rect class="box accent" x="712" y="60" width="272" height="310" rx="10"/>
+
+  <rect class="box plain" x="744" y="88" width="208" height="30" rx="6"/>
+  <text class="tick mid zh" x="848" y="108">卷積層：找局部樣態</text>
+  <rect class="box plain" x="764" y="126" width="168" height="30" rx="6"/>
+  <text class="tick mid zh" x="848" y="146">卷積層：組合成證據</text>
+  <rect class="box plain" x="784" y="164" width="128" height="30" rx="6"/>
+  <text class="tick mid zh" x="848" y="184">全連接層</text>
+
+  <path class="flow" d="M848,196 L848,216" marker-end="url(#arrow)"/>
+
+  <text class="tick zh" x="732" y="240">三種基因型的機率</text>
+
+  <text class="tick end mono" x="796" y="264">0/0</text>
+  <rect class="bar" x="804" y="252" width="6" height="16" rx="2"/>
+  <text class="tick" x="818" y="264">0.01</text>
+
+  <text class="tick end mono" x="796" y="294">0/1</text>
+  <rect class="bar germline" x="804" y="282" width="116" height="16" rx="2"/>
+  <text class="tick" x="928" y="294">0.97</text>
+
+  <text class="tick end mono" x="796" y="324">1/1</text>
+  <rect class="bar" x="804" y="312" width="8" height="16" rx="2"/>
+  <text class="tick" x="820" y="324">0.02</text>
+
+  <text class="tick zh bold" x="732" y="356">此例判為 heterozygous（0/1）</text>
+
+  <!-- ══════════════ 結論 ══════════════ -->
+  <line class="axis" x1="20" y1="400" x2="980" y2="400"/>
+  <text class="anno zh bold" x="20" y="432">模型看的不是「幾比幾」，而是整張帶著品質與比對資訊的畫面。</text>
+  <text class="anno zh" x="20" y="460">Clair3 與 DeepVariant 都屬於這種做法，但兩者的通道定義、模型結構與訓練資料並不相同。</text>
+</svg>
