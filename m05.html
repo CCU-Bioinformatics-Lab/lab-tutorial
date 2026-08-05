@@ -53,7 +53,7 @@
 
 <div class="wrap ">
   <main class="main" id="main">
-    <header class="mhead"><p class="mhead__kicker">模組 5 · Germline variant calling</p><h1>Germline variant calling：從證據到判定</h1><p class="mhead__sub">說明 Clair3 與 DeepVariant 的角色，以及 phasing 如何提供額外證據、協助區分變異與定序雜訊。</p><p class="mhead__meta"><span class="chip">約 35 分鐘</span><a class="chip" href="m04.html">建議先修：資料格式</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說明 variant caller 在做什麼判斷，以及為什麼它不是單純數 read</li><li>說明 phasing 資訊如何作為辨識定序錯誤的輔助證據</li><li>說出 Clair3 與 DeepVariant 在流程中的位置</li><li>建立 precision、recall 與 F1 的基本概念，並說明三項指標各自衡量的內容</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">模組 5 · Germline variant calling</p><h1>Germline variant calling：從證據到判定</h1><p class="mhead__sub">說明 Clair3 與 DeepVariant 的角色，以及 phasing 如何提供額外證據、協助區分變異與定序雜訊。</p><p class="mhead__meta"><span class="chip">約 35 分鐘</span><a class="chip" href="m04.html">建議先修：資料格式</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說明 variant caller 在做什麼判斷，以及為什麼它不是單純數 read</li><li>說明 phasing 資訊如何作為辨識定序錯誤的輔助證據</li><li>說出 Clair3 與 DeepVariant 在流程中的位置</li><li>說明為什麼 phasing 與 calling 是來回兩次，而不是單向的一次</li></ul></section>
 
 <section data-part="why" class="part" id="part-why">
 <h2 data-num="①" id="為什麼重要">為什麼重要</h2>
@@ -61,15 +61,15 @@
 <p class="prose">本課程後續工具多以 caller 輸出的候選變異為輸入，進一步進行篩選或校正。
 因此需要先理解 caller 的輸出內容與限制。</p>
 
-<p class="prose">germline calling 的情境相對單純。本節先建立 <span class="term" data-term="precision" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-precision-0">precision<span class="term__pop" id="gd-precision-0" role="tooltip"><b class="term__hd">precision <i>精確率</i></b><span class="term__def" data-lang="zh">所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</span><span class="term__def" data-lang="en">Of the calls you made, the fraction that are correct: TP / (TP + FP).</span><a class="term__more" href="glossary.html#precision">完整條目 →</a></span></span> 與 <span class="term" data-term="recall" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-recall-1">recall<span class="term__pop" id="gd-recall-1" role="tooltip"><b class="term__hd">recall <i>召回率</i></b><span class="term__def" data-lang="zh">在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</span><span class="term__def" data-lang="en">Within a stated evaluation scope, the fraction of true positives that were found: TP / (TP + FN). With a fixed caller candidate set, post-filtering can preserve or lower recall but cannot recover variants the caller never emitted; report the candidate-set scope explicitly.</span><a class="term__more" href="glossary.html#recall">完整條目 →</a></span></span> 的基本直覺，
-再於 M07 延伸到 somatic calling 的額外因素。</p>
+<p class="prose">germline calling 的情境相對單純：一個人只有兩條染色體，變異要嘛在其中一條、要嘛兩條都有。
+本節在這個單純的情境下把 caller 的判斷方式講清楚，M07 再處理腫瘤帶來的額外因素。</p>
 </section>
 
 
 <section data-part="concept" class="part" id="part-concept">
 <h2 data-num="②" id="概念與互動">概念與互動</h2>
 
-<h3 id="變異檢測variant-calling從已比對-read-中判斷哪些位置具有足夠證據支持變異存在的過程-通常輸出-vcf-deciding-which-positions-genuinely-carry-variants-given-aligned-reads-outputs-a-vcf-完整條目-的判斷內容"><span class="term" data-term="variant calling" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-variant-calling-2">變異檢測<span class="term__pop" id="gd-variant-calling-2" role="tooltip"><b class="term__hd">variant calling</b><span class="term__def" data-lang="zh">從已比對 read 中判斷哪些位置具有足夠證據支持變異存在的過程，通常輸出 VCF。</span><span class="term__def" data-lang="en">Deciding which positions genuinely carry variants, given aligned reads. Outputs a VCF.</span><a class="term__more" href="glossary.html#variant-calling">完整條目 →</a></span></span>的判斷內容</h3>
+<h3 id="變異檢測variant-calling從已比對-read-中判斷哪些位置具有足夠證據支持變異存在的過程-通常輸出-vcf-deciding-which-positions-genuinely-carry-variants-given-aligned-reads-outputs-a-vcf-完整條目-的判斷內容"><span class="term" data-term="variant calling" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-variant-calling-0">變異檢測<span class="term__pop" id="gd-variant-calling-0" role="tooltip"><b class="term__hd">variant calling</b><span class="term__def" data-lang="zh">從已比對 read 中判斷哪些位置具有足夠證據支持變異存在的過程，通常輸出 VCF。</span><span class="term__def" data-lang="en">Deciding which positions genuinely carry variants, given aligned reads. Outputs a VCF.</span><a class="term__more" href="glossary.html#variant-calling">完整條目 →</a></span></span>的判斷內容</h3>
 
 <p class="prose">某個位置有 30 條 read 支持 <code>A</code>、28 條支持 <code>G</code>。這組數字可以提出 heterozygous 候選，
 但不能單獨定案 —— 因為<b>同樣的 30 比 28，畫面可以完全不同</b>：</p>
@@ -286,7 +286,7 @@
 
 <p class="prose">所以 caller 讀的不是兩個數字，而是這個位置的整張畫面 ——
 把覆蓋此處的 read 排成一張表（一列一條 read、一欄一個位置，這種排法叫 <b>pileup</b>），
-再把表上每個格子的資訊編碼成好幾層數值送進模型。<span class="term" data-term="Clair3" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clair3-3">Clair3<span class="term__pop" id="gd-clair3-3" role="tooltip"><b class="term__hd">Clair3</b><span class="term__def" data-lang="zh">以深度學習做 germline variant calling 的工具，長 read 上常用。</span><span class="term__def" data-lang="en">A deep-learning germline variant caller widely used for long reads.</span><a class="term__more" href="glossary.html#clair3">完整條目 →</a></span></span> 與 <span class="term" data-term="DeepVariant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-deepvariant-4">DeepVariant<span class="term__pop" id="gd-deepvariant-4" role="tooltip"><b class="term__hd">DeepVariant</b><span class="term__def" data-lang="zh">Google 開發的 germline variant caller，把 pileup 轉成影像再用 CNN 分類。</span><span class="term__def" data-lang="en">Google's germline variant caller; encodes pileups as images and classifies them with a CNN.</span><a class="term__more" href="glossary.html#deepvariant">完整條目 →</a></span></span> 都是這種做法：</p>
+再把表上每個格子的資訊編碼成好幾層數值送進模型。<span class="term" data-term="Clair3" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clair3-1">Clair3<span class="term__pop" id="gd-clair3-1" role="tooltip"><b class="term__hd">Clair3</b><span class="term__def" data-lang="zh">以深度學習做 germline variant calling 的工具，長 read 上常用。</span><span class="term__def" data-lang="en">A deep-learning germline variant caller widely used for long reads.</span><a class="term__more" href="glossary.html#clair3">完整條目 →</a></span></span> 與 <span class="term" data-term="DeepVariant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-deepvariant-2">DeepVariant<span class="term__pop" id="gd-deepvariant-2" role="tooltip"><b class="term__hd">DeepVariant</b><span class="term__def" data-lang="zh">Google 開發的 germline variant caller，把 pileup 轉成影像再用 CNN 分類。</span><span class="term__def" data-lang="en">Google's germline variant caller; encodes pileups as images and classifies them with a CNN.</span><a class="term__more" href="glossary.html#deepvariant">完整條目 →</a></span></span> 都是這種做法：</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" class="dia-svg" role="img">
   <title>caller 把一個位置的 read 堆疊變成多層數值，再由模型判定基因型</title>
@@ -614,14 +614,195 @@ Clair3 則先用輕量模型掃過所有位置，只把信心不足的少數位�
   <text class="tick zh" x="36" y="382">兩段式的用意：把昂貴的計算只花在難判的少數位置上。實際步驟名稱與門檻依版本而異。</text>
 </svg><figcaption>上：caller 吃 BAM 與參考序列，吐出 germline VCF，供後續 phasing 使用。中：DeepVariant 的三個步驟。下：Clair3 的兩段式設計 —— 把昂貴的計算只花在難判的少數位置上。步驟名稱與門檻依版本而異。</figcaption></figure>
 
-<h3 id="phasing-如何協助辨識定序雜訊">phasing 如何協助辨識定序雜訊</h3>
+<h3 id="把-read-先分成兩群-判斷就變簡單了">把 read 先分成兩群，判斷就變簡單了</h3>
 
-<p class="prose">以下示範 read-level phasing 如何作為辨識候選變異的輔助證據：</p>
+<p class="prose">前面那張畫面還有一個沒用上的線索：這些 read 分別來自哪一條染色體。
+一個人的每個位置有兩條染色體，一條來自父親、一條來自母親。
+把 read 依這兩條分成兩群（也就是 <span class="term" data-term="phasing" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-phasing-3">phasing<span class="term__pop" id="gd-phasing-3" role="tooltip"><b class="term__hd">phasing <i>定相</i></b><span class="term__def" data-lang="zh">為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。</span><span class="term__def" data-lang="en">Determining which variants lie on the same physical chromosome, turning 0/1 into 0|1. Long reads provide direct molecular evidence.</span><a class="term__more" href="glossary.html#phasing">完整條目 →</a></span></span>），同一個畫面會變得好判斷得多：</p>
 
-<ul class="prose">
-<li><b>一般 heterozygous germline 變異</b>：在 phasing 與 mapping 品質可靠的簡化情境下，支持 read 往往較集中於同一條 <span class="term" data-term="haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-haplotype-5">haplotype<span class="term__pop" id="gd-haplotype-5" role="tooltip"><b class="term__hd">haplotype <i>單倍型</i></b><span class="term__def" data-lang="zh">同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</span><span class="term__def" data-lang="en">A set of variants that lie on the same physical chromosome copy and are inherited together.</span><a class="term__more" href="glossary.html#haplotype">完整條目 →</a></span></span>。</li>
-<li><b>隨機定序錯誤</b>：通常較分散於 HP1 與 HP2；但系統性錯誤、mapping bias、copy-number／LOH 或 phasing 錯誤可能不符合此模式。</li>
-</ul>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" class="dia-svg" role="img">
+  <title>先把 read 分成兩群，再判定變異：haplotype 資訊如何幫助 germline calling</title>
+  <desc>① 六條 read、四個位置；其中三個位置各出現了兩種鹼基，但看不出哪些是真的變異、哪些是錯誤。
+        ② phasing 把 read 分成兩群之後，位置 1 與位置 3 的差異在同一群裡每一條 read 都一致，
+        與真的 heterozygous 變異相容；位置 2 的差異則是兩群各零星一條，與定序錯誤相容。
+        ③ 因此實際流程是來回兩次：先做一次 calling 取得可靠的 heterozygous 位點，
+        用它們把 read 分成 HP1 與 HP2，再把 haplotype 標籤當成模型的額外輸入重判一次。
+        ④ 最終判定中，位置 1 與位置 3 保留為 heterozygous 變異，位置 2 被判為錯誤而移除。</desc>
+
+  <!-- ══════════════ ① 混在一起的 read ══════════════ -->
+  <text class="lbl bold zh" x="16" y="48">① 定序後的 read：混在一起</text>
+  <rect class="box plain" x="16" y="64" width="454" height="246" rx="10"/>
+
+  <rect class="read hp0" x="56" y="96" width="390" height="14" rx="7"/>
+  <rect class="read hp0" x="56" y="124" width="390" height="14" rx="7"/>
+  <rect class="read hp0" x="56" y="152" width="390" height="14" rx="7"/>
+  <rect class="read hp0" x="56" y="180" width="390" height="14" rx="7"/>
+  <rect class="read hp0" x="56" y="208" width="390" height="14" rx="7"/>
+  <rect class="read hp0" x="56" y="236" width="390" height="14" rx="7"/>
+
+  <!-- r1(HP1) -->
+  <text class="base g mono" x="120" y="107" font-size="15">G</text>
+  <text class="base t mono" x="215" y="107" font-size="15">T</text>
+  <text class="base t mono" x="310" y="107" font-size="15">T</text>
+  <text class="base a mono" x="405" y="107" font-size="15">A</text>
+  <!-- r3(HP2) -->
+  <text class="base a mono" x="120" y="135" font-size="15">A</text>
+  <text class="base t mono" x="215" y="135" font-size="15">T</text>
+  <text class="base c mono" x="310" y="135" font-size="15">C</text>
+  <text class="base a mono" x="405" y="135" font-size="15">A</text>
+  <!-- r2(HP1，帶一個錯誤) -->
+  <text class="base g mono" x="120" y="163" font-size="15">G</text>
+  <text class="base c mono" x="215" y="163" font-size="15">C</text>
+  <text class="base t mono" x="310" y="163" font-size="15">T</text>
+  <text class="base a mono" x="405" y="163" font-size="15">A</text>
+  <!-- r6(HP2) -->
+  <text class="base a mono" x="120" y="191" font-size="15">A</text>
+  <text class="base t mono" x="215" y="191" font-size="15">T</text>
+  <text class="base c mono" x="310" y="191" font-size="15">C</text>
+  <text class="base a mono" x="405" y="191" font-size="15">A</text>
+  <!-- r4(HP1) -->
+  <text class="base g mono" x="120" y="219" font-size="15">G</text>
+  <text class="base t mono" x="215" y="219" font-size="15">T</text>
+  <text class="base t mono" x="310" y="219" font-size="15">T</text>
+  <text class="base a mono" x="405" y="219" font-size="15">A</text>
+  <!-- r5(HP2，帶一個錯誤) -->
+  <text class="base a mono" x="120" y="247" font-size="15">A</text>
+  <text class="base c mono" x="215" y="247" font-size="15">C</text>
+  <text class="base c mono" x="310" y="247" font-size="15">C</text>
+  <text class="base a mono" x="405" y="247" font-size="15">A</text>
+
+  <text class="tick zh" x="36" y="278">六條 read、四個位置；其中三個位置出現兩種鹼基。</text>
+  <text class="tick zh" x="36" y="300">哪些是真的變異、哪些是錯誤？這樣排看不出來。</text>
+
+  <path class="flow" d="M478,180 L522,180" marker-end="url(#arrow)"/>
+
+  <!-- ══════════════ ② phasing 後 ══════════════ -->
+  <text class="lbl bold zh" x="530" y="48">② phasing：把 read 分成兩群</text>
+  <rect class="box plain" x="530" y="64" width="454" height="246" rx="10"/>
+
+  <circle class="mark germline" cx="634" cy="88" r="6"/>
+  <circle class="mark artifact" cx="729" cy="88" r="6"/>
+  <circle class="mark germline" cx="824" cy="88" r="6"/>
+
+  <rect class="read hp1" x="570" y="104" width="390" height="14" rx="7"/>
+  <rect class="read hp1" x="570" y="132" width="390" height="14" rx="7"/>
+  <rect class="read hp1" x="570" y="160" width="390" height="14" rx="7"/>
+
+  <line class="guide" x1="550" y1="186" x2="964" y2="186"/>
+
+  <rect class="read hp2" x="570" y="196" width="390" height="14" rx="7"/>
+  <rect class="read hp2" x="570" y="224" width="390" height="14" rx="7"/>
+  <rect class="read hp2" x="570" y="252" width="390" height="14" rx="7"/>
+
+  <text class="tick end bold hp1" x="566" y="143">HP1</text>
+  <text class="tick end bold hp2" x="566" y="235">HP2</text>
+
+  <!-- HP1 群：位置 1 全是 G、位置 3 全是 T；位置 2 只有中間那條是 C -->
+  <text class="base g mono" x="634" y="115" font-size="15">G</text>
+  <text class="base t mono" x="729" y="115" font-size="15">T</text>
+  <text class="base t mono" x="824" y="115" font-size="15">T</text>
+  <text class="base a mono" x="919" y="115" font-size="15">A</text>
+
+  <text class="base g mono" x="634" y="143" font-size="15">G</text>
+  <text class="base c mono" x="729" y="143" font-size="15">C</text>
+  <text class="base t mono" x="824" y="143" font-size="15">T</text>
+  <text class="base a mono" x="919" y="143" font-size="15">A</text>
+
+  <text class="base g mono" x="634" y="171" font-size="15">G</text>
+  <text class="base t mono" x="729" y="171" font-size="15">T</text>
+  <text class="base t mono" x="824" y="171" font-size="15">T</text>
+  <text class="base a mono" x="919" y="171" font-size="15">A</text>
+
+  <!-- HP2 群：位置 1 全是 A、位置 3 全是 C；位置 2 只有最後那條是 C -->
+  <text class="base a mono" x="634" y="207" font-size="15">A</text>
+  <text class="base t mono" x="729" y="207" font-size="15">T</text>
+  <text class="base c mono" x="824" y="207" font-size="15">C</text>
+  <text class="base a mono" x="919" y="207" font-size="15">A</text>
+
+  <text class="base a mono" x="634" y="235" font-size="15">A</text>
+  <text class="base t mono" x="729" y="235" font-size="15">T</text>
+  <text class="base c mono" x="824" y="235" font-size="15">C</text>
+  <text class="base a mono" x="919" y="235" font-size="15">A</text>
+
+  <text class="base a mono" x="634" y="263" font-size="15">A</text>
+  <text class="base c mono" x="729" y="263" font-size="15">C</text>
+  <text class="base c mono" x="824" y="263" font-size="15">C</text>
+  <text class="base a mono" x="919" y="263" font-size="15">A</text>
+
+  <circle class="mark germline" cx="556" cy="279" r="5"/>
+  <text class="tick zh" x="570" y="284">位置 1、3：同一群內每條都一致 → 像真的變異</text>
+  <circle class="mark artifact" cx="556" cy="301" r="5"/>
+  <text class="tick zh" x="570" y="306">位置 2：兩群各零星一條 → 像定序錯誤</text>
+
+  <!-- ══════════════ ③ 來回兩次的流程 ══════════════ -->
+  <text class="lbl bold zh" x="16" y="340">③ 所以實際流程是來回兩次</text>
+  <rect class="box plain" x="16" y="356" width="660" height="180" rx="10"/>
+
+  <rect class="box accent" x="36" y="392" width="190" height="76" rx="6"/>
+  <text class="tick mid zh bold" x="131" y="418">第一次 calling</text>
+  <text class="tick mid zh" x="131" y="440">還沒有 haplotype</text>
+  <text class="tick mid zh" x="131" y="458">取得可靠的 het 位點</text>
+
+  <path class="flow" d="M230,430 L242,430" marker-end="url(#arrow)"/>
+
+  <rect class="box accent" x="246" y="392" width="190" height="76" rx="6"/>
+  <text class="tick mid zh bold" x="341" y="418">用這些位點 phasing</text>
+  <text class="tick mid zh" x="341" y="440">把 read 分成</text>
+  <text class="tick mid zh" x="341" y="458">HP1 與 HP2</text>
+
+  <path class="flow" d="M440,430 L452,430" marker-end="url(#arrow)"/>
+
+  <rect class="box ok" x="456" y="392" width="190" height="76" rx="6"/>
+  <text class="tick mid zh bold" x="551" y="418">帶著 HP 再判一次</text>
+  <text class="tick mid zh" x="551" y="440">haplotype 成為</text>
+  <text class="tick mid zh" x="551" y="458">模型的額外輸入</text>
+
+  <text class="tick zh" x="36" y="500">難判的位置在第二次才定案；容易的位置第一次就結束了。</text>
+
+  <path class="flow" d="M684,430 L706,430" marker-end="url(#arrow)"/>
+
+  <!-- ══════════════ ④ 最終判定 ══════════════ -->
+  <text class="lbl bold zh" x="716" y="340">④ 最終判定</text>
+  <rect class="box plain" x="716" y="356" width="268" height="180" rx="10"/>
+
+  <text class="tick zh" x="736" y="386">兩條染色體各自的鹼基</text>
+
+  <line class="axis" x1="736" y1="410" x2="964" y2="410"/>
+  <line class="axis" x1="736" y1="458" x2="964" y2="458"/>
+
+  <text class="tick end bold hp1" x="762" y="405">HP1</text>
+  <text class="tick end bold hp2" x="762" y="480">HP2</text>
+
+  <text class="base g mono" x="800" y="405" font-size="16">G</text>
+  <text class="base a mono" x="800" y="480" font-size="16">A</text>
+  <circle class="mark germline" cx="800" cy="434" r="6"/>
+
+  <path class="conn thick" d="M842,420 L866,448 M866,420 L842,448"/>
+
+  <text class="base t mono" x="906" y="405" font-size="16">T</text>
+  <text class="base c mono" x="906" y="480" font-size="16">C</text>
+  <circle class="mark germline" cx="906" cy="434" r="6"/>
+
+  <text class="tick zh" x="736" y="512">位置 2 被判為錯誤，不寫進 VCF。</text>
+
+  <!-- ══════════════ 結論 ══════════════ -->
+  <line class="axis" x1="20" y1="556" x2="980" y2="556"/>
+  <text class="anno zh bold" x="20" y="588">「先 call 再 phase」與「phase 幫助 call」並不衝突：先用最有把握的 het 位點做 phasing，</text>
+  <text class="anno zh" x="20" y="616">再把 haplotype 資訊餵回模型重判一次 —— Clair3 與 PEPPER-Margin-DeepVariant 都是這樣做。</text>
+</svg><figcaption>① 六條 read 混在一起時，其中三個位置各看得到兩種鹼基，分不出哪些是真的。② 分成兩群之後：位置 1 與位置 3 在同一群裡每條 read 都一致，與真的 heterozygous 變異相容；位置 2 只是兩群各零星一條，與定序錯誤相容。③ 因此流程是來回兩次：先 call 出可靠的 het 位點 → 用它們 phasing → 帶著 HP 標籤再判一次。④ 位置 2 被移除，不寫進 VCF。</figcaption></figure>
+
+<p class="prose">關鍵在<b>一致性</b>，不在數量。真的 heterozygous 變異只存在於其中一條染色體上，
+所以那一群的每一條 read 都應該帶著它；隨機的定序錯誤沒有這個約束，會零星散落在兩群裡。
+這個判準對錯誤率較高的平台（例如部分 ONT 資料）特別有用 —— 那正是單看計數最不可靠的情形。</p>
+
+<p class="prose">這也解釋了一個看起來矛盾的地方：明明要先有變異才能 phasing，怎麼又說 phasing 幫助 calling？
+因為兩者是<b>來回兩次</b>：先用最有把握的位點做一次 calling，用它們把 read 分群，
+再把 <span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-hp-tag-4">HP 標籤<span class="term__pop" id="gd-hp-tag-4" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span>當成模型的額外輸入重判一次。Clair3 的 full-alignment 階段與
+PEPPER-Margin-DeepVariant 都採用這個順序。</p>
+
+<p class="prose">同一個「集中或分散」的線索在腫瘤資料裡會再出現一次，只是那時要判斷的不只是真假，
+還包括這個變異長在哪一條 <span class="term" data-term="haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-haplotype-5">haplotype<span class="term__pop" id="gd-haplotype-5" role="tooltip"><b class="term__hd">haplotype <i>單倍型</i></b><span class="term__def" data-lang="zh">同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</span><span class="term__def" data-lang="en">A set of variants that lie on the same physical chromosome copy and are inherited together.</span><a class="term__more" href="glossary.html#haplotype">完整條目 →</a></span></span> 上 —— 需要的證據也更多。以下這張圖先把最重要的陷阱說清楚：
+<b>兩種情況的支持 read 總數可以幾乎一樣</b>，所以不能靠數量判斷。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img">
   <title>以 haplotype 分布作為候選判讀的輔助證據</title>
@@ -788,48 +969,15 @@ Clair3 則先用輕量模型掃過所有位置，只把信心不足的少數位�
   <text class="anno zh" x="20" y="542">需先建立 HP1／HP2 分群，再結合品質、比對與其他證據判讀。</text>
 </svg><figcaption>兩邊示意同一種畫面：中間是待判斷的候選位置，左右各有一個已知參考位點，將 read 分成兩個 haplotype 群組。左邊示意支持 read 集中於一群；右邊示意支持 read 分布於兩群。兩邊的<b>總數相近</b>，因此僅依數量難以區分，仍需整合品質與比對證據。</figcaption></figure>
 
-<p class="prose">換句話說，「這個候選的支持 read 是否集中在單一 haplotype 上」可作為重要的輔助特徵。
-後續模組會在不同情境中再次使用這項訊息：</p>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>應用情境</th><th>用途</th></tr></thead>
-<tbody>
-<tr><td>germline calling（本節）</td><td>支持 read 分布分散 → 可列為定序錯誤的候選訊號</td></tr>
-<tr><td>LongPhase-S 的 read-level filter</td><td>somatic read 若同時帶有 HP1 與 HP2 的 germline allele → 可疑</td></tr>
-<tr><td>LongPhase-S 的 haplotype origin filter</td><td>若資料可可靠建立 haplotype origin，somatic-supporting read 的分布可作為來源判定的輔助證據；CN／LOH 等情況需另行評估</td></tr>
-<tr><td>LongPhase-TO / D 的 triplet graph</td><td>候選點與左右兩個 germline 位點的連結樣態</td></tr>
-</tbody>
-</table>
-</div>
-
-<p class="prose">在本節示例中，<b>「分布集中或分散」是重要線索之一</b>，但不能取代品質、比對與 copy-number 等證據。</p>
-
-<h3 id="precision-與-recall-基礎概念">precision 與 recall：基礎概念</h3>
-
-<p class="prose">評估 caller 時，至少應同時查看 precision 與 recall。假設 benchmark 標示某區域有 100 個真變異，
-而 caller 報告 90 個，其中 80 個為真變異：</p>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>指標</th><th>計算方式</th><th>這個例子</th><th>解讀問題</th></tr></thead>
-<tbody>
-<tr><td><span class="term" data-term="precision" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-precision-6">precision<span class="term__pop" id="gd-precision-6" role="tooltip"><b class="term__hd">precision <i>精確率</i></b><span class="term__def" data-lang="zh">所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</span><span class="term__def" data-lang="en">Of the calls you made, the fraction that are correct: TP / (TP + FP).</span><a class="term__more" href="glossary.html#precision">完整條目 →</a></span></span></td><td>TP ÷（TP + FP）</td><td>80 ÷ 90 = <b>0.89</b></td><td>報告的候選中有多少為真變異？</td></tr>
-<tr><td><span class="term" data-term="recall" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-recall-7">recall<span class="term__pop" id="gd-recall-7" role="tooltip"><b class="term__hd">recall <i>召回率</i></b><span class="term__def" data-lang="zh">在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</span><span class="term__def" data-lang="en">Within a stated evaluation scope, the fraction of true positives that were found: TP / (TP + FN). With a fixed caller candidate set, post-filtering can preserve or lower recall but cannot recover variants the caller never emitted; report the candidate-set scope explicitly.</span><a class="term__more" href="glossary.html#recall">完整條目 →</a></span></span></td><td>TP ÷（TP + FN）</td><td>80 ÷ 100 = <b>0.80</b></td><td>所有真變異中有多少被找出？</td></tr>
-<tr><td><span class="term" data-term="F1" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-f1-8">F1<span class="term__pop" id="gd-f1-8" role="tooltip"><b class="term__hd">F1</b><span class="term__def" data-lang="zh">precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。</span><span class="term__def" data-lang="en">The harmonic mean of precision and recall. A precision gain has little effect when false negatives dominate the evaluation.</span><a class="term__more" href="glossary.html#f1">完整條目 →</a></span></span></td><td>兩者的調和平均</td><td><b>0.84</b></td><td>同時摘要 precision 與 recall</td></tr>
-</tbody>
-</table>
-</div>
-
-<p class="prose">調整判定門檻通常會改變 precision–recall trade-off：放寬門檻可能提高 recall，收緊門檻可能提高 precision，
-但實際方向與幅度取決於資料與模型。M10 的滑桿示範：<b>precision 增加時，F1 不一定同步增加相同幅度。</b></p>
+<p class="prose">要注意這個判準有邊界：系統性錯誤、mapping bias，以及腫瘤裡的 copy-number 變化或
+<span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-6">LOH<span class="term__pop" id="gd-loh-6" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span>，都可能讓分布不符合上述的簡化模式。它是重要線索，不是單獨的判定依據。</p>
 </section>
 
 
 <section data-part="evidence" class="part" id="part-evidence">
 <h2 data-num="③" id="真實證據">真實證據</h2>
 
-<p class="prose">本教材示例使用 <span class="term" data-term="Clair3" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clair3-9">Clair3<span class="term__pop" id="gd-clair3-9" role="tooltip"><b class="term__hd">Clair3</b><span class="term__def" data-lang="zh">以深度學習做 germline variant calling 的工具，長 read 上常用。</span><span class="term__def" data-lang="en">A deep-learning germline variant caller widely used for long reads.</span><a class="term__more" href="glossary.html#clair3">完整條目 →</a></span></span>；部分流程也會使用 PEPPER-Margin-DeepVariant。
+<p class="prose">本教材示例使用 <span class="term" data-term="Clair3" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clair3-7">Clair3<span class="term__pop" id="gd-clair3-7" role="tooltip"><b class="term__hd">Clair3</b><span class="term__def" data-lang="zh">以深度學習做 germline variant calling 的工具，長 read 上常用。</span><span class="term__def" data-lang="en">A deep-learning germline variant caller widely used for long reads.</span><a class="term__more" href="glossary.html#clair3">完整條目 →</a></span></span>；部分流程也會使用 PEPPER-Margin-DeepVariant。
 以下提供一組示範指令：</p>
 
 <pre><code>docker run \
@@ -845,7 +993,7 @@ Clair3 則先用輕量模型掃過所有位置，只把信心不足的少數位�
 
 <p class="cli-note">最後的 <code>--ont_r9_guppy5_sup</code> 是與特定 ONT 化學版本／basecaller 資料相容的模型選項。
 R10 與 PacBio HiFi 應依所用版本文件選擇相容模型（例如 <code>--ont_r10_q20</code> 或 <code>--hifi</code>）。
-模型不匹配可能降低效能，且流程未必報錯；請將平台、basecaller 與模型版本記錄於 <span class="term" data-term="provenance" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-provenance-10">provenance<span class="term__pop" id="gd-provenance-10" role="tooltip"><b class="term__hd">provenance <i>資料來源履歷</i></b><span class="term__def" data-lang="zh">記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。</span><span class="term__def" data-lang="en">The full origin record of a dataset. In this lab it is a first-class experimental variable, not metadata.</span><a class="term__more" href="glossary.html#provenance">完整條目 →</a></span></span>。</p>
+模型不匹配可能降低效能，且流程未必報錯；請將平台、basecaller 與模型版本記錄於 <span class="term" data-term="provenance" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-provenance-8">provenance<span class="term__pop" id="gd-provenance-8" role="tooltip"><b class="term__hd">provenance <i>資料來源履歷</i></b><span class="term__def" data-lang="zh">記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。</span><span class="term__def" data-lang="en">The full origin record of a dataset. In this lab it is a first-class experimental variable, not metadata.</span><a class="term__more" href="glossary.html#provenance">完整條目 →</a></span></span>。</p>
 
 <p class="prose">在本教材流程中，germline VCF 產生後，再由後續 phasing 工具使用其中的 heterozygous 位點作為錨點。
 這是本流程的先 call、再 phase 順序；其他工具可能採用不同的整合方式。</p>
@@ -856,7 +1004,7 @@ R10 與 PacBio HiFi 應依所用版本文件選擇相容模型（例如 <code>--
 <h2 data-num="④" id="判讀練習">判讀練習</h2>
 
 <div class="reveal__q"><p class="prose">某個位點有 50 條 read 覆蓋，其中 25 條支持 alt allele（VAF = 0.5）。
-檢查這 25 條 read 的 <span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-hp-tag-11">HP tag<span class="term__pop" id="gd-hp-tag-11" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span>，發現 13 條屬於 HP1、12 條屬於 HP2。<br><br>
+檢查這 25 條 read 的 <span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-hp-tag-9">HP tag<span class="term__pop" id="gd-hp-tag-9" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span>，發現 13 條屬於 HP1、12 條屬於 HP2。<br><br>
 請判斷此分布較支持一般 germline 變異，還是定序錯誤／比對假訊號，並說明需要補充哪些證據。</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>在相位與 mapping 品質可靠、且未見 CN／LOH 等因素時，這個分布與一般 heterozygous germline 模式不一致，可列為可疑訊號。</b></p>
 <p class="prose">一般 heterozygous germline 變異預期位於其中一條染色體，因此支持 read 往往較集中於 HP1 或 HP2；13 比 12 的分布需要結合其他證據判讀，不能單獨定義為錯誤。</p>
 <p class="prose">接近均分的支持 read 可與隨機錯誤一致，但系統性錯誤、mapping bias、相位錯誤或腫瘤區域的 copy-number 狀態也可能造成類似結果。</p>
@@ -910,9 +1058,9 @@ bcftools view -H -v indels out.vcf | wc -l</code></pre>
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m04.html"><small>← 上一模組</small>資料格式讀寫能力</a><a class="next" href="m06.html"><small>下一模組 →</small>Phasing 與 haplotagging</a></nav>
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>Clair3</dt><dd>以深度學習做 germline variant calling 的工具，長 read 上常用。</dd><dt>DeepVariant</dt><dd>Google 開發的 germline variant caller，把 pileup 轉成影像再用 CNN 分類。</dd><dt>F1</dt><dd>precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>haplotype（單倍型）</dt><dd>同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</dd><dt>precision（精確率）</dt><dd>所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</dd><dt>provenance（資料來源履歷）</dt><dd>記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。</dd><dt>recall（召回率）</dt><dd>在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</dd><dt>variant calling</dt><dd>從已比對 read 中判斷哪些位置具有足夠證據支持變異存在的過程，通常輸出 VCF。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>Clair3</dt><dd>以深度學習做 germline variant calling 的工具，長 read 上常用。</dd><dt>DeepVariant</dt><dd>Google 開發的 germline variant caller，把 pileup 轉成影像再用 CNN 分類。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>haplotype（單倍型）</dt><dd>同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</dd><dt>phasing（定相）</dt><dd>為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。</dd><dt>provenance（資料來源履歷）</dt><dd>記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。</dd><dt>variant calling</dt><dd>從已比對 read 中判斷哪些位置具有足夠證據支持變異存在的過程，通常輸出 VCF。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#變異檢測variant-calling從已比對-read-中判斷哪些位置具有足夠證據支持變異存在的過程-通常輸出-vcf-deciding-which-positions-genuinely-carry-variants-given-aligned-reads-outputs-a-vcf-完整條目-的判斷內容">變異檢測variant calling從已比對 read 中判斷哪些位置具有足夠證據支持變異存在的過程，通常輸出 VCF。Deciding which positions genuinely carry variants, given aligned reads. Outputs a VCF.完整條目 →的判斷內容</a></li><li class="lv3"><a href="#phasing-如何協助辨識定序雜訊">phasing 如何協助辨識定序雜訊</a></li><li class="lv3"><a href="#precision-與-recall-基礎概念">precision 與 recall：基礎概念</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行一次-germline-calling">執行一次 germline calling</a></li><li class="lv3"><a href="#檢查結果的合理性">檢查結果的合理性</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#變異檢測variant-calling從已比對-read-中判斷哪些位置具有足夠證據支持變異存在的過程-通常輸出-vcf-deciding-which-positions-genuinely-carry-variants-given-aligned-reads-outputs-a-vcf-完整條目-的判斷內容">變異檢測variant calling從已比對 read 中判斷哪些位置具有足夠證據支持變異存在的過程，通常輸出 VCF。Deciding which positions genuinely carry variants, given aligned reads. Outputs a VCF.完整條目 →的判斷內容</a></li><li class="lv3"><a href="#把-read-先分成兩群-判斷就變簡單了">把 read 先分成兩群，判斷就變簡單了</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行一次-germline-calling">執行一次 germline calling</a></li><li class="lv3"><a href="#檢查結果的合理性">檢查結果的合理性</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">
