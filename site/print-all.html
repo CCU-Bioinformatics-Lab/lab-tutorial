@@ -9757,15 +9757,17 @@ bcftools query -f '[%GT\t%GT2]\n' phased_prefix.vcf | \
   </article>
 <hr>
 <article class="module" id="capstone">
-    <header class="mhead"><p class="mhead__kicker">模組 ★ · Capstone</p><h1>Capstone：整合式位點判讀</h1><p class="mhead__sub">整合單一位點的多項證據，完成可重現的推論流程，並撰寫明確標示不確定性的結論。</p><p class="mhead__meta"><span class="chip">約 120 分鐘</span><a class="chip" href="m13.html">建議先修：LongPhase-TO</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>獨立判讀一個位點的所有證據，並得出有根據的結論</li><li>在 tumor-normal 與 tumor-only 兩種情境下做出不同的判斷，並說明理由</li><li>計算 precision 與 recall，並指出它們在這個案例裡的限制</li><li>寫出一段帶有明確不確定性的結論</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">模組 ★ · Capstone</p><h1>Capstone：整合式位點判讀</h1><p class="mhead__sub">整合單一位點的多項證據，完成可重現的推論流程，並撰寫明確標示不確定性的結論。</p><p class="mhead__meta"><span class="chip">約 120 分鐘</span><a class="chip" href="m13.html">建議先修：LongPhase-TO</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>獨立判讀一個位點的所有證據，並得出有根據的結論</li><li>在有配對正常樣本與只有腫瘤樣本兩種情境下做出不同的判斷，並說明理由</li><li>在同一個位點上跑完兩種流程，並在各自的輸出檔案裡找到答案</li><li>計算 precision 與 recall，並指出它們在這個案例裡的限制</li><li>寫出一段明確區分「觀測到的」與「推論出來的」結論</li></ul></section>
 
 <section data-part="why" class="part" id="capstone__part-why">
 <h2 data-num="①" id="capstone__為什麼重要">為什麼重要</h2>
 
-<p class="prose">前面十四個模組提供了相關概念與工具。本節將它們整合到同一個案例中，要求你獨立判讀證據。</p>
+<p class="prose">前面十四個模組各自處理一件事。這一節把它們放回同一個位點上，
+要求你自己判讀，而不是照著步驟做。</p>
 
-<p class="prose"><b>評量標準不只包括完成指令，也包括解讀是否有證據支持。</b>
-實務上需要說明觀測值代表什麼、哪些結論仍受資料或模型限制，以及你對各項判讀的確定程度。</p>
+<p class="prose"><b>評量的重點不是指令跑不跑得動，是你的解讀有沒有證據撐住。</b>
+實務上要說清楚三件事：你觀測到什麼、你從觀測推論出什麼、以及哪些結論還受資料或模型限制。
+這三件事混在一起寫，別人就無法判斷你有幾分把握。</p>
 </section>
 
 
@@ -9917,8 +9919,8 @@ bcftools query -f '[%GT\t%GT2]\n' phased_prefix.vcf | \
 典型 het germline 的 VAF 通常接近 0.5；實際腫瘤樣本的 VAF 仍可能受這些因素影響，
 因此 tumor-only 下不能以單一 VAF 值作出定論。</li>
 <li><b>haplotype 結構</b> —— 這是 LongPhase-TO 主要利用的證據。
-用左右兩個 germline SNP 建 <span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="capstone__gd-triplet-graph-6">triplet graph<span class="term__pop" id="capstone__gd-triplet-graph-6" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span>，看這個候選點是不是
-「從某一條既有 haplotype 分支出來」的樣態。</li>
+用左右兩個 germline SNP 建 <span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="capstone__gd-triplet-graph-6">triplet graph<span class="term__pop" id="capstone__gd-triplet-graph-6" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span>，看支持這個候選的 read
+是不是都落在同一條 haplotype 上（M13 的第二件事）。本例 10:1 偏向 HP1，符合這個樣態。</li>
 </ul>
 <p class="prose">因此結論可寫成：<b>「目前證據與 somatic 變異相容，但無法完全排除私有 germline 變異」</b> ——
 並在報告中明確標示這項限制。</p>
@@ -10004,9 +10006,9 @@ bcftools query -f '[%GT\t%GT2]\n' phased_prefix.vcf | \
 <li>recall = <b>0.551</b>（不變）</li>
 <li>F1 = <b>0.685</b>（<b>只有 +0.024</b>）</li>
 </ul>
-<p class="prose"><b>這個例子呈現了該 CNN 方法所討論的現象。</b>precision 增加 8 個百分點，
+<p class="prose"><b>值得注意的是這兩個數字動的幅度差很多。</b>precision 增加 8 個百分點，
 F1 只動了 2.4 個百分點 —— 因為 <b>FN（335）遠多於 FP（88）</b>，
-F1 被 recall 那一側綁住了。</p>
+F1 被 recall 那一側綁住了。只要 FN 一直是大宗，再怎麼壓 FP，F1 都不會有大改變。</p>
 <p class="prose">而且這仍是理想化假設。實際過濾器可能誤刪部分 TP，
 使 FN 增加並縮小改善幅度。</p>
 <p class="prose"><b>值得嗎？看你的用途：</b></p>
@@ -10017,20 +10019,83 @@ F1 被 recall 那一側綁住了。</p>
 兩個都報，並解釋 FN 的組成。</li>
 </ul>
 <p class="prose">最後應追查 335 個 FN 中有多少是 caller 一開始就未產生的候選。
-若占大多數，後處理無法補回這些事件，應改從 caller、覆蓋度或候選產生階段處理。</p></div></details>
+若占大多數，後處理無法補回這些事件，應改從 caller、覆蓋度或候選產生階段處理（guardrail #10）。</p></div></details>
 </section>
 
 
 <section data-part="evidence" class="part" id="capstone__part-evidence">
 <h2 data-num="③" id="capstone__真實證據">真實證據</h2>
 
-<h3 id="capstone__執行一次可重現的流程">執行一次可重現的流程</h3>
+<h3 id="capstone__同一個位點-兩種流程各跑一次">同一個位點，兩種流程各跑一次</h3>
 
-<p class="prose">兩個 repo 都<b>沒有附範例資料</b>；可準備一個小型測試區段
-（BAM 切片及其對應的 VCF），再依下列步驟執行：</p>
+<p class="prose">任務二是用想的，這一節要你<b>真的跑出來看</b>。
+同一份腫瘤資料跑兩次：一次帶配對正常樣本，一次假裝沒有。
+兩種流程把答案寫在完全不同的地方，這是新手最常卡住的一點。</p>
 
-<pre><code># 僅執行小區域，便於快速驗證
-REGION=&quot;chr9:5000000-5200000&quot;
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 490" class="dia-svg" role="img">
+  <title>同一個位點跑兩種流程，答案會寫在不同的檔案、不同的欄位</title>
+  <desc>左邊是有配對正常組織時跑的 longphase-s somatic_haplotag：
+        它的答案寫在輸出 BAM 每一條 read 的 HP 標籤上，例如 HP 冒號 Z 冒號 2-1，
+        意思是這條 read 屬於 HP2 的體細胞後代；估出來的腫瘤比例另外寫在 purity.out 檔案。
+        右邊是只有腫瘤樣本時跑的 longphase-to phase：
+        它的答案寫在輸出 VCF 的 FORMAT 欄位，GT 是 0 直槓 0、GT2 是點直槓 1，
+        同樣表示這個變異長在 HP2 上；腫瘤比例寫在 VCF 檔頭，並多輸出一份 LOH 區段的 BED。
+        下方是重點：兩邊對這個位點的判斷一致，都指向 HP2，
+        但右邊少了正常組織這個直接對照，所以無法排除這個病人私有的遺傳變異，把握較低。
+        要找答案時得先知道它被寫在哪裡，這是兩個工具最常被搞混的地方。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">同一個位點，兩種流程把答案寫在不同地方</text>
+  <text class="tick zh" x="20" y="58">先知道答案寫在哪個檔案的哪個欄位，才找得到它。</text>
+
+  <!-- ══ 左：配對版 ══ -->
+  <rect class="box plain" x="20" y="76" width="470" height="286" rx="10"/>
+  <text class="anno bold zh" x="44" y="106">有配對正常組織</text>
+  <text class="tick mono" x="44" y="132">longphase-s somatic_haplotag</text>
+
+  <text class="tick zh bold" x="44" y="172">答案寫在輸出 BAM 的 read 標籤上</text>
+  <rect class="box sunken" x="44" y="184" width="422" height="52" rx="6"/>
+  <text class="tick mono" x="60" y="206">read_0142  chr9  5073770  …</text>
+  <text class="tick mono bold hp2" x="60" y="226">HP:Z:2-1</text>
+  <text class="tick zh" x="180" y="226">← 這條 read 屬於 HP2 的後代</text>
+
+  <text class="tick zh bold" x="44" y="268">腫瘤比例寫在另一個檔案</text>
+  <rect class="box sunken" x="44" y="280" width="422" height="34" rx="6"/>
+  <text class="tick mono" x="60" y="302">capstone_out_purity.out</text>
+
+  <text class="tick zh" x="44" y="344">沒有 LOH 輸出</text>
+
+  <!-- ══ 右：僅腫瘤版 ══ -->
+  <rect class="box plain" x="510" y="76" width="470" height="286" rx="10"/>
+  <text class="anno bold zh" x="534" y="106">只有腫瘤樣本</text>
+  <text class="tick mono" x="534" y="132">longphase-to phase</text>
+
+  <text class="tick zh bold" x="534" y="172">答案寫在輸出 VCF 的 FORMAT 欄位</text>
+  <rect class="box sunken" x="534" y="184" width="422" height="52" rx="6"/>
+  <text class="tick mono" x="550" y="206">chr9  5073770  …  GT:GT2:GT3</text>
+  <text class="tick mono bold hp2" x="550" y="226">0|0:.|1:./.</text>
+  <text class="tick zh" x="680" y="226">← 同樣是長在 HP2 上</text>
+
+  <text class="tick zh bold" x="534" y="268">腫瘤比例寫在 VCF 的檔頭裡</text>
+  <rect class="box sunken" x="534" y="280" width="422" height="34" rx="6"/>
+  <text class="tick mono" x="550" y="302">##tumor_purity=0.61</text>
+
+  <text class="tick zh" x="534" y="344">另外多一份 <tspan class="mono">&lt;prefix&gt;_LOH.bed</tspan></text>
+
+  <!-- ══ 重點 ══ -->
+  <line class="axis" x1="20" y1="384" x2="980" y2="384"/>
+
+  <rect class="box warn" x="20" y="402" width="960" height="76" rx="10"/>
+  <text class="anno bold zh" x="44" y="432">兩邊的判斷一致，但<tspan class="bold">把握不一樣</tspan></text>
+  <text class="tick zh" x="44" y="462">右邊少了正常組織這個直接對照，所以排除不掉「這個病人私有的遺傳變異」—— 結論要照實寫出這一點。</text>
+</svg><figcaption>配對版把每條 read 的歸屬寫成 BAM 的 <code>HP:Z:</code> 標籤，純度另外寫一個檔；
+僅腫瘤版把每個位置的歸屬寫成 VCF 的 <code>GT2</code>，純度寫在 VCF 檔頭，並多輸出一份 LOH 區段。
+兩邊對這個位點的判斷一致，但右邊少了正常組織這個直接對照。</figcaption></figure>
+
+<p class="prose">兩個 repo 都<b>沒有附範例資料</b>，要自己準備一個小區段來跑。</p>
+
+<h3 id="capstone__有配對正常樣本">① 有配對正常樣本</h3>
+
+<pre><code>REGION=&quot;chr9:5000000-5200000&quot;
 
 longphase-s somatic_haplotag \
   -s phased_normal.vcf \
@@ -10040,34 +10105,59 @@ longphase-s somatic_haplotag \
   -r reference.fasta \
   --region &quot;${REGION}&quot; \
   -t 8 \
-  -o capstone_out \
+  -o capstone_sn \
   --output-somatic-vcf \
-  --log
+  --somatic-calling-log
 
-# purity 估計會寫入此檔案（不會印到 stdout）
-grep -A2 'Estimation result' capstone_out_purity.out
+# 純度寫在這個檔案裡，不會印到畫面上
+grep -A2 'Estimation result' capstone_sn_purity.out
 
-# 檢視 read 的 somatic haplotype 指派
-samtools view capstone_out.bam | grep -o 'HP:Z:[0-9-]*' | sort | uniq -c</code></pre>
+# 每條 read 被分到哪一類
+samtools view capstone_sn.bam | grep -o 'HP:Z:[0-9-]*' | sort | uniq -c</code></pre>
 
-<h3 id="capstone__使用-igv-檢視">使用 IGV 檢視</h3>
+<h3 id="capstone__假裝沒有正常樣本">② 假裝沒有正常樣本</h3>
 
-<p class="prose">將 <code>capstone_out.bam</code> 載入 IGV，依 <code>HP</code> tag 分組並定位到候選位點。
-可檢查 somatic 變異 read 是否偏向某一條 haplotype，以及兩側 germline allele 是否一致；
-這些視覺訊號仍需與 mapping/base quality、覆蓋度及過濾結果一併判讀。</p>
+<p class="prose"><code>longphase-to phase</code> <b>沒有 <code>--region</code> 參數</b>，
+所以要先把 BAM 與 VCF 切出小區段再跑：</p>
 
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd">通過標準</p>
-<p class="prose">寫一頁報告，內容包含：</p>
+<pre><code># 先切出區段（longphase-to 不吃 --region）
+samtools view -b tumor.bam &quot;${REGION}&quot; &gt; tumor_sub.bam &amp;&amp; samtools index tumor_sub.bam
+bcftools view -r &quot;${REGION}&quot; tumor.vcf -Ov -o tumor_sub.vcf
+
+longphase-to phase \
+  -s tumor_sub.vcf \
+  -b tumor_sub.bam \
+  -r reference.fasta \
+  -t 8 \
+  -o capstone_to \
+  --caller clairs_to_ssrs \
+  --pon-file PoN/gnomad.vcf.gz,PoN/dbsnp.vcf.gz \
+  --strict-pon-file PoN/1000g-pon.vcf.gz \
+  --loh
+
+# 純度寫在 VCF 檔頭
+grep '##tumor_purity' capstone_to.vcf
+
+# 這個位點的三層答案
+bcftools query -r chr9:5073770 -f '%POS\t[%GT\t%GT2\t%GT3]\n' capstone_to.vcf</code></pre>
+
+<h3 id="capstone__把兩邊兜起來">③ 把兩邊兜起來</h3>
+
+<p class="prose">跑完之後回答三個問題，這才是這一節的重點：</p>
+
 <ol class="prose">
-<li>你選的位點與所有觀測值</li>
-<li>你的判斷（somatic / germline / artifact）與逐條理由</li>
-<li>如果改成 tumor-only，判斷會怎麼變、為什麼</li>
-<li>precision / recall 的計算，以及它們在這個案例裡的限制</li>
-<li><b>一段明確的不確定性陳述</b> —— 哪些結論你有信心、哪些只是「與資料相容」</li>
+<li>兩邊對這個位點的<b>歸屬</b>（HP1 還是 HP2）一致嗎？不一致的話，哪一邊的證據比較薄？</li>
+<li>兩邊估出來的<b>純度</b>差多少？差距落在什麼範圍還算合理？</li>
+<li>僅腫瘤版多報了哪些位點？其中有多少是配對版判定為 germline 的？
+這個差集就是<b>失去正常樣本的代價</b>，而且可以量出來。</li>
 </ol>
-<p class="prose">第 5 點要求報告明確呈現證據範圍與不確定性。</p>
-</div>
+
+<h3 id="capstone__用-igv-看一眼">用 IGV 看一眼</h3>
+
+<p class="prose">把 <code>capstone_sn.bam</code> 載入 IGV，依 <code>HP</code> tag 分組並跳到候選位點。
+要看的是：帶 ALT 的 read 是不是集中在同一條 haplotype 上，以及兩側 germline allele 是否一致。
+這些視覺訊號仍要跟 mapping/base quality、覆蓋度與過濾結果一起判讀，
+單看一張截圖不足以下結論。</p>
 </section>
 
 
@@ -10079,27 +10169,179 @@ samtools view capstone_out.bam | grep -o 'HP:Z:[0-9-]*' | sort | uniq -c</code><
 顯示 ALT–ALT–REF。你想說「我發現了一個 subclone」。<br><br>
 你可以這樣寫嗎？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>不可以。</b>這是整份教材最後要留給你的一課。</p>
 <p class="prose">你直接觀測到的是：<b>一個 DNA 分子片段的序列上，第一與第二個變異同時存在，第三個不存在。</b>
-這不是對細胞數量或獨立分子數量的直接計數。</p>
-<p class="prose">從這裡到「存在一個 subclone」，中間隔著好幾層推論：</p>
-<ul class="prose">
-<li><b>一條 read 通常反映一個 DNA 分子片段，不等於一個細胞，也不保證是獨立分子觀測</b>（guardrail #7）。
-需要多條彼此獨立且品質足夠的 read，才能評估這個組合是否可重現。</li>
-<li>你需要排除 <b>定序錯誤</b> 與 <b>比對錯誤</b>。</li>
-<li>你需要考慮 <b><span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="capstone__gd-copy-number-10">copy number<span class="term__pop" id="capstone__gd-copy-number-10" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span> 與 <span class="term" data-term="mutation multiplicity" tabindex="0" role="button" aria-expanded="false" aria-describedby="capstone__gd-mutation-multiplicity-11">mutation multiplicity<span class="term__pop" id="capstone__gd-mutation-multiplicity-11" role="tooltip"><b class="term__hd">mutation multiplicity</b><span class="term__def" data-lang="zh">在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</span><span class="term__def" data-lang="en">How many mutant-allele copies are present in a cell carrying the mutation; a necessary term when converting VAF to cancer cell fraction.</span><a class="term__more" href="glossary.html#mutation-multiplicity">完整條目 →</a></span></span></b>，
-否則無法從 VAF 反推細胞比例。</li>
-<li>即使完成上述檢查，得到的仍是<b>與 clone／subclone 差異相容的候選解釋</b>，
-而不是已確認的細胞族群；仍需額外的拷貝數、細胞比例或單細胞/多區域資料支持。</li>
-</ul>
-<p class="prose">這是最需要謹慎的地方：輸出「不是唯一的全基因體演化樹，
-也不是已確認的細胞族群，而是由目前 read 證據支持、並在結構上與 clone／subclone 差異相容的<b>區域候選</b>」。</p>
-<p class="prose">以下警告框示範如何保留這項限制。</p></div></details>
+這不是對細胞數量或獨立分子數量的直接計數。從這裡到「存在一個 subclone」，中間隔著三道檢查：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" class="dia-svg" role="img">
+  <title>從「你看到什麼」到「你可以寫什麼」中間隔著三道檢查</title>
+  <desc>左上是你真正觀測到的東西：一條 read 跨過三個位置，前兩個帶 ALT、第三個是 REF。
+        右上是不能直接寫出來的結論「我發現了一個 subclone」，中間用打叉的虛線箭頭表示這一跳被禁止。
+        左側由上而下是三道必須先做的檢查：
+        第一，這個組合是不是定序或比對錯誤造成的，需要多條彼此獨立的 read 才能確認；
+        第二，一條 read 是一個 DNA 分子，不是一個細胞，所以分子數不等於細胞數；
+        第三，要把 VAF 換算成細胞比例，必須先知道該處的拷貝數與突變拷貝數。
+        底部是三道檢查都做完之後，實際可以寫進報告的句子：
+        read 證據支持一個區域層級的候選拓撲，其結構與 clone 或 subclone 的分化相容，
+        仍需單細胞或多區域資料驗證。
+        右側說明這條界線為什麼重要：觀測講的是分子的狀態，結論講的是細胞族群的存在，
+        兩者之間隔著取樣波動、錯誤率與拷貝數三個未知。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">從「你看到什麼」到「你可以寫什麼」</text>
+  <text class="tick zh" x="20" y="58">中間隔著三道檢查。跳過它們，結論就超出資料撐得住的範圍。</text>
+
+  <!-- ══ 觀測 ══ -->
+  <rect class="box plain" x="20" y="76" width="560" height="150" rx="10"/>
+  <text class="anno bold zh" x="44" y="106">你真正看到的</text>
+
+  <rect class="read hp0" x="48" y="140" width="500" height="15" rx="7.5"/>
+  <circle class="mark somatic" cx="150" cy="132" r="6"/>
+  <circle class="mark somatic" cx="298" cy="132" r="6"/>
+  <circle class="mark ref" cx="446" cy="132" r="6"/>
+  <text class="base t mono mid" x="150" y="152" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="298" y="152" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="446" y="152" style="font-size:15px">G</text>
+  <text class="tick mid zh" x="150" y="178">位置 ①</text>
+  <text class="tick mid zh" x="298" y="178">位置 ②</text>
+  <text class="tick mid zh" x="446" y="178">位置 ③</text>
+  <text class="tick zh" x="44" y="206">一條 read 上：①② 帶 ALT，③ 是 REF。這就是全部的觀測。</text>
+
+  <!-- ══ 禁止的一跳 ══ -->
+  <path class="conn bad" d="M584,150 L634,150" marker-end="url(#arrow)" style="stroke-dasharray:7 4"/>
+  <text class="anno bold bad mid" x="609" y="140">✗</text>
+
+  <rect class="box bad" x="640" y="76" width="340" height="150" rx="10"/>
+  <text class="anno bold zh bad" x="664" y="106">不能直接跳到這裡</text>
+  <text class="anno zh" x="664" y="142">「我發現了一個 subclone」</text>
+  <text class="tick zh" x="664" y="176">這句話講的是<tspan class="bold">一群細胞存在</tspan>，</text>
+  <text class="tick zh" x="664" y="200">而你手上只有一條分子的序列。</text>
+
+  <!-- ══ 三道檢查 ══ -->
+  <path class="flow" d="M300,226 L300,246" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box plain" x="20" y="250" width="560" height="76" rx="10"/>
+  <text class="anno bold zh" x="44" y="280">檢查一　這是真的，還是錯誤？</text>
+  <text class="tick zh" x="44" y="308">需要多條<tspan class="bold">彼此獨立</tspan>的 read 都看到同樣組合，才排除得了定序與比對錯誤。</text>
+
+  <path class="flow" d="M300,326 L300,342" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box plain" x="20" y="346" width="560" height="76" rx="10"/>
+  <text class="anno bold zh" x="44" y="376">檢查二　幾條分子，不等於幾個細胞</text>
+  <text class="tick zh" x="44" y="404">一條 read 是<tspan class="bold">一個 DNA 分子片段</tspan>，不是一個細胞（guardrail #7）。</text>
+
+  <path class="flow" d="M300,422 L300,438" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box plain" x="20" y="442" width="560" height="76" rx="10"/>
+  <text class="anno bold zh" x="44" y="472">檢查三　VAF 要換算才變成細胞比例</text>
+  <text class="tick zh" x="44" y="500">換算需要先知道該處的<tspan class="bold">拷貝數</tspan>與<tspan class="bold">突變拷貝數</tspan>，兩者都要另外估。</text>
+
+  <!-- ══ 右側：為什麼這條界線重要 ══ -->
+  <rect class="box sunken" x="640" y="250" width="340" height="268" rx="10"/>
+  <text class="anno bold zh" x="664" y="280">這條界線為什麼重要</text>
+  <text class="tick zh" x="664" y="314">觀測講的是<tspan class="bold">分子的狀態</tspan>，</text>
+  <text class="tick zh" x="664" y="338">結論講的是<tspan class="bold">細胞族群的存在</tspan>。</text>
+  <text class="tick zh" x="664" y="376">兩者之間隔著三個未知：</text>
+  <text class="tick zh" x="664" y="404">· 取樣到的分子夠不夠多</text>
+  <text class="tick zh" x="664" y="428">· 錯誤率有多高</text>
+  <text class="tick zh" x="664" y="452">· 那一段有幾份拷貝</text>
+  <text class="tick zh" x="664" y="486">寫得太滿，讀的人就無法</text>
+  <text class="tick zh" x="664" y="510">判斷你到底有幾分把握。</text>
+
+  <!-- ══ 可以寫的結論 ══ -->
+  <path class="flow" d="M300,518 L300,534" marker-end="url(#arrow-sm)"/>
+  <rect class="box ok" x="20" y="538" width="960" height="92" rx="10"/>
+  <text class="anno bold zh ok" x="44" y="568">三道檢查都做完之後，可以寫的是這樣一句話</text>
+  <text class="tick zh" x="44" y="598">「read 證據支持一個<tspan class="bold">區域層級</tspan>的候選拓撲，其結構與 clone／subclone 的分化相容。」</text>
+  <text class="tick zh" x="44" y="622">並補上一句：這是候選解釋，尚需單細胞或多區域資料驗證。</text>
+</svg><figcaption>左上是你真正看到的，右上是不能直接跳過去的結論。
+中間三道檢查每一道都需要額外的證據：多條獨立 read 排除錯誤、分子數不等於細胞數（guardrail #7）、
+VAF 要靠拷貝數與突變拷貝數才換算得成細胞比例。底部是三道都做完之後真正可以寫的那句話。</figcaption></figure>
+
+<p class="prose">即使三道都做完，得到的仍是<b>與 clone／subclone 差異相容的候選解釋</b>，
+而不是已確認的細胞族群；要確認還需要拷貝數、細胞比例或單細胞／多區域資料。</p></div></details>
 
 <aside class="guardrail" id="capstone__guard-9"><p class="guardrail__hd">重要區分 #9：latent node 不是「還沒觀察到的細胞」</p><p class="prose">subclone 重建在建立候選演化樹時，有時必須<b>加入沒有被任何 read 直接觀測到的中間狀態</b>，
-才能在模型限制下保持圖的連通性。例如只觀察到 <code>00</code> 與 <code>11</code> 時，
-若每條邊只能新增一個突變，模型可能加入 <code>10</code> 或 <code>01</code> 作為中間狀態。</p>
-<p class="prose">這種節點稱為 <b>latent node</b>。它是模型為滿足連通條件加入的候選分子狀態，
-<b>不是未觀察到的細胞、clone 或 subclone</b>。</p>
-<p class="prose">為什麼要這麼小心？因為 latent node 是<b>模型的產物</b>，不是資料的產物。
+才能在模型限制下保持圖的連通性。這種節點稱為 <b>latent node</b>。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" class="dia-svg" role="img">
+  <title>latent node 是模型為了接通圖而補進去的狀態，不是還沒觀察到的細胞</title>
+  <desc>左邊是資料實際看到的：兩個位置的組合只觀測到 0 0 與 1 1 兩種，各有 read 支持。
+        中間是模型遇到的問題：這個模型規定每一條邊只能新增一個突變，
+        但從 0 0 直接跳到 1 1 一次多了兩個突變，因此兩點接不起來。
+        右邊是模型的處理方式：補一個沒有任何 read 支持的中間狀態，
+        可以是 1 0 也可以是 0 1，圖才連得起來。這個補進去的節點就叫 latent node，
+        圖上畫成虛線空心以示區別。
+        下方是重點：兩種補法都能讓圖連通，資料本身無法分辨該用哪一個，
+        所以 latent node 是模型的產物而不是資料的產物。
+        換一組模型假設或補進新資料之後，它可能就不存在了。
+        因此不能把它讀成「有一個還沒被發現的 subclone」。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">latent node：模型補上去的節點，不是資料看到的細胞</text>
+
+  <!-- ══ ① 資料看到的 ══ -->
+  <rect class="box plain" x="20" y="56" width="300" height="230" rx="10"/>
+  <text class="anno bold zh" x="44" y="86">① 資料看到的</text>
+  <text class="tick zh" x="44" y="112">兩個位置的組合，只觀測到兩種</text>
+
+  <circle class="mark ref" cx="110" cy="170" r="26"/>
+  <text class="anno mono mid bold germline" x="110" y="177" style="font-size:20px">00</text>
+  <text class="tick mid zh" x="110" y="214">12 條 read</text>
+
+  <circle class="mark ref" cx="230" cy="170" r="26"/>
+  <text class="anno mono mid bold somatic" x="230" y="177" style="font-size:20px">11</text>
+  <text class="tick mid zh" x="230" y="214">9 條 read</text>
+
+  <text class="tick zh" x="44" y="256">兩種都有 read 撐著，</text>
+  <text class="tick zh" x="44" y="278">這是實際的觀測。</text>
+
+  <!-- ══ ② 模型遇到的問題 ══ -->
+  <rect class="box warn" x="340" y="56" width="300" height="230" rx="10"/>
+  <text class="anno bold zh" x="364" y="86">② 模型接不起來</text>
+  <text class="tick zh" x="364" y="112">此模型規定：一條邊只能加一個突變</text>
+
+  <circle class="mark ref" cx="430" cy="170" r="26"/>
+  <text class="anno mono mid bold germline" x="430" y="177" style="font-size:20px">00</text>
+  <circle class="mark ref" cx="550" cy="170" r="26"/>
+  <text class="anno mono mid bold somatic" x="550" y="177" style="font-size:20px">11</text>
+
+  <path class="conn bad" d="M458,170 L522,170" marker-end="url(#arrow)" style="stroke-dasharray:6 4"/>
+  <text class="anno bold bad mid" x="490" y="150">✗</text>
+  <text class="tick mid zh bad" x="490" y="214">一次多了兩個</text>
+
+  <text class="tick zh" x="364" y="256">直接連會違反模型的規則，</text>
+  <text class="tick zh" x="364" y="278">所以這張圖是斷的。</text>
+
+  <!-- ══ ③ 模型補一個節點 ══ -->
+  <rect class="box accent" x="660" y="56" width="320" height="230" rx="10"/>
+  <text class="anno bold zh" x="684" y="86">③ 於是補一個中間狀態</text>
+  <text class="tick zh" x="684" y="112">補上去之後，每條邊都只加一個</text>
+
+  <circle class="mark ref" cx="726" cy="182" r="24"/>
+  <text class="anno mono mid bold germline" x="726" y="189" style="font-size:18px">00</text>
+
+  <circle class="mark ref" cx="820" cy="182" r="24" style="stroke-dasharray:5 3"/>
+  <text class="anno mono mid bold" x="820" y="189" style="font-size:18px">10</text>
+
+  <circle class="mark ref" cx="914" cy="182" r="24"/>
+  <text class="anno mono mid bold somatic" x="914" y="189" style="font-size:18px">11</text>
+
+  <path class="conn" d="M752,182 L794,182" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M846,182 L888,182" marker-end="url(#arrow-sm)"/>
+
+  <text class="tick mid zh" x="820" y="232">0 條 read</text>
+  <text class="anno mid zh bold" x="820" y="266">這一個就是 latent node</text>
+
+  <!-- ══ 重點 ══ -->
+  <line class="axis" x1="20" y1="308" x2="980" y2="308"/>
+
+  <rect class="box bad" x="20" y="326" width="960" height="130" rx="10"/>
+  <text class="anno bold zh bad" x="44" y="356">為什麼不能把它當成「還沒被發現的 subclone」</text>
+  <text class="tick zh" x="44" y="388">補 <tspan class="mono bold">10</tspan> 可以接通，補 <tspan class="mono bold">01</tspan> 也一樣可以接通 —— <tspan class="bold">資料本身分不出該用哪一個</tspan>。</text>
+  <text class="tick zh" x="44" y="414">會出現這個節點，是因為模型規定了「一條邊只能加一個突變」，不是因為看到了什麼。</text>
+  <text class="tick zh" x="44" y="440">換一組假設、或補進新的 read，它可能就不見了。它是<tspan class="bold">模型的產物，不是資料的產物</tspan>。</text>
+</svg><figcaption>資料只看到 <code>00</code> 與 <code>11</code>；
+模型規定一條邊只能新增一個突變，所以兩點直接連不起來，必須補一個中間狀態。
+關鍵在最下面一行：補 <code>10</code> 或補 <code>01</code> 都能接通，<b>資料本身分不出來該用哪一個</b>。</figcaption></figure>
+
+<p class="prose">所以 latent node 是<b>模型的產物，不是資料的產物</b>。
 把它當成「存在一個尚未發現的 subclone」會超出資料支持範圍；
 換用不同模型假設或新增資料後，該節點可能不再出現。</p>
 <p class="prose">同理，subclone 重建的「候選拓撲」也不是完整的腫瘤演化樹：
@@ -10115,37 +10357,19 @@ read 證據支持一個分支式、多步驟的候選拓撲，其結構與 clone
 <section data-part="practice" class="part" id="capstone__part-practice">
 <h2 data-num="⑤" id="capstone__實作練習">實作練習</h2>
 
-<h3 id="capstone__執行一次可重現的流程-2">執行一次可重現的流程</h3>
+<h3 id="capstone__換一個自己的位點-從頭做一次">換一個自己的位點，從頭做一次</h3>
 
-<p class="prose">開源版本沒有附範例資料；可準備一個小型測試區段
-（BAM 切片及其對應的 VCF），再依下列步驟執行：</p>
+<p class="prose">上一節用的是指定好的 chr9 位點。這一次<b>自己挑一個</b>，
+把整套判讀重做一遍 —— 這才是驗收。</p>
 
-<pre><code># 僅執行小區域，便於快速驗證
-REGION=&quot;chr9:5000000-5200000&quot;
-
-longphase-s somatic_haplotag \
-  -s phased_normal.vcf \
-  -b normal.bam \
-  --tumor-snv-file tumor.vcf \
-  --tumor-bam-file tumor.bam \
-  -r reference.fasta \
-  --region &quot;${REGION}&quot; \
-  -t 8 \
-  -o capstone_out \
-  --output-somatic-vcf \
-  --log
-
-# purity 估計會寫入此檔案（不會印到 stdout）
-grep -A2 'Estimation result' capstone_out_purity.out
-
-# 檢視 read 的 somatic haplotype 指派
-samtools view capstone_out.bam | grep -o 'HP:Z:[0-9-]*' | sort | uniq -c</code></pre>
-
-<h3 id="capstone__使用-igv-檢視-2">使用 IGV 檢視</h3>
-
-<p class="prose">載入 <code>capstone_out.bam</code>，依 <code>HP</code> tag 分組並定位到候選位點。
-可檢查 somatic 變異 read 是否偏向某一條 haplotype，以及兩側 germline allele 是否一致；
-這些視覺訊號仍需與 mapping/base quality、覆蓋度及過濾結果一併判讀。</p>
+<ol class="prose">
+<li>從 <code>capstone_to.vcf</code> 裡挑一個 <code>GT2</code> 不是 <code>./.</code> 的位點。
+刻意挑一個<b>證據沒那麼漂亮</b>的（例如支持的 read 只有 5、6 條，或 <code>GT2</code> 是 <code>1|1</code>）。</li>
+<li>把該位點的觀測值全部列出來：coverage、支持 ALT 的條數、HP 分布、序列脈絡、PON 命中與否。</li>
+<li>用任務一的五類證據逐條檢查一次。</li>
+<li>再用任務二的方式問一次：如果沒有正常樣本，你會少掉哪一條？</li>
+<li>用 IGV 看一眼，確認你的判讀跟畫面對得起來。</li>
+</ol>
 
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">通過標準</p>
@@ -10157,7 +10381,7 @@ samtools view capstone_out.bam | grep -o 'HP:Z:[0-9-]*' | sort | uniq -c</code><
 <li>precision 與 recall 的計算，以及它們在這個案例裡的限制</li>
 <li><b>一段明確的不確定性陳述</b> —— 哪些結論你有信心、哪些只是「與資料相容」</li>
 </ol>
-<p class="prose">第 5 點要求報告明確呈現證據範圍與不確定性。</p>
+<p class="prose">第 5 點是這份教材真正要教會的事：把證據的邊界寫出來，而不是把話講滿。</p>
 </div>
 
 <h3 id="capstone__接下來讀什麼">接下來讀什麼</h3>
@@ -10168,21 +10392,21 @@ samtools view capstone_out.bam | grep -o 'HP:Z:[0-9-]*' | sort | uniq -c</code><
 <table>
 <thead><tr><th>如果你的題目是</th><th>需要補的背景</th></tr></thead>
 <tbody>
-<tr><td>配對樣本的 indel</td><td>CNN 基礎、把 pileup 編碼成影像、類別不平衡的處理</td></tr>
+<tr><td>配對樣本的 indel</td><td>卷積神經網路（CNN）基礎、把 pileup 編碼成影像、類別不平衡的處理</td></tr>
 <tr><td>僅腫瘤樣本的 indel 或甲基化</td><td>梯度提升樹（XGBoost）、特徵工程、PCA</td></tr>
 <tr><td>subclone 重建</td><td>布林超立方體、簡約演化樹、Group Steiner tree</td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">最後一列的演算法背景是本教材<b>尚未涵蓋</b>的部分；
-若研究涉及該方向，請另行取得 Steiner tree 的參考資料。</p>
+<p class="prose">這三列的演算法背景都是本教材<b>尚未涵蓋</b>的部分 ——
+教材教的是怎麼判讀證據，不是怎麼訓練模型。若研究涉及這些方向，需要另外補足。</p>
 
 <section class="quiz" data-quiz="capstone"><h2 id="capstone__學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
 </section>
 
     
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>F1</dt><dd>precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>PON（正常樣本面板／族群資料庫（依流程而異））</dt><dd>PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>mutation multiplicity</dt><dd>在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</dd><dt>precision（精確率）</dt><dd>所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</dd><dt>recall（召回率）</dt><dd>在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</dd><dt>triplet graph</dt><dd>LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>F1</dt><dd>precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>PON（正常樣本面板／族群資料庫（依流程而異））</dt><dd>PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>precision（精確率）</dt><dd>所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</dd><dt>recall（召回率）</dt><dd>在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</dd><dt>triplet graph</dt><dd>LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
   </article>
     
     

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640">
+  <title>從「你看到什麼」到「你可以寫什麼」中間隔著三道檢查</title>
+  <desc>左上是你真正觀測到的東西：一條 read 跨過三個位置，前兩個帶 ALT、第三個是 REF。
+        右上是不能直接寫出來的結論「我發現了一個 subclone」，中間用打叉的虛線箭頭表示這一跳被禁止。
+        左側由上而下是三道必須先做的檢查：
+        第一，這個組合是不是定序或比對錯誤造成的，需要多條彼此獨立的 read 才能確認；
+        第二，一條 read 是一個 DNA 分子，不是一個細胞，所以分子數不等於細胞數；
+        第三，要把 VAF 換算成細胞比例，必須先知道該處的拷貝數與突變拷貝數。
+        底部是三道檢查都做完之後，實際可以寫進報告的句子：
+        read 證據支持一個區域層級的候選拓撲，其結構與 clone 或 subclone 的分化相容，
+        仍需單細胞或多區域資料驗證。
+        右側說明這條界線為什麼重要：觀測講的是分子的狀態，結論講的是細胞族群的存在，
+        兩者之間隔著取樣波動、錯誤率與拷貝數三個未知。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">從「你看到什麼」到「你可以寫什麼」</text>
+  <text class="tick zh" x="20" y="58">中間隔著三道檢查。跳過它們，結論就超出資料撐得住的範圍。</text>
+
+  <!-- ══ 觀測 ══ -->
+  <rect class="box plain" x="20" y="76" width="560" height="150" rx="10"/>
+  <text class="anno bold zh" x="44" y="106">你真正看到的</text>
+
+  <rect class="read hp0" x="48" y="140" width="500" height="15" rx="7.5"/>
+  <circle class="mark somatic" cx="150" cy="132" r="6"/>
+  <circle class="mark somatic" cx="298" cy="132" r="6"/>
+  <circle class="mark ref" cx="446" cy="132" r="6"/>
+  <text class="base t mono mid" x="150" y="152" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="298" y="152" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="446" y="152" style="font-size:15px">G</text>
+  <text class="tick mid zh" x="150" y="178">位置 ①</text>
+  <text class="tick mid zh" x="298" y="178">位置 ②</text>
+  <text class="tick mid zh" x="446" y="178">位置 ③</text>
+  <text class="tick zh" x="44" y="206">一條 read 上：①② 帶 ALT，③ 是 REF。這就是全部的觀測。</text>
+
+  <!-- ══ 禁止的一跳 ══ -->
+  <path class="conn bad" d="M584,150 L634,150" marker-end="url(#arrow)" style="stroke-dasharray:7 4"/>
+  <text class="anno bold bad mid" x="609" y="140">✗</text>
+
+  <rect class="box bad" x="640" y="76" width="340" height="150" rx="10"/>
+  <text class="anno bold zh bad" x="664" y="106">不能直接跳到這裡</text>
+  <text class="anno zh" x="664" y="142">「我發現了一個 subclone」</text>
+  <text class="tick zh" x="664" y="176">這句話講的是<tspan class="bold">一群細胞存在</tspan>，</text>
+  <text class="tick zh" x="664" y="200">而你手上只有一條分子的序列。</text>
+
+  <!-- ══ 三道檢查 ══ -->
+  <path class="flow" d="M300,226 L300,246" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box plain" x="20" y="250" width="560" height="76" rx="10"/>
+  <text class="anno bold zh" x="44" y="280">檢查一　這是真的，還是錯誤？</text>
+  <text class="tick zh" x="44" y="308">需要多條<tspan class="bold">彼此獨立</tspan>的 read 都看到同樣組合，才排除得了定序與比對錯誤。</text>
+
+  <path class="flow" d="M300,326 L300,342" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box plain" x="20" y="346" width="560" height="76" rx="10"/>
+  <text class="anno bold zh" x="44" y="376">檢查二　幾條分子，不等於幾個細胞</text>
+  <text class="tick zh" x="44" y="404">一條 read 是<tspan class="bold">一個 DNA 分子片段</tspan>，不是一個細胞（guardrail #7）。</text>
+
+  <path class="flow" d="M300,422 L300,438" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box plain" x="20" y="442" width="560" height="76" rx="10"/>
+  <text class="anno bold zh" x="44" y="472">檢查三　VAF 要換算才變成細胞比例</text>
+  <text class="tick zh" x="44" y="500">換算需要先知道該處的<tspan class="bold">拷貝數</tspan>與<tspan class="bold">突變拷貝數</tspan>，兩者都要另外估。</text>
+
+  <!-- ══ 右側：為什麼這條界線重要 ══ -->
+  <rect class="box sunken" x="640" y="250" width="340" height="268" rx="10"/>
+  <text class="anno bold zh" x="664" y="280">這條界線為什麼重要</text>
+  <text class="tick zh" x="664" y="314">觀測講的是<tspan class="bold">分子的狀態</tspan>，</text>
+  <text class="tick zh" x="664" y="338">結論講的是<tspan class="bold">細胞族群的存在</tspan>。</text>
+  <text class="tick zh" x="664" y="376">兩者之間隔著三個未知：</text>
+  <text class="tick zh" x="664" y="404">· 取樣到的分子夠不夠多</text>
+  <text class="tick zh" x="664" y="428">· 錯誤率有多高</text>
+  <text class="tick zh" x="664" y="452">· 那一段有幾份拷貝</text>
+  <text class="tick zh" x="664" y="486">寫得太滿，讀的人就無法</text>
+  <text class="tick zh" x="664" y="510">判斷你到底有幾分把握。</text>
+
+  <!-- ══ 可以寫的結論 ══ -->
+  <path class="flow" d="M300,518 L300,534" marker-end="url(#arrow-sm)"/>
+  <rect class="box ok" x="20" y="538" width="960" height="92" rx="10"/>
+  <text class="anno bold zh ok" x="44" y="568">三道檢查都做完之後，可以寫的是這樣一句話</text>
+  <text class="tick zh" x="44" y="598">「read 證據支持一個<tspan class="bold">區域層級</tspan>的候選拓撲，其結構與 clone／subclone 的分化相容。」</text>
+  <text class="tick zh" x="44" y="622">並補上一句：這是候選解釋，尚需單細胞或多區域資料驗證。</text>
+</svg>

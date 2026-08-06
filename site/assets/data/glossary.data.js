@@ -897,7 +897,6 @@ window.TW_GLOSSARY = {
   ],
   "slug": "mutation-multiplicity",
   "modules": [
-   "capstone",
    "m08"
   ]
  },

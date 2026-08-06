@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 490">
+  <title>同一個位點跑兩種流程，答案會寫在不同的檔案、不同的欄位</title>
+  <desc>左邊是有配對正常組織時跑的 longphase-s somatic_haplotag：
+        它的答案寫在輸出 BAM 每一條 read 的 HP 標籤上，例如 HP 冒號 Z 冒號 2-1，
+        意思是這條 read 屬於 HP2 的體細胞後代；估出來的腫瘤比例另外寫在 purity.out 檔案。
+        右邊是只有腫瘤樣本時跑的 longphase-to phase：
+        它的答案寫在輸出 VCF 的 FORMAT 欄位，GT 是 0 直槓 0、GT2 是點直槓 1，
+        同樣表示這個變異長在 HP2 上；腫瘤比例寫在 VCF 檔頭，並多輸出一份 LOH 區段的 BED。
+        下方是重點：兩邊對這個位點的判斷一致，都指向 HP2，
+        但右邊少了正常組織這個直接對照，所以無法排除這個病人私有的遺傳變異，把握較低。
+        要找答案時得先知道它被寫在哪裡，這是兩個工具最常被搞混的地方。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">同一個位點，兩種流程把答案寫在不同地方</text>
+  <text class="tick zh" x="20" y="58">先知道答案寫在哪個檔案的哪個欄位，才找得到它。</text>
+
+  <!-- ══ 左：配對版 ══ -->
+  <rect class="box plain" x="20" y="76" width="470" height="286" rx="10"/>
+  <text class="anno bold zh" x="44" y="106">有配對正常組織</text>
+  <text class="tick mono" x="44" y="132">longphase-s somatic_haplotag</text>
+
+  <text class="tick zh bold" x="44" y="172">答案寫在輸出 BAM 的 read 標籤上</text>
+  <rect class="box sunken" x="44" y="184" width="422" height="52" rx="6"/>
+  <text class="tick mono" x="60" y="206">read_0142  chr9  5073770  …</text>
+  <text class="tick mono bold hp2" x="60" y="226">HP:Z:2-1</text>
+  <text class="tick zh" x="180" y="226">← 這條 read 屬於 HP2 的後代</text>
+
+  <text class="tick zh bold" x="44" y="268">腫瘤比例寫在另一個檔案</text>
+  <rect class="box sunken" x="44" y="280" width="422" height="34" rx="6"/>
+  <text class="tick mono" x="60" y="302">capstone_out_purity.out</text>
+
+  <text class="tick zh" x="44" y="344">沒有 LOH 輸出</text>
+
+  <!-- ══ 右：僅腫瘤版 ══ -->
+  <rect class="box plain" x="510" y="76" width="470" height="286" rx="10"/>
+  <text class="anno bold zh" x="534" y="106">只有腫瘤樣本</text>
+  <text class="tick mono" x="534" y="132">longphase-to phase</text>
+
+  <text class="tick zh bold" x="534" y="172">答案寫在輸出 VCF 的 FORMAT 欄位</text>
+  <rect class="box sunken" x="534" y="184" width="422" height="52" rx="6"/>
+  <text class="tick mono" x="550" y="206">chr9  5073770  …  GT:GT2:GT3</text>
+  <text class="tick mono bold hp2" x="550" y="226">0|0:.|1:./.</text>
+  <text class="tick zh" x="680" y="226">← 同樣是長在 HP2 上</text>
+
+  <text class="tick zh bold" x="534" y="268">腫瘤比例寫在 VCF 的檔頭裡</text>
+  <rect class="box sunken" x="534" y="280" width="422" height="34" rx="6"/>
+  <text class="tick mono" x="550" y="302">##tumor_purity=0.61</text>
+
+  <text class="tick zh" x="534" y="344">另外多一份 <tspan class="mono">&lt;prefix&gt;_LOH.bed</tspan></text>
+
+  <!-- ══ 重點 ══ -->
+  <line class="axis" x1="20" y1="384" x2="980" y2="384"/>
+
+  <rect class="box warn" x="20" y="402" width="960" height="76" rx="10"/>
+  <text class="anno bold zh" x="44" y="432">兩邊的判斷一致，但<tspan class="bold">把握不一樣</tspan></text>
+  <text class="tick zh" x="44" y="462">右邊少了正常組織這個直接對照，所以排除不掉「這個病人私有的遺傳變異」—— 結論要照實寫出這一點。</text>
+</svg>
