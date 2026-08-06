@@ -12,9 +12,23 @@
 <section data-part="why">
 <h2>為什麼重要</h2>
 
-<p class="prose">本模組整合前述資料與概念，聚焦於 phasing 與 haplotagging。</p>
+<p class="prose">M0 的那個問題到這裡才真正有答案。報告說 T790M 有、C797S 也有，
+但要回答它們在不在同一份 DNA 上，得先把 read 依來源分成兩群 —— 這件事就是 <b>phasing</b>。</p>
 
-<p class="prose">先以簡化 pileup 練習 read 分群，再說明工具如何根據 read 與 variant 的連結進行 phasing。</p>
+<p class="prose">它產出兩個東西，之後每個模組都會用到：</p>
+
+<ul class="prose">
+<li><b>變異</b>的相位寫進 VCF —— 哪些變異在同一條 haplotype 上。</li>
+<li><b>每一條 read</b> 的 haplotype 寫進 BAM 的 <code>HP</code> tag —— 這條 read 來自哪一條。
+這一步叫 <b>haplotagging</b>。</li>
+</ul>
+
+<p class="prose">第二個特別關鍵：M7 判斷 somatic 變異真假時用的「支持 read 是否集中在同一條 haplotype」，
+以及 M9 依 haplotype 分開統計甲基化，都是在 <code>HP</code> tag 上算的。
+沒有這一步，那些判準根本無從計算。</p>
+
+<p class="prose">本模組先用一段簡化 pileup 讓你自己分一次群，再說明工具怎麼做同一件事、
+以及它在哪些情況下會分錯。</p>
 </section>
 
 

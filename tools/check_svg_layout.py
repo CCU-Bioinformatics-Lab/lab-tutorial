@@ -90,6 +90,14 @@ def main():
             fsm = re.search(r"font-size=[\"']?(\d+)", attrs)
             if fsm:
                 fs = int(fsm.group(1))
+            # style="font-size:20px" 也要算 —— 這是專案裡覆寫字級的「正解」寫法
+            # （verify.mjs 第 12 項要求：跟 diagram.css 撞名的 property 必須走
+            # inline style），所以絕大多數覆寫其實長這樣。只看 font-size= 屬性
+            # 的話，這 120 多處都會被當成 class 的預設字級，寬度一路低估，
+            # 重疊就測不出來。
+            sfm = re.search(r"font-size\s*:\s*(\d+)", attrs)
+            if sfm:
+                fs = int(sfm.group(1))
             w = text_width(txt, fs)
             anchor_mid = "mid" in cls.split()
             anchor_end = "end" in cls.split()

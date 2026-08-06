@@ -548,6 +548,70 @@
     }
    ],
    "explain_html": "read 的 haplotype 分布可作為候選評估線索；應結合 phasing、mapping、copy number 與其他證據，而不能單獨視為隨機雜訊。"
+  },
+  {
+   "id": "m05.q2",
+   "type": "single",
+   "stem_html": "某個位置有 30 條 read 支持 <code>A</code>、28 條支持 <code>G</code>。除了這兩個數字，caller 還會看什麼才決定要不要報這個變異？",
+   "choices": [
+    {
+     "id": "a",
+     "html": "read 落在哪一股、鹼基品質、鄰近序列好不好對齊",
+     "correct": true,
+     "why": "正確。同樣的 30 比 28 可以是兩張完全不同的畫面：一邊正反股都有、品質高、鄰近序列單純；另一邊全部同一股、品質低、緊鄰同型多聚體。caller 讀的是整張 pileup 編碼成的數值，不是那兩個數字。"
+    },
+    {
+     "id": "b",
+     "html": "數量接近一半就會報，不必看其他資訊",
+     "correct": false,
+     "why": "如果只看比例，上面那兩張畫面會得到同一個結論 —— 而其中一張其實是比對與品質造成的假訊號。"
+    },
+    {
+     "id": "c",
+     "html": "這個位置在族群資料庫裡的頻率高不高",
+     "correct": false,
+     "why": "族群頻率是 tumor-only somatic 判讀在用的線索（M7），不是 germline caller 判斷「這裡有沒有變異」的依據。"
+    },
+    {
+     "id": "d",
+     "html": "這條染色體的 copy number 是不是 2",
+     "correct": false,
+     "why": "copy number 會影響 VAF 的解讀（M8），但 germline caller 的判斷輸入是這個位置的 pileup，不是拷貝數。"
+    }
+   ],
+   "explain_html": "把「數量」換成「整張畫面」是這一章的核心：鹼基品質、比對品質、read 落在哪一股、鄰近序列的對齊難度，都是同一個位置的證據。"
+  },
+  {
+   "id": "m05.q3",
+   "type": "single",
+   "stem_html": "「要先有變異才能 phasing，但 phasing 又能幫助 calling」—— 這不矛盾，因為流程實際上怎麼做？",
+   "choices": [
+    {
+     "id": "a",
+     "html": "先用最有把握的位點 call 一次、據此把 read 分群，再帶著 HP 標籤重判一次",
+     "correct": true,
+     "why": "正確。兩者是來回兩次：第一次只用最有把握的 het 位點，把 read 分成兩群；分群之後，真變異在同一群裡每條 read 都有，隨機錯誤則零星散在兩群，判斷因此變簡單。"
+    },
+    {
+     "id": "b",
+     "html": "phasing 不需要變異，直接用 read 序列就能分群",
+     "correct": false,
+     "why": "分群靠的正是 heterozygous 位點上的 allele 差異。沒有 informative 位點，兩條 haplotype 在資料上長得一樣，無從分群。"
+    },
+    {
+     "id": "c",
+     "html": "先把所有候選都報出來，最後才一次 phasing",
+     "correct": false,
+     "why": "這樣 phasing 的結果就回不去幫助 calling 了 —— 那些靠 haplotype 一致性才能判掉的假訊號會留在輸出裡。"
+    },
+    {
+     "id": "d",
+     "html": "phasing 只用在 somatic 分析，germline calling 用不到",
+     "correct": false,
+     "why": "反過來說才對：germline 的 het 位點是 phasing 的錨點，而 Clair3 的 full-alignment 階段與 PEPPER-Margin-DeepVariant 都把相位資訊回頭當成模型輸入。"
+    }
+   ],
+   "explain_html": "記住順序：先 call 出有把握的 → phasing → 帶著 HP 再判一次。同一個「一致或分散」的線索，到 M7 判 somatic 時會再用一次。"
   }
  ],
  "m06": [

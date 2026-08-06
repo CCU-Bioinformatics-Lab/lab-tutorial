@@ -160,6 +160,8 @@ benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
 <p class="prose">λ 由 benchmark 與驗證集的正負比例估計，而非人工指定（該資料約為 1.45）；
 應同時說明估計資料、FP 總數為零時的處理，以及權重敏感度。</p>
 
+{{svg:m10-loss-vs-score | [wide] 兩條曲線共用同一條 epoch 橫軸。上面的 validation loss 一路降到第 22 個 epoch 才最低；下面的任務分數第 12 個 epoch 就到頂，之後開始下滑。<b>兩個最佳點相差十個 epoch</b> —— 取 loss 最低的那一個，拿到的是一個任務目標已經變差的模型。}}
+
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">核心原則</p>
 <p class="prose"><b>模型選擇的標準應與任務目標對齊，而不必與 loss 最小化完全相同。</b>

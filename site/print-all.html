@@ -1597,7 +1597,7 @@ bcftools view -g het sample.vcf | grep -vc '^#'</code></pre>
 
   <!-- 中間的斷裂 -->
   <text class="anno mid zh bad bold" x="500" y="126">沒有任何一條 read 能同時跨過兩個位點</text>
-  <text class="anno mid zh" x="500" y="152">→ 兩個變異是不是在同一條分子上？<tspan class="bad bold">無法判斷</tspan></text>
+  <text class="anno mid zh" x="500" y="152">→ 兩個變異是不是在同一條分子上？<tspan class="anno bad bold">無法判斷</tspan></text>
 
   <!-- ══ 下：ONT ════════════════════════════════════════════════ -->
   <rect class="box accent" x="16" y="206" width="968" height="180" rx="10"/>
@@ -1781,14 +1781,14 @@ bcftools view -g het sample.vcf | grep -vc '^#'</code></pre>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" class="dia-svg" role="img">
   <title>低腫瘤比例為什麼難：把數字算出來就懂了</title>
-  <desc>在本簡化模型中，定序深度相同時，腫瘤細胞比例越低，支持一個真變異的 read 數就越少。
-        在腫瘤佔兩成且符合模型假設的樣本上，一個所有腫瘤細胞都帶有的變異期望約有五條 read 支持。
+  <desc>在本簡化模型中，定序深度相同時，腫瘤 DNA 在樣本中的佔比越低，支持一個真變異的 read 數就越少。
+        在腫瘤 DNA 佔兩成且符合模型假設的樣本上，一個所有腫瘤細胞都帶有的變異期望約有五條 read 支持。
         定序本身也可能在位置產生錯誤 read；背景若接近真訊號，會增加低比例樣本的判讀困難。</desc>
 
-  <text class="lbl bold zh" x="20" y="32">同樣 50× 的定序深度，腫瘤比例不同的結果</text>
+  <text class="lbl bold zh" x="20" y="32">同樣 50× 的定序深度，腫瘤 DNA 佔比不同的結果</text>
 
   <!-- 表頭 -->
-  <text class="tick zh bold" x="40" y="72">腫瘤比例</text>
+  <text class="tick zh bold" x="40" y="72">腫瘤 DNA 佔比</text>
   <text class="tick zh bold" x="180" y="72">支持真變異的 read 數</text>
   <text class="tick zh bold" x="700" y="72">好不好判斷</text>
 
@@ -1868,7 +1868,7 @@ bcftools view -g het sample.vcf | grep -vc '^#'</code></pre>
 
   <!-- 結論 -->
   <rect class="box bad" x="20" y="300" width="960" height="84" rx="8"/>
-  <text class="anno bold zh bad" x="42" y="330">在本模型中，腫瘤佔 20% 時期望真訊號約 5 條，背景約 1–2 條。</text>
+  <text class="anno bold zh bad" x="42" y="330">在本模型中，腫瘤 DNA 佔 20% 時期望真訊號約 5 條，背景約 1–2 條。</text>
   <text class="anno zh" x="42" y="358">兩者距離較近，過濾門檻會面臨 precision–recall 取捨。</text>
   <text class="anno zh bold" x="42" y="378">門檻過嚴可能漏掉真變異，過鬆則可能保留較多假陽性；實際結果依資料與模型而異。</text>
 </svg><figcaption>每個方塊代表一條支持變異的 read。在本模型中，tumor DNA fraction 為 100% 時期望約 25 條，20% 時約 5 條；下方另以每個位置約 1–2 條錯誤 read 作為背景假設。少量背景錯誤可能與低比例變異訊號重疊。</figcaption></figure>
@@ -1899,20 +1899,41 @@ caller 版本、benchmark 來源與混合方式）與結果一併記錄。</p>
 <p class="prose">若要評估方法在不同 tumor DNA fraction 下的效能，可依計算後的比例混合 tumor 與 normal BAM，
 建立預先設定的合成梯度：</p>
 
-<pre><code># 1. 先量出兩個 BAM 的實際 coverage
+<pre><code># 1. 先量出兩個 BAM 的實際 coverage（本例量到 tumor 50×、normal 25×）
 mosdepth --by 500 tumor_cov  tumor.bam
 mosdepth --by 500 normal_cov normal.bam
 
-# 2. 依實測 coverage 與目標 DNA fraction 計算抽樣比例（以下僅為深度已標準化的示意）
-samtools view -s 1.60 -b tumor.bam  &gt; tumor_sub.bam
+# 2. 抽樣率不是目標 fraction，要從實測深度回推：
+#      抽樣率 = （目標 fraction × 合成後總深度）÷ 來源深度
+#    總深度取 25×（兩邊都拿得出來），目標 DNA fraction 0.6：
+#      tumor  需要 0.6×25 = 15× → 15 ÷ 50 = 0.30
+#      normal 需要 0.4×25 = 10× → 10 ÷ 25 = 0.40
+samtools view -s 1.30 -b tumor.bam  &gt; tumor_sub.bam
 samtools view -s 1.40 -b normal.bam &gt; normal_sub.bam
 
 # 3. 合併成指定 DNA fraction 的樣本
 samtools merge dna_frac_0.6.bam tumor_sub.bam normal_sub.bam
 samtools index dna_frac_0.6.bam</code></pre>
 
-<p class="cli-note">此示例以 tumor coverage 50×、normal 25× 建立 1.0 / 0.8 / 0.6 / 0.4 / 0.2 梯度。
-此類 coverage 混合直接控制的是 <b>tumor DNA/read fraction</b>；若來源深度未標準化，不能直接以 0.60／0.40 作抽樣率。</p>
+<p class="cli-note"><b><code>-s</code> 的小數部分是抽樣率，不是你要的 fraction。</b>
+兩個來源深度不同時直接填 0.60／0.40 會得到 30×:10× ＝ 0.75，不是 0.6。
+以 tumor 50×、normal 25×、合成後總深度 25× 為例，五個梯度的抽樣率是：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>目標 tumor DNA fraction</th><th>tumor 抽樣率</th><th>normal 抽樣率</th></tr></thead>
+<tbody>
+<tr><td>0.2</td><td><code>-s 1.10</code></td><td><code>-s 1.80</code></td></tr>
+<tr><td>0.4</td><td><code>-s 1.20</code></td><td><code>-s 1.60</code></td></tr>
+<tr><td>0.6</td><td><code>-s 1.30</code></td><td><code>-s 1.40</code></td></tr>
+<tr><td>0.8</td><td><code>-s 1.40</code></td><td><code>-s 1.20</code></td></tr>
+<tr><td>1.0</td><td><code>-s 1.50</code></td><td>不混入 normal</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="cli-note">這樣控制的是 <b>tumor DNA/read fraction</b>，五個樣本的總深度也才一致 ——
+否則深度與 fraction 兩個變數會同時在動，之後看到效能下降就分不清是哪一個造成的。</p>
 
 <aside class="guardrail" id="m03__guard-2"><p class="guardrail__hd">重要區分 #2：tumor cellular purity 不等於 tumor DNA fraction</p><p class="prose">上述配方依 coverage 近似控制 DNA 量。在來源 tumor BAM 接近純腫瘤、
 且 tumor／normal 每細胞 DNA 量與輸入深度均已校正的合成設定下，tumor DNA fraction 才可近似 cellular purity。
@@ -2235,7 +2256,7 @@ chr7   105 .  A   G   60   PASS   .    GT:PS  0|1:105</code></pre>
   <g>
     <!-- 被剪掉的部分：虛線紅框 -->
     <rect class="box ghost artifact" x="198" y="120" width="96" height="28" rx="3" style="stroke-dasharray:5 3"/>
-    <text class="mono mid artifact" x="246" y="140" font-size="15">GCT…</text>
+    <text class="tick mono mid artifact" x="246" y="140">GCT…</text>
     <!-- 對上的部分 -->
     <rect class="box plain" x="300" y="120" width="28" height="28" rx="3"/><text class="base a mono mid" x="314" y="141" font-size="17">A</text>
     <rect class="box plain" x="334" y="120" width="28" height="28" rx="3"/><text class="base t mono mid" x="348" y="141" font-size="17">T</text>
@@ -2273,7 +2294,7 @@ chr7   105 .  A   G   60   PASS   .    GT:PS  0|1:105</code></pre>
     <rect class="box plain" x="504" y="236" width="28" height="28" rx="3"/><text class="base c mono mid" x="518" y="257" font-size="17">C</text>
     <rect class="box plain" x="538" y="236" width="28" height="28" rx="3"/><text class="base t mono mid" x="552" y="257" font-size="17">T</text>
     <rect class="box ghost artifact" x="572" y="236" width="96" height="28" rx="3" style="stroke-dasharray:5 3"/>
-    <text class="mono mid artifact" x="620" y="256" font-size="15">AGC…</text>
+    <text class="tick mono mid artifact" x="620" y="256">AGC…</text>
   </g>
 
   <text class="tick zh" x="20" y="308">此 read 的 CIGAR</text>
@@ -2282,7 +2303,7 @@ chr7   105 .  A   G   60   PASS   .    GT:PS  0|1:105</code></pre>
 
   <!-- ══════ 為什麼重要 ══════ -->
   <line class="axis" x1="20" y1="342" x2="980" y2="342"/>
-  <text class="lbl bold zh" x="20" y="374">單一 read 的 clipping 可見於技術或比對現象；若多條在<tspan class="bold somatic">同一位置</tspan>出現 ——</text>
+  <text class="lbl bold zh" x="20" y="374">單一 read 的 clipping 可見於技術或比對現象；若多條在<tspan class="lbl bold somatic">同一位置</tspan>出現 ——</text>
 
   <!-- 左：散落的 clipping（正常） -->
   <rect class="box ok" x="20" y="392" width="466" height="148" rx="8"/>
@@ -3460,9 +3481,23 @@ bcftools view -H -v indels out.vcf | wc -l</code></pre>
 <section data-part="why" class="part" id="m06__part-why">
 <h2 data-num="①" id="m06__為什麼重要">為什麼重要</h2>
 
-<p class="prose">本模組整合前述資料與概念，聚焦於 phasing 與 haplotagging。</p>
+<p class="prose">M0 的那個問題到這裡才真正有答案。報告說 T790M 有、C797S 也有，
+但要回答它們在不在同一份 DNA 上，得先把 read 依來源分成兩群 —— 這件事就是 <b>phasing</b>。</p>
 
-<p class="prose">先以簡化 pileup 練習 read 分群，再說明工具如何根據 read 與 variant 的連結進行 phasing。</p>
+<p class="prose">它產出兩個東西，之後每個模組都會用到：</p>
+
+<ul class="prose">
+<li><b>變異</b>的相位寫進 VCF —— 哪些變異在同一條 haplotype 上。</li>
+<li><b>每一條 read</b> 的 haplotype 寫進 BAM 的 <code>HP</code> tag —— 這條 read 來自哪一條。
+這一步叫 <b>haplotagging</b>。</li>
+</ul>
+
+<p class="prose">第二個特別關鍵：M7 判斷 somatic 變異真假時用的「支持 read 是否集中在同一條 haplotype」，
+以及 M9 依 haplotype 分開統計甲基化，都是在 <code>HP</code> tag 上算的。
+沒有這一步，那些判準根本無從計算。</p>
+
+<p class="prose">本模組先用一段簡化 pileup 讓你自己分一次群，再說明工具怎麼做同一件事、
+以及它在哪些情況下會分錯。</p>
 </section>
 
 
@@ -4889,16 +4924,21 @@ population database set 定義一致；它不同於 GATK Mutect2 所稱的 recur
 <section data-part="predict" class="part" id="m07__part-predict">
 <h2 data-num="④" id="m07__判讀練習">判讀練習</h2>
 
-<div class="reveal__q"><p class="prose">某個腫瘤樣本中有一個候選變異，VAF = 0.48，且未被所使用的 population database set 涵蓋。<br><br>
+<div class="reveal__q"><p class="prose">某個腫瘤樣本的一個位點有 50 條 read 覆蓋，其中 <b>24 條支持 alt</b>（VAF = 0.48），
+且未被所使用的 population database set 涵蓋。<br><br>
 在 tumor-only 模式下，請列出需要檢查的證據與可能分類。</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose">VAF 約 0.5 且未被族群資料庫涵蓋時，可優先考慮 private germline，
 但不能排除 somatic 或其他來源。</p>
 <p class="prose">在簡化的 diploid、單拷貝模型下，somatic VAF 可近似為 purity／2；
 較一般的模型還受 purity、multiplicity 與 total copy number 影響，並會受到 normal DNA、
 clonality、mapping bias 與 depth 影響，因此不能單獨依 VAF 分類。</p>
-<p class="prose">接著檢查<b>支持 read 的 haplotype 分布</b>：如果 4 條支持 read 全在同一條
-haplotype 上，與 somatic 相容；如果分散在兩條上，更像 artifact。此外還要看 copy number、
-LOH、品質與獨立證據。<span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="m07__gd-triplet-graph-13">triplet graph<span class="term__pop" id="m07__gd-triplet-graph-13" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span> 中的三種 pattern 是理想化示例，實務資料未必能完全區分，
-系統性 artifact 或 phasing error 也可能造成例外。</p></div></details>
+<p class="prose">接著檢查<b>這 24 條支持 read 的 haplotype 分布</b>：如果幾乎全部落在同一條
+haplotype 上，與「真的變異」相容（private germline 或 somatic 都會這樣）；如果大致均分在兩條上，
+更像 artifact —— 因為那等於同一個位置各自獨立突變了一次。此外還要看 copy number、LOH、品質與獨立證據。</p>
+
+<p class="prose">要注意這個判準本身是理想化的：實務資料不會這麼乾淨，
+系統性 artifact 或 phasing error 都會造成例外，所以它是提高或降低疑慮，不是定案。
+前面提到的三位點路徑結構（<span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="m07__gd-triplet-graph-13">triplet graph<span class="term__pop" id="m07__gd-triplet-graph-13" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span>）就是為了讓這個判準更穩健：
+左右鄰居都要對得上，才算得出「跟某一條既有 haplotype 只差候選這一格」的那條路徑。</p></div></details>
 </section>
 
 
@@ -4910,28 +4950,44 @@ LOH、品質與獨立證據。<span class="term" data-term="triplet graph" tabin
 <p class="prose">此練習比較 paired 與 tumor-only 的輸出差異。若有配對資料，可在相同參考序列與
 相近過濾設定下執行兩種模式，再比較結果：</p>
 
-<pre><code># 配對模式找到、而僅腫瘤模式未找到的候選（數量依資料與設定而異）
+<pre><code># isec 要求 bgzip 壓縮＋索引，少了索引會直接報錯
+bcftools index -f paired.vcf.gz
+bcftools index -f tumoronly.vcf.gz
+
+# 配對模式找到、而僅腫瘤模式未找到的候選（數量依資料與設定而異）
 bcftools isec -C paired.vcf.gz tumoronly.vcf.gz | wc -l
 
 # 僅腫瘤模式多出的候選（可能包含 private germline、artifact 或 paired caller 漏報）
 bcftools isec -C tumoronly.vcf.gz paired.vcf.gz | wc -l</code></pre>
 
+<p class="cli-note">若檔案還是未壓縮的 <code>.vcf</code>，先 <code>bcftools view -Oz -o out.vcf.gz in.vcf</code>
+轉成 bgzip 格式再建索引；一般的 <code>gzip</code> 壓出來的檔案 <code>bcftools index</code> 不接受。</p>
+
 <h3 id="m07__檢查多出來的候選是什麼">檢查多出來的候選是什麼</h3>
 
 <p class="prose">上面第二條指令的輸出，就是本模組那張圖裡的位置 ③。逐項檢查它們：</p>
 
-<pre><code># 1) 在配對正常樣本裡的 VAF —— 接近 0.5 提示 private germline
-bcftools mpileup -f reference.fasta -r chr1:1000000 normal.bam | less
+<p class="cli-note">下面第 2 步先講一件事再看指令：<b><code>HP</code> 標籤的型別依工具而異。</b>
+<code>longphase-s haplotag</code> 寫的是整數 <code>HP:i:</code>，
+<code>somatic_haplotag</code> 與整個 <code>longphase-to</code> 寫的是字串 <code>HP:Z:</code>。
+只 grep 其中一種，另一種資料會安靜地數出 0，所以下面用 <code>HP:[iZ]:</code> 同時涵蓋兩者。</p>
+
+<pre><code># 1) 在配對正常樣本裡數這個位置的 ref/alt read —— 接近一半提示 private germline
+#    第 5 欄是每條 read 在該位置讀到的字母，可以直接數（. 與 , 代表與參考相同）
+samtools mpileup -f reference.fasta -r chr1:1000000-1000000 normal.bam
+
+# 想要精確數字而不是用眼睛數，讓 bcftools 把 AD 欄挖出來
+bcftools mpileup -f reference.fasta -r chr1:1000000-1000000 -a AD normal.bam \
+  | bcftools query -f '%POS\t%REF\t%ALT\t[%AD]\n'
 
 # 2) 支持 read 落在哪一條 haplotype 上
 #    haplotag 過的 BAM 裡直接數 HP 標籤；兩邊都有支持就要提高疑慮
 samtools view tumor.haplotagged.bam chr1:1000000-1000000 \
-  | grep -o 'HP:Z:[12]' | sort | uniq -c</code></pre>
+  | grep -oE 'HP:[iZ]:[12]' | sort | uniq -c</code></pre>
 
-<p class="cli-note"><b>注意</b>：<code>HP</code> 標籤的型別依工具而異。
-<code>longphase-s haplotag</code> 寫的是整數 <code>HP:i:</code>，
-<code>somatic_haplotag</code> 與整個 <code>longphase-to</code> 寫的是字串 <code>HP:Z:</code>；
-上面的 <code>grep</code> 請依實際輸出調整。</p>
+<p class="cli-note">第 1 步的兩道指令是同一件事的兩種讀法：<code>samtools mpileup</code> 給的是可以用眼睛看的
+pileup 字串，<code>bcftools mpileup</code> 給的是 VCF —— 後者預設<b>不</b>帶 allele depth，
+所以要加 <code>-a AD</code> 才數得出來。</p>
 
 <p class="prose">兩項要合起來看。VAF 接近 0.5 可提示 private germline，
 但仍需排除污染、比對偏差與其他模型不確定性；haplotype 分布可提示 artifact，
@@ -5727,9 +5783,10 @@ samtools view tumor.haplotagged.bam chr1:1000000-1000000 \
 mosdepth --by 500 tumor_cov  tumor.bam
 mosdepth --by 500 normal_cov normal.bam
 
-# 2. 依實測 coverage 計算抽樣比例（-s 的格式是 seed.fraction）
-#    只有輸入深度已標準化時，才可用 60%／40% 近似目標 DNA fraction
-samtools view -s 1.60 -b tumor.bam  &gt; t_sub.bam
+# 2. 依實測 coverage 回推抽樣率（-s 的格式是 seed.fraction）
+#    抽樣率 =（目標 fraction × 合成後總深度）÷ 來源深度 —— 推導與五個梯度的數值見 M3
+#    以 tumor 50×、normal 25×、總深度 25×、目標 DNA fraction 0.6 為例：
+samtools view -s 1.30 -b tumor.bam  &gt; t_sub.bam
 samtools view -s 1.40 -b normal.bam &gt; n_sub.bam
 
 # 3. 合併
@@ -5765,7 +5822,7 @@ bcftools view -H -g het sample.vcf | awk '{print $1, int($2/1000000)}' | \
   </article>
 <hr>
 <article class="module" id="m09">
-    <header class="mhead"><p class="mhead__kicker">模組 9 · Methylation primer</p><h1>甲基化入門</h1><p class="mhead__sub">介紹 5mC、allele-specific methylation、MM/ML tags，以及區分直接證據與註記的方法。</p><p class="mhead__meta"><span class="chip">約 45 分鐘</span><a class="chip" href="m06.html">建議先修：Phasing</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說明 5mC 是什麼、ONT 為什麼能直接偵測它</li><li>說明 MM/ML tag 可能在流程中遺失的情況，以及保留方法</li><li>區分「甲基化當作證據」與「甲基化當作事後註記」兩種用法</li><li>說明什麼是 within-state epigenetic heterogeneity</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">模組 9 · Methylation primer</p><h1>甲基化入門</h1><p class="mhead__sub">介紹 5mC、allele-specific methylation、MM/ML tags，以及區分直接證據與註記的方法。</p><p class="mhead__meta"><span class="chip">約 45 分鐘</span><a class="chip" href="m06.html">建議先修：Phasing</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說明 5mC 是什麼、ONT 為什麼能直接偵測它</li><li>說明 MM/ML tag 可能在流程中遺失的情況，以及保留方法</li><li>區分「甲基化當作證據」與「甲基化當作事後註記」兩種用法</li><li>說明什麼是 within-ALT residual structure：固定 haplotype 與 allele 之後，仍存在的 read 層級甲基化分群</li></ul></section>
 
 <section data-part="why" class="part" id="m09__part-why">
 <h2 data-num="①" id="m09__為什麼重要">為什麼重要</h2>
@@ -6423,6 +6480,7 @@ germline 的兩側都是混合；定序錯誤的 ALT 側只是 REF 的隨機子�
 它們的 allele 與 haplotype 相同，僅依序列無法區分，但甲基化模式可能不同。</p>
 
 <p class="prose">這個現象稱為 <b>within-ALT residual structure</b>；研究依其統計定義，在七個資料集中將其量化為主要殘餘變異來源（51.2%–80.4%）。
+（<b>資料集不等於細胞株</b>：同一個細胞株可能有多份不同 basecaller／流程的資料，例如 HCC1395 就有 HKU 與 NYGC 兩份，所以資料集數會多於細胞株數。）
 換句話說：<b>固定 haplotype 與 allele 後，仍可觀察到額外的 read-level 甲基化分群。</b></p>
 
 <p class="prose">它的意義是：上一節那棵樹的<b>一個節點裡，可能還藏著更細的分群</b> ——
@@ -6520,9 +6578,11 @@ germline 的兩側都是混合；定序錯誤的 ALT 側只是 REF 的隨機子�
 <section data-part="evidence" class="part" id="m09__part-evidence">
 <h2 data-num="③" id="m09__真實證據">真實證據</h2>
 
-<p class="prose">實務限制之一是：本教材示例使用的六個細胞株中，
-<b>只有五份資料集有可用的甲基化資料</b>。
-因此使用甲基化的分析樣本數較少；甲基化較適合作為區域層級的補充證據，而非唯一判準。</p>
+<p class="prose">實務限制之一是甲基化資料的覆蓋範圍。這裡要留意計數單位：M2 列出的是<b>六個細胞株</b>，
+而評估用的是<b>資料集</b>，同一株可能有多份（HCC1395 的 HKU 與 NYGC）。
+以細胞株計，六個裡<b>只有五個有可用的甲基化資料</b>；以資料集計則多於五份。
+不論用哪個單位，能做甲基化分析的樣本都比能做序列分析的少；
+因此甲基化較適合作為區域層級的補充證據，而非唯一判準。</p>
 
 <p class="prose">研究統計各資料集中帶有<b>穩定甲基化差異</b>的 sSNV 位點比例，
 COLO829 為 9.5%、H2009 為 35.4%，資料集間差異明顯。不可評估的主要限制之一是 <b>ALT read 的 coverage 不足</b>；
@@ -6630,7 +6690,7 @@ modkit pileup methyl.bam out_hp.bed --ref reference.fasta --partition-tag HP</co
   </article>
 <hr>
 <article class="module" id="m10">
-    <header class="mhead"><p class="mhead__kicker">模組 10 · Evidence and benchmarking</p><h1>證據、驗證與效能評估</h1><p class="mhead__sub">從 precision、recall、F1、資料來源與參考標註品質，系統性評估效能結果與適用範圍。</p><p class="mhead__meta"><span class="chip">約 60 分鐘</span><a class="chip" href="m07.html">建議先修：Somatic variant calling</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>批判性解讀效能圖，而非僅依最高長條判斷</li><li>解釋為什麼 precision 明顯上升時 F1 可能幾乎不動</li><li>說明 truth set 之間的可靠度差異，以及 LongPhase-S 以加權方式處理它的做法</li><li>指出 data leakage、distribution shift 與 label noise 各自的徵兆</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">模組 10 · Evidence and benchmarking</p><h1>證據、驗證與效能評估</h1><p class="mhead__sub">從 precision、recall、F1、資料來源與參考標註品質，系統性評估效能結果與適用範圍。</p><p class="mhead__meta"><span class="chip">約 60 分鐘</span><a class="chip" href="m07.html">建議先修：Somatic variant calling</a><a class="chip" href="m08.html">建議先修：腫瘤混合體</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>批判性解讀效能圖，而非僅依最高長條判斷</li><li>解釋為什麼 precision 明顯上升時 F1 可能幾乎不動</li><li>說明 truth set 之間的可靠度差異，以及 LongPhase-S 以加權方式處理它的做法</li><li>指出 data leakage、distribution shift 與 label noise 各自的徵兆</li></ul></section>
 
 <section data-part="why" class="part" id="m10__part-why">
 <h2 data-num="①" id="m10__為什麼重要">為什麼重要</h2>
@@ -6858,6 +6918,76 @@ benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
 
 <p class="prose">λ 由 benchmark 與驗證集的正負比例估計，而非人工指定（該資料約為 1.45）；
 應同時說明估計資料、FP 總數為零時的處理，以及權重敏感度。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" class="dia-svg" role="img">
+  <title>validation loss 最低的 epoch 不等於任務目標最好的 epoch</title>
+  <desc>兩個上下並排、共用同一條 epoch 橫軸的曲線。
+        上面那條是 validation loss，越低越好：它一路下降，在第 22 個 epoch 附近才到最低點。
+        下面那條是任務導向分數，越高越好：它在第 12 個 epoch 就到最高點，之後就開始下滑。
+        兩個最高／最低點落在不同的 epoch，中間相差十個 epoch。
+        右側說明那個分數怎麼算：成功移除的假陽性，減去 λ 倍的誤刪真陽性，再除以假陽性總數，
+        λ 約為 1.45，由驗證集的正負比例估出，λ 越大表示越不容忍誤刪真陽性。
+        因此模型選的是第 12 個 epoch：那時 loss 還在下降，但任務目標已經開始變差。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">同一次訓練，兩個指標的最佳點不在同一個 epoch</text>
+
+  <!-- ══════ ① validation loss ══════ -->
+  <text class="anno bold zh warn" x="20" y="58">① validation loss —— 越低越好</text>
+
+  <line class="axis" x1="100" y1="68" x2="100" y2="168"/>
+  <line class="guide muted" x1="100" y1="168" x2="620" y2="168"/>
+
+  <path class="conn warn thick" d="M100,82 Q152,105 204,120 Q258,136 308,142
+                                   Q362,152 412,155 Q448,159 481,160
+                                   Q518,157 551,152 Q588,146 620,143"/>
+  <circle class="mark ref" cx="481" cy="160" r="7"/>
+  <text class="tick zh warn" x="500" y="182">最低點在這裡</text>
+
+  <!-- ══════ ② 任務導向分數 ══════ -->
+  <text class="anno bold zh ok" x="20" y="196">② 任務分數 —— 越高越好</text>
+
+  <line class="axis" x1="100" y1="204" x2="100" y2="304"/>
+  <line class="axis" x1="100" y1="304" x2="640" y2="304"/>
+
+  <path class="conn ok thick" d="M100,293 Q152,257 204,240 Q258,224 308,218
+                                 Q362,226 412,232 Q447,238 481,243
+                                 Q516,249 551,254 Q586,260 620,265"/>
+  <circle class="mark ref" cx="308" cy="218" r="7"/>
+  <text class="tick zh ok" x="326" y="214">最高點在這裡</text>
+
+  <!-- 兩個 epoch 的對齊虛線 -->
+  <line class="guide" x1="308" y1="68" x2="308" y2="304"/>
+  <line class="guide" x1="481" y1="68" x2="481" y2="304"/>
+
+  <!-- 橫軸刻度 -->
+  <text class="tick mid" x="100" y="324">0</text>
+  <text class="tick mid" x="273" y="324">10</text>
+  <text class="tick mid" x="457" y="324">20</text>
+  <text class="tick mid" x="620" y="324">30</text>
+  <text class="tick zh" x="654" y="324">epoch</text>
+
+  <text class="anno bold zh ok mid" x="308" y="352">↑ epoch 12：任務分數最高</text>
+  <text class="anno bold zh warn mid" x="481" y="376">↑ epoch 22：loss 最低</text>
+
+  <!-- ══════ 右：那個分數是什麼 ══════ -->
+  <rect class="box plain" x="660" y="68" width="320" height="236" rx="8"/>
+  <text class="anno bold zh" x="676" y="96">它改用什麼分數挑 epoch</text>
+
+  <text class="tick zh" x="676" y="126">成功移除的 FP − λ × 誤刪的 TP</text>
+  <line class="guide muted" x1="676" y1="138" x2="960" y2="138"/>
+  <text class="tick zh" x="676" y="160">FP 總數</text>
+
+  <text class="tick zh" x="676" y="196">λ ≈ 1.45，由正負比例算出</text>
+  <text class="tick zh" x="676" y="220">λ 越大 → 越不容忍誤刪 TP</text>
+
+  <text class="anno bold zh ok" x="676" y="258">結果選 epoch 12</text>
+  <text class="tick zh" x="676" y="284">loss 還在降，目標已經變差</text>
+
+  <!-- ══════ 結論 ══════ -->
+  <rect class="box warn" x="20" y="396" width="960" height="60" rx="8"/>
+  <text class="anno zh" x="42" y="422">loss 衡量的是平均分類誤差；任務要的是「少刪真的、多刪假的」。兩者不是同一件事。</text>
+  <text class="anno zh bold" x="42" y="446">所以模型選擇的標準要跟任務目標對齊，不是跟 loss 對齊。</text>
+</svg><figcaption>兩條曲線共用同一條 epoch 橫軸。上面的 validation loss 一路降到第 22 個 epoch 才最低；下面的任務分數第 12 個 epoch 就到頂，之後開始下滑。<b>兩個最佳點相差十個 epoch</b> —— 取 loss 最低的那一個，拿到的是一個任務目標已經變差的模型。</figcaption></figure>
 
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">核心原則</p>
@@ -7178,7 +7308,7 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
   <text class="tick mid zh" x="101" y="524">para = 17</text>
   <text class="tick mid zh" x="219" y="524">cross = 1</text>
   <line class="guide" x1="34" y1="538" x2="306" y2="538"/>
-  <text class="mono bold ok" x="34" y="568" font-size="20">ESR = 0.06</text>
+  <text class="anno mono bold ok" x="34" y="568" style="font-size:20px">ESR = 0.06</text>
   <text class="anno bold zh ok" x="34" y="596">平行連接</text>
   <text class="tick zh" x="34" y="620">ESR ≤ 0.1 → 這一票的權重</text>
   <text class="tick zh" x="34" y="640">拉到 20（正常是 1）</text>
@@ -7214,7 +7344,7 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
   <text class="tick mid zh" x="749" y="524">para = 11</text>
   <text class="tick mid zh" x="867" y="524">cross = 10</text>
   <line class="guide" x1="682" y1="538" x2="954" y2="538"/>
-  <text class="mono bold bad" x="682" y="568" font-size="20">ESR = 0.91</text>
+  <text class="anno mono bold bad" x="682" y="568" style="font-size:20px">ESR = 0.91</text>
   <text class="anno bold zh bad" x="682" y="596">整條邊丟掉</text>
   <text class="tick zh" x="682" y="620">ESR 超過門檻 0.7（-1）→</text>
   <text class="tick zh" x="682" y="640">分不出來，不參與定相</text>
@@ -7411,7 +7541,7 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
   <text class="mono" x="520" y="272">指派 A：HP1=ref、HP2=alt → 12 + 11 = 23</text>
   <text class="mono" x="520" y="298">指派 B：HP1=alt、HP2=ref →  1 +  2 = 3</text>
   <line class="guide" x1="520" y1="314" x2="966" y2="314"/>
-  <text class="mono bold ok" x="520" y="344" font-size="20">23 ÷ 26 = 0.88 &gt; 0.75</text>
+  <text class="anno mono bold ok" x="520" y="344" style="font-size:20px">23 ÷ 26 = 0.88 &gt; 0.75</text>
   <rect class="box ok" x="520" y="358" width="446" height="40" rx="6"/>
   <text class="tick zh ok" x="534" y="383">超過 snpConfidence → 這個變異保留 PS 與定相的 GT</text>
   <rect class="box bad" x="520" y="414" width="446" height="62" rx="6"/>

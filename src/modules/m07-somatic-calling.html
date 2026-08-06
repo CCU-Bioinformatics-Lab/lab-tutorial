@@ -187,7 +187,8 @@ population database set 定義一致；它不同於 GATK Mutect2 所稱的 recur
 <h2>判讀練習</h2>
 
 {{ask}}
-<p class="prose">某個腫瘤樣本中有一個候選變異，VAF = 0.48，且未被所使用的 population database set 涵蓋。<br><br>
+<p class="prose">某個腫瘤樣本的一個位點有 50 條 read 覆蓋，其中 <b>24 條支持 alt</b>（VAF = 0.48），
+且未被所使用的 population database set 涵蓋。<br><br>
 在 tumor-only 模式下，請列出需要檢查的證據與可能分類。</p>
 {{reveal}}
 <p class="prose">VAF 約 0.5 且未被族群資料庫涵蓋時，可優先考慮 private germline，
@@ -195,10 +196,14 @@ population database set 定義一致；它不同於 GATK Mutect2 所稱的 recur
 <p class="prose">在簡化的 diploid、單拷貝模型下，somatic VAF 可近似為 purity／2；
 較一般的模型還受 purity、multiplicity 與 total copy number 影響，並會受到 normal DNA、
 clonality、mapping bias 與 depth 影響，因此不能單獨依 VAF 分類。</p>
-<p class="prose">接著檢查<b>支持 read 的 haplotype 分布</b>：如果 4 條支持 read 全在同一條
-haplotype 上，與 somatic 相容；如果分散在兩條上，更像 artifact。此外還要看 copy number、
-LOH、品質與獨立證據。[[triplet graph]] 中的三種 pattern 是理想化示例，實務資料未必能完全區分，
-系統性 artifact 或 phasing error 也可能造成例外。</p>
+<p class="prose">接著檢查<b>這 24 條支持 read 的 haplotype 分布</b>：如果幾乎全部落在同一條
+haplotype 上，與「真的變異」相容（private germline 或 somatic 都會這樣）；如果大致均分在兩條上，
+更像 artifact —— 因為那等於同一個位置各自獨立突變了一次。此外還要看 copy number、LOH、品質與獨立證據。</p>
+
+<p class="prose">要注意這個判準本身是理想化的：實務資料不會這麼乾淨，
+系統性 artifact 或 phasing error 都會造成例外，所以它是提高或降低疑慮，不是定案。
+前面提到的三位點路徑結構（[[triplet graph]]）就是為了讓這個判準更穩健：
+左右鄰居都要對得上，才算得出「跟某一條既有 haplotype 只差候選這一格」的那條路徑。</p>
 {{/ask}}
 </section>
 
@@ -212,6 +217,10 @@ LOH、品質與獨立證據。[[triplet graph]] 中的三種 pattern 是理想�
 相近過濾設定下執行兩種模式，再比較結果：</p>
 
 {{cli}}
+# isec 要求 bgzip 壓縮＋索引，少了索引會直接報錯
+bcftools index -f paired.vcf.gz
+bcftools index -f tumoronly.vcf.gz
+
 # 配對模式找到、而僅腫瘤模式未找到的候選（數量依資料與設定而異）
 bcftools isec -C paired.vcf.gz tumoronly.vcf.gz | wc -l
 
@@ -219,24 +228,36 @@ bcftools isec -C paired.vcf.gz tumoronly.vcf.gz | wc -l
 bcftools isec -C tumoronly.vcf.gz paired.vcf.gz | wc -l
 {{/cli}}
 
+<p class="cli-note">若檔案還是未壓縮的 <code>.vcf</code>，先 <code>bcftools view -Oz -o out.vcf.gz in.vcf</code>
+轉成 bgzip 格式再建索引；一般的 <code>gzip</code> 壓出來的檔案 <code>bcftools index</code> 不接受。</p>
+
 <h3>檢查多出來的候選是什麼</h3>
 
 <p class="prose">上面第二條指令的輸出，就是本模組那張圖裡的位置 ③。逐項檢查它們：</p>
 
+<p class="cli-note">下面第 2 步先講一件事再看指令：<b><code>HP</code> 標籤的型別依工具而異。</b>
+<code>longphase-s haplotag</code> 寫的是整數 <code>HP:i:</code>，
+<code>somatic_haplotag</code> 與整個 <code>longphase-to</code> 寫的是字串 <code>HP:Z:</code>。
+只 grep 其中一種，另一種資料會安靜地數出 0，所以下面用 <code>HP:[iZ]:</code> 同時涵蓋兩者。</p>
+
 {{cli}}
-# 1) 在配對正常樣本裡的 VAF —— 接近 0.5 提示 private germline
-bcftools mpileup -f reference.fasta -r chr1:1000000 normal.bam | less
+# 1) 在配對正常樣本裡數這個位置的 ref/alt read —— 接近一半提示 private germline
+#    第 5 欄是每條 read 在該位置讀到的字母，可以直接數（. 與 , 代表與參考相同）
+samtools mpileup -f reference.fasta -r chr1:1000000-1000000 normal.bam
+
+# 想要精確數字而不是用眼睛數，讓 bcftools 把 AD 欄挖出來
+bcftools mpileup -f reference.fasta -r chr1:1000000-1000000 -a AD normal.bam \
+  | bcftools query -f '%POS\t%REF\t%ALT\t[%AD]\n'
 
 # 2) 支持 read 落在哪一條 haplotype 上
 #    haplotag 過的 BAM 裡直接數 HP 標籤；兩邊都有支持就要提高疑慮
 samtools view tumor.haplotagged.bam chr1:1000000-1000000 \
-  | grep -o 'HP:Z:[12]' | sort | uniq -c
+  | grep -oE 'HP:[iZ]:[12]' | sort | uniq -c
 {{/cli}}
 
-<p class="cli-note"><b>注意</b>：<code>HP</code> 標籤的型別依工具而異。
-<code>longphase-s haplotag</code> 寫的是整數 <code>HP:i:</code>，
-<code>somatic_haplotag</code> 與整個 <code>longphase-to</code> 寫的是字串 <code>HP:Z:</code>；
-上面的 <code>grep</code> 請依實際輸出調整。</p>
+<p class="cli-note">第 1 步的兩道指令是同一件事的兩種讀法：<code>samtools mpileup</code> 給的是可以用眼睛看的
+pileup 字串，<code>bcftools mpileup</code> 給的是 VCF —— 後者預設<b>不</b>帶 allele depth，
+所以要加 <code>-a AD</code> 才數得出來。</p>
 
 <p class="prose">兩項要合起來看。VAF 接近 0.5 可提示 private germline，
 但仍需排除污染、比對偏差與其他模型不確定性；haplotype 分布可提示 artifact，

@@ -121,12 +121,16 @@ caller 版本、benchmark 來源與混合方式）與結果一併記錄。</p>
 建立預先設定的合成梯度：</p>
 
 {{cli}}
-# 1. 先量出兩個 BAM 的實際 coverage
+# 1. 先量出兩個 BAM 的實際 coverage（本例量到 tumor 50×、normal 25×）
 mosdepth --by 500 tumor_cov  tumor.bam
 mosdepth --by 500 normal_cov normal.bam
 
-# 2. 依實測 coverage 與目標 DNA fraction 計算抽樣比例（以下僅為深度已標準化的示意）
-samtools view -s 1.60 -b tumor.bam  > tumor_sub.bam
+# 2. 抽樣率不是目標 fraction，要從實測深度回推：
+#      抽樣率 = （目標 fraction × 合成後總深度）÷ 來源深度
+#    總深度取 25×（兩邊都拿得出來），目標 DNA fraction 0.6：
+#      tumor  需要 0.6×25 = 15× → 15 ÷ 50 = 0.30
+#      normal 需要 0.4×25 = 10× → 10 ÷ 25 = 0.40
+samtools view -s 1.30 -b tumor.bam  > tumor_sub.bam
 samtools view -s 1.40 -b normal.bam > normal_sub.bam
 
 # 3. 合併成指定 DNA fraction 的樣本
@@ -134,8 +138,25 @@ samtools merge dna_frac_0.6.bam tumor_sub.bam normal_sub.bam
 samtools index dna_frac_0.6.bam
 {{/cli}}
 
-<p class="cli-note">此示例以 tumor coverage 50×、normal 25× 建立 1.0 / 0.8 / 0.6 / 0.4 / 0.2 梯度。
-此類 coverage 混合直接控制的是 <b>tumor DNA/read fraction</b>；若來源深度未標準化，不能直接以 0.60／0.40 作抽樣率。</p>
+<p class="cli-note"><b><code>-s</code> 的小數部分是抽樣率，不是你要的 fraction。</b>
+兩個來源深度不同時直接填 0.60／0.40 會得到 30×:10× ＝ 0.75，不是 0.6。
+以 tumor 50×、normal 25×、合成後總深度 25× 為例，五個梯度的抽樣率是：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>目標 tumor DNA fraction</th><th>tumor 抽樣率</th><th>normal 抽樣率</th></tr></thead>
+<tbody>
+<tr><td>0.2</td><td><code>-s 1.10</code></td><td><code>-s 1.80</code></td></tr>
+<tr><td>0.4</td><td><code>-s 1.20</code></td><td><code>-s 1.60</code></td></tr>
+<tr><td>0.6</td><td><code>-s 1.30</code></td><td><code>-s 1.40</code></td></tr>
+<tr><td>0.8</td><td><code>-s 1.40</code></td><td><code>-s 1.20</code></td></tr>
+<tr><td>1.0</td><td><code>-s 1.50</code></td><td>不混入 normal</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="cli-note">這樣控制的是 <b>tumor DNA/read fraction</b>，五個樣本的總深度也才一致 ——
+否則深度與 fraction 兩個變數會同時在動，之後看到效能下降就分不清是哪一個造成的。</p>
 
 {{guard:2 | tumor cellular purity 不等於 tumor DNA fraction}}
 <p class="prose">上述配方依 coverage 近似控制 DNA 量。在來源 tumor BAM 接近純腫瘤、

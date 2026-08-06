@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400">
   <title>低腫瘤比例為什麼難：把數字算出來就懂了</title>
-  <desc>在本簡化模型中，定序深度相同時，腫瘤細胞比例越低，支持一個真變異的 read 數就越少。
-        在腫瘤佔兩成且符合模型假設的樣本上，一個所有腫瘤細胞都帶有的變異期望約有五條 read 支持。
+  <desc>在本簡化模型中，定序深度相同時，腫瘤 DNA 在樣本中的佔比越低，支持一個真變異的 read 數就越少。
+        在腫瘤 DNA 佔兩成且符合模型假設的樣本上，一個所有腫瘤細胞都帶有的變異期望約有五條 read 支持。
         定序本身也可能在位置產生錯誤 read；背景若接近真訊號，會增加低比例樣本的判讀困難。</desc>
 
-  <text class="lbl bold zh" x="20" y="32">同樣 50× 的定序深度，腫瘤比例不同的結果</text>
+  <text class="lbl bold zh" x="20" y="32">同樣 50× 的定序深度，腫瘤 DNA 佔比不同的結果</text>
 
   <!-- 表頭 -->
-  <text class="tick zh bold" x="40" y="72">腫瘤比例</text>
+  <text class="tick zh bold" x="40" y="72">腫瘤 DNA 佔比</text>
   <text class="tick zh bold" x="180" y="72">支持真變異的 read 數</text>
   <text class="tick zh bold" x="700" y="72">好不好判斷</text>
 
@@ -87,7 +87,7 @@
 
   <!-- 結論 -->
   <rect class="box bad" x="20" y="300" width="960" height="84" rx="8"/>
-  <text class="anno bold zh bad" x="42" y="330">在本模型中，腫瘤佔 20% 時期望真訊號約 5 條，背景約 1–2 條。</text>
+  <text class="anno bold zh bad" x="42" y="330">在本模型中，腫瘤 DNA 佔 20% 時期望真訊號約 5 條，背景約 1–2 條。</text>
   <text class="anno zh" x="42" y="358">兩者距離較近，過濾門檻會面臨 precision–recall 取捨。</text>
   <text class="anno zh bold" x="42" y="378">門檻過嚴可能漏掉真變異，過鬆則可能保留較多假陽性；實際結果依資料與模型而異。</text>
 </svg>

@@ -68,7 +68,7 @@
   <text class="tick mid zh" x="101" y="524">para = 17</text>
   <text class="tick mid zh" x="219" y="524">cross = 1</text>
   <line class="guide" x1="34" y1="538" x2="306" y2="538"/>
-  <text class="mono bold ok" x="34" y="568" font-size="20">ESR = 0.06</text>
+  <text class="anno mono bold ok" x="34" y="568" style="font-size:20px">ESR = 0.06</text>
   <text class="anno bold zh ok" x="34" y="596">平行連接</text>
   <text class="tick zh" x="34" y="620">ESR ≤ 0.1 → 這一票的權重</text>
   <text class="tick zh" x="34" y="640">拉到 20（正常是 1）</text>
@@ -104,7 +104,7 @@
   <text class="tick mid zh" x="749" y="524">para = 11</text>
   <text class="tick mid zh" x="867" y="524">cross = 10</text>
   <line class="guide" x1="682" y1="538" x2="954" y2="538"/>
-  <text class="mono bold bad" x="682" y="568" font-size="20">ESR = 0.91</text>
+  <text class="anno mono bold bad" x="682" y="568" style="font-size:20px">ESR = 0.91</text>
   <text class="anno bold zh bad" x="682" y="596">整條邊丟掉</text>
   <text class="tick zh" x="682" y="620">ESR 超過門檻 0.7（-1）→</text>
   <text class="tick zh" x="682" y="640">分不出來，不參與定相</text>

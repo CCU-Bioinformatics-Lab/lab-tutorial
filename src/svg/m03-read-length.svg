@@ -36,7 +36,7 @@
 
   <!-- 中間的斷裂 -->
   <text class="anno mid zh bad bold" x="500" y="126">沒有任何一條 read 能同時跨過兩個位點</text>
-  <text class="anno mid zh" x="500" y="152">→ 兩個變異是不是在同一條分子上？<tspan class="bad bold">無法判斷</tspan></text>
+  <text class="anno mid zh" x="500" y="152">→ 兩個變異是不是在同一條分子上？<tspan class="anno bad bold">無法判斷</tspan></text>
 
   <!-- ══ 下：ONT ════════════════════════════════════════════════ -->
   <rect class="box accent" x="16" y="206" width="968" height="180" rx="10"/>

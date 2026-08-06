@@ -100,13 +100,27 @@
 .dia-svg .mid  { text-anchor: middle; }
 .dia-svg .end  { text-anchor: end; }
 
-.dia-svg .lbl.hp1, .dia-svg .anno.hp1 { fill: var(--hp1); }
-.dia-svg .lbl.hp2, .dia-svg .anno.hp2 { fill: var(--hp2); }
-.dia-svg .lbl.somatic,  .dia-svg .anno.somatic  { fill: var(--somatic); }
-.dia-svg .lbl.germline, .dia-svg .anno.germline { fill: var(--germline); }
-.dia-svg .lbl.artifact, .dia-svg .anno.artifact { fill: var(--artifact); }
-.dia-svg .lbl.ok  { fill: var(--ok); }
-.dia-svg .lbl.bad { fill: var(--bad); }
+/* 文字的語意色。
+   ★ 四個尺寸 class 都要列出來，不能只寫 .lbl 與 .anno ★
+   曾經只有 .lbl / .anno 有規則，於是全專案 285 處 .tick.somatic、.anno.ok…
+   統統被 .tick / .anno 的 var(--muted) 吃掉，安安靜靜地印成灰色。
+   沒有錯誤訊息，而且灰字看起來也「像是本來就這樣」，所以三十張圖都沒人發現。
+   新增語意色時，四個尺寸一起加。
+
+   ★ .base 刻意不列入 ★
+   鹼基字母的色相屬於 base-a/c/g/t 那一套。給它 .somatic / .artifact 的色相
+   會讓兩套編碼撞在同一種形狀上（見本檔開頭的色相不撞規則）——
+   要強調某個字母，用框線或底色，不要換字的顏色。 */
+.dia-svg .ttl.hp1, .dia-svg .lbl.hp1, .dia-svg .anno.hp1, .dia-svg .tick.hp1 { fill: var(--hp1); }
+.dia-svg .ttl.hp2, .dia-svg .lbl.hp2, .dia-svg .anno.hp2, .dia-svg .tick.hp2 { fill: var(--hp2); }
+.dia-svg .ttl.somatic,  .dia-svg .lbl.somatic,  .dia-svg .anno.somatic,  .dia-svg .tick.somatic  { fill: var(--somatic); }
+.dia-svg .ttl.germline, .dia-svg .lbl.germline, .dia-svg .anno.germline, .dia-svg .tick.germline { fill: var(--germline); }
+.dia-svg .ttl.artifact, .dia-svg .lbl.artifact, .dia-svg .anno.artifact, .dia-svg .tick.artifact { fill: var(--artifact); }
+.dia-svg .ttl.met,      .dia-svg .lbl.met,      .dia-svg .anno.met,      .dia-svg .tick.met      { fill: var(--met); }
+.dia-svg .ttl.accent,   .dia-svg .lbl.accent,   .dia-svg .anno.accent,   .dia-svg .tick.accent   { fill: var(--accent); }
+.dia-svg .ttl.ok,   .dia-svg .lbl.ok,   .dia-svg .anno.ok,   .dia-svg .tick.ok   { fill: var(--ok); }
+.dia-svg .ttl.warn, .dia-svg .lbl.warn, .dia-svg .anno.warn, .dia-svg .tick.warn { fill: var(--warn); }
+.dia-svg .ttl.bad,  .dia-svg .lbl.bad,  .dia-svg .anno.bad,  .dia-svg .tick.bad  { fill: var(--bad); }
 
 /* --- 線條 / 座標軸 / 導引線 --------------------------------------------- */
 .dia-svg .axis  { stroke: var(--rule-strong); stroke-width: 2; fill: none; }

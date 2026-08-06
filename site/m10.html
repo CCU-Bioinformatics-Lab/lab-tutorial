@@ -53,7 +53,7 @@
 
 <div class="wrap ">
   <main class="main" id="main">
-    <header class="mhead"><p class="mhead__kicker">模組 10 · Evidence and benchmarking</p><h1>證據、驗證與效能評估</h1><p class="mhead__sub">從 precision、recall、F1、資料來源與參考標註品質，系統性評估效能結果與適用範圍。</p><p class="mhead__meta"><span class="chip">約 60 分鐘</span><a class="chip" href="m07.html">建議先修：Somatic variant calling</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>批判性解讀效能圖，而非僅依最高長條判斷</li><li>解釋為什麼 precision 明顯上升時 F1 可能幾乎不動</li><li>說明 truth set 之間的可靠度差異，以及 LongPhase-S 以加權方式處理它的做法</li><li>指出 data leakage、distribution shift 與 label noise 各自的徵兆</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">模組 10 · Evidence and benchmarking</p><h1>證據、驗證與效能評估</h1><p class="mhead__sub">從 precision、recall、F1、資料來源與參考標註品質，系統性評估效能結果與適用範圍。</p><p class="mhead__meta"><span class="chip">約 60 分鐘</span><a class="chip" href="m07.html">建議先修：Somatic variant calling</a><a class="chip" href="m08.html">建議先修：腫瘤混合體</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>批判性解讀效能圖，而非僅依最高長條判斷</li><li>解釋為什麼 precision 明顯上升時 F1 可能幾乎不動</li><li>說明 truth set 之間的可靠度差異，以及 LongPhase-S 以加權方式處理它的做法</li><li>指出 data leakage、distribution shift 與 label noise 各自的徵兆</li></ul></section>
 
 <section data-part="why" class="part" id="part-why">
 <h2 data-num="①" id="為什麼重要">為什麼重要</h2>
@@ -281,6 +281,76 @@ benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
 
 <p class="prose">λ 由 benchmark 與驗證集的正負比例估計，而非人工指定（該資料約為 1.45）；
 應同時說明估計資料、FP 總數為零時的處理，以及權重敏感度。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" class="dia-svg" role="img">
+  <title>validation loss 最低的 epoch 不等於任務目標最好的 epoch</title>
+  <desc>兩個上下並排、共用同一條 epoch 橫軸的曲線。
+        上面那條是 validation loss，越低越好：它一路下降，在第 22 個 epoch 附近才到最低點。
+        下面那條是任務導向分數，越高越好：它在第 12 個 epoch 就到最高點，之後就開始下滑。
+        兩個最高／最低點落在不同的 epoch，中間相差十個 epoch。
+        右側說明那個分數怎麼算：成功移除的假陽性，減去 λ 倍的誤刪真陽性，再除以假陽性總數，
+        λ 約為 1.45，由驗證集的正負比例估出，λ 越大表示越不容忍誤刪真陽性。
+        因此模型選的是第 12 個 epoch：那時 loss 還在下降，但任務目標已經開始變差。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">同一次訓練，兩個指標的最佳點不在同一個 epoch</text>
+
+  <!-- ══════ ① validation loss ══════ -->
+  <text class="anno bold zh warn" x="20" y="58">① validation loss —— 越低越好</text>
+
+  <line class="axis" x1="100" y1="68" x2="100" y2="168"/>
+  <line class="guide muted" x1="100" y1="168" x2="620" y2="168"/>
+
+  <path class="conn warn thick" d="M100,82 Q152,105 204,120 Q258,136 308,142
+                                   Q362,152 412,155 Q448,159 481,160
+                                   Q518,157 551,152 Q588,146 620,143"/>
+  <circle class="mark ref" cx="481" cy="160" r="7"/>
+  <text class="tick zh warn" x="500" y="182">最低點在這裡</text>
+
+  <!-- ══════ ② 任務導向分數 ══════ -->
+  <text class="anno bold zh ok" x="20" y="196">② 任務分數 —— 越高越好</text>
+
+  <line class="axis" x1="100" y1="204" x2="100" y2="304"/>
+  <line class="axis" x1="100" y1="304" x2="640" y2="304"/>
+
+  <path class="conn ok thick" d="M100,293 Q152,257 204,240 Q258,224 308,218
+                                 Q362,226 412,232 Q447,238 481,243
+                                 Q516,249 551,254 Q586,260 620,265"/>
+  <circle class="mark ref" cx="308" cy="218" r="7"/>
+  <text class="tick zh ok" x="326" y="214">最高點在這裡</text>
+
+  <!-- 兩個 epoch 的對齊虛線 -->
+  <line class="guide" x1="308" y1="68" x2="308" y2="304"/>
+  <line class="guide" x1="481" y1="68" x2="481" y2="304"/>
+
+  <!-- 橫軸刻度 -->
+  <text class="tick mid" x="100" y="324">0</text>
+  <text class="tick mid" x="273" y="324">10</text>
+  <text class="tick mid" x="457" y="324">20</text>
+  <text class="tick mid" x="620" y="324">30</text>
+  <text class="tick zh" x="654" y="324">epoch</text>
+
+  <text class="anno bold zh ok mid" x="308" y="352">↑ epoch 12：任務分數最高</text>
+  <text class="anno bold zh warn mid" x="481" y="376">↑ epoch 22：loss 最低</text>
+
+  <!-- ══════ 右：那個分數是什麼 ══════ -->
+  <rect class="box plain" x="660" y="68" width="320" height="236" rx="8"/>
+  <text class="anno bold zh" x="676" y="96">它改用什麼分數挑 epoch</text>
+
+  <text class="tick zh" x="676" y="126">成功移除的 FP − λ × 誤刪的 TP</text>
+  <line class="guide muted" x1="676" y1="138" x2="960" y2="138"/>
+  <text class="tick zh" x="676" y="160">FP 總數</text>
+
+  <text class="tick zh" x="676" y="196">λ ≈ 1.45，由正負比例算出</text>
+  <text class="tick zh" x="676" y="220">λ 越大 → 越不容忍誤刪 TP</text>
+
+  <text class="anno bold zh ok" x="676" y="258">結果選 epoch 12</text>
+  <text class="tick zh" x="676" y="284">loss 還在降，目標已經變差</text>
+
+  <!-- ══════ 結論 ══════ -->
+  <rect class="box warn" x="20" y="396" width="960" height="60" rx="8"/>
+  <text class="anno zh" x="42" y="422">loss 衡量的是平均分類誤差；任務要的是「少刪真的、多刪假的」。兩者不是同一件事。</text>
+  <text class="anno zh bold" x="42" y="446">所以模型選擇的標準要跟任務目標對齊，不是跟 loss 對齊。</text>
+</svg><figcaption>兩條曲線共用同一條 epoch 橫軸。上面的 validation loss 一路降到第 22 個 epoch 才最低；下面的任務分數第 12 個 epoch 就到頂，之後開始下滑。<b>兩個最佳點相差十個 epoch</b> —— 取 loss 最低的那一個，拿到的是一個任務目標已經變差的模型。</figcaption></figure>
 
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">核心原則</p>

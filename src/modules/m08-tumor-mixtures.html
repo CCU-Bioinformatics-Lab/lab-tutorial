@@ -228,9 +228,10 @@
 mosdepth --by 500 tumor_cov  tumor.bam
 mosdepth --by 500 normal_cov normal.bam
 
-# 2. 依實測 coverage 計算抽樣比例（-s 的格式是 seed.fraction）
-#    只有輸入深度已標準化時，才可用 60%／40% 近似目標 DNA fraction
-samtools view -s 1.60 -b tumor.bam  > t_sub.bam
+# 2. 依實測 coverage 回推抽樣率（-s 的格式是 seed.fraction）
+#    抽樣率 =（目標 fraction × 合成後總深度）÷ 來源深度 —— 推導與五個梯度的數值見 M3
+#    以 tumor 50×、normal 25×、總深度 25×、目標 DNA fraction 0.6 為例：
+samtools view -s 1.30 -b tumor.bam  > t_sub.bam
 samtools view -s 1.40 -b normal.bam > n_sub.bam
 
 # 3. 合併
