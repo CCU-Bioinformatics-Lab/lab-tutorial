@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540">
+  <title>定相的結果有三條軌道，以及它們怎麼寫成 VCF 的 GT、GT2、GT3</title>
+  <desc>上半部是六個位置的定相結果。左邊四個位置在正常區，兩條 germline haplotype 都在；
+        右邊兩個位置落在 LOH 區，HP1 整段不存在，圖上畫成灰色虛線的空軌道。
+        第三條軌道 HP2-1 是 HP2 的體細胞後代：它跟 HP2 完全一樣，只有帶紅點的兩個位置不同。
+        下半部把其中三個位置的 VCF 欄位攤開來看。
+        一般的遺傳變異只有 GT；正常區的體細胞變異 GT 是 0 直槓 0，靠 GT2 說明它長在哪一條上；
+        LOH 區的位置 GT 有一側寫成一個點，表示那一條 haplotype 不存在，
+        而 GT2 與 GT3 分別代表剩下那一條再往下分出來的兩支。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">定相的結果：三條軌道，以及它們怎麼寫進 VCF</text>
+  <text class="tick zh" x="20" y="58">同一條 read 上看到的 allele 被連起來，就得到下面三條軌道。</text>
+
+  <!-- 區域 -->
+  <text class="anno mid zh" x="420" y="90">正常區：兩條都在</text>
+  <text class="anno mid zh" x="790" y="90">LOH 區：只剩一條</text>
+  <line class="axis" x1="200" y1="100" x2="940" y2="100"/>
+  <line class="axis" x1="640" y1="94" x2="640" y2="240" style="stroke-dasharray:6 4"/>
+
+  <!-- 軌道 -->
+  <text class="tick end hp1 bold" x="190" y="142">HP1</text>
+  <rect class="read hp1" x="200" y="130" width="440" height="15" rx="7.5"/>
+  <rect class="read hp0 ghost" x="640" y="130" width="300" height="15" rx="7.5"/>
+  <text class="tick mid zh" x="790" y="142">整段不存在</text>
+
+  <text class="tick end hp2 bold" x="190" y="188">HP2</text>
+  <rect class="read hp2" x="200" y="176" width="740" height="15" rx="7.5"/>
+
+  <text class="tick end hp2 bold" x="190" y="234">HP2-1</text>
+  <rect class="read hp2" x="200" y="222" width="740" height="15" rx="7.5"/>
+
+  <text class="base a mono mid" x="260" y="142" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="360" y="142" style="font-size:15px">G</text>
+  <text class="base a mono mid" x="460" y="142" style="font-size:15px">A</text>
+  <text class="base c mono mid" x="560" y="142" style="font-size:15px">C</text>
+
+  <text class="base g mono mid" x="260" y="188" style="font-size:15px">G</text>
+  <text class="base g mono mid" x="360" y="188" style="font-size:15px">G</text>
+  <text class="base t mono mid" x="460" y="188" style="font-size:15px">T</text>
+  <text class="base t mono mid" x="560" y="188" style="font-size:15px">T</text>
+  <text class="base g mono mid" x="720" y="188" style="font-size:15px">G</text>
+  <text class="base t mono mid" x="840" y="188" style="font-size:15px">T</text>
+
+  <text class="base g mono mid" x="260" y="234" style="font-size:15px">G</text>
+  <text class="base a mono mid" x="360" y="234" style="font-size:15px">A</text>
+  <text class="base t mono mid" x="460" y="234" style="font-size:15px">T</text>
+  <text class="base t mono mid" x="560" y="234" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="720" y="234" style="font-size:15px">A</text>
+  <text class="base t mono mid" x="840" y="234" style="font-size:15px">T</text>
+
+  <!-- 體細胞變異：read 上方的小圓 -->
+  <circle class="mark somatic" cx="360" cy="214" r="6"/>
+  <circle class="mark somatic" cx="720" cy="214" r="6"/>
+  <text class="anno somatic bold zh" x="736" y="266">紅點 ＝ 只有癌細胞才有的變異</text>
+
+  <text class="tick zh" x="200" y="266">HP2-1 跟 HP2 只差紅點那兩格 —— 它是 HP2 的後代</text>
+
+  <!-- 引線 -->
+  <path class="guide" d="M260,246 L170,296"/>
+  <path class="guide" d="M360,246 L500,296"/>
+  <path class="guide" d="M720,246 L830,296"/>
+
+  <!-- ══ 三個位置攤開來看 ══ -->
+  <rect class="box plain" x="20" y="300" width="300" height="222" rx="10"/>
+  <text class="anno bold zh" x="40" y="330">① 一般的遺傳變異</text>
+  <text class="tick mono" x="40" y="362">GT</text>
+  <text class="tick mono bold" x="98" y="362">0|1</text>
+  <text class="tick mono" x="40" y="386">GT2</text>
+  <text class="tick mono" x="98" y="386">./.</text>
+  <text class="tick mono" x="40" y="410">GT3</text>
+  <text class="tick mono" x="98" y="410">./.</text>
+  <text class="tick zh" x="40" y="444">兩條 haplotype 一邊 ref、</text>
+  <text class="tick zh" x="40" y="468">一邊 alt，跟癌症無關。</text>
+  <text class="tick zh" x="40" y="500">GT2、GT3 空著。</text>
+
+  <rect class="box plain" x="350" y="300" width="300" height="222" rx="10"/>
+  <text class="anno bold zh somatic" x="370" y="330">② 正常區裡的體細胞變異</text>
+  <text class="tick mono" x="370" y="362">GT</text>
+  <text class="tick mono" x="428" y="362">0|0</text>
+  <text class="tick mono" x="370" y="386">GT2</text>
+  <text class="tick mono bold" x="428" y="386">.|1</text>
+  <text class="tick mono" x="370" y="410">GT3</text>
+  <text class="tick mono" x="428" y="410">./.</text>
+  <text class="tick zh" x="370" y="444">兩條 germline 都是 ref，</text>
+  <text class="tick zh" x="370" y="468">所以 GT 是 0|0。</text>
+  <text class="tick zh" x="370" y="500">GT2 第二格是 1 ＝ 長在 HP2 上。</text>
+
+  <rect class="box plain" x="680" y="300" width="300" height="222" rx="10"/>
+  <text class="anno bold zh somatic" x="700" y="330">③ LOH 區裡的體細胞變異</text>
+  <text class="tick mono" x="700" y="362">GT</text>
+  <text class="tick mono bold" x="758" y="362">0|.</text>
+  <text class="tick mono" x="700" y="386">GT2</text>
+  <text class="tick mono" x="758" y="386">1|.</text>
+  <text class="tick mono" x="700" y="410">GT3</text>
+  <text class="tick mono" x="758" y="410">0|.</text>
+  <text class="tick zh" x="700" y="444">GT 有一側是「.」，代表</text>
+  <text class="tick zh" x="700" y="468">那一條 haplotype 不存在。</text>
+  <text class="tick zh" x="700" y="500">GT2 與 GT3 是剩下那條的兩支。</text>
+</svg>

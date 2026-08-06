@@ -28,78 +28,78 @@
   <rect class="box ghost" x="194" y="96" width="28" height="216" rx="4"/>
 
   <!-- 參考序列 -->
-  <text class="base c mono" x="124" y="112" font-size="14">C</text>
-  <text class="base t mono" x="152" y="112" font-size="14">T</text>
-  <text class="base a mono" x="180" y="112" font-size="14">A</text>
-  <text class="base a mono" x="208" y="112" font-size="14">A</text>
-  <text class="base g mono" x="236" y="112" font-size="14">G</text>
-  <text class="base c mono" x="264" y="112" font-size="14">C</text>
-  <text class="base t mono" x="292" y="112" font-size="14">T</text>
+  <text class="base c mono" x="124" y="112" font-size="15">C</text>
+  <text class="base t mono" x="152" y="112" font-size="15">T</text>
+  <text class="base a mono" x="180" y="112" font-size="15">A</text>
+  <text class="base a mono" x="208" y="112" font-size="15">A</text>
+  <text class="base g mono" x="236" y="112" font-size="15">G</text>
+  <text class="base c mono" x="264" y="112" font-size="15">C</text>
+  <text class="base t mono" x="292" y="112" font-size="15">T</text>
 
   <!-- 八條 read：奇數列帶 G（alt），偶數列與參考相同 -->
-  <text class="base c mono" x="124" y="138" font-size="14">C</text>
-  <text class="base t mono" x="152" y="138" font-size="14">T</text>
-  <text class="base a mono" x="180" y="138" font-size="14">A</text>
-  <text class="base g mono" x="208" y="138" font-size="14">G</text>
-  <text class="base g mono" x="236" y="138" font-size="14">G</text>
-  <text class="base c mono" x="264" y="138" font-size="14">C</text>
-  <text class="base t mono" x="292" y="138" font-size="14">T</text>
+  <text class="base c mono" x="124" y="138" font-size="15">C</text>
+  <text class="base t mono" x="152" y="138" font-size="15">T</text>
+  <text class="base a mono" x="180" y="138" font-size="15">A</text>
+  <text class="base g mono" x="208" y="138" font-size="15">G</text>
+  <text class="base g mono" x="236" y="138" font-size="15">G</text>
+  <text class="base c mono" x="264" y="138" font-size="15">C</text>
+  <text class="base t mono" x="292" y="138" font-size="15">T</text>
 
-  <text class="base c mono" x="124" y="162" font-size="14">C</text>
-  <text class="base t mono" x="152" y="162" font-size="14">T</text>
-  <text class="base a mono" x="180" y="162" font-size="14">A</text>
-  <text class="base a mono" x="208" y="162" font-size="14">A</text>
-  <text class="base g mono" x="236" y="162" font-size="14">G</text>
-  <text class="base c mono" x="264" y="162" font-size="14">C</text>
-  <text class="base t mono" x="292" y="162" font-size="14">T</text>
+  <text class="base c mono" x="124" y="162" font-size="15">C</text>
+  <text class="base t mono" x="152" y="162" font-size="15">T</text>
+  <text class="base a mono" x="180" y="162" font-size="15">A</text>
+  <text class="base a mono" x="208" y="162" font-size="15">A</text>
+  <text class="base g mono" x="236" y="162" font-size="15">G</text>
+  <text class="base c mono" x="264" y="162" font-size="15">C</text>
+  <text class="base t mono" x="292" y="162" font-size="15">T</text>
 
-  <text class="base c mono" x="124" y="186" font-size="14">C</text>
-  <text class="base t mono" x="152" y="186" font-size="14">T</text>
-  <text class="base a mono" x="180" y="186" font-size="14">A</text>
-  <text class="base g mono" x="208" y="186" font-size="14">G</text>
-  <text class="base g mono" x="236" y="186" font-size="14">G</text>
-  <text class="base c mono" x="264" y="186" font-size="14">C</text>
-  <text class="base t mono" x="292" y="186" font-size="14">T</text>
+  <text class="base c mono" x="124" y="186" font-size="15">C</text>
+  <text class="base t mono" x="152" y="186" font-size="15">T</text>
+  <text class="base a mono" x="180" y="186" font-size="15">A</text>
+  <text class="base g mono" x="208" y="186" font-size="15">G</text>
+  <text class="base g mono" x="236" y="186" font-size="15">G</text>
+  <text class="base c mono" x="264" y="186" font-size="15">C</text>
+  <text class="base t mono" x="292" y="186" font-size="15">T</text>
 
-  <text class="base c mono" x="124" y="210" font-size="14">C</text>
-  <text class="base t mono" x="152" y="210" font-size="14">T</text>
-  <text class="base a mono" x="180" y="210" font-size="14">A</text>
-  <text class="base a mono" x="208" y="210" font-size="14">A</text>
-  <text class="base g mono" x="236" y="210" font-size="14">G</text>
-  <text class="base c mono" x="264" y="210" font-size="14">C</text>
-  <text class="base t mono" x="292" y="210" font-size="14">T</text>
+  <text class="base c mono" x="124" y="210" font-size="15">C</text>
+  <text class="base t mono" x="152" y="210" font-size="15">T</text>
+  <text class="base a mono" x="180" y="210" font-size="15">A</text>
+  <text class="base a mono" x="208" y="210" font-size="15">A</text>
+  <text class="base g mono" x="236" y="210" font-size="15">G</text>
+  <text class="base c mono" x="264" y="210" font-size="15">C</text>
+  <text class="base t mono" x="292" y="210" font-size="15">T</text>
 
-  <text class="base c mono" x="124" y="234" font-size="14">C</text>
-  <text class="base t mono" x="152" y="234" font-size="14">T</text>
-  <text class="base a mono" x="180" y="234" font-size="14">A</text>
-  <text class="base g mono" x="208" y="234" font-size="14">G</text>
-  <text class="base g mono" x="236" y="234" font-size="14">G</text>
-  <text class="base c mono" x="264" y="234" font-size="14">C</text>
-  <text class="base t mono" x="292" y="234" font-size="14">T</text>
+  <text class="base c mono" x="124" y="234" font-size="15">C</text>
+  <text class="base t mono" x="152" y="234" font-size="15">T</text>
+  <text class="base a mono" x="180" y="234" font-size="15">A</text>
+  <text class="base g mono" x="208" y="234" font-size="15">G</text>
+  <text class="base g mono" x="236" y="234" font-size="15">G</text>
+  <text class="base c mono" x="264" y="234" font-size="15">C</text>
+  <text class="base t mono" x="292" y="234" font-size="15">T</text>
 
-  <text class="base c mono" x="124" y="258" font-size="14">C</text>
-  <text class="base t mono" x="152" y="258" font-size="14">T</text>
-  <text class="base a mono" x="180" y="258" font-size="14">A</text>
-  <text class="base a mono" x="208" y="258" font-size="14">A</text>
-  <text class="base g mono" x="236" y="258" font-size="14">G</text>
-  <text class="base c mono" x="264" y="258" font-size="14">C</text>
-  <text class="base t mono" x="292" y="258" font-size="14">T</text>
+  <text class="base c mono" x="124" y="258" font-size="15">C</text>
+  <text class="base t mono" x="152" y="258" font-size="15">T</text>
+  <text class="base a mono" x="180" y="258" font-size="15">A</text>
+  <text class="base a mono" x="208" y="258" font-size="15">A</text>
+  <text class="base g mono" x="236" y="258" font-size="15">G</text>
+  <text class="base c mono" x="264" y="258" font-size="15">C</text>
+  <text class="base t mono" x="292" y="258" font-size="15">T</text>
 
-  <text class="base c mono" x="124" y="282" font-size="14">C</text>
-  <text class="base t mono" x="152" y="282" font-size="14">T</text>
-  <text class="base a mono" x="180" y="282" font-size="14">A</text>
-  <text class="base g mono" x="208" y="282" font-size="14">G</text>
-  <text class="base g mono" x="236" y="282" font-size="14">G</text>
-  <text class="base c mono" x="264" y="282" font-size="14">C</text>
-  <text class="base t mono" x="292" y="282" font-size="14">T</text>
+  <text class="base c mono" x="124" y="282" font-size="15">C</text>
+  <text class="base t mono" x="152" y="282" font-size="15">T</text>
+  <text class="base a mono" x="180" y="282" font-size="15">A</text>
+  <text class="base g mono" x="208" y="282" font-size="15">G</text>
+  <text class="base g mono" x="236" y="282" font-size="15">G</text>
+  <text class="base c mono" x="264" y="282" font-size="15">C</text>
+  <text class="base t mono" x="292" y="282" font-size="15">T</text>
 
-  <text class="base c mono" x="124" y="306" font-size="14">C</text>
-  <text class="base t mono" x="152" y="306" font-size="14">T</text>
-  <text class="base a mono" x="180" y="306" font-size="14">A</text>
-  <text class="base a mono" x="208" y="306" font-size="14">A</text>
-  <text class="base g mono" x="236" y="306" font-size="14">G</text>
-  <text class="base c mono" x="264" y="306" font-size="14">C</text>
-  <text class="base t mono" x="292" y="306" font-size="14">T</text>
+  <text class="base c mono" x="124" y="306" font-size="15">C</text>
+  <text class="base t mono" x="152" y="306" font-size="15">T</text>
+  <text class="base a mono" x="180" y="306" font-size="15">A</text>
+  <text class="base a mono" x="208" y="306" font-size="15">A</text>
+  <text class="base g mono" x="236" y="306" font-size="15">G</text>
+  <text class="base c mono" x="264" y="306" font-size="15">C</text>
+  <text class="base t mono" x="292" y="306" font-size="15">T</text>
 
   <text class="tick zh" x="34" y="336">一列是一條 read，一欄是一個位置</text>
   <text class="tick zh" x="34" y="358">每個格子還帶著品質與股向</text>

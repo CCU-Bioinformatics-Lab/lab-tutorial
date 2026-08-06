@@ -6,7 +6,9 @@
         下排沒有正常組織，改查族群資料庫：① 的族群等位基因頻率 0.31，高於資料庫收錄門檻 0.001，
         查得到所以排除；③ 的頻率只有 0.0002，低於門檻，資料庫裡沒有這一筆，因此被留下來成為假陽性。
         兩排的差別只有一個位置，而那個位置的成因是「族群裡常見」與「這個人有」不是同一件事。
-        位置 ② 兩排都靠 read 的分布排除，與有沒有正常組織無關。</desc>
+        位置 ② 兩排都靠 read 的分布排除，與有沒有正常組織無關：
+        支持 ① 與 ③ 的是同三條 read，支持 ④ 的兩條也在這三條裡面，
+        但支持 ② 的兩條分屬兩群不同的 read，與同一次突變的來源應該一致不符。</desc>
 
   <!-- ══════════════════ 圖例 ══════════════════ -->
   <circle class="mark germline" cx="28" cy="27" r="8"/>
@@ -36,10 +38,10 @@
 
   <rect class="box plain" x="44" y="150" width="300" height="16" rx="4"/>
   <text class="tick end mono" x="42" y="163">ref</text>
-  <text class="base t mono" x="92"  y="163" font-size="14">T</text>
-  <text class="base a mono" x="162" y="163" font-size="14">A</text>
-  <text class="base g mono" x="232" y="163" font-size="14">G</text>
-  <text class="base g mono" x="302" y="163" font-size="14">G</text>
+  <text class="base t mono" x="92"  y="163" font-size="15">T</text>
+  <text class="base a mono" x="162" y="163" font-size="15">A</text>
+  <text class="base g mono" x="232" y="163" font-size="15">G</text>
+  <text class="base g mono" x="302" y="163" font-size="15">G</text>
 
   <rect class="read hp0" x="44" y="176" width="300" height="14" rx="7"/>
   <rect class="read hp0" x="44" y="196" width="300" height="14" rx="7"/>
@@ -80,7 +82,7 @@
   <text class="base g mono" x="302" y="287" font-size="15">G</text>
 
   <text class="tick zh" x="32" y="312">四個位置都跟參考不一樣，全部列為候選。</text>
-  <text class="tick zh" x="32" y="334">①③ 長得一模一樣：各 3 條支持。</text>
+  <text class="tick zh" x="32" y="334">①③ 各 3 條支持；② 的 2 條散在兩群。</text>
 
   <path class="flow" d="M356,220 L384,220" marker-end="url(#arrow)"/>
 
@@ -94,10 +96,10 @@
   <text class="tick mid" x="668" y="136">④</text>
 
   <rect class="box plain" x="412" y="148" width="286" height="16" rx="4"/>
-  <text class="base t mono" x="458" y="161" font-size="14">T</text>
-  <text class="base a mono" x="528" y="161" font-size="14">A</text>
-  <text class="base g mono" x="598" y="161" font-size="14">G</text>
-  <text class="base g mono" x="668" y="161" font-size="14">G</text>
+  <text class="base t mono" x="458" y="161" font-size="15">T</text>
+  <text class="base a mono" x="528" y="161" font-size="15">A</text>
+  <text class="base g mono" x="598" y="161" font-size="15">G</text>
+  <text class="base g mono" x="668" y="161" font-size="15">G</text>
 
   <rect class="read hp0" x="412" y="174" width="286" height="14" rx="7"/>
   <rect class="read hp0" x="412" y="194" width="286" height="14" rx="7"/>
@@ -125,7 +127,7 @@
   <text class="base g mono" x="668" y="245" font-size="15">G</text>
 
   <text class="tick zh" x="412" y="274">① ③ 在這裡也看得到 → 兩個都排除</text>
-  <text class="tick zh" x="412" y="296">④ 在這裡一條都沒有 → 保留</text>
+  <text class="tick zh" x="412" y="296">④ 都沒有 → 保留；② 靠 read 分布排除</text>
 
   <path class="flow" d="M716,220 L744,220" marker-end="url(#arrow)"/>
 
@@ -166,10 +168,10 @@
 
   <rect class="box plain" x="44" y="472" width="300" height="16" rx="4"/>
   <text class="tick end mono" x="42" y="485">ref</text>
-  <text class="base t mono" x="92"  y="485" font-size="14">T</text>
-  <text class="base a mono" x="162" y="485" font-size="14">A</text>
-  <text class="base g mono" x="232" y="485" font-size="14">G</text>
-  <text class="base g mono" x="302" y="485" font-size="14">G</text>
+  <text class="base t mono" x="92"  y="485" font-size="15">T</text>
+  <text class="base a mono" x="162" y="485" font-size="15">A</text>
+  <text class="base g mono" x="232" y="485" font-size="15">G</text>
+  <text class="base g mono" x="302" y="485" font-size="15">G</text>
 
   <rect class="read hp0" x="44" y="498" width="300" height="14" rx="7"/>
   <rect class="read hp0" x="44" y="518" width="300" height="14" rx="7"/>
@@ -229,7 +231,7 @@
 
   <!-- ② artifact -->
   <text class="tick end" x="440" y="500">②</text>
-  <text class="tick zh" x="448" y="500">artifact 不在族群資料庫裡</text>
+  <text class="tick zh" x="448" y="500">不在資料庫裡 → 由 read 分布排除</text>
 
   <!-- ③ AF = 0.0002，停在門檻左邊 -->
   <text class="tick end" x="440" y="524">③</text>
@@ -238,7 +240,7 @@
 
   <!-- ④ somatic -->
   <text class="tick end" x="440" y="548">④</text>
-  <text class="tick zh" x="448" y="548">somatic 也不在族群資料庫裡</text>
+  <text class="tick zh" x="448" y="548">不在資料庫裡 → 但 read 分布支持它</text>
 
   <!-- 座標軸 -->
   <line class="axis" x1="444" y1="576" x2="640" y2="576"/>

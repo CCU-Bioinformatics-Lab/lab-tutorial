@@ -336,7 +336,25 @@ for (const f of fs.existsSync(path.join(SRC, 'svg'))
   }
 }
 
-/* ── 13. 大小預算 ────────────────────────────────────────────────────── */
+/* ── 13. 產出的 HTML 不得殘留沒展開的 macro 或詞彙標記 ───────────────────
+   踩過才加的一項。build.mjs 的第 9 步（[[term]]）要能看到文字才展開得了，
+   而 {{svg:}} / {{fig:}} / {{widget:}} 會先把整塊圖 stash 起來。圖說一旦
+   被一起 stash，[[soft clipping]] 就會原樣印在頁面上 —— <b>而且沒有任何
+   錯誤訊息</b>，因為對 build 來說那只是一段普通文字。
+   曾經同時漏在 m08 與 m13 的圖說裡，靠眼睛看沒發現。                     */
+
+for (const f of html) {
+  const s = fs.readFileSync(f, 'utf8');
+  const rel = path.relative(ROOT, f);
+  for (const m of s.matchAll(/\[\[[^\]\n]{1,60}\]\]/g)) {
+    fail(rel, `殘留沒展開的詞彙標記 ${m[0]} —— 多半是寫在被 stash 的區塊裡`);
+  }
+  for (const m of s.matchAll(/\{\{[^}\n]{1,60}\}\}/g)) {
+    fail(rel, `殘留沒展開的 macro ${m[0]}`);
+  }
+}
+
+/* ── 14. 大小預算 ────────────────────────────────────────────────────── */
 
 let total = 0;
 for (const f of files) total += fs.statSync(f).size;

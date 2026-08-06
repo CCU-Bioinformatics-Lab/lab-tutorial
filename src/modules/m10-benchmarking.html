@@ -3,7 +3,7 @@
   "objectives": [
     "批判性解讀效能圖，而非僅依最高長條判斷",
     "解釋為什麼 precision 明顯上升時 F1 可能幾乎不動",
-    "說明 truth set 之間的可靠度差異，以及本研究如何處理",
+    "說明 truth set 之間的可靠度差異，以及 LongPhase-S 以加權方式處理它的做法",
     "指出 data leakage、distribution shift 與 label noise 各自的徵兆"
   ]
 }
@@ -16,6 +16,36 @@
 判讀<b>圖表未呈現的資訊</b>，是研究與工程實務中的重要能力。</p>
 
 <p class="prose">本節的目標不只是計算 F1，也包括培養批判性解讀與驗證能力。</p>
+
+<h3>本模組的數字來自兩項工作</h3>
+
+<p class="prose">下面會反覆引用兩組具體結果。它們是不同的方法、處理不同的問題，先在這裡分清楚，
+後面提到時就直接用名字稱呼：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>名稱</th><th>它是什麼</th><th>本模組用它示範什麼</th></tr></thead>
+<tbody>
+<tr>
+  <td><b>indel 精修模型</b></td>
+  <td>接在 somatic caller 後面的一個後處理模型。它把每個候選 indel 周圍的 pileup
+  <b>編碼成一張影像</b>，再用<b>卷積神經網路（CNN）</b>判斷這個候選是真的還是假的。
+  輸入是配對 tumor–normal 的 long-read 資料。關鍵性質是：<b>它只會刪掉候選，不會生出新的候選。</b></td>
+  <td>precision 上升而 F1 幾乎不動的原因、模型選擇該用什麼分數、
+  以及兩個長得一樣卻標記相反的候選</td>
+</tr>
+<tr>
+  <td><b>LongPhase-S 的 purity 估計</b></td>
+  <td>由樣本本身估計腫瘤比例，再依估計值調整過濾參數。方法本身在 M12 展開，
+  這裡只借它的<b>評估設計</b>。</td>
+  <td>交叉驗證要以什麼為單位切分、benchmark 可靠度不同時怎麼加權</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">第一項的那句「只會刪掉候選」，是本模組第一個要拆解的東西 ——
+它替所有後處理方法設下了一個效能上限。</p>
 </section>
 
 
@@ -46,10 +76,11 @@ caller 未產生的候選不會由此恢復；若後處理包含 re-calling 或 
 
 {{guard:10 | 僅移除候選的後處理無法恢復 caller 未產生的候選}}
 <p class="prose">一項可由指標定義解釋的結果是：<b>precision 明顯提升，但 F1 僅維持或小幅增加。</b></p>
-<p class="prose">F1 同時受 FP 與 FN 影響。在該資料中，原始 caller 漏失多個真實 indel，因此 <b>FN 的數量遠多於 FP</b>。
+<p class="prose">F1 同時受 FP 與 FN 影響。在 indel 精修模型用的資料中，原始 caller 漏失多個真實 indel，
+因此 <b>FN 的數量遠多於 FP</b>。
 在此情況下，少量減少 FP 對 F1 的影響有限；如果過濾時又誤刪少量 TP，
 增加的 FN 還會把改善抵銷掉。</p>
-<p class="prose"><b>此限制不僅適用於該 CNN 方法。</b>許多分析工具屬於 caller 後處理，因此可能存在相同的效能上限。
+<p class="prose"><b>此限制不只適用於 indel 精修模型。</b>許多分析工具屬於 caller 後處理，因此可能存在相同的效能上限。
 解讀 precision 提升時，亦應檢視 recall 的變化及原始 FN 數量。</p>
 {{/guard}}
 
@@ -82,21 +113,22 @@ benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
 <table>
 <thead><tr><th>因素</th><th>可能徵兆</th><th>本例的處理</th></tr></thead>
 <tbody>
-<tr><td>[[data leakage]]</td><td>測試效能異常偏高</td><td>研究按染色體切分：chr2 與 chr8 僅用於驗證；仍需檢查樣本與位點是否跨 split</td></tr>
-<tr><td>[[distribution shift]]</td><td>訓練與測試的類別或特徵分布不同</td><td>研究指出訓練 FP 佔 4%、測試佔 19%，因此不能只看 loss</td></tr>
+<tr><td>[[data leakage]]</td><td>測試效能異常偏高</td><td>indel 精修模型按染色體切分：chr2 與 chr8 僅用於驗證；仍需檢查樣本與位點是否跨 split</td></tr>
+<tr><td>[[distribution shift]]</td><td>訓練與測試的類別或特徵分布不同</td><td>indel 精修模型的訓練集 FP 佔 4%、測試集佔 19%，因此不能只看 loss</td></tr>
 <tr><td>[[label noise]]</td><td>特定類別的表現持續受限</td><td>特徵相近的兩個位點被賦予相反標籤，提示可能存在標註不確定性</td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">最後一項可由具體案例說明。研究比較兩個 deletion 的影像編碼：
-一個是 true positive（分數 0.997），一個是 false positive（分數 0.994）。
+<p class="prose">最後一項可由具體案例說明。下面並列 indel 精修模型送進 CNN 的兩張影像 ——
+也就是兩個 deletion 候選各自的 pileup 編碼：一個是 true positive（模型給 0.997），
+一個是 false positive（0.994）。
 兩者的 tumor reads 都顯示集中一致的 deletion，normal reads 未見相應支持。
-<b>就該影像編碼呈現的特徵而言，兩個候選近似。</b></p>
+<b>就這種影像編碼呈現的特徵而言，兩個候選近似。</b></p>
 
 {{fig:c-s34-lookalike}}
 
-<p class="prose">研究結論指出：「這兩類 candidates 在該影像輸入下未呈現可辨識差異。」這類位點常落在 homopolymer 或 tandem repeat 區域，
+<p class="prose">該工作的結論是：在這種影像輸入下，這兩類候選沒有可辨識的差異。這類位點常落在 homopolymer 或 tandem repeat 區域，
 <b>benchmark 標註的不確定性可能較高</b>；若要判定 label noise，仍需獨立 truth 或重複實驗支持。</p>
 
 <h3>合成 DNA fraction 混合樣本及其適用範圍</h3>
@@ -115,13 +147,13 @@ benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
 
 <h3>用對的指標選模型</h3>
 
-<p class="prose">一項可注意的模型選擇設計是：<b>研究未以 validation loss 最低的 epoch 作為最佳模型。</b></p>
+<p class="prose">indel 精修模型有一項值得注意的模型選擇設計：<b>它不取 validation loss 最低的那個 epoch 當最佳模型。</b></p>
 
 <p class="prose">理由是 loss 反映所選損失函數（例如 cross-entropy）的平均目標，不必然等同於分類錯誤率；
 若任務目標是「在盡量保留真 indel 的前提下，篩掉更多假的」，
 兩者不是同一件事。</p>
 
-<p class="prose">因此研究定義以下任務導向分數：</p>
+<p class="prose">因此它改用以下任務導向分數挑 epoch：</p>
 
 <pre><code>score = (成功移除的 FP − λ × 誤刪的 TP) ÷ FP 總數</code></pre>
 

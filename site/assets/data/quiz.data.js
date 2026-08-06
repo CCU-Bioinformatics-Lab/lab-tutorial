@@ -171,13 +171,13 @@ window.TW_QUIZ = {
    "choices": [
     {
      "id": "a",
-     "html": "直接觀測為此 DNA 分子同時包含 A、B；可提出的推論僅為此結果與部分細胞可能同時帶有 A、B 相容，單一 read 無法證明細胞群或發生順序",
+     "html": "直接觀測到的是這個分子帶有 A 與 B；細胞群與順序都還不知道",
      "correct": true,
      "why": "正確。此選項區分分子層級的直接觀測與待驗證的細胞層級模型，並保留單一 read 無法回答的不確定性。"
     },
     {
      "id": "b",
-     "html": "已證明存在一個固定細胞群同時帶有 A、B",
+     "html": "已證明樣本裡存在一群細胞同時帶有 A 與 B",
      "correct": false,
      "why": "一條 read 僅直接支持一條 DNA 分子含有 A、B；bulk 資料沒有細胞標籤，無法由單一 read 證明特定細胞群。"
     },
@@ -189,7 +189,7 @@ window.TW_QUIZ = {
     },
     {
      "id": "d",
-     "html": "A 與 B 在整個樣本中的比例一定相同",
+     "html": "A 與 B 在整個樣本中的 VAF 一定會相同",
      "correct": false,
      "why": "單一 read 不提供整體樣本的變異計數；比較比例需要統計足量且可比較的 reads。"
     }
@@ -211,7 +211,7 @@ window.TW_QUIZ = {
     },
     {
      "id": "b",
-     "html": "前者未定相、後者已定相 —— 豎線多說了「哪一份 allele 在哪一條 haplotype 上」",
+     "html": "前者未定相，後者已定相（豎線標出相位）",
      "correct": true,
      "why": "正確。豎線表示已在該位點建立兩個 allele 的相位關係；實際 phasing 還需要跨位點整合 read 證據。"
     },
@@ -223,7 +223,7 @@ window.TW_QUIZ = {
     },
     {
      "id": "d",
-     "html": "前者品質較低",
+     "html": "前者的品質分數比較低",
      "correct": false,
      "why": "兩者都不表達品質。品質在 QUAL 欄位與 FORMAT 的其他欄位裡。"
     }
@@ -237,25 +237,25 @@ window.TW_QUIZ = {
    "choices": [
     {
      "id": "a",
-     "html": "因為它們通常是定序錯誤",
+     "html": "因為它們多半是定序錯誤造成的",
      "correct": false,
      "why": "homozygous 位點大多是真的，只是不帶 phasing 資訊。"
     },
     {
      "id": "b",
-     "html": "因為兩條 haplotype 在該位置看起來一樣，無法用它區分 read",
+     "html": "因為兩條 haplotype 在該位置看起來一樣",
      "correct": true,
      "why": "正確。phasing 需要「能區分兩條」的位點，而 hom 位點上每條 read 看到的都相同。"
     },
     {
      "id": "c",
-     "html": "因為 caller 不會報告它們",
+     "html": "因為 caller 通常不會報告它們",
      "correct": false,
      "why": "caller 會報告，只是對 phasing 沒用。"
     },
     {
      "id": "d",
-     "html": "因為它們的 VAF 太低",
+     "html": "因為它們的 VAF 通常太低",
      "correct": false,
      "why": "hom 位點的 VAF 接近 1.0，不是太低。"
     }
@@ -271,19 +271,19 @@ window.TW_QUIZ = {
    "choices": [
     {
      "id": "a",
-     "html": "偵測這兩個變異的能力",
+     "html": "偵測這兩個變異本身的能力",
      "correct": false,
      "why": "在相同覆蓋與品質條件下，短讀通常可分別偵測這兩個變異，但無法以單條 read 建立 3 kb 的分子連結；其單鹼基錯誤率通常較低。"
     },
     {
      "id": "b",
-     "html": "判斷這兩個變異是否位在同一條分子上的能力",
+     "html": "判斷兩者是否位在同一條分子上",
      "correct": true,
      "why": "正確。失去的是<b>連結</b>，不是偵測。一條 100 bp 的 read 跨不過 3 kb。"
     },
     {
      "id": "c",
-     "html": "計算 VAF 的能力",
+     "html": "計算兩者 VAF 的能力",
      "correct": false,
      "why": "VAF 是各自數 read 算出來的，短讀通常可以分別計算兩個位置的 VAF。"
     },
@@ -436,19 +436,19 @@ window.TW_QUIZ = {
     },
     {
      "id": "b",
-     "html": "untagged 是沒有 HP assignment；HP3 是有 somatic signal 但來源 haplotype 未定",
+     "html": "untagged 沒有 HP；HP3 有 somatic signal 但來源未定",
      "correct": true,
      "why": "正確。一般沒有 HP 的 read 不能因此直接改寫成 HP3。"
     },
     {
      "id": "c",
-     "html": "只要沒有 HP tag，就一定是 HP3",
+     "html": "只要沒有 HP tag，就應該標成 HP3",
      "correct": false,
      "why": "HP3 不是「缺少 HP」的同義詞；它需要 somatic signal 加上來源未定。"
     },
     {
      "id": "d",
-     "html": "HP3 是 VCF 的 FILTER 值",
+     "html": "HP3 是寫在 VCF FILTER 欄的值",
      "correct": false,
      "why": "HP3 是 read-level 判讀概念，出現在 BAM tag／haplotype assignment 的脈絡，不是 VCF FILTER。"
     }
@@ -492,7 +492,7 @@ window.TW_QUIZ = {
    "choices": [
     {
      "id": "a",
-     "html": "完全吻合（match）",
+     "html": "read 與參考在這一段完全吻合",
      "correct": false,
      "why": "常見誤解。<code>M</code> 只代表「有對齊」，錯配在 CIGAR 上也可能是 <code>M</code>。"
     },
@@ -504,13 +504,13 @@ window.TW_QUIZ = {
     },
     {
      "id": "c",
-     "html": "methylation",
+     "html": "這一段帶有甲基化修飾",
      "correct": false,
      "why": "甲基化在 MM/ML tags 裡，不在 CIGAR。"
     },
     {
      "id": "d",
-     "html": "缺失（missing）",
+     "html": "這一段在 read 上缺失",
      "correct": false,
      "why": "相對於參考的 deletion 用 <code>D</code> 表示。"
     }
@@ -531,13 +531,13 @@ window.TW_QUIZ = {
     },
     {
      "id": "b",
-     "html": "支持 read 未呈現單一 haplotype 偏向，候選點需進一步檢查 phasing、mapping、copy number 等因素",
+     "html": "支持 read 沒有偏向任何一條 haplotype",
      "correct": true,
      "why": "正確。支持 read 未呈現明顯單一 haplotype 偏向，候選點需進一步檢查 phasing、mapping、copy number 與其他可能因素。"
     },
     {
      "id": "c",
-     "html": "phasing 失敗了",
+     "html": "這段區域的 phasing 失敗了",
      "correct": false,
      "why": "有可能，但更直接的解釋是這個候選點本身可疑。要區分兩者，去看周圍其他位點的 phasing 是否正常。"
     },
@@ -630,19 +630,19 @@ window.TW_QUIZ = {
     },
     {
      "id": "b",
-     "html": "族群 germline 資料庫的聯集：1000G、CoLoRSdb、dbSNP、gnomAD",
+     "html": "公開族群 germline 資料庫的聯集",
      "correct": true,
-     "why": "正確。依工具下載清單，列出的四個檔案均為族群 germline 資料庫。"
+     "why": "正確。工具下載清單裡的 1000G、CoLoRSdb、dbSNP、gnomAD 四個檔案，都是族群 germline 資料庫。"
     },
     {
      "id": "c",
-     "html": "這個病人自己的正常組織",
+     "html": "這個病人自己的正常組織樣本",
      "correct": false,
      "why": "那是 matched normal。此 PON 在缺少 matched normal 時可提供族群背景，但無法完全取代。"
     },
     {
      "id": "d",
-     "html": "benchmark 的標準答案",
+     "html": "benchmark 用的標準答案",
      "correct": false,
      "why": "該選項是 truth set，用於效能評估，與此處的背景資料庫角色不同。"
     }
@@ -721,25 +721,25 @@ window.TW_QUIZ = {
    "choices": [
     {
      "id": "a",
-     "html": "因為它不影響任何訊號",
+     "html": "因為它幾乎不影響任何可觀測的訊號",
      "correct": false,
      "why": "它明確影響 heterozygosity —— het 位點會消失。"
     },
     {
      "id": "b",
-     "html": "因為在 copy-neutral 模型中 coverage 仍接近正常，heterozygosity 變化提供主要訊號",
+     "html": "因為 coverage 仍接近正常，要看 heterozygosity",
      "correct": true,
      "why": "正確。在理想 copy-neutral 模型中，丟掉一條 haplotype，再複製另一條，使總 copy number 仍為 2；僅依 coverage 通常難以偵測，需觀察 heterozygosity。"
     },
     {
      "id": "c",
-     "html": "因為它只發生在低 purity 樣本",
+     "html": "因為它只在低 purity 的樣本裡才會出現",
      "correct": false,
      "why": "與 purity 無關，它是腫瘤中常見的機制。"
     },
     {
      "id": "d",
-     "html": "因為 ONT 讀不到那個區域",
+     "html": "因為 ONT 在那一段區域讀不出來",
      "correct": false,
      "why": "讀得到，問題出在用什麼指標判斷。"
     }
@@ -755,13 +755,13 @@ window.TW_QUIZ = {
    "choices": [
     {
      "id": "a",
-     "html": "一個看 CpG、另一個看別的位置",
+     "html": "一個看 CpG 位點，另一個看非 CpG 的位置",
      "correct": false,
      "why": "兩者都以 CpG 為主要觀察位置。哺乳類多數 5mC 位於 CpG，但特定細胞或情況亦可見非 CpG 甲基化。"
     },
     {
      "id": "b",
-     "html": "一個把甲基化當成<b>判斷依據</b>餵給分類器；另一個只當成<b>事後註記</b>，刻意不讓它影響判斷",
+     "html": "一個把甲基化餵進分類器當<b>判斷依據</b>，另一個只當<b>事後註記</b>",
      "correct": true,
      "why": "正確。這個區別是方法論紀律：一旦甲基化參與了推論，就不能再用它來驗證推論，否則是循環論證。"
     },
@@ -773,7 +773,7 @@ window.TW_QUIZ = {
     },
     {
      "id": "d",
-     "html": "沒有實質差別",
+     "html": "兩者其實沒有實質差別",
      "correct": false,
      "why": "差別很大，而且是刻意的設計選擇，不是實作細節。"
     }
@@ -787,25 +787,25 @@ window.TW_QUIZ = {
    "choices": [
     {
      "id": "a",
-     "html": "basecaller 版本不對",
+     "html": "basecaller 的版本跟化學版本不合",
      "correct": false,
      "why": "有可能，但如果原始 BAM 裡有資料，問題就出在後面的處理。"
     },
     {
      "id": "b",
-     "html": "轉 FASTQ 與重新比對時沒有加 <code>-T '*'</code> 與 <code>-y</code>，MM/ML tag 被丟掉了",
+     "html": "沒有加 <code>-T '*'</code> 與 <code>-y</code>，MM/ML tag 被丟掉了",
      "correct": true,
      "why": "正確。這是常見原因；該流程可能不會顯示警告，因此需確認輸出的 BAM 是否仍保留 MM/ML tags。"
     },
     {
      "id": "c",
-     "html": "參考基因體版本不對",
+     "html": "重新比對時換了參考基因體版本",
      "correct": false,
      "why": "那會造成座標錯誤，不會讓 tag 消失。"
     },
     {
      "id": "d",
-     "html": "甲基化需要 bisulfite 前處理",
+     "html": "ONT 的甲基化需要 bisulfite 前處理",
      "correct": false,
      "why": "ONT 的優勢正是不需要前處理。"
     }
@@ -820,25 +820,25 @@ window.TW_QUIZ = {
    "choices": [
     {
      "id": "a",
-     "html": "因為過濾器誤刪了大量 TP",
+     "html": "因為過濾器同時誤刪了大量 TP",
      "correct": false,
      "why": "在題目假設不誤刪 TP 的情況下，F1 改善仍有限；需進一步檢查 FN 的基線數量。"
     },
     {
      "id": "b",
-     "html": "因為 FN 的數量遠多於 FP，F1 被 recall 那一側綁住了",
+     "html": "因為 FN 遠多於 FP，recall 沒有動",
      "correct": true,
      "why": "正確。在僅對既有候選進行後處理時，無法恢復 caller 未輸出的變異，因此 FN 不會因這類過濾而減少。"
     },
     {
      "id": "c",
-     "html": "因為 F1 的計算方式有問題",
+     "html": "因為 F1 這個指標本身有問題",
      "correct": false,
      "why": "F1 按定義反映 precision 與 recall 的綜合結果；若兩者變化有限，F1 的變化也可能有限。"
     },
     {
      "id": "d",
-     "html": "因為樣本數太少",
+     "html": "因為評估的樣本數太少",
      "correct": false,
      "why": "與樣本數無關，這是 F1 公式的結構性後果。"
     }
@@ -852,13 +852,13 @@ window.TW_QUIZ = {
    "choices": [
     {
      "id": "a",
-     "html": "因為 loss 計算有 bug",
+     "html": "因為 loss 的計算有 bug",
      "correct": false,
      "why": "沒有 bug，只是目標不一致。"
     },
     {
      "id": "b",
-     "html": "因為 loss 反映的是平均分類誤差，但真正的目標是在保留真實 indel 的前提下移除更多 false positives",
+     "html": "因為 loss 最小不等於「篩掉最多假陽性」",
      "correct": true,
      "why": "正確。它自訂了一個與目標對齊的分數：(成功移除的 FP − λ × 誤刪的 TP) ÷ FP 總數，而且 λ 是從正負比例算出來的。"
     },
@@ -1013,33 +1013,34 @@ window.TW_QUIZ = {
   {
    "id": "m13.q1",
    "type": "single",
-   "stem_html": "triplet graph 為什麼需要三個位點，兩個不行？",
+   "stem_html": "沒有正常樣本可以對照時，LongPhase-TO 用什麼判斷一個候選變異是真的體細胞變異，而不是定序錯誤？",
    "choices": [
     {
      "id": "a",
-     "html": "三個點統計上比較穩定",
+     "html": "看支持它的 read 有幾條，太少就不算",
      "correct": false,
-     "why": "不只是穩定度的問題，是分辨能力的有無。"
+     "why": "數量本身分不出來。真變異與定序錯誤都可能只有三條 read 支持 —— 這正是那張對照圖兩邊刻意都畫三條的原因。"
     },
     {
      "id": "b",
-     "html": "降成兩個點時，在此簡化兩點模型中兩種情況拓撲相同，分辨能力消失",
+     "html": "看支持它的 read 左右鄰居是不是都指向同一條 haplotype",
      "correct": true,
-     "why": "正確。真 somatic 可由既有 haplotype 分支形成第三條路徑；這個關係需要三個點才顯現得出來。"
+     "why": "正確。體細胞變異發生在某一個細胞的某一條染色體上，所以支持它的 read 會一致地落在那一條上，形成一條「跟母體只差一格」的新路徑；定序錯誤落在哪條 read 上是隨機的，湊不出一致的來源。"
     },
     {
      "id": "c",
-     "html": "因為 diploid 有兩條染色體，所以要多一個",
+     "html": "看它的 VAF 是不是接近 0.5",
      "correct": false,
-     "why": "這個推理聽起來合理但不是原因。原因是兩點圖在兩種情況下同構。"
+     "why": "VAF 接近 0.5 反而是 germline heterozygous 的特徵。而且體細胞變異的 VAF 會隨腫瘤比例變動，不能當成判準。"
     },
     {
      "id": "d",
-     "html": "因為 CIGAR 有三種操作碼",
+     "html": "查它在不在族群資料庫裡，不在就是體細胞變異",
      "correct": false,
-     "why": "無關。"
+     "why": "族群資料庫只是第一關，用來排除大家都有的遺傳變異。它收不到這個人的私有變異，所以「不在資料庫裡」不等於「是癌症造成的」。"
     }
-   ]
+   ],
+   "explain_html": "這一步只用 long read 才給得起的資訊：一條 read 一次跨過好幾個位置，所以「哪些 allele 綁在同一條分子上」看得見。左鄰居與右鄰居都要看，因此最小單位是三個位置。"
   },
   {
    "id": "m13.q2",

@@ -22,29 +22,29 @@
   <!-- HP1 群：全部帶有候選變異 -->
   <text class="tick hp1 bold" x="38" y="118">HP1</text>
   <rect class="read hp1" x="46" y="104" width="410" height="13" rx="6.5"/>
-  <text class="base a mono" x="130" y="115" font-size="14">A</text>
+  <text class="base a mono" x="130" y="115" font-size="15">A</text>
   <circle class="mark somatic" cx="252" cy="110" r="5"/>
-  <text class="base g mono" x="374" y="115" font-size="14">G</text>
+  <text class="base g mono" x="374" y="115" font-size="15">G</text>
 
   <rect class="read hp1" x="52" y="123" width="400" height="13" rx="6.5"/>
-  <text class="base a mono" x="130" y="134" font-size="14">A</text>
+  <text class="base a mono" x="130" y="134" font-size="15">A</text>
   <circle class="mark somatic" cx="252" cy="129" r="5"/>
-  <text class="base g mono" x="374" y="134" font-size="14">G</text>
+  <text class="base g mono" x="374" y="134" font-size="15">G</text>
 
   <rect class="read hp1" x="42" y="142" width="415" height="13" rx="6.5"/>
-  <text class="base a mono" x="130" y="153" font-size="14">A</text>
+  <text class="base a mono" x="130" y="153" font-size="15">A</text>
   <circle class="mark somatic" cx="252" cy="148" r="5"/>
-  <text class="base g mono" x="374" y="153" font-size="14">G</text>
+  <text class="base g mono" x="374" y="153" font-size="15">G</text>
 
   <rect class="read hp1" x="56" y="161" width="398" height="13" rx="6.5"/>
-  <text class="base a mono" x="130" y="172" font-size="14">A</text>
+  <text class="base a mono" x="130" y="172" font-size="15">A</text>
   <circle class="mark somatic" cx="252" cy="167" r="5"/>
-  <text class="base g mono" x="374" y="172" font-size="14">G</text>
+  <text class="base g mono" x="374" y="172" font-size="15">G</text>
 
   <rect class="read hp1" x="48" y="180" width="405" height="13" rx="6.5"/>
-  <text class="base a mono" x="130" y="191" font-size="14">A</text>
+  <text class="base a mono" x="130" y="191" font-size="15">A</text>
   <circle class="mark somatic" cx="252" cy="186" r="5"/>
-  <text class="base g mono" x="374" y="191" font-size="14">G</text>
+  <text class="base g mono" x="374" y="191" font-size="15">G</text>
 
   <!-- 分隔 -->
   <line class="guide" x1="38" y1="204" x2="466" y2="204"/>
@@ -52,29 +52,29 @@
   <!-- HP2 群：此示例沒有候選訊號 -->
   <text class="tick hp2 bold" x="38" y="232">HP2</text>
   <rect class="read hp2" x="44" y="218" width="412" height="13" rx="6.5"/>
-  <text class="base t mono" x="130" y="229" font-size="14">T</text>
+  <text class="base t mono" x="130" y="229" font-size="15">T</text>
   <circle class="mark ref" cx="252" cy="224" r="5"/>
-  <text class="base c mono" x="374" y="229" font-size="14">C</text>
+  <text class="base c mono" x="374" y="229" font-size="15">C</text>
 
   <rect class="read hp2" x="54" y="237" width="400" height="13" rx="6.5"/>
-  <text class="base t mono" x="130" y="248" font-size="14">T</text>
+  <text class="base t mono" x="130" y="248" font-size="15">T</text>
   <circle class="mark ref" cx="252" cy="243" r="5"/>
-  <text class="base c mono" x="374" y="248" font-size="14">C</text>
+  <text class="base c mono" x="374" y="248" font-size="15">C</text>
 
   <rect class="read hp2" x="46" y="256" width="408" height="13" rx="6.5"/>
-  <text class="base t mono" x="130" y="267" font-size="14">T</text>
+  <text class="base t mono" x="130" y="267" font-size="15">T</text>
   <circle class="mark ref" cx="252" cy="262" r="5"/>
-  <text class="base c mono" x="374" y="267" font-size="14">C</text>
+  <text class="base c mono" x="374" y="267" font-size="15">C</text>
 
   <rect class="read hp2" x="50" y="275" width="404" height="13" rx="6.5"/>
-  <text class="base t mono" x="130" y="286" font-size="14">T</text>
+  <text class="base t mono" x="130" y="286" font-size="15">T</text>
   <circle class="mark ref" cx="252" cy="281" r="5"/>
-  <text class="base c mono" x="374" y="286" font-size="14">C</text>
+  <text class="base c mono" x="374" y="286" font-size="15">C</text>
 
   <rect class="read hp2" x="42" y="294" width="414" height="13" rx="6.5"/>
-  <text class="base t mono" x="130" y="305" font-size="14">T</text>
+  <text class="base t mono" x="130" y="305" font-size="15">T</text>
   <circle class="mark ref" cx="252" cy="300" r="5"/>
-  <text class="base c mono" x="374" y="305" font-size="14">C</text>
+  <text class="base c mono" x="374" y="305" font-size="15">C</text>
 
   <!-- 左側統計 -->
   <rect class="box ok" x="38" y="348" width="428" height="62" rx="8"/>
@@ -97,58 +97,58 @@
   <!-- HP1 群：只有兩條帶有 -->
   <text class="tick hp1 bold" x="534" y="118">HP1</text>
   <rect class="read hp1" x="542" y="104" width="410" height="13" rx="6.5"/>
-  <text class="base a mono" x="626" y="115" font-size="14">A</text>
+  <text class="base a mono" x="626" y="115" font-size="15">A</text>
   <circle class="mark artifact" cx="748" cy="110" r="5"/>
-  <text class="base g mono" x="870" y="115" font-size="14">G</text>
+  <text class="base g mono" x="870" y="115" font-size="15">G</text>
 
   <rect class="read hp1" x="548" y="123" width="400" height="13" rx="6.5"/>
-  <text class="base a mono" x="626" y="134" font-size="14">A</text>
+  <text class="base a mono" x="626" y="134" font-size="15">A</text>
   <circle class="mark ref" cx="748" cy="129" r="5"/>
-  <text class="base g mono" x="870" y="134" font-size="14">G</text>
+  <text class="base g mono" x="870" y="134" font-size="15">G</text>
 
   <rect class="read hp1" x="538" y="142" width="415" height="13" rx="6.5"/>
-  <text class="base a mono" x="626" y="153" font-size="14">A</text>
+  <text class="base a mono" x="626" y="153" font-size="15">A</text>
   <circle class="mark ref" cx="748" cy="148" r="5"/>
-  <text class="base g mono" x="870" y="153" font-size="14">G</text>
+  <text class="base g mono" x="870" y="153" font-size="15">G</text>
 
   <rect class="read hp1" x="552" y="161" width="398" height="13" rx="6.5"/>
-  <text class="base a mono" x="626" y="172" font-size="14">A</text>
+  <text class="base a mono" x="626" y="172" font-size="15">A</text>
   <circle class="mark artifact" cx="748" cy="167" r="5"/>
-  <text class="base g mono" x="870" y="172" font-size="14">G</text>
+  <text class="base g mono" x="870" y="172" font-size="15">G</text>
 
   <rect class="read hp1" x="544" y="180" width="405" height="13" rx="6.5"/>
-  <text class="base a mono" x="626" y="191" font-size="14">A</text>
+  <text class="base a mono" x="626" y="191" font-size="15">A</text>
   <circle class="mark ref" cx="748" cy="186" r="5"/>
-  <text class="base g mono" x="870" y="191" font-size="14">G</text>
+  <text class="base g mono" x="870" y="191" font-size="15">G</text>
 
   <line class="guide" x1="534" y1="204" x2="962" y2="204"/>
 
   <!-- HP2 群：也有兩條帶有 -->
   <text class="tick hp2 bold" x="534" y="232">HP2</text>
   <rect class="read hp2" x="540" y="218" width="412" height="13" rx="6.5"/>
-  <text class="base t mono" x="626" y="229" font-size="14">T</text>
+  <text class="base t mono" x="626" y="229" font-size="15">T</text>
   <circle class="mark artifact" cx="748" cy="224" r="5"/>
-  <text class="base c mono" x="870" y="229" font-size="14">C</text>
+  <text class="base c mono" x="870" y="229" font-size="15">C</text>
 
   <rect class="read hp2" x="550" y="237" width="400" height="13" rx="6.5"/>
-  <text class="base t mono" x="626" y="248" font-size="14">T</text>
+  <text class="base t mono" x="626" y="248" font-size="15">T</text>
   <circle class="mark ref" cx="748" cy="243" r="5"/>
-  <text class="base c mono" x="870" y="248" font-size="14">C</text>
+  <text class="base c mono" x="870" y="248" font-size="15">C</text>
 
   <rect class="read hp2" x="542" y="256" width="408" height="13" rx="6.5"/>
-  <text class="base t mono" x="626" y="267" font-size="14">T</text>
+  <text class="base t mono" x="626" y="267" font-size="15">T</text>
   <circle class="mark artifact" cx="748" cy="262" r="5"/>
-  <text class="base c mono" x="870" y="267" font-size="14">C</text>
+  <text class="base c mono" x="870" y="267" font-size="15">C</text>
 
   <rect class="read hp2" x="546" y="275" width="404" height="13" rx="6.5"/>
-  <text class="base t mono" x="626" y="286" font-size="14">T</text>
+  <text class="base t mono" x="626" y="286" font-size="15">T</text>
   <circle class="mark ref" cx="748" cy="281" r="5"/>
-  <text class="base c mono" x="870" y="286" font-size="14">C</text>
+  <text class="base c mono" x="870" y="286" font-size="15">C</text>
 
   <rect class="read hp2" x="538" y="294" width="414" height="13" rx="6.5"/>
-  <text class="base t mono" x="626" y="305" font-size="14">T</text>
+  <text class="base t mono" x="626" y="305" font-size="15">T</text>
   <circle class="mark artifact" cx="748" cy="300" r="5"/>
-  <text class="base c mono" x="870" y="305" font-size="14">C</text>
+  <text class="base c mono" x="870" y="305" font-size="15">C</text>
 
   <rect class="box bad" x="534" y="348" width="428" height="62" rx="8"/>
   <text class="anno bold zh bad" x="554" y="376">兩群皆有支持，分布較分散</text>

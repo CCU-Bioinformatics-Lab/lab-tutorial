@@ -53,7 +53,7 @@
 
 <div class="wrap ">
   <main class="main" id="main">
-    <header class="mhead"><p class="mhead__kicker">模組 10 · Evidence and benchmarking</p><h1>證據、驗證與效能評估</h1><p class="mhead__sub">從 precision、recall、F1、資料來源與參考標註品質，系統性評估效能結果與適用範圍。</p><p class="mhead__meta"><span class="chip">約 60 分鐘</span><a class="chip" href="m07.html">建議先修：Somatic variant calling</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>批判性解讀效能圖，而非僅依最高長條判斷</li><li>解釋為什麼 precision 明顯上升時 F1 可能幾乎不動</li><li>說明 truth set 之間的可靠度差異，以及本研究如何處理</li><li>指出 data leakage、distribution shift 與 label noise 各自的徵兆</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">模組 10 · Evidence and benchmarking</p><h1>證據、驗證與效能評估</h1><p class="mhead__sub">從 precision、recall、F1、資料來源與參考標註品質，系統性評估效能結果與適用範圍。</p><p class="mhead__meta"><span class="chip">約 60 分鐘</span><a class="chip" href="m07.html">建議先修：Somatic variant calling</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>批判性解讀效能圖，而非僅依最高長條判斷</li><li>解釋為什麼 precision 明顯上升時 F1 可能幾乎不動</li><li>說明 truth set 之間的可靠度差異，以及 LongPhase-S 以加權方式處理它的做法</li><li>指出 data leakage、distribution shift 與 label noise 各自的徵兆</li></ul></section>
 
 <section data-part="why" class="part" id="part-why">
 <h2 data-num="①" id="為什麼重要">為什麼重要</h2>
@@ -62,6 +62,36 @@
 判讀<b>圖表未呈現的資訊</b>，是研究與工程實務中的重要能力。</p>
 
 <p class="prose">本節的目標不只是計算 F1，也包括培養批判性解讀與驗證能力。</p>
+
+<h3 id="本模組的數字來自兩項工作">本模組的數字來自兩項工作</h3>
+
+<p class="prose">下面會反覆引用兩組具體結果。它們是不同的方法、處理不同的問題，先在這裡分清楚，
+後面提到時就直接用名字稱呼：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>名稱</th><th>它是什麼</th><th>本模組用它示範什麼</th></tr></thead>
+<tbody>
+<tr>
+  <td><b>indel 精修模型</b></td>
+  <td>接在 somatic caller 後面的一個後處理模型。它把每個候選 indel 周圍的 pileup
+  <b>編碼成一張影像</b>，再用<b>卷積神經網路（CNN）</b>判斷這個候選是真的還是假的。
+  輸入是配對 tumor–normal 的 long-read 資料。關鍵性質是：<b>它只會刪掉候選，不會生出新的候選。</b></td>
+  <td>precision 上升而 F1 幾乎不動的原因、模型選擇該用什麼分數、
+  以及兩個長得一樣卻標記相反的候選</td>
+</tr>
+<tr>
+  <td><b>LongPhase-S 的 purity 估計</b></td>
+  <td>由樣本本身估計腫瘤比例，再依估計值調整過濾參數。方法本身在 M12 展開，
+  這裡只借它的<b>評估設計</b>。</td>
+  <td>交叉驗證要以什麼為單位切分、benchmark 可靠度不同時怎麼加權</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">第一項的那句「只會刪掉候選」，是本模組第一個要拆解的東西 ——
+它替所有後處理方法設下了一個效能上限。</p>
 </section>
 
 
@@ -169,10 +199,11 @@ caller 未產生的候選不會由此恢復；若後處理包含 re-calling 或 
 <figure class="widget" data-widget="pr-threshold" data-wid="m10.pr"><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>將門檻由 0.5 調至 0.9，比較 precision 與 F1 的變化；再將<b>模擬中的 caller 漏失數設為 0</b>，重複操作並比較兩種情境。</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
 
 <aside class="guardrail" id="guard-10"><p class="guardrail__hd">重要區分 #10：僅移除候選的後處理無法恢復 caller 未產生的候選</p><p class="prose">一項可由指標定義解釋的結果是：<b>precision 明顯提升，但 F1 僅維持或小幅增加。</b></p>
-<p class="prose">F1 同時受 FP 與 FN 影響。在該資料中，原始 caller 漏失多個真實 indel，因此 <b>FN 的數量遠多於 FP</b>。
+<p class="prose">F1 同時受 FP 與 FN 影響。在 indel 精修模型用的資料中，原始 caller 漏失多個真實 indel，
+因此 <b>FN 的數量遠多於 FP</b>。
 在此情況下，少量減少 FP 對 F1 的影響有限；如果過濾時又誤刪少量 TP，
 增加的 FN 還會把改善抵銷掉。</p>
-<p class="prose"><b>此限制不僅適用於該 CNN 方法。</b>許多分析工具屬於 caller 後處理，因此可能存在相同的效能上限。
+<p class="prose"><b>此限制不只適用於 indel 精修模型。</b>許多分析工具屬於 caller 後處理，因此可能存在相同的效能上限。
 解讀 precision 提升時，亦應檢視 recall 的變化及原始 FN 數量。</p></aside>
 
 <h3 id="truth-settruth-set-標準答案集評估用的參考標註-可靠度依資料來源與建立方法而異-困難區域可能包含標註錯誤-the-reference-labels-used-for-evaluation-a-truth-set-is-not-infallible-truth-reliability-varies-and-hard-regions-can-contain-label-errors-完整條目-並非無誤的標準"><span class="term" data-term="truth set" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-truth-set-3">truth set<span class="term__pop" id="gd-truth-set-3" role="tooltip"><b class="term__hd">truth set <i>標準答案集</i></b><span class="term__def" data-lang="zh">評估用的參考標註。可靠度依資料來源與建立方法而異，困難區域可能包含標註錯誤。</span><span class="term__def" data-lang="en">The reference labels used for evaluation. A truth set is not infallible truth: reliability varies, and hard regions can contain label errors.</span><a class="term__more" href="glossary.html#truth-set">完整條目 →</a></span></span> 並非無誤的標準</h3>
@@ -204,21 +235,22 @@ benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
 <table>
 <thead><tr><th>因素</th><th>可能徵兆</th><th>本例的處理</th></tr></thead>
 <tbody>
-<tr><td><span class="term" data-term="data leakage" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-data-leakage-5">data leakage<span class="term__pop" id="gd-data-leakage-5" role="tooltip"><b class="term__hd">data leakage <i>資料洩漏</i></b><span class="term__def" data-lang="zh">訓練或模型選擇階段取得了評估資料的資訊，讓效能被高估。實驗室的做法是<b>按染色體切分</b>，確保同一個位點不會同時出現在訓練、驗證與最終測試中。</span><span class="term__def" data-lang="en">Evaluation information entering training or model selection and inflating performance. The lab splits by chromosome so a locus cannot appear in training, validation and final test partitions at once.</span><a class="term__more" href="glossary.html#data-leakage">完整條目 →</a></span></span></td><td>測試效能異常偏高</td><td>研究按染色體切分：chr2 與 chr8 僅用於驗證；仍需檢查樣本與位點是否跨 split</td></tr>
-<tr><td><span class="term" data-term="distribution shift" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-distribution-shift-6">distribution shift<span class="term__pop" id="gd-distribution-shift-6" role="tooltip"><b class="term__hd">distribution shift <i>分布偏移</i></b><span class="term__def" data-lang="zh">測試資料的組成與訓練資料存在顯著差異（例如正負樣本比例不同），使得模型表現不如預期。</span><span class="term__def" data-lang="en">Test data differing in composition from training data, so measured performance does not transfer.</span><a class="term__more" href="glossary.html#distribution-shift">完整條目 →</a></span></span></td><td>訓練與測試的類別或特徵分布不同</td><td>研究指出訓練 FP 佔 4%、測試佔 19%，因此不能只看 loss</td></tr>
+<tr><td><span class="term" data-term="data leakage" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-data-leakage-5">data leakage<span class="term__pop" id="gd-data-leakage-5" role="tooltip"><b class="term__hd">data leakage <i>資料洩漏</i></b><span class="term__def" data-lang="zh">訓練或模型選擇階段取得了評估資料的資訊，讓效能被高估。實驗室的做法是<b>按染色體切分</b>，確保同一個位點不會同時出現在訓練、驗證與最終測試中。</span><span class="term__def" data-lang="en">Evaluation information entering training or model selection and inflating performance. The lab splits by chromosome so a locus cannot appear in training, validation and final test partitions at once.</span><a class="term__more" href="glossary.html#data-leakage">完整條目 →</a></span></span></td><td>測試效能異常偏高</td><td>indel 精修模型按染色體切分：chr2 與 chr8 僅用於驗證；仍需檢查樣本與位點是否跨 split</td></tr>
+<tr><td><span class="term" data-term="distribution shift" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-distribution-shift-6">distribution shift<span class="term__pop" id="gd-distribution-shift-6" role="tooltip"><b class="term__hd">distribution shift <i>分布偏移</i></b><span class="term__def" data-lang="zh">測試資料的組成與訓練資料存在顯著差異（例如正負樣本比例不同），使得模型表現不如預期。</span><span class="term__def" data-lang="en">Test data differing in composition from training data, so measured performance does not transfer.</span><a class="term__more" href="glossary.html#distribution-shift">完整條目 →</a></span></span></td><td>訓練與測試的類別或特徵分布不同</td><td>indel 精修模型的訓練集 FP 佔 4%、測試集佔 19%，因此不能只看 loss</td></tr>
 <tr><td><span class="term" data-term="label noise" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-label-noise-7">label noise<span class="term__pop" id="gd-label-noise-7" role="tooltip"><b class="term__hd">label noise <i>標籤雜訊</i></b><span class="term__def" data-lang="zh">訓練或評估標籤與真實狀態不一致的情況。在 homopolymer 與重複區域可能較常見；特徵相近的位點也可能得到相反標籤。</span><span class="term__def" data-lang="en">Errors in the labels themselves. They can be more frequent in homopolymers and repeats, where near-identical sites may receive different labels.</span><a class="term__more" href="glossary.html#label-noise">完整條目 →</a></span></span></td><td>特定類別的表現持續受限</td><td>特徵相近的兩個位點被賦予相反標籤，提示可能存在標註不確定性</td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">最後一項可由具體案例說明。研究比較兩個 deletion 的影像編碼：
-一個是 true positive（分數 0.997），一個是 false positive（分數 0.994）。
+<p class="prose">最後一項可由具體案例說明。下面並列 indel 精修模型送進 CNN 的兩張影像 ——
+也就是兩個 deletion 候選各自的 pileup 編碼：一個是 true positive（模型給 0.997），
+一個是 false positive（0.994）。
 兩者的 tumor reads 都顯示集中一致的 deletion，normal reads 未見相應支持。
-<b>就該影像編碼呈現的特徵而言，兩個候選近似。</b></p>
+<b>就這種影像編碼呈現的特徵而言，兩個候選近似。</b></p>
 
 <figure class="fig"><img src="assets/img/c/c-s34-lookalike.webp" alt="兩個 deletion 候選點的影像編碼並列比較：左邊是 true positive 分數 0.997，右邊是 false positive 分數 0.994；在此影像中兩者外觀相近" loading="lazy" decoding="async"><figcaption>兩個 deletion 候選點的模型分數相近：左側 true positive（0.997），右側 false positive（0.994）。兩者在此影像中都有集中對齊的 deletion，normal 均未呈現明顯異常。就此影像可見的訊息而言，兩個候選點難以區分；需要其他證據補充判讀。</figcaption></figure>
 
-<p class="prose">研究結論指出：「這兩類 candidates 在該影像輸入下未呈現可辨識差異。」這類位點常落在 homopolymer 或 tandem repeat 區域，
+<p class="prose">該工作的結論是：在這種影像輸入下，這兩類候選沒有可辨識的差異。這類位點常落在 homopolymer 或 tandem repeat 區域，
 <b>benchmark 標註的不確定性可能較高</b>；若要判定 label noise，仍需獨立 truth 或重複實驗支持。</p>
 
 <h3 id="合成-dna-fraction-混合樣本及其適用範圍">合成 DNA fraction 混合樣本及其適用範圍</h3>
@@ -237,13 +269,13 @@ benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
 
 <h3 id="用對的指標選模型">用對的指標選模型</h3>
 
-<p class="prose">一項可注意的模型選擇設計是：<b>研究未以 validation loss 最低的 epoch 作為最佳模型。</b></p>
+<p class="prose">indel 精修模型有一項值得注意的模型選擇設計：<b>它不取 validation loss 最低的那個 epoch 當最佳模型。</b></p>
 
 <p class="prose">理由是 loss 反映所選損失函數（例如 cross-entropy）的平均目標，不必然等同於分類錯誤率；
 若任務目標是「在盡量保留真 indel 的前提下，篩掉更多假的」，
 兩者不是同一件事。</p>
 
-<p class="prose">因此研究定義以下任務導向分數：</p>
+<p class="prose">因此它改用以下任務導向分數挑 epoch：</p>
 
 <pre><code>score = (成功移除的 FP − λ × 誤刪的 TP) ÷ FP 總數</code></pre>
 
@@ -334,7 +366,7 @@ awk '{c[$NF]++} END {for (k in c) print k, c[k]}' test_sites.tsv</code></pre>
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m09.html"><small>← 上一模組</small>甲基化入門</a><a class="next" href="m11.html"><small>下一模組 →</small>LongPhase：核心 phasing 流程</a></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>F1</dt><dd>precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。</dd><dt>cross-validation（交叉驗證）</dt><dd>輪流保留資料子集作為驗證折，用來估計模型的泛化能力與選擇設定；這些折是 validation，不是最終 test。最終測試集應在模型與設定確定後才使用，並另行保留。</dd><dt>data leakage（資料洩漏）</dt><dd>訓練或模型選擇階段取得了評估資料的資訊，讓效能被高估。實驗室的做法是<b>按染色體切分</b>，確保同一個位點不會同時出現在訓練、驗證與最終測試中。</dd><dt>distribution shift（分布偏移）</dt><dd>測試資料的組成與訓練資料存在顯著差異（例如正負樣本比例不同），使得模型表現不如預期。</dd><dt>high-confidence region</dt><dd>benchmark 建立者指定的高可信度區間，通常以 BED 檔表示；區間外不宜視為具有相同標註可靠度。</dd><dt>label noise（標籤雜訊）</dt><dd>訓練或評估標籤與真實狀態不一致的情況。在 homopolymer 與重複區域可能較常見；特徵相近的位點也可能得到相反標籤。</dd><dt>precision（精確率）</dt><dd>所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</dd><dt>recall（召回率）</dt><dd>在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</dd><dt>truth set（標準答案集）</dt><dd>評估用的參考標註。可靠度依資料來源與建立方法而異，困難區域可能包含標註錯誤。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#先釐清三項指標">先釐清三項指標</a></li><li class="lv3"><a href="#觀察-precision-與-f1-的差異">觀察 precision 與 F1 的差異</a></li><li class="lv3"><a href="#truth-settruth-set-標準答案集評估用的參考標註-可靠度依資料來源與建立方法而異-困難區域可能包含標註錯誤-the-reference-labels-used-for-evaluation-a-truth-set-is-not-infallible-truth-reliability-varies-and-hard-regions-can-contain-label-errors-完整條目-並非無誤的標準">truth settruth set 標準答案集評估用的參考標註。可靠度依資料來源與建立方法而異，困難區域可能包含標註錯誤。The reference labels used for evaluation. A truth set is not infallible truth: reliability varies, and hard regions can contain label errors.完整條目 → 並非無誤的標準</a></li><li class="lv3"><a href="#三項可能造成評估偏差的因素">三項可能造成評估偏差的因素</a></li><li class="lv3"><a href="#合成-dna-fraction-混合樣本及其適用範圍">合成 DNA fraction 混合樣本及其適用範圍</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#用對的指標選模型">用對的指標選模型</a></li><li class="lv3"><a href="#本例交叉驗證以樣本為分割單位">本例交叉驗證以樣本為分割單位</a></li><li class="lv2"><a href="#先提出預測-再查看解答">先提出預測，再查看解答</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#以標準化流程評估效能">以標準化流程評估效能</a></li><li class="lv3"><a href="#解讀效能數字時的四項檢核">解讀效能數字時的四項檢核</a></li><li class="lv3"><a href="#檢查訓練-測試資料是否存在洩漏">檢查訓練／測試資料是否存在洩漏</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv3"><a href="#本模組的數字來自兩項工作">本模組的數字來自兩項工作</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#先釐清三項指標">先釐清三項指標</a></li><li class="lv3"><a href="#觀察-precision-與-f1-的差異">觀察 precision 與 F1 的差異</a></li><li class="lv3"><a href="#truth-settruth-set-標準答案集評估用的參考標註-可靠度依資料來源與建立方法而異-困難區域可能包含標註錯誤-the-reference-labels-used-for-evaluation-a-truth-set-is-not-infallible-truth-reliability-varies-and-hard-regions-can-contain-label-errors-完整條目-並非無誤的標準">truth settruth set 標準答案集評估用的參考標註。可靠度依資料來源與建立方法而異，困難區域可能包含標註錯誤。The reference labels used for evaluation. A truth set is not infallible truth: reliability varies, and hard regions can contain label errors.完整條目 → 並非無誤的標準</a></li><li class="lv3"><a href="#三項可能造成評估偏差的因素">三項可能造成評估偏差的因素</a></li><li class="lv3"><a href="#合成-dna-fraction-混合樣本及其適用範圍">合成 DNA fraction 混合樣本及其適用範圍</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#用對的指標選模型">用對的指標選模型</a></li><li class="lv3"><a href="#本例交叉驗證以樣本為分割單位">本例交叉驗證以樣本為分割單位</a></li><li class="lv2"><a href="#先提出預測-再查看解答">先提出預測，再查看解答</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#以標準化流程評估效能">以標準化流程評估效能</a></li><li class="lv3"><a href="#解讀效能數字時的四項檢核">解讀效能數字時的四項檢核</a></li><li class="lv3"><a href="#檢查訓練-測試資料是否存在洩漏">檢查訓練／測試資料是否存在洩漏</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">

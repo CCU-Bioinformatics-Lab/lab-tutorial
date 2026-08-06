@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 710">
+  <title>沒有正常樣本時，用「鄰居一不一致」分辨真變異與定序錯誤</title>
+  <desc>上半部是同一個候選位置的兩種情況，各六條 read，而且兩邊帶候選 allele 的 read 都剛好三條 ——
+        所以光數數量分不出來，要看它們落在哪裡。
+        左邊：三條帶 T 的 read，左右鄰居都是 C 與 A，也就是三條全部落在同一條染色體（HP2）上。
+        右邊：三條帶 T 的 read，一條的鄰居是 HP1 的組合、一條是 HP2 的組合、
+        一條的組合在這個人身上根本不存在，因此無法歸屬。
+        下半部把同樣的資料畫成路徑圖：三個位置各有兩種 allele，一條 read 走出一條路徑。
+        左邊出現第三條完整的路徑，而且它跟 HP2 只差候選這一格，符合「變異從某一條既有染色體長出來」；
+        右邊帶 T 的 read 各走各的，沒有任何一條路徑被穩定支持。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">同一個候選位置：它是真的變異，還是定序錯誤？</text>
+  <text class="tick zh" x="20" y="58">兩邊帶 T 的 read 都是三條 —— 數量分不出來。要看的是這些 read 的<tspan class="bold">左右鄰居</tspan>。</text>
+
+  <!-- ══════════ 左：真的體細胞變異 ══════════ -->
+  <rect class="box ok" x="20" y="76" width="468" height="286" rx="10"/>
+  <text class="anno bold zh ok" x="40" y="106">① 真的體細胞變異</text>
+  <text class="tick zh" x="40" y="132">三條帶 T 的 read，鄰居組合完全一樣</text>
+
+  <text class="tick mid zh" x="116" y="162">左鄰居</text>
+  <text class="tick mid zh bold" x="254" y="162">候選位置</text>
+  <text class="tick mid zh" x="392" y="162">右鄰居</text>
+
+  <rect class="read hp1" x="56" y="176" width="396" height="15" rx="7.5"/>
+  <rect class="read hp1" x="56" y="202" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="56" y="228" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="56" y="254" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="56" y="280" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="56" y="306" width="396" height="15" rx="7.5"/>
+
+  <!-- 高亮欄一定畫在 read 之後，否則會被 read 的 fill 整個蓋掉 -->
+  <rect class="region" x="230" y="170" width="48" height="157"/>
+  <rect class="box ghost" x="230" y="170" width="48" height="157" rx="4"/>
+
+  <text class="base a mono mid" x="116" y="188" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="254" y="188" style="font-size:15px">G</text>
+  <text class="base t mono mid" x="392" y="188" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="116" y="214" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="254" y="214" style="font-size:15px">G</text>
+  <text class="base t mono mid" x="392" y="214" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="116" y="240" style="font-size:15px">C</text>
+  <text class="base g mono mid" x="254" y="240" style="font-size:15px">G</text>
+  <text class="base a mono mid" x="392" y="240" style="font-size:15px">A</text>
+  <text class="base c mono mid" x="116" y="266" style="font-size:15px">C</text>
+  <text class="base t mono mid" x="254" y="266" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="392" y="266" style="font-size:15px">A</text>
+  <text class="base c mono mid" x="116" y="292" style="font-size:15px">C</text>
+  <text class="base t mono mid" x="254" y="292" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="392" y="292" style="font-size:15px">A</text>
+  <text class="base c mono mid" x="116" y="318" style="font-size:15px">C</text>
+  <text class="base t mono mid" x="254" y="318" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="392" y="318" style="font-size:15px">A</text>
+
+  <text class="anno hp2 bold" x="456" y="266">HP2</text>
+  <text class="anno hp2 bold" x="456" y="292">HP2</text>
+  <text class="anno hp2 bold" x="456" y="318">HP2</text>
+
+  <text class="anno bold zh ok" x="40" y="348">→ 它有固定的出身：長在 HP2 上</text>
+
+  <!-- ══════════ 右：定序錯誤 ══════════ -->
+  <rect class="box bad" x="512" y="76" width="468" height="286" rx="10"/>
+  <text class="anno bold zh bad" x="532" y="106">② 定序錯誤</text>
+  <text class="tick zh" x="532" y="132">三條帶 T 的 read，鄰居組合各不相同</text>
+
+  <text class="tick mid zh" x="608" y="162">左鄰居</text>
+  <text class="tick mid zh bold" x="746" y="162">候選位置</text>
+  <text class="tick mid zh" x="884" y="162">右鄰居</text>
+
+  <rect class="read hp1" x="548" y="176" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="548" y="202" width="396" height="15" rx="7.5"/>
+  <rect class="read hp1" x="548" y="228" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="548" y="254" width="396" height="15" rx="7.5"/>
+  <rect class="read hp0" x="548" y="280" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="548" y="306" width="396" height="15" rx="7.5"/>
+
+  <rect class="region" x="722" y="170" width="48" height="157"/>
+  <rect class="box ghost" x="722" y="170" width="48" height="157" rx="4"/>
+
+  <text class="base a mono mid" x="608" y="188" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="746" y="188" style="font-size:15px">G</text>
+  <text class="base t mono mid" x="884" y="188" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="608" y="214" style="font-size:15px">C</text>
+  <text class="base g mono mid" x="746" y="214" style="font-size:15px">G</text>
+  <text class="base a mono mid" x="884" y="214" style="font-size:15px">A</text>
+  <text class="base a mono mid" x="608" y="240" style="font-size:15px">A</text>
+  <text class="base t mono mid" x="746" y="240" style="font-size:15px">T</text>
+  <text class="base t mono mid" x="884" y="240" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="608" y="266" style="font-size:15px">C</text>
+  <text class="base t mono mid" x="746" y="266" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="884" y="266" style="font-size:15px">A</text>
+  <text class="base a mono mid" x="608" y="292" style="font-size:15px">A</text>
+  <text class="base t mono mid" x="746" y="292" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="884" y="292" style="font-size:15px">A</text>
+  <text class="base c mono mid" x="608" y="318" style="font-size:15px">C</text>
+  <text class="base g mono mid" x="746" y="318" style="font-size:15px">G</text>
+  <text class="base a mono mid" x="884" y="318" style="font-size:15px">A</text>
+
+  <text class="anno hp1 bold" x="946" y="240">HP1</text>
+  <text class="anno hp2 bold" x="946" y="266">HP2</text>
+  <text class="anno bold" x="946" y="292">？</text>
+
+  <text class="anno bold zh bad" x="532" y="348">→ 它沒有固定的出身</text>
+
+  <!-- ══════════ 下半：畫成路徑圖 ══════════ -->
+  <line class="axis" x1="20" y1="382" x2="980" y2="382"/>
+  <text class="lbl bold zh" x="20" y="412">把同一批 read 畫成路徑：三個位置，一條 read 走一條路</text>
+
+  <!-- 左 -->
+  <rect class="box plain" x="20" y="428" width="468" height="262" rx="10"/>
+  <line class="conn hp1" x1="40" y1="453" x2="70" y2="453"/>
+  <text class="tick mono" x="76" y="458">HP1</text>
+  <line class="conn hp2" x1="140" y1="453" x2="170" y2="453"/>
+  <text class="tick mono" x="176" y="458">HP2</text>
+  <line class="conn somatic thick" x1="240" y1="453" x2="270" y2="453"/>
+  <text class="anno zh somatic bold" x="276" y="458">第三條路徑</text>
+
+  <rect class="region" x="224" y="500" width="60" height="136"/>
+
+  <path class="conn hp1" d="M116,530 L254,530 L392,530"/>
+  <path class="conn hp2" d="M116,606 L254,530 L392,606"/>
+  <path class="conn somatic thick" d="M116,606 L254,606 L392,606"/>
+
+  <circle class="mark ref" cx="116" cy="530" r="21"/>
+  <circle class="mark ref" cx="254" cy="530" r="21"/>
+  <circle class="mark ref" cx="392" cy="530" r="21"/>
+  <circle class="mark ref" cx="116" cy="606" r="21"/>
+  <circle class="mark ref" cx="254" cy="606" r="21"/>
+  <circle class="mark ref" cx="392" cy="606" r="21"/>
+
+  <text class="base a mono mid" x="116" y="537" style="font-size:20px">A</text>
+  <text class="base g mono mid" x="254" y="537" style="font-size:20px">G</text>
+  <text class="base t mono mid" x="392" y="537" style="font-size:20px">T</text>
+  <text class="base c mono mid" x="116" y="613" style="font-size:20px">C</text>
+  <text class="base t mono mid" x="254" y="613" style="font-size:20px">T</text>
+  <text class="base a mono mid" x="392" y="613" style="font-size:20px">A</text>
+
+  <text class="tick zh" x="40" y="652">三條 read 走出<tspan class="bold">同一條</tspan>新路徑，</text>
+  <text class="tick zh" x="40" y="674">而它跟 HP2 只差候選這一格 —— 像是從 HP2 長出來的。</text>
+
+  <!-- 右 -->
+  <rect class="box plain" x="512" y="428" width="468" height="262" rx="10"/>
+  <line class="conn hp1" x1="532" y1="453" x2="562" y2="453"/>
+  <text class="tick mono" x="568" y="458">HP1</text>
+  <line class="conn hp2" x1="632" y1="453" x2="662" y2="453"/>
+  <text class="tick mono" x="668" y="458">HP2</text>
+  <line class="conn artifact" x1="732" y1="453" x2="762" y2="453" style="stroke-dasharray:6 4"/>
+  <text class="anno zh artifact bold" x="768" y="458">帶 T 的三條</text>
+
+  <rect class="region" x="716" y="500" width="60" height="136"/>
+
+  <path class="conn hp1" d="M608,530 L746,530 L884,530"/>
+  <path class="conn hp2" d="M608,606 L746,530 L884,606"/>
+  <path class="conn artifact" d="M608,530 L746,606 L884,530" style="stroke-dasharray:6 4"/>
+  <path class="conn artifact" d="M608,606 L746,606 L884,606" style="stroke-dasharray:6 4"/>
+  <path class="conn artifact" d="M608,530 L746,606 L884,606" style="stroke-dasharray:6 4"/>
+
+  <circle class="mark ref" cx="608" cy="530" r="21"/>
+  <circle class="mark ref" cx="746" cy="530" r="21"/>
+  <circle class="mark ref" cx="884" cy="530" r="21"/>
+  <circle class="mark ref" cx="608" cy="606" r="21"/>
+  <circle class="mark ref" cx="746" cy="606" r="21"/>
+  <circle class="mark ref" cx="884" cy="606" r="21"/>
+
+  <text class="base a mono mid" x="608" y="537" style="font-size:20px">A</text>
+  <text class="base g mono mid" x="746" y="537" style="font-size:20px">G</text>
+  <text class="base t mono mid" x="884" y="537" style="font-size:20px">T</text>
+  <text class="base c mono mid" x="608" y="613" style="font-size:20px">C</text>
+  <text class="base t mono mid" x="746" y="613" style="font-size:20px">T</text>
+  <text class="base a mono mid" x="884" y="613" style="font-size:20px">A</text>
+
+  <text class="tick zh" x="532" y="652">三條 read <tspan class="bold">各走各的</tspan>，</text>
+  <text class="tick zh" x="532" y="674">沒有哪一條新路徑被穩定支持 —— 這是隨機出現的訊號。</text>
+</svg>

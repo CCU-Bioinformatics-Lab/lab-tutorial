@@ -150,7 +150,7 @@ window.TW_MODULES = [
   "title_en": "LongPhase-TO: tumour-only",
   "short": "LongPhase-TO",
   "q": "沒有配對正常組織時，如何以其他證據補足對照？",
-  "sub": "依序說明 clipping、CNV/BFB 區間、染色體等級 LOH、triplet graph 與 purity 估計，並練習 GT:GT2:GT3 解碼。",
+  "sub": "沒有對照組時改看 read 上的鄰居關係：LOH 偵測、三位點投票、跨 LOH 的定相、腫瘤比例估計，以及這四步在原始碼裡的落點。",
   "est_min": 80,
   "group": "實驗室工具"
  },

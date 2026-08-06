@@ -1,97 +1,91 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700">
-  <title>從 clipping 界定候選事件區間，再用雜合比例評估大範圍 LOH 候選</title>
-  <desc>第一層：覆蓋度沿著染色體起伏，轉折附近可能累積「左端被剪」或「右端被剪」的 read。
-        一組上升與下降可提供事件區間的候選邊界。
-        第二層：對每個區間計算雜合比例，也就是能區分兩條染色體的位置佔多少。
-        比例偏低可作為 LOH 候選訊號，但仍需考慮覆蓋度、比對品質與拷貝數。
-        中間夾著的小事件可能把較大範圍的 LOH 候選切成好幾段。
-        第三層：排除小事件的干擾後重新計算，以評估較大範圍的 LOH 候選。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 790">
+  <title>怎麼找出「只剩一條染色體」的區段：先切邊界，再算雜合比例，最後跳過小事件</title>
+  <desc>第一層：read 的兩端如果對不上參考序列就會被剪掉，而斷點附近會有很多 read 在同一個位置被剪。
+        左端被剪與右端被剪各算一種訊號。兩個方向相反、距離又很近的訊號會被配成一對，
+        代表中間夾著一個小事件；配不成對的落單訊號則當成大區段的邊界。
+        第二層：對每個區段統計雜合位點佔所有變異的比例。
+        一條染色體整段消失時，原本一邊 A 一邊 G 的位置會只剩一種 allele，比例因此掉到門檻以下。
+        圖中一段真正連續的 LOH 被中間兩個小事件墊高了比例，於是被切成三段。
+        第三層：算比例時把小事件區間裡的變異先扣掉，三段就併回成一段連續的 LOH，
+        寫進 LOH.bed，第三步定相時會用到。
+        這一整套只用 read 與參考的對應關係，以及變異本身是雜合還是同型，不需要正常樣本。</desc>
 
-  <!-- ═══════════ 第一層：覆蓋度與 clipping ═══════════ -->
-  <text class="lbl bold zh" x="20" y="32">① 覆蓋度的起伏，會在轉折處留下被剪斷的 read</text>
+  <!-- ══════════ ① 用被剪斷的 read 切出邊界 ══════════ -->
+  <text class="lbl bold zh" x="20" y="32">① read 被剪斷的位置，就是切區段的地方</text>
+  <text class="tick zh" x="20" y="58">read 的一端對不上參考序列時會被剪掉。同一個位置擠了很多剪痕，代表那裡有斷點。</text>
 
-  <text class="tick end zh" x="112" y="118">覆蓋度</text>
-  <line class="axis" x1="120" y1="180" x2="910" y2="180"/>
+  <rect class="box plain" x="20" y="72" width="960" height="176" rx="10"/>
 
-  <!-- 覆蓋度階梯 -->
-  <path class="conn thick" d="M120,140 L240,140 L240,108 L400,108 L400,140 L470,140
-                              L540,76 L610,140 L680,140 L680,104 L840,104 L840,140 L900,140" style="stroke-width:3"/>
+  <text class="tick end zh" x="132" y="106">read</text>
+  <rect class="read hp0" x="148" y="96" width="200" height="14" rx="7"/>
+  <rect class="read hp0" x="176" y="116" width="172" height="14" rx="7"/>
+  <rect class="read hp0" x="160" y="136" width="188" height="14" rx="7"/>
+  <rect class="read hp0" x="352" y="96" width="176" height="14" rx="7"/>
+  <rect class="read hp0" x="352" y="116" width="150" height="14" rx="7"/>
+  <rect class="read hp0" x="352" y="136" width="196" height="14" rx="7"/>
+  <rect class="read hp0" x="576" y="96" width="180" height="14" rx="7"/>
+  <rect class="read hp0" x="576" y="116" width="204" height="14" rx="7"/>
+  <rect class="read hp0" x="620" y="136" width="160" height="14" rx="7"/>
+  <rect class="read hp0" x="784" y="96" width="164" height="14" rx="7"/>
+  <rect class="read hp0" x="784" y="116" width="140" height="14" rx="7"/>
+  <rect class="read hp0" x="800" y="136" width="148" height="14" rx="7"/>
 
-  <!-- 上升處：左端被剪（up clipping） -->
-  <g>
-    <path d="M240,172 L240,148" stroke="var(--hp1)" stroke-width="4" marker-end="url(#arrow)"/>
-    <path d="M470,172 L470,148" stroke="var(--hp1)" stroke-width="4" marker-end="url(#arrow)"/>
-    <path d="M680,172 L680,148" stroke="var(--hp1)" stroke-width="4" marker-end="url(#arrow)"/>
-  </g>
-  <!-- 下降處：右端被剪（down clipping） -->
-  <g>
-    <path d="M400,148 L400,172" stroke="var(--hp2)" stroke-width="4" marker-end="url(#arrow)"/>
-    <path d="M610,148 L610,172" stroke="var(--hp2)" stroke-width="4" marker-end="url(#arrow)"/>
-    <path d="M840,148 L840,172" stroke="var(--hp2)" stroke-width="4" marker-end="url(#arrow)"/>
-  </g>
+  <line class="conn bad" x1="350" y1="92" x2="350" y2="154" style="stroke-width:5"/>
+  <line class="conn bad" x1="574" y1="92" x2="574" y2="154" style="stroke-width:5"/>
+  <line class="conn bad" x1="782" y1="92" x2="782" y2="154" style="stroke-width:5"/>
 
-  <text class="tick mid zh" x="320" y="100">拷貝數變多</text>
-  <text class="tick mid zh" x="540" y="66">劇烈重排</text>
+  <text class="tick mid zh" x="350" y="176">右端被剪</text>
+  <text class="tick mid zh" x="574" y="176">左端被剪</text>
+  <text class="tick mid zh" x="782" y="176">右端被剪</text>
 
-  <!-- 圖例 -->
-  <path d="M922,120 L922,100" stroke="var(--hp1)" stroke-width="4" marker-end="url(#arrow)"/>
-  <text class="tick zh hp1" x="932" y="112">左端剪</text>
-  <path d="M922,138 L922,158" stroke="var(--hp2)" stroke-width="4" marker-end="url(#arrow)"/>
-  <text class="tick zh hp2" x="932" y="152">右端剪</text>
+  <text class="tick end zh" x="132" y="212">配成對</text>
+  <path class="conn ok" d="M350,206 L574,206" style="stroke-width:4"/>
+  <circle class="mark ref" cx="782" cy="206" r="7"/>
+  <text class="anno mid zh ok bold" x="462" y="200">方向相反又很近 → 中間夾著一個小事件</text>
+  <text class="anno mid zh" x="800" y="234">落單 → 大區段的邊界</text>
 
-  <!-- 框出的區間 -->
-  <text class="tick end zh" x="112" y="212">框出的區間</text>
-  <line class="axis" x1="240" y1="206" x2="400" y2="206" style="stroke-width:5"/>
-  <line class="axis" x1="470" y1="206" x2="610" y2="206" style="stroke-width:5"/>
-  <line class="axis" x1="680" y1="206" x2="840" y2="206" style="stroke-width:5"/>
-  <text class="tick mid zh" x="320" y="230">一個事件</text>
-  <text class="tick mid zh" x="540" y="230">一個事件</text>
-  <text class="tick mid zh" x="760" y="230">一個事件</text>
+  <!-- ══════════ ② 算雜合比例 ══════════ -->
+  <line class="axis" x1="20" y1="268" x2="980" y2="268"/>
+  <text class="lbl bold zh" x="20" y="300">② 每個區段算一個數字：雜合位點佔多少</text>
+  <text class="tick zh" x="20" y="326">一條染色體整段不見了，原本能分出兩邊的位置只剩一種 allele，這個比例就會掉到門檻以下。</text>
 
-  <text class="anno zh" x="20" y="266">重點：這一步主要利用 read 與參考的對應關係界定候選區段，仍需搭配其他訊號確認。</text>
+  <text class="anno end zh" x="140" y="352">高</text>
+  <text class="anno end zh" x="140" y="466">低</text>
+  <line class="guide" x1="148" y1="346" x2="948" y2="346"/>
+  <line class="axis" x1="148" y1="460" x2="948" y2="460"/>
+  <line class="guide bad" x1="148" y1="428" x2="948" y2="428" style="stroke-dasharray:5 4"/>
+  <text class="anno bad bold zh" x="954" y="426">門檻</text>
 
-  <!-- ═══════════ 第二層：雜合比例 ═══════════ -->
-  <line class="axis" x1="20" y1="290" x2="980" y2="290"/>
-  <text class="lbl bold zh" x="20" y="322">② 對每個區段算「雜合比例」：能區分兩條染色體的位置佔多少</text>
+  <path class="conn thick" d="M148,364 L300,364 L300,440 L420,440 L420,372 L470,372
+                              L470,440 L640,440 L640,372 L700,372 L700,440 L860,440
+                              L860,364 L948,364"/>
 
-  <text class="tick end" x="112" y="356">1.0</text>
-  <text class="tick end" x="112" y="456">0</text>
-  <line class="guide" x1="120" y1="350" x2="910" y2="350"/>
-  <line class="axis" x1="120" y1="450" x2="910" y2="450"/>
+  <text class="tick mid zh" x="224" y="404">正常</text>
+  <text class="tick mid zh" x="904" y="404">正常</text>
+  <text class="anno mid zh bold" x="445" y="396">小事件</text>
+  <text class="anno mid zh bold" x="670" y="396">小事件</text>
 
-  <!-- 階梯：低=LOH，中間兩個小島偏高 -->
-  <path class="conn thick somatic" d="M120,370 L240,370 L240,440 L400,440 L400,365 L470,365
-                              L470,440 L610,440 L610,360 L680,360 L680,440 L840,440
-                              L840,370 L900,370" style="stroke-width:3"/>
+  <text class="anno mid zh" x="548" y="486">門檻以下的<tspan class="bold">三段</tspan>各自被標成 LOH</text>
 
-  <!-- 兩個小島標成問題 -->
-  <text class="lbl bold bad mid" x="435" y="352">✗</text>
-  <text class="lbl bold bad mid" x="645" y="348">✗</text>
+  <rect class="box bad" x="148" y="500" width="800" height="42" rx="6"/>
+  <text class="anno mid zh" x="548" y="527">問題：本來是<tspan class="bold">一段連續</tspan>的 LOH，被兩個小事件切成三塊。</text>
 
-  <text class="tick mid zh" x="180" y="410">正常</text>
-  <text class="tick mid zh bold somatic" x="320" y="472">比例偏低 → LOH 候選</text>
-  <text class="tick mid zh bold somatic" x="540" y="472">比例偏低 → LOH 候選</text>
-  <text class="tick mid zh bold somatic" x="760" y="472">比例偏低 → LOH 候選</text>
-  <text class="tick mid zh" x="880" y="410">正常</text>
+  <!-- ══════════ ③ 跳過小事件重算 ══════════ -->
+  <line class="axis" x1="20" y1="570" x2="980" y2="570"/>
+  <text class="lbl bold zh" x="20" y="602">③ 算比例時，先把小事件區間裡的變異扣掉</text>
 
-  <rect class="box plain" x="120" y="490" width="790" height="46" rx="6"/>
-  <text class="anno zh" x="140" y="518">問題：中間夾的兩個小事件比例偏高，可能把<tspan class="bold bad">較大範圍 LOH 候選切成三段</tspan>。</text>
+  <line class="guide" x1="148" y1="626" x2="948" y2="626"/>
+  <line class="axis" x1="148" y1="690" x2="948" y2="690"/>
+  <line class="guide bad" x1="148" y1="662" x2="948" y2="662" style="stroke-dasharray:5 4"/>
 
-  <!-- ═══════════ 第三層：跳過小事件 ═══════════ -->
-  <line class="axis" x1="20" y1="558" x2="980" y2="558"/>
-  <text class="lbl bold zh" x="20" y="590">③ 排除小事件干擾，重新計算 —— 評估較大範圍</text>
+  <path class="conn thick ok" d="M148,638 L300,638 L300,676 L860,676 L860,638 L948,638"/>
 
-  <line class="guide" x1="120" y1="612" x2="910" y2="612"/>
-  <line class="axis" x1="120" y1="646" x2="910" y2="646"/>
+  <path class="guide muted" d="M420,676 Q445,650 470,676"/>
+  <path class="guide muted" d="M640,676 Q670,650 700,676"/>
+  <text class="tick mid zh" x="445" y="662">跳過</text>
+  <text class="tick mid zh" x="670" y="662">跳過</text>
 
-  <path class="conn thick ok" d="M120,620 L240,620 L240,640 L840,640 L840,620 L900,620"/>
-
-  <!-- 跳過的小事件用虛線弧標示 -->
-  <path class="guide muted" d="M400,640 Q435,618 470,640"/>
-  <path class="guide muted" d="M610,640 Q645,618 680,640"/>
-  <text class="tick mid zh" x="435" y="634">跳過</text>
-  <text class="tick mid zh" x="645" y="634">跳過</text>
-
-  <line class="axis ok" x1="240" y1="664" x2="840" y2="664" style="stroke-width:6"/>
-  <text class="anno mid zh bold ok" x="540" y="690">較大範圍的染色體層級 LOH 候選</text>
+  <line class="axis ok" x1="300" y1="712" x2="860" y2="712" style="stroke-width:6"/>
+  <text class="anno mid zh bold ok" x="580" y="740">併回成一段：這一整段只剩一條染色體</text>
+  <text class="tick mid zh" x="580" y="766">寫進 <tspan class="mono">&lt;prefix&gt;_LOH.bed</tspan>，第三步定相時會用到</text>
 </svg>

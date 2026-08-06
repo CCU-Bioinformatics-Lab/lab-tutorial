@@ -52,8 +52,8 @@
 
   <rect class="box plain" x="346" y="366" width="306" height="104" rx="8"/>
   <text class="anno bold mid" x="499" y="394">情況 B</text>
-  <text class="tick mid zh" x="499" y="420">腫瘤佔 80%，四份染色體</text>
-  <text class="tick mid zh" x="499" y="442">所有腫瘤細胞都帶著它</text>
+  <text class="tick mid zh" x="499" y="420">腫瘤佔 50%，三份染色體</text>
+  <text class="tick mid zh" x="499" y="442">突變佔一份，所有腫瘤細胞都有</text>
   <text class="tick mid zh ok bold" x="499" y="464">→ clonal 狀態（時間需其他證據）</text>
 
   <rect class="box bad" x="672" y="366" width="308" height="104" rx="8"/>

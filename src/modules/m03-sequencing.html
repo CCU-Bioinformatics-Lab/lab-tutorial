@@ -190,8 +190,9 @@ samtools index dna_frac_0.6.bam
 samtools stats aln.bam | grep -E '^SN' | grep -E 'length|reads mapped'
 
 # 讀長分布（看有多少條真的夠長）
-samtools view aln.bam | awk '{print length($10)}' | sort -n | \
-  awk '{a[NR]=$1} END {print "中位數", a[int(NR/2)]; print "第 50 百分位", a[int(NR*0.5)]; print "最長", a[NR]}'
+# -F 0x900 排除 secondary 與 supplementary，否則同一條 read 會被數好幾次
+samtools view -F 0x900 aln.bam | awk '{print length($10)}' | sort -n | \
+  awk '{a[NR]=$1} END {print "中位數", a[int(NR*0.5)]; print "第 90 百分位", a[int(NR*0.9)]; print "最長", a[NR]}'
 
 # 覆蓋度
 mosdepth --by 500 out aln.bam && head out.mosdepth.summary.txt

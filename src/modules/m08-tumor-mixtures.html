@@ -93,16 +93,18 @@
 <p class="prose"><b>VAF 是可由 reads 估計的觀測量；purity、totalCN、multiplicity 與 CCF 通常需由多項證據估計或推論。</b>
 這些參數之間存在可識別性限制，因此「估計腫瘤細胞比例」本身就是一個獨立的研究題目。</p>
 
-{{widget:purity-vaf #vaf | 先以 CN=2、multiplicity=1、CCF=1 作為基準，確認曲線為 purity 的一半；再將 total CN 調至 3 或 4，比較曲線與右側 tumor DNA fraction 和 cellular purity 的差異。}}
+{{widget:purity-vaf #vaf | 先以 CN=2、multiplicity=1、CCF=1 作為基準，確認曲線為 purity 的一半；再將 total CN 調至 3 或 4，比較曲線與右側 tumor DNA fraction 和 cellular purity 的差異。<b>可以順手驗算上圖</b>：purity 0.50、total CN 3 時預期 VAF 顯示 0.200，與 purity 0.40、CN 2 得到的數字相同。}}
 
 {{guard:3 | VAF 不是 cancer cell fraction}}
 <p class="prose">上面的滑桿已經示範過了：同一個 VAF = 0.20，可能是</p>
 <ul class="prose">
 <li>purity 0.4、diploid、clonal 的突變，或</li>
-<li>purity 0.8、CN 4、multiplicity 1、clonal 的突變，或</li>
+<li>purity 0.5、CN 3、multiplicity 1、clonal 的突變，或</li>
 <li>purity 0.8、diploid、CCF 只有 0.5 的 subclonal 突變</li>
 </ul>
-<p class="prose">三種情況的生物意義不同；第三例的 CCF=0.5 表示 subclonal，但 VAF 仍然相同。</p>
+<p class="prose">三種情況的生物意義不同；第三例的 CCF=0.5 表示 subclonal，但 VAF 仍然相同。
+可用上面的關係式逐一驗算：<code>0.4 ÷ 2</code>、<code>0.5 ÷ (0.5×3 + 0.5×2)</code>、
+<code>0.8×0.5 ÷ 2</code>，三者都是 0.20。</p>
 <p class="prose">此限制已被列為後續工作：可納入 allele-specific CNV、LOH、tumor purity、DNA fraction 與 mutation multiplicity，
 以建立 CN-aware 的 read-AF 解讀。這是方法適用範圍的重要限制。</p>
 {{/guard}}

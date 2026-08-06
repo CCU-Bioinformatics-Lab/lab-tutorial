@@ -118,6 +118,7 @@
 .dia-svg .conn.hp1 { stroke: var(--hp1); }
 .dia-svg .conn.hp2 { stroke: var(--hp2); }
 .dia-svg .conn.somatic { stroke: var(--somatic); }
+.dia-svg .conn.artifact { stroke: var(--artifact); }
 .dia-svg .conn.ok   { stroke: var(--ok); }
 .dia-svg .conn.warn { stroke: var(--warn); }
 .dia-svg .conn.bad  { stroke: var(--bad); }

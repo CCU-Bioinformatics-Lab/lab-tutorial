@@ -93,7 +93,8 @@ window.TW_GLOSSARY = {
   "slug": "heterozygous",
   "modules": [
    "m02",
-   "m06"
+   "m06",
+   "m13"
   ]
  },
  "homozygous": {
@@ -253,7 +254,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "long-read",
   "modules": [
-   "m03"
+   "m03",
+   "m13"
   ]
  },
  "read": {
@@ -697,7 +699,8 @@ window.TW_GLOSSARY = {
   "slug": "clairs",
   "modules": [
    "m07",
-   "m12"
+   "m12",
+   "m13"
   ]
  },
  "DeepSomatic": {
@@ -761,7 +764,8 @@ window.TW_GLOSSARY = {
   "slug": "pon",
   "modules": [
    "capstone",
-   "m07"
+   "m07",
+   "m13"
   ]
  },
  "TINC": {
@@ -812,7 +816,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "tumour-dna-fraction",
   "modules": [
-   "m03"
+   "m03",
+   "m13"
   ]
  },
  "cancer cell fraction": {
@@ -857,7 +862,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "aneuploidy",
   "modules": [
-   "m03"
+   "m03",
+   "m13"
   ]
  },
  "copy number": {
@@ -1106,12 +1112,13 @@ window.TW_GLOSSARY = {
   ],
   "slug": "ghir",
   "modules": [
-   "m12"
+   "m12",
+   "m13"
   ]
  },
  "triplet graph": {
-  "zh": "LongPhase-TO 用來評估 candidate 的局部結構：取候選點與左右兩個 germline 位點，觀察三個位置的 allele 組合如何由 reads 連結。在此方法的判定規則中，三位點可提供兩位點模型缺少的辨識資訊。",
-  "en": "LongPhase-TO's structure for judging a candidate: the candidate plus two flanking germline sites, and how their alleles link across reads.",
+  "zh": "LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。",
+  "en": "LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.",
   "see": [
    "LongPhase-TO",
    "somatic variant"
@@ -1119,7 +1126,8 @@ window.TW_GLOSSARY = {
   "slug": "triplet-graph",
   "modules": [
    "capstone",
-   "m07"
+   "m07",
+   "m13"
   ]
  },
  "provenance": {

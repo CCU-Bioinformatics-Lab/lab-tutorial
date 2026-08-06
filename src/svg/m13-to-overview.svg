@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 830">
+  <title>LongPhase-TO 一個指令做完的四件事，以及它的輸入與輸出</title>
+  <desc>輸入有三樣：只有腫瘤樣本的 BAM、別的工具產生的候選變異 VCF，
+        以及一份族群常見遺傳變異的清單。沒有配對的正常樣本可以對照。
+        中間由上而下依序做四件事：先沿著染色體找出只剩一條染色體的 LOH 區段；
+        再逐一判斷每個候選變異是不是真的；接著把 germline 與 somatic 變異一起定相；
+        最後從兩條 haplotype 的 read 有多不平衡，估計樣本裡有多少比例來自腫瘤。
+        第四件事算出來的比例若超過 0.9，會用它回頭把第三步重跑一次，
+        圖上以右側往回的虛線表示。
+        輸出有三樣：帶 GT、GT2、GT3 的 VCF、標出 LOH 區段的 BED，
+        以及寫在 VCF 檔頭的腫瘤比例。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">一個 phase 指令，由上而下做完四件事</text>
+  <text class="tick zh" x="20" y="58">沒有正常樣本可以對照，所以這四件事都只能從腫瘤自己的 read 推出來。</text>
+
+  <!-- ══ 輸入 ══ -->
+  <rect class="box sunken" x="20" y="76" width="960" height="100" rx="10"/>
+  <text class="anno bold zh" x="44" y="102">輸入</text>
+
+  <rect class="box plain" x="44" y="112" width="290" height="54" rx="6"/>
+  <text class="tick zh bold" x="60" y="134">腫瘤樣本的 BAM</text>
+  <text class="tick zh" x="60" y="156">沒有配對的正常樣本</text>
+
+  <rect class="box plain" x="354" y="112" width="300" height="54" rx="6"/>
+  <text class="tick zh bold" x="370" y="134">候選變異 VCF</text>
+  <text class="tick zh" x="370" y="156">由 ClairS-TO 或 DeepSomatic-TO 產生</text>
+
+  <rect class="box plain" x="674" y="112" width="280" height="54" rx="6"/>
+  <text class="tick zh bold" x="690" y="134">族群資料庫（PON）</text>
+  <text class="tick zh" x="690" y="156">大家都有的遺傳變異清單</text>
+
+  <path class="flow" d="M470,176 L470,204" marker-end="url(#arrow)"/>
+
+  <!-- ══ 四件事：由上而下就是程式跑的順序 ══ -->
+  <rect class="box accent" x="20" y="214" width="900" height="96" rx="10"/>
+  <text class="anno bold zh" x="44" y="252">① 哪些區段只剩一條染色體？</text>
+  <text class="tick zh" x="420" y="246">用 read 被剪斷的位置切出區段邊界，</text>
+  <text class="tick zh" x="420" y="270">再算每個區段裡「雜合位點佔多少」，</text>
+  <text class="tick zh" x="420" y="294">比例低到一定程度就標成 LOH。</text>
+
+  <path class="flow" d="M470,310 L470,320" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box accent" x="20" y="324" width="900" height="96" rx="10"/>
+  <text class="anno bold zh" x="44" y="362">② 每個候選變異是真的嗎？</text>
+  <text class="tick zh" x="420" y="356">看支持它的 read 落在哪一條染色體上：</text>
+  <text class="tick zh" x="420" y="380">全落在同一條，像是從那一條長出來的；</text>
+  <text class="tick zh" x="420" y="404">散在兩條，比較像隨機出現的定序錯誤。</text>
+
+  <path class="flow" d="M470,420 L470,430" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box accent" x="20" y="434" width="900" height="96" rx="10"/>
+  <text class="anno bold zh" x="44" y="472">③ 每個變異在哪一條染色體上？</text>
+  <text class="tick zh" x="420" y="466">把「同一條 read 上看到的 allele」連成圖，</text>
+  <text class="tick zh" x="420" y="490">一次定相 germline 與 somatic 變異。</text>
+  <text class="tick zh" x="420" y="514">LOH 區裡只剩一條，也要接得過去。</text>
+
+  <path class="flow" d="M470,530 L470,540" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box accent" x="20" y="544" width="900" height="118" rx="10"/>
+  <text class="anno bold zh" x="44" y="592">④ 這個樣本有多少比例是腫瘤？</text>
+  <text class="tick zh" x="420" y="576">看兩條 haplotype 的 read 有多不平衡，</text>
+  <text class="tick zh" x="420" y="600">加上 LOH 佔了全基因體多少，</text>
+  <text class="tick zh" x="420" y="624">一起丟進一個事先訓練好的式子。</text>
+  <text class="anno zh somatic bold" x="420" y="650">算出來超過 0.9 時，回頭把 ③ 重跑一次。</text>
+
+  <!-- 回饋線：算完比例才知道第三步該不該重做 -->
+  <path class="conn somatic" d="M920,616 L956,616 L956,482 L926,482"
+        marker-end="url(#arrow)" style="stroke-dasharray:7 4"/>
+
+  <path class="flow" d="M470,662 L470,690" marker-end="url(#arrow)"/>
+
+  <!-- ══ 輸出 ══ -->
+  <rect class="box sunken" x="20" y="698" width="960" height="100" rx="10"/>
+  <text class="anno bold zh" x="44" y="724">輸出</text>
+
+  <rect class="box plain" x="44" y="734" width="290" height="54" rx="6"/>
+  <text class="tick mono bold" x="60" y="756">phased VCF</text>
+  <text class="tick zh" x="60" y="778">每個位置的 GT · GT2 · GT3</text>
+
+  <rect class="box plain" x="354" y="734" width="300" height="54" rx="6"/>
+  <text class="tick mono bold" x="370" y="756">&lt;prefix&gt;_LOH.bed</text>
+  <text class="tick zh" x="370" y="778">哪些區段只剩一條染色體</text>
+
+  <rect class="box plain" x="674" y="734" width="280" height="54" rx="6"/>
+  <text class="tick mono bold" x="690" y="756">##tumor_purity=</text>
+  <text class="tick zh" x="690" y="778">寫在 VCF 的檔頭裡</text>
+</svg>

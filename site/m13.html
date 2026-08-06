@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>LongPhase-TO（tumor-only） · 長讀癌症基因體學入門</title>
-<meta name="description" content="依序說明 clipping、CNV/BFB 區間、染色體等級 LOH、triplet graph 與 purity 估計，並練習 GT:GT2:GT3 解碼。">
+<meta name="description" content="沒有對照組時改看 read 上的鄰居關係：LOH 偵測、三位點投票、跨 LOH 的定相、腫瘤比例估計，以及這四步在原始碼裡的落點。">
 <link rel="stylesheet" href="assets/css/tokens.css">
 <link rel="stylesheet" href="assets/css/base.css">
 <link rel="stylesheet" href="assets/css/layout.css">
@@ -53,309 +53,716 @@
 
 <div class="wrap ">
   <main class="main" id="main">
-    <header class="mhead"><p class="mhead__kicker">模組 13 · LongPhase-TO: tumour-only</p><h1>LongPhase-TO（tumor-only）</h1><p class="mhead__sub">依序說明 clipping、CNV/BFB 區間、染色體等級 LOH、triplet graph 與 purity 估計，並練習 GT:GT2:GT3 解碼。</p><p class="mhead__meta"><span class="chip">約 80 分鐘</span><a class="chip" href="m12.html">建議先修：LongPhase-S</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說明 clipping 如何用來界定 CNV / BFB 的事件區間</li><li>解釋為什麼要用 heterozygosity ratio 而不是 coverage 來偵測 LOH</li><li>說明 triplet graph 為什麼需要三個位點而不是兩個</li><li>解讀一個 GT:GT2:GT3 字串，包含 LOH 區內的巢狀情況</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">模組 13 · LongPhase-TO: tumour-only</p><h1>LongPhase-TO（tumor-only）</h1><p class="mhead__sub">沒有對照組時改看 read 上的鄰居關係：LOH 偵測、三位點投票、跨 LOH 的定相、腫瘤比例估計，以及這四步在原始碼裡的落點。</p><p class="mhead__meta"><span class="chip">約 80 分鐘</span><a class="chip" href="m12.html">建議先修：LongPhase-S</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說出沒有配對正常樣本時，LongPhase-TO 改用什麼證據取代對照組</li><li>解釋為什麼判斷候選變異的真假，要看「支持它的 read 落在哪一條染色體上」</li><li>說明偵測 LOH 為什麼用雜合位點比例而不是 coverage，以及小事件為什麼要先扣掉</li><li>讀懂一個 GT:GT2:GT3 字串，包含 LOH 區內的情況</li><li>在原始碼裡指出這四個步驟各自寫在哪個函式</li></ul></section>
 
 <section data-part="why" class="part" id="part-why">
 <h2 data-num="①" id="為什麼重要">為什麼重要</h2>
 
-<p class="prose"><span class="term" data-term="LongPhase-TO" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-longphase-to-0">LongPhase-TO<span class="term__pop" id="gd-longphase-to-0" role="tooltip"><b class="term__hd">LongPhase-TO</b><span class="term__def" data-lang="zh">tumor-only 版本。做染色體等級的 LOH 偵測、triplet graph 再校正、somatic phasing 與 purity 估計。</span><span class="term__def" data-lang="en">The tumour-only version: chromosome-scale LOH detection, triplet-graph recalibration, somatic phasing and purity estimation.</span><a class="term__more" href="glossary.html#longphase-to">完整條目 →</a></span></span> 是 tumor-only 支線的基礎。它在<b>沒有配對正常樣本</b>的情況下，
-執行 LOH 偵測、候選 somatic 判定、phasing 與 purity 估計。</p>
+<p class="prose">上一章的做法需要兩份樣本：腫瘤一份、同一個病人的正常組織一份。
+有了正常樣本，「這個變異是不是癌細胞才有的」就有直接的參照 ——
+正常樣本裡也看得到的，本來就有，不是癌症造成的。</p>
 
-<p class="prose">缺少正常樣本對照時，流程改以<b>haplotype 與 graph 結構</b>作為判定證據。本節說明這些結構。</p>
+<p class="prose">實務上常常只拿得到腫瘤那一份。這時候少掉的不只是一個檔案，是<b>整個對照組</b>。
+看到一個候選變異，你沒有辦法直接回答「這個人本來就有嗎」。</p>
+
+<p class="prose"><span class="term" data-term="LongPhase-TO" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-longphase-to-0">LongPhase-TO<span class="term__pop" id="gd-longphase-to-0" role="tooltip"><b class="term__hd">LongPhase-TO</b><span class="term__def" data-lang="zh">tumor-only 版本。做染色體等級的 LOH 偵測、triplet graph 再校正、somatic phasing 與 purity 估計。</span><span class="term__def" data-lang="en">The tumour-only version: chromosome-scale LOH detection, triplet-graph recalibration, somatic phasing and purity estimation.</span><a class="term__more" href="glossary.html#longphase-to">完整條目 →</a></span></span> 換了一種證據：<b>不比對兩個樣本，改看同一批 read 內部的結構</b>。
+一條 <span class="term" data-term="long read" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-long-read-1">long read<span class="term__pop" id="gd-long-read-1" role="tooltip"><b class="term__hd">long read <i>長讀</i></b><span class="term__def" data-lang="zh">單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</span><span class="term__def" data-lang="en">A sequencing read thousands to tens of thousands of bases long. Its length lets one molecule link multiple variants directly.</span><a class="term__more" href="glossary.html#long-read">完整條目 →</a></span></span> 一次跨過好幾個位置，所以「哪些 allele 綁在同一條分子上」這件事，
+只有腫瘤樣本時仍然看得見。這一章就是在講它怎麼把這個結構當成缺席的對照組來用。</p>
 </section>
 
 
 <section data-part="concept" class="part" id="part-concept">
 <h2 data-num="②" id="概念與互動">概念與互動</h2>
 
-<h3 id="第一步-以-clipping-界定事件邊界">第一步：以 clipping 界定事件邊界</h3>
+<h3 id="先看整件事的形狀">先看整件事的形狀</h3>
 
-<p class="prose">要偵測染色體等級的 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-1">LOH<span class="term__pop" id="gd-loh-1" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span>，需先界定待分析的基因體區段。
-LongPhase-TO 會檢查 <b><span class="term" data-term="soft clipping" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-soft-clipping-2">soft clipping<span class="term__pop" id="gd-soft-clipping-2" role="tooltip"><b class="term__hd">soft clipping</b><span class="term__def" data-lang="zh">read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</span><span class="term__def" data-lang="en">A read end that failed to align but is retained in the BAM (CIGAR S). Clipping clustered at one position may suggest a structural breakpoint and needs corroborating evidence.</span><a class="term__more" href="glossary.html#soft-clipping">完整條目 →</a></span></span></b> 的分布（M4 的 CIGAR <code>S</code>）：</p>
+<p class="prose">這個工具只有一個主要指令，但它一次做完四件事。
+先把這四件事的順序記住，後面每一節都是在把其中一格放大。</p>
 
-<ul class="prose">
-<li>大量 read 在某處出現<b>左端</b> clipping，可能對應 coverage 上升的轉折（up clipping）</li>
-<li>大量 read 在某處出現<b>右端</b> clipping，可能對應 coverage 下降的轉折（down clipping）</li>
-<li>一組 up/down clipping 可提供 CNV 或 <span class="term" data-term="BFB" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-bfb-3">BFB<span class="term__pop" id="gd-bfb-3" role="tooltip"><b class="term__hd">BFB <i>斷裂—融合—橋循環</i></b><span class="term__def" data-lang="zh">Breakage-fusion-bridge：染色體反覆斷裂與融合造成的劇烈重排，在 coverage 上呈現特殊的階梯形狀。</span><span class="term__def" data-lang="en">Breakage-fusion-bridge: repeated chromosome breakage and fusion producing characteristic coverage staircases.</span><a class="term__more" href="glossary.html#bfb">完整條目 →</a></span></span> 事件區間的候選邊界，仍需其他訊號驗證</li>
-</ul>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 830" class="dia-svg" role="img">
+  <title>LongPhase-TO 一個指令做完的四件事，以及它的輸入與輸出</title>
+  <desc>輸入有三樣：只有腫瘤樣本的 BAM、別的工具產生的候選變異 VCF，
+        以及一份族群常見遺傳變異的清單。沒有配對的正常樣本可以對照。
+        中間由上而下依序做四件事：先沿著染色體找出只剩一條染色體的 LOH 區段；
+        再逐一判斷每個候選變異是不是真的；接著把 germline 與 somatic 變異一起定相；
+        最後從兩條 haplotype 的 read 有多不平衡，估計樣本裡有多少比例來自腫瘤。
+        第四件事算出來的比例若超過 0.9，會用它回頭把第三步重跑一次，
+        圖上以右側往回的虛線表示。
+        輸出有三樣：帶 GT、GT2、GT3 的 VCF、標出 LOH 區段的 BED，
+        以及寫在 VCF 檔頭的腫瘤比例。</desc>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" class="dia-svg" role="img">
-  <title>從 clipping 界定候選事件區間，再用雜合比例評估大範圍 LOH 候選</title>
-  <desc>第一層：覆蓋度沿著染色體起伏，轉折附近可能累積「左端被剪」或「右端被剪」的 read。
-        一組上升與下降可提供事件區間的候選邊界。
-        第二層：對每個區間計算雜合比例，也就是能區分兩條染色體的位置佔多少。
-        比例偏低可作為 LOH 候選訊號，但仍需考慮覆蓋度、比對品質與拷貝數。
-        中間夾著的小事件可能把較大範圍的 LOH 候選切成好幾段。
-        第三層：排除小事件的干擾後重新計算，以評估較大範圍的 LOH 候選。</desc>
+  <text class="lbl bold zh" x="20" y="32">一個 phase 指令，由上而下做完四件事</text>
+  <text class="tick zh" x="20" y="58">沒有正常樣本可以對照，所以這四件事都只能從腫瘤自己的 read 推出來。</text>
 
-  <!-- ═══════════ 第一層：覆蓋度與 clipping ═══════════ -->
-  <text class="lbl bold zh" x="20" y="32">① 覆蓋度的起伏，會在轉折處留下被剪斷的 read</text>
+  <!-- ══ 輸入 ══ -->
+  <rect class="box sunken" x="20" y="76" width="960" height="100" rx="10"/>
+  <text class="anno bold zh" x="44" y="102">輸入</text>
 
-  <text class="tick end zh" x="112" y="118">覆蓋度</text>
-  <line class="axis" x1="120" y1="180" x2="910" y2="180"/>
+  <rect class="box plain" x="44" y="112" width="290" height="54" rx="6"/>
+  <text class="tick zh bold" x="60" y="134">腫瘤樣本的 BAM</text>
+  <text class="tick zh" x="60" y="156">沒有配對的正常樣本</text>
 
-  <!-- 覆蓋度階梯 -->
-  <path class="conn thick" d="M120,140 L240,140 L240,108 L400,108 L400,140 L470,140
-                              L540,76 L610,140 L680,140 L680,104 L840,104 L840,140 L900,140" style="stroke-width:3"/>
+  <rect class="box plain" x="354" y="112" width="300" height="54" rx="6"/>
+  <text class="tick zh bold" x="370" y="134">候選變異 VCF</text>
+  <text class="tick zh" x="370" y="156">由 ClairS-TO 或 DeepSomatic-TO 產生</text>
 
-  <!-- 上升處：左端被剪（up clipping） -->
-  <g>
-    <path d="M240,172 L240,148" stroke="var(--hp1)" stroke-width="4" marker-end="url(#arrow)"/>
-    <path d="M470,172 L470,148" stroke="var(--hp1)" stroke-width="4" marker-end="url(#arrow)"/>
-    <path d="M680,172 L680,148" stroke="var(--hp1)" stroke-width="4" marker-end="url(#arrow)"/>
-  </g>
-  <!-- 下降處：右端被剪（down clipping） -->
-  <g>
-    <path d="M400,148 L400,172" stroke="var(--hp2)" stroke-width="4" marker-end="url(#arrow)"/>
-    <path d="M610,148 L610,172" stroke="var(--hp2)" stroke-width="4" marker-end="url(#arrow)"/>
-    <path d="M840,148 L840,172" stroke="var(--hp2)" stroke-width="4" marker-end="url(#arrow)"/>
-  </g>
+  <rect class="box plain" x="674" y="112" width="280" height="54" rx="6"/>
+  <text class="tick zh bold" x="690" y="134">族群資料庫（PON）</text>
+  <text class="tick zh" x="690" y="156">大家都有的遺傳變異清單</text>
 
-  <text class="tick mid zh" x="320" y="100">拷貝數變多</text>
-  <text class="tick mid zh" x="540" y="66">劇烈重排</text>
+  <path class="flow" d="M470,176 L470,204" marker-end="url(#arrow)"/>
 
-  <!-- 圖例 -->
-  <path d="M922,120 L922,100" stroke="var(--hp1)" stroke-width="4" marker-end="url(#arrow)"/>
-  <text class="tick zh hp1" x="932" y="112">左端剪</text>
-  <path d="M922,138 L922,158" stroke="var(--hp2)" stroke-width="4" marker-end="url(#arrow)"/>
-  <text class="tick zh hp2" x="932" y="152">右端剪</text>
+  <!-- ══ 四件事：由上而下就是程式跑的順序 ══ -->
+  <rect class="box accent" x="20" y="214" width="900" height="96" rx="10"/>
+  <text class="anno bold zh" x="44" y="252">① 哪些區段只剩一條染色體？</text>
+  <text class="tick zh" x="420" y="246">用 read 被剪斷的位置切出區段邊界，</text>
+  <text class="tick zh" x="420" y="270">再算每個區段裡「雜合位點佔多少」，</text>
+  <text class="tick zh" x="420" y="294">比例低到一定程度就標成 LOH。</text>
 
-  <!-- 框出的區間 -->
-  <text class="tick end zh" x="112" y="212">框出的區間</text>
-  <line class="axis" x1="240" y1="206" x2="400" y2="206" style="stroke-width:5"/>
-  <line class="axis" x1="470" y1="206" x2="610" y2="206" style="stroke-width:5"/>
-  <line class="axis" x1="680" y1="206" x2="840" y2="206" style="stroke-width:5"/>
-  <text class="tick mid zh" x="320" y="230">一個事件</text>
-  <text class="tick mid zh" x="540" y="230">一個事件</text>
-  <text class="tick mid zh" x="760" y="230">一個事件</text>
+  <path class="flow" d="M470,310 L470,320" marker-end="url(#arrow-sm)"/>
 
-  <text class="anno zh" x="20" y="266">重點：這一步主要利用 read 與參考的對應關係界定候選區段，仍需搭配其他訊號確認。</text>
+  <rect class="box accent" x="20" y="324" width="900" height="96" rx="10"/>
+  <text class="anno bold zh" x="44" y="362">② 每個候選變異是真的嗎？</text>
+  <text class="tick zh" x="420" y="356">看支持它的 read 落在哪一條染色體上：</text>
+  <text class="tick zh" x="420" y="380">全落在同一條，像是從那一條長出來的；</text>
+  <text class="tick zh" x="420" y="404">散在兩條，比較像隨機出現的定序錯誤。</text>
 
-  <!-- ═══════════ 第二層：雜合比例 ═══════════ -->
-  <line class="axis" x1="20" y1="290" x2="980" y2="290"/>
-  <text class="lbl bold zh" x="20" y="322">② 對每個區段算「雜合比例」：能區分兩條染色體的位置佔多少</text>
+  <path class="flow" d="M470,420 L470,430" marker-end="url(#arrow-sm)"/>
 
-  <text class="tick end" x="112" y="356">1.0</text>
-  <text class="tick end" x="112" y="456">0</text>
-  <line class="guide" x1="120" y1="350" x2="910" y2="350"/>
-  <line class="axis" x1="120" y1="450" x2="910" y2="450"/>
+  <rect class="box accent" x="20" y="434" width="900" height="96" rx="10"/>
+  <text class="anno bold zh" x="44" y="472">③ 每個變異在哪一條染色體上？</text>
+  <text class="tick zh" x="420" y="466">把「同一條 read 上看到的 allele」連成圖，</text>
+  <text class="tick zh" x="420" y="490">一次定相 germline 與 somatic 變異。</text>
+  <text class="tick zh" x="420" y="514">LOH 區裡只剩一條，也要接得過去。</text>
 
-  <!-- 階梯：低=LOH，中間兩個小島偏高 -->
-  <path class="conn thick somatic" d="M120,370 L240,370 L240,440 L400,440 L400,365 L470,365
-                              L470,440 L610,440 L610,360 L680,360 L680,440 L840,440
-                              L840,370 L900,370" style="stroke-width:3"/>
+  <path class="flow" d="M470,530 L470,540" marker-end="url(#arrow-sm)"/>
 
-  <!-- 兩個小島標成問題 -->
-  <text class="lbl bold bad mid" x="435" y="352">✗</text>
-  <text class="lbl bold bad mid" x="645" y="348">✗</text>
+  <rect class="box accent" x="20" y="544" width="900" height="118" rx="10"/>
+  <text class="anno bold zh" x="44" y="592">④ 這個樣本有多少比例是腫瘤？</text>
+  <text class="tick zh" x="420" y="576">看兩條 haplotype 的 read 有多不平衡，</text>
+  <text class="tick zh" x="420" y="600">加上 LOH 佔了全基因體多少，</text>
+  <text class="tick zh" x="420" y="624">一起丟進一個事先訓練好的式子。</text>
+  <text class="anno zh somatic bold" x="420" y="650">算出來超過 0.9 時，回頭把 ③ 重跑一次。</text>
 
-  <text class="tick mid zh" x="180" y="410">正常</text>
-  <text class="tick mid zh bold somatic" x="320" y="472">比例偏低 → LOH 候選</text>
-  <text class="tick mid zh bold somatic" x="540" y="472">比例偏低 → LOH 候選</text>
-  <text class="tick mid zh bold somatic" x="760" y="472">比例偏低 → LOH 候選</text>
-  <text class="tick mid zh" x="880" y="410">正常</text>
+  <!-- 回饋線：算完比例才知道第三步該不該重做 -->
+  <path class="conn somatic" d="M920,616 L956,616 L956,482 L926,482"
+        marker-end="url(#arrow)" style="stroke-dasharray:7 4"/>
 
-  <rect class="box plain" x="120" y="490" width="790" height="46" rx="6"/>
-  <text class="anno zh" x="140" y="518">問題：中間夾的兩個小事件比例偏高，可能把<tspan class="bold bad">較大範圍 LOH 候選切成三段</tspan>。</text>
+  <path class="flow" d="M470,662 L470,690" marker-end="url(#arrow)"/>
 
-  <!-- ═══════════ 第三層：跳過小事件 ═══════════ -->
-  <line class="axis" x1="20" y1="558" x2="980" y2="558"/>
-  <text class="lbl bold zh" x="20" y="590">③ 排除小事件干擾，重新計算 —— 評估較大範圍</text>
+  <!-- ══ 輸出 ══ -->
+  <rect class="box sunken" x="20" y="698" width="960" height="100" rx="10"/>
+  <text class="anno bold zh" x="44" y="724">輸出</text>
 
-  <line class="guide" x1="120" y1="612" x2="910" y2="612"/>
-  <line class="axis" x1="120" y1="646" x2="910" y2="646"/>
+  <rect class="box plain" x="44" y="734" width="290" height="54" rx="6"/>
+  <text class="tick mono bold" x="60" y="756">phased VCF</text>
+  <text class="tick zh" x="60" y="778">每個位置的 GT · GT2 · GT3</text>
 
-  <path class="conn thick ok" d="M120,620 L240,620 L240,640 L840,640 L840,620 L900,620"/>
+  <rect class="box plain" x="354" y="734" width="300" height="54" rx="6"/>
+  <text class="tick mono bold" x="370" y="756">&lt;prefix&gt;_LOH.bed</text>
+  <text class="tick zh" x="370" y="778">哪些區段只剩一條染色體</text>
 
-  <!-- 跳過的小事件用虛線弧標示 -->
-  <path class="guide muted" d="M400,640 Q435,618 470,640"/>
-  <path class="guide muted" d="M610,640 Q645,618 680,640"/>
-  <text class="tick mid zh" x="435" y="634">跳過</text>
-  <text class="tick mid zh" x="645" y="634">跳過</text>
+  <rect class="box plain" x="674" y="734" width="280" height="54" rx="6"/>
+  <text class="tick mono bold" x="690" y="756">##tumor_purity=</text>
+  <text class="tick zh" x="690" y="778">寫在 VCF 的檔頭裡</text>
+</svg><figcaption>由上而下就是程式實際跑的順序，不是隨便排的。
+③ 需要 ① 算出來的 LOH 區段才做得下去；④ 需要 ③ 的定相結果才算得出來。
+而 ④ 算出來的數字如果很高，還會<b>回頭把 ③ 重跑一次</b> —— 這條回饋線是這個流程唯一的循環。</figcaption></figure>
 
-  <line class="axis ok" x1="240" y1="664" x2="840" y2="664" style="stroke-width:6"/>
-  <text class="anno mid zh bold ok" x="540" y="690">較大範圍的染色體層級 LOH 候選</text>
-</svg><figcaption>三層。① clipping 與 coverage 的轉折可提供候選事件邊界：上升處常見「左端被剪」、下降處常見「右端被剪」，一組上下界定一個候選區間；此步驟不直接使用 variant calls。② 對每個區段計算雜合比例，比例偏低時標記為 LOH 候選；中間夾的小事件可能使連續 LOH 被切成數段。③ 排除小事件後重算，有助於估計連續區段的範圍。</figcaption></figure>
+<h3 id="第一件事-哪些區段只剩一條染色體">第一件事：哪些區段只剩一條染色體</h3>
 
-<p class="prose">實際訊號可能較分散 —— 有些事件是「緩升緩降」的，clipping 分布在一小段區域而非單一位置。
-因此可用滑動視窗累積 clipping 訊號，再依峰值定位候選邊界。</p>
+<p class="prose">人的每個位置本來有兩份，一份來自父親、一份來自母親。
+腫瘤細胞常常整段整段地弄丟其中一份，這叫 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-2">LOH<span class="term__pop" id="gd-loh-2" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span>。
+LOH 區段對後面每一步都有影響，所以要先找出來。</p>
 
-<h3 id="第二步-以-heterozygosity-ratio-找-loh-候選">第二步：以 heterozygosity ratio 找 LOH 候選</h3>
+<p class="prose">怎麼找？看一個很簡單的數字：<b>這個區段裡，「兩份不一樣」的位置佔多少</b>。
+兩份都在的時候，一個人身上大約每一千個鹼基就有一個位置是一邊 A、一邊 G，
+這種位置叫 <span class="term" data-term="heterozygous" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-heterozygous-3">雜合<span class="term__pop" id="gd-heterozygous-3" role="tooltip"><b class="term__hd">heterozygous <i>異型合子</i></b><span class="term__def" data-lang="zh">在一般二倍體位點上，兩份 allele 不同（例如一份 A、一份 G）。此類位點可作為區分 haplotype 的資訊錨點；複雜拷貝數情況需另行解讀。</span><span class="term__def" data-lang="en">At a typical diploid locus, carrying two different allele copies (for example A and G). These sites can anchor phasing; copy-number changes require separate interpretation.</span><a class="term__more" href="glossary.html#heterozygous">完整條目 →</a></span></span>。少了一份之後，這些位置只剩一種 allele，比例就會塌下來。</p>
 
-<p class="prose">切好區段之後，統計每個區段裡 heterozygous 位點的比例。
-比例低於預設門檻時可標記為 LOH 候選，並需結合 coverage、mapping 與其他 QC 判讀。</p>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 790" class="dia-svg" role="img">
+  <title>怎麼找出「只剩一條染色體」的區段：先切邊界，再算雜合比例，最後跳過小事件</title>
+  <desc>第一層：read 的兩端如果對不上參考序列就會被剪掉，而斷點附近會有很多 read 在同一個位置被剪。
+        左端被剪與右端被剪各算一種訊號。兩個方向相反、距離又很近的訊號會被配成一對，
+        代表中間夾著一個小事件；配不成對的落單訊號則當成大區段的邊界。
+        第二層：對每個區段統計雜合位點佔所有變異的比例。
+        一條染色體整段消失時，原本一邊 A 一邊 G 的位置會只剩一種 allele，比例因此掉到門檻以下。
+        圖中一段真正連續的 LOH 被中間兩個小事件墊高了比例，於是被切成三段。
+        第三層：算比例時把小事件區間裡的變異先扣掉，三段就併回成一段連續的 LOH，
+        寫進 LOH.bed，第三步定相時會用到。
+        這一整套只用 read 與參考的對應關係，以及變異本身是雜合還是同型，不需要正常樣本。</desc>
+
+  <!-- ══════════ ① 用被剪斷的 read 切出邊界 ══════════ -->
+  <text class="lbl bold zh" x="20" y="32">① read 被剪斷的位置，就是切區段的地方</text>
+  <text class="tick zh" x="20" y="58">read 的一端對不上參考序列時會被剪掉。同一個位置擠了很多剪痕，代表那裡有斷點。</text>
+
+  <rect class="box plain" x="20" y="72" width="960" height="176" rx="10"/>
+
+  <text class="tick end zh" x="132" y="106">read</text>
+  <rect class="read hp0" x="148" y="96" width="200" height="14" rx="7"/>
+  <rect class="read hp0" x="176" y="116" width="172" height="14" rx="7"/>
+  <rect class="read hp0" x="160" y="136" width="188" height="14" rx="7"/>
+  <rect class="read hp0" x="352" y="96" width="176" height="14" rx="7"/>
+  <rect class="read hp0" x="352" y="116" width="150" height="14" rx="7"/>
+  <rect class="read hp0" x="352" y="136" width="196" height="14" rx="7"/>
+  <rect class="read hp0" x="576" y="96" width="180" height="14" rx="7"/>
+  <rect class="read hp0" x="576" y="116" width="204" height="14" rx="7"/>
+  <rect class="read hp0" x="620" y="136" width="160" height="14" rx="7"/>
+  <rect class="read hp0" x="784" y="96" width="164" height="14" rx="7"/>
+  <rect class="read hp0" x="784" y="116" width="140" height="14" rx="7"/>
+  <rect class="read hp0" x="800" y="136" width="148" height="14" rx="7"/>
+
+  <line class="conn bad" x1="350" y1="92" x2="350" y2="154" style="stroke-width:5"/>
+  <line class="conn bad" x1="574" y1="92" x2="574" y2="154" style="stroke-width:5"/>
+  <line class="conn bad" x1="782" y1="92" x2="782" y2="154" style="stroke-width:5"/>
+
+  <text class="tick mid zh" x="350" y="176">右端被剪</text>
+  <text class="tick mid zh" x="574" y="176">左端被剪</text>
+  <text class="tick mid zh" x="782" y="176">右端被剪</text>
+
+  <text class="tick end zh" x="132" y="212">配成對</text>
+  <path class="conn ok" d="M350,206 L574,206" style="stroke-width:4"/>
+  <circle class="mark ref" cx="782" cy="206" r="7"/>
+  <text class="anno mid zh ok bold" x="462" y="200">方向相反又很近 → 中間夾著一個小事件</text>
+  <text class="anno mid zh" x="800" y="234">落單 → 大區段的邊界</text>
+
+  <!-- ══════════ ② 算雜合比例 ══════════ -->
+  <line class="axis" x1="20" y1="268" x2="980" y2="268"/>
+  <text class="lbl bold zh" x="20" y="300">② 每個區段算一個數字：雜合位點佔多少</text>
+  <text class="tick zh" x="20" y="326">一條染色體整段不見了，原本能分出兩邊的位置只剩一種 allele，這個比例就會掉到門檻以下。</text>
+
+  <text class="anno end zh" x="140" y="352">高</text>
+  <text class="anno end zh" x="140" y="466">低</text>
+  <line class="guide" x1="148" y1="346" x2="948" y2="346"/>
+  <line class="axis" x1="148" y1="460" x2="948" y2="460"/>
+  <line class="guide bad" x1="148" y1="428" x2="948" y2="428" style="stroke-dasharray:5 4"/>
+  <text class="anno bad bold zh" x="954" y="426">門檻</text>
+
+  <path class="conn thick" d="M148,364 L300,364 L300,440 L420,440 L420,372 L470,372
+                              L470,440 L640,440 L640,372 L700,372 L700,440 L860,440
+                              L860,364 L948,364"/>
+
+  <text class="tick mid zh" x="224" y="404">正常</text>
+  <text class="tick mid zh" x="904" y="404">正常</text>
+  <text class="anno mid zh bold" x="445" y="396">小事件</text>
+  <text class="anno mid zh bold" x="670" y="396">小事件</text>
+
+  <text class="anno mid zh" x="548" y="486">門檻以下的<tspan class="bold">三段</tspan>各自被標成 LOH</text>
+
+  <rect class="box bad" x="148" y="500" width="800" height="42" rx="6"/>
+  <text class="anno mid zh" x="548" y="527">問題：本來是<tspan class="bold">一段連續</tspan>的 LOH，被兩個小事件切成三塊。</text>
+
+  <!-- ══════════ ③ 跳過小事件重算 ══════════ -->
+  <line class="axis" x1="20" y1="570" x2="980" y2="570"/>
+  <text class="lbl bold zh" x="20" y="602">③ 算比例時，先把小事件區間裡的變異扣掉</text>
+
+  <line class="guide" x1="148" y1="626" x2="948" y2="626"/>
+  <line class="axis" x1="148" y1="690" x2="948" y2="690"/>
+  <line class="guide bad" x1="148" y1="662" x2="948" y2="662" style="stroke-dasharray:5 4"/>
+
+  <path class="conn thick ok" d="M148,638 L300,638 L300,676 L860,676 L860,638 L948,638"/>
+
+  <path class="guide muted" d="M420,676 Q445,650 470,676"/>
+  <path class="guide muted" d="M640,676 Q670,650 700,676"/>
+  <text class="tick mid zh" x="445" y="662">跳過</text>
+  <text class="tick mid zh" x="670" y="662">跳過</text>
+
+  <line class="axis ok" x1="300" y1="712" x2="860" y2="712" style="stroke-width:6"/>
+  <text class="anno mid zh bold ok" x="580" y="740">併回成一段：這一整段只剩一條染色體</text>
+  <text class="tick mid zh" x="580" y="766">寫進 <tspan class="mono">&lt;prefix&gt;_LOH.bed</tspan>，第三步定相時會用到</text>
+</svg><figcaption>三層。① 區段的邊界不是憑空切的：read 的一端對不上參考序列時會被<b>剪掉</b>（<span class="term" data-term="soft clipping" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-soft-clipping-4">soft clipping<span class="term__pop" id="gd-soft-clipping-4" role="tooltip"><b class="term__hd">soft clipping</b><span class="term__def" data-lang="zh">read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</span><span class="term__def" data-lang="en">A read end that failed to align but is retained in the BAM (CIGAR S). Clipping clustered at one position may suggest a structural breakpoint and needs corroborating evidence.</span><a class="term__more" href="glossary.html#soft-clipping">完整條目 →</a></span></span>，M4 的 CIGAR <code>S</code>），
+而斷點附近會有一整排 read 在同一個位置被剪。方向相反又靠得很近的兩個剪痕會被<b>配成一對</b>，代表中間夾著一個小事件；配不到對的落單剪痕就當成大區段的邊界。
+② 每個區段算一次雜合比例，低於門檻的標成 LOH。③ 關鍵的一步：算比例時先把小事件區間裡的變異扣掉，否則一段連續的 LOH 會被切成好幾塊。</figcaption></figure>
 
 <div class="guardrail guardrail--info">
-<p class="guardrail__hd">為什麼不用 coverage？</p>
-<p class="prose">回到 M8 的 LOH 模擬器：<b>copy-neutral LOH 的 coverage 可接近正常範圍</b>。
-因此單獨依 coverage 可能漏檢 copy-neutral LOH。</p>
-<p class="prose">heterozygosity ratio 可對 copy-loss 與 copy-neutral LOH 提供訊號，
-因為兩者都可能使原本的 het 位點減少；敏感度仍受 coverage、mapping 與門檻影響。</p>
+<p class="guardrail__hd">為什麼不看 coverage 就好？</p>
+<p class="prose">直覺上「少一份」應該等於「深度剩一半」。但 M8 的 LOH 模擬器示範過另一種情況：
+一條 haplotype 遺失之後，另一條被複製補上，<b>深度看起來完全正常</b>，
+可是兩份都來自同一個親代 —— 這叫 copy-neutral LOH。</p>
+<p class="prose">只看 coverage 會整個漏掉這一類。雜合比例則對兩類都有反應：
+不管是「少一份」還是「一份變兩份一樣的」，原本能分出兩邊的位置都會消失。</p>
 </div>
 
-<p class="prose">還有一個細節：LongPhase-TO 會<b>排除區段內的小 CNV/BFB 事件</b>再統計。
-理由是一個大的染色體等級 LOH 裡面可能夾雜幾個小事件，
-如果不排除，區段可能被切碎，原本連續的 LOH 可能被報成好幾段。
-此設計旨在降低小事件對區段界定的干擾。</p>
+<p class="prose">為什麼小事件非扣不可？因為一段大 LOH 裡面常常夾著幾個小的重排
+（<span class="term" data-term="BFB" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-bfb-5">BFB<span class="term__pop" id="gd-bfb-5" role="tooltip"><b class="term__hd">BFB <i>斷裂—融合—橋循環</i></b><span class="term__def" data-lang="zh">Breakage-fusion-bridge：染色體反覆斷裂與融合造成的劇烈重排，在 coverage 上呈現特殊的階梯形狀。</span><span class="term__def" data-lang="en">Breakage-fusion-bridge: repeated chromosome breakage and fusion producing characteristic coverage staircases.</span><a class="term__more" href="glossary.html#bfb">完整條目 →</a></span></span> 這類劇烈斷裂—融合就會製造這種局部訊號）。這些小區間裡雜合位點會短暫回來，
+把比例墊到門檻之上。不處理的話，程式會以為那裡不是 LOH，於是把一段連續的區域報成三段不相干的區域。</p>
 
-<h3 id="第三步-triplet-graph-的三位點結構">第三步：triplet graph 的三位點結構</h3>
+<h3 id="第二件事-這個候選變異是真的嗎">第二件事：這個候選變異是真的嗎</h3>
 
-<p class="prose">沒有正常樣本時，如何判斷一個候選點是 somatic 還是 germline／artifact？
-LongPhase-TO 會比較候選點與<b>左右兩個 germline 位點</b>的 allele 連結結構。</p>
+<p class="prose">候選變異不是 LongPhase-TO 自己叫出來的 —— 那是 <span class="term" data-term="ClairS" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clairs-6">ClairS<span class="term__pop" id="gd-clairs-6" role="tooltip"><b class="term__hd">ClairS</b><span class="term__def" data-lang="zh">配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</span><span class="term__def" data-lang="en">A somatic variant caller for matched tumour–normal data; ClairS-TO is the tumour-only version.</span><a class="term__more" href="glossary.html#clairs">完整條目 →</a></span></span>-TO 或 DeepSomatic-TO 的工作。
+LongPhase-TO 做的是<b>再校正</b>（<span class="term" data-term="recalibration" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-recalibration-7">recalibration<span class="term__pop" id="gd-recalibration-7" role="tooltip"><b class="term__hd">recalibration <i>再校正</i></b><span class="term__def" data-lang="zh">以額外證據重新評估 caller 已輸出的 candidates。若僅處理既有候選，可移除 false positives，但不能恢復 caller 未輸出的變異。</span><span class="term__def" data-lang="en">Re-judging a caller's candidates with extra evidence. When the candidate set is fixed, it can remove false positives but cannot recover variants the caller never emitted.</span><a class="term__more" href="glossary.html#recalibration">完整條目 →</a></span></span>）：把明顯不合理的候選挑掉。</p>
 
-<p class="prose">在 LongPhase-TO 的 triplet 模型中，<b>三個位點比兩個位點具有更高的可分辨性</b>。</p>
+<p class="prose">第一關很直接：拿去對 <span class="term" data-term="PON" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-pon-8">PON<span class="term__pop" id="gd-pon-8" role="tooltip"><b class="term__hd">PON <i>正常樣本面板／族群資料庫（依流程而異）</i></b><span class="term__def" data-lang="zh">PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</span><span class="term__def" data-lang="en">The abbreviation is workflow-dependent and the two uses are not interchangeable. In this tutorial's tumour-only workflows, PON denotes a population germline database set; in GATK Mutect2, a Panel of Normals (PoN) is built from multiple normal samples to flag recurrent technical artifacts. Either can miss a private germline variant or an unseen artifact, so neither replaces a patient's matched normal.</span><a class="term__more" href="glossary.html#pon">完整條目 →</a></span></span> 這種族群資料庫比。
+大家都有的變異，多半是這個人與生俱來的，不是癌症造成的，先排除掉。
+但族群資料庫收不到每個人的私有變異，所以過了這一關還不夠。</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" class="dia-svg" role="img">
-  <title>三點 triplet graph 如何區分候選 somatic indel 與定序錯誤</title>
-  <desc>上半部：取候選點與左右兩個 germline 位點，共三個位置。
-        在此示例中，候選插入以 C-GT-A 表示，從原本兩條路徑之一形成第三條候選路徑；
-        新路徑與其來源只差一個位置。定序錯誤則產生無法由既有來源解釋的路徑。
-        下半部：若只取兩個位置，真變異與錯誤的拓撲在此示例下相同，僅憑兩點無法分辨。</desc>
+<p class="prose">第二關才是重點，而且它用的證據只有 long read 給得起：
+<b>看支持這個候選的 read，左右兩邊的鄰居是什麼</b>。</p>
 
-  <!-- ══ 上半：三個位點，看得出差別 ══ -->
-  <text class="lbl bold zh" x="20" y="28">用三個位點：兩種情況畫出不同的圖</text>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 710" class="dia-svg" role="img">
+  <title>沒有正常樣本時，用「鄰居一不一致」分辨真變異與定序錯誤</title>
+  <desc>上半部是同一個候選位置的兩種情況，各六條 read，而且兩邊帶候選 allele 的 read 都剛好三條 ——
+        所以光數數量分不出來，要看它們落在哪裡。
+        左邊：三條帶 T 的 read，左右鄰居都是 C 與 A，也就是三條全部落在同一條染色體（HP2）上。
+        右邊：三條帶 T 的 read，一條的鄰居是 HP1 的組合、一條是 HP2 的組合、
+        一條的組合在這個人身上根本不存在，因此無法歸屬。
+        下半部把同樣的資料畫成路徑圖：三個位置各有兩種 allele，一條 read 走出一條路徑。
+        左邊出現第三條完整的路徑，而且它跟 HP2 只差候選這一格，符合「變異從某一條既有染色體長出來」；
+        右邊帶 T 的 read 各走各的，沒有任何一條路徑被穩定支持。</desc>
 
-  <!-- 左：真腫瘤變異 -->
-  <rect class="box ok" x="20" y="44" width="466" height="212" rx="10"/>
-  <text class="anno bold zh ok" x="40" y="72">候選 somatic 變異（示意）</text>
+  <text class="lbl bold zh" x="20" y="32">同一個候選位置：它是真的變異，還是定序錯誤？</text>
+  <text class="tick zh" x="20" y="58">兩邊帶 T 的 read 都是三條 —— 數量分不出來。要看的是這些 read 的<tspan class="bold">左右鄰居</tspan>。</text>
 
-  <text class="tick zh" x="40" y="98">read 上看到的三個位置</text>
-  <g class="mono">
-    <text class="anno hp1" x="40" y="126">A — G — T</text>
-    <text class="tick zh" x="180" y="126">原本的路徑一</text>
-    <text class="anno hp2" x="40" y="152">C — G — A</text>
-    <text class="tick zh" x="180" y="152">原本的路徑二</text>
-    <text class="anno somatic bold" x="40" y="178">C-GT-A</text>
-    <text class="tick zh somatic" x="180" y="178">新出現的第三條</text>
-  </g>
+  <!-- ══════════ 左：真的體細胞變異 ══════════ -->
+  <rect class="box ok" x="20" y="76" width="468" height="286" rx="10"/>
+  <text class="anno bold zh ok" x="40" y="106">① 真的體細胞變異</text>
+  <text class="tick zh" x="40" y="132">三條帶 T 的 read，鄰居組合完全一樣</text>
 
-  <path class="conn somatic" d="M104,160 L104,170" marker-end="url(#arrow-sm)"/>
-  <rect class="box plain" x="40" y="196" width="426" height="48" rx="6"/>
-  <text class="tick zh" x="56" y="216">第三條跟「路徑二」只差中間<tspan class="bold">一個</tspan>位置。</text>
-  <text class="tick zh bold ok" x="56" y="236">與路徑二相差一個位置，符合此模型的來源。</text>
+  <text class="tick mid zh" x="116" y="162">左鄰居</text>
+  <text class="tick mid zh bold" x="254" y="162">候選位置</text>
+  <text class="tick mid zh" x="392" y="162">右鄰居</text>
 
-  <!-- 右：定序錯誤 -->
-  <rect class="box bad" x="514" y="44" width="466" height="212" rx="10"/>
-  <text class="anno bold zh bad" x="534" y="72">定序錯誤</text>
+  <rect class="read hp1" x="56" y="176" width="396" height="15" rx="7.5"/>
+  <rect class="read hp1" x="56" y="202" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="56" y="228" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="56" y="254" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="56" y="280" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="56" y="306" width="396" height="15" rx="7.5"/>
 
-  <text class="tick zh" x="534" y="98">read 上看到的三個位置</text>
-  <g class="mono">
-    <text class="anno hp1" x="534" y="126">A — G — T</text>
-    <text class="tick zh" x="674" y="126">原本的路徑一</text>
-    <text class="anno hp2" x="534" y="152">C — G — A</text>
-    <text class="tick zh" x="674" y="152">原本的路徑二</text>
-    <text class="anno artifact bold" x="534" y="178">A — A — T</text>
-    <text class="tick zh artifact" x="674" y="178">無法對應來源的路徑</text>
-  </g>
+  <!-- 高亮欄一定畫在 read 之後，否則會被 read 的 fill 整個蓋掉 -->
+  <rect class="region" x="230" y="170" width="48" height="157"/>
+  <rect class="box ghost" x="230" y="170" width="48" height="157" rx="4"/>
 
-  <rect class="box plain" x="534" y="196" width="426" height="48" rx="6"/>
-  <text class="tick zh" x="550" y="216">它跟兩條原本的路徑<tspan class="bold">都</tspan>差了不只一個位置。</text>
-  <text class="tick zh bold bad" x="550" y="236">無法由既有路徑解釋。</text>
+  <text class="base a mono mid" x="116" y="188" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="254" y="188" style="font-size:15px">G</text>
+  <text class="base t mono mid" x="392" y="188" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="116" y="214" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="254" y="214" style="font-size:15px">G</text>
+  <text class="base t mono mid" x="392" y="214" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="116" y="240" style="font-size:15px">C</text>
+  <text class="base g mono mid" x="254" y="240" style="font-size:15px">G</text>
+  <text class="base a mono mid" x="392" y="240" style="font-size:15px">A</text>
+  <text class="base c mono mid" x="116" y="266" style="font-size:15px">C</text>
+  <text class="base t mono mid" x="254" y="266" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="392" y="266" style="font-size:15px">A</text>
+  <text class="base c mono mid" x="116" y="292" style="font-size:15px">C</text>
+  <text class="base t mono mid" x="254" y="292" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="392" y="292" style="font-size:15px">A</text>
+  <text class="base c mono mid" x="116" y="318" style="font-size:15px">C</text>
+  <text class="base t mono mid" x="254" y="318" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="392" y="318" style="font-size:15px">A</text>
 
-  <!-- ══ 下半：兩個位點就分不出來了 ══ -->
-  <line class="axis" x1="20" y1="284" x2="980" y2="284"/>
-  <text class="lbl bold zh" x="20" y="314">如果只用兩個位置：在此示例下拓撲相同</text>
+  <text class="anno hp2 bold" x="456" y="266">HP2</text>
+  <text class="anno hp2 bold" x="456" y="292">HP2</text>
+  <text class="anno hp2 bold" x="456" y="318">HP2</text>
+
+  <text class="anno bold zh ok" x="40" y="348">→ 它有固定的出身：長在 HP2 上</text>
+
+  <!-- ══════════ 右：定序錯誤 ══════════ -->
+  <rect class="box bad" x="512" y="76" width="468" height="286" rx="10"/>
+  <text class="anno bold zh bad" x="532" y="106">② 定序錯誤</text>
+  <text class="tick zh" x="532" y="132">三條帶 T 的 read，鄰居組合各不相同</text>
+
+  <text class="tick mid zh" x="608" y="162">左鄰居</text>
+  <text class="tick mid zh bold" x="746" y="162">候選位置</text>
+  <text class="tick mid zh" x="884" y="162">右鄰居</text>
+
+  <rect class="read hp1" x="548" y="176" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="548" y="202" width="396" height="15" rx="7.5"/>
+  <rect class="read hp1" x="548" y="228" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="548" y="254" width="396" height="15" rx="7.5"/>
+  <rect class="read hp0" x="548" y="280" width="396" height="15" rx="7.5"/>
+  <rect class="read hp2" x="548" y="306" width="396" height="15" rx="7.5"/>
+
+  <rect class="region" x="722" y="170" width="48" height="157"/>
+  <rect class="box ghost" x="722" y="170" width="48" height="157" rx="4"/>
+
+  <text class="base a mono mid" x="608" y="188" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="746" y="188" style="font-size:15px">G</text>
+  <text class="base t mono mid" x="884" y="188" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="608" y="214" style="font-size:15px">C</text>
+  <text class="base g mono mid" x="746" y="214" style="font-size:15px">G</text>
+  <text class="base a mono mid" x="884" y="214" style="font-size:15px">A</text>
+  <text class="base a mono mid" x="608" y="240" style="font-size:15px">A</text>
+  <text class="base t mono mid" x="746" y="240" style="font-size:15px">T</text>
+  <text class="base t mono mid" x="884" y="240" style="font-size:15px">T</text>
+  <text class="base c mono mid" x="608" y="266" style="font-size:15px">C</text>
+  <text class="base t mono mid" x="746" y="266" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="884" y="266" style="font-size:15px">A</text>
+  <text class="base a mono mid" x="608" y="292" style="font-size:15px">A</text>
+  <text class="base t mono mid" x="746" y="292" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="884" y="292" style="font-size:15px">A</text>
+  <text class="base c mono mid" x="608" y="318" style="font-size:15px">C</text>
+  <text class="base g mono mid" x="746" y="318" style="font-size:15px">G</text>
+  <text class="base a mono mid" x="884" y="318" style="font-size:15px">A</text>
+
+  <text class="anno hp1 bold" x="946" y="240">HP1</text>
+  <text class="anno hp2 bold" x="946" y="266">HP2</text>
+  <text class="anno bold" x="946" y="292">？</text>
+
+  <text class="anno bold zh bad" x="532" y="348">→ 它沒有固定的出身</text>
+
+  <!-- ══════════ 下半：畫成路徑圖 ══════════ -->
+  <line class="axis" x1="20" y1="382" x2="980" y2="382"/>
+  <text class="lbl bold zh" x="20" y="412">把同一批 read 畫成路徑：三個位置，一條 read 走一條路</text>
 
   <!-- 左 -->
-  <rect class="box plain" x="20" y="330" width="466" height="196" rx="10"/>
-  <text class="anno bold zh" x="40" y="358">真腫瘤變異（去掉第三個位置）</text>
-  <g class="mono">
-    <text class="anno hp1" x="40" y="392">A — G</text>
-    <text class="anno hp2" x="40" y="418">C — G</text>
-    <text class="anno somatic bold" x="40" y="444">C-GT</text>
-  </g>
-  <text class="tick zh" x="180" y="392">路徑一</text>
-  <text class="tick zh" x="180" y="418">路徑二</text>
-  <text class="tick zh" x="180" y="444">第三條</text>
+  <rect class="box plain" x="20" y="428" width="468" height="262" rx="10"/>
+  <line class="conn hp1" x1="40" y1="453" x2="70" y2="453"/>
+  <text class="tick mono" x="76" y="458">HP1</text>
+  <line class="conn hp2" x1="140" y1="453" x2="170" y2="453"/>
+  <text class="tick mono" x="176" y="458">HP2</text>
+  <line class="conn somatic thick" x1="240" y1="453" x2="270" y2="453"/>
+  <text class="anno zh somatic bold" x="276" y="458">第三條路徑</text>
 
-  <rect class="box ghost" x="290" y="368" width="176" height="90" rx="6"/>
-  <text class="tick mid zh" x="378" y="394">三條路徑</text>
-  <text class="tick mid zh" x="378" y="416">各差一個位置</text>
-  <text class="tick mid zh bold" x="378" y="442">拓撲：Y 字型</text>
+  <rect class="region" x="224" y="500" width="60" height="136"/>
 
-  <text class="tick zh" x="40" y="480">僅憑兩點無法確認來源。</text>
+  <path class="conn hp1" d="M116,530 L254,530 L392,530"/>
+  <path class="conn hp2" d="M116,606 L254,530 L392,606"/>
+  <path class="conn somatic thick" d="M116,606 L254,606 L392,606"/>
+
+  <circle class="mark ref" cx="116" cy="530" r="21"/>
+  <circle class="mark ref" cx="254" cy="530" r="21"/>
+  <circle class="mark ref" cx="392" cy="530" r="21"/>
+  <circle class="mark ref" cx="116" cy="606" r="21"/>
+  <circle class="mark ref" cx="254" cy="606" r="21"/>
+  <circle class="mark ref" cx="392" cy="606" r="21"/>
+
+  <text class="base a mono mid" x="116" y="537" style="font-size:20px">A</text>
+  <text class="base g mono mid" x="254" y="537" style="font-size:20px">G</text>
+  <text class="base t mono mid" x="392" y="537" style="font-size:20px">T</text>
+  <text class="base c mono mid" x="116" y="613" style="font-size:20px">C</text>
+  <text class="base t mono mid" x="254" y="613" style="font-size:20px">T</text>
+  <text class="base a mono mid" x="392" y="613" style="font-size:20px">A</text>
+
+  <text class="tick zh" x="40" y="652">三條 read 走出<tspan class="bold">同一條</tspan>新路徑，</text>
+  <text class="tick zh" x="40" y="674">而它跟 HP2 只差候選這一格 —— 像是從 HP2 長出來的。</text>
 
   <!-- 右 -->
-  <rect class="box plain" x="514" y="330" width="466" height="196" rx="10"/>
-  <text class="anno bold zh" x="534" y="358">定序錯誤（去掉第三個位置）</text>
-  <g class="mono">
-    <text class="anno hp1" x="534" y="392">A — G</text>
-    <text class="anno hp2" x="534" y="418">C — G</text>
-    <text class="anno artifact bold" x="534" y="444">A — A</text>
-  </g>
-  <text class="tick zh" x="674" y="392">路徑一</text>
-  <text class="tick zh" x="674" y="418">路徑二</text>
-  <text class="tick zh" x="674" y="444">第三條</text>
+  <rect class="box plain" x="512" y="428" width="468" height="262" rx="10"/>
+  <line class="conn hp1" x1="532" y1="453" x2="562" y2="453"/>
+  <text class="tick mono" x="568" y="458">HP1</text>
+  <line class="conn hp2" x1="632" y1="453" x2="662" y2="453"/>
+  <text class="tick mono" x="668" y="458">HP2</text>
+  <line class="conn artifact" x1="732" y1="453" x2="762" y2="453" style="stroke-dasharray:6 4"/>
+  <text class="anno zh artifact bold" x="768" y="458">帶 T 的三條</text>
 
-  <rect class="box ghost" x="784" y="368" width="176" height="90" rx="6"/>
-  <text class="tick mid zh" x="872" y="394">三條路徑</text>
-  <text class="tick mid zh" x="872" y="416">也各差一個位置</text>
-  <text class="tick mid zh bold" x="872" y="442">拓撲：Y 字型</text>
+  <rect class="region" x="716" y="500" width="60" height="136"/>
 
-  <text class="tick zh bold bad" x="534" y="480">在此示意下相同 —— 僅憑兩點無法分辨。</text>
+  <path class="conn hp1" d="M608,530 L746,530 L884,530"/>
+  <path class="conn hp2" d="M608,606 L746,530 L884,606"/>
+  <path class="conn artifact" d="M608,530 L746,606 L884,530" style="stroke-dasharray:6 4"/>
+  <path class="conn artifact" d="M608,606 L746,606 L884,606" style="stroke-dasharray:6 4"/>
+  <path class="conn artifact" d="M608,530 L746,606 L884,606" style="stroke-dasharray:6 4"/>
 
-  <text class="anno zh bold" x="20" y="516">因此此方法使用三個位置；少一個時，真變異與定序錯誤可能呈現相同拓撲。</text>
-</svg><figcaption>上半部用三個位點：在此局部演化模型中，符合 somatic 假設的候選可形成一條與來源路徑只差一個位置的新路徑；示意中的定序錯誤路徑則無法對應既有路徑。下半部只用兩個位點時，兩種示意情況呈現相同拓撲，僅憑這兩點無法區分。</figcaption></figure>
+  <circle class="mark ref" cx="608" cy="530" r="21"/>
+  <circle class="mark ref" cx="746" cy="530" r="21"/>
+  <circle class="mark ref" cx="884" cy="530" r="21"/>
+  <circle class="mark ref" cx="608" cy="606" r="21"/>
+  <circle class="mark ref" cx="746" cy="606" r="21"/>
+  <circle class="mark ref" cx="884" cy="606" r="21"/>
 
-<ul class="prose">
-<li>在此局部模型中，somatic 變異被視為從某一條既有 haplotype 衍生。
-原本有兩條路徑（AGT 與 CGA），示例中的插入後路徑為<b>第三條</b>（C-GT-A），
-與 CGA 僅差一個候選位置，符合模型的衍生關係。</li>
-<li>在此示意中，定序錯誤路徑無法由任一既有路徑解釋；實際資料仍需結合 read 支持與品質指標。</li>
-<li>若只取<b>兩個</b>位點建圖，這兩種示意情況會產生<b>相同拓撲</b>，
-因此僅憑兩點無法區分。</li>
-</ul>
+  <text class="base a mono mid" x="608" y="537" style="font-size:20px">A</text>
+  <text class="base g mono mid" x="746" y="537" style="font-size:20px">G</text>
+  <text class="base t mono mid" x="884" y="537" style="font-size:20px">T</text>
+  <text class="base c mono mid" x="608" y="613" style="font-size:20px">C</text>
+  <text class="base t mono mid" x="746" y="613" style="font-size:20px">T</text>
+  <text class="base a mono mid" x="884" y="613" style="font-size:20px">A</text>
 
-<p class="prose">在此基礎上還可以再細分：兩條 germline haplotype 的側翼 allele 不一致時形成 <b>12 種 high-confidence
-triplet</b>；因 LOH 而只剩一條 germline haplotype 時形成 <b>9 種 low-confidence triplet</b>。
-每個候選點周圍會建立多個 triplet graph，再依各類型計數與既定門檻決定是否保留。</p>
+  <text class="tick zh" x="532" y="652">三條 read <tspan class="bold">各走各的</tspan>，</text>
+  <text class="tick zh" x="532" y="674">沒有哪一條新路徑被穩定支持 —— 這是隨機出現的訊號。</text>
+</svg><figcaption>兩邊帶 T 的 read 刻意都是三條 —— 光數數量分不出真假，這正是重點。
+差別在鄰居：左邊三條的鄰居都是 C 與 A，也就是三條全落在同一條染色體上；右邊三條各有各的鄰居，湊不出一致的來源。
+下半部把同一批資料畫成路徑圖後更清楚：左邊多出<b>一條完整的新路徑</b>，而且它跟 HP2 只差候選這一格；右邊則沒有任何一條新路徑被穩定支持。</figcaption></figure>
 
-<h3 id="第四步-解讀-gt-gt2-gt3">第四步：解讀 GT:GT2:GT3</h3>
+<p class="prose">背後的理由是癌症怎麼發生的。一個體細胞變異只會發生在<b>某一個細胞的某一條染色體</b>上，
+之後那個細胞分裂出來的後代才帶著它。所以真變異必然掛在一條既有的 haplotype 底下，
+形成一條「跟母體只差一格」的新路徑。定序錯誤沒有這個身世，它落在哪條 read 上是隨機的。</p>
 
-<p class="prose">LongPhase-TO 把 somatic haplotype 寫在<b>自訂的 VCF FORMAT 欄位</b>，
-分成三層。以下用解碼器示範此編碼：</p>
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">為什麼要三個位置，兩個不夠？</p>
+<p class="prose">M11 講過兩個位置之間的一條邊：它其實是四個計數（rr／ra／ar／aa），
+能回答的是「這兩個位置該平行接還是交叉接」。</p>
+<p class="prose">但這裡要問的是另一個問題：<b>候選 allele 在左右兩側是不是都指向同一條 haplotype</b>。
+只有一個鄰居時，「跟左邊一致」很容易碰巧發生；要有左鄰居<b>和</b>右鄰居，
+才看得出「這條新路徑從頭到尾只跟某一條差一格」。所以最小單位是三個位置，
+這個結構就叫 <span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-triplet-graph-9">triplet graph<span class="term__pop" id="gd-triplet-graph-9" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span>。</p>
+</div>
 
-<figure class="widget" data-widget="gt-decoder" data-wid="m13.gt" data-config='{"value":"0|0:.|1:./."}'><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>從下拉選單逐一檢視七種常見組合。特別注意最後兩個<b>LOH 區內</b>的例子 —— 此時可使用 GT3，並呈現如 <code>hp1-1-1</code> 的階層標籤。</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
+<p class="prose">實際上一個候選點周圍不會只取一組三位點。程式會拿它左右幾個變異輪流搭配，
+組出很多組三位點，每一組各自看一次、各投一票，最後看票數決定留不留。
+一組看走眼不會定生死，這是把單一雜訊的影響攤掉的常見做法。</p>
+
+<h3 id="第三件事-把每個變異掛回染色體">第三件事：把每個變異掛回染色體</h3>
+
+<p class="prose">前兩件事做完，才輪到定相本身。做法跟 M11 一樣 ——
+把「同一條 read 上看到的 allele」連成一張圖，再沿著圖走出兩條 haplotype。
+差別在這裡多做兩件事：<b>somatic 變異也要一起掛上去</b>，而且<b>LOH 區要接得過去</b>。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" class="dia-svg" role="img">
+  <title>定相的結果有三條軌道，以及它們怎麼寫成 VCF 的 GT、GT2、GT3</title>
+  <desc>上半部是六個位置的定相結果。左邊四個位置在正常區，兩條 germline haplotype 都在；
+        右邊兩個位置落在 LOH 區，HP1 整段不存在，圖上畫成灰色虛線的空軌道。
+        第三條軌道 HP2-1 是 HP2 的體細胞後代：它跟 HP2 完全一樣，只有帶紅點的兩個位置不同。
+        下半部把其中三個位置的 VCF 欄位攤開來看。
+        一般的遺傳變異只有 GT；正常區的體細胞變異 GT 是 0 直槓 0，靠 GT2 說明它長在哪一條上；
+        LOH 區的位置 GT 有一側寫成一個點，表示那一條 haplotype 不存在，
+        而 GT2 與 GT3 分別代表剩下那一條再往下分出來的兩支。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">定相的結果：三條軌道，以及它們怎麼寫進 VCF</text>
+  <text class="tick zh" x="20" y="58">同一條 read 上看到的 allele 被連起來，就得到下面三條軌道。</text>
+
+  <!-- 區域 -->
+  <text class="anno mid zh" x="420" y="90">正常區：兩條都在</text>
+  <text class="anno mid zh" x="790" y="90">LOH 區：只剩一條</text>
+  <line class="axis" x1="200" y1="100" x2="940" y2="100"/>
+  <line class="axis" x1="640" y1="94" x2="640" y2="240" style="stroke-dasharray:6 4"/>
+
+  <!-- 軌道 -->
+  <text class="tick end hp1 bold" x="190" y="142">HP1</text>
+  <rect class="read hp1" x="200" y="130" width="440" height="15" rx="7.5"/>
+  <rect class="read hp0 ghost" x="640" y="130" width="300" height="15" rx="7.5"/>
+  <text class="tick mid zh" x="790" y="142">整段不存在</text>
+
+  <text class="tick end hp2 bold" x="190" y="188">HP2</text>
+  <rect class="read hp2" x="200" y="176" width="740" height="15" rx="7.5"/>
+
+  <text class="tick end hp2 bold" x="190" y="234">HP2-1</text>
+  <rect class="read hp2" x="200" y="222" width="740" height="15" rx="7.5"/>
+
+  <text class="base a mono mid" x="260" y="142" style="font-size:15px">A</text>
+  <text class="base g mono mid" x="360" y="142" style="font-size:15px">G</text>
+  <text class="base a mono mid" x="460" y="142" style="font-size:15px">A</text>
+  <text class="base c mono mid" x="560" y="142" style="font-size:15px">C</text>
+
+  <text class="base g mono mid" x="260" y="188" style="font-size:15px">G</text>
+  <text class="base g mono mid" x="360" y="188" style="font-size:15px">G</text>
+  <text class="base t mono mid" x="460" y="188" style="font-size:15px">T</text>
+  <text class="base t mono mid" x="560" y="188" style="font-size:15px">T</text>
+  <text class="base g mono mid" x="720" y="188" style="font-size:15px">G</text>
+  <text class="base t mono mid" x="840" y="188" style="font-size:15px">T</text>
+
+  <text class="base g mono mid" x="260" y="234" style="font-size:15px">G</text>
+  <text class="base a mono mid" x="360" y="234" style="font-size:15px">A</text>
+  <text class="base t mono mid" x="460" y="234" style="font-size:15px">T</text>
+  <text class="base t mono mid" x="560" y="234" style="font-size:15px">T</text>
+  <text class="base a mono mid" x="720" y="234" style="font-size:15px">A</text>
+  <text class="base t mono mid" x="840" y="234" style="font-size:15px">T</text>
+
+  <!-- 體細胞變異：read 上方的小圓 -->
+  <circle class="mark somatic" cx="360" cy="214" r="6"/>
+  <circle class="mark somatic" cx="720" cy="214" r="6"/>
+  <text class="anno somatic bold zh" x="736" y="266">紅點 ＝ 只有癌細胞才有的變異</text>
+
+  <text class="tick zh" x="200" y="266">HP2-1 跟 HP2 只差紅點那兩格 —— 它是 HP2 的後代</text>
+
+  <!-- 引線 -->
+  <path class="guide" d="M260,246 L170,296"/>
+  <path class="guide" d="M360,246 L500,296"/>
+  <path class="guide" d="M720,246 L830,296"/>
+
+  <!-- ══ 三個位置攤開來看 ══ -->
+  <rect class="box plain" x="20" y="300" width="300" height="222" rx="10"/>
+  <text class="anno bold zh" x="40" y="330">① 一般的遺傳變異</text>
+  <text class="tick mono" x="40" y="362">GT</text>
+  <text class="tick mono bold" x="98" y="362">0|1</text>
+  <text class="tick mono" x="40" y="386">GT2</text>
+  <text class="tick mono" x="98" y="386">./.</text>
+  <text class="tick mono" x="40" y="410">GT3</text>
+  <text class="tick mono" x="98" y="410">./.</text>
+  <text class="tick zh" x="40" y="444">兩條 haplotype 一邊 ref、</text>
+  <text class="tick zh" x="40" y="468">一邊 alt，跟癌症無關。</text>
+  <text class="tick zh" x="40" y="500">GT2、GT3 空著。</text>
+
+  <rect class="box plain" x="350" y="300" width="300" height="222" rx="10"/>
+  <text class="anno bold zh somatic" x="370" y="330">② 正常區裡的體細胞變異</text>
+  <text class="tick mono" x="370" y="362">GT</text>
+  <text class="tick mono" x="428" y="362">0|0</text>
+  <text class="tick mono" x="370" y="386">GT2</text>
+  <text class="tick mono bold" x="428" y="386">.|1</text>
+  <text class="tick mono" x="370" y="410">GT3</text>
+  <text class="tick mono" x="428" y="410">./.</text>
+  <text class="tick zh" x="370" y="444">兩條 germline 都是 ref，</text>
+  <text class="tick zh" x="370" y="468">所以 GT 是 0|0。</text>
+  <text class="tick zh" x="370" y="500">GT2 第二格是 1 ＝ 長在 HP2 上。</text>
+
+  <rect class="box plain" x="680" y="300" width="300" height="222" rx="10"/>
+  <text class="anno bold zh somatic" x="700" y="330">③ LOH 區裡的體細胞變異</text>
+  <text class="tick mono" x="700" y="362">GT</text>
+  <text class="tick mono bold" x="758" y="362">0|.</text>
+  <text class="tick mono" x="700" y="386">GT2</text>
+  <text class="tick mono" x="758" y="386">1|.</text>
+  <text class="tick mono" x="700" y="410">GT3</text>
+  <text class="tick mono" x="758" y="410">0|.</text>
+  <text class="tick zh" x="700" y="444">GT 有一側是「.」，代表</text>
+  <text class="tick zh" x="700" y="468">那一條 haplotype 不存在。</text>
+  <text class="tick zh" x="700" y="500">GT2 與 GT3 是剩下那條的兩支。</text>
+</svg><figcaption>三條軌道。HP1 與 HP2 是與生俱來的兩條；HP2-1 是 HP2 的體細胞後代 ——
+它跟 HP2 完全一樣，只有帶紅點的位置不同，名字本身就記錄了來源。
+進到 LOH 區之後 HP1 整段不存在，程式用 LOH 邊界兩側的連結判斷「留下來的是哪一條」，再讓它一路接過去。
+下半部是同樣三個位置寫成 VCF 的樣子。</figcaption></figure>
+
+<p class="prose">結果寫在 VCF 的 FORMAT 欄位，分成三層。用下面的解碼器把七種常見組合逐一看過一次：</p>
+
+<figure class="widget" data-widget="gt-decoder" data-wid="m13.gt" data-config='{"value":"0|0:.|1:./."}'><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>從下拉選單逐一檢視。最快的讀法是先看 <code>GT</code> 有沒有「<code>.</code>」——
+有就代表這裡是 LOH 區，那一側的 haplotype 不存在。</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>欄位</th><th>描述的層次</th></tr></thead>
+<thead><tr><th>欄位</th><th>回答的問題</th><th>怎麼讀</th></tr></thead>
 <tbody>
-<tr><td><code>GT</code></td><td>germline haplotype。有一側是 <code>.</code> 就代表這裡是 LOH</td></tr>
-<tr><td><code>GT2</code></td><td>LongPhase-TO 定義的 somatic haplotype。<code>1|1</code> 代表來源無法判定（hp3）</td></tr>
-<tr><td><code>GT3</code></td><td>LongPhase-TO 定義的 LOH 區內再分支，例如 <code>hp1-1-1</code> 與 <code>hp1-1-2</code></td></tr>
+<tr><td><code>GT</code></td><td>與生俱來的兩條長什麼樣</td><td>有一側是 <code>.</code> ＝ 這裡是 LOH</td></tr>
+<tr><td><code>GT2</code></td><td>癌細胞才有的變異長在哪一條上</td><td>哪一格是 <code>1</code>，就是長在那一條上；<code>1|1</code> 代表<b>判不出來</b></td></tr>
+<tr><td><code>GT3</code></td><td>LOH 區裡，剩下那一條再往下分的第二支</td><td>非 LOH 區通常用不到，寫 <code>./.</code></td></tr>
 </tbody>
 </table>
 </div>
 
-<h3 id="第五步-估計-purity">第五步：估計 purity</h3>
+<p class="prose">為什麼 LOH 區要多一層？因為那裡只剩一條 germline haplotype 可以掛，
+但癌細胞在那一條上可能先後長出<b>兩批</b>不同的變異，屬於不同的細胞群。
+只有 <code>GT2</code> 一格的話，這兩批會被混在一起；多一層 <code>GT3</code> 才分得開。</p>
 
-<p class="prose">此模型與 M12 的 GHIR 概念相近，另納入 <b>LOH ratio</b>。
-LongPhase-TO 將 haplotype imbalance 的 Q1／Q3 與 LOH 比例作為多項式迴歸的輸入特徵，
-估計模型定義的 purity。</p>
+<h3 id="第四件事-這個樣本有多少比例是腫瘤">第四件事：這個樣本有多少比例是腫瘤</h3>
 
-<h3 id="兩個版本的對照">兩個版本的對照</h3>
+<p class="prose">檢體不會是純的癌細胞，裡面一定混著正常細胞。混得多寡直接影響每個變異的訊號強度，
+所以這個比例要估出來。M12 用的是 <span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ghir-10">GHIR<span class="term__pop" id="gd-ghir-10" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</span><span class="term__def" data-lang="en">Germline Haplotype Imbalance Ratio: the normalized balance of reads assigned to HP1 and HP2 at a germline site. Under the tutorial's illustrative definition, an ideal unbiased sample is near 0.5. It is not a direct purity measurement; somatic branches, LOH/CNV, TINC, phasing errors, mapping bias and sparse sampling can all shift it. LongPhase-S estimates purity from its distribution only after filtering and model calibration.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span>；這裡的比值算法一樣，差別只在<b>數的是帶 reference allele 的 read</b>。</p>
 
-<div class="table-wrap">
-<table>
-<thead><tr><th></th><th>LongPhase-S</th><th>LongPhase-TO</th></tr></thead>
-<tbody>
-<tr><td>somatic haplotype 放哪</td><td>BAM <code>HP:Z:1-1</code></td><td>VCF FORMAT <code>GT2</code> / <code>GT3</code></td></tr>
-<tr><td>purity 放哪</td><td><code>&lt;prefix&gt;_purity.out</code> 檔案</td><td>VCF header <code>##tumor_purity=</code></td></tr>
-<tr><td>purity 參數</td><td><code>--tumor-purity</code>（0.1–1.0）</td><td><code>--purity</code>（0–1）</td></tr>
-<tr><td>掛在哪個子命令</td><td><code>somatic_haplotag</code></td><td><code>phase</code></td></tr>
-<tr><td><code>--caller</code></td><td>沒有</td><td><b>目前流程中應指定</b></td></tr>
-<tr><td><code>--loh</code></td><td>沒有</td><td>有，輸出 <code>_LOH.bed</code></td></tr>
-</tbody>
-</table>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" class="dia-svg" role="img">
+  <title>從兩條 haplotype 的失衡程度，估計樣本裡有多少比例來自腫瘤</title>
+  <desc>挑一個已經定相好的體細胞變異位置，只數「帶 reference allele」的 read。
+        這個變異長在 HP2 上，所以帶 alt 的 read 全是癌細胞貢獻的；
+        而帶 ref 的 read 有兩個來源：HP1 上的（癌細胞與正常細胞都有）
+        與 HP2 上的（只有正常細胞才有，因為癌細胞那一份已經變成 alt 了）。
+        三格由左到右是腫瘤佔兩成、六成、九成。
+        腫瘤越多，正常細胞越少，HP2 這一側帶 ref 的 read 就越少，
+        兩側的比值於是從接近 0.5 一路往 1.0 靠。
+        全基因體上每個體細胞變異都算一次這個比值，
+        再把分布的四分位數和 LOH 佔基因體的比例一起交給一條事先訓練好的迴歸式，
+        就得到最後那個腫瘤 DNA 比例。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">怎麼從 read 看出這個樣本有多少比例是腫瘤</text>
+  <text class="tick zh" x="20" y="58">在一個長在 HP2 上的體細胞變異位置，只數「帶 reference allele」的 read 各有幾條。</text>
+
+  <!-- ══ 三種混合比例 ══ -->
+  <rect class="box plain" x="20" y="76" width="306" height="300" rx="10"/>
+  <text class="anno bold mid zh" x="173" y="106">腫瘤細胞佔 2 成</text>
+  <circle class="cell tumor" cx="65" cy="136" r="9"/>
+  <circle class="cell tumor" cx="89" cy="136" r="9"/>
+  <circle class="cell normal" cx="113" cy="136" r="9"/>
+  <circle class="cell normal" cx="137" cy="136" r="9"/>
+  <circle class="cell normal" cx="161" cy="136" r="9"/>
+  <circle class="cell normal" cx="185" cy="136" r="9"/>
+  <circle class="cell normal" cx="209" cy="136" r="9"/>
+  <circle class="cell normal" cx="233" cy="136" r="9"/>
+  <circle class="cell normal" cx="257" cy="136" r="9"/>
+  <circle class="cell normal" cx="281" cy="136" r="9"/>
+  <text class="tick zh" x="40" y="178">帶 ref 的 read 有幾條：</text>
+  <text class="tick end hp1 bold" x="76" y="206">HP1</text>
+  <rect class="bar hp1" x="84" y="196" width="160" height="14"/>
+  <text class="tick mono" x="252" y="206">10</text>
+  <text class="tick end hp2 bold" x="76" y="234">HP2</text>
+  <rect class="bar hp2" x="84" y="224" width="128" height="14"/>
+  <text class="tick mono" x="220" y="234">8</text>
+  <rect class="box sunken" x="40" y="254" width="266" height="62" rx="6"/>
+  <text class="tick mono mid" x="173" y="280">10 / (10 + 8)</text>
+  <text class="anno mono bold mid" x="173" y="306">= 0.56</text>
+  <text class="anno mid zh" x="173" y="348">兩邊差不多</text>
+
+  <rect class="box plain" x="347" y="76" width="306" height="300" rx="10"/>
+  <text class="anno bold mid zh" x="500" y="106">腫瘤細胞佔 6 成</text>
+  <circle class="cell tumor" cx="392" cy="136" r="9"/>
+  <circle class="cell tumor" cx="416" cy="136" r="9"/>
+  <circle class="cell tumor" cx="440" cy="136" r="9"/>
+  <circle class="cell tumor" cx="464" cy="136" r="9"/>
+  <circle class="cell tumor" cx="488" cy="136" r="9"/>
+  <circle class="cell tumor" cx="512" cy="136" r="9"/>
+  <circle class="cell normal" cx="536" cy="136" r="9"/>
+  <circle class="cell normal" cx="560" cy="136" r="9"/>
+  <circle class="cell normal" cx="584" cy="136" r="9"/>
+  <circle class="cell normal" cx="608" cy="136" r="9"/>
+  <text class="tick zh" x="367" y="178">帶 ref 的 read 有幾條：</text>
+  <text class="tick end hp1 bold" x="403" y="206">HP1</text>
+  <rect class="bar hp1" x="411" y="196" width="160" height="14"/>
+  <text class="tick mono" x="579" y="206">10</text>
+  <text class="tick end hp2 bold" x="403" y="234">HP2</text>
+  <rect class="bar hp2" x="411" y="224" width="64" height="14"/>
+  <text class="tick mono" x="483" y="234">4</text>
+  <rect class="box sunken" x="367" y="254" width="266" height="62" rx="6"/>
+  <text class="tick mono mid" x="500" y="280">10 / (10 + 4)</text>
+  <text class="anno mono bold mid" x="500" y="306">= 0.71</text>
+  <text class="anno mid zh" x="500" y="348">開始偏向一邊</text>
+
+  <rect class="box plain" x="674" y="76" width="306" height="300" rx="10"/>
+  <text class="anno bold mid zh" x="827" y="106">腫瘤細胞佔 9 成</text>
+  <circle class="cell tumor" cx="719" cy="136" r="9"/>
+  <circle class="cell tumor" cx="743" cy="136" r="9"/>
+  <circle class="cell tumor" cx="767" cy="136" r="9"/>
+  <circle class="cell tumor" cx="791" cy="136" r="9"/>
+  <circle class="cell tumor" cx="815" cy="136" r="9"/>
+  <circle class="cell tumor" cx="839" cy="136" r="9"/>
+  <circle class="cell tumor" cx="863" cy="136" r="9"/>
+  <circle class="cell tumor" cx="887" cy="136" r="9"/>
+  <circle class="cell tumor" cx="911" cy="136" r="9"/>
+  <circle class="cell normal" cx="935" cy="136" r="9"/>
+  <text class="tick zh" x="694" y="178">帶 ref 的 read 有幾條：</text>
+  <text class="tick end hp1 bold" x="730" y="206">HP1</text>
+  <rect class="bar hp1" x="738" y="196" width="160" height="14"/>
+  <text class="tick mono" x="906" y="206">10</text>
+  <text class="tick end hp2 bold" x="730" y="234">HP2</text>
+  <rect class="bar hp2" x="738" y="224" width="16" height="14"/>
+  <text class="tick mono" x="762" y="234">1</text>
+  <rect class="box sunken" x="694" y="254" width="266" height="62" rx="6"/>
+  <text class="tick mono mid" x="827" y="280">10 / (10 + 1)</text>
+  <text class="anno mono bold mid" x="827" y="306">= 0.91</text>
+  <text class="anno mid zh" x="827" y="348">幾乎全偏到 HP1</text>
+
+  <!-- 為什麼會這樣 -->
+  <rect class="box accent" x="20" y="390" width="960" height="46" rx="6"/>
+  <text class="anno mid zh" x="500" y="419">HP2 這一側帶 ref 的 read <tspan class="bold">只有正常細胞才貢獻得出來</tspan> —— 腫瘤越多，它就越少。</text>
+
+  <!-- ══ 全基因體彙整 ══ -->
+  <line class="axis" x1="20" y1="460" x2="980" y2="460"/>
+  <text class="lbl bold zh" x="20" y="492">全基因體每個位置都算一次，再交給一條事先訓練好的式子</text>
+
+  <rect class="box plain" x="20" y="508" width="290" height="66" rx="8"/>
+  <text class="tick mid zh" x="165" y="534">所有位置的比值分布</text>
+  <text class="tick mid zh" x="165" y="558">（取它的四分位數）</text>
+
+  <text class="anno mid zh" x="340" y="548">＋</text>
+
+  <rect class="box plain" x="370" y="508" width="290" height="66" rx="8"/>
+  <text class="tick mid zh" x="515" y="534">LOH 佔全基因體多少</text>
+  <text class="tick mid zh" x="515" y="558">（第一步就算好了）</text>
+
+  <path class="flow" d="M672,541 L706,541" marker-end="url(#arrow)"/>
+
+  <rect class="box accent" x="716" y="508" width="264" height="66" rx="8"/>
+  <text class="tick mid zh" x="848" y="534">腫瘤 DNA 比例</text>
+  <text class="tick mono mid" x="848" y="558">##tumor_purity=0.62</text>
+</svg><figcaption>挑一個長在 HP2 上的體細胞變異。帶 ref 的 read 有兩個來源：HP1 上的（癌細胞與正常細胞都給得出來）
+與 HP2 上的（<b>只有正常細胞給得出來</b>，因為癌細胞那一份已經變成 alt 了）。
+所以腫瘤越多，HP2 這一側就越薄，兩側的比值從接近 0.5 一路往 1.0 靠。</figcaption></figure>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">這個數字叫什麼，要小心</p>
+<p class="prose">程式把它寫成 <code>##tumor_purity=</code>，但它量到的其實是
+<b><span class="term" data-term="tumour DNA fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-dna-fraction-11">腫瘤 DNA 佔的比例<span class="term__pop" id="gd-tumour-dna-fraction-11" role="tooltip"><b class="term__hd">tumour DNA fraction <i>腫瘤 DNA 比例</i></b><span class="term__def" data-lang="zh">樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。</span><span class="term__def" data-lang="en">The fraction of DNA originating from tumour cells; diverges from cellular purity under aneuploidy or WGD.</span><a class="term__more" href="glossary.html#tumour-dna-fraction">完整條目 →</a></span></span></b>，不是腫瘤<b>細胞</b>佔的比例。</p>
+<p class="prose">在實驗室依覆蓋度混出來的合成樣本裡，兩者恰好相等，所以平常不容易察覺差別。
+但真實腫瘤如果是 <span class="term" data-term="aneuploidy" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-aneuploidy-12">非整倍體<span class="term__pop" id="gd-aneuploidy-12" role="tooltip"><b class="term__hd">aneuploidy <i>非整倍體</i></b><span class="term__def" data-lang="zh">染色體數目異常。腫瘤裡非常普遍，也可能使 cellular purity 與 DNA fraction 不一致。</span><span class="term__def" data-lang="en">An abnormal chromosome count. It is common in tumours and can make cellular purity differ from tumour DNA fraction.</span><a class="term__more" href="glossary.html#aneuploidy">完整條目 →</a></span></span>或發生過全基因體加倍，一個癌細胞貢獻的 DNA 比正常細胞多，
+兩個數字就會分開。報告數字時要說清楚是哪一個。</p>
 </div>
 
-<p class="prose">建議保留此表作為兩個版本切換時的參考；以下六列是常見差異。</p>
+<p class="prose">最後一步是把兩樣東西交給一條事先訓練好的式子：全基因體所有位置的比值分布，
+加上 LOH 佔了基因體多少。為什麼要加 LOH 這一項？因為 LOH 區本身就會把比值推向 1.0
+（那裡本來就只剩一條），只看比值分布會高估。兩個特徵一起看，才對得起來。</p>
+
+<p class="prose">這條式子的係數是在幾個已知答案的細胞株資料上配出來後<b>固定下來</b>的，
+之後每個樣本都用同一組係數。所以它的可靠度取決於新樣本跟當初那些細胞株像不像 ——
+這是所有預訓練模型共通的邊界條件，不是這個工具特有的問題。</p>
 </section>
 
 
 <section data-part="evidence" class="part" id="part-evidence">
-<h2 data-num="③" id="真實證據">真實證據</h2>
+<h2 data-num="③" id="真實資料與證據">真實資料與證據</h2>
 
 <pre><code>longphase-to phase \
   -s SNP.vcf \
@@ -368,56 +775,57 @@ LongPhase-TO 將 haplotype imbalance 的 Q1／Q3 與 LOH 比例作為多項式�
   --strict-pon-file PoN/1000g-pon.vcf.gz \
   --loh</code></pre>
 
-<p class="cli-note">注意：<code>--caller</code> 只接受
-<code>clairs_to_ss</code>、<code>clairs_to_ssrs</code>、<code>deepsomatic_to</code> 三個值，
-無效或省略時會回報錯誤（請以目前版本核對）。<code>--pon-file</code> 的參數值是<b>逗號分隔的單一字串</b>，
-不是重複的旗標。<code>--strict-pon-file</code> 比 <code>--pon-file</code> 採更嚴格的匹配條件，
-要求 position 與 ALT allele 都吻合。</p>
+<p class="cli-note">四個容易寫錯的地方：<code>--caller</code> 只接受
+<code>clairs_to_ss</code>、<code>clairs_to_ssrs</code>、<code>deepsomatic_to</code>，寫錯會直接報錯結束。
+<code>--pon-file</code> 的值是<b>一個用逗號分隔的字串</b>，不是重複的旗標。
+<code>--strict-pon-file</code> 比 <code>--pon-file</code> 嚴格：它要求位置<b>與</b> ALT allele 都吻合才算命中。
+<code>--loh</code> 不加就不會輸出 LOH 區間。</p>
 
 <figure class="fig"><img src="assets/img/b/b-s31-somatic-calling.webp" srcset="assets/img/b/b-s31-somatic-calling.webp 1x, assets/img/b/b-s31-somatic-calling@2x.webp 2x" alt="LongPhase-TO 在真實資料上訓練後的 somatic calling 效能" loading="lazy" decoding="async"><figcaption>LongPhase-TO 的 somatic calling 結果。在此資料中，tumor-only 的絕對數值低於 tumor–normal；重點是相對於 baseline 的改善，實際差異取決於資料與評估設定。</figcaption></figure>
 
-<h3 id="如何檢視輸出">如何檢視輸出</h3>
+<h3 id="怎麼看輸出">怎麼看輸出</h3>
 
-<pre><code># purity 會寫入 VCF header
+<pre><code># 估出來的腫瘤比例寫在 VCF 檔頭
 grep '##tumor_purity' phased_prefix.vcf
 
-# 看 LongPhase-TO 加的 FILTER 標籤
-grep -v '^##' phased_prefix.vcf | awk '{print $7}' | sort | uniq -c
+# LongPhase-TO 加上去的 FILTER 標籤分布
+awk '!/^#/ {print $7}' phased_prefix.vcf | sort | uniq -c
 
 # LOH 區間
 head phased_prefix_LOH.bed</code></pre>
 
-<p class="prose">在啟用 somatic refinement 的目前版本設定下，FILTER 欄位可能包含 <code>PASS</code>、
-<code>LP_nonSomatic</code> 或 <code>LP_PON</code>；加入 <code>--disable-refine-somatic</code> 時則不套用此步驟。
-這是 LongPhase-TO 對 caller 輸出做<span class="term" data-term="recalibration" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-recalibration-4">再校正<span class="term__pop" id="gd-recalibration-4" role="tooltip"><b class="term__hd">recalibration <i>再校正</i></b><span class="term__def" data-lang="zh">以額外證據重新評估 caller 已輸出的 candidates。若僅處理既有候選，可移除 false positives，但不能恢復 caller 未輸出的變異。</span><span class="term__def" data-lang="en">Re-judging a caller's candidates with extra evidence. When the candidate set is fixed, it can remove false positives but cannot recover variants the caller never emitted.</span><a class="term__more" href="glossary.html#recalibration">完整條目 →</a></span></span>的結果。</p>
+<p class="prose">FILTER 欄位會出現 <code>PASS</code>、<code>LP_nonSomatic</code> 或 <code>LP_PON</code>：
+分別是留下來的、被三位點投票否決的、被族群資料庫擋掉的。
+加上 <code>--disable-refine-somatic</code> 就不做這一步，可以用來看再校正到底改了哪些位置。</p>
 </section>
 
 
 <section data-part="predict" class="part" id="part-predict">
-<h2 data-num="④" id="判讀練習">判讀練習</h2>
+<h2 data-num="④" id="預測與結果檢視">預測與結果檢視</h2>
 
 <div class="reveal__q"><p class="prose">你在輸出的 VCF 裡看到一列的 FORMAT 是 <code>0|0:1|1:./.</code>。<br><br>
-這代表什麼？這個位點的資訊完整嗎？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose">拆開來看：</p>
+這代表什麼？這個位置的資訊完整嗎？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose">一層一層拆：</p>
 <ul class="prose">
-<li><code>GT = 0|0</code> —— 兩條 germline haplotype 都是 reference。
+<li><code>GT = 0|0</code> —— 與生俱來的兩條在這裡都是 reference。
 沒有 <code>.</code>，所以<b>這裡不是 LOH 區</b>。</li>
-<li><code>GT2 = 1|1</code> —— 有 somatic 事件，但<b>兩側都標成 ALT</b>。
-依定義這代表 <b>somatic haplotype 無法判定</b>，也就是 <code>hp3</code>。</li>
-<li><code>GT3 = ./.</code> —— 未使用第三層；非 LOH 情境通常不使用此欄位。</li>
+<li><code>GT2 = 1|1</code> —— 有 somatic 事件，但<b>兩格都寫成 1</b>。
+依定義這代表<b>來源判不出來</b>，也就是 <code>hp3</code>。</li>
+<li><code>GT3 = ./.</code> —— 沒用到第三層，符合「這裡不是 LOH 區」。</li>
 </ul>
-<p class="prose"><b>因此資訊不完整</b>：依 LongPhase-TO 的 FORMAT 定義，工具將此列標示為 somatic 事件，
-但無法判斷它源自 HP1 還是 HP2。</p>
-<p class="prose">常見原因是該位點附近沒有足夠的 germline 錨點 —— 可能 read 太短，
-也可能那一段本身 het 位點稀疏。</p>
-<p class="prose">此設計在證據不足時保留未判定狀態，沒有指定單一來源。
-這與 LongPhase-S 對 HP3 及並列候選的處理一致：<b>保留不確定性，避免無依據的單一指派。</b></p></div></details>
+<p class="prose"><b>所以資訊不完整</b>：工具認定這裡有 somatic 事件，
+但沒辦法說它長在 HP1 還是 HP2 上。</p>
+<p class="prose">最常見的原因是這附近沒有可用的錨點 —— 附近沒有雜合位點，
+或者跨過去的 read 太短，兩邊都連不到能區分 HP1／HP2 的位置。
+回到第二件事那張圖就懂了：沒有鄰居可看，就沒有辦法判斷出身。</p>
+<p class="prose">留意它<b>沒有</b>隨便挑一條寫上去。證據不足時保留「不確定」，
+跟 M12 對 HP3 的處理是同一個原則：不要把猜測寫成結論。</p></div></details>
 </section>
 
 
 <section data-part="practice" class="part" id="part-practice">
 <h2 data-num="⑤" id="實作練習">實作練習</h2>
 
-<h3 id="執行完整流程">執行完整流程</h3>
+<h3 id="跑一次-然後檢查四個輸出">跑一次，然後檢查四個輸出</h3>
 
 <pre><code>longphase-to phase \
   -s tumor_snv.vcf \
@@ -430,45 +838,76 @@ head phased_prefix_LOH.bed</code></pre>
   --strict-pon-file PoN/1000g-pon.vcf.gz \
   --loh</code></pre>
 
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd">四項重要參數</p>
-<ul class="prose">
-<li><code>--caller</code> 在目前流程中應明確指定，只接受 <code>clairs_to_ss</code>、
-<code>clairs_to_ssrs</code>、<code>deepsomatic_to</code>；無效或省略時會回報錯誤。</li>
-<li><code>--pon-file</code> 使用<b>逗號分隔的單一字串</b>，不是重複的旗標。</li>
-<li><code>--strict-pon-file</code> 要求位置<b>與</b> ALT allele 都吻合才算命中，匹配條件較嚴格。</li>
-<li><code>--loh</code> 要自己加，否則不會輸出 LOH 區間。</li>
-</ul>
-</div>
-
-<h3 id="檢視輸出">檢視輸出</h3>
-
-<pre><code># purity 會寫入 VCF header（與配對版不同）
-grep '##tumor_purity' phased_prefix.vcf
-
-# 再校正後的 FILTER 分布
-awk '!/^#/ {print $7}' phased_prefix.vcf | sort | uniq -c
-
-# LOH 區間，以及它們總共佔多少基因體
+<pre><code># ① LOH 一共佔了多少基因體？
 awk '{s+=$3-$2} END {print &quot;LOH 總長度:&quot;, s/1e6, &quot;Mb&quot;}' phased_prefix_LOH.bed
 
-# 有 somatic 事件的位點（GT2 不是 ./.）
+# ② 估出來的腫瘤比例
+grep '##tumor_purity' phased_prefix.vcf
+
+# ③ 有 somatic 事件的位置（GT2 不是 ./.）
 bcftools query -f '%POS\t[%GT\t%GT2\t%GT3]\n' phased_prefix.vcf | \
-  awk '$3 != &quot;./.&quot;' | head -20</code></pre>
+  awk '$3 != &quot;./.&quot;' | head -20
+
+# ④ 其中有幾個落在 LOH 區裡（GT 帶點）
+bcftools query -f '[%GT\t%GT2]\n' phased_prefix.vcf | \
+  awk '$2 != &quot;./.&quot; &amp;&amp; $1 ~ /\./' | wc -l</code></pre>
+
+<p class="prose">③ 跑出來如果有一堆 <code>1|1</code>，代表很多位置判不出來源，
+通常是覆蓋度或 read 長度不足；④ 的數字跟 ① 的 LOH 長度應該是相關的，
+兩者兜不起來就值得回頭看 LOH 是不是切得太碎。</p>
+
+<h3 id="把圖印出來看">把圖印出來看</h3>
+
+<pre><code>longphase-to phase ... --dot -o phased_prefix</code></pre>
+
+<p class="prose">加 <code>--dot</code> 會另外輸出一個 Graphviz 的 <code>.dot</code> 檔，
+裡面就是這一章講的那張「節點是 allele、邊是 read 支持」的圖。
+自己畫出一小段來看，比讀十遍說明有用。</p>
+
+<h3 id="追程式碼時的對照表">追程式碼時的對照表</h3>
+
+<p class="prose">四件事在原始碼裡各有明確的落點。<code>PhasingProcess.cpp</code> 的建構子
+從上往下讀就是整個流程，其他檔案都是被它叫起來的：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>這一章講的</th><th>程式裡的位置</th></tr></thead>
+<tbody>
+<tr><td>整個流程的順序</td><td><code>PhasingProcess.cpp</code> 建構子，由上而下</td></tr>
+<tr><td>讀 BAM、順便數剪痕</td><td><code>BamParser::direct_detect_alleles()</code> → <code>clipCount</code></td></tr>
+<tr><td>由剪痕切出區段與小事件</td><td><code>Clip::detectGenomicEventInterval()</code></td></tr>
+<tr><td>算雜合比例、判定 LOH</td><td><code>Clip::detectLOHRegion()</code>（門檻就寫在這個函式裡）</td></tr>
+<tr><td>建圖：節點是 allele，邊是 read</td><td><code>VairiantGraph::addEdge()</code></td></tr>
+<tr><td>三位點投票</td><td><code>VairiantGraph::somaticCalling()</code> → <code>patternMining()</code></td></tr>
+<tr><td>定相本體</td><td><code>VairiantGraph::phasingProcess()</code></td></tr>
+<tr><td>估腫瘤比例</td><td><code>PurityCalculator::getPurity()</code></td></tr>
+<tr><td>寫出 GT / GT2 / GT3</td><td><code>VairiantGraph::exportPhasingResult()</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">grep 的時候會踩到的兩件事</p>
+<p class="prose">第一，圖的類別名稱是 <code>VairiantGraph</code> —— 原始碼裡就是這樣拼的，
+搜 <code>VariantGraph</code> 會一無所獲。</p>
+<p class="prose">第二，一個候選點會被拿去跟左右各幾個變異搭配成很多組三位點，
+那個「幾個」是 <code>--somaticConnectAdjacent</code>（預設 6）。
+它跟一般定相用的 <code>--connectAdjacent</code>（預設 35）是<b>兩個不同的參數</b>，別看錯。</p>
+</div>
 
 <h3 id="兩個版本的差異對照表">兩個版本的差異對照表</h3>
 
-<p class="prose">建議保留此表，以便在兩個工具之間切換時查閱：</p>
+<p class="prose">在兩個工具之間切換時最容易搞混的六件事：</p>
 
 <div class="table-wrap">
 <table>
 <thead><tr><th></th><th>配對版（longphase-s）</th><th>僅腫瘤版（longphase-to）</th></tr></thead>
 <tbody>
-<tr><td>somatic haplotype 放哪</td><td>BAM 的 <code>HP:Z:1-1</code></td><td>VCF FORMAT 的 <code>GT2</code>／<code>GT3</code></td></tr>
-<tr><td>純度放哪</td><td><code>&lt;prefix&gt;_purity.out</code> 檔案</td><td>VCF header <code>##tumor_purity=</code></td></tr>
-<tr><td>純度參數名</td><td><code>--tumor-purity</code>（0.1–1.0）</td><td><code>--purity</code>（0–1）</td></tr>
+<tr><td>somatic haplotype 寫在哪</td><td>BAM 的 <code>HP:Z:1-1</code></td><td>VCF FORMAT 的 <code>GT2</code>／<code>GT3</code></td></tr>
+<tr><td>腫瘤比例寫在哪</td><td><code>&lt;prefix&gt;_purity.out</code> 檔案</td><td>VCF 檔頭 <code>##tumor_purity=</code></td></tr>
+<tr><td>指定比例的參數名</td><td><code>--tumor-purity</code>（0.1–1.0）</td><td><code>--purity</code>（0–1）</td></tr>
 <tr><td>掛在哪個子命令</td><td><code>somatic_haplotag</code></td><td><code>phase</code></td></tr>
-<tr><td><code>--caller</code></td><td>沒有這個參數</td><td><b>實質必填</b></td></tr>
+<tr><td><code>--caller</code></td><td>沒有這個參數</td><td>實質必填</td></tr>
 <tr><td><code>--loh</code></td><td>沒有</td><td>有，輸出 <code>_LOH.bed</code></td></tr>
 </tbody>
 </table>
@@ -478,9 +917,9 @@ bcftools query -f '%POS\t[%GT\t%GT2\t%GT3]\n' phased_prefix.vcf | \
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m12.html"><small>← 上一模組</small>LongPhase-S（配對 tumor–normal）</a><a class="next" href="capstone.html"><small>下一模組 →</small>Capstone：整合式位點判讀</a></nav>
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>BFB（斷裂—融合—橋循環）</dt><dd>Breakage-fusion-bridge：染色體反覆斷裂與融合造成的劇烈重排，在 coverage 上呈現特殊的階梯形狀。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>LongPhase-TO</dt><dd>tumor-only 版本。做染色體等級的 LOH 偵測、triplet graph 再校正、somatic phasing 與 purity 估計。</dd><dt>recalibration（再校正）</dt><dd>以額外證據重新評估 caller 已輸出的 candidates。若僅處理既有候選，可移除 false positives，但不能恢復 caller 未輸出的變異。</dd><dt>soft clipping</dt><dd>read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>BFB（斷裂—融合—橋循環）</dt><dd>Breakage-fusion-bridge：染色體反覆斷裂與融合造成的劇烈重排，在 coverage 上呈現特殊的階梯形狀。</dd><dt>ClairS</dt><dd>配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</dd><dt>GHIR（生殖系單倍型失衡比）</dt><dd>Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>LongPhase-TO</dt><dd>tumor-only 版本。做染色體等級的 LOH 偵測、triplet graph 再校正、somatic phasing 與 purity 估計。</dd><dt>PON（正常樣本面板／族群資料庫（依流程而異））</dt><dd>PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</dd><dt>aneuploidy（非整倍體）</dt><dd>染色體數目異常。腫瘤裡非常普遍，也可能使 cellular purity 與 DNA fraction 不一致。</dd><dt>heterozygous（異型合子）</dt><dd>在一般二倍體位點上，兩份 allele 不同（例如一份 A、一份 G）。此類位點可作為區分 haplotype 的資訊錨點；複雜拷貝數情況需另行解讀。</dd><dt>long read（長讀）</dt><dd>單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</dd><dt>recalibration（再校正）</dt><dd>以額外證據重新評估 caller 已輸出的 candidates。若僅處理既有候選，可移除 false positives，但不能恢復 caller 未輸出的變異。</dd><dt>soft clipping</dt><dd>read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</dd><dt>triplet graph</dt><dd>LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</dd><dt>tumour DNA fraction（腫瘤 DNA 比例）</dt><dd>樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#第一步-以-clipping-界定事件邊界">第一步：以 clipping 界定事件邊界</a></li><li class="lv3"><a href="#第二步-以-heterozygosity-ratio-找-loh-候選">第二步：以 heterozygosity ratio 找 LOH 候選</a></li><li class="lv3"><a href="#第三步-triplet-graph-的三位點結構">第三步：triplet graph 的三位點結構</a></li><li class="lv3"><a href="#第四步-解讀-gt-gt2-gt3">第四步：解讀 GT:GT2:GT3</a></li><li class="lv3"><a href="#第五步-估計-purity">第五步：估計 purity</a></li><li class="lv3"><a href="#兩個版本的對照">兩個版本的對照</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#如何檢視輸出">如何檢視輸出</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行完整流程">執行完整流程</a></li><li class="lv3"><a href="#檢視輸出">檢視輸出</a></li><li class="lv3"><a href="#兩個版本的差異對照表">兩個版本的差異對照表</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#先看整件事的形狀">先看整件事的形狀</a></li><li class="lv3"><a href="#第一件事-哪些區段只剩一條染色體">第一件事：哪些區段只剩一條染色體</a></li><li class="lv3"><a href="#第二件事-這個候選變異是真的嗎">第二件事：這個候選變異是真的嗎</a></li><li class="lv3"><a href="#第三件事-把每個變異掛回染色體">第三件事：把每個變異掛回染色體</a></li><li class="lv3"><a href="#第四件事-這個樣本有多少比例是腫瘤">第四件事：這個樣本有多少比例是腫瘤</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#怎麼看輸出">怎麼看輸出</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#跑一次-然後檢查四個輸出">跑一次，然後檢查四個輸出</a></li><li class="lv3"><a href="#把圖印出來看">把圖印出來看</a></li><li class="lv3"><a href="#追程式碼時的對照表">追程式碼時的對照表</a></li><li class="lv3"><a href="#兩個版本的差異對照表">兩個版本的差異對照表</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">

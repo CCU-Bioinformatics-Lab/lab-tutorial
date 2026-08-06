@@ -81,7 +81,9 @@
         下排沒有正常組織，改查族群資料庫：① 的族群等位基因頻率 0.31，高於資料庫收錄門檻 0.001，
         查得到所以排除；③ 的頻率只有 0.0002，低於門檻，資料庫裡沒有這一筆，因此被留下來成為假陽性。
         兩排的差別只有一個位置，而那個位置的成因是「族群裡常見」與「這個人有」不是同一件事。
-        位置 ② 兩排都靠 read 的分布排除，與有沒有正常組織無關。</desc>
+        位置 ② 兩排都靠 read 的分布排除，與有沒有正常組織無關：
+        支持 ① 與 ③ 的是同三條 read，支持 ④ 的兩條也在這三條裡面，
+        但支持 ② 的兩條分屬兩群不同的 read，與同一次突變的來源應該一致不符。</desc>
 
   <!-- ══════════════════ 圖例 ══════════════════ -->
   <circle class="mark germline" cx="28" cy="27" r="8"/>
@@ -111,10 +113,10 @@
 
   <rect class="box plain" x="44" y="150" width="300" height="16" rx="4"/>
   <text class="tick end mono" x="42" y="163">ref</text>
-  <text class="base t mono" x="92"  y="163" font-size="14">T</text>
-  <text class="base a mono" x="162" y="163" font-size="14">A</text>
-  <text class="base g mono" x="232" y="163" font-size="14">G</text>
-  <text class="base g mono" x="302" y="163" font-size="14">G</text>
+  <text class="base t mono" x="92"  y="163" font-size="15">T</text>
+  <text class="base a mono" x="162" y="163" font-size="15">A</text>
+  <text class="base g mono" x="232" y="163" font-size="15">G</text>
+  <text class="base g mono" x="302" y="163" font-size="15">G</text>
 
   <rect class="read hp0" x="44" y="176" width="300" height="14" rx="7"/>
   <rect class="read hp0" x="44" y="196" width="300" height="14" rx="7"/>
@@ -155,7 +157,7 @@
   <text class="base g mono" x="302" y="287" font-size="15">G</text>
 
   <text class="tick zh" x="32" y="312">四個位置都跟參考不一樣，全部列為候選。</text>
-  <text class="tick zh" x="32" y="334">①③ 長得一模一樣：各 3 條支持。</text>
+  <text class="tick zh" x="32" y="334">①③ 各 3 條支持；② 的 2 條散在兩群。</text>
 
   <path class="flow" d="M356,220 L384,220" marker-end="url(#arrow)"/>
 
@@ -169,10 +171,10 @@
   <text class="tick mid" x="668" y="136">④</text>
 
   <rect class="box plain" x="412" y="148" width="286" height="16" rx="4"/>
-  <text class="base t mono" x="458" y="161" font-size="14">T</text>
-  <text class="base a mono" x="528" y="161" font-size="14">A</text>
-  <text class="base g mono" x="598" y="161" font-size="14">G</text>
-  <text class="base g mono" x="668" y="161" font-size="14">G</text>
+  <text class="base t mono" x="458" y="161" font-size="15">T</text>
+  <text class="base a mono" x="528" y="161" font-size="15">A</text>
+  <text class="base g mono" x="598" y="161" font-size="15">G</text>
+  <text class="base g mono" x="668" y="161" font-size="15">G</text>
 
   <rect class="read hp0" x="412" y="174" width="286" height="14" rx="7"/>
   <rect class="read hp0" x="412" y="194" width="286" height="14" rx="7"/>
@@ -200,7 +202,7 @@
   <text class="base g mono" x="668" y="245" font-size="15">G</text>
 
   <text class="tick zh" x="412" y="274">① ③ 在這裡也看得到 → 兩個都排除</text>
-  <text class="tick zh" x="412" y="296">④ 在這裡一條都沒有 → 保留</text>
+  <text class="tick zh" x="412" y="296">④ 都沒有 → 保留；② 靠 read 分布排除</text>
 
   <path class="flow" d="M716,220 L744,220" marker-end="url(#arrow)"/>
 
@@ -241,10 +243,10 @@
 
   <rect class="box plain" x="44" y="472" width="300" height="16" rx="4"/>
   <text class="tick end mono" x="42" y="485">ref</text>
-  <text class="base t mono" x="92"  y="485" font-size="14">T</text>
-  <text class="base a mono" x="162" y="485" font-size="14">A</text>
-  <text class="base g mono" x="232" y="485" font-size="14">G</text>
-  <text class="base g mono" x="302" y="485" font-size="14">G</text>
+  <text class="base t mono" x="92"  y="485" font-size="15">T</text>
+  <text class="base a mono" x="162" y="485" font-size="15">A</text>
+  <text class="base g mono" x="232" y="485" font-size="15">G</text>
+  <text class="base g mono" x="302" y="485" font-size="15">G</text>
 
   <rect class="read hp0" x="44" y="498" width="300" height="14" rx="7"/>
   <rect class="read hp0" x="44" y="518" width="300" height="14" rx="7"/>
@@ -304,7 +306,7 @@
 
   <!-- ② artifact -->
   <text class="tick end" x="440" y="500">②</text>
-  <text class="tick zh" x="448" y="500">artifact 不在族群資料庫裡</text>
+  <text class="tick zh" x="448" y="500">不在資料庫裡 → 由 read 分布排除</text>
 
   <!-- ③ AF = 0.0002，停在門檻左邊 -->
   <text class="tick end" x="440" y="524">③</text>
@@ -313,7 +315,7 @@
 
   <!-- ④ somatic -->
   <text class="tick end" x="440" y="548">④</text>
-  <text class="tick zh" x="448" y="548">somatic 也不在族群資料庫裡</text>
+  <text class="tick zh" x="448" y="548">不在資料庫裡 → 但 read 分布支持它</text>
 
   <!-- 座標軸 -->
   <line class="axis" x1="444" y1="576" x2="640" y2="576"/>
@@ -947,42 +949,42 @@ clonality 與 depth（完整關係式見 M8）。因此不能只用「有沒有�
   <rect class="read hp2" x="110" y="383" width="310" height="12" rx="6"/>
   <rect class="region" x="253" y="184" width="24" height="211"/>
   <rect class="box ghost" x="253" y="184" width="24" height="211" rx="4"/>
-  <text class="base t mono" x="170" y="200" font-size="14">T</text>
-  <text class="base a mono" x="265" y="200" font-size="14">A</text>
-  <text class="base c mono" x="360" y="200" font-size="14">C</text>
-  <text class="base t mono" x="170" y="217" font-size="14">T</text>
-  <text class="base a mono" x="265" y="217" font-size="14">A</text>
-  <text class="base c mono" x="360" y="217" font-size="14">C</text>
-  <text class="base t mono" x="170" y="234" font-size="14">T</text>
-  <text class="base a mono" x="265" y="234" font-size="14">A</text>
-  <text class="base c mono" x="360" y="234" font-size="14">C</text>
-  <text class="base t mono" x="170" y="251" font-size="14">T</text>
-  <text class="base a mono" x="265" y="251" font-size="14">A</text>
-  <text class="base c mono" x="360" y="251" font-size="14">C</text>
-  <text class="base t mono" x="170" y="268" font-size="14">T</text>
-  <text class="base g mono" x="265" y="268" font-size="14">G</text>
-  <text class="base c mono" x="360" y="268" font-size="14">C</text>
-  <text class="base t mono" x="170" y="285" font-size="14">T</text>
-  <text class="base g mono" x="265" y="285" font-size="14">G</text>
-  <text class="base c mono" x="360" y="285" font-size="14">C</text>
-  <text class="base g mono" x="170" y="308" font-size="14">G</text>
-  <text class="base g mono" x="265" y="308" font-size="14">G</text>
-  <text class="base a mono" x="360" y="308" font-size="14">A</text>
-  <text class="base g mono" x="170" y="325" font-size="14">G</text>
-  <text class="base g mono" x="265" y="325" font-size="14">G</text>
-  <text class="base a mono" x="360" y="325" font-size="14">A</text>
-  <text class="base g mono" x="170" y="342" font-size="14">G</text>
-  <text class="base g mono" x="265" y="342" font-size="14">G</text>
-  <text class="base a mono" x="360" y="342" font-size="14">A</text>
-  <text class="base g mono" x="170" y="359" font-size="14">G</text>
-  <text class="base g mono" x="265" y="359" font-size="14">G</text>
-  <text class="base a mono" x="360" y="359" font-size="14">A</text>
-  <text class="base g mono" x="170" y="376" font-size="14">G</text>
-  <text class="base g mono" x="265" y="376" font-size="14">G</text>
-  <text class="base a mono" x="360" y="376" font-size="14">A</text>
-  <text class="base g mono" x="170" y="393" font-size="14">G</text>
-  <text class="base g mono" x="265" y="393" font-size="14">G</text>
-  <text class="base a mono" x="360" y="393" font-size="14">A</text>
+  <text class="base t mono" x="170" y="200" font-size="15">T</text>
+  <text class="base a mono" x="265" y="200" font-size="15">A</text>
+  <text class="base c mono" x="360" y="200" font-size="15">C</text>
+  <text class="base t mono" x="170" y="217" font-size="15">T</text>
+  <text class="base a mono" x="265" y="217" font-size="15">A</text>
+  <text class="base c mono" x="360" y="217" font-size="15">C</text>
+  <text class="base t mono" x="170" y="234" font-size="15">T</text>
+  <text class="base a mono" x="265" y="234" font-size="15">A</text>
+  <text class="base c mono" x="360" y="234" font-size="15">C</text>
+  <text class="base t mono" x="170" y="251" font-size="15">T</text>
+  <text class="base a mono" x="265" y="251" font-size="15">A</text>
+  <text class="base c mono" x="360" y="251" font-size="15">C</text>
+  <text class="base t mono" x="170" y="268" font-size="15">T</text>
+  <text class="base g mono" x="265" y="268" font-size="15">G</text>
+  <text class="base c mono" x="360" y="268" font-size="15">C</text>
+  <text class="base t mono" x="170" y="285" font-size="15">T</text>
+  <text class="base g mono" x="265" y="285" font-size="15">G</text>
+  <text class="base c mono" x="360" y="285" font-size="15">C</text>
+  <text class="base g mono" x="170" y="308" font-size="15">G</text>
+  <text class="base g mono" x="265" y="308" font-size="15">G</text>
+  <text class="base a mono" x="360" y="308" font-size="15">A</text>
+  <text class="base g mono" x="170" y="325" font-size="15">G</text>
+  <text class="base g mono" x="265" y="325" font-size="15">G</text>
+  <text class="base a mono" x="360" y="325" font-size="15">A</text>
+  <text class="base g mono" x="170" y="342" font-size="15">G</text>
+  <text class="base g mono" x="265" y="342" font-size="15">G</text>
+  <text class="base a mono" x="360" y="342" font-size="15">A</text>
+  <text class="base g mono" x="170" y="359" font-size="15">G</text>
+  <text class="base g mono" x="265" y="359" font-size="15">G</text>
+  <text class="base a mono" x="360" y="359" font-size="15">A</text>
+  <text class="base g mono" x="170" y="376" font-size="15">G</text>
+  <text class="base g mono" x="265" y="376" font-size="15">G</text>
+  <text class="base a mono" x="360" y="376" font-size="15">A</text>
+  <text class="base g mono" x="170" y="393" font-size="15">G</text>
+  <text class="base g mono" x="265" y="393" font-size="15">G</text>
+  <text class="base a mono" x="360" y="393" font-size="15">A</text>
   <text class="tick end bold hp1" x="102" y="238">HP1</text>
   <text class="tick end bold hp2" x="102" y="346">HP2</text>
   <text class="tick end zh" x="102" y="260">6 條</text>
@@ -1017,42 +1019,42 @@ clonality 與 depth（完整關係式見 M8）。因此不能只用「有沒有�
   <rect class="read hp2" x="600" y="383" width="310" height="12" rx="6"/>
   <rect class="region" x="743" y="184" width="24" height="211"/>
   <rect class="box ghost" x="743" y="184" width="24" height="211" rx="4"/>
-  <text class="base t mono" x="660" y="200" font-size="14">T</text>
-  <text class="base a mono" x="755" y="200" font-size="14">A</text>
-  <text class="base c mono" x="850" y="200" font-size="14">C</text>
-  <text class="base t mono" x="660" y="217" font-size="14">T</text>
-  <text class="base g mono" x="755" y="217" font-size="14">G</text>
-  <text class="base c mono" x="850" y="217" font-size="14">C</text>
-  <text class="base t mono" x="660" y="234" font-size="14">T</text>
-  <text class="base g mono" x="755" y="234" font-size="14">G</text>
-  <text class="base c mono" x="850" y="234" font-size="14">C</text>
-  <text class="base t mono" x="660" y="251" font-size="14">T</text>
-  <text class="base a mono" x="755" y="251" font-size="14">A</text>
-  <text class="base c mono" x="850" y="251" font-size="14">C</text>
-  <text class="base t mono" x="660" y="268" font-size="14">T</text>
-  <text class="base g mono" x="755" y="268" font-size="14">G</text>
-  <text class="base c mono" x="850" y="268" font-size="14">C</text>
-  <text class="base t mono" x="660" y="285" font-size="14">T</text>
-  <text class="base g mono" x="755" y="285" font-size="14">G</text>
-  <text class="base c mono" x="850" y="285" font-size="14">C</text>
-  <text class="base g mono" x="660" y="308" font-size="14">G</text>
-  <text class="base g mono" x="755" y="308" font-size="14">G</text>
-  <text class="base a mono" x="850" y="308" font-size="14">A</text>
-  <text class="base g mono" x="660" y="325" font-size="14">G</text>
-  <text class="base a mono" x="755" y="325" font-size="14">A</text>
-  <text class="base a mono" x="850" y="325" font-size="14">A</text>
-  <text class="base g mono" x="660" y="342" font-size="14">G</text>
-  <text class="base g mono" x="755" y="342" font-size="14">G</text>
-  <text class="base a mono" x="850" y="342" font-size="14">A</text>
-  <text class="base g mono" x="660" y="359" font-size="14">G</text>
-  <text class="base g mono" x="755" y="359" font-size="14">G</text>
-  <text class="base a mono" x="850" y="359" font-size="14">A</text>
-  <text class="base g mono" x="660" y="376" font-size="14">G</text>
-  <text class="base a mono" x="755" y="376" font-size="14">A</text>
-  <text class="base a mono" x="850" y="376" font-size="14">A</text>
-  <text class="base g mono" x="660" y="393" font-size="14">G</text>
-  <text class="base g mono" x="755" y="393" font-size="14">G</text>
-  <text class="base a mono" x="850" y="393" font-size="14">A</text>
+  <text class="base t mono" x="660" y="200" font-size="15">T</text>
+  <text class="base a mono" x="755" y="200" font-size="15">A</text>
+  <text class="base c mono" x="850" y="200" font-size="15">C</text>
+  <text class="base t mono" x="660" y="217" font-size="15">T</text>
+  <text class="base g mono" x="755" y="217" font-size="15">G</text>
+  <text class="base c mono" x="850" y="217" font-size="15">C</text>
+  <text class="base t mono" x="660" y="234" font-size="15">T</text>
+  <text class="base g mono" x="755" y="234" font-size="15">G</text>
+  <text class="base c mono" x="850" y="234" font-size="15">C</text>
+  <text class="base t mono" x="660" y="251" font-size="15">T</text>
+  <text class="base a mono" x="755" y="251" font-size="15">A</text>
+  <text class="base c mono" x="850" y="251" font-size="15">C</text>
+  <text class="base t mono" x="660" y="268" font-size="15">T</text>
+  <text class="base g mono" x="755" y="268" font-size="15">G</text>
+  <text class="base c mono" x="850" y="268" font-size="15">C</text>
+  <text class="base t mono" x="660" y="285" font-size="15">T</text>
+  <text class="base g mono" x="755" y="285" font-size="15">G</text>
+  <text class="base c mono" x="850" y="285" font-size="15">C</text>
+  <text class="base g mono" x="660" y="308" font-size="15">G</text>
+  <text class="base g mono" x="755" y="308" font-size="15">G</text>
+  <text class="base a mono" x="850" y="308" font-size="15">A</text>
+  <text class="base g mono" x="660" y="325" font-size="15">G</text>
+  <text class="base a mono" x="755" y="325" font-size="15">A</text>
+  <text class="base a mono" x="850" y="325" font-size="15">A</text>
+  <text class="base g mono" x="660" y="342" font-size="15">G</text>
+  <text class="base g mono" x="755" y="342" font-size="15">G</text>
+  <text class="base a mono" x="850" y="342" font-size="15">A</text>
+  <text class="base g mono" x="660" y="359" font-size="15">G</text>
+  <text class="base g mono" x="755" y="359" font-size="15">G</text>
+  <text class="base a mono" x="850" y="359" font-size="15">A</text>
+  <text class="base g mono" x="660" y="376" font-size="15">G</text>
+  <text class="base a mono" x="755" y="376" font-size="15">A</text>
+  <text class="base a mono" x="850" y="376" font-size="15">A</text>
+  <text class="base g mono" x="660" y="393" font-size="15">G</text>
+  <text class="base g mono" x="755" y="393" font-size="15">G</text>
+  <text class="base a mono" x="850" y="393" font-size="15">A</text>
   <text class="tick end bold hp1" x="592" y="238">HP1</text>
   <text class="tick end bold hp2" x="592" y="346">HP2</text>
   <text class="tick end zh" x="592" y="260">6 條</text>
@@ -1072,7 +1074,7 @@ clonality 與 depth（完整關係式見 M8）。因此不能只用「有沒有�
 
 <p class="prose">這個想法在兩個工具裡有不同的實作：LongPhase-S 做成 read-level 與 haplotype origin
 兩個過濾器（四個過濾器與各自的門檻見 M12）；LongPhase-TO 把它擴展成三個位點的
-<span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-triplet-graph-12">triplet graph<span class="term__pop" id="gd-triplet-graph-12" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 用來評估 candidate 的局部結構：取候選點與左右兩個 germline 位點，觀察三個位置的 allele 組合如何由 reads 連結。在此方法的判定規則中，三位點可提供兩位點模型缺少的辨識資訊。</span><span class="term__def" data-lang="en">LongPhase-TO's structure for judging a candidate: the candidate plus two flanking germline sites, and how their alleles link across reads.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span>，用路徑結構判斷（見 M13）。</p>
+<span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-triplet-graph-12">triplet graph<span class="term__pop" id="gd-triplet-graph-12" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span>，用路徑結構判斷（見 M13）。</p>
 
 <h3 id="一句話總結">一句話總結</h3>
 
@@ -1139,7 +1141,7 @@ population database set 定義一致；它不同於 GATK Mutect2 所稱的 recur
 clonality、mapping bias 與 depth 影響，因此不能單獨依 VAF 分類。</p>
 <p class="prose">接著檢查<b>支持 read 的 haplotype 分布</b>：如果 4 條支持 read 全在同一條
 haplotype 上，與 somatic 相容；如果分散在兩條上，更像 artifact。此外還要看 copy number、
-LOH、品質與獨立證據。<span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-triplet-graph-13">triplet graph<span class="term__pop" id="gd-triplet-graph-13" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 用來評估 candidate 的局部結構：取候選點與左右兩個 germline 位點，觀察三個位置的 allele 組合如何由 reads 連結。在此方法的判定規則中，三位點可提供兩位點模型缺少的辨識資訊。</span><span class="term__def" data-lang="en">LongPhase-TO's structure for judging a candidate: the candidate plus two flanking germline sites, and how their alleles link across reads.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span> 中的三種 pattern 是理想化示例，實務資料未必能完全區分，
+LOH、品質與獨立證據。<span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-triplet-graph-13">triplet graph<span class="term__pop" id="gd-triplet-graph-13" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span> 中的三種 pattern 是理想化示例，實務資料未必能完全區分，
 系統性 artifact 或 phasing error 也可能造成例外。</p></div></details>
 </section>
 
@@ -1183,7 +1185,7 @@ samtools view tumor.haplotagged.bam chr1:1000000-1000000 \
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m06.html"><small>← 上一模組</small>Phasing 與 haplotagging</a><a class="next" href="m08.html"><small>下一模組 →</small>腫瘤樣本的混合組成</a></nav>
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>ClairS</dt><dd>配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</dd><dt>DeepSomatic</dt><dd>Google 的 somatic variant caller，同樣有 tumor-only 版本。</dd><dt>PON（正常樣本面板／族群資料庫（依流程而異））</dt><dd>PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</dd><dt>TINC（腫瘤污染正常樣本）</dt><dd>Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。</dd><dt>candidate（候選變異）</dt><dd>caller 提出、但尚未被確認的變異位點。本實驗室多數工具位於 caller 之後，進行<b>再校正</b>，處理的就是這些 candidates。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>germline variant（生殖系變異）</dt><dd>在生殖系形成、通常存在於多數細胞的變異；可遺傳給子代，但不代表必然傳遞。</dd><dt>haplotype（單倍型）</dt><dd>同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</dd><dt>somatic variant（體細胞變異）</dt><dd>在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</dd><dt>triplet graph</dt><dd>LongPhase-TO 用來評估 candidate 的局部結構：取候選點與左右兩個 germline 位點，觀察三個位置的 allele 組合如何由 reads 連結。在此方法的判定規則中，三位點可提供兩位點模型缺少的辨識資訊。</dd><dt>tumour-normal（配對腫瘤／正常）</dt><dd>同時定序病人的腫瘤與正常組織；正常樣本提供個體 germline 背景，有助於辨識 somatic 候選。</dd><dt>tumour-only（僅腫瘤）</dt><dd>只有腫瘤樣本、沒有配對正常樣本。在成本或檢體受限時很常見，但少了 germline 對照，分析難度會大幅提高。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>ClairS</dt><dd>配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</dd><dt>DeepSomatic</dt><dd>Google 的 somatic variant caller，同樣有 tumor-only 版本。</dd><dt>PON（正常樣本面板／族群資料庫（依流程而異））</dt><dd>PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</dd><dt>TINC（腫瘤污染正常樣本）</dt><dd>Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。</dd><dt>candidate（候選變異）</dt><dd>caller 提出、但尚未被確認的變異位點。本實驗室多數工具位於 caller 之後，進行<b>再校正</b>，處理的就是這些 candidates。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>germline variant（生殖系變異）</dt><dd>在生殖系形成、通常存在於多數細胞的變異；可遺傳給子代，但不代表必然傳遞。</dd><dt>haplotype（單倍型）</dt><dd>同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</dd><dt>somatic variant（體細胞變異）</dt><dd>在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</dd><dt>triplet graph</dt><dd>LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</dd><dt>tumour-normal（配對腫瘤／正常）</dt><dd>同時定序病人的腫瘤與正常組織；正常樣本提供個體 germline 背景，有助於辨識 somatic 候選。</dd><dt>tumour-only（僅腫瘤）</dt><dd>只有腫瘤樣本、沒有配對正常樣本。在成本或檢體受限時很常見，但少了 germline 對照，分析難度會大幅提高。</dd></dl></section>
   </main>
   <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#同一批-read-兩種對照-兩種輸出">同一批 read，兩種對照，兩種輸出</a></li><li class="lv3"><a href="#沒有正常組織時-改用什麼當對照">沒有正常組織時，改用什麼當對照</a></li><li class="lv3"><a href="#tn-calling-也不是把兩個-vcf-相減">TN calling 也不是把兩個 VCF 相減</a></li><li class="lv3"><a href="#tinc-normal-裡的訊號強度說明三種不同的事">TINC：normal 裡的訊號強度說明三種不同的事</a></li><li class="lv3"><a href="#沒有正常組織時-還剩下什麼證據">沒有正常組織時，還剩下什麼證據</a></li><li class="lv3"><a href="#一句話總結">一句話總結</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#tn-calling-指令示範">TN calling 指令示範</a></li><li class="lv3"><a href="#to-模式-準備-population-database-set">TO 模式：準備 population database set</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#比較兩種-calling-設計的結果">比較兩種 calling 設計的結果</a></li><li class="lv3"><a href="#檢查多出來的候選是什麼">檢查多出來的候選是什麼</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
 </div>

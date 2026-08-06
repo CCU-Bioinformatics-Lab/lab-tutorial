@@ -1,10 +1,11 @@
 <!--tw
 {
   "objectives": [
-    "說明 clipping 如何用來界定 CNV / BFB 的事件區間",
-    "解釋為什麼要用 heterozygosity ratio 而不是 coverage 來偵測 LOH",
-    "說明 triplet graph 為什麼需要三個位點而不是兩個",
-    "解讀一個 GT:GT2:GT3 字串，包含 LOH 區內的巢狀情況"
+    "說出沒有配對正常樣本時，LongPhase-TO 改用什麼證據取代對照組",
+    "解釋為什麼判斷候選變異的真假，要看「支持它的 read 落在哪一條染色體上」",
+    "說明偵測 LOH 為什麼用雜合位點比例而不是 coverage，以及小事件為什麼要先扣掉",
+    "讀懂一個 GT:GT2:GT3 字串，包含 LOH 區內的情況",
+    "在原始碼裡指出這四個步驟各自寫在哪個函式"
   ]
 }
 -->
@@ -12,118 +13,153 @@
 <section data-part="why">
 <h2>為什麼重要</h2>
 
-<p class="prose">[[LongPhase-TO]] 是 tumor-only 支線的基礎。它在<b>沒有配對正常樣本</b>的情況下，
-執行 LOH 偵測、候選 somatic 判定、phasing 與 purity 估計。</p>
+<p class="prose">上一章的做法需要兩份樣本：腫瘤一份、同一個病人的正常組織一份。
+有了正常樣本，「這個變異是不是癌細胞才有的」就有直接的參照 ——
+正常樣本裡也看得到的，本來就有，不是癌症造成的。</p>
 
-<p class="prose">缺少正常樣本對照時，流程改以<b>haplotype 與 graph 結構</b>作為判定證據。本節說明這些結構。</p>
+<p class="prose">實務上常常只拿得到腫瘤那一份。這時候少掉的不只是一個檔案，是<b>整個對照組</b>。
+看到一個候選變異，你沒有辦法直接回答「這個人本來就有嗎」。</p>
+
+<p class="prose">[[LongPhase-TO]] 換了一種證據：<b>不比對兩個樣本，改看同一批 read 內部的結構</b>。
+一條 [[long read]] 一次跨過好幾個位置，所以「哪些 allele 綁在同一條分子上」這件事，
+只有腫瘤樣本時仍然看得見。這一章就是在講它怎麼把這個結構當成缺席的對照組來用。</p>
 </section>
 
 
 <section data-part="concept">
 <h2>概念與互動</h2>
 
-<h3>第一步：以 clipping 界定事件邊界</h3>
+<h3>先看整件事的形狀</h3>
 
-<p class="prose">要偵測染色體等級的 [[LOH]]，需先界定待分析的基因體區段。
-LongPhase-TO 會檢查 <b>[[soft clipping]]</b> 的分布（M4 的 CIGAR <code>S</code>）：</p>
+<p class="prose">這個工具只有一個主要指令，但它一次做完四件事。
+先把這四件事的順序記住，後面每一節都是在把其中一格放大。</p>
 
-<ul class="prose">
-<li>大量 read 在某處出現<b>左端</b> clipping，可能對應 coverage 上升的轉折（up clipping）</li>
-<li>大量 read 在某處出現<b>右端</b> clipping，可能對應 coverage 下降的轉折（down clipping）</li>
-<li>一組 up/down clipping 可提供 CNV 或 [[BFB]] 事件區間的候選邊界，仍需其他訊號驗證</li>
-</ul>
+{{svg:m13-to-overview | [wide] 由上而下就是程式實際跑的順序，不是隨便排的。
+③ 需要 ① 算出來的 LOH 區段才做得下去；④ 需要 ③ 的定相結果才算得出來。
+而 ④ 算出來的數字如果很高，還會<b>回頭把 ③ 重跑一次</b> —— 這條回饋線是這個流程唯一的循環。}}
 
-{{svg:m13-clipping-interval | [wide] 三層。① clipping 與 coverage 的轉折可提供候選事件邊界：上升處常見「左端被剪」、下降處常見「右端被剪」，一組上下界定一個候選區間；此步驟不直接使用 variant calls。② 對每個區段計算雜合比例，比例偏低時標記為 LOH 候選；中間夾的小事件可能使連續 LOH 被切成數段。③ 排除小事件後重算，有助於估計連續區段的範圍。}}
+<h3>第一件事：哪些區段只剩一條染色體</h3>
 
-<p class="prose">實際訊號可能較分散 —— 有些事件是「緩升緩降」的，clipping 分布在一小段區域而非單一位置。
-因此可用滑動視窗累積 clipping 訊號，再依峰值定位候選邊界。</p>
+<p class="prose">人的每個位置本來有兩份，一份來自父親、一份來自母親。
+腫瘤細胞常常整段整段地弄丟其中一份，這叫 [[LOH]]。
+LOH 區段對後面每一步都有影響，所以要先找出來。</p>
 
-<h3>第二步：以 heterozygosity ratio 找 LOH 候選</h3>
+<p class="prose">怎麼找？看一個很簡單的數字：<b>這個區段裡，「兩份不一樣」的位置佔多少</b>。
+兩份都在的時候，一個人身上大約每一千個鹼基就有一個位置是一邊 A、一邊 G，
+這種位置叫 [[heterozygous|雜合]]。少了一份之後，這些位置只剩一種 allele，比例就會塌下來。</p>
 
-<p class="prose">切好區段之後，統計每個區段裡 heterozygous 位點的比例。
-比例低於預設門檻時可標記為 LOH 候選，並需結合 coverage、mapping 與其他 QC 判讀。</p>
+{{svg:m13-clipping-interval | [wide] 三層。① 區段的邊界不是憑空切的：read 的一端對不上參考序列時會被<b>剪掉</b>（[[soft clipping]]，M4 的 CIGAR <code>S</code>），
+而斷點附近會有一整排 read 在同一個位置被剪。方向相反又靠得很近的兩個剪痕會被<b>配成一對</b>，代表中間夾著一個小事件；配不到對的落單剪痕就當成大區段的邊界。
+② 每個區段算一次雜合比例，低於門檻的標成 LOH。③ 關鍵的一步：算比例時先把小事件區間裡的變異扣掉，否則一段連續的 LOH 會被切成好幾塊。}}
 
 <div class="guardrail guardrail--info">
-<p class="guardrail__hd">為什麼不用 coverage？</p>
-<p class="prose">回到 M8 的 LOH 模擬器：<b>copy-neutral LOH 的 coverage 可接近正常範圍</b>。
-因此單獨依 coverage 可能漏檢 copy-neutral LOH。</p>
-<p class="prose">heterozygosity ratio 可對 copy-loss 與 copy-neutral LOH 提供訊號，
-因為兩者都可能使原本的 het 位點減少；敏感度仍受 coverage、mapping 與門檻影響。</p>
+<p class="guardrail__hd">為什麼不看 coverage 就好？</p>
+<p class="prose">直覺上「少一份」應該等於「深度剩一半」。但 M8 的 LOH 模擬器示範過另一種情況：
+一條 haplotype 遺失之後，另一條被複製補上，<b>深度看起來完全正常</b>，
+可是兩份都來自同一個親代 —— 這叫 copy-neutral LOH。</p>
+<p class="prose">只看 coverage 會整個漏掉這一類。雜合比例則對兩類都有反應：
+不管是「少一份」還是「一份變兩份一樣的」，原本能分出兩邊的位置都會消失。</p>
 </div>
 
-<p class="prose">還有一個細節：LongPhase-TO 會<b>排除區段內的小 CNV/BFB 事件</b>再統計。
-理由是一個大的染色體等級 LOH 裡面可能夾雜幾個小事件，
-如果不排除，區段可能被切碎，原本連續的 LOH 可能被報成好幾段。
-此設計旨在降低小事件對區段界定的干擾。</p>
+<p class="prose">為什麼小事件非扣不可？因為一段大 LOH 裡面常常夾著幾個小的重排
+（[[BFB]] 這類劇烈斷裂—融合就會製造這種局部訊號）。這些小區間裡雜合位點會短暫回來，
+把比例墊到門檻之上。不處理的話，程式會以為那裡不是 LOH，於是把一段連續的區域報成三段不相干的區域。</p>
 
-<h3>第三步：triplet graph 的三位點結構</h3>
+<h3>第二件事：這個候選變異是真的嗎</h3>
 
-<p class="prose">沒有正常樣本時，如何判斷一個候選點是 somatic 還是 germline／artifact？
-LongPhase-TO 會比較候選點與<b>左右兩個 germline 位點</b>的 allele 連結結構。</p>
+<p class="prose">候選變異不是 LongPhase-TO 自己叫出來的 —— 那是 [[ClairS]]-TO 或 DeepSomatic-TO 的工作。
+LongPhase-TO 做的是<b>再校正</b>（[[recalibration]]）：把明顯不合理的候選挑掉。</p>
 
-<p class="prose">在 LongPhase-TO 的 triplet 模型中，<b>三個位點比兩個位點具有更高的可分辨性</b>。</p>
+<p class="prose">第一關很直接：拿去對 [[PON]] 這種族群資料庫比。
+大家都有的變異，多半是這個人與生俱來的，不是癌症造成的，先排除掉。
+但族群資料庫收不到每個人的私有變異，所以過了這一關還不夠。</p>
 
-{{svg:m13-triplet | [wide] 上半部用三個位點：在此局部演化模型中，符合 somatic 假設的候選可形成一條與來源路徑只差一個位置的新路徑；示意中的定序錯誤路徑則無法對應既有路徑。下半部只用兩個位點時，兩種示意情況呈現相同拓撲，僅憑這兩點無法區分。}}
+<p class="prose">第二關才是重點，而且它用的證據只有 long read 給得起：
+<b>看支持這個候選的 read，左右兩邊的鄰居是什麼</b>。</p>
 
-<ul class="prose">
-<li>在此局部模型中，somatic 變異被視為從某一條既有 haplotype 衍生。
-原本有兩條路徑（AGT 與 CGA），示例中的插入後路徑為<b>第三條</b>（C-GT-A），
-與 CGA 僅差一個候選位置，符合模型的衍生關係。</li>
-<li>在此示意中，定序錯誤路徑無法由任一既有路徑解釋；實際資料仍需結合 read 支持與品質指標。</li>
-<li>若只取<b>兩個</b>位點建圖，這兩種示意情況會產生<b>相同拓撲</b>，
-因此僅憑兩點無法區分。</li>
-</ul>
+{{svg:m13-somatic-vs-artifact | [wide] 兩邊帶 T 的 read 刻意都是三條 —— 光數數量分不出真假，這正是重點。
+差別在鄰居：左邊三條的鄰居都是 C 與 A，也就是三條全落在同一條染色體上；右邊三條各有各的鄰居，湊不出一致的來源。
+下半部把同一批資料畫成路徑圖後更清楚：左邊多出<b>一條完整的新路徑</b>，而且它跟 HP2 只差候選這一格；右邊則沒有任何一條新路徑被穩定支持。}}
 
-<p class="prose">在此基礎上還可以再細分：兩條 germline haplotype 的側翼 allele 不一致時形成 <b>12 種 high-confidence
-triplet</b>；因 LOH 而只剩一條 germline haplotype 時形成 <b>9 種 low-confidence triplet</b>。
-每個候選點周圍會建立多個 triplet graph，再依各類型計數與既定門檻決定是否保留。</p>
+<p class="prose">背後的理由是癌症怎麼發生的。一個體細胞變異只會發生在<b>某一個細胞的某一條染色體</b>上，
+之後那個細胞分裂出來的後代才帶著它。所以真變異必然掛在一條既有的 haplotype 底下，
+形成一條「跟母體只差一格」的新路徑。定序錯誤沒有這個身世，它落在哪條 read 上是隨機的。</p>
 
-<h3>第四步：解讀 GT:GT2:GT3</h3>
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">為什麼要三個位置，兩個不夠？</p>
+<p class="prose">M11 講過兩個位置之間的一條邊：它其實是四個計數（rr／ra／ar／aa），
+能回答的是「這兩個位置該平行接還是交叉接」。</p>
+<p class="prose">但這裡要問的是另一個問題：<b>候選 allele 在左右兩側是不是都指向同一條 haplotype</b>。
+只有一個鄰居時，「跟左邊一致」很容易碰巧發生；要有左鄰居<b>和</b>右鄰居，
+才看得出「這條新路徑從頭到尾只跟某一條差一格」。所以最小單位是三個位置，
+這個結構就叫 [[triplet graph]]。</p>
+</div>
 
-<p class="prose">LongPhase-TO 把 somatic haplotype 寫在<b>自訂的 VCF FORMAT 欄位</b>，
-分成三層。以下用解碼器示範此編碼：</p>
+<p class="prose">實際上一個候選點周圍不會只取一組三位點。程式會拿它左右幾個變異輪流搭配，
+組出很多組三位點，每一組各自看一次、各投一票，最後看票數決定留不留。
+一組看走眼不會定生死，這是把單一雜訊的影響攤掉的常見做法。</p>
 
-{{widget:gt-decoder #gt {"value":"0|0:.|1:./."} | 從下拉選單逐一檢視七種常見組合。特別注意最後兩個<b>LOH 區內</b>的例子 —— 此時可使用 GT3，並呈現如 <code>hp1-1-1</code> 的階層標籤。}}
+<h3>第三件事：把每個變異掛回染色體</h3>
+
+<p class="prose">前兩件事做完，才輪到定相本身。做法跟 M11 一樣 ——
+把「同一條 read 上看到的 allele」連成一張圖，再沿著圖走出兩條 haplotype。
+差別在這裡多做兩件事：<b>somatic 變異也要一起掛上去</b>，而且<b>LOH 區要接得過去</b>。</p>
+
+{{svg:m13-loh-phasing | [wide] 三條軌道。HP1 與 HP2 是與生俱來的兩條；HP2-1 是 HP2 的體細胞後代 ——
+它跟 HP2 完全一樣，只有帶紅點的位置不同，名字本身就記錄了來源。
+進到 LOH 區之後 HP1 整段不存在，程式用 LOH 邊界兩側的連結判斷「留下來的是哪一條」，再讓它一路接過去。
+下半部是同樣三個位置寫成 VCF 的樣子。}}
+
+<p class="prose">結果寫在 VCF 的 FORMAT 欄位，分成三層。用下面的解碼器把七種常見組合逐一看過一次：</p>
+
+{{widget:gt-decoder #gt {"value":"0|0:.|1:./."} | 從下拉選單逐一檢視。最快的讀法是先看 <code>GT</code> 有沒有「<code>.</code>」——
+有就代表這裡是 LOH 區，那一側的 haplotype 不存在。}}
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>欄位</th><th>描述的層次</th></tr></thead>
+<thead><tr><th>欄位</th><th>回答的問題</th><th>怎麼讀</th></tr></thead>
 <tbody>
-<tr><td><code>GT</code></td><td>germline haplotype。有一側是 <code>.</code> 就代表這裡是 LOH</td></tr>
-<tr><td><code>GT2</code></td><td>LongPhase-TO 定義的 somatic haplotype。<code>1|1</code> 代表來源無法判定（hp3）</td></tr>
-<tr><td><code>GT3</code></td><td>LongPhase-TO 定義的 LOH 區內再分支，例如 <code>hp1-1-1</code> 與 <code>hp1-1-2</code></td></tr>
+<tr><td><code>GT</code></td><td>與生俱來的兩條長什麼樣</td><td>有一側是 <code>.</code> ＝ 這裡是 LOH</td></tr>
+<tr><td><code>GT2</code></td><td>癌細胞才有的變異長在哪一條上</td><td>哪一格是 <code>1</code>，就是長在那一條上；<code>1|1</code> 代表<b>判不出來</b></td></tr>
+<tr><td><code>GT3</code></td><td>LOH 區裡，剩下那一條再往下分的第二支</td><td>非 LOH 區通常用不到，寫 <code>./.</code></td></tr>
 </tbody>
 </table>
 </div>
 
-<h3>第五步：估計 purity</h3>
+<p class="prose">為什麼 LOH 區要多一層？因為那裡只剩一條 germline haplotype 可以掛，
+但癌細胞在那一條上可能先後長出<b>兩批</b>不同的變異，屬於不同的細胞群。
+只有 <code>GT2</code> 一格的話，這兩批會被混在一起；多一層 <code>GT3</code> 才分得開。</p>
 
-<p class="prose">此模型與 M12 的 GHIR 概念相近，另納入 <b>LOH ratio</b>。
-LongPhase-TO 將 haplotype imbalance 的 Q1／Q3 與 LOH 比例作為多項式迴歸的輸入特徵，
-估計模型定義的 purity。</p>
+<h3>第四件事：這個樣本有多少比例是腫瘤</h3>
 
-<h3>兩個版本的對照</h3>
+<p class="prose">檢體不會是純的癌細胞，裡面一定混著正常細胞。混得多寡直接影響每個變異的訊號強度，
+所以這個比例要估出來。M12 用的是 [[GHIR]]；這裡的比值算法一樣，差別只在<b>數的是帶 reference allele 的 read</b>。</p>
 
-<div class="table-wrap">
-<table>
-<thead><tr><th></th><th>LongPhase-S</th><th>LongPhase-TO</th></tr></thead>
-<tbody>
-<tr><td>somatic haplotype 放哪</td><td>BAM <code>HP:Z:1-1</code></td><td>VCF FORMAT <code>GT2</code> / <code>GT3</code></td></tr>
-<tr><td>purity 放哪</td><td><code>&lt;prefix&gt;_purity.out</code> 檔案</td><td>VCF header <code>##tumor_purity=</code></td></tr>
-<tr><td>purity 參數</td><td><code>--tumor-purity</code>（0.1–1.0）</td><td><code>--purity</code>（0–1）</td></tr>
-<tr><td>掛在哪個子命令</td><td><code>somatic_haplotag</code></td><td><code>phase</code></td></tr>
-<tr><td><code>--caller</code></td><td>沒有</td><td><b>目前流程中應指定</b></td></tr>
-<tr><td><code>--loh</code></td><td>沒有</td><td>有，輸出 <code>_LOH.bed</code></td></tr>
-</tbody>
-</table>
+{{svg:m13-imbalance-fraction | [wide] 挑一個長在 HP2 上的體細胞變異。帶 ref 的 read 有兩個來源：HP1 上的（癌細胞與正常細胞都給得出來）
+與 HP2 上的（<b>只有正常細胞給得出來</b>，因為癌細胞那一份已經變成 alt 了）。
+所以腫瘤越多，HP2 這一側就越薄，兩側的比值從接近 0.5 一路往 1.0 靠。}}
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">這個數字叫什麼，要小心</p>
+<p class="prose">程式把它寫成 <code>##tumor_purity=</code>，但它量到的其實是
+<b>[[tumour DNA fraction|腫瘤 DNA 佔的比例]]</b>，不是腫瘤<b>細胞</b>佔的比例。</p>
+<p class="prose">在實驗室依覆蓋度混出來的合成樣本裡，兩者恰好相等，所以平常不容易察覺差別。
+但真實腫瘤如果是 [[aneuploidy|非整倍體]]或發生過全基因體加倍，一個癌細胞貢獻的 DNA 比正常細胞多，
+兩個數字就會分開。報告數字時要說清楚是哪一個。</p>
 </div>
 
-<p class="prose">建議保留此表作為兩個版本切換時的參考；以下六列是常見差異。</p>
+<p class="prose">最後一步是把兩樣東西交給一條事先訓練好的式子：全基因體所有位置的比值分布，
+加上 LOH 佔了基因體多少。為什麼要加 LOH 這一項？因為 LOH 區本身就會把比值推向 1.0
+（那裡本來就只剩一條），只看比值分布會高估。兩個特徵一起看，才對得起來。</p>
+
+<p class="prose">這條式子的係數是在幾個已知答案的細胞株資料上配出來後<b>固定下來</b>的，
+之後每個樣本都用同一組係數。所以它的可靠度取決於新樣本跟當初那些細胞株像不像 ——
+這是所有預訓練模型共通的邊界條件，不是這個工具特有的問題。</p>
 </section>
 
 
 <section data-part="evidence">
-<h2>真實證據</h2>
+<h2>真實資料與證據</h2>
 
 {{cli}}
 longphase-to phase \
@@ -138,54 +174,55 @@ longphase-to phase \
   --loh
 {{/cli}}
 
-<p class="cli-note">注意：<code>--caller</code> 只接受
-<code>clairs_to_ss</code>、<code>clairs_to_ssrs</code>、<code>deepsomatic_to</code> 三個值，
-無效或省略時會回報錯誤（請以目前版本核對）。<code>--pon-file</code> 的參數值是<b>逗號分隔的單一字串</b>，
-不是重複的旗標。<code>--strict-pon-file</code> 比 <code>--pon-file</code> 採更嚴格的匹配條件，
-要求 position 與 ALT allele 都吻合。</p>
+<p class="cli-note">四個容易寫錯的地方：<code>--caller</code> 只接受
+<code>clairs_to_ss</code>、<code>clairs_to_ssrs</code>、<code>deepsomatic_to</code>，寫錯會直接報錯結束。
+<code>--pon-file</code> 的值是<b>一個用逗號分隔的字串</b>，不是重複的旗標。
+<code>--strict-pon-file</code> 比 <code>--pon-file</code> 嚴格：它要求位置<b>與</b> ALT allele 都吻合才算命中。
+<code>--loh</code> 不加就不會輸出 LOH 區間。</p>
 
 {{fig:b-s31-somatic-calling}}
 
-<h3>如何檢視輸出</h3>
+<h3>怎麼看輸出</h3>
 
 {{cli}}
-# purity 會寫入 VCF header
+# 估出來的腫瘤比例寫在 VCF 檔頭
 grep '##tumor_purity' phased_prefix.vcf
 
-# 看 LongPhase-TO 加的 FILTER 標籤
-grep -v '^##' phased_prefix.vcf | awk '{print $7}' | sort | uniq -c
+# LongPhase-TO 加上去的 FILTER 標籤分布
+awk '!/^#/ {print $7}' phased_prefix.vcf | sort | uniq -c
 
 # LOH 區間
 head phased_prefix_LOH.bed
 {{/cli}}
 
-<p class="prose">在啟用 somatic refinement 的目前版本設定下，FILTER 欄位可能包含 <code>PASS</code>、
-<code>LP_nonSomatic</code> 或 <code>LP_PON</code>；加入 <code>--disable-refine-somatic</code> 時則不套用此步驟。
-這是 LongPhase-TO 對 caller 輸出做[[recalibration|再校正]]的結果。</p>
+<p class="prose">FILTER 欄位會出現 <code>PASS</code>、<code>LP_nonSomatic</code> 或 <code>LP_PON</code>：
+分別是留下來的、被三位點投票否決的、被族群資料庫擋掉的。
+加上 <code>--disable-refine-somatic</code> 就不做這一步，可以用來看再校正到底改了哪些位置。</p>
 </section>
 
 
 <section data-part="predict">
-<h2>判讀練習</h2>
+<h2>預測與結果檢視</h2>
 
 {{ask}}
 <p class="prose">你在輸出的 VCF 裡看到一列的 FORMAT 是 <code>0|0:1|1:./.</code>。<br><br>
-這代表什麼？這個位點的資訊完整嗎？</p>
+這代表什麼？這個位置的資訊完整嗎？</p>
 {{reveal}}
-<p class="prose">拆開來看：</p>
+<p class="prose">一層一層拆：</p>
 <ul class="prose">
-<li><code>GT = 0|0</code> —— 兩條 germline haplotype 都是 reference。
+<li><code>GT = 0|0</code> —— 與生俱來的兩條在這裡都是 reference。
 沒有 <code>.</code>，所以<b>這裡不是 LOH 區</b>。</li>
-<li><code>GT2 = 1|1</code> —— 有 somatic 事件，但<b>兩側都標成 ALT</b>。
-依定義這代表 <b>somatic haplotype 無法判定</b>，也就是 <code>hp3</code>。</li>
-<li><code>GT3 = ./.</code> —— 未使用第三層；非 LOH 情境通常不使用此欄位。</li>
+<li><code>GT2 = 1|1</code> —— 有 somatic 事件，但<b>兩格都寫成 1</b>。
+依定義這代表<b>來源判不出來</b>，也就是 <code>hp3</code>。</li>
+<li><code>GT3 = ./.</code> —— 沒用到第三層，符合「這裡不是 LOH 區」。</li>
 </ul>
-<p class="prose"><b>因此資訊不完整</b>：依 LongPhase-TO 的 FORMAT 定義，工具將此列標示為 somatic 事件，
-但無法判斷它源自 HP1 還是 HP2。</p>
-<p class="prose">常見原因是該位點附近沒有足夠的 germline 錨點 —— 可能 read 太短，
-也可能那一段本身 het 位點稀疏。</p>
-<p class="prose">此設計在證據不足時保留未判定狀態，沒有指定單一來源。
-這與 LongPhase-S 對 HP3 及並列候選的處理一致：<b>保留不確定性，避免無依據的單一指派。</b></p>
+<p class="prose"><b>所以資訊不完整</b>：工具認定這裡有 somatic 事件，
+但沒辦法說它長在 HP1 還是 HP2 上。</p>
+<p class="prose">最常見的原因是這附近沒有可用的錨點 —— 附近沒有雜合位點，
+或者跨過去的 read 太短，兩邊都連不到能區分 HP1／HP2 的位置。
+回到第二件事那張圖就懂了：沒有鄰居可看，就沒有辦法判斷出身。</p>
+<p class="prose">留意它<b>沒有</b>隨便挑一條寫上去。證據不足時保留「不確定」，
+跟 M12 對 HP3 的處理是同一個原則：不要把猜測寫成結論。</p>
 {{/ask}}
 </section>
 
@@ -193,7 +230,7 @@ head phased_prefix_LOH.bed
 <section data-part="practice">
 <h2>實作練習</h2>
 
-<h3>執行完整流程</h3>
+<h3>跑一次，然後檢查四個輸出</h3>
 
 {{cli}}
 longphase-to phase \
@@ -208,47 +245,80 @@ longphase-to phase \
   --loh
 {{/cli}}
 
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd">四項重要參數</p>
-<ul class="prose">
-<li><code>--caller</code> 在目前流程中應明確指定，只接受 <code>clairs_to_ss</code>、
-<code>clairs_to_ssrs</code>、<code>deepsomatic_to</code>；無效或省略時會回報錯誤。</li>
-<li><code>--pon-file</code> 使用<b>逗號分隔的單一字串</b>，不是重複的旗標。</li>
-<li><code>--strict-pon-file</code> 要求位置<b>與</b> ALT allele 都吻合才算命中，匹配條件較嚴格。</li>
-<li><code>--loh</code> 要自己加，否則不會輸出 LOH 區間。</li>
-</ul>
-</div>
-
-<h3>檢視輸出</h3>
-
 {{cli}}
-# purity 會寫入 VCF header（與配對版不同）
-grep '##tumor_purity' phased_prefix.vcf
-
-# 再校正後的 FILTER 分布
-awk '!/^#/ {print $7}' phased_prefix.vcf | sort | uniq -c
-
-# LOH 區間，以及它們總共佔多少基因體
+# ① LOH 一共佔了多少基因體？
 awk '{s+=$3-$2} END {print "LOH 總長度:", s/1e6, "Mb"}' phased_prefix_LOH.bed
 
-# 有 somatic 事件的位點（GT2 不是 ./.）
+# ② 估出來的腫瘤比例
+grep '##tumor_purity' phased_prefix.vcf
+
+# ③ 有 somatic 事件的位置（GT2 不是 ./.）
 bcftools query -f '%POS\t[%GT\t%GT2\t%GT3]\n' phased_prefix.vcf | \
   awk '$3 != "./."' | head -20
+
+# ④ 其中有幾個落在 LOH 區裡（GT 帶點）
+bcftools query -f '[%GT\t%GT2]\n' phased_prefix.vcf | \
+  awk '$2 != "./." && $1 ~ /\./' | wc -l
 {{/cli}}
+
+<p class="prose">③ 跑出來如果有一堆 <code>1|1</code>，代表很多位置判不出來源，
+通常是覆蓋度或 read 長度不足；④ 的數字跟 ① 的 LOH 長度應該是相關的，
+兩者兜不起來就值得回頭看 LOH 是不是切得太碎。</p>
+
+<h3>把圖印出來看</h3>
+
+{{cli}}
+longphase-to phase ... --dot -o phased_prefix
+{{/cli}}
+
+<p class="prose">加 <code>--dot</code> 會另外輸出一個 Graphviz 的 <code>.dot</code> 檔，
+裡面就是這一章講的那張「節點是 allele、邊是 read 支持」的圖。
+自己畫出一小段來看，比讀十遍說明有用。</p>
+
+<h3>追程式碼時的對照表</h3>
+
+<p class="prose">四件事在原始碼裡各有明確的落點。<code>PhasingProcess.cpp</code> 的建構子
+從上往下讀就是整個流程，其他檔案都是被它叫起來的：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>這一章講的</th><th>程式裡的位置</th></tr></thead>
+<tbody>
+<tr><td>整個流程的順序</td><td><code>PhasingProcess.cpp</code> 建構子，由上而下</td></tr>
+<tr><td>讀 BAM、順便數剪痕</td><td><code>BamParser::direct_detect_alleles()</code> → <code>clipCount</code></td></tr>
+<tr><td>由剪痕切出區段與小事件</td><td><code>Clip::detectGenomicEventInterval()</code></td></tr>
+<tr><td>算雜合比例、判定 LOH</td><td><code>Clip::detectLOHRegion()</code>（門檻就寫在這個函式裡）</td></tr>
+<tr><td>建圖：節點是 allele，邊是 read</td><td><code>VairiantGraph::addEdge()</code></td></tr>
+<tr><td>三位點投票</td><td><code>VairiantGraph::somaticCalling()</code> → <code>patternMining()</code></td></tr>
+<tr><td>定相本體</td><td><code>VairiantGraph::phasingProcess()</code></td></tr>
+<tr><td>估腫瘤比例</td><td><code>PurityCalculator::getPurity()</code></td></tr>
+<tr><td>寫出 GT / GT2 / GT3</td><td><code>VairiantGraph::exportPhasingResult()</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">grep 的時候會踩到的兩件事</p>
+<p class="prose">第一，圖的類別名稱是 <code>VairiantGraph</code> —— 原始碼裡就是這樣拼的，
+搜 <code>VariantGraph</code> 會一無所獲。</p>
+<p class="prose">第二，一個候選點會被拿去跟左右各幾個變異搭配成很多組三位點，
+那個「幾個」是 <code>--somaticConnectAdjacent</code>（預設 6）。
+它跟一般定相用的 <code>--connectAdjacent</code>（預設 35）是<b>兩個不同的參數</b>，別看錯。</p>
+</div>
 
 <h3>兩個版本的差異對照表</h3>
 
-<p class="prose">建議保留此表，以便在兩個工具之間切換時查閱：</p>
+<p class="prose">在兩個工具之間切換時最容易搞混的六件事：</p>
 
 <div class="table-wrap">
 <table>
 <thead><tr><th></th><th>配對版（longphase-s）</th><th>僅腫瘤版（longphase-to）</th></tr></thead>
 <tbody>
-<tr><td>somatic haplotype 放哪</td><td>BAM 的 <code>HP:Z:1-1</code></td><td>VCF FORMAT 的 <code>GT2</code>／<code>GT3</code></td></tr>
-<tr><td>純度放哪</td><td><code>&lt;prefix&gt;_purity.out</code> 檔案</td><td>VCF header <code>##tumor_purity=</code></td></tr>
-<tr><td>純度參數名</td><td><code>--tumor-purity</code>（0.1–1.0）</td><td><code>--purity</code>（0–1）</td></tr>
+<tr><td>somatic haplotype 寫在哪</td><td>BAM 的 <code>HP:Z:1-1</code></td><td>VCF FORMAT 的 <code>GT2</code>／<code>GT3</code></td></tr>
+<tr><td>腫瘤比例寫在哪</td><td><code>&lt;prefix&gt;_purity.out</code> 檔案</td><td>VCF 檔頭 <code>##tumor_purity=</code></td></tr>
+<tr><td>指定比例的參數名</td><td><code>--tumor-purity</code>（0.1–1.0）</td><td><code>--purity</code>（0–1）</td></tr>
 <tr><td>掛在哪個子命令</td><td><code>somatic_haplotag</code></td><td><code>phase</code></td></tr>
-<tr><td><code>--caller</code></td><td>沒有這個參數</td><td><b>實質必填</b></td></tr>
+<tr><td><code>--caller</code></td><td>沒有這個參數</td><td>實質必填</td></tr>
 <tr><td><code>--loh</code></td><td>沒有</td><td>有，輸出 <code>_LOH.bed</code></td></tr>
 </tbody>
 </table>

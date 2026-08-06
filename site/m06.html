@@ -326,12 +326,13 @@ longphase-s phase \
   --ont
 
 # 2. 依 phased VCF 將 read 標記為 HP tag
+#    注意 -s 吃的是上一步的產物：phase 的 -o 給的是「前綴」，實際檔名是 &lt;前綴&gt;.vcf
 longphase-s haplotag \
   -r reference.fasta \
-  -s phased_snp.vcf \
+  -s phased_prefix.vcf \
   -b alignment.bam \
   -t 8 \
-  -o tagged_bam_prefix</code></pre>
+  -o tagged_prefix</code></pre>
 
 <p class="cli-note">依目前版本，LongPhase-S 的 <code>--ont</code>／<code>--pb</code> 參數要求與 LongPhase-TO 的處理方式不同。
 LongPhase-TO 僅支援 ONT，某些不相容參數可能被接受但不產生預期效果；請依版本文件核對，
@@ -366,22 +367,9 @@ LongPhase-TO 僅支援 ONT，某些不相容參數可能被接受但不產生預
 
 <h3 id="執行-phasing-與-haplotagging">執行 phasing 與 haplotagging</h3>
 
-<pre><code># 1. 對 germline VCF 執行 phasing
-longphase-s phase \
-  -s SNP.vcf \
-  -b alignment.bam \
-  -r reference.fasta \
-  -t 8 \
-  -o phased_prefix \
-  --ont
-
-# 2. 依 phased VCF 將 read 標記為 HP tag
-longphase-s haplotag \
-  -r reference.fasta \
-  -s phased_prefix.vcf \
-  -b alignment.bam \
-  -t 8 \
-  -o tagged_prefix</code></pre>
+<p class="prose">用上一節那兩道指令跑一次自己的資料（<code>phase</code> 產生
+<code>phased_prefix.vcf</code>，<code>haplotag</code> 產生 <code>tagged_prefix.bam</code>）。
+兩個步驟都完成後，再依下面三項檢查輸出。</p>
 
 <h3 id="以-igv-檢查-haplotagging-結果">以 IGV 檢查 haplotagging 結果</h3>
 
@@ -406,8 +394,10 @@ total=$(samtools view -c tagged_prefix.bam)
 tagged=$(samtools view tagged_prefix.bam | grep -c 'HP:')
 echo &quot;標記率: $tagged / $total&quot;</code></pre>
 
-<p class="cli-note">標記率若低於同類資料或依預期明顯偏低，再依上方順序檢查；七成僅是示例門檻，
-實際判讀需考慮 read 長度、heterozygous-site density、coverage、平台與工具版本。</p>
+<p class="cli-note">標記率<b>沒有通用門檻</b>可以照抄：它同時受 read 長度、heterozygous 位點密度、coverage、
+平台與工具版本影響，同一份資料的不同區段也會不一樣。判讀方式是自己建立基線 ——
+先看同一份資料在 het 位點密度正常的區段拿到多少，再拿可疑區段跟它比；
+明顯偏低時才依上方「30% 沒有 HP tag」那份清單逐項排查。</p>
 
 <section class="quiz" data-quiz="m06"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
 </section>

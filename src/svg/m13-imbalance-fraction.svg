@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
+  <title>從兩條 haplotype 的失衡程度，估計樣本裡有多少比例來自腫瘤</title>
+  <desc>挑一個已經定相好的體細胞變異位置，只數「帶 reference allele」的 read。
+        這個變異長在 HP2 上，所以帶 alt 的 read 全是癌細胞貢獻的；
+        而帶 ref 的 read 有兩個來源：HP1 上的（癌細胞與正常細胞都有）
+        與 HP2 上的（只有正常細胞才有，因為癌細胞那一份已經變成 alt 了）。
+        三格由左到右是腫瘤佔兩成、六成、九成。
+        腫瘤越多，正常細胞越少，HP2 這一側帶 ref 的 read 就越少，
+        兩側的比值於是從接近 0.5 一路往 1.0 靠。
+        全基因體上每個體細胞變異都算一次這個比值，
+        再把分布的四分位數和 LOH 佔基因體的比例一起交給一條事先訓練好的迴歸式，
+        就得到最後那個腫瘤 DNA 比例。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">怎麼從 read 看出這個樣本有多少比例是腫瘤</text>
+  <text class="tick zh" x="20" y="58">在一個長在 HP2 上的體細胞變異位置，只數「帶 reference allele」的 read 各有幾條。</text>
+
+  <!-- ══ 三種混合比例 ══ -->
+  <rect class="box plain" x="20" y="76" width="306" height="300" rx="10"/>
+  <text class="anno bold mid zh" x="173" y="106">腫瘤細胞佔 2 成</text>
+  <circle class="cell tumor" cx="65" cy="136" r="9"/>
+  <circle class="cell tumor" cx="89" cy="136" r="9"/>
+  <circle class="cell normal" cx="113" cy="136" r="9"/>
+  <circle class="cell normal" cx="137" cy="136" r="9"/>
+  <circle class="cell normal" cx="161" cy="136" r="9"/>
+  <circle class="cell normal" cx="185" cy="136" r="9"/>
+  <circle class="cell normal" cx="209" cy="136" r="9"/>
+  <circle class="cell normal" cx="233" cy="136" r="9"/>
+  <circle class="cell normal" cx="257" cy="136" r="9"/>
+  <circle class="cell normal" cx="281" cy="136" r="9"/>
+  <text class="tick zh" x="40" y="178">帶 ref 的 read 有幾條：</text>
+  <text class="tick end hp1 bold" x="76" y="206">HP1</text>
+  <rect class="bar hp1" x="84" y="196" width="160" height="14"/>
+  <text class="tick mono" x="252" y="206">10</text>
+  <text class="tick end hp2 bold" x="76" y="234">HP2</text>
+  <rect class="bar hp2" x="84" y="224" width="128" height="14"/>
+  <text class="tick mono" x="220" y="234">8</text>
+  <rect class="box sunken" x="40" y="254" width="266" height="62" rx="6"/>
+  <text class="tick mono mid" x="173" y="280">10 / (10 + 8)</text>
+  <text class="anno mono bold mid" x="173" y="306">= 0.56</text>
+  <text class="anno mid zh" x="173" y="348">兩邊差不多</text>
+
+  <rect class="box plain" x="347" y="76" width="306" height="300" rx="10"/>
+  <text class="anno bold mid zh" x="500" y="106">腫瘤細胞佔 6 成</text>
+  <circle class="cell tumor" cx="392" cy="136" r="9"/>
+  <circle class="cell tumor" cx="416" cy="136" r="9"/>
+  <circle class="cell tumor" cx="440" cy="136" r="9"/>
+  <circle class="cell tumor" cx="464" cy="136" r="9"/>
+  <circle class="cell tumor" cx="488" cy="136" r="9"/>
+  <circle class="cell tumor" cx="512" cy="136" r="9"/>
+  <circle class="cell normal" cx="536" cy="136" r="9"/>
+  <circle class="cell normal" cx="560" cy="136" r="9"/>
+  <circle class="cell normal" cx="584" cy="136" r="9"/>
+  <circle class="cell normal" cx="608" cy="136" r="9"/>
+  <text class="tick zh" x="367" y="178">帶 ref 的 read 有幾條：</text>
+  <text class="tick end hp1 bold" x="403" y="206">HP1</text>
+  <rect class="bar hp1" x="411" y="196" width="160" height="14"/>
+  <text class="tick mono" x="579" y="206">10</text>
+  <text class="tick end hp2 bold" x="403" y="234">HP2</text>
+  <rect class="bar hp2" x="411" y="224" width="64" height="14"/>
+  <text class="tick mono" x="483" y="234">4</text>
+  <rect class="box sunken" x="367" y="254" width="266" height="62" rx="6"/>
+  <text class="tick mono mid" x="500" y="280">10 / (10 + 4)</text>
+  <text class="anno mono bold mid" x="500" y="306">= 0.71</text>
+  <text class="anno mid zh" x="500" y="348">開始偏向一邊</text>
+
+  <rect class="box plain" x="674" y="76" width="306" height="300" rx="10"/>
+  <text class="anno bold mid zh" x="827" y="106">腫瘤細胞佔 9 成</text>
+  <circle class="cell tumor" cx="719" cy="136" r="9"/>
+  <circle class="cell tumor" cx="743" cy="136" r="9"/>
+  <circle class="cell tumor" cx="767" cy="136" r="9"/>
+  <circle class="cell tumor" cx="791" cy="136" r="9"/>
+  <circle class="cell tumor" cx="815" cy="136" r="9"/>
+  <circle class="cell tumor" cx="839" cy="136" r="9"/>
+  <circle class="cell tumor" cx="863" cy="136" r="9"/>
+  <circle class="cell tumor" cx="887" cy="136" r="9"/>
+  <circle class="cell tumor" cx="911" cy="136" r="9"/>
+  <circle class="cell normal" cx="935" cy="136" r="9"/>
+  <text class="tick zh" x="694" y="178">帶 ref 的 read 有幾條：</text>
+  <text class="tick end hp1 bold" x="730" y="206">HP1</text>
+  <rect class="bar hp1" x="738" y="196" width="160" height="14"/>
+  <text class="tick mono" x="906" y="206">10</text>
+  <text class="tick end hp2 bold" x="730" y="234">HP2</text>
+  <rect class="bar hp2" x="738" y="224" width="16" height="14"/>
+  <text class="tick mono" x="762" y="234">1</text>
+  <rect class="box sunken" x="694" y="254" width="266" height="62" rx="6"/>
+  <text class="tick mono mid" x="827" y="280">10 / (10 + 1)</text>
+  <text class="anno mono bold mid" x="827" y="306">= 0.91</text>
+  <text class="anno mid zh" x="827" y="348">幾乎全偏到 HP1</text>
+
+  <!-- 為什麼會這樣 -->
+  <rect class="box accent" x="20" y="390" width="960" height="46" rx="6"/>
+  <text class="anno mid zh" x="500" y="419">HP2 這一側帶 ref 的 read <tspan class="bold">只有正常細胞才貢獻得出來</tspan> —— 腫瘤越多，它就越少。</text>
+
+  <!-- ══ 全基因體彙整 ══ -->
+  <line class="axis" x1="20" y1="460" x2="980" y2="460"/>
+  <text class="lbl bold zh" x="20" y="492">全基因體每個位置都算一次，再交給一條事先訓練好的式子</text>
+
+  <rect class="box plain" x="20" y="508" width="290" height="66" rx="8"/>
+  <text class="tick mid zh" x="165" y="534">所有位置的比值分布</text>
+  <text class="tick mid zh" x="165" y="558">（取它的四分位數）</text>
+
+  <text class="anno mid zh" x="340" y="548">＋</text>
+
+  <rect class="box plain" x="370" y="508" width="290" height="66" rx="8"/>
+  <text class="tick mid zh" x="515" y="534">LOH 佔全基因體多少</text>
+  <text class="tick mid zh" x="515" y="558">（第一步就算好了）</text>
+
+  <path class="flow" d="M672,541 L706,541" marker-end="url(#arrow)"/>
+
+  <rect class="box accent" x="716" y="508" width="264" height="66" rx="8"/>
+  <text class="tick mid zh" x="848" y="534">腫瘤 DNA 比例</text>
+  <text class="tick mono mid" x="848" y="558">##tumor_purity=0.62</text>
+</svg>
