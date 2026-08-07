@@ -16,6 +16,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { GUARD_TOPICS } from './guards.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = path.join(ROOT, 'site');
@@ -249,18 +250,6 @@ for (const f of html) {
    它們是本教材相對於原始素材最大的增值，改寫內容時很容易不小心刪掉 ——
    所以在這裡把它變成 build-time 錯誤。                                    */
 
-const GUARD_TOPICS = {
-  1: 'HP1/HP2 不等於父系母系',
-  2: 'tumor purity 不等於 tumor DNA fraction',
-  3: 'VAF 不等於 cancer cell fraction',
-  4: 'LOH 不等於缺失',
-  5: 'PON 有兩個意思',
-  6: 'matched-normal calling 不是 VCF 相減',
-  7: '一條 read 是一個分子，不是一個細胞',
-  8: '甲基化相關性不是因果',
-  9: 'latent node 不是未觀測到的細胞',
-  10: '後處理救不回 caller 漏掉的變異',
-};
 const guardsFound = new Set();
 for (const f of fs.existsSync(path.join(SRC, 'modules'))
   ? walk(path.join(SRC, 'modules')).filter((x) => x.endsWith('.html')) : []) {
@@ -271,8 +260,15 @@ const guardsMissing = Object.keys(GUARD_TOPICS).map(Number).filter((n) => !guard
 if (guardsMissing.length) {
   for (const n of guardsMissing) {
     fail('src/modules/', `缺少 guardrail #${n}（${GUARD_TOPICS[n]}）` +
-      ` —— 十個警告框必須全部就位，這是本教材最大的增值`);
+      ` —— 這些警告框必須全部就位，這是本教材最大的增值`);
   }
+}
+/* 反向也要擋：用了名冊上沒有的編號，頁面照樣渲染成「重要區分 #N」，
+   但它不受這一項保護 —— 下一次改寫就可能靜靜地消失。 */
+const guardsUnknown = [...guardsFound].filter((n) => !GUARD_TOPICS[n]).sort((a, b) => a - b);
+for (const n of guardsUnknown) {
+  fail('src/modules/', `用了未登記的 guardrail #${n}` +
+    ` —— 請在 tools/guards.mjs 的 GUARD_TOPICS 補上，否則它不受第 11 項保護`);
 }
 
 /* ── 12. presentation attribute 不得跟 diagram.css 的宣告撞名 ──────────

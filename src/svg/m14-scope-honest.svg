@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480">
+  <title>三條 subclone 重建路線的輸入、聯合分布來源、輸出與代價</title>
+  <desc>三欄比較。
+        第一欄 single-cell：把細胞一個一個分開定序，
+        聯合分布是在細胞層級直接觀測到的，輸出是完整的細胞譜系樹，
+        代價是成本高、能觀察的細胞數有限。
+        第二欄 bulk 短讀加頻率：整團細胞一起定序、覆蓋全基因體，
+        聯合分布不是觀測到的，要靠簡約性等模型假設補上，
+        輸出是一棵全基因體的樹，代價是多棵樹同時相容、換程式就換答案。
+        第三欄 bulk 長讀加單倍型：同樣是整團細胞一起定序，但 read 跨 10 到 50 kb，
+        聯合分布在分子層級直接觀測到，
+        輸出是幾萬個局部候選拓撲而不是一棵全域樹，
+        代價是這種觀測只在 read 跨距內成立，而且可用的區域數量受突變負荷限制。
+        讀法是：三者不是誰取代誰，中間那條回答整體有幾群，右邊那條回答這幾個位點的先後。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">三條路線各自看得到什麼</text>
+  <text class="tick zh" x="20" y="58">關鍵那一列是「聯合分布怎麼來的」：觀測到的，還是假設補的。</text>
+
+  <rect class="box plain" x="180" y="104" width="258" height="282" rx="8"/>
+  <rect class="box sunken" x="450" y="104" width="258" height="282" rx="8"/>
+  <rect class="box accent" x="720" y="104" width="258" height="282" rx="8"/>
+
+  <text class="lbl bold mid" x="309" y="128">single-cell</text>
+  <text class="lbl bold zh mid" x="579" y="128">bulk 短讀 ＋ 頻率</text>
+  <text class="lbl bold zh mid" x="849" y="128">bulk 長讀 ＋ 單倍型</text>
+  <line class="axis" x1="20" y1="140" x2="980" y2="140" style="stroke-width:1.5"/>
+
+  <text class="anno bold zh" x="20" y="176">輸入</text>
+  <text class="anno zh mid" x="309" y="164">一個一個細胞</text>
+  <text class="anno zh mid" x="309" y="186">分開定序</text>
+  <text class="anno zh mid" x="579" y="164">整團細胞一起定序</text>
+  <text class="anno zh mid" x="579" y="186">覆蓋全基因體</text>
+  <text class="anno zh mid" x="849" y="164">整團細胞一起定序</text>
+  <text class="anno zh mid" x="849" y="186">read 跨 10–50 kb</text>
+  <line class="axis" x1="20" y1="200" x2="980" y2="200" style="stroke-width:1.5"/>
+
+  <text class="anno bold zh" x="20" y="234">聯合分布</text>
+  <text class="anno bold zh mid ok" x="309" y="222">直接觀測</text>
+  <text class="anno zh mid" x="309" y="244">細胞層級</text>
+  <text class="anno bold zh mid warn" x="579" y="222">靠模型假設補</text>
+  <text class="anno zh mid" x="579" y="244">簡約性等偏好</text>
+  <text class="anno bold zh mid ok" x="849" y="222">直接觀測</text>
+  <text class="anno zh mid" x="849" y="244">分子層級</text>
+  <line class="axis" x1="20" y1="262" x2="980" y2="262" style="stroke-width:1.5"/>
+
+  <text class="anno bold zh" x="20" y="296">輸出</text>
+  <text class="anno zh mid" x="309" y="290">完整的細胞譜系樹</text>
+  <text class="anno zh mid" x="579" y="290">一棵全基因體的樹</text>
+  <text class="anno zh mid" x="849" y="284">幾萬個局部候選拓撲</text>
+  <text class="anno zh mid" x="849" y="306">不是一棵全域樹</text>
+  <line class="axis" x1="20" y1="324" x2="980" y2="324" style="stroke-width:1.5"/>
+
+  <text class="anno bold zh" x="20" y="358">代價</text>
+  <text class="anno zh mid warn" x="309" y="346">成本高</text>
+  <text class="anno zh mid warn" x="309" y="368">能看的細胞數有限</text>
+  <text class="anno zh mid bad" x="579" y="346">多棵樹同時相容</text>
+  <text class="anno zh mid bad" x="579" y="368">換程式就換答案</text>
+  <text class="anno zh mid warn" x="849" y="346">只在 read 跨距內成立</text>
+  <text class="anno zh mid warn" x="849" y="368">受突變負荷限制</text>
+
+  <line class="axis" x1="20" y1="410" x2="980" y2="410"/>
+  <text class="anno zh bold" x="20" y="440">三者不是誰取代誰：中間那條回答「整體有幾群」，右邊那條回答「這幾個位點的先後」。</text>
+  <text class="anno zh" x="20" y="468">而 single-cell 是三者裡唯一直接觀測到細胞的；另外兩條看到的都是分子，不是細胞。</text>
+</svg>

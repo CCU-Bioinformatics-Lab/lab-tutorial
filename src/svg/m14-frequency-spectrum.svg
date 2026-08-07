@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>mutation frequency spectrum：一份腫瘤樣本裡幾千個 somatic 變異的 VAF 直方圖</title>
+  <desc>橫軸是 VAF，縱軸是落在該區間的 somatic 變異個數。圖上有三塊結構。
+        第一塊是位於 VAF 0.30 附近的峰，代表所有腫瘤細胞都帶有的變異；
+        在拷貝數正常、變異只在其中一份拷貝上的條件下，峰的位置恰好是純度除以二，
+        所以峰在 0.30 表示純度 0.60。
+        第二塊是峰左邊 VAF 0.18 附近的鼓起，代表只有一部分腫瘤細胞帶有的變異，
+        每一個這樣的鼓起對應一群 subclone。
+        第三塊是中性演化檢定用的區間。要注意檢定的對象不是這張直方圖本身：
+        直方圖的形狀是頻率倒數的平方，真正呈直線的是把
+        「出現在某個頻率以上的變異數」累積起來之後對頻率倒數作圖的那條線。
+        原始研究刻意只在 VAF 0.12 到 0.24 這一段擬合，因為更低頻的一端混著
+        深度不足造成的假陽性，更高頻的一端已經進入 clonal 峰。
+        圖上最左邊三根長條就是那個假陽性區，標了叉號，不能拿來擬合。
+        讀法是：分群看第一塊與第二塊，天擇要換成累積曲線並且只用中間那一段。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">把幾千個 somatic 變異的 VAF 畫成直方圖</text>
+  <text class="tick zh" x="20" y="58">三塊結構各自回答不同的問題，而第三塊不能直接看這張圖。</text>
+  <text class="tick zh" x="20" y="94">變異數</text>
+
+  <!-- 直方圖 -->
+  <rect class="bar artifact" x="90"  y="140" width="32" height="200"/>
+  <rect class="bar artifact" x="124" y="170" width="32" height="170"/>
+  <rect class="bar artifact" x="158" y="210" width="32" height="130"/>
+  <rect class="bar" x="192" y="235" width="32" height="105"/>
+  <rect class="bar" x="226" y="252" width="32" height="88"/>
+  <rect class="bar" x="260" y="262" width="32" height="78"/>
+  <rect class="bar" x="294" y="268" width="32" height="72"/>
+  <rect class="bar" x="328" y="270" width="32" height="70"/>
+  <rect class="bar warn" x="362" y="252" width="32" height="88"/>
+  <rect class="bar warn" x="396" y="232" width="32" height="108"/>
+  <rect class="bar warn" x="430" y="244" width="32" height="96"/>
+  <rect class="bar warn" x="464" y="266" width="32" height="74"/>
+  <rect class="bar" x="498" y="278" width="32" height="62"/>
+  <rect class="bar" x="532" y="274" width="32" height="66"/>
+  <rect class="bar somatic" x="566" y="244" width="32" height="96"/>
+  <rect class="bar somatic" x="600" y="190" width="32" height="150"/>
+  <rect class="bar somatic" x="634" y="208" width="32" height="132"/>
+  <rect class="bar" x="668" y="256" width="32" height="84"/>
+  <rect class="bar" x="702" y="296" width="32" height="44"/>
+  <rect class="bar" x="736" y="318" width="32" height="22"/>
+  <rect class="bar" x="770" y="328" width="32" height="12"/>
+  <rect class="bar" x="804" y="333" width="32" height="7"/>
+  <rect class="bar" x="838" y="335" width="32" height="5"/>
+  <rect class="bar" x="872" y="337" width="32" height="3"/>
+  <rect class="bar" x="906" y="338" width="32" height="2"/>
+
+  <!-- 框與編號（畫在長條之後才看得見） -->
+  <rect class="box ghost artifact" x="86"  y="134" width="108" height="212" rx="6"/>
+  <rect class="box ghost" x="358" y="226" width="142" height="120" rx="6"/>
+  <rect class="box ghost accent" x="562" y="184" width="108" height="162" rx="6"/>
+
+  <text class="tick bold mid artifact" x="140" y="126">✗ 假陽性區</text>
+  <text class="tick bold mid" x="429" y="218">② subclonal 肩</text>
+  <text class="tick bold mid" x="616" y="176">① clonal 峰</text>
+
+  <!-- 純度讀數 -->
+  <line class="guide somatic" x1="600" y1="146" x2="600" y2="340" style="stroke-width:2.5"/>
+  <text class="tick zh somatic" x="700" y="122">峰在 0.30 → 純度 0.60</text>
+  <path class="conn somatic" d="M696,126 L610,146" marker-end="url(#arrow-sm)"/>
+
+  <!-- 座標軸 -->
+  <line class="axis" x1="80" y1="340" x2="950" y2="340"/>
+  <line class="axis" x1="80" y1="100" x2="80" y2="340"/>
+  <text class="tick mid mono" x="90"  y="362">0</text>
+  <text class="tick mid mono" x="260" y="362">0.1</text>
+  <text class="tick mid mono" x="430" y="362">0.2</text>
+  <text class="tick mid mono" x="600" y="362">0.3</text>
+  <text class="tick mid mono" x="770" y="362">0.4</text>
+  <text class="tick mid mono" x="940" y="362">0.5</text>
+
+  <!-- ③ 擬合區間：畫在軸下方，不跟 ① ② 的標籤搶位置 -->
+  <path class="conn bad" d="M294,376 L294,392 L498,392 L498,376" style="stroke-width:2"/>
+  <text class="tick bold zh bad" x="510" y="398">③ 中性檢定只在這一段擬合（VAF 0.12–0.24）</text>
+  <text class="tick zh" x="80" y="424">VAF ＝ 帶有此變異的 read 佔該位點所有 read 的比例</text>
+
+  <line class="axis" x1="20" y1="448" x2="980" y2="448"/>
+  <text class="anno zh" x="20" y="478">① 所有腫瘤細胞都帶有。CN＝2、multiplicity＝1 時峰的位置<tspan class="bold">恰好</tspan>是純度 ÷ 2，可反推純度。</text>
+  <text class="anno zh" x="20" y="508">② 只有一部分腫瘤細胞帶有。每一個鼓起對應一群 subclone —— 這是「分群」要抓的東西。</text>
+  <text class="anno zh bold" x="20" y="538">③ 別直接量這張圖的斜率：直方圖是 1/f²，要先把變異數累積起來，那條線才對 1/f 呈直線。</text>
+</svg>

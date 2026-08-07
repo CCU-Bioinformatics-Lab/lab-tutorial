@@ -769,10 +769,19 @@ samtools view tagged.bam | grep -c 'HP:i:'</code></pre>
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">遇到 help 與實際不一致時</p>
 <p class="prose">以上差異都是在原始碼裡核對過的：help 字串與 <code>longopts</code> 註冊表<b>本來就不完全一致</b>。
-權威是原始碼裡的 <code>longopts</code> 表 —— 在 twolinin/longphase 的 repo 根目錄，
+權威是原始碼裡的 <code>longopts</code> 表 —— 在
+<a href="https://github.com/twolinin/LongPhase"><code>twolinin/longphase</code></a> 的 repo 根目錄，
 <code>phase</code> 看 <code>Phasing.cpp</code>、<code>haplotag</code> 看 <code>Haplotag.cpp</code>、
 <code>modcall</code> 看 <code>ModCall.cpp</code>。使用新參數前先檢索該表確認名稱，並記錄版本。</p>
 </div>
+
+<h3 id="原始文獻與程式碼">原始文獻與程式碼</h3>
+
+<p class="prose">本章內文不預設讀者讀過這篇論文或看過這個 repo —— 上面的解釋本身是完整的，
+以下連結給想追下去的人。LongPhase：Lin JH、Chen LC、Yu SQ、Huang YT，
+<i>LongPhase: an ultra-fast chromosome-scale phasing algorithm for small and large
+variants</i>，Bioinformatics，2022。程式碼在
+<a href="https://github.com/twolinin/LongPhase"><code>github.com/twolinin/LongPhase</code></a>。</p>
 </section>
 
 
@@ -858,7 +867,7 @@ grep -A40 'static const struct option longopts' Phasing.cpp</code></pre>
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m10.html"><small>← 上一模組</small>證據、驗證與效能評估</a><a class="next" href="m12.html"><small>下一模組 →</small>LongPhase-S（配對 tumor–normal）</a></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>LongPhase</dt><dd>實驗室開發的長 read phasing 工具，是後續所有工具的共同基礎。輸出 germline haplotype。</dd><dt>PS tag（phase set）</dt><dd>標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>switch error</dt><dd>phasing 結果自某一位置起將兩條 haplotype 的方向對調，是常見的 phasing 錯誤類型。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#輸入與輸出">輸入與輸出</a></li><li class="lv3"><a href="#四種變異-一張圖">四種變異，一張圖</a></li><li class="lv3"><a href="#一條邊怎麼決定方向-又怎麼被丟掉">一條邊怎麼決定方向，又怎麼被丟掉</a></li><li class="lv3"><a href="#heuristic-phasing-加權投票">heuristic phasing：加權投票</a></li><li class="lv3"><a href="#最後兩道信心門檻">最後兩道信心門檻</a></li><li class="lv3"><a href="#三種失敗模式">三種失敗模式</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#最小可跑範例">最小可跑範例</a></li><li class="lv3"><a href="#co-phasing-把其他三種變異一起帶進去">co-phasing：把其他三種變異一起帶進去</a></li><li class="lv3"><a href="#把圖直接印出來看">把圖直接印出來看</a></li><li class="lv3"><a href="#如何驗證輸出">如何驗證輸出</a></li><li class="lv3"><a href="#參數對應到哪一步">參數對應到哪一步</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行最小流程">執行最小流程</a></li><li class="lv3"><a href="#把兩道門檻的效果量出來">把兩道門檻的效果量出來</a></li><li class="lv3"><a href="#確認參數名稱">確認參數名稱</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#輸入與輸出">輸入與輸出</a></li><li class="lv3"><a href="#四種變異-一張圖">四種變異，一張圖</a></li><li class="lv3"><a href="#一條邊怎麼決定方向-又怎麼被丟掉">一條邊怎麼決定方向，又怎麼被丟掉</a></li><li class="lv3"><a href="#heuristic-phasing-加權投票">heuristic phasing：加權投票</a></li><li class="lv3"><a href="#最後兩道信心門檻">最後兩道信心門檻</a></li><li class="lv3"><a href="#三種失敗模式">三種失敗模式</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#最小可跑範例">最小可跑範例</a></li><li class="lv3"><a href="#co-phasing-把其他三種變異一起帶進去">co-phasing：把其他三種變異一起帶進去</a></li><li class="lv3"><a href="#把圖直接印出來看">把圖直接印出來看</a></li><li class="lv3"><a href="#如何驗證輸出">如何驗證輸出</a></li><li class="lv3"><a href="#參數對應到哪一步">參數對應到哪一步</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行最小流程">執行最小流程</a></li><li class="lv3"><a href="#把兩道門檻的效果量出來">把兩道門檻的效果量出來</a></li><li class="lv3"><a href="#確認參數名稱">確認參數名稱</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">

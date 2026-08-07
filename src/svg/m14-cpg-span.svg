@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 490">
+  <title>一條 read 能同時看到幾個 CpG：短讀與長讀的差距</title>
+  <desc>上半是基因體的平均 CpG 密度，大約每 100 個鹼基一個 CpG。
+        在這個密度下，一條 100 bp 的短讀只跨得到一個 CpG，
+        而一條 20 kb 的長讀長度是圖上這一整段的十倍，跨過大約 200 個 CpG。
+        下半是 CpG island 內部的密度，大約每 15 個鹼基一個 CpG。
+        在這裡 100 bp 的短讀跨得到約七個 CpG，達到 epiallele 分析所需的四個門檻。
+        兩者合起來說明：短讀要做分子層級的甲基化分析，只做得到 CpG island 這類密集區域，
+        長讀則不必挑區域。
+        讀法是：門檻不是四個 CpG 這個數字本身，而是「哪些區域達得到這個門檻」。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">4 個 CpG 這個門檻，決定了短讀能分析哪些區域</text>
+  <text class="tick zh" x="20" y="58">短線＝一個 CpG 的位置（這張圖不表示它甲基化與否）。長圓角矩形＝一條 read 蓋到的範圍。</text>
+
+  <!-- ① 基因體平均密度 -->
+  <rect class="box plain" x="20" y="80" width="960" height="178" rx="8"/>
+  <text class="tick bold zh" x="40" y="106">① 基因體平均：約每 100 bp 一個 CpG（全基因體約 2,800 萬個）</text>
+
+  <rect class="read" x="82" y="132" width="45" height="12" rx="6"/>
+  <text class="tick zh" x="140" y="142">100 bp read → 只跨到 1 個 CpG</text>
+
+  <line class="axis" x1="50" y1="170" x2="950" y2="170"/>
+  <line class="conn" x1="60"  y1="162" x2="60"  y2="178"/>
+  <line class="conn" x1="105" y1="162" x2="105" y2="178"/>
+  <line class="conn" x1="150" y1="162" x2="150" y2="178"/>
+  <line class="conn" x1="195" y1="162" x2="195" y2="178"/>
+  <line class="conn" x1="240" y1="162" x2="240" y2="178"/>
+  <line class="conn" x1="285" y1="162" x2="285" y2="178"/>
+  <line class="conn" x1="330" y1="162" x2="330" y2="178"/>
+  <line class="conn" x1="375" y1="162" x2="375" y2="178"/>
+  <line class="conn" x1="420" y1="162" x2="420" y2="178"/>
+  <line class="conn" x1="465" y1="162" x2="465" y2="178"/>
+  <line class="conn" x1="510" y1="162" x2="510" y2="178"/>
+  <line class="conn" x1="555" y1="162" x2="555" y2="178"/>
+  <line class="conn" x1="600" y1="162" x2="600" y2="178"/>
+  <line class="conn" x1="645" y1="162" x2="645" y2="178"/>
+  <line class="conn" x1="690" y1="162" x2="690" y2="178"/>
+  <line class="conn" x1="735" y1="162" x2="735" y2="178"/>
+  <line class="conn" x1="780" y1="162" x2="780" y2="178"/>
+  <line class="conn" x1="825" y1="162" x2="825" y2="178"/>
+  <line class="conn" x1="870" y1="162" x2="870" y2="178"/>
+  <line class="conn" x1="915" y1="162" x2="915" y2="178"/>
+  <text class="tick zh end" x="950" y="198">這一段 ＝ 2,000 bp</text>
+
+  <rect class="read" x="50" y="214" width="900" height="12" rx="6"/>
+  <path class="conn" d="M50,220 L28,220" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M950,220 L972,220" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh bold" x="60" y="246">20 kb read：長度是這一整段的 10 倍，跨過約 200 個 CpG</text>
+
+  <!-- ② CpG island 內 -->
+  <rect class="box plain" x="20" y="270" width="960" height="140" rx="8"/>
+  <text class="tick bold zh" x="40" y="296">② CpG island 內：約每 15 bp 一個 CpG</text>
+
+  <rect class="read" x="70" y="320" width="450" height="12" rx="6"/>
+  <text class="tick zh ok" x="534" y="330">100 bp read → 跨到 7 個 CpG，達到門檻</text>
+
+  <line class="axis" x1="50" y1="358" x2="950" y2="358"/>
+  <line class="conn" x1="70"  y1="350" x2="70"  y2="366"/>
+  <line class="conn" x1="140" y1="350" x2="140" y2="366"/>
+  <line class="conn" x1="210" y1="350" x2="210" y2="366"/>
+  <line class="conn" x1="280" y1="350" x2="280" y2="366"/>
+  <line class="conn" x1="350" y1="350" x2="350" y2="366"/>
+  <line class="conn" x1="420" y1="350" x2="420" y2="366"/>
+  <line class="conn" x1="490" y1="350" x2="490" y2="366"/>
+  <line class="conn" x1="560" y1="350" x2="560" y2="366"/>
+  <line class="conn" x1="630" y1="350" x2="630" y2="366"/>
+  <line class="conn" x1="700" y1="350" x2="700" y2="366"/>
+  <line class="conn" x1="770" y1="350" x2="770" y2="366"/>
+  <line class="conn" x1="840" y1="350" x2="840" y2="366"/>
+  <line class="conn" x1="910" y1="350" x2="910" y2="366"/>
+  <text class="tick zh end" x="950" y="386">這一段 ＝ 200 bp</text>
+
+  <line class="axis" x1="20" y1="428" x2="980" y2="428"/>
+  <text class="anno zh bold" x="20" y="458">所以短讀的 epiallele 分析只做得到 CpG island 這類密集區，長讀不必挑區域。</text>
+  <text class="anno zh" x="20" y="486">而且同一條長讀上還帶著序列變異，所以序列與甲基化的聯合分布是同一次觀測給的。</text>
+</svg>

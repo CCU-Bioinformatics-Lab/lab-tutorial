@@ -155,6 +155,17 @@ window.TW_MODULES = [
   "group": "實驗室工具"
  },
  {
+  "id": "m14",
+  "num": "14",
+  "title_zh": "Subclone 重建：從頻率到單倍型",
+  "title_en": "Subclonal reconstruction: from frequency to haplotype",
+  "short": "Subclone 重建",
+  "q": "同一份資料，為什麼可以畫出兩棵不同的演化樹？",
+  "sub": "從短讀時代的 VAF 與甲基化頻率譜出發，說明頻率為什麼不足以決定演化樹，再說明長讀如何把分子層級的共現關係變成直接觀測，以及隨之而來的分析單位與限制。",
+  "est_min": 60,
+  "group": "研究前沿"
+ },
+ {
   "id": "capstone",
   "num": "★",
   "title_zh": "Capstone：整合式位點判讀",

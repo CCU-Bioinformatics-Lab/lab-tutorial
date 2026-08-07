@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480">
+  <title>同一組 CCF 值，線性與分支兩棵 clone tree 都通過檢查</title>
+  <desc>左右兩邊用的是同一組 CCF 值：1.00、0.60 與 0.30。
+        左邊是線性樹，0.30 那群是 0.60 那群的後代，檢查條件是 0.30 小於等於 0.60，成立。
+        右邊是分支樹，0.60 與 0.30 是兄弟，各自從 1.00 長出來，
+        檢查條件是 0.60 加 0.30 等於 0.90，小於等於 1.00，也成立。
+        每棵樹下方畫出對應的細胞群組成：
+        左邊帶 C 的細胞完全包在帶 B 的細胞裡面，右邊兩者互不重疊。
+        兩種情況的生物學意義完全不同，一邊是一條線上的連續演化，一邊是兩支平行分支，
+        但它們對得上同一組數字。
+        讀法是：CCF 只給出每一群有多大，不足以決定誰是誰的祖先。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">同一組 CCF：1.00 · 0.60 · 0.30</text>
+  <text class="tick zh" x="20" y="58">兩棵樹都通過那條算術檢查，所以光靠 CCF 選不出來。</text>
+
+  <!-- 左：線性 -->
+  <rect class="box plain" x="20" y="76" width="470" height="320" rx="8"/>
+  <text class="tick bold zh" x="40" y="104">線性：0.30 那群是 0.60 那群的後代</text>
+
+  <circle class="box plain" cx="255" cy="142" r="24"/>
+  <text class="tick mid mono bold" x="255" y="147">1.00</text>
+  <text class="tick zh" x="295" y="147">群 A</text>
+  <path class="conn thick" d="M255,166 L255,178" marker-end="url(#arrow-sm)"/>
+  <circle class="box hp1" cx="255" cy="202" r="24"/>
+  <text class="tick mid mono bold" x="255" y="207">0.60</text>
+  <text class="tick zh" x="295" y="207">群 B</text>
+  <path class="conn thick" d="M255,226 L255,238" marker-end="url(#arrow-sm)"/>
+  <circle class="box hp2" cx="255" cy="262" r="24"/>
+  <text class="tick mid mono bold" x="255" y="267">0.30</text>
+  <text class="tick zh" x="295" y="267">群 C</text>
+
+  <text class="tick mono ok" x="40" y="304">0.30 ≤ 0.60 ✓</text>
+
+  <rect class="bar" x="40" y="316" width="300" height="20"/>
+  <text class="tick zh" x="350" y="331">全部腫瘤</text>
+  <rect class="bar hp1" x="40" y="340" width="180" height="20"/>
+  <text class="tick zh" x="350" y="355">帶 B</text>
+  <rect class="bar hp2" x="40" y="364" width="90" height="20"/>
+  <text class="tick zh" x="350" y="379">帶 C</text>
+
+  <!-- 右：分支 -->
+  <rect class="box plain" x="510" y="76" width="470" height="320" rx="8"/>
+  <text class="tick bold zh" x="530" y="104">分支：0.60 與 0.30 各自從 1.00 長出來</text>
+
+  <circle class="box plain" cx="745" cy="142" r="24"/>
+  <text class="tick mid mono bold" x="745" y="147">1.00</text>
+  <text class="tick zh" x="785" y="147">群 A</text>
+  <path class="conn thick" d="M728,158 L672,214" marker-end="url(#arrow-sm)"/>
+  <path class="conn thick" d="M762,158 L818,214"  marker-end="url(#arrow-sm)"/>
+  <circle class="box hp1" cx="655" cy="238" r="24"/>
+  <text class="tick mid mono bold" x="655" y="243">0.60</text>
+  <text class="tick zh end" x="623" y="243">群 B</text>
+  <circle class="box hp2" cx="835" cy="238" r="24"/>
+  <text class="tick mid mono bold" x="835" y="243">0.30</text>
+  <text class="tick zh" x="867" y="243">群 C</text>
+
+  <text class="tick mono ok" x="530" y="304">0.60 ＋ 0.30 ＝ 0.90 ≤ 1.00 ✓</text>
+
+  <rect class="bar" x="530" y="316" width="300" height="20"/>
+  <text class="tick zh" x="840" y="331">全部腫瘤</text>
+  <rect class="bar hp1" x="530" y="340" width="180" height="20"/>
+  <text class="tick zh" x="840" y="355">帶 B</text>
+  <rect class="bar hp2" x="710" y="364" width="90" height="20"/>
+  <text class="tick zh" x="840" y="379">帶 C</text>
+
+  <line class="axis" x1="20" y1="412" x2="980" y2="412"/>
+  <text class="anno zh bold" x="20" y="442">差別在最下面那排：左邊「帶 C」完全包在「帶 B」裡，右邊兩者互不重疊。</text>
+  <text class="anno zh" x="20" y="470">而這件事 CCF 沒有記錄。要選出一棵樹，方法必須自己補上一個偏好 —— 通常是取步數最少的。</text>
+</svg>

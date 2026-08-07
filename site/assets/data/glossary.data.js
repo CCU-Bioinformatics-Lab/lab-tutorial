@@ -63,7 +63,8 @@ window.TW_GLOSSARY = {
    "m01",
    "m02",
    "m05",
-   "m07"
+   "m07",
+   "m14"
   ]
  },
  "diploid": {
@@ -187,7 +188,8 @@ window.TW_GLOSSARY = {
   "modules": [
    "m01",
    "m02",
-   "m07"
+   "m07",
+   "m14"
   ]
  },
  "clone": {
@@ -215,7 +217,8 @@ window.TW_GLOSSARY = {
   "slug": "subclone",
   "modules": [
    "m01",
-   "m02"
+   "m02",
+   "m14"
   ]
  },
  "intratumour heterogeneity": {
@@ -255,7 +258,8 @@ window.TW_GLOSSARY = {
   "slug": "long-read",
   "modules": [
    "m03",
-   "m13"
+   "m13",
+   "m14"
   ]
  },
  "read": {
@@ -336,7 +340,8 @@ window.TW_GLOSSARY = {
    "m02",
    "m03",
    "m08",
-   "m12"
+   "m12",
+   "m14"
   ]
  },
  "homopolymer": {
@@ -361,7 +366,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "5mc",
   "modules": [
-   "m09"
+   "m09",
+   "m14"
   ]
  },
  "CpG": {
@@ -372,7 +378,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "cpg",
   "modules": [
-   "m09"
+   "m09",
+   "m14"
   ]
  },
  "MM/ML tag": {
@@ -467,7 +474,8 @@ window.TW_GLOSSARY = {
   "slug": "soft-clipping",
   "modules": [
    "m04",
-   "m13"
+   "m13",
+   "m14"
   ]
  },
  "VCF": {
@@ -515,7 +523,8 @@ window.TW_GLOSSARY = {
    "m04",
    "m05",
    "m06",
-   "m11"
+   "m11",
+   "m14"
   ]
  },
  "phasing": {
@@ -570,7 +579,8 @@ window.TW_GLOSSARY = {
   "slug": "phase-block",
   "modules": [
    "m06",
-   "m11"
+   "m11",
+   "m14"
   ]
  },
  "switch error": {
@@ -609,7 +619,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "somatic-haplotype",
   "modules": [
-   "m04"
+   "m04",
+   "m14"
   ]
  },
  "somatic haplotagging": {
@@ -800,7 +811,8 @@ window.TW_GLOSSARY = {
    "capstone",
    "m03",
    "m08",
-   "m12"
+   "m12",
+   "m14"
   ]
  },
  "tumour DNA fraction": {
@@ -835,7 +847,8 @@ window.TW_GLOSSARY = {
   "slug": "cancer-cell-fraction",
   "modules": [
    "capstone",
-   "m08"
+   "m08",
+   "m14"
   ]
  },
  "ploidy": {
@@ -884,7 +897,8 @@ window.TW_GLOSSARY = {
    "capstone",
    "m07",
    "m08",
-   "m12"
+   "m12",
+   "m14"
   ]
  },
  "mutation multiplicity": {
@@ -897,7 +911,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "mutation-multiplicity",
   "modules": [
-   "m08"
+   "m08",
+   "m14"
   ]
  },
  "LOH": {
@@ -919,7 +934,8 @@ window.TW_GLOSSARY = {
    "m08",
    "m11",
    "m12",
-   "m13"
+   "m13",
+   "m14"
   ]
  },
  "BFB": {
@@ -1142,6 +1158,135 @@ window.TW_GLOSSARY = {
    "m02",
    "m03",
    "m05"
+  ]
+ },
+ "mutation frequency spectrum": {
+  "zh_gloss": "突變頻率譜",
+  "zh": "把一份樣本裡所有 somatic 變異的 VAF 畫成直方圖後得到的分布。分布上的峰與肩對應不同大小的細胞群，最低頻端的尾巴斜率則被用來判斷有沒有天擇。",
+  "en": "The distribution obtained by histogramming the VAFs of all somatic variants in a sample. Peaks and shoulders correspond to cell populations of different sizes; the slope of the low-frequency tail is used to test for selection.",
+  "see": [
+   "VAF",
+   "cancer cell fraction",
+   "subclone",
+   "marginal distribution"
+  ],
+  "slug": "mutation-frequency-spectrum",
+  "modules": [
+   "m14"
+  ]
+ },
+ "marginal distribution": {
+  "zh_gloss": "邊際分布",
+  "zh": "只描述單一變數的分布。VAF 與甲基化 β 值都是邊際統計：它們各自只講一個位點有多少比例帶有標記，不講兩個位點在同一個分子或同一個細胞上的搭配情形。",
+  "en": "A distribution over a single variable. VAF and methylation beta values are both marginal statistics: each describes one site in isolation and says nothing about how two sites co-occur on the same molecule or cell.",
+  "see": [
+   "joint distribution",
+   "VAF",
+   "mutation frequency spectrum"
+  ],
+  "slug": "marginal-distribution",
+  "modules": [
+   "m14"
+  ]
+ },
+ "joint distribution": {
+  "zh_gloss": "聯合分布",
+  "zh": "多個變數一起看的分布，也就是「哪些組合各出現多少」。演化樹的形狀取決於聯合分布，而不是邊際分布；長讀的價值在於一條分子上的組合是直接觀測到的。",
+  "en": "A distribution over several variables jointly, i.e. how often each combination occurs. Tree topology depends on the joint distribution, not the marginals; the value of long reads is that combinations on one molecule are observed directly.",
+  "see": [
+   "marginal distribution",
+   "long read",
+   "clone tree"
+  ],
+  "slug": "joint-distribution",
+  "modules": [
+   "m14"
+  ]
+ },
+ "clone tree": {
+  "zh_gloss": "克隆演化樹",
+  "zh": "描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。",
+  "en": "A tree describing ancestral relationships among cell populations in a tumour: nodes are groups of cells sharing a mutation set, edges represent additional mutations acquired on top of an ancestor. Multiple trees are often compatible with the same clusters.",
+  "see": [
+   "clone",
+   "subclone",
+   "parsimony",
+   "cancer cell fraction"
+  ],
+  "slug": "clone-tree",
+  "modules": [
+   "m14"
+  ]
+ },
+ "parsimony": {
+  "zh_gloss": "簡約法",
+  "zh": "在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。",
+  "en": "Choosing, among all solutions compatible with the data, the one requiring the fewest steps or lowest cost. It is a preference rather than evidence: when several solutions tie, parsimony picks one, but the data has not ruled the others out.",
+  "see": [
+   "clone tree",
+   "latent node",
+   "joint distribution"
+  ],
+  "slug": "parsimony",
+  "modules": [
+   "m14"
+  ]
+ },
+ "latent node": {
+  "zh_gloss": "潛在節點",
+  "zh": "建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。",
+  "en": "An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.",
+  "see": [
+   "clone tree",
+   "parsimony",
+   "provenance"
+  ],
+  "slug": "latent-node",
+  "modules": [
+   "m14"
+  ]
+ },
+ "epiallele": {
+  "zh_gloss": "表觀等位型",
+  "zh": "同一條分子上一組相鄰 CpG 的甲基化組合，例如四個 CpG 的 1101。逐位點的 β 值看不到它 —— 要算 epiallele 的組成，一條 read 至少得跨過 4 個 CpG。",
+  "en": "The combination of methylation states across a set of neighbouring CpGs on a single molecule, e.g. 1101 over four CpGs. Per-site beta values cannot resolve it; computing epiallele composition requires reads spanning at least four CpGs.",
+  "see": [
+   "5mC",
+   "CpG",
+   "epimutation",
+   "joint distribution"
+  ],
+  "slug": "epiallele",
+  "modules": [
+   "m14"
+  ]
+ },
+ "epimutation": {
+  "zh_gloss": "表觀突變",
+  "zh": "細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 10⁻⁵ 到 10⁻⁴，而 DNA 突變約每鹼基 10⁻⁹ 到 10⁻¹⁰，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 10⁻³ 的），應當成量級而非定值。",
+  "en": "A stochastic flip of methylation state during cell division. Commonly cited at 10⁻⁵–10⁻⁴ per CpG per division versus 10⁻⁹–10⁻¹⁰ per base for DNA mutation — roughly five orders of magnitude faster like-for-like — which makes it a higher-resolution lineage clock. Treat it as an order of magnitude, not a constant: estimates vary by site and assay, up to ~10⁻³.",
+  "see": [
+   "5mC",
+   "CpG",
+   "epiallele"
+  ],
+  "slug": "epimutation",
+  "modules": [
+   "m14"
+  ]
+ },
+ "read-AF": {
+  "zh_gloss": "read 層級的 ALT 比例",
+  "zh": "在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。",
+  "en": "The fraction of reads carrying the ALT allele at a somatic site, computed within one analysis window and one haplotype family. Because the denominator is already restricted, no purity or copy-number correction is needed; it is used to rank candidate trees of equal cost.",
+  "see": [
+   "VAF",
+   "somatic haplotype",
+   "clone tree"
+  ],
+  "slug": "read-af",
+  "modules": [
+   "m14"
   ]
  }
 };

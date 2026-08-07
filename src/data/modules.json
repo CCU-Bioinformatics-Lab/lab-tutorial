@@ -210,6 +210,22 @@
     ]
   },
   {
+    "id": "m14",
+    "num": "14",
+    "src": "m14-subclonal.html",
+    "group": "研究前沿",
+    "short": "Subclone 重建",
+    "title_zh": "Subclone 重建：從頻率到單倍型",
+    "title_en": "Subclonal reconstruction: from frequency to haplotype",
+    "q": "同一份資料，為什麼可以畫出兩棵不同的演化樹？",
+    "sub": "從短讀時代的 VAF 與甲基化頻率譜出發，說明頻率為什麼不足以決定演化樹，再說明長讀如何把分子層級的共現關係變成直接觀測，以及隨之而來的分析單位與限制。",
+    "est_min": 60,
+    "prereq": [
+      "m09",
+      "m13"
+    ]
+  },
+  {
     "id": "capstone",
     "num": "★",
     "src": "capstone.html",
@@ -221,7 +237,8 @@
     "sub": "整合單一位點的多項證據，完成可重現的推論流程，並撰寫明確標示不確定性的結論。",
     "est_min": 120,
     "prereq": [
-      "m13"
+      "m13",
+      "m14"
     ]
   }
 ]

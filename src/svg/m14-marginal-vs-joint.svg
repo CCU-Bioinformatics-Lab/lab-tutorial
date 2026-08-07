@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 596">
+  <title>邊際頻率相同的兩種細胞組成，聯合計數與樹卻不同</title>
+  <desc>左右兩種細胞組成的邊際頻率刻意做成完全一樣：S1 出現在 50% 的細胞裡，S2 出現在 30% 的細胞裡。
+        左邊的組成是：3 個細胞同時帶有 S1 與 S2，2 個只帶 S1，5 個都沒有。
+        右邊的組成是：5 個只帶 S1，3 個只帶 S2，2 個都沒有，沒有任何細胞同時帶有兩者。
+        兩邊各自數出來的 S1 都是 5 個、S2 都是 3 個，所以邊際頻率相同。
+        差別出現在聯合計數表，而且剛好互換：左邊「只帶 S2」的 01 是 0 個、11 是 3 個；
+        右邊 01 是 3 個、11 是 0 個。
+        因此左邊相容的樹是一條線，S2 出現在已經有 S1 的細胞裡；
+        右邊的樹分岔，因為只帶 S2 的那群細胞必須另外從起點長出來。
+        兩邊都是每個突變只發生一次就解釋得通的樹。
+        讀法是：邊際頻率永遠不會告訴你 01 與 11 這兩格各有幾個，而樹的形狀就取決於它們。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">頻率是邊際分布，樹要的是聯合分布</text>
+  <text class="tick zh" x="20" y="58">左右兩邊的邊際頻率刻意做成完全相同 —— 重點正是「光看這兩個數字分不出來」。</text>
+
+  <!-- ══════════ 左：組成甲 ══════════ -->
+  <rect class="box plain" x="20" y="100" width="470" height="412" rx="8"/>
+  <text class="tick bold zh" x="40" y="126">組成 甲　S1 ＝ 0.50　S2 ＝ 0.30</text>
+  <text class="tick zh" x="40" y="148">10 個腫瘤細胞。小方塊：左＝S1、右＝S2，實心＝帶有</text>
+
+  <rect class="bar somatic" x="41"  y="162" width="13" height="14" rx="2"/>
+  <rect class="bar somatic" x="58"  y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="56" cy="196" r="15"/><circle class="nucleus" cx="56" cy="196" r="6"/>
+  <rect class="bar somatic" x="81"  y="162" width="13" height="14" rx="2"/>
+  <rect class="bar somatic" x="98"  y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="96" cy="196" r="15"/><circle class="nucleus" cx="96" cy="196" r="6"/>
+  <rect class="bar somatic" x="121" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar somatic" x="138" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="136" cy="196" r="15"/><circle class="nucleus" cx="136" cy="196" r="6"/>
+  <rect class="bar somatic" x="161" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="178" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="176" cy="196" r="15"/><circle class="nucleus" cx="176" cy="196" r="6"/>
+  <rect class="bar somatic" x="201" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="218" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="216" cy="196" r="15"/><circle class="nucleus" cx="216" cy="196" r="6"/>
+  <rect class="bar" x="241" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="258" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="256" cy="196" r="15"/><circle class="nucleus" cx="256" cy="196" r="6"/>
+  <rect class="bar" x="281" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="298" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="296" cy="196" r="15"/><circle class="nucleus" cx="296" cy="196" r="6"/>
+  <rect class="bar" x="321" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="338" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="336" cy="196" r="15"/><circle class="nucleus" cx="336" cy="196" r="6"/>
+  <rect class="bar" x="361" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="378" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="376" cy="196" r="15"/><circle class="nucleus" cx="376" cy="196" r="6"/>
+  <rect class="bar" x="401" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="418" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="416" cy="196" r="15"/><circle class="nucleus" cx="416" cy="196" r="6"/>
+
+  <text class="tick zh" x="40" y="234">聯合計數：每種狀態各有幾個細胞</text>
+  <rect class="box sunken" x="62"  y="246" width="76" height="58" rx="6"/>
+  <rect class="box sunken" x="162" y="246" width="76" height="58" rx="6"/>
+  <rect class="box ghost" x="262" y="246" width="76" height="58" rx="6"/>
+  <rect class="box accent" x="362" y="246" width="76" height="58" rx="6"/>
+  <text class="tick mid mono bold" x="100" y="268">00</text>
+  <text class="tick mid mono bold" x="200" y="268">10</text>
+  <text class="tick mid mono bold" x="300" y="268">01</text>
+  <text class="tick mid mono bold" x="400" y="268">11</text>
+  <text class="tick mid mono bold" x="100" y="296" style="font-size:20px">5</text>
+  <text class="tick mid mono bold" x="200" y="296" style="font-size:20px">2</text>
+  <text class="tick mid mono" x="300" y="296" style="font-size:20px">0</text>
+  <text class="tick mid mono bold accent" x="400" y="296" style="font-size:20px">3</text>
+
+  <text class="tick zh" x="40" y="330">→ 與這張表相容的樹</text>
+
+  <circle class="box plain" cx="100" cy="386" r="22"/>
+  <text class="tick mid mono bold" x="100" y="391">00</text>
+  <path class="conn somatic thick" d="M124,386 L216,386" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid mono somatic" x="170" y="374">+S1</text>
+  <circle class="box plain" cx="240" cy="386" r="22"/>
+  <text class="tick mid mono bold" x="240" y="391">10</text>
+  <path class="conn somatic thick" d="M264,386 L356,386" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid mono somatic" x="310" y="374">+S2</text>
+  <circle class="box plain" cx="380" cy="386" r="22"/>
+  <text class="tick mid mono bold" x="380" y="391">11</text>
+
+  <circle class="box ghost" cx="240" cy="452" r="22"/>
+  <text class="tick mid mono" x="240" y="457">01</text>
+  <text class="tick zh" x="272" y="457">沒有任何細胞</text>
+
+  <text class="tick bold zh" x="40" y="496">線性：S2 只出現在已經有 S1 的細胞裡</text>
+
+  <!-- ══════════ 右：組成乙 ══════════ -->
+  <rect class="box plain" x="510" y="100" width="470" height="412" rx="8"/>
+  <text class="tick bold zh" x="530" y="126">組成 乙　S1 ＝ 0.50　S2 ＝ 0.30</text>
+  <text class="tick zh" x="530" y="148">10 個腫瘤細胞。小方塊：左＝S1、右＝S2，實心＝帶有</text>
+
+  <rect class="bar somatic" x="531" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="548" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="546" cy="196" r="15"/><circle class="nucleus" cx="546" cy="196" r="6"/>
+  <rect class="bar somatic" x="571" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="588" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="586" cy="196" r="15"/><circle class="nucleus" cx="586" cy="196" r="6"/>
+  <rect class="bar somatic" x="611" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="628" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="626" cy="196" r="15"/><circle class="nucleus" cx="626" cy="196" r="6"/>
+  <rect class="bar somatic" x="651" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="668" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="666" cy="196" r="15"/><circle class="nucleus" cx="666" cy="196" r="6"/>
+  <rect class="bar somatic" x="691" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="708" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="706" cy="196" r="15"/><circle class="nucleus" cx="706" cy="196" r="6"/>
+  <rect class="bar" x="731" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar somatic" x="748" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="746" cy="196" r="15"/><circle class="nucleus" cx="746" cy="196" r="6"/>
+  <rect class="bar" x="771" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar somatic" x="788" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="786" cy="196" r="15"/><circle class="nucleus" cx="786" cy="196" r="6"/>
+  <rect class="bar" x="811" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar somatic" x="828" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="826" cy="196" r="15"/><circle class="nucleus" cx="826" cy="196" r="6"/>
+  <rect class="bar" x="851" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="868" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="866" cy="196" r="15"/><circle class="nucleus" cx="866" cy="196" r="6"/>
+  <rect class="bar" x="891" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="908" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="906" cy="196" r="15"/><circle class="nucleus" cx="906" cy="196" r="6"/>
+
+  <text class="tick zh" x="530" y="234">聯合計數：每種狀態各有幾個細胞</text>
+  <rect class="box sunken" x="552" y="246" width="76" height="58" rx="6"/>
+  <rect class="box sunken" x="652" y="246" width="76" height="58" rx="6"/>
+  <rect class="box accent" x="752" y="246" width="76" height="58" rx="6"/>
+  <rect class="box ghost" x="852" y="246" width="76" height="58" rx="6"/>
+  <text class="tick mid mono bold" x="590" y="268">00</text>
+  <text class="tick mid mono bold" x="690" y="268">10</text>
+  <text class="tick mid mono bold" x="790" y="268">01</text>
+  <text class="tick mid mono bold" x="890" y="268">11</text>
+  <text class="tick mid mono bold" x="590" y="296" style="font-size:20px">2</text>
+  <text class="tick mid mono bold" x="690" y="296" style="font-size:20px">5</text>
+  <text class="tick mid mono bold accent" x="790" y="296" style="font-size:20px">3</text>
+  <text class="tick mid mono" x="890" y="296" style="font-size:20px">0</text>
+
+  <text class="tick zh" x="530" y="330">→ 與這張表相容的樹</text>
+
+  <circle class="box plain" cx="590" cy="420" r="22"/>
+  <text class="tick mid mono bold" x="590" y="425">00</text>
+  <path class="conn somatic thick" d="M609,410 L708,392" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid mono somatic" x="655" y="390">+S1</text>
+  <path class="conn somatic thick" d="M609,430 L708,448" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid mono somatic" x="655" y="466">+S2</text>
+  <circle class="box plain" cx="730" cy="386" r="22"/>
+  <text class="tick mid mono bold" x="730" y="391">10</text>
+  <circle class="box plain" cx="730" cy="454" r="22"/>
+  <text class="tick mid mono bold" x="730" y="459">01</text>
+  <circle class="box ghost" cx="870" cy="420" r="22"/>
+  <text class="tick mid mono" x="870" y="425">11</text>
+  <text class="tick zh mid" x="870" y="386">沒有任何細胞</text>
+
+  <text class="tick bold zh" x="530" y="496">分支：有一群細胞只帶 S2，完全不帶 S1</text>
+
+  <line class="axis" x1="20" y1="520" x2="980" y2="520"/>
+  <text class="anno zh bold" x="20" y="546">差別只有兩格：<tspan class="mono">01</tspan> 與 <tspan class="mono">11</tspan> 誰是空的 —— 而邊際頻率對這兩格完全沒有意見。</text>
+  <text class="anno zh" x="20" y="574">兩邊都是「每個突變只發生一次」解釋得通的樹。若兩格都不是空的，就連這種樹都不存在了。</text>
+</svg>

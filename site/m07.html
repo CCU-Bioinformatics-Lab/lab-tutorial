@@ -1131,6 +1131,21 @@ population database set 定義一致；它不同於 GATK Mutect2 所稱的 recur
 低於這個頻率的位點不在檔案裡，所以查不到。</p>
 
 <figure class="fig"><img src="assets/img/d/d-s31-haplotype-aware.webp" alt="haplotype-aware somatic indel calling 在不同 tumor DNA fraction 下的 F1、precision、recall" loading="lazy" decoding="async"><figcaption>haplotype-aware recalibration 的效果。在此資料中，改善主要出現在 <b>precision</b>；若僅對既有候選進行後處理，通常可移除部分假陽性，但無法恢復 caller 未輸出的變異。</figcaption></figure>
+
+<h3 id="原始文獻與程式碼">原始文獻與程式碼</h3>
+
+<p class="prose">本章內文不預設讀者讀過以下任一篇 —— 上面的解釋本身是完整的，以下連結給想追下去的人。</p>
+<ul class="prose">
+<li>ClairS（tumour-normal）：<i>ClairS: a deep-learning method for long-read somatic small
+variant calling</i>，bioRxiv，2023。程式碼在
+<a href="https://github.com/HKU-BAL/ClairS"><code>github.com/HKU-BAL/ClairS</code></a>。</li>
+<li>ClairS-TO（tumour-only）：<i>ClairS-TO: a deep-learning method for long-read tumor-only
+somatic small variant calling</i>，Nature Communications，2025。程式碼在
+<a href="https://github.com/HKU-BAL/ClairS-TO"><code>github.com/HKU-BAL/ClairS-TO</code></a>。</li>
+<li>DeepSomatic：<i>Accurate somatic small variant discovery for multiple sequencing
+technologies with DeepSomatic</i>，Nature Biotechnology，2025。程式碼在
+<a href="https://github.com/google/deepsomatic"><code>github.com/google/deepsomatic</code></a>。</li>
+</ul>
 </section>
 
 
@@ -1212,7 +1227,7 @@ pileup 字串，<code>bcftools mpileup</code> 給的是 VCF —— 後者預設<
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m06.html"><small>← 上一模組</small>Phasing 與 haplotagging</a><a class="next" href="m08.html"><small>下一模組 →</small>腫瘤樣本的混合組成</a></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>ClairS</dt><dd>配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</dd><dt>DeepSomatic</dt><dd>Google 的 somatic variant caller，同樣有 tumor-only 版本。</dd><dt>PON（正常樣本面板／族群資料庫（依流程而異））</dt><dd>PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</dd><dt>TINC（腫瘤污染正常樣本）</dt><dd>Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。</dd><dt>candidate（候選變異）</dt><dd>caller 提出、但尚未被確認的變異位點。本實驗室多數工具位於 caller 之後，進行<b>再校正</b>，處理的就是這些 candidates。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>germline variant（生殖系變異）</dt><dd>在生殖系形成、通常存在於多數細胞的變異；可遺傳給子代，但不代表必然傳遞。</dd><dt>haplotype（單倍型）</dt><dd>同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</dd><dt>somatic variant（體細胞變異）</dt><dd>在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</dd><dt>triplet graph</dt><dd>LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</dd><dt>tumour-normal（配對腫瘤／正常）</dt><dd>同時定序病人的腫瘤與正常組織；正常樣本提供個體 germline 背景，有助於辨識 somatic 候選。</dd><dt>tumour-only（僅腫瘤）</dt><dd>只有腫瘤樣本、沒有配對正常樣本。在成本或檢體受限時很常見，但少了 germline 對照，分析難度會大幅提高。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#同一批-read-兩種對照-兩種輸出">同一批 read，兩種對照，兩種輸出</a></li><li class="lv3"><a href="#沒有正常組織時-改用什麼當對照">沒有正常組織時，改用什麼當對照</a></li><li class="lv3"><a href="#tn-calling-也不是把兩個-vcf-相減">TN calling 也不是把兩個 VCF 相減</a></li><li class="lv3"><a href="#tinc-normal-裡的訊號強度說明三種不同的事">TINC：normal 裡的訊號強度說明三種不同的事</a></li><li class="lv3"><a href="#沒有正常組織時-還剩下什麼證據">沒有正常組織時，還剩下什麼證據</a></li><li class="lv3"><a href="#一句話總結">一句話總結</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#tn-calling-指令示範">TN calling 指令示範</a></li><li class="lv3"><a href="#to-模式-準備-population-database-set">TO 模式：準備 population database set</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#比較兩種-calling-設計的結果">比較兩種 calling 設計的結果</a></li><li class="lv3"><a href="#檢查多出來的候選是什麼">檢查多出來的候選是什麼</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#同一批-read-兩種對照-兩種輸出">同一批 read，兩種對照，兩種輸出</a></li><li class="lv3"><a href="#沒有正常組織時-改用什麼當對照">沒有正常組織時，改用什麼當對照</a></li><li class="lv3"><a href="#tn-calling-也不是把兩個-vcf-相減">TN calling 也不是把兩個 VCF 相減</a></li><li class="lv3"><a href="#tinc-normal-裡的訊號強度說明三種不同的事">TINC：normal 裡的訊號強度說明三種不同的事</a></li><li class="lv3"><a href="#沒有正常組織時-還剩下什麼證據">沒有正常組織時，還剩下什麼證據</a></li><li class="lv3"><a href="#一句話總結">一句話總結</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#tn-calling-指令示範">TN calling 指令示範</a></li><li class="lv3"><a href="#to-模式-準備-population-database-set">TO 模式：準備 population database set</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#比較兩種-calling-設計的結果">比較兩種 calling 設計的結果</a></li><li class="lv3"><a href="#檢查多出來的候選是什麼">檢查多出來的候選是什麼</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">

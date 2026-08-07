@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <title>subclone 重建的四個轉折：從頻率分群到分子層級的共現觀測</title>
+  <desc>四列，由上到下是時間順序。
+        第一列 2014 到 2015 年，PyClone、SciClone 與 PhyloWGS 用變異頻率分群，
+        第一次讓「腫瘤裡有幾群細胞、各佔多少」變成可計算的問題；
+        留下的問題是誰是誰的祖先仍需額外偏好才能決定。
+        第二列 2016 年，改成量分布的形狀：把變異數累積起來對 1 除以 f 作圖，
+        中性演化時那條線是直的，
+        904 個腫瘤中有 323 個符合；留下的問題是 driver 變異的頻率偏向兩端，中性比例可能被高估。
+        第三列 2024 年的大規模評比，31 個程式在 51 個模擬腫瘤上跑，
+        把「答案不唯一」量化出來：換程式對結果的影響大於換腫瘤。
+        第四列是換一種資訊來源，甲基化提供快約五個數量級的時鐘，
+        長讀直接觀測同一分子上的共現；代價是這種觀測只在一條 read 跨得到的距離內成立。
+        讀法是：前三列都在同一份資訊裡想辦法，第四列才換掉資訊本身。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">subclone 重建的四個轉折</text>
+  <text class="anno zh" x="20" y="58">前三個轉折都在同一份資訊裡想辦法；第四個才換掉資訊本身。</text>
+
+  <text class="anno bold zh" x="40" y="98">年代</text>
+  <text class="anno bold zh" x="250" y="98">這一步做到了什麼</text>
+  <text class="anno bold zh" x="640" y="98">留下什麼問題</text>
+  <line class="axis" x1="20" y1="106" x2="980" y2="106"/>
+
+  <path class="flow" d="M28,116 L28,462" marker-end="url(#arrow-sm)"/>
+
+  <!-- 列 1 -->
+  <rect class="box plain" x="40" y="116" width="940" height="80" rx="8"/>
+  <text class="anno mono bold" x="56" y="146">2014–2015</text>
+  <text class="anno zh" x="56" y="172">頻率分群</text>
+  <text class="anno zh" x="250" y="146">用變異頻率把突變分成幾群</text>
+  <text class="anno zh" x="250" y="172">PyClone · SciClone · PhyloWGS</text>
+  <text class="anno zh warn" x="640" y="146">誰是誰的祖先，還是要靠</text>
+  <text class="anno zh warn" x="640" y="172">額外的偏好才選得出來</text>
+
+  <!-- 列 2 -->
+  <rect class="box plain" x="40" y="206" width="940" height="80" rx="8"/>
+  <text class="anno mono bold" x="56" y="236">2016</text>
+  <text class="anno zh" x="56" y="262">頻率譜的形狀</text>
+  <text class="anno zh" x="250" y="236">不分群，改看累積曲線的斜率</text>
+  <text class="anno zh" x="250" y="262">904 個腫瘤中 323 個符合 1/f</text>
+  <text class="anno zh warn" x="640" y="236">driver 頻率偏向兩端，</text>
+  <text class="anno zh warn" x="640" y="262">中性的比例可能被高估</text>
+
+  <!-- 列 3 -->
+  <rect class="box plain" x="40" y="296" width="940" height="80" rx="8"/>
+  <text class="anno mono bold" x="56" y="326">2024</text>
+  <text class="anno zh" x="56" y="352">大規模評比</text>
+  <text class="anno zh" x="250" y="326">把「答案不唯一」量化出來</text>
+  <text class="anno zh" x="250" y="352">31 個程式 × 51 個模擬腫瘤</text>
+  <text class="anno zh bad" x="640" y="326">換程式的影響比換腫瘤大</text>
+  <text class="anno zh bad" x="640" y="352">—— 資訊本身就不夠</text>
+
+  <!-- 列 4 -->
+  <rect class="box accent" x="40" y="386" width="940" height="80" rx="8"/>
+  <text class="anno mono bold" x="56" y="416">2014–2025</text>
+  <text class="anno zh" x="56" y="442">換一種資訊</text>
+  <text class="anno zh" x="250" y="416">甲基化：快約五個數量級的時鐘</text>
+  <text class="anno zh" x="250" y="442">長讀：同一分子上的共現是觀測值</text>
+  <text class="anno zh warn" x="640" y="416">共現只在一條 read 跨得到</text>
+  <text class="anno zh warn" x="640" y="442">的距離內成立</text>
+</svg>

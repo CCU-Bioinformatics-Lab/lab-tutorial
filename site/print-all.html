@@ -3719,6 +3719,18 @@ R10 與 PacBio HiFi 應依所用版本文件選擇相容模型（例如 <code>--
 
 <p class="prose">在本教材流程中，germline VCF 產生後，再由後續 phasing 工具使用其中的 heterozygous 位點作為錨點。
 這是本流程的先 call、再 phase 順序；其他工具可能採用不同的整合方式。</p>
+
+<h3 id="m05__原始文獻與程式碼">原始文獻與程式碼</h3>
+
+<p class="prose">本章內文不預設讀者讀過以下任一篇 —— 上面的解釋本身是完整的，以下連結給想追下去的人。</p>
+<ul class="prose">
+<li>Clair3：Zheng Z 等，<i>Symphonizing pileup and full-alignment for deep learning-based
+long-read variant calling</i>，Nature Computational Science，2022。程式碼在
+<a href="https://github.com/HKU-BAL/Clair3"><code>github.com/HKU-BAL/Clair3</code></a>。</li>
+<li>DeepVariant：Poplin R 等，<i>A universal SNP and small-indel variant caller using deep
+neural networks</i>，Nature Biotechnology，2018（doi 10.1038/nbt.4235）。程式碼在
+<a href="https://github.com/google/deepvariant"><code>github.com/google/deepvariant</code></a>。</li>
+</ul>
 </section>
 
 
@@ -5230,6 +5242,21 @@ population database set 定義一致；它不同於 GATK Mutect2 所稱的 recur
 低於這個頻率的位點不在檔案裡，所以查不到。</p>
 
 <figure class="fig"><img src="assets/img/d/d-s31-haplotype-aware.webp" alt="haplotype-aware somatic indel calling 在不同 tumor DNA fraction 下的 F1、precision、recall" loading="lazy" decoding="async"><figcaption>haplotype-aware recalibration 的效果。在此資料中，改善主要出現在 <b>precision</b>；若僅對既有候選進行後處理，通常可移除部分假陽性，但無法恢復 caller 未輸出的變異。</figcaption></figure>
+
+<h3 id="m07__原始文獻與程式碼">原始文獻與程式碼</h3>
+
+<p class="prose">本章內文不預設讀者讀過以下任一篇 —— 上面的解釋本身是完整的，以下連結給想追下去的人。</p>
+<ul class="prose">
+<li>ClairS（tumour-normal）：<i>ClairS: a deep-learning method for long-read somatic small
+variant calling</i>，bioRxiv，2023。程式碼在
+<a href="https://github.com/HKU-BAL/ClairS"><code>github.com/HKU-BAL/ClairS</code></a>。</li>
+<li>ClairS-TO（tumour-only）：<i>ClairS-TO: a deep-learning method for long-read tumor-only
+somatic small variant calling</i>，Nature Communications，2025。程式碼在
+<a href="https://github.com/HKU-BAL/ClairS-TO"><code>github.com/HKU-BAL/ClairS-TO</code></a>。</li>
+<li>DeepSomatic：<i>Accurate somatic small variant discovery for multiple sequencing
+technologies with DeepSomatic</i>，Nature Biotechnology，2025。程式碼在
+<a href="https://github.com/google/deepsomatic"><code>github.com/google/deepsomatic</code></a>。</li>
+</ul>
 </section>
 
 
@@ -8103,10 +8130,19 @@ samtools view tagged.bam | grep -c 'HP:i:'</code></pre>
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">遇到 help 與實際不一致時</p>
 <p class="prose">以上差異都是在原始碼裡核對過的：help 字串與 <code>longopts</code> 註冊表<b>本來就不完全一致</b>。
-權威是原始碼裡的 <code>longopts</code> 表 —— 在 twolinin/longphase 的 repo 根目錄，
+權威是原始碼裡的 <code>longopts</code> 表 —— 在
+<a href="https://github.com/twolinin/LongPhase"><code>twolinin/longphase</code></a> 的 repo 根目錄，
 <code>phase</code> 看 <code>Phasing.cpp</code>、<code>haplotag</code> 看 <code>Haplotag.cpp</code>、
 <code>modcall</code> 看 <code>ModCall.cpp</code>。使用新參數前先檢索該表確認名稱，並記錄版本。</p>
 </div>
+
+<h3 id="m11__原始文獻與程式碼">原始文獻與程式碼</h3>
+
+<p class="prose">本章內文不預設讀者讀過這篇論文或看過這個 repo —— 上面的解釋本身是完整的，
+以下連結給想追下去的人。LongPhase：Lin JH、Chen LC、Yu SQ、Huang YT，
+<i>LongPhase: an ultra-fast chromosome-scale phasing algorithm for small and large
+variants</i>，Bioinformatics，2022。程式碼在
+<a href="https://github.com/twolinin/LongPhase"><code>github.com/twolinin/LongPhase</code></a>。</p>
 </section>
 
 
@@ -9107,8 +9143,11 @@ longphase-s somatic_haplotag \
 
 <h3 id="m12__原始文獻與程式碼">原始文獻與程式碼</h3>
 
-<p class="prose">本章的方法對應 LongPhase-S 的預印本（bioRxiv, 2025，doi 10.1101/2025.11.20.689492），
-程式碼在 <code>github.com/CCU-Bioinformatics-Lab/longphase-s</code>。
+<p class="prose">本章內文不預設讀者讀過這篇論文或看過這個 repo —— 上面的解釋本身是完整的，
+以下連結給想追下去的人。本章的方法對應 LongPhase-S 的預印本
+（<a href="https://www.biorxiv.org/content/10.1101/2025.11.20.689492v1">bioRxiv, 2025，doi
+10.1101/2025.11.20.689492</a>），程式碼在
+<a href="https://github.com/CCU-Bioinformatics-Lab/longphase-s"><code>github.com/CCU-Bioinformatics-Lab/longphase-s</code></a>。
 上面的階段名稱與參數判準以<b>原始碼</b>為準；文件與論文用字若有出入，請以 <code>longopts</code> 表為準。</p>
 </section>
 
@@ -9945,6 +9984,13 @@ head phased_prefix_LOH.bed</code></pre>
 <p class="prose">FILTER 欄位會出現 <code>PASS</code>、<code>LP_nonSomatic</code> 或 <code>LP_PON</code>：
 分別是留下來的、被三位點投票否決的、被族群資料庫擋掉的。
 加上 <code>--disable-refine-somatic</code> 就不做這一步，可以用來看再校正到底改了哪些位置。</p>
+
+<h3 id="m13__程式碼">程式碼</h3>
+
+<p class="prose">本章內文不預設讀者看過這個 repo —— 上面的解釋本身是完整的，連結給想追下去的人。
+LongPhase-TO 的程式碼在
+<a href="https://github.com/CCU-Bioinformatics-Lab/longphase-to"><code>github.com/CCU-Bioinformatics-Lab/longphase-to</code></a>；
+截至本教材撰寫時尚未有對應論文，參數與行為以原始碼的 <code>longopts</code> 表為準。</p>
 </section>
 
 
@@ -10068,8 +10114,1442 @@ bcftools query -f '[%GT\t%GT2]\n' phased_prefix.vcf | \
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>BFB（斷裂—融合—橋循環）</dt><dd>Breakage-fusion-bridge：染色體反覆斷裂與融合造成的劇烈重排，在 coverage 上呈現特殊的階梯形狀。</dd><dt>ClairS</dt><dd>配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</dd><dt>GHIR（生殖系單倍型失衡比）</dt><dd>Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>LongPhase-TO</dt><dd>tumor-only 版本。做染色體等級的 LOH 偵測、triplet graph 再校正、somatic phasing 與 purity 估計。</dd><dt>PON（正常樣本面板／族群資料庫（依流程而異））</dt><dd>PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</dd><dt>aneuploidy（非整倍體）</dt><dd>染色體數目異常。腫瘤裡非常普遍，也可能使 cellular purity 與 DNA fraction 不一致。</dd><dt>heterozygous（異型合子）</dt><dd>在一般二倍體位點上，兩份 allele 不同（例如一份 A、一份 G）。此類位點可作為區分 haplotype 的資訊錨點；複雜拷貝數情況需另行解讀。</dd><dt>long read（長讀）</dt><dd>單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</dd><dt>recalibration（再校正）</dt><dd>以額外證據重新評估 caller 已輸出的 candidates。若僅處理既有候選，可移除 false positives，但不能恢復 caller 未輸出的變異。</dd><dt>soft clipping</dt><dd>read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</dd><dt>triplet graph</dt><dd>LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</dd><dt>tumour DNA fraction（腫瘤 DNA 比例）</dt><dd>樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。</dd></dl></section>
   </article>
 <hr>
+<article class="module" id="m14">
+    <header class="mhead"><p class="mhead__kicker">模組 14 · Subclonal reconstruction: from frequency to haplotype</p><h1>Subclone 重建：從頻率到單倍型</h1><p class="mhead__sub">從短讀時代的 VAF 與甲基化頻率譜出發，說明頻率為什麼不足以決定演化樹，再說明長讀如何把分子層級的共現關係變成直接觀測，以及隨之而來的分析單位與限制。</p><p class="mhead__meta"><span class="chip">約 60 分鐘</span><a class="chip" href="m09.html">建議先修：甲基化</a><a class="chip" href="m13.html">建議先修：LongPhase-TO</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說出 VAF 與甲基化 β 值為什麼都是 marginal distribution，而演化樹需要的是 joint distribution</li><li>解釋為什麼同一組 CCF 群集可以同時符合線性與分支兩棵 clone tree，以及 parsimony 與 latent node 在這裡的角色</li><li>說明 epimutation 為什麼是比 DNA 突變更快的時鐘，以及 epiallele 至少要跨過幾個位點才量得出來</li><li>指出長讀把哪一件事從推論變成觀測，並算出這件事能成立的距離範圍</li><li>說出 read-AF 在這條路線裡取代了頻率譜的哪一個角色</li></ul></section>
+
+<section data-part="why" class="part" id="m14__part-why">
+<h2 data-num="①" id="m14__為什麼重要">為什麼重要</h2>
+
+<p class="prose">前面十四個章節都在回答同一種問題：<b>這個位置有沒有變異</b>、<b>它在哪一條染色體上</b>。
+這一章換一個問題：把整個腫瘤看成一個族群，<b>這些變異是照什麼順序發生的</b>？</p>
+
+<p class="prose">這個問題有二十年的研究史，而它有一個令人不安的性質：<b>同一份資料可以支持不只一個答案</b>。
+一場跨機構的評比把 31 個 subclone 重建程式放在 51 個模擬腫瘤上跑，總共 12,061 次執行（2024 年線上發表，2025 年正式刊出）。
+結論不是「某個程式比較準」，而是更麻煩的一句話 ——
+<b>換一個程式對結果的影響，比換一個腫瘤還大</b>。</p>
+
+<p class="prose">同一份輸入、不同程式、不同答案，而每個答案都與資料相符。
+這不是誰寫錯了程式，是<b>資料本身沒有攜帶足以唯一決定答案的資訊</b>。
+這一章要講清楚缺的是哪一塊資訊、為什麼短讀資料拿不到它，以及長讀把它拿到之後，
+問題的形狀怎麼變了。</p>
+</section>
+
+
+<section data-part="concept" class="part" id="m14__part-concept">
+<h2 data-num="②" id="m14__概念與互動">概念與互動</h2>
+
+<h3 id="m14__這條路線的四個轉折">這條路線的四個轉折</h3>
+
+<p class="prose">先看整條路怎麼走過來的。四個轉折各自解決了前一階段的一個問題，
+也各自留下新的問題給下一階段。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="m14__m14-method-timeline__title" aria-describedby="m14__m14-method-timeline__desc">
+  <title id="m14__m14-method-timeline__title">subclone 重建的四個轉折：從頻率分群到分子層級的共現觀測</title>
+  <desc id="m14__m14-method-timeline__desc">四列，由上到下是時間順序。
+        第一列 2014 到 2015 年，PyClone、SciClone 與 PhyloWGS 用變異頻率分群，
+        第一次讓「腫瘤裡有幾群細胞、各佔多少」變成可計算的問題；
+        留下的問題是誰是誰的祖先仍需額外偏好才能決定。
+        第二列 2016 年，改成量分布的形狀：把變異數累積起來對 1 除以 f 作圖，
+        中性演化時那條線是直的，
+        904 個腫瘤中有 323 個符合；留下的問題是 driver 變異的頻率偏向兩端，中性比例可能被高估。
+        第三列 2024 年的大規模評比，31 個程式在 51 個模擬腫瘤上跑，
+        把「答案不唯一」量化出來：換程式對結果的影響大於換腫瘤。
+        第四列是換一種資訊來源，甲基化提供快約五個數量級的時鐘，
+        長讀直接觀測同一分子上的共現；代價是這種觀測只在一條 read 跨得到的距離內成立。
+        讀法是：前三列都在同一份資訊裡想辦法，第四列才換掉資訊本身。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">subclone 重建的四個轉折</text>
+  <text class="anno zh" x="20" y="58">前三個轉折都在同一份資訊裡想辦法；第四個才換掉資訊本身。</text>
+
+  <text class="anno bold zh" x="40" y="98">年代</text>
+  <text class="anno bold zh" x="250" y="98">這一步做到了什麼</text>
+  <text class="anno bold zh" x="640" y="98">留下什麼問題</text>
+  <line class="axis" x1="20" y1="106" x2="980" y2="106"/>
+
+  <path class="flow" d="M28,116 L28,462" marker-end="url(#arrow-sm)"/>
+
+  <!-- 列 1 -->
+  <rect class="box plain" x="40" y="116" width="940" height="80" rx="8"/>
+  <text class="anno mono bold" x="56" y="146">2014–2015</text>
+  <text class="anno zh" x="56" y="172">頻率分群</text>
+  <text class="anno zh" x="250" y="146">用變異頻率把突變分成幾群</text>
+  <text class="anno zh" x="250" y="172">PyClone · SciClone · PhyloWGS</text>
+  <text class="anno zh warn" x="640" y="146">誰是誰的祖先，還是要靠</text>
+  <text class="anno zh warn" x="640" y="172">額外的偏好才選得出來</text>
+
+  <!-- 列 2 -->
+  <rect class="box plain" x="40" y="206" width="940" height="80" rx="8"/>
+  <text class="anno mono bold" x="56" y="236">2016</text>
+  <text class="anno zh" x="56" y="262">頻率譜的形狀</text>
+  <text class="anno zh" x="250" y="236">不分群，改看累積曲線的斜率</text>
+  <text class="anno zh" x="250" y="262">904 個腫瘤中 323 個符合 1/f</text>
+  <text class="anno zh warn" x="640" y="236">driver 頻率偏向兩端，</text>
+  <text class="anno zh warn" x="640" y="262">中性的比例可能被高估</text>
+
+  <!-- 列 3 -->
+  <rect class="box plain" x="40" y="296" width="940" height="80" rx="8"/>
+  <text class="anno mono bold" x="56" y="326">2024</text>
+  <text class="anno zh" x="56" y="352">大規模評比</text>
+  <text class="anno zh" x="250" y="326">把「答案不唯一」量化出來</text>
+  <text class="anno zh" x="250" y="352">31 個程式 × 51 個模擬腫瘤</text>
+  <text class="anno zh bad" x="640" y="326">換程式的影響比換腫瘤大</text>
+  <text class="anno zh bad" x="640" y="352">—— 資訊本身就不夠</text>
+
+  <!-- 列 4 -->
+  <rect class="box accent" x="40" y="386" width="940" height="80" rx="8"/>
+  <text class="anno mono bold" x="56" y="416">2014–2025</text>
+  <text class="anno zh" x="56" y="442">換一種資訊</text>
+  <text class="anno zh" x="250" y="416">甲基化：快約五個數量級的時鐘</text>
+  <text class="anno zh" x="250" y="442">長讀：同一分子上的共現是觀測值</text>
+  <text class="anno zh warn" x="640" y="416">共現只在一條 read 跨得到</text>
+  <text class="anno zh warn" x="640" y="442">的距離內成立</text>
+</svg><figcaption>四個轉折不是誰取代誰，而是各自補上前一個看不到的東西。
+① 用頻率把變異分群，第一次讓「腫瘤裡有幾群細胞」變成可計算的問題。
+② 發現頻率分布本身有形狀，可以拿來判斷有沒有天擇。
+③ 大規模評比暴露出前兩者共同的天花板：答案不唯一。
+④ 兩條新的資訊來源 —— 甲基化提供更快的時鐘，長讀提供分子層級的共現關係。</figcaption></figure>
+
+<h3 id="m14__第一步-把一堆變異的頻率畫成一張圖-mutation-frequency-spectrum">第一步：把一堆變異的頻率畫成一張圖 —— mutation frequency spectrum</h3>
+
+<p class="prose">假設你手上有一份腫瘤樣本、幾千個 somatic 變異，每一個都有自己的 <span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-vaf-0">VAF<span class="term__pop" id="m14__gd-vaf-0" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en" lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span>。
+把這幾千個 VAF 畫成直方圖，會得到一張有結構的圖 —— 這張圖叫 <span class="term" data-term="mutation frequency spectrum" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-mutation-frequency-spectrum-1">mutation frequency spectrum<span class="term__pop" id="m14__gd-mutation-frequency-spectrum-1" role="tooltip"><b class="term__hd">mutation frequency spectrum <i>突變頻率譜</i></b><span class="term__def" data-lang="zh">把一份樣本裡所有 somatic 變異的 VAF 畫成直方圖後得到的分布。分布上的峰與肩對應不同大小的細胞群，最低頻端的尾巴斜率則被用來判斷有沒有天擇。</span><span class="term__def" data-lang="en" lang="en">The distribution obtained by histogramming the VAFs of all somatic variants in a sample. Peaks and shoulders correspond to cell populations of different sizes; the slope of the low-frequency tail is used to test for selection.</span><a class="term__more" href="glossary.html#mutation-frequency-spectrum">完整條目 →</a></span></span>。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img" aria-labelledby="m14__m14-frequency-spectrum__title" aria-describedby="m14__m14-frequency-spectrum__desc">
+  <title id="m14__m14-frequency-spectrum__title">mutation frequency spectrum：一份腫瘤樣本裡幾千個 somatic 變異的 VAF 直方圖</title>
+  <desc id="m14__m14-frequency-spectrum__desc">橫軸是 VAF，縱軸是落在該區間的 somatic 變異個數。圖上有三塊結構。
+        第一塊是位於 VAF 0.30 附近的峰，代表所有腫瘤細胞都帶有的變異；
+        在拷貝數正常、變異只在其中一份拷貝上的條件下，峰的位置恰好是純度除以二，
+        所以峰在 0.30 表示純度 0.60。
+        第二塊是峰左邊 VAF 0.18 附近的鼓起，代表只有一部分腫瘤細胞帶有的變異，
+        每一個這樣的鼓起對應一群 subclone。
+        第三塊是中性演化檢定用的區間。要注意檢定的對象不是這張直方圖本身：
+        直方圖的形狀是頻率倒數的平方，真正呈直線的是把
+        「出現在某個頻率以上的變異數」累積起來之後對頻率倒數作圖的那條線。
+        原始研究刻意只在 VAF 0.12 到 0.24 這一段擬合，因為更低頻的一端混著
+        深度不足造成的假陽性，更高頻的一端已經進入 clonal 峰。
+        圖上最左邊三根長條就是那個假陽性區，標了叉號，不能拿來擬合。
+        讀法是：分群看第一塊與第二塊，天擇要換成累積曲線並且只用中間那一段。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">把幾千個 somatic 變異的 VAF 畫成直方圖</text>
+  <text class="tick zh" x="20" y="58">三塊結構各自回答不同的問題，而第三塊不能直接看這張圖。</text>
+  <text class="tick zh" x="20" y="94">變異數</text>
+
+  <!-- 直方圖 -->
+  <rect class="bar artifact" x="90"  y="140" width="32" height="200"/>
+  <rect class="bar artifact" x="124" y="170" width="32" height="170"/>
+  <rect class="bar artifact" x="158" y="210" width="32" height="130"/>
+  <rect class="bar" x="192" y="235" width="32" height="105"/>
+  <rect class="bar" x="226" y="252" width="32" height="88"/>
+  <rect class="bar" x="260" y="262" width="32" height="78"/>
+  <rect class="bar" x="294" y="268" width="32" height="72"/>
+  <rect class="bar" x="328" y="270" width="32" height="70"/>
+  <rect class="bar warn" x="362" y="252" width="32" height="88"/>
+  <rect class="bar warn" x="396" y="232" width="32" height="108"/>
+  <rect class="bar warn" x="430" y="244" width="32" height="96"/>
+  <rect class="bar warn" x="464" y="266" width="32" height="74"/>
+  <rect class="bar" x="498" y="278" width="32" height="62"/>
+  <rect class="bar" x="532" y="274" width="32" height="66"/>
+  <rect class="bar somatic" x="566" y="244" width="32" height="96"/>
+  <rect class="bar somatic" x="600" y="190" width="32" height="150"/>
+  <rect class="bar somatic" x="634" y="208" width="32" height="132"/>
+  <rect class="bar" x="668" y="256" width="32" height="84"/>
+  <rect class="bar" x="702" y="296" width="32" height="44"/>
+  <rect class="bar" x="736" y="318" width="32" height="22"/>
+  <rect class="bar" x="770" y="328" width="32" height="12"/>
+  <rect class="bar" x="804" y="333" width="32" height="7"/>
+  <rect class="bar" x="838" y="335" width="32" height="5"/>
+  <rect class="bar" x="872" y="337" width="32" height="3"/>
+  <rect class="bar" x="906" y="338" width="32" height="2"/>
+
+  <!-- 框與編號（畫在長條之後才看得見） -->
+  <rect class="box ghost artifact" x="86"  y="134" width="108" height="212" rx="6"/>
+  <rect class="box ghost" x="358" y="226" width="142" height="120" rx="6"/>
+  <rect class="box ghost accent" x="562" y="184" width="108" height="162" rx="6"/>
+
+  <text class="tick bold mid artifact" x="140" y="126">✗ 假陽性區</text>
+  <text class="tick bold mid" x="429" y="218">② subclonal 肩</text>
+  <text class="tick bold mid" x="616" y="176">① clonal 峰</text>
+
+  <!-- 純度讀數 -->
+  <line class="guide somatic" x1="600" y1="146" x2="600" y2="340" style="stroke-width:2.5"/>
+  <text class="tick zh somatic" x="700" y="122">峰在 0.30 → 純度 0.60</text>
+  <path class="conn somatic" d="M696,126 L610,146" marker-end="url(#arrow-sm)"/>
+
+  <!-- 座標軸 -->
+  <line class="axis" x1="80" y1="340" x2="950" y2="340"/>
+  <line class="axis" x1="80" y1="100" x2="80" y2="340"/>
+  <text class="tick mid mono" x="90"  y="362">0</text>
+  <text class="tick mid mono" x="260" y="362">0.1</text>
+  <text class="tick mid mono" x="430" y="362">0.2</text>
+  <text class="tick mid mono" x="600" y="362">0.3</text>
+  <text class="tick mid mono" x="770" y="362">0.4</text>
+  <text class="tick mid mono" x="940" y="362">0.5</text>
+
+  <!-- ③ 擬合區間：畫在軸下方，不跟 ① ② 的標籤搶位置 -->
+  <path class="conn bad" d="M294,376 L294,392 L498,392 L498,376" style="stroke-width:2"/>
+  <text class="tick bold zh bad" x="510" y="398">③ 中性檢定只在這一段擬合（VAF 0.12–0.24）</text>
+  <text class="tick zh" x="80" y="424">VAF ＝ 帶有此變異的 read 佔該位點所有 read 的比例</text>
+
+  <line class="axis" x1="20" y1="448" x2="980" y2="448"/>
+  <text class="anno zh" x="20" y="478">① 所有腫瘤細胞都帶有。CN＝2、multiplicity＝1 時峰的位置<tspan class="bold">恰好</tspan>是純度 ÷ 2，可反推純度。</text>
+  <text class="anno zh" x="20" y="508">② 只有一部分腫瘤細胞帶有。每一個鼓起對應一群 subclone —— 這是「分群」要抓的東西。</text>
+  <text class="anno zh bold" x="20" y="538">③ 別直接量這張圖的斜率：直方圖是 1/f²，要先把變異數累積起來，那條線才對 1/f 呈直線。</text>
+</svg><figcaption>三塊結構各有意義。
+<b>①</b> 最右邊的峰是所有腫瘤細胞都帶有的變異，它的位置由 <span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-tumour-purity-2">純度<span class="term__pop" id="m14__gd-tumour-purity-2" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en" lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span>決定（拷貝數正常、變異只在其中一份拷貝上時，<b>恰好</b>是 purity ÷ 2）。
+<b>②</b> 左邊的肩是只有一部分腫瘤細胞帶有的變異 —— 每一個肩對應一群 <span class="term" data-term="subclone" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-subclone-3">subclone<span class="term__pop" id="m14__gd-subclone-3" role="tooltip"><b class="term__hd">subclone <i>次克隆</i></b><span class="term__def" data-lang="zh">clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。</span><span class="term__def" data-lang="en" lang="en">A subset of a clone that acquired further mutations and expanded. Treatment-resistant populations are often subclones.</span><a class="term__more" href="glossary.html#subclone">完整條目 →</a></span></span>。
+<b>③</b> 中性演化的檢定用的是中間那一段（VAF 0.12–0.24），而且量的不是這張直方圖 ——
+要先把變異數<b>累積</b>起來再對 1/f 作圖，那條線才是直線。
+最左邊三根打叉的長條是假陽性區：深度不足時定序錯誤也落在那裡，不能拿來擬合。
+把 ① 與 ② 分開就是分群；③ 是在問有沒有天擇。</figcaption></figure>
+
+<p class="prose">2014 到 2015 年之間出現了三個影響最大的做法，思路都是<b>對這張圖分群</b>：
+<b>SciClone</b>（2014）用 beta 混合模型（拿幾個鐘形分布去配一張直方圖）配 VAF，並且主要只用拷貝數正常、沒有 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-loh-4">LOH<span class="term__pop" id="m14__gd-loh-4" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en" lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 的區段
+—— 因為只有那裡的 VAF 好解釋。<b>PyClone</b>（2014）改成用 Dirichlet process（不必預先固定群數的分群模型）對
+「帶有這個變異的細胞比例」分群，把 <span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-copy-number-5">拷貝數<span class="term__pop" id="m14__gd-copy-number-5" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en" lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span>與正常細胞混入一起放進模型。
+<b>PhyloWGS</b>（2015）再往前一步，把分群與建樹合成同一個推論。</p>
+
+<p class="prose">2016 年有人問了不一樣的問題：不去分群，直接看分布的形狀。
+機制是這樣的：腫瘤指數成長時，越早發生的變異會出現在越多細胞裡，而這樣的變異本來就越少。
+把「出現在至少 f 這個比例以上的變異」數出來，這個累積數量在中性演化下正比於 1/f ——
+所以<b>累積曲線對 1/f 作圖是一條直線</b>。
+在 14 種癌別、904 個腫瘤裡，有 323 個符合這條直線。</p>
+
+<p class="prose">兩件事很容易搞錯，要特別分清楚。
+第一，<b>直線是累積曲線的性質，不是直方圖的性質</b> ——
+直方圖本身的形狀是 1/f²（累積曲線的微分），直接量直方圖的斜率會得到錯的指數。
+第二，原始研究刻意只在 <b>VAF 0.12 到 0.24</b> 這一段擬合：
+更低頻的一端混著假陽性，更高頻的一端已經進入 clonal 峰。</p>
+
+<p class="prose">後續研究指出符合中性的比例可能被高估 ——
+driver 變異的頻率天生偏向 0 與 1 兩端，很難在中間頻率被抓到，
+所以「這條線是直的」不等於「沒有天擇」。</p>
+
+<h3 id="m14__從-vaf-到-ccf-分母要自己湊出來">從 VAF 到 CCF：分母要自己湊出來</h3>
+
+<p class="prose">上面說的分群，其實不是對 VAF 分群，而是對 <span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-cancer-cell-fraction-6">CCF<span class="term__pop" id="m14__gd-cancer-cell-fraction-6" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en" lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span> 分群。
+理由 M8 講過：VAF 是「帶變異的 read 佔多少」，CCF 是「帶變異的癌細胞佔多少」，兩者差一段換算。</p>
+
+<p class="prose">換算式的分母不是 2：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" class="dia-svg" role="img" aria-labelledby="m14__m14-vaf-ccf-chain__title" aria-describedby="m14__m14-vaf-ccf-chain__desc">
+  <title id="m14__m14-vaf-ccf-chain__title">從 VAF 換算到 cancer cell fraction 要經過三個估計值</title>
+  <desc id="m14__m14-vaf-ccf-chain__desc">上半是換算式：CCF 等於 VAF 乘上一個分數，
+        分子是純度乘腫瘤拷貝數再加上 2 乘以 1 減純度，分母是純度乘 multiplicity。
+        式子裡有三個量不是直接量到的：純度與腫瘤拷貝數各自來自另一支程式，
+        multiplicity 也就是變異位在幾份腫瘤拷貝上，通常只能在 1 與 2 之間猜。
+        下半用同一個 VAF 0.30 示範三組假設的結果：
+        純度 0.60、拷貝數 2、multiplicity 1 時 CCF 是 1.00，讀成所有腫瘤細胞都帶有；
+        只把 multiplicity 改成 2，CCF 掉到 0.50，同一個變異就被讀成只有一半腫瘤細胞帶有；
+        把拷貝數改成 3，CCF 變成 1.30，超過 1 表示這組假設本身不成立。
+        讀法是：CCF 是三個估計值的商，其中 multiplicity 猜錯一格就足以讓 clonal 與 subclonal 互換。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">CCF 是三個估計值的商</text>
+  <text class="tick zh" x="20" y="58">換算式的分母不是 2。三個量各自有誤差，其中一個通常只能猜。</text>
+
+  <rect class="box plain" x="20" y="82" width="960" height="112" rx="8"/>
+  <text class="lbl bold" x="40" y="150">CCF ＝ VAF ×</text>
+  <text class="anno zh" x="200" y="132">純度 × 腫瘤拷貝數 ＋ 2 × (1 − 純度)</text>
+  <line class="axis" x1="196" y1="142" x2="536" y2="142" style="stroke-width:1.5"/>
+  <text class="anno zh" x="200" y="170">純度 × multiplicity</text>
+
+  <text class="tick zh" x="560" y="116">純度：另一支程式估的</text>
+  <text class="tick zh" x="560" y="142">腫瘤拷貝數：另一支程式估的</text>
+  <text class="tick zh bad" x="560" y="168">multiplicity：通常只能在 1 與 2 之間猜</text>
+
+  <text class="lbl bold zh" x="20" y="232">同一個 VAF ＝ 0.30，在三組假設下落在哪裡</text>
+
+  <!-- CCF > 1 的無效區 -->
+  <rect class="region bad" x="767" y="252" width="173" height="146"/>
+  <text class="tick zh bad" x="775" y="270">CCF &gt; 1 → 假設不成立</text>
+
+  <text class="tick bold zh" x="30"  y="292">純度</text>
+  <text class="tick bold zh" x="130" y="292">腫瘤拷貝數</text>
+  <text class="tick bold" x="270" y="292">multiplicity</text>
+  <text class="tick bold" x="420" y="292">CCF</text>
+  <line class="axis" x1="20" y1="300" x2="980" y2="300" style="stroke-width:1.5"/>
+
+  <!-- 三列 -->
+  <line class="guide" x1="420" y1="322" x2="940" y2="322"/>
+  <text class="tick mono" x="30"  y="327">0.60</text>
+  <text class="tick mono" x="130" y="327">2</text>
+  <text class="tick mono" x="270" y="327">1</text>
+  <circle class="pt tp" cx="767" cy="322" r="7"/>
+  <text class="tick mono bold somatic" x="780" y="327">1.00</text>
+
+  <line class="guide" x1="420" y1="356" x2="940" y2="356"/>
+  <text class="tick mono" x="30"  y="361">0.60</text>
+  <text class="tick mono" x="130" y="361">2</text>
+  <text class="tick mono bold bad" x="270" y="361">2</text>
+  <circle class="pt tp" cx="593" cy="356" r="7"/>
+  <text class="tick mono bold somatic" x="606" y="361">0.50</text>
+
+  <line class="guide" x1="420" y1="390" x2="940" y2="390"/>
+  <text class="tick mono" x="30"  y="395">0.60</text>
+  <text class="tick mono bold bad" x="130" y="395">3</text>
+  <text class="tick mono" x="270" y="395">1</text>
+  <circle class="pt fp" cx="871" cy="390" r="7"/>
+  <text class="tick mono bold bad" x="884" y="395">1.30</text>
+
+  <line class="axis" x1="420" y1="410" x2="940" y2="410"/>
+  <text class="tick mid mono" x="420" y="432">0</text>
+  <text class="tick mid mono" x="593" y="432">0.5</text>
+  <text class="tick mid mono" x="767" y="432">1.0</text>
+  <text class="tick mid mono" x="940" y="432">1.5</text>
+
+  <line class="axis" x1="20" y1="452" x2="980" y2="452"/>
+  <text class="anno zh bold" x="20" y="482">multiplicity 從 1 改成 2，CCF 就少一半 —— 剛好足以把一個 clonal 變異讀成 subclonal。</text>
+  <text class="anno zh" x="20" y="510">前兩列都是<tspan class="bold">合理的讀法</tspan>，資料本身分不出來；只有第三列的 CCF &gt; 1 才是假設出錯。</text>
+</svg><figcaption>從 VAF 走到 CCF 要經過三個估計值。
+<b>純度</b>與<b>拷貝數</b>來自另外的程式，各自有誤差；
+<span class="term" data-term="mutation multiplicity" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-mutation-multiplicity-7">multiplicity<span class="term__pop" id="m14__gd-mutation-multiplicity-7" role="tooltip"><b class="term__hd">mutation multiplicity</b><span class="term__def" data-lang="zh">在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</span><span class="term__def" data-lang="en" lang="en">How many mutant-allele copies are present in a cell carrying the mutation; a necessary term when converting VAF to cancer cell fraction.</span><a class="term__more" href="glossary.html#mutation-multiplicity">完整條目 →</a></span></span>（變異在幾份腫瘤拷貝上）通常只能在 1 與 2 之間猜。
+猜錯一格，CCF 就差兩倍 —— 而 CCF 差兩倍，剛好足以把一個 clonal 變異讀成 subclonal。
+下方三條軸畫的是同一個 VAF = 0.30 在不同假設下落到哪裡。</figcaption></figure>
+
+<p class="prose">所以頻率路線的第一層不確定性，來自<b>換算</b>：CCF 是三個估計值的商，
+而三個都可能錯。這一層在 M8 已經標成「重要區分 #3：VAF 不等於 cancer cell fraction」。</p>
+
+<p class="prose">先動手確認一件事：同一個 CCF，純度改變時 VAF 會怎麼跑。
+峰的位置之所以能反推純度，就是這條關係。</p>
+
+<div class="note"><b>互動元件</b>（列印版保留說明；數位版可操作）<br>固定 CCF＝1（所有腫瘤細胞都帶有），只改純度。
+觀察 VAF 的峰位置怎麼移動 —— 前面那張頻率譜之所以能從峰位置反推純度，用的就是這條關係。
+反過來說，純度估錯，整張圖的橫軸就跟著錯。</div>
+
+<h3 id="m14__群集之後-clone-tree-還是不唯一">群集之後：clone tree 還是不唯一</h3>
+
+<p class="prose">假設換算完全正確，得到三群變異，CCF 分別是 1.0、0.6、0.3。
+現在要把這三群排成一棵 <span class="term" data-term="clone tree" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-clone-tree-8">clone tree<span class="term__pop" id="m14__gd-clone-tree-8" role="tooltip"><b class="term__hd">clone tree <i>克隆演化樹</i></b><span class="term__def" data-lang="zh">描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</span><span class="term__def" data-lang="en" lang="en">A tree describing ancestral relationships among cell populations in a tumour: nodes are groups of cells sharing a mutation set, edges represent additional mutations acquired on top of an ancestor. Multiple trees are often compatible with the same clusters.</span><a class="term__more" href="glossary.html#clone-tree">完整條目 →</a></span></span> —— 誰是誰的祖先。</p>
+
+<p class="prose">可用的約束只有一條，它是純粹的算術：<b>一群細胞不可能比它的祖先還多</b>。
+所以子節點的 CCF 不能超過父節點；如果一個節點有兩個子節點，兩個子節點的 CCF 之和也不能超過它。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" class="dia-svg" role="img" aria-labelledby="m14__m14-linear-vs-branched__title" aria-describedby="m14__m14-linear-vs-branched__desc">
+  <title id="m14__m14-linear-vs-branched__title">同一組 CCF 值，線性與分支兩棵 clone tree 都通過檢查</title>
+  <desc id="m14__m14-linear-vs-branched__desc">左右兩邊用的是同一組 CCF 值：1.00、0.60 與 0.30。
+        左邊是線性樹，0.30 那群是 0.60 那群的後代，檢查條件是 0.30 小於等於 0.60，成立。
+        右邊是分支樹，0.60 與 0.30 是兄弟，各自從 1.00 長出來，
+        檢查條件是 0.60 加 0.30 等於 0.90，小於等於 1.00，也成立。
+        每棵樹下方畫出對應的細胞群組成：
+        左邊帶 C 的細胞完全包在帶 B 的細胞裡面，右邊兩者互不重疊。
+        兩種情況的生物學意義完全不同，一邊是一條線上的連續演化，一邊是兩支平行分支，
+        但它們對得上同一組數字。
+        讀法是：CCF 只給出每一群有多大，不足以決定誰是誰的祖先。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">同一組 CCF：1.00 · 0.60 · 0.30</text>
+  <text class="tick zh" x="20" y="58">兩棵樹都通過那條算術檢查，所以光靠 CCF 選不出來。</text>
+
+  <!-- 左：線性 -->
+  <rect class="box plain" x="20" y="76" width="470" height="320" rx="8"/>
+  <text class="tick bold zh" x="40" y="104">線性：0.30 那群是 0.60 那群的後代</text>
+
+  <circle class="box plain" cx="255" cy="142" r="24"/>
+  <text class="tick mid mono bold" x="255" y="147">1.00</text>
+  <text class="tick zh" x="295" y="147">群 A</text>
+  <path class="conn thick" d="M255,166 L255,178" marker-end="url(#arrow-sm)"/>
+  <circle class="box hp1" cx="255" cy="202" r="24"/>
+  <text class="tick mid mono bold" x="255" y="207">0.60</text>
+  <text class="tick zh" x="295" y="207">群 B</text>
+  <path class="conn thick" d="M255,226 L255,238" marker-end="url(#arrow-sm)"/>
+  <circle class="box hp2" cx="255" cy="262" r="24"/>
+  <text class="tick mid mono bold" x="255" y="267">0.30</text>
+  <text class="tick zh" x="295" y="267">群 C</text>
+
+  <text class="tick mono ok" x="40" y="304">0.30 ≤ 0.60 ✓</text>
+
+  <rect class="bar" x="40" y="316" width="300" height="20"/>
+  <text class="tick zh" x="350" y="331">全部腫瘤</text>
+  <rect class="bar hp1" x="40" y="340" width="180" height="20"/>
+  <text class="tick zh" x="350" y="355">帶 B</text>
+  <rect class="bar hp2" x="40" y="364" width="90" height="20"/>
+  <text class="tick zh" x="350" y="379">帶 C</text>
+
+  <!-- 右：分支 -->
+  <rect class="box plain" x="510" y="76" width="470" height="320" rx="8"/>
+  <text class="tick bold zh" x="530" y="104">分支：0.60 與 0.30 各自從 1.00 長出來</text>
+
+  <circle class="box plain" cx="745" cy="142" r="24"/>
+  <text class="tick mid mono bold" x="745" y="147">1.00</text>
+  <text class="tick zh" x="785" y="147">群 A</text>
+  <path class="conn thick" d="M728,158 L672,214" marker-end="url(#arrow-sm)"/>
+  <path class="conn thick" d="M762,158 L818,214"  marker-end="url(#arrow-sm)"/>
+  <circle class="box hp1" cx="655" cy="238" r="24"/>
+  <text class="tick mid mono bold" x="655" y="243">0.60</text>
+  <text class="tick zh end" x="623" y="243">群 B</text>
+  <circle class="box hp2" cx="835" cy="238" r="24"/>
+  <text class="tick mid mono bold" x="835" y="243">0.30</text>
+  <text class="tick zh" x="867" y="243">群 C</text>
+
+  <text class="tick mono ok" x="530" y="304">0.60 ＋ 0.30 ＝ 0.90 ≤ 1.00 ✓</text>
+
+  <rect class="bar" x="530" y="316" width="300" height="20"/>
+  <text class="tick zh" x="840" y="331">全部腫瘤</text>
+  <rect class="bar hp1" x="530" y="340" width="180" height="20"/>
+  <text class="tick zh" x="840" y="355">帶 B</text>
+  <rect class="bar hp2" x="710" y="364" width="90" height="20"/>
+  <text class="tick zh" x="840" y="379">帶 C</text>
+
+  <line class="axis" x1="20" y1="412" x2="980" y2="412"/>
+  <text class="anno zh bold" x="20" y="442">差別在最下面那排：左邊「帶 C」完全包在「帶 B」裡，右邊兩者互不重疊。</text>
+  <text class="anno zh" x="20" y="470">而這件事 CCF 沒有記錄。要選出一棵樹，方法必須自己補上一個偏好 —— 通常是取步數最少的。</text>
+</svg><figcaption>同一組 CCF 值 1.0 / 0.6 / 0.3，兩棵樹都通過那條算術檢查。
+<b>左</b>：線性 —— 0.3 那群是 0.6 那群的後代（0.3 ≤ 0.6 ✓）。
+<b>右</b>：分支 —— 0.6 與 0.3 是兄弟，各自從 1.0 長出來（0.6 ＋ 0.3 ＝ 0.9 ≤ 1.0 ✓）。
+兩棵樹的生物學意義完全不同：左邊是一條線上的連續演化，右邊是兩支平行的分支。
+但是它們對得上<b>同一組數字</b>，所以光靠 CCF 選不出來。</figcaption></figure>
+
+<p class="prose">被卡住的時候，方法必須引入額外的偏好。最常用的偏好是 <span class="term" data-term="parsimony" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-parsimony-9">簡約<span class="term__pop" id="m14__gd-parsimony-9" role="tooltip"><b class="term__hd">parsimony <i>簡約法</i></b><span class="term__def" data-lang="zh">在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</span><span class="term__def" data-lang="en" lang="en">Choosing, among all solutions compatible with the data, the one requiring the fewest steps or lowest cost. It is a preference rather than evidence: when several solutions tie, parsimony picks one, but the data has not ruled the others out.</span><a class="term__more" href="glossary.html#parsimony">完整條目 →</a></span></span>：
+在所有相容的樹裡選步數最少的那一棵。這是一個很合理的偏好 —— 但它是<b>偏好，不是證據</b>。
+有時候為了讓樹連得起來，還必須補進沒有被任何資料直接支持的中間狀態，
+這種節點叫 <span class="term" data-term="latent node" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-latent-node-10">latent node<span class="term__pop" id="m14__gd-latent-node-10" role="tooltip"><b class="term__hd">latent node <i>潛在節點</i></b><span class="term__def" data-lang="zh">建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</span><span class="term__def" data-lang="en" lang="en">An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.</span><a class="term__more" href="glossary.html#latent-node">完整條目 →</a></span></span>。</p>
+
+<p class="prose">用兩個位點就看得到它為什麼一定會出現。假設你只觀測到 <code>00</code> 與 <code>11</code>
+兩種狀態 —— 沒有任何一條 read 是 <code>10</code>，也沒有任何一條是 <code>01</code>。
+但一步只能加一個突變，所以從 <code>00</code> 走到 <code>11</code> 中間<b>必須</b>經過
+<code>10</code> 或 <code>01</code>。方法只能補一個進去，而它補的那個是
+「模型為了連通而假設的」，不是看到的。</p>
+
+<p class="prose">所以 latent node 讀起來要很小心：它<b>不是</b>「一群還沒被觀察到的細胞」。
+它可能對應真的中間世代（那群細胞後來被取代了），也可能只是這個模型的記帳需要。
+而且這裡有兩個並列的補法（補 <code>10</code> 或補 <code>01</code>），資料同樣沒辦法選。</p>
+
+<aside class="guardrail" id="m14__guard-11"><p class="guardrail__hd">重要區分 #11：頻率群集不等於 clone tree</p><p class="prose">看到一張「腫瘤演化樹」圖時，要分清楚圖上有兩種東西：
+<b>群集</b>（有幾群、每群多大）與<b>樹</b>（誰是誰的祖先）。</p>
+<p class="prose">群集<b>比樹穩定一些</b>，但也只是一些 —— 同一份資料換一個程式，
+連 subclone 的數量都可能不一樣，而且真實的 subclone 越多、樣本有 whole-genome doubling 時，
+程式越傾向少報。</p>
+<p class="prose"><b>樹更糟</b> —— 同一組群集常常有多棵樹同時相容，是方法用簡約性或其他偏好挑了一棵。
+多數工具只輸出那一棵，不告訴你另外幾棵也成立。</p>
+<p class="prose">所以「這棵樹顯示 A 發生在 B 之前」這種說法，強度取決於相容的樹有幾棵。
+只有一棵時它是結論；有五棵時它是選擇。這也是本章開頭那場評比中，
+換程式就換答案的直接原因。</p></aside>
+
+<h3 id="m14__根因-頻率是-marginal-distribution-樹要的是-joint-distribution">根因：頻率是 marginal distribution，樹要的是 joint distribution</h3>
+
+<p class="prose">上面兩層不確定性看起來是兩個獨立的麻煩，其實是同一個。用兩個位點就講得完。</p>
+
+<p class="prose">一個區域裡有兩個 somatic 位點 S1、S2。頻率告訴你的是兩個數字：
+S1 出現在 50% 的細胞裡、S2 出現在 30% 的細胞裡。
+這兩個數字各自描述<b>一個位點</b>，這樣的分布叫 <span class="term" data-term="marginal distribution" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-marginal-distribution-11">marginal distribution<span class="term__pop" id="m14__gd-marginal-distribution-11" role="tooltip"><b class="term__hd">marginal distribution <i>邊際分布</i></b><span class="term__def" data-lang="zh">只描述單一變數的分布。VAF 與甲基化 β 值都是邊際統計：它們各自只講一個位點有多少比例帶有標記，不講兩個位點在同一個分子或同一個細胞上的搭配情形。</span><span class="term__def" data-lang="en" lang="en">A distribution over a single variable. VAF and methylation beta values are both marginal statistics: each describes one site in isolation and says nothing about how two sites co-occur on the same molecule or cell.</span><a class="term__more" href="glossary.html#marginal-distribution">完整條目 →</a></span></span>。</p>
+
+<p class="prose">但樹要回答的問題是：<b>同時帶有 S1 與 S2 的細胞佔多少</b>？
+這是兩個位點<b>一起看</b>的分布，叫 <span class="term" data-term="joint distribution" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-joint-distribution-12">joint distribution<span class="term__pop" id="m14__gd-joint-distribution-12" role="tooltip"><b class="term__hd">joint distribution <i>聯合分布</i></b><span class="term__def" data-lang="zh">多個變數一起看的分布，也就是「哪些組合各出現多少」。演化樹的形狀取決於聯合分布，而不是邊際分布；長讀的價值在於一條分子上的組合是直接觀測到的。</span><span class="term__def" data-lang="en" lang="en">A distribution over several variables jointly, i.e. how often each combination occurs. Tree topology depends on the joint distribution, not the marginals; the value of long reads is that combinations on one molecule are observed directly.</span><a class="term__more" href="glossary.html#joint-distribution">完整條目 →</a></span></span>。
+而從邊際分布推不出聯合分布 —— 這不是統計技巧不夠，是資訊真的不在裡面。</p>
+
+<p class="prose">精確一點說，邊際不是完全沒有用，它給出一個<b>區間</b>：
+同時帶有兩者的比例最多不會超過 0.30（不可能比帶 S2 的還多），
+最少也不會低於 0.50 ＋ 0.30 − 1 ＝ 0（兩者可以完全不重疊）。
+所以邊際把答案夾在 0 到 0.30 之間，<b>然後就再也縮不動了</b>。
+而樹的形狀在這個區間的兩端完全不同。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 596" class="dia-svg" role="img" aria-labelledby="m14__m14-marginal-vs-joint__title" aria-describedby="m14__m14-marginal-vs-joint__desc">
+  <title id="m14__m14-marginal-vs-joint__title">邊際頻率相同的兩種細胞組成，聯合計數與樹卻不同</title>
+  <desc id="m14__m14-marginal-vs-joint__desc">左右兩種細胞組成的邊際頻率刻意做成完全一樣：S1 出現在 50% 的細胞裡，S2 出現在 30% 的細胞裡。
+        左邊的組成是：3 個細胞同時帶有 S1 與 S2，2 個只帶 S1，5 個都沒有。
+        右邊的組成是：5 個只帶 S1，3 個只帶 S2，2 個都沒有，沒有任何細胞同時帶有兩者。
+        兩邊各自數出來的 S1 都是 5 個、S2 都是 3 個，所以邊際頻率相同。
+        差別出現在聯合計數表，而且剛好互換：左邊「只帶 S2」的 01 是 0 個、11 是 3 個；
+        右邊 01 是 3 個、11 是 0 個。
+        因此左邊相容的樹是一條線，S2 出現在已經有 S1 的細胞裡；
+        右邊的樹分岔，因為只帶 S2 的那群細胞必須另外從起點長出來。
+        兩邊都是每個突變只發生一次就解釋得通的樹。
+        讀法是：邊際頻率永遠不會告訴你 01 與 11 這兩格各有幾個，而樹的形狀就取決於它們。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">頻率是邊際分布，樹要的是聯合分布</text>
+  <text class="tick zh" x="20" y="58">左右兩邊的邊際頻率刻意做成完全相同 —— 重點正是「光看這兩個數字分不出來」。</text>
+
+  <!-- ══════════ 左：組成甲 ══════════ -->
+  <rect class="box plain" x="20" y="100" width="470" height="412" rx="8"/>
+  <text class="tick bold zh" x="40" y="126">組成 甲　S1 ＝ 0.50　S2 ＝ 0.30</text>
+  <text class="tick zh" x="40" y="148">10 個腫瘤細胞。小方塊：左＝S1、右＝S2，實心＝帶有</text>
+
+  <rect class="bar somatic" x="41"  y="162" width="13" height="14" rx="2"/>
+  <rect class="bar somatic" x="58"  y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="56" cy="196" r="15"/><circle class="nucleus" cx="56" cy="196" r="6"/>
+  <rect class="bar somatic" x="81"  y="162" width="13" height="14" rx="2"/>
+  <rect class="bar somatic" x="98"  y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="96" cy="196" r="15"/><circle class="nucleus" cx="96" cy="196" r="6"/>
+  <rect class="bar somatic" x="121" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar somatic" x="138" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="136" cy="196" r="15"/><circle class="nucleus" cx="136" cy="196" r="6"/>
+  <rect class="bar somatic" x="161" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="178" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="176" cy="196" r="15"/><circle class="nucleus" cx="176" cy="196" r="6"/>
+  <rect class="bar somatic" x="201" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="218" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="216" cy="196" r="15"/><circle class="nucleus" cx="216" cy="196" r="6"/>
+  <rect class="bar" x="241" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="258" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="256" cy="196" r="15"/><circle class="nucleus" cx="256" cy="196" r="6"/>
+  <rect class="bar" x="281" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="298" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="296" cy="196" r="15"/><circle class="nucleus" cx="296" cy="196" r="6"/>
+  <rect class="bar" x="321" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="338" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="336" cy="196" r="15"/><circle class="nucleus" cx="336" cy="196" r="6"/>
+  <rect class="bar" x="361" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="378" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="376" cy="196" r="15"/><circle class="nucleus" cx="376" cy="196" r="6"/>
+  <rect class="bar" x="401" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="418" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="416" cy="196" r="15"/><circle class="nucleus" cx="416" cy="196" r="6"/>
+
+  <text class="tick zh" x="40" y="234">聯合計數：每種狀態各有幾個細胞</text>
+  <rect class="box sunken" x="62"  y="246" width="76" height="58" rx="6"/>
+  <rect class="box sunken" x="162" y="246" width="76" height="58" rx="6"/>
+  <rect class="box ghost" x="262" y="246" width="76" height="58" rx="6"/>
+  <rect class="box accent" x="362" y="246" width="76" height="58" rx="6"/>
+  <text class="tick mid mono bold" x="100" y="268">00</text>
+  <text class="tick mid mono bold" x="200" y="268">10</text>
+  <text class="tick mid mono bold" x="300" y="268">01</text>
+  <text class="tick mid mono bold" x="400" y="268">11</text>
+  <text class="tick mid mono bold" x="100" y="296" style="font-size:20px">5</text>
+  <text class="tick mid mono bold" x="200" y="296" style="font-size:20px">2</text>
+  <text class="tick mid mono" x="300" y="296" style="font-size:20px">0</text>
+  <text class="tick mid mono bold accent" x="400" y="296" style="font-size:20px">3</text>
+
+  <text class="tick zh" x="40" y="330">→ 與這張表相容的樹</text>
+
+  <circle class="box plain" cx="100" cy="386" r="22"/>
+  <text class="tick mid mono bold" x="100" y="391">00</text>
+  <path class="conn somatic thick" d="M124,386 L216,386" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid mono somatic" x="170" y="374">+S1</text>
+  <circle class="box plain" cx="240" cy="386" r="22"/>
+  <text class="tick mid mono bold" x="240" y="391">10</text>
+  <path class="conn somatic thick" d="M264,386 L356,386" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid mono somatic" x="310" y="374">+S2</text>
+  <circle class="box plain" cx="380" cy="386" r="22"/>
+  <text class="tick mid mono bold" x="380" y="391">11</text>
+
+  <circle class="box ghost" cx="240" cy="452" r="22"/>
+  <text class="tick mid mono" x="240" y="457">01</text>
+  <text class="tick zh" x="272" y="457">沒有任何細胞</text>
+
+  <text class="tick bold zh" x="40" y="496">線性：S2 只出現在已經有 S1 的細胞裡</text>
+
+  <!-- ══════════ 右：組成乙 ══════════ -->
+  <rect class="box plain" x="510" y="100" width="470" height="412" rx="8"/>
+  <text class="tick bold zh" x="530" y="126">組成 乙　S1 ＝ 0.50　S2 ＝ 0.30</text>
+  <text class="tick zh" x="530" y="148">10 個腫瘤細胞。小方塊：左＝S1、右＝S2，實心＝帶有</text>
+
+  <rect class="bar somatic" x="531" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="548" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="546" cy="196" r="15"/><circle class="nucleus" cx="546" cy="196" r="6"/>
+  <rect class="bar somatic" x="571" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="588" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="586" cy="196" r="15"/><circle class="nucleus" cx="586" cy="196" r="6"/>
+  <rect class="bar somatic" x="611" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="628" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="626" cy="196" r="15"/><circle class="nucleus" cx="626" cy="196" r="6"/>
+  <rect class="bar somatic" x="651" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="668" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="666" cy="196" r="15"/><circle class="nucleus" cx="666" cy="196" r="6"/>
+  <rect class="bar somatic" x="691" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="708" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="706" cy="196" r="15"/><circle class="nucleus" cx="706" cy="196" r="6"/>
+  <rect class="bar" x="731" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar somatic" x="748" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="746" cy="196" r="15"/><circle class="nucleus" cx="746" cy="196" r="6"/>
+  <rect class="bar" x="771" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar somatic" x="788" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="786" cy="196" r="15"/><circle class="nucleus" cx="786" cy="196" r="6"/>
+  <rect class="bar" x="811" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar somatic" x="828" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="826" cy="196" r="15"/><circle class="nucleus" cx="826" cy="196" r="6"/>
+  <rect class="bar" x="851" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="868" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="866" cy="196" r="15"/><circle class="nucleus" cx="866" cy="196" r="6"/>
+  <rect class="bar" x="891" y="162" width="13" height="14" rx="2"/>
+  <rect class="bar" x="908" y="162" width="13" height="14" rx="2"/>
+  <circle class="cell tumor" cx="906" cy="196" r="15"/><circle class="nucleus" cx="906" cy="196" r="6"/>
+
+  <text class="tick zh" x="530" y="234">聯合計數：每種狀態各有幾個細胞</text>
+  <rect class="box sunken" x="552" y="246" width="76" height="58" rx="6"/>
+  <rect class="box sunken" x="652" y="246" width="76" height="58" rx="6"/>
+  <rect class="box accent" x="752" y="246" width="76" height="58" rx="6"/>
+  <rect class="box ghost" x="852" y="246" width="76" height="58" rx="6"/>
+  <text class="tick mid mono bold" x="590" y="268">00</text>
+  <text class="tick mid mono bold" x="690" y="268">10</text>
+  <text class="tick mid mono bold" x="790" y="268">01</text>
+  <text class="tick mid mono bold" x="890" y="268">11</text>
+  <text class="tick mid mono bold" x="590" y="296" style="font-size:20px">2</text>
+  <text class="tick mid mono bold" x="690" y="296" style="font-size:20px">5</text>
+  <text class="tick mid mono bold accent" x="790" y="296" style="font-size:20px">3</text>
+  <text class="tick mid mono" x="890" y="296" style="font-size:20px">0</text>
+
+  <text class="tick zh" x="530" y="330">→ 與這張表相容的樹</text>
+
+  <circle class="box plain" cx="590" cy="420" r="22"/>
+  <text class="tick mid mono bold" x="590" y="425">00</text>
+  <path class="conn somatic thick" d="M609,410 L708,392" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid mono somatic" x="655" y="390">+S1</text>
+  <path class="conn somatic thick" d="M609,430 L708,448" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid mono somatic" x="655" y="466">+S2</text>
+  <circle class="box plain" cx="730" cy="386" r="22"/>
+  <text class="tick mid mono bold" x="730" y="391">10</text>
+  <circle class="box plain" cx="730" cy="454" r="22"/>
+  <text class="tick mid mono bold" x="730" y="459">01</text>
+  <circle class="box ghost" cx="870" cy="420" r="22"/>
+  <text class="tick mid mono" x="870" y="425">11</text>
+  <text class="tick zh mid" x="870" y="386">沒有任何細胞</text>
+
+  <text class="tick bold zh" x="530" y="496">分支：有一群細胞只帶 S2，完全不帶 S1</text>
+
+  <line class="axis" x1="20" y1="520" x2="980" y2="520"/>
+  <text class="anno zh bold" x="20" y="546">差別只有兩格：<tspan class="mono">01</tspan> 與 <tspan class="mono">11</tspan> 誰是空的 —— 而邊際頻率對這兩格完全沒有意見。</text>
+  <text class="anno zh" x="20" y="574">兩邊都是「每個突變只發生一次」解釋得通的樹。若兩格都不是空的，就連這種樹都不存在了。</text>
+</svg><figcaption>兩種細胞組成，<b>上方兩個頻率刻意做成完全一樣</b>（0.50 與 0.30）——
+重點正是「光看這兩個數字分不出來」。
+<b>左</b>：帶 S2 的 3 個細胞全都也帶 S1，所以 S2 是 S1 的後代，樹是一條線。
+<b>右</b>：沒有任何細胞同時帶兩者，有 3 個只帶 S2，所以 S2 必須另外從起點長出來，樹分岔。
+下排是差別所在：<b>聯合計數表</b>，而且剛好互換 —— 左邊 01 是空的、右邊 11 是空的。
+這兩格邊際頻率完全沒有意見。</figcaption></figure>
+
+<div class="note"><b>互動元件</b>（列印版保留說明；數位版可操作）<br>滑桿只改一件事：同時帶有 S1 與 S2 的細胞有幾個。
+上方兩個邊際頻率<b>從頭到尾不會動</b>，下方的聯合計數表與右側的樹則會跟著換。
+把滑桿在 3 與 0 之間走一趟：兩端各對應上圖的左與右，同一組邊際頻率相容於兩棵不同的樹。
+中間的 1 與 2 值得停一下 —— 四種狀態全都出現時，<b>連「每個突變只發生一次」的樹都不存在</b>，
+S2 必須發生兩次。真實資料裡這通常代表某個 call 是假的，或那幾條 read 被分到錯的 haplotype，
+而這件事只有聯合觀測看得出來。
+切到「只有邊際頻率」，聯合計數表全部變成問號 —— 那就是短讀路線的處境。</div>
+
+<p class="prose">現在回頭看前面兩層不確定性，它們是同一件事的兩個面：
+CCF 換算是在<b>估計邊際</b>，簡約性是在<b>猜聯合</b>。
+短讀路線的每一個模型假設，都是在補聯合分布那一格。</p>
+
+<h3 id="m14__甲基化也有同一個病-值與-epiallele">甲基化也有同一個病：β 值與 epiallele</h3>
+
+<p class="prose">既然序列上的頻率不夠，換一種標記會不會好一些？<span class="term" data-term="5mC" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-5mc-13">甲基化<span class="term__pop" id="m14__gd-5mc-13" role="tooltip"><b class="term__hd">5mC <i>5-甲基胞嘧啶</i></b><span class="term__def" data-lang="zh">胞嘧啶第 5 個碳上的甲基化修飾。這是常見的 DNA 甲基化形式，主要見於 CpG；可影響轉錄調控，效應依基因組位置與細胞類型而異。</span><span class="term__def" data-lang="en" lang="en">5-methylcytosine, the commonest DNA methylation mark, usually at CpG sites. Affects expression without changing sequence.</span><a class="term__more" href="glossary.html#5mc">完整條目 →</a></span></span>是很自然的候選。</p>
+
+<p class="prose">先講它為什麼吸引人。<span class="term" data-term="epimutation" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-epimutation-14">epimutation<span class="term__pop" id="m14__gd-epimutation-14" role="tooltip"><b class="term__hd">epimutation <i>表觀突變</i></b><span class="term__def" data-lang="zh">細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 10⁻⁵ 到 10⁻⁴，而 DNA 突變約每鹼基 10⁻⁹ 到 10⁻¹⁰，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 10⁻³ 的），應當成量級而非定值。</span><span class="term__def" data-lang="en" lang="en">A stochastic flip of methylation state during cell division. Commonly cited at 10⁻⁵–10⁻⁴ per CpG per division versus 10⁻⁹–10⁻¹⁰ per base for DNA mutation — roughly five orders of magnitude faster like-for-like — which makes it a higher-resolution lineage clock. Treat it as an order of magnitude, not a constant: estimates vary by site and assay, up to ~10⁻³.</span><a class="term__more" href="glossary.html#epimutation">完整條目 →</a></span></span>（甲基化狀態的隨機翻轉）發生的速率，
+文獻常引的量級是每個 <span class="term" data-term="CpG" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-cpg-15">CpG<span class="term__pop" id="m14__gd-cpg-15" role="tooltip"><b class="term__hd">CpG</b><span class="term__def" data-lang="zh">序列上一個 C 後接一個 G（p 代表兩者之間的磷酸鍵）。哺乳類多數 5mC 位於 CpG，特定細胞或情況亦可見非 CpG 甲基化。</span><span class="term__def" data-lang="en" lang="en">A cytosine followed by a guanine. Most mammalian 5mC occurs at CpG sites, although non-CpG methylation is also observed in particular cells and contexts.</span><a class="term__more" href="glossary.html#cpg">完整條目 →</a></span></span>、每次細胞分裂 10⁻⁵ 到 10⁻⁴；DNA 突變則是每個鹼基 10⁻⁹ 到 10⁻¹⁰。
+同量級對同量級比，<b>快了大約五個數量級</b>。這代表甲基化是一個解析度高得多的時鐘 ——
+兩群細胞分開才幾十代時，序列上還沒有任何差異，甲基化上已經有了。</p>
+
+<p class="prose">這個速率要當成量級而不是常數：它隨位點與量測方式差很多，
+專門被挑出來當時鐘用的位點有估到 10⁻³ 這個量級的。
+所以「甲基化快得多」很穩，但「快幾個數量級」不要當定值引用。</p>
+
+<p class="prose">這個想法已經走到規模化。2015 年一項研究拿 19 位低度膠質瘤病人的原發與復發檢體，
+各自用甲基化與用突變建樹，兩棵樹高度吻合（相關係數 0.56 到 0.90），
+說明甲基化攜帶的譜系訊號是真的 —— 但那是「高度吻合」而不是「同一棵樹」，
+研究裡也有病人的甲基化訊號跨越了基因型上已經分開的分支。
+2025 年的一項研究更進一步：只用 bulk 甲基化資料，在 1,976 個淋巴系癌樣本上推估出
+腫瘤的生長速率與發生年齡，不需要定序基因體。</p>
+
+<p class="prose">但是甲基化的常規讀法有一模一樣的病。一個 CpG 位點的甲基化程度寫成 β 值 ——
+<b>這個位點上所有分子中，甲基化的比例</b>。那也是一個邊際。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" class="dia-svg" role="img" aria-labelledby="m14__m14-beta-vs-epiallele__title" aria-describedby="m14__m14-beta-vs-epiallele__desc">
+  <title id="m14__m14-beta-vs-epiallele__title">逐位點的 β 值相同，分子層級的 epiallele 組成卻完全不同</title>
+  <desc id="m14__m14-beta-vs-epiallele__desc">左右兩邊都是一個區域裡的四個 CpG、六條分子。
+        兩邊每一個 CpG 的甲基化比例都恰好是 0.50，所以逐位點統計的 β 值完全相同。
+        左邊六條分子各自有不同的甲基化組合，共六種不同的組合，
+        而且每條分子甲基化的個數也不一樣，這是同一群細胞的隨機起伏。
+        右邊只有兩種組合，三條分子四個 CpG 全部甲基化，另外三條全部未甲基化，
+        這代表兩群不同的細胞。
+        差別只在把同一條分子上的四個 CpG 一起看的時候才出現，
+        這種一起看的組合稱為 epiallele。
+        要注意的是，右邊那種乾淨的兩群也可能是同一群細胞的兩條 haplotype，
+        一條甲基化、一條不甲基化，這種情形叫 allele-specific methylation；
+        要分開得看這兩群 epiallele 跟 HP 標籤對不對得上。
+        讀法是：β 值是邊際統計，跟 VAF 有一樣的限制。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">β 值也是邊際統計</text>
+  <text class="tick zh" x="20" y="58">實心＝甲基化，空心＝未甲基化。左右兩邊每個位點的 β 值都是 0.50。</text>
+
+  <!-- ══════════ 左 ══════════ -->
+  <rect class="box plain" x="20" y="100" width="470" height="336" rx="8"/>
+  <text class="tick bold zh" x="40" y="126">組成 甲：同一群細胞的隨機起伏</text>
+  <text class="tick mid mono" x="110" y="152">1</text>
+  <text class="tick mid mono" x="190" y="152">2</text>
+  <text class="tick mid mono" x="270" y="152">3</text>
+  <text class="tick mid mono" x="350" y="152">4</text>
+  <text class="tick zh" x="390" y="152">CpG</text>
+
+  <rect class="read" x="60" y="166" width="320" height="12" rx="6"/>
+  <circle class="cpg met" cx="110" cy="186" r="5"/>
+  <circle class="cpg met" cx="190" cy="186" r="5"/>
+  <circle class="cpg met" cx="270" cy="186" r="5"/>
+  <circle class="cpg unmet" cx="350" cy="186" r="5"/>
+
+  <rect class="read" x="60" y="196" width="320" height="12" rx="6"/>
+  <circle class="cpg unmet" cx="110" cy="216" r="5"/>
+  <circle class="cpg met" cx="190" cy="216" r="5"/>
+  <circle class="cpg met" cx="270" cy="216" r="5"/>
+  <circle class="cpg met" cx="350" cy="216" r="5"/>
+
+  <rect class="read" x="60" y="226" width="320" height="12" rx="6"/>
+  <circle class="cpg met" cx="110" cy="246" r="5"/>
+  <circle class="cpg met" cx="190" cy="246" r="5"/>
+  <circle class="cpg unmet" cx="270" cy="246" r="5"/>
+  <circle class="cpg unmet" cx="350" cy="246" r="5"/>
+
+  <rect class="read" x="60" y="256" width="320" height="12" rx="6"/>
+  <circle class="cpg unmet" cx="110" cy="276" r="5"/>
+  <circle class="cpg unmet" cx="190" cy="276" r="5"/>
+  <circle class="cpg met" cx="270" cy="276" r="5"/>
+  <circle class="cpg met" cx="350" cy="276" r="5"/>
+
+  <rect class="read" x="60" y="286" width="320" height="12" rx="6"/>
+  <circle class="cpg met" cx="110" cy="306" r="5"/>
+  <circle class="cpg unmet" cx="190" cy="306" r="5"/>
+  <circle class="cpg unmet" cx="270" cy="306" r="5"/>
+  <circle class="cpg unmet" cx="350" cy="306" r="5"/>
+
+  <rect class="read" x="60" y="316" width="320" height="12" rx="6"/>
+  <circle class="cpg unmet" cx="110" cy="336" r="5"/>
+  <circle class="cpg unmet" cx="190" cy="336" r="5"/>
+  <circle class="cpg unmet" cx="270" cy="336" r="5"/>
+  <circle class="cpg met" cx="350" cy="336" r="5"/>
+
+  <line class="axis" x1="40" y1="352" x2="470" y2="352" style="stroke-width:1.5"/>
+  <text class="tick zh" x="40" y="376">β 值（每個位點各自統計）</text>
+  <text class="tick mid mono bold" x="110" y="400">0.50</text>
+  <text class="tick mid mono bold" x="190" y="400">0.50</text>
+  <text class="tick mid mono bold" x="270" y="400">0.50</text>
+  <text class="tick mid mono bold" x="350" y="400">0.50</text>
+  <text class="tick bold zh met" x="40" y="426">不同的 epiallele：6 種，每條分子甲基化的數量也不同</text>
+
+  <!-- ══════════ 右 ══════════ -->
+  <rect class="box plain" x="510" y="100" width="470" height="336" rx="8"/>
+  <text class="tick bold zh" x="530" y="126">組成 乙：兩群細胞，各自一致</text>
+  <text class="tick mid mono" x="600" y="152">1</text>
+  <text class="tick mid mono" x="680" y="152">2</text>
+  <text class="tick mid mono" x="760" y="152">3</text>
+  <text class="tick mid mono" x="840" y="152">4</text>
+  <text class="tick zh" x="880" y="152">CpG</text>
+
+  <rect class="read" x="550" y="166" width="320" height="12" rx="6"/>
+  <circle class="cpg met" cx="600" cy="186" r="5"/>
+  <circle class="cpg met" cx="680" cy="186" r="5"/>
+  <circle class="cpg met" cx="760" cy="186" r="5"/>
+  <circle class="cpg met" cx="840" cy="186" r="5"/>
+
+  <rect class="read" x="550" y="196" width="320" height="12" rx="6"/>
+  <circle class="cpg met" cx="600" cy="216" r="5"/>
+  <circle class="cpg met" cx="680" cy="216" r="5"/>
+  <circle class="cpg met" cx="760" cy="216" r="5"/>
+  <circle class="cpg met" cx="840" cy="216" r="5"/>
+
+  <rect class="read" x="550" y="226" width="320" height="12" rx="6"/>
+  <circle class="cpg met" cx="600" cy="246" r="5"/>
+  <circle class="cpg met" cx="680" cy="246" r="5"/>
+  <circle class="cpg met" cx="760" cy="246" r="5"/>
+  <circle class="cpg met" cx="840" cy="246" r="5"/>
+
+  <rect class="read" x="550" y="256" width="320" height="12" rx="6"/>
+  <circle class="cpg unmet" cx="600" cy="276" r="5"/>
+  <circle class="cpg unmet" cx="680" cy="276" r="5"/>
+  <circle class="cpg unmet" cx="760" cy="276" r="5"/>
+  <circle class="cpg unmet" cx="840" cy="276" r="5"/>
+
+  <rect class="read" x="550" y="286" width="320" height="12" rx="6"/>
+  <circle class="cpg unmet" cx="600" cy="306" r="5"/>
+  <circle class="cpg unmet" cx="680" cy="306" r="5"/>
+  <circle class="cpg unmet" cx="760" cy="306" r="5"/>
+  <circle class="cpg unmet" cx="840" cy="306" r="5"/>
+
+  <rect class="read" x="550" y="316" width="320" height="12" rx="6"/>
+  <circle class="cpg unmet" cx="600" cy="336" r="5"/>
+  <circle class="cpg unmet" cx="680" cy="336" r="5"/>
+  <circle class="cpg unmet" cx="760" cy="336" r="5"/>
+  <circle class="cpg unmet" cx="840" cy="336" r="5"/>
+
+  <line class="axis" x1="530" y1="352" x2="960" y2="352" style="stroke-width:1.5"/>
+  <text class="tick zh" x="530" y="376">β 值（每個位點各自統計）</text>
+  <text class="tick mid mono bold" x="600" y="400">0.50</text>
+  <text class="tick mid mono bold" x="680" y="400">0.50</text>
+  <text class="tick mid mono bold" x="760" y="400">0.50</text>
+  <text class="tick mid mono bold" x="840" y="400">0.50</text>
+  <text class="tick bold zh met" x="530" y="426">不同的 epiallele：2 種</text>
+
+  <line class="axis" x1="20" y1="452" x2="980" y2="452"/>
+  <text class="anno zh bold" x="20" y="482">同一條分子上的四個 CpG 一起看，才分得出「一群細胞在起伏」與「兩群細胞」。</text>
+  <text class="anno zh" x="20" y="510">但「兩群」也可能是同一群細胞的兩條 haplotype，一條甲基化一條不甲基化 —— 要看它跟 HP 標籤對不對得上。</text>
+</svg><figcaption>一個區域裡的四個 CpG，<b>左右兩邊每個位點的 β 值都是 0.50</b>，
+逐位點統計完全無法區分。
+<b>左</b>：每個分子都是雜亂的半甲基化 —— 這是同一群細胞的隨機起伏。
+<b>右</b>：分子分成乾淨的兩群，一群全甲基、一群全不甲基。
+同樣地，差別只在<b>同一個分子上這四個 CpG 一起看</b>時才出現。
+把一個分子上的甲基化組合當成一個單位，這個單位叫 <span class="term" data-term="epiallele" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-epiallele-16">epiallele<span class="term__pop" id="m14__gd-epiallele-16" role="tooltip"><b class="term__hd">epiallele <i>表觀等位型</i></b><span class="term__def" data-lang="zh">同一條分子上一組相鄰 CpG 的甲基化組合，例如四個 CpG 的 1101。逐位點的 β 值看不到它 —— 要算 epiallele 的組成，一條 read 至少得跨過 4 個 CpG。</span><span class="term__def" data-lang="en" lang="en">The combination of methylation states across a set of neighbouring CpGs on a single molecule, e.g. 1101 over four CpGs. Per-site beta values cannot resolve it; computing epiallele composition requires reads spanning at least four CpGs.</span><a class="term__more" href="glossary.html#epiallele">完整條目 →</a></span></span>。
+<b>但右邊那種兩群不一定是兩群細胞</b> —— 見下方的警告。</figcaption></figure>
+
+<aside class="guardrail" id="m14__guard-12"><p class="guardrail__hd">重要區分 #12：兩群 epiallele 不一定是兩群細胞</p><p class="prose">上圖右邊那種「一群全甲基、一群全不甲基」的乾淨分裂，最直覺的解讀是兩群細胞。
+但同一群細胞的<b>兩條 haplotype</b> 也會產生完全一樣的圖形 ——
+一條甲基化、另一條不甲基化。這件事有名字，叫 <b>allele-specific methylation</b>，
+在 imprinting 的區域是常態而非例外。</p>
+<p class="prose">怎麼分開？把 epiallele 的分群跟 <span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-hp-tag-17">HP tag<span class="term__pop" id="m14__gd-hp-tag-17" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en" lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span> 對一下：
+兩群剛好對上 HP1 與 HP2 → 是同一群細胞的兩條染色體；
+兩群都落在<b>同一個</b> HP 裡 → 才是兩群細胞。</p>
+<p class="prose">這正是為什麼這條路線把甲基化放在<b>單倍型家族之內</b>看，而不是直接看整個位點。
+少了這一步，最常見的生物現象會被讀成 subclone。</p></aside>
+
+<p class="prose">2014 年的 methclone 就是在做這件事：它從 read 直接數 epiallele 的組成，
+再用組成的熵變化量去衡量兩個時間點之間譜系結構的改變。</p>
+
+<p class="prose">它的要求值得看清楚，因為那是<b>整類做法都躲不掉的形狀</b>，只是每個工具挑的數字不同。
+methclone 要求一條 read 跨過 <b>4 個相鄰的 CpG</b>（於是有 2⁴ ＝ 16 種可能組合），
+並且該位置要有 <b>60× 以上的深度</b>，組成的比例才估得準。
+換句話說，你需要的是「同一條分子上有足夠多的 CpG，而且這樣的分子要足夠多」——
+4 是 methclone 的選擇，不是自然常數。</p>
+
+<h3 id="m14__而這個門檻-短讀剛好卡在上面">而這個門檻，短讀剛好卡在上面</h3>
+
+<p class="prose">全人類基因體大約有 2,800 萬個 CpG，散在 3.1 Gb 上，
+平均<b>每 100 bp 才一個</b>。CpG island 內部密得多，大約每 10 到 20 bp 一個。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 490" class="dia-svg" role="img" aria-labelledby="m14__m14-cpg-span__title" aria-describedby="m14__m14-cpg-span__desc">
+  <title id="m14__m14-cpg-span__title">一條 read 能同時看到幾個 CpG：短讀與長讀的差距</title>
+  <desc id="m14__m14-cpg-span__desc">上半是基因體的平均 CpG 密度，大約每 100 個鹼基一個 CpG。
+        在這個密度下，一條 100 bp 的短讀只跨得到一個 CpG，
+        而一條 20 kb 的長讀長度是圖上這一整段的十倍，跨過大約 200 個 CpG。
+        下半是 CpG island 內部的密度，大約每 15 個鹼基一個 CpG。
+        在這裡 100 bp 的短讀跨得到約七個 CpG，達到 epiallele 分析所需的四個門檻。
+        兩者合起來說明：短讀要做分子層級的甲基化分析，只做得到 CpG island 這類密集區域，
+        長讀則不必挑區域。
+        讀法是：門檻不是四個 CpG 這個數字本身，而是「哪些區域達得到這個門檻」。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">4 個 CpG 這個門檻，決定了短讀能分析哪些區域</text>
+  <text class="tick zh" x="20" y="58">短線＝一個 CpG 的位置（這張圖不表示它甲基化與否）。長圓角矩形＝一條 read 蓋到的範圍。</text>
+
+  <!-- ① 基因體平均密度 -->
+  <rect class="box plain" x="20" y="80" width="960" height="178" rx="8"/>
+  <text class="tick bold zh" x="40" y="106">① 基因體平均：約每 100 bp 一個 CpG（全基因體約 2,800 萬個）</text>
+
+  <rect class="read" x="82" y="132" width="45" height="12" rx="6"/>
+  <text class="tick zh" x="140" y="142">100 bp read → 只跨到 1 個 CpG</text>
+
+  <line class="axis" x1="50" y1="170" x2="950" y2="170"/>
+  <line class="conn" x1="60"  y1="162" x2="60"  y2="178"/>
+  <line class="conn" x1="105" y1="162" x2="105" y2="178"/>
+  <line class="conn" x1="150" y1="162" x2="150" y2="178"/>
+  <line class="conn" x1="195" y1="162" x2="195" y2="178"/>
+  <line class="conn" x1="240" y1="162" x2="240" y2="178"/>
+  <line class="conn" x1="285" y1="162" x2="285" y2="178"/>
+  <line class="conn" x1="330" y1="162" x2="330" y2="178"/>
+  <line class="conn" x1="375" y1="162" x2="375" y2="178"/>
+  <line class="conn" x1="420" y1="162" x2="420" y2="178"/>
+  <line class="conn" x1="465" y1="162" x2="465" y2="178"/>
+  <line class="conn" x1="510" y1="162" x2="510" y2="178"/>
+  <line class="conn" x1="555" y1="162" x2="555" y2="178"/>
+  <line class="conn" x1="600" y1="162" x2="600" y2="178"/>
+  <line class="conn" x1="645" y1="162" x2="645" y2="178"/>
+  <line class="conn" x1="690" y1="162" x2="690" y2="178"/>
+  <line class="conn" x1="735" y1="162" x2="735" y2="178"/>
+  <line class="conn" x1="780" y1="162" x2="780" y2="178"/>
+  <line class="conn" x1="825" y1="162" x2="825" y2="178"/>
+  <line class="conn" x1="870" y1="162" x2="870" y2="178"/>
+  <line class="conn" x1="915" y1="162" x2="915" y2="178"/>
+  <text class="tick zh end" x="950" y="198">這一段 ＝ 2,000 bp</text>
+
+  <rect class="read" x="50" y="214" width="900" height="12" rx="6"/>
+  <path class="conn" d="M50,220 L28,220" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M950,220 L972,220" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh bold" x="60" y="246">20 kb read：長度是這一整段的 10 倍，跨過約 200 個 CpG</text>
+
+  <!-- ② CpG island 內 -->
+  <rect class="box plain" x="20" y="270" width="960" height="140" rx="8"/>
+  <text class="tick bold zh" x="40" y="296">② CpG island 內：約每 15 bp 一個 CpG</text>
+
+  <rect class="read" x="70" y="320" width="450" height="12" rx="6"/>
+  <text class="tick zh ok" x="534" y="330">100 bp read → 跨到 7 個 CpG，達到門檻</text>
+
+  <line class="axis" x1="50" y1="358" x2="950" y2="358"/>
+  <line class="conn" x1="70"  y1="350" x2="70"  y2="366"/>
+  <line class="conn" x1="140" y1="350" x2="140" y2="366"/>
+  <line class="conn" x1="210" y1="350" x2="210" y2="366"/>
+  <line class="conn" x1="280" y1="350" x2="280" y2="366"/>
+  <line class="conn" x1="350" y1="350" x2="350" y2="366"/>
+  <line class="conn" x1="420" y1="350" x2="420" y2="366"/>
+  <line class="conn" x1="490" y1="350" x2="490" y2="366"/>
+  <line class="conn" x1="560" y1="350" x2="560" y2="366"/>
+  <line class="conn" x1="630" y1="350" x2="630" y2="366"/>
+  <line class="conn" x1="700" y1="350" x2="700" y2="366"/>
+  <line class="conn" x1="770" y1="350" x2="770" y2="366"/>
+  <line class="conn" x1="840" y1="350" x2="840" y2="366"/>
+  <line class="conn" x1="910" y1="350" x2="910" y2="366"/>
+  <text class="tick zh end" x="950" y="386">這一段 ＝ 200 bp</text>
+
+  <line class="axis" x1="20" y1="428" x2="980" y2="428"/>
+  <text class="anno zh bold" x="20" y="458">所以短讀的 epiallele 分析只做得到 CpG island 這類密集區，長讀不必挑區域。</text>
+  <text class="anno zh" x="20" y="486">而且同一條長讀上還帶著序列變異，所以序列與甲基化的聯合分布是同一次觀測給的。</text>
+</svg><figcaption>同一段基因體，兩種讀長能同時看到的 CpG 數量。
+<b>上</b>：100 bp 的短讀在基因體平均密度下大約只跨到 1 個 CpG，只有落在 CpG island 裡才勉強跨到 4 個以上
+—— 也就是說，epiallele 分析在短讀上<b>只做得到基因體的一小部分區域</b>。
+<b>下</b>：20 kb 的長讀在平均密度下跨過約 200 個 CpG，而且不必挑區域。
+同一條分子上同時還帶著序列變異，所以序列與甲基化的聯合分布是同一次觀測給的。</figcaption></figure>
+
+<h3 id="m14__長讀把-joint-distribution-直接觀測到了">長讀把 joint distribution 直接觀測到了</h3>
+
+<p class="prose">到這裡轉折就很清楚了。一條 <span class="term" data-term="long read" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-long-read-18">long read<span class="term__pop" id="m14__gd-long-read-18" role="tooltip"><b class="term__hd">long read <i>長讀</i></b><span class="term__def" data-lang="zh">單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</span><span class="term__def" data-lang="en" lang="en">A sequencing read thousands to tens of thousands of bases long. Its length lets one molecule link multiple variants directly.</span><a class="term__more" href="glossary.html#long-read">完整條目 →</a></span></span> 是<b>一個分子</b>，
+它在多個位點上的 allele 是一次觀測到的組合，不是從兩個邊際推出來的。
+換句話說：<b>聯合分布不必再猜，數出來就好。</b></p>
+
+<p class="prose">M9 講過這個觀測長什麼樣：把每條 read 在 k 個 somatic 位點上的 R／A 寫成 0／1 向量，
+就得到一張狀態表；找最少步數、能走到所有觀測狀態的樹，就是這個區域的候選演化順序。
+現在可以把那張狀態表放回這一章的座標裡看 —— <b>它就是聯合分布的直接樣本</b>，
+而不是 CCF 群集那種邊際的整理。</p>
+
+<p class="prose">還有第二層結構要先分開。<span class="term" data-term="somatic variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-somatic-variant-19">somatic 變異<span class="term__pop" id="m14__gd-somatic-variant-19" role="tooltip"><b class="term__hd">somatic variant <i>體細胞變異</i></b><span class="term__def" data-lang="zh">在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</span><span class="term__def" data-lang="en" lang="en">A variant acquired outside the germline, usually after conception. It may be restricted to a subset of cells and is generally not passed to offspring; it is a central focus of cancer genomics.</span><a class="term__more" href="glossary.html#somatic-variant">完整條目 →</a></span></span>發生在某一個細胞的某<b>一條</b>染色體上，
+所以同一個 somatic 位點的變異只會出現在其中一條 <span class="term" data-term="haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-haplotype-20">haplotype<span class="term__pop" id="m14__gd-haplotype-20" role="tooltip"><b class="term__hd">haplotype <i>單倍型</i></b><span class="term__def" data-lang="zh">同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</span><span class="term__def" data-lang="en" lang="en">A set of variants that lie on the same physical chromosome copy and are inherited together.</span><a class="term__more" href="glossary.html#haplotype">完整條目 →</a></span></span> 上。
+把 read 先按 <span class="term" data-term="somatic haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-somatic-haplotype-21">單倍型家族<span class="term__pop" id="m14__gd-somatic-haplotype-21" role="tooltip"><b class="term__hd">somatic haplotype</b><span class="term__def" data-lang="zh">在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</span><span class="term__def" data-lang="en" lang="en">A sub-level beneath the germline haplotype: HP1-1 and HP2-1 carry somatic mutations derived from HP1 and HP2; HP3 is unassignable.</span><a class="term__more" href="glossary.html#somatic-haplotype">完整條目 →</a></span></span>分成兩堆再各自建樹，
+一方面符合生物學，一方面讓每一堆的狀態空間小一半。</p>
+
+<h3 id="m14__代價-分析單位變成-區域-單倍型家族">代價：分析單位變成「區域 × 單倍型家族」</h3>
+
+<p class="prose">聯合觀測不是免費的。<b>它只在一條 read 跨得到的距離內成立</b>。
+兩個位點如果相距 100 kb，沒有任何一條 read 同時蓋到它們，
+那兩個位點之間的聯合分布就跟短讀時代一樣是未知的。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530" class="dia-svg" role="img" aria-labelledby="m14__m14-analysis-unit__title" aria-describedby="m14__m14-analysis-unit__desc">
+  <title id="m14__m14-analysis-unit__title">分析單位怎麼切出來：phase set → 區域 → 單倍型家族</title>
+  <desc id="m14__m14-analysis-unit__desc">三層，由上到下是切分的順序。
+        第一層是 phase set。跨越兩個 phase set 之間沒有相位關係，所以分析不能跨過去。
+        第二層在 phase set 內按 read 實際跨得到的距離切成區域，
+        圖上是三個區域，各含 2 個或 3 個 somatic 位點，每個區域有五條 read。
+        區域裡的 read 畫成虛線外框，代表這時候還不知道它們來自哪一條 haplotype。
+        第三層把中間那個區域的五條 read 按單倍型家族分成兩堆，三條一堆、兩條一堆，
+        外框改成實線，代表來源已經由程式判定。
+        第三層每一條 read 的 x 座標與第二層完全相同，因為那是同一批 read，只是重新分組。
+        讀法是：最小分析單位是「一個區域的一個單倍型家族」，不是整條染色體。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">最小分析單位：一個區域的一個單倍型家族</text>
+  <text class="tick zh" x="20" y="58">上方小圓＝somatic 位點。虛線外框的 read ＝ 還不知道來自哪一條 haplotype。</text>
+
+  <!-- ① phase set -->
+  <text class="tick bold zh" x="24" y="119">① phase set</text>
+  <rect class="box accent" x="140" y="104" width="460" height="20" rx="6"/>
+  <text class="tick mid" x="370" y="119">phase set A</text>
+  <rect class="box accent" x="640" y="104" width="320" height="20" rx="6"/>
+  <text class="tick mid" x="800" y="119">phase set B</text>
+  <path class="conn bad" d="M600,140 L616,128" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh bad" x="624" y="148">跨 phase set 之間沒有相位關係，分析不能跨過去</text>
+
+  <!-- ② 區域 -->
+  <text class="tick bold zh" x="24" y="210">② 切區域</text>
+  <circle class="mark somatic" cx="200" cy="176" r="6"/>
+  <circle class="mark somatic" cx="260" cy="176" r="6"/>
+  <circle class="mark somatic" cx="380" cy="176" r="6"/>
+  <circle class="mark somatic" cx="450" cy="176" r="6"/>
+  <circle class="mark somatic" cx="520" cy="176" r="6"/>
+  <circle class="mark somatic" cx="720" cy="176" r="6"/>
+  <circle class="mark somatic" cx="790" cy="176" r="6"/>
+
+  <rect class="read hp0" x="150" y="190" width="180" height="12" rx="6"/>
+  <rect class="read hp0" x="350" y="190" width="230" height="12" rx="6"/>
+  <rect class="read hp0" x="670" y="190" width="250" height="12" rx="6"/>
+  <rect class="read hp0" x="170" y="208" width="170" height="12" rx="6"/>
+  <rect class="read hp0" x="370" y="208" width="210" height="12" rx="6"/>
+  <rect class="read hp0" x="690" y="208" width="230" height="12" rx="6"/>
+  <rect class="read hp0" x="160" y="226" width="175" height="12" rx="6"/>
+  <rect class="read hp0" x="360" y="226" width="225" height="12" rx="6"/>
+  <rect class="read hp0" x="700" y="226" width="245" height="12" rx="6"/>
+  <rect class="read hp0" x="155" y="244" width="178" height="12" rx="6"/>
+  <rect class="read hp0" x="356" y="244" width="220" height="12" rx="6"/>
+  <rect class="read hp0" x="676" y="244" width="255" height="12" rx="6"/>
+  <rect class="read hp0" x="175" y="262" width="165" height="12" rx="6"/>
+  <rect class="read hp0" x="366" y="262" width="215" height="12" rx="6"/>
+  <rect class="read hp0" x="686" y="262" width="240" height="12" rx="6"/>
+
+  <rect class="box ghost" x="146" y="184" width="190" height="96" rx="6"/>
+  <rect class="box ghost" x="346" y="184" width="240" height="96" rx="6"/>
+  <rect class="box ghost" x="666" y="184" width="280" height="96" rx="6"/>
+  <text class="tick mid mono" x="241" y="298">W1 · k=2</text>
+  <text class="tick mid mono" x="466" y="298">W2 · k=3</text>
+  <text class="tick mid mono" x="806" y="298">W3 · k=2</text>
+
+  <!-- ③ 單倍型家族 -->
+  <text class="tick bold zh" x="24" y="366">③ 分家族</text>
+  <text class="tick zh" x="140" y="326">把 W2 這五條 read 按單倍型家族分成兩堆（每一條的 x 座標與上方相同）</text>
+
+  <rect class="read hp1" x="350" y="340" width="230" height="12" rx="6"/>
+  <rect class="read hp1" x="370" y="360" width="210" height="12" rx="6"/>
+  <rect class="read hp1" x="360" y="380" width="225" height="12" rx="6"/>
+  <text class="tick bold hp1" x="610" y="366">HP1 family</text>
+  <text class="tick zh" x="740" y="366">每一堆各自建樹</text>
+
+  <line class="guide" x1="346" y1="396" x2="700" y2="396"/>
+
+  <rect class="read hp2" x="356" y="406" width="220" height="12" rx="6"/>
+  <rect class="read hp2" x="366" y="426" width="215" height="12" rx="6"/>
+  <text class="tick bold hp2" x="610" y="422">HP2 family</text>
+  <text class="tick zh" x="740" y="422">狀態空間小一半</text>
+
+  <line class="axis" x1="20" y1="456" x2="980" y2="456"/>
+  <text class="anno zh bold" x="20" y="486">somatic 變異只發生在其中一條 haplotype 上，所以先分家族既符合生物學，也讓問題變小。</text>
+  <text class="anno zh" x="20" y="514">代價：兩個相距超過 read 跨距的位點之間，聯合分布仍然是未知的 —— 跟短讀時代一樣。</text>
+</svg><figcaption>分析單位怎麼被切出來。
+<b>①</b> 先落在同一個 <span class="term" data-term="phase block" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-phase-block-22">phase set<span class="term__pop" id="m14__gd-phase-block-22" role="tooltip"><b class="term__hd">phase block</b><span class="term__def" data-lang="zh">一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</span><span class="term__def" data-lang="en" lang="en">A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.</span><a class="term__more" href="glossary.html#phase-block">完整條目 →</a></span></span> 內 —— 跨 phase set 的相位關係本來就沒有定義。
+<b>②</b> 再按 read 實際跨得到的距離切成區域，每個區域裡有 k 個 somatic 位點（k 通常是 2 或 3）。
+<b>③</b> 每個區域內再按單倍型家族分成兩堆。
+所以最小分析單位是「一個區域的一個單倍型家族」，而不是整條染色體。
+上下兩層的 x 座標刻意對齊：這是同一批 read，只是被重新分組。</figcaption></figure>
+
+<p class="prose">這件事的量級可以自己算一遍，算完就知道為什麼 k 幾乎都是 2 或 3。
+一般實體腫瘤的突變負荷大約每 Mb 有 1 到 10 個 somatic 變異。
+取 5 個／Mb、read 跨距 20 kb，那麼一個區域裡的變異數平均是 0.1 個。
+用 Poisson 算「至少有 2 個」的機率是 0.5% 左右 ——
+3.1 Gb 切成 15 萬多個區域，只有幾百個區域夠格。</p>
+
+<p class="prose">還要再打一個折。分析單位是「區域 × 單倍型家族」，
+所以兩個變異不只要落在同一個區域，還得落在<b>同一條 haplotype</b> 上，才湊得成 k＝2 的狀態表。
+一對變異落在同一家族的機率大約是 ½，於是 0.5% 再減半到 0.24%。</p>
+
+<p class="prose">但突變負荷高的樣本完全是另一回事。同樣的算法，50 個／Mb 時平均是 1 個／區域，
+「至少有 2 個」的機率跳到 26%，打完家族那個折之後仍有<b>兩三萬個</b>可用單位。
+<b>所以這條路線的可用性直接綁在樣本的突變負荷上</b> —— 這不是參數調整能改變的。</p>
+
+<h3 id="m14__read-af-頻率沒有被丟掉-只是換了位置">read-AF：頻率沒有被丟掉，只是換了位置</h3>
+
+<p class="prose">最後要說明一件容易誤會的事：長讀路線並沒有拋棄頻率。
+頻率從「用來分群」變成「用來在並列的候選裡排序」。</p>
+
+<p class="prose">M8 提過這個量叫 <span class="term" data-term="read-AF" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-read-af-23">read-AF<span class="term__pop" id="m14__gd-read-af-23" role="tooltip"><b class="term__hd">read-AF <i>read 層級的 ALT 比例</i></b><span class="term__def" data-lang="zh">在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</span><span class="term__def" data-lang="en" lang="en">The fraction of reads carrying the ALT allele at a somatic site, computed within one analysis window and one haplotype family. Because the denominator is already restricted, no purity or copy-number correction is needed; it is used to rank candidate trees of equal cost.</span><a class="term__more" href="glossary.html#read-af">完整條目 →</a></span></span>：在同一個區域、同一個單倍型家族的 read 裡面，
+某個 somatic 位點的 ALT 佔多少。它跟全基因體 VAF 的差別是<b>分母被限縮</b>了 ——
+只算同一段區域、同一條 haplotype 的 read。</p>
+
+<p class="prose">這裡要講清楚一件很容易講錯的事：<b>限縮分母並沒有讓純度消失</b>。
+同一條 haplotype 的 read 裡面也有來自正常細胞的分子（它們在這個位點是 REF），
+所以 read-AF 大約是「純度 × 帶有這個變異的腫瘤細胞比例」，不是後者本身。
+read-AF 之所以不必換算，是因為它只被拿來<b>比大小</b>：同一個區域、同一個單倍型家族裡的
+兩個位點共用同一個純度，比較兩者時純度是共同因子，會被約掉。
+M8 已經把這件事列為方法的適用範圍限制 ——
+兩個位點的<b>局部拷貝數或 multiplicity 若不同，就約不掉</b>。</p>
+
+<p class="prose">用法很直接：先發生的變異應該出現在更多分子上。
+所以候選樹裡若有兩條路徑步數相同，read-AF 遞減的那一條更合理。
+關鍵是<b>順序</b>：先用聯合觀測把候選集合縮到最小成本解，<b>再</b>用 read-AF 排序。
+反過來做就會退回頻率路線的老問題 —— 用邊際去猜聯合。</p>
+
+<h3 id="m14__三條路線各自看得到什麼">三條路線各自看得到什麼</h3>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" class="dia-svg" role="img" aria-labelledby="m14__m14-scope-honest__title" aria-describedby="m14__m14-scope-honest__desc">
+  <title id="m14__m14-scope-honest__title">三條 subclone 重建路線的輸入、聯合分布來源、輸出與代價</title>
+  <desc id="m14__m14-scope-honest__desc">三欄比較。
+        第一欄 single-cell：把細胞一個一個分開定序，
+        聯合分布是在細胞層級直接觀測到的，輸出是完整的細胞譜系樹，
+        代價是成本高、能觀察的細胞數有限。
+        第二欄 bulk 短讀加頻率：整團細胞一起定序、覆蓋全基因體，
+        聯合分布不是觀測到的，要靠簡約性等模型假設補上，
+        輸出是一棵全基因體的樹，代價是多棵樹同時相容、換程式就換答案。
+        第三欄 bulk 長讀加單倍型：同樣是整團細胞一起定序，但 read 跨 10 到 50 kb，
+        聯合分布在分子層級直接觀測到，
+        輸出是幾萬個局部候選拓撲而不是一棵全域樹，
+        代價是這種觀測只在 read 跨距內成立，而且可用的區域數量受突變負荷限制。
+        讀法是：三者不是誰取代誰，中間那條回答整體有幾群，右邊那條回答這幾個位點的先後。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">三條路線各自看得到什麼</text>
+  <text class="tick zh" x="20" y="58">關鍵那一列是「聯合分布怎麼來的」：觀測到的，還是假設補的。</text>
+
+  <rect class="box plain" x="180" y="104" width="258" height="282" rx="8"/>
+  <rect class="box sunken" x="450" y="104" width="258" height="282" rx="8"/>
+  <rect class="box accent" x="720" y="104" width="258" height="282" rx="8"/>
+
+  <text class="lbl bold mid" x="309" y="128">single-cell</text>
+  <text class="lbl bold zh mid" x="579" y="128">bulk 短讀 ＋ 頻率</text>
+  <text class="lbl bold zh mid" x="849" y="128">bulk 長讀 ＋ 單倍型</text>
+  <line class="axis" x1="20" y1="140" x2="980" y2="140" style="stroke-width:1.5"/>
+
+  <text class="anno bold zh" x="20" y="176">輸入</text>
+  <text class="anno zh mid" x="309" y="164">一個一個細胞</text>
+  <text class="anno zh mid" x="309" y="186">分開定序</text>
+  <text class="anno zh mid" x="579" y="164">整團細胞一起定序</text>
+  <text class="anno zh mid" x="579" y="186">覆蓋全基因體</text>
+  <text class="anno zh mid" x="849" y="164">整團細胞一起定序</text>
+  <text class="anno zh mid" x="849" y="186">read 跨 10–50 kb</text>
+  <line class="axis" x1="20" y1="200" x2="980" y2="200" style="stroke-width:1.5"/>
+
+  <text class="anno bold zh" x="20" y="234">聯合分布</text>
+  <text class="anno bold zh mid ok" x="309" y="222">直接觀測</text>
+  <text class="anno zh mid" x="309" y="244">細胞層級</text>
+  <text class="anno bold zh mid warn" x="579" y="222">靠模型假設補</text>
+  <text class="anno zh mid" x="579" y="244">簡約性等偏好</text>
+  <text class="anno bold zh mid ok" x="849" y="222">直接觀測</text>
+  <text class="anno zh mid" x="849" y="244">分子層級</text>
+  <line class="axis" x1="20" y1="262" x2="980" y2="262" style="stroke-width:1.5"/>
+
+  <text class="anno bold zh" x="20" y="296">輸出</text>
+  <text class="anno zh mid" x="309" y="290">完整的細胞譜系樹</text>
+  <text class="anno zh mid" x="579" y="290">一棵全基因體的樹</text>
+  <text class="anno zh mid" x="849" y="284">幾萬個局部候選拓撲</text>
+  <text class="anno zh mid" x="849" y="306">不是一棵全域樹</text>
+  <line class="axis" x1="20" y1="324" x2="980" y2="324" style="stroke-width:1.5"/>
+
+  <text class="anno bold zh" x="20" y="358">代價</text>
+  <text class="anno zh mid warn" x="309" y="346">成本高</text>
+  <text class="anno zh mid warn" x="309" y="368">能看的細胞數有限</text>
+  <text class="anno zh mid bad" x="579" y="346">多棵樹同時相容</text>
+  <text class="anno zh mid bad" x="579" y="368">換程式就換答案</text>
+  <text class="anno zh mid warn" x="849" y="346">只在 read 跨距內成立</text>
+  <text class="anno zh mid warn" x="849" y="368">受突變負荷限制</text>
+
+  <line class="axis" x1="20" y1="410" x2="980" y2="410"/>
+  <text class="anno zh bold" x="20" y="440">三者不是誰取代誰：中間那條回答「整體有幾群」，右邊那條回答「這幾個位點的先後」。</text>
+  <text class="anno zh" x="20" y="468">而 single-cell 是三者裡唯一直接觀測到細胞的；另外兩條看到的都是分子，不是細胞。</text>
+</svg><figcaption>三條路線的輸入、輸出與代價。
+<b>single-cell</b>：直接拿到細胞層級的聯合分布，是資訊最完整的一條，但成本最高、覆蓋率低。
+<b>bulk 短讀＋頻率</b>：覆蓋全基因體、便宜，輸出是一棵全基因體的樹，但那棵樹要靠模型假設補聯合分布。
+<b>bulk 長讀＋單倍型</b>：聯合分布是觀測到的，但只在 read 跨距內成立，
+所以輸出是<b>幾萬個局部候選拓撲</b>，不是一棵全基因體的樹。
+三者不是誰取代誰 —— 中間那條回答「整體有幾群」，右邊那條回答「這幾個位點的先後」。</figcaption></figure>
+
+<p class="prose">最後這一點值得停一下，因為它決定了這條路線該用來回答什麼問題。
+它<b>不</b>產出「這個腫瘤有 4 個 subclone、佔比分別是多少」這種全域結論。
+它產出的是幾萬筆局部陳述，每一筆的形式是
+「在這個區域、這條 haplotype 上，這幾個變異的先後順序有哪些候選」。</p>
+
+<p class="prose">而 M0 那個用藥問題正好是局部的：兩個變異在不在同一群細胞裡。
+這種問題只需要那兩個位點附近的聯合分布，不需要整棵樹。</p>
+</section>
+
+
+<section data-part="evidence" class="part" id="m14__part-evidence">
+<h2 data-num="③" id="m14__真實證據">真實證據</h2>
+
+<p class="prose">這一章的每個論點都有可查的數字。以下是它們各自的來源與量級。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">本章的論點</th><th scope="col">支持它的實測</th></tr></thead>
+<tbody>
+<tr>
+<td>頻率路線的天花板是資訊，不是實作品質</td>
+<td>31 個 subclone 重建程式、51 個模擬腫瘤、7 項任務、12,061 次執行。<b>演算法選擇對表現的影響大於腫瘤本身的特性</b>；純度校正後的深度、拷貝數狀態與可比對性則與多數程式的表現相關（2024 線上／2025 刊出）</td>
+</tr>
+<tr>
+<td>頻率譜的形狀可以量，但也容易被過度解讀</td>
+<td>14 種癌別、904 個腫瘤中有 323 個符合 1/f 中性演化的直線（2016）。後續分析指出 driver 頻率偏向 0 與 1 兩端，難以在中間頻率被觀察到，因此中性比例可能被高估（2018、2019）</td>
+</tr>
+<tr>
+<td>甲基化是解析度更高的時鐘</td>
+<td>epimutation 速率約 10⁻⁵–10⁻⁴／CpG／次分裂（文獻多寫成上界），DNA 突變約 10⁻⁹–10⁻¹⁰／bp／次分裂，同量級對比約差五個數量級。專門當時鐘用的位點另有估到 10⁻³ 的，所以這是量級而非定值</td>
+</tr>
+<tr>
+<td>甲基化攜帶的譜系訊號與突變高度吻合</td>
+<td>19 位低度膠質瘤病人的原發與復發檢體中，用甲基化建的樹與用 somatic 變異建的樹高度吻合（相關係數 0.56–0.90），但並非完全一致（2015）</td>
+</tr>
+<tr>
+<td>甲基化路線已經規模化</td>
+<td>只用 bulk 甲基化資料，在 1,976 個淋巴系癌樣本上推估生長速率與發生年齡；同一批分析中，bulk 樣本內偵測到的 subclonal 天擇並不常見（2025）</td>
+</tr>
+<tr>
+<td>分子層級的聯合觀測有明確的技術門檻</td>
+<td>epiallele 組成分析要求 read 跨過 4 個<b>相鄰</b> CpG（2⁴＝16 種組合），且該位置深度 60× 以上（2014）。全基因體平均每 100 bp 一個 CpG，因此 100 bp 短讀只在 CpG 密集區達得到這個門檻</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">兩件事要注意。第一，上表前兩列都來自<b>模擬</b>腫瘤或<b>統計配適</b>，不是有金標準的真實檢體
+—— 真實腫瘤的演化史沒有人知道，所以這個領域連「金標準」都得自己合成出來。M10 討論過同一個困難的另一個版本：用合成純度的樣本評估 variant caller 時，那個「正確答案」也是自己造的。
+第二，最後一列的「4 個 CpG」與「每 100 bp 一個」是兩個獨立的事實，
+把它們放在一起才看得出短讀的限制在哪裡；單獨看任何一個都不會得到這個結論。</p>
+
+<h3 id="m14__原始文獻與程式碼">原始文獻與程式碼</h3>
+
+<p class="prose">本章內文不預設讀者讀過以下任一篇 —— 上面的解釋本身是完整的，以下清單給想追下去的人。</p>
+
+<ul class="prose">
+<li><b>SciClone</b>：Miller CA 等，<i>SciClone: inferring clonal architecture and tracking the
+spatial and temporal patterns of tumor evolution</i>，PLoS Computational Biology 10(8):e1003665，2014。</li>
+<li><b>PyClone</b>：Roth A 等，<i>PyClone: statistical inference of clonal population structure
+in cancer</i>，Nature Methods 11(4):396–398，2014。</li>
+<li><b>methclone</b>：Li S 等，<i>Dynamic evolution of clonal epialleles revealed by methclone</i>，
+Genome Biology 15:472，2014。</li>
+<li><b>PhyloWGS</b>：Deshwar AG 等，<i>PhyloWGS: reconstructing subclonal composition and
+evolution from whole-genome sequencing of tumors</i>，Genome Biology 16:35，2015。</li>
+<li><b>甲基化與突變建出的樹互相吻合</b>：Mazor T 等，<i>DNA methylation and somatic mutations
+converge on the cell cycle and define similar evolutionary histories in brain tumors</i>，
+Cancer Cell 28(3):307–317，2015。</li>
+<li><b>1/f 中性演化檢定</b>：Williams MJ 等，<i>Identification of neutral tumor evolution
+across cancer types</i>，Nature Genetics 48(3):238–244，2016。</li>
+<li><b>對中性檢定的質疑</b>：Tarabichi M 等，<i>Neutral tumor evolution?</i>，
+Nature Genetics 50(12):1630–1633，2018；以及 Bozic I 等，
+<i>On measuring selection in cancer from subclonal mutation frequencies</i>，
+PLoS Computational Biology 15(9):e1007368，2019。</li>
+<li><b>epimutation 速率的整理</b>：Chen S、Wu J、Gaiti F，<i>Methylation-based lineage tracing
+in cancer</i>，Blood，2026（doi:10.1182/blood.2024028196）。文中的速率寫成「up to」，是上界而非定值。</li>
+<li><b>大規模評比</b>：Salcedo A 等，<i>Crowd-sourced benchmarking of single-sample tumor
+subclonal reconstruction</i>，Nature Biotechnology 43(4):581–592（2024 年線上發表，2025 年刊出）。</li>
+<li><b>EVOFLUx</b>：Gabbutt C、Duran-Ferrer M 等，<i>Fluctuating DNA methylation tracks cancer
+evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
+<a href="https://github.com/Duran-FerrerM/evoflux"><code>github.com/Duran-FerrerM/evoflux</code></a>。</li>
+</ul>
+</section>
+
+
+<section data-part="predict" class="part" id="m14__part-predict">
+<h2 data-num="④" id="m14__先提出預測-再查看解答">先提出預測，再查看解答</h2>
+
+<div class="reveal__q"><p class="prose">一份腫瘤樣本，換算後得到三群 somatic 變異，CCF 分別是 <code>1.00</code>、<code>0.55</code>、<code>0.40</code>。
+請問：CCF 0.40 那一群，是 CCF 0.55 那一群的<b>後代</b>，還是它的<b>兄弟</b>？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>分不出來，而且不是資料量不夠的問題。</b></p>
+<p class="prose">兩種解都通過那條算術檢查：當後代時 0.40 ≤ 0.55 ✓；當兄弟時 0.55 ＋ 0.40 ＝ 0.95 ≤ 1.00 ✓。
+如果程式只給你一棵樹，那棵樹是它的偏好（通常是簡約性）挑出來的，不是資料挑出來的。</p>
+<p class="prose">要真正分開，需要的不是更多變異、也不是更深的定序，
+而是<b>另一種資訊</b>：同時帶有這兩群變異的細胞佔多少。
+這是聯合分布，而 CCF 是邊際分布。</p>
+<p class="prose">怎麼拿到？三條路。<b>single-cell</b> 直接在細胞層級觀測共現。
+<b>多個時間點或多個部位取樣</b>可以縮小可能的樹的數量 —— 兄弟關係在不同部位常有不同比例，後代關係則同步變化。
+<b>長讀</b>在兩群變異剛好落在同一條 read 跨距內時，直接數出聯合計數。
+注意第三條有條件：兩群變異必須夠近。距離 100 kb 的話，長讀也幫不上。</p></div></details>
+</section>
+
+
+<section data-part="practice" class="part" id="m14__part-practice">
+<h2 data-num="⑤" id="m14__實作練習">實作練習</h2>
+
+<p class="prose">五個步驟，從畫出頻率譜開始，做到把狀態表抽出來。
+最後一步抽出來的東西<b>就是</b>建樹演算法的輸入，那是這一章的兩條路線真正接起來的地方。</p>
+
+<h3 id="m14__一-畫出這份樣本的頻率譜">一、畫出這份樣本的頻率譜</h3>
+
+<p class="prose">先從 somatic VCF 取出每個變異的 VAF。不同 caller 放的位置不同，
+先看清楚欄位再抽 —— 常見的是 <code>FORMAT/AF</code>，也有放在 <code>INFO/AF</code> 或用
+<code>FORMAT/AD</code> 自己算的。</p>
+
+<pre><code># 先確認 AF 放在哪裡
+bcftools view -h somatic.vcf.gz | grep -E '^##(INFO|FORMAT)=&lt;ID=(AF|AD|DP)'
+
+# 只取 PASS 的 SNV，抽出 VAF
+# ★ 兩種寫法不能混，一定要照上一步 grep 到的結果選：
+#     AF 在 FORMAT → 用 [%AF]（中括號代表「對每個樣本各印一次」）
+#     AF 在 INFO   → 用 %INFO/AF
+#   寫錯的後果很惡毒：query 找不到 FORMAT/AF 時會「安靜地」退回去用 INFO/AF，
+#   不報錯也不警告，你拿到的數字就不是你以為的那個。
+bcftools view -f PASS -v snps somatic.vcf.gz \
+  | bcftools query -f '%CHROM\t%POS\t[%AF]\n' \
+  &gt; vaf.tsv        # ← FORMAT/AF 版本；INFO 版本把 [%AF] 換成 %INFO/AF
+
+wc -l vaf.tsv</code></pre>
+
+<p class="prose">再畫成直方圖。不必裝繪圖套件，文字直方圖已經足以看出峰與肩：</p>
+
+<pre><code>python3 - &lt;&lt;'PY'
+import collections
+h = collections.Counter()
+n = 0
+for line in open('vaf.tsv'):
+    f = line.split()
+    try:
+        v = float(f[2])
+    except (IndexError, ValueError):
+        continue
+    if not 0.0 &lt;= v &lt;= 1.0:
+        continue
+    h[min(int(v * 50), 49)] += 1     # 50 個 bin，每個寬 0.02
+    n += 1
+if not n:
+    raise SystemExit('vaf.tsv 裡沒有解析得到任何 VAF —— 回上一步確認欄位選對了')
+top = max(h.values())
+for b in range(50):
+    lo = b / 50
+    print(f'{lo:.2f} {&quot;#&quot; * int(h[b] * 60 / top):60s} {h[b]}')
+print('total', n)
+PY</code></pre>
+
+<p class="prose">要看的東西：<b>最右邊那個峰的中心在哪</b>。
+拷貝數正常（CN＝2）而且變異只在其中一份拷貝上（multiplicity＝1）時分母剛好是 2，
+所以峰的位置<b>恰好</b>是純度 ÷ 2 —— 峰在 0.30 就代表純度約 0.6。峰左邊有沒有第二個鼓起？那就是候選 subclone。
+最低頻端的計數往上翹是正常的（那是 1/f 的尾），但要注意最左邊幾個 bin 常常混著假陽性
+—— 深度不足時定序錯誤也落在那裡。</p>
+
+<h3 id="m14__二-確認-multiplicity-猜錯會差多少">二、確認 multiplicity 猜錯會差多少</h3>
+
+<p class="prose">上一步的橫軸是 VAF，不是 CCF。把換算寫出來，親眼看差距：</p>
+
+<pre><code>python3 - &lt;&lt;'PY'
+def ccf(vaf, purity, cn_tumour, mult):
+    # 分母：腫瘤貢獻的拷貝 + 正常細胞貢獻的兩份
+    depth_frac = purity * cn_tumour + 2 * (1 - purity)
+    return vaf * depth_frac / (purity * mult)
+
+vaf = 0.30
+for purity in (0.4, 0.6, 0.8):
+    for cn, mult in ((2, 1), (2, 2), (3, 1), (3, 2)):
+        print(f'purity={purity}  CN={cn}  multiplicity={mult}'
+              f'  -&gt;  CCF={ccf(vaf, purity, cn, mult):.2f}')
+PY</code></pre>
+
+<p class="prose">同一個 VAF＝0.30，跑出來的 CCF 從 0.38 一路到 1.80（超過 1 的代表這組假設不成立）。
+<b>multiplicity 從 1 改成 2，CCF 就少一半</b> —— 而這個值通常只能猜。
+這就是「clonal 還是 subclonal」在實務上常常翻盤的原因。</p>
+
+<h3 id="m14__三-量一下你的-read-到底跨多遠">三、量一下你的 read 到底跨多遠</h3>
+
+<p class="prose">聯合觀測只在 read 跨距內成立，所以這個數字決定了整條路線可用的範圍：</p>
+
+<pre><code># 要量的是「這條 read 在參考座標上蓋了多寬」，不是 SEQ 有多長。
+# 兩者不一樣：I 與 S 吃掉 query 不吃 reference，D 與 N 反之，hard clip 根本不在 SEQ 裡。
+# 決定區域寬度的是參考座標，所以從 CIGAR 把 M/D/N/=/X 加起來。
+# -F 0x904 一次濾掉 unmapped(0x4)、secondary(0x100)、supplementary(0x800)。
+samtools view -F 0x904 tumor.haplotagged.bam 2&gt;/dev/null \
+  | head -200000 \
+  | awk '{ span = 0
+           cig  = $6
+           while (match(cig, /^[0-9]+[MIDNSHP=X]/)) {
+             op  = substr(cig, RLENGTH, 1)
+             len = substr(cig, 1, RLENGTH - 1) + 0
+             if (op ~ /[MDN=X]/) span += len
+             cig = substr(cig, RLENGTH + 1)
+           }
+           if (span &gt; 0) print span }' \
+  | sort -n \
+  | awk '{a[NR]=$1; s+=$1}
+         END {if (!NR) { print &quot;沒有讀到任何 read —— 檢查檔名與索引&quot;; exit 1 }
+              print &quot;n      &quot;, NR;
+              print &quot;median &quot;, a[int(NR/2)];
+              print &quot;mean   &quot;, int(s/NR);
+              print &quot;p90    &quot;, a[int(NR*0.9)]}'</code></pre>
+
+<p class="prose"><code>head</code> 會把管線關掉，所以 <code>samtools</code> 通常會印一句
+<code>writing to standard output failed: Broken pipe</code> —— 那是正常的，不是錯誤，
+上面用 <code>2>/dev/null</code> 收掉了。另外這是「前 20 萬條」而不是隨機抽樣，
+看趨勢夠用，要精確數字就把 <code>head</code> 拿掉。</p>
+
+<p class="prose">用 median 當跨距估計值，再數有多少 somatic 位點對落在這個距離內：</p>
+
+<pre><code>SPAN=20000        # 換成上一步量到的 median
+
+bcftools view -f PASS -v snps somatic.vcf.gz \
+  | bcftools query -f '%CHROM\t%POS\n' \
+  | awk -v span=$SPAN '
+      $1 == chrom &amp;&amp; $2 - prev &lt;= span { pairs++ }
+      { chrom = $1; prev = $2; total++ }
+      END { print &quot;somatic SNV      &quot;, total + 0;
+            print &quot;相鄰且在跨距內   &quot;, pairs + 0;
+            print &quot;比例             &quot;, total ? pairs / total : &quot;n/a（沒有讀到變異）&quot; }'</code></pre>
+
+<p class="prose">這個比例低於一成是很正常的 —— 對照前面的 Poisson 估算就知道那是突變負荷決定的。
+比例極低的樣本，這條路線能用的區域本來就少，這不是流程設定的問題。</p>
+
+<h3 id="m14__四-把一個區域的狀態表抽出來">四、把一個區域的狀態表抽出來</h3>
+
+<p class="prose">這是最關鍵的一步。挑一個有兩三個 somatic 位點的小區域，
+把每條 read 在這些位點上的 R／A 讀出來，依 <span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-hp-tag-24">HP tag<span class="term__pop" id="m14__gd-hp-tag-24" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en" lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span> 分組 ——
+<b>抽出來的表就是建樹演算法的輸入</b>。</p>
+
+<pre><code>REGION=chr12:1002000-1014000     # 換成你自己找到的區域
+#      ↑ 寬度 12 kb，刻意壓在上一步量到的 median（約 20 kb）之內。
+#        區域比 read 跨距寬的話，整張狀態表會幾乎都是 -（見下面的排查表）。
+
+# 先看這個區域裡有哪些 somatic 位點
+bcftools view -f PASS -v snps -r $REGION somatic.vcf.gz \
+  | bcftools query -f '%POS\t%REF\t%ALT\n'</code></pre>
+
+<pre><code>python3 - &lt;&lt;'PY'
+import subprocess, collections, sys
+
+BAM    = 'tumor.haplotagged.bam'
+REF    = 'GRCh38.fa'
+REGION = 'chr12:1002000-1014000'
+# 上一步查到的位點，格式：位置 -&gt; ALT 鹼基。
+# 三個位點的最大間距 8.9 kb &lt; read median，所以會有 read 同時蓋到它們。
+SITES  = {1003120: 'A', 1007450: 'T', 1011980: 'G'}
+
+pos_sorted = sorted(SITES)
+# -f 一定要給：沒有參考序列時 mpileup 不會輸出 . 與 , 這兩個「與參考相同」的符號，
+#             而是直接印出鹼基，下面的判斷就全部失效。
+# --output-QNAME 才知道每一格是哪一條 read 貢獻的；-d 0 解除深度上限。
+# --ff 要自己列全：samtools mpileup 的預設只排除 SECONDARY,QCFAIL,DUP，
+#      沒有排除 SUPPLEMENTARY，於是同一個 read 名字會出現兩次，
+#      下面的 per_read[name][pos] 就會被安靜地覆蓋掉。
+#      這個選項不是累加的 —— 只寫 SUPPLEMENTARY 會把其他三個預設值取消掉。
+# -Q 是鹼基品質門檻，預設就是 13；想放寬才調低，想收緊要往上加。
+# -q 是 mapping 品質門檻，預設 0，所以 -q 10 才真的是在過濾。
+cmd = ['samtools', 'mpileup', '-f', REF, '-r', REGION, '--output-QNAME',
+       '--ff', 'UNMAP,SECONDARY,QCFAIL,DUP,SUPPLEMENTARY',
+       '-d', '0', '-Q', '13', '-q', '10', BAM]
+per_read = collections.defaultdict(dict)
+
+for line in subprocess.run(cmd, capture_output=True, text=True).stdout.splitlines():
+    f = line.split('\t')
+    if len(f) &lt; 7:
+        continue
+    pos = int(f[1])
+    if pos not in SITES:
+        continue
+    bases, names = f[4].upper(), f[6].split(',')
+    alt = SITES[pos]
+    # 把 mpileup 的符號攤平成一個鹼基一格（略過 indel 與 clip 標記）
+    flat, i = [], 0
+    while i &lt; len(bases):
+        c = bases[i]
+        if c in '^':
+            i += 2; continue
+        if c == '$':
+            i += 1; continue
+        if c in '+-':
+            j = i + 1
+            num = ''
+            while j &lt; len(bases) and bases[j].isdigit():
+                num += bases[j]; j += 1
+            i = j + int(num or 0); continue
+        flat.append(c); i += 1
+    # names 與 flat 必須一一對應。萬一不對，寧可當場停下 ——
+    # 靜靜錯位會產生看起來很合理但完全錯的 genotype。
+    if len(names) != len(flat):
+        raise SystemExit(f'pos {pos}: read 名字 {len(names)} 個對不上鹼基 {len(flat)} 個')
+    for name, c in zip(names, flat):
+        if c in '.,':
+            per_read[name][pos] = 'R'
+        elif c == alt:
+            per_read[name][pos] = 'A'
+
+# 讀 HP tag，把 read 分到單倍型家族
+hp = {}
+# 這裡同樣要 -F 0x900：supplementary 用同一個 QNAME，會覆蓋掉正確的 HP
+for line in subprocess.run(['samtools', 'view', '-F', '0x900', BAM, REGION],
+                           capture_output=True, text=True).stdout.splitlines():
+    f = line.split('\t')
+    tag = next((t.split(':')[-1] for t in f[11:] if t.startswith('HP:')), '.')
+    hp[f[0]] = tag
+
+table = collections.Counter()
+for name, calls in per_read.items():
+    vec = ''.join(calls.get(p, '-') for p in pos_sorted)
+    table[(hp.get(name, '.'), vec)] += 1
+
+print('HP    ' + '  '.join(str(p) for p in pos_sorted) + '   read 數')
+for (h, vec), n in sorted(table.items(), key=lambda kv: (kv[0][0], -kv[1])):
+    print(f'{h:5s} ' + '  '.join(f'{c:&gt;7s}' for c in vec) + f'   {n}')
+PY</code></pre>
+
+<p class="prose">輸出的每一列是一個<b>觀測狀態</b>：某個單倍型家族裡，有幾條 read 呈現這個 R／A 組合。
+把 R 記成 0、A 記成 1，這張表就是 M9 那個組合問題的輸入。
+<code>-</code> 代表那條 read 沒有蓋到該位點 —— 這種部分觀測要保留，
+它仍然限制了候選樹（它排除掉一些狀態，只是排除得比較弱）。</p>
+
+<h3 id="m14__五-排查順序">五、排查順序</h3>
+
+<p class="prose">上面第四步最容易卡住。按這個順序查：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">症狀</th><th scope="col">先查什麼</th></tr></thead>
+<tbody>
+<tr><td><code>HP</code> 欄全是 <code>.</code></td><td>BAM 沒有經過 haplotagging，或這個區域落在 phase set 之外。用 <code>samtools view</code> 直接看有沒有 <code>HP:</code> 欄位；注意不同工具寫的是 <code>HP:i:</code> 或 <code>HP:Z:</code></td></tr>
+<tr><td>整張表幾乎都是 <code>-</code></td><td>區域比 read 跨距寬。回到第三步量到的 median，把區域縮到那個尺度以內</td></tr>
+<tr><td>只出現一種狀態</td><td>k 太小（區域裡實際只有一個位點有訊號），或另外幾個位點的 ALT 鹼基填錯了。回頭核對第一個指令印出的 REF／ALT</td></tr>
+<tr><td>read 數遠少於該區域的深度</td><td>先看 <code>-q</code>（mapping 品質，預設 0，所以是你自己加上去的門檻在濾）。<code>-Q</code> 預設就是 13，調到 10 是<b>放寬</b>不是收緊。也要確認位點沒落在 <span class="term" data-term="soft clipping" tabindex="0" role="button" aria-expanded="false" aria-describedby="m14__gd-soft-clipping-25">soft clip<span class="term__pop" id="m14__gd-soft-clipping-25" role="tooltip"><b class="term__hd">soft clipping</b><span class="term__def" data-lang="zh">read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</span><span class="term__def" data-lang="en" lang="en">A read end that failed to align but is retained in the BAM (CIGAR S). Clipping clustered at one position may suggest a structural breakpoint and needs corroborating evidence.</span><a class="term__more" href="glossary.html#soft-clipping">完整條目 →</a></span></span> 段落裡</td></tr>
+<tr><td>同一條 read 名字出現兩次</td><td>supplementary alignment 沒有濾掉。注意兩支工具的旗標不一樣：<code>samtools view</code> 用 <code>-F 0x900</code>，而 <code>samtools mpileup</code> <b>沒有 <code>-F</code></b>，要用 <code>--ff</code> 並且把四個預設值一起列出來（這個選項不累加）</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">最後提醒一件跟本章主題直接相關的事：這張表的每一列是<b>分子</b>，不是細胞。
+一個細胞的兩條染色體會產生兩條不同 haplotype 的 read；
+同一條染色體也可能被多條 read 覆蓋。所以「狀態 11 有 6 條 read」不等於「有 6 個細胞帶有兩個變異」
+—— 這是 M0 那個「read 是分子片段的觀測，不是細胞標籤」的警告在這一章的具體後果。</p>
+</section>
+
+<section class="quiz" data-quiz="m14"><h2 id="m14__學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
+
+    
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>5mC（5-甲基胞嘧啶）</dt><dd>胞嘧啶第 5 個碳上的甲基化修飾。這是常見的 DNA 甲基化形式，主要見於 CpG；可影響轉錄調控，效應依基因組位置與細胞類型而異。</dd><dt>CpG</dt><dd>序列上一個 C 後接一個 G（p 代表兩者之間的磷酸鍵）。哺乳類多數 5mC 位於 CpG，特定細胞或情況亦可見非 CpG 甲基化。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>VAF（變異等位基因頻率）</dt><dd>在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></dd><dt>clone tree（克隆演化樹）</dt><dd>描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>epiallele（表觀等位型）</dt><dd>同一條分子上一組相鄰 CpG 的甲基化組合，例如四個 CpG 的 1101。逐位點的 β 值看不到它 —— 要算 epiallele 的組成，一條 read 至少得跨過 4 個 CpG。</dd><dt>epimutation（表觀突變）</dt><dd>細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 10⁻⁵ 到 10⁻⁴，而 DNA 突變約每鹼基 10⁻⁹ 到 10⁻¹⁰，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 10⁻³ 的），應當成量級而非定值。</dd><dt>haplotype（單倍型）</dt><dd>同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</dd><dt>joint distribution（聯合分布）</dt><dd>多個變數一起看的分布，也就是「哪些組合各出現多少」。演化樹的形狀取決於聯合分布，而不是邊際分布；長讀的價值在於一條分子上的組合是直接觀測到的。</dd><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>long read（長讀）</dt><dd>單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</dd><dt>marginal distribution（邊際分布）</dt><dd>只描述單一變數的分布。VAF 與甲基化 β 值都是邊際統計：它們各自只講一個位點有多少比例帶有標記，不講兩個位點在同一個分子或同一個細胞上的搭配情形。</dd><dt>mutation frequency spectrum（突變頻率譜）</dt><dd>把一份樣本裡所有 somatic 變異的 VAF 畫成直方圖後得到的分布。分布上的峰與肩對應不同大小的細胞群，最低頻端的尾巴斜率則被用來判斷有沒有天擇。</dd><dt>mutation multiplicity</dt><dd>在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</dd><dt>parsimony（簡約法）</dt><dd>在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>read-AF（read 層級的 ALT 比例）</dt><dd>在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</dd><dt>soft clipping</dt><dd>read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd><dt>somatic variant（體細胞變異）</dt><dd>在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</dd><dt>subclone（次克隆）</dt><dd>clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
+  </article>
+<hr>
 <article class="module" id="capstone">
-    <header class="mhead"><p class="mhead__kicker">模組 ★ · Capstone</p><h1>Capstone：整合式位點判讀</h1><p class="mhead__sub">整合單一位點的多項證據，完成可重現的推論流程，並撰寫明確標示不確定性的結論。</p><p class="mhead__meta"><span class="chip">約 120 分鐘</span><a class="chip" href="m13.html">建議先修：LongPhase-TO</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>獨立判讀一個位點的所有證據，並得出有根據的結論</li><li>在有配對正常樣本與只有腫瘤樣本兩種情境下做出不同的判斷，並說明理由</li><li>在同一個位點上跑完兩種流程，並在各自的輸出檔案裡找到答案</li><li>計算 precision 與 recall，並指出它們在這個案例裡的限制</li><li>寫出一段明確區分「觀測到的」與「推論出來的」結論</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">模組 ★ · Capstone</p><h1>Capstone：整合式位點判讀</h1><p class="mhead__sub">整合單一位點的多項證據，完成可重現的推論流程，並撰寫明確標示不確定性的結論。</p><p class="mhead__meta"><span class="chip">約 120 分鐘</span><a class="chip" href="m13.html">建議先修：LongPhase-TO</a><a class="chip" href="m14.html">建議先修：Subclone 重建</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>獨立判讀一個位點的所有證據，並得出有根據的結論</li><li>在有配對正常樣本與只有腫瘤樣本兩種情境下做出不同的判斷，並說明理由</li><li>在同一個位點上跑完兩種流程，並在各自的輸出檔案裡找到答案</li><li>計算 precision 與 recall，並指出它們在這個案例裡的限制</li><li>寫出一段明確區分「觀測到的」與「推論出來的」結論</li></ul></section>
 
 <section data-part="why" class="part" id="capstone__part-why">
 <h2 data-num="①" id="capstone__為什麼重要">為什麼重要</h2>

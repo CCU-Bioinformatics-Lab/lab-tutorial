@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
+  <title>逐位點的 β 值相同，分子層級的 epiallele 組成卻完全不同</title>
+  <desc>左右兩邊都是一個區域裡的四個 CpG、六條分子。
+        兩邊每一個 CpG 的甲基化比例都恰好是 0.50，所以逐位點統計的 β 值完全相同。
+        左邊六條分子各自有不同的甲基化組合，共六種不同的組合，
+        而且每條分子甲基化的個數也不一樣，這是同一群細胞的隨機起伏。
+        右邊只有兩種組合，三條分子四個 CpG 全部甲基化，另外三條全部未甲基化，
+        這代表兩群不同的細胞。
+        差別只在把同一條分子上的四個 CpG 一起看的時候才出現，
+        這種一起看的組合稱為 epiallele。
+        要注意的是，右邊那種乾淨的兩群也可能是同一群細胞的兩條 haplotype，
+        一條甲基化、一條不甲基化，這種情形叫 allele-specific methylation；
+        要分開得看這兩群 epiallele 跟 HP 標籤對不對得上。
+        讀法是：β 值是邊際統計，跟 VAF 有一樣的限制。</desc>
+
+  <text class="lbl bold zh" x="20" y="32">β 值也是邊際統計</text>
+  <text class="tick zh" x="20" y="58">實心＝甲基化，空心＝未甲基化。左右兩邊每個位點的 β 值都是 0.50。</text>
+
+  <!-- ══════════ 左 ══════════ -->
+  <rect class="box plain" x="20" y="100" width="470" height="336" rx="8"/>
+  <text class="tick bold zh" x="40" y="126">組成 甲：同一群細胞的隨機起伏</text>
+  <text class="tick mid mono" x="110" y="152">1</text>
+  <text class="tick mid mono" x="190" y="152">2</text>
+  <text class="tick mid mono" x="270" y="152">3</text>
+  <text class="tick mid mono" x="350" y="152">4</text>
+  <text class="tick zh" x="390" y="152">CpG</text>
+
+  <rect class="read" x="60" y="166" width="320" height="12" rx="6"/>
+  <circle class="cpg met" cx="110" cy="186" r="5"/>
+  <circle class="cpg met" cx="190" cy="186" r="5"/>
+  <circle class="cpg met" cx="270" cy="186" r="5"/>
+  <circle class="cpg unmet" cx="350" cy="186" r="5"/>
+
+  <rect class="read" x="60" y="196" width="320" height="12" rx="6"/>
+  <circle class="cpg unmet" cx="110" cy="216" r="5"/>
+  <circle class="cpg met" cx="190" cy="216" r="5"/>
+  <circle class="cpg met" cx="270" cy="216" r="5"/>
+  <circle class="cpg met" cx="350" cy="216" r="5"/>
+
+  <rect class="read" x="60" y="226" width="320" height="12" rx="6"/>
+  <circle class="cpg met" cx="110" cy="246" r="5"/>
+  <circle class="cpg met" cx="190" cy="246" r="5"/>
+  <circle class="cpg unmet" cx="270" cy="246" r="5"/>
+  <circle class="cpg unmet" cx="350" cy="246" r="5"/>
+
+  <rect class="read" x="60" y="256" width="320" height="12" rx="6"/>
+  <circle class="cpg unmet" cx="110" cy="276" r="5"/>
+  <circle class="cpg unmet" cx="190" cy="276" r="5"/>
+  <circle class="cpg met" cx="270" cy="276" r="5"/>
+  <circle class="cpg met" cx="350" cy="276" r="5"/>
+
+  <rect class="read" x="60" y="286" width="320" height="12" rx="6"/>
+  <circle class="cpg met" cx="110" cy="306" r="5"/>
+  <circle class="cpg unmet" cx="190" cy="306" r="5"/>
+  <circle class="cpg unmet" cx="270" cy="306" r="5"/>
+  <circle class="cpg unmet" cx="350" cy="306" r="5"/>
+
+  <rect class="read" x="60" y="316" width="320" height="12" rx="6"/>
+  <circle class="cpg unmet" cx="110" cy="336" r="5"/>
+  <circle class="cpg unmet" cx="190" cy="336" r="5"/>
+  <circle class="cpg unmet" cx="270" cy="336" r="5"/>
+  <circle class="cpg met" cx="350" cy="336" r="5"/>
+
+  <line class="axis" x1="40" y1="352" x2="470" y2="352" style="stroke-width:1.5"/>
+  <text class="tick zh" x="40" y="376">β 值（每個位點各自統計）</text>
+  <text class="tick mid mono bold" x="110" y="400">0.50</text>
+  <text class="tick mid mono bold" x="190" y="400">0.50</text>
+  <text class="tick mid mono bold" x="270" y="400">0.50</text>
+  <text class="tick mid mono bold" x="350" y="400">0.50</text>
+  <text class="tick bold zh met" x="40" y="426">不同的 epiallele：6 種，每條分子甲基化的數量也不同</text>
+
+  <!-- ══════════ 右 ══════════ -->
+  <rect class="box plain" x="510" y="100" width="470" height="336" rx="8"/>
+  <text class="tick bold zh" x="530" y="126">組成 乙：兩群細胞，各自一致</text>
+  <text class="tick mid mono" x="600" y="152">1</text>
+  <text class="tick mid mono" x="680" y="152">2</text>
+  <text class="tick mid mono" x="760" y="152">3</text>
+  <text class="tick mid mono" x="840" y="152">4</text>
+  <text class="tick zh" x="880" y="152">CpG</text>
+
+  <rect class="read" x="550" y="166" width="320" height="12" rx="6"/>
+  <circle class="cpg met" cx="600" cy="186" r="5"/>
+  <circle class="cpg met" cx="680" cy="186" r="5"/>
+  <circle class="cpg met" cx="760" cy="186" r="5"/>
+  <circle class="cpg met" cx="840" cy="186" r="5"/>
+
+  <rect class="read" x="550" y="196" width="320" height="12" rx="6"/>
+  <circle class="cpg met" cx="600" cy="216" r="5"/>
+  <circle class="cpg met" cx="680" cy="216" r="5"/>
+  <circle class="cpg met" cx="760" cy="216" r="5"/>
+  <circle class="cpg met" cx="840" cy="216" r="5"/>
+
+  <rect class="read" x="550" y="226" width="320" height="12" rx="6"/>
+  <circle class="cpg met" cx="600" cy="246" r="5"/>
+  <circle class="cpg met" cx="680" cy="246" r="5"/>
+  <circle class="cpg met" cx="760" cy="246" r="5"/>
+  <circle class="cpg met" cx="840" cy="246" r="5"/>
+
+  <rect class="read" x="550" y="256" width="320" height="12" rx="6"/>
+  <circle class="cpg unmet" cx="600" cy="276" r="5"/>
+  <circle class="cpg unmet" cx="680" cy="276" r="5"/>
+  <circle class="cpg unmet" cx="760" cy="276" r="5"/>
+  <circle class="cpg unmet" cx="840" cy="276" r="5"/>
+
+  <rect class="read" x="550" y="286" width="320" height="12" rx="6"/>
+  <circle class="cpg unmet" cx="600" cy="306" r="5"/>
+  <circle class="cpg unmet" cx="680" cy="306" r="5"/>
+  <circle class="cpg unmet" cx="760" cy="306" r="5"/>
+  <circle class="cpg unmet" cx="840" cy="306" r="5"/>
+
+  <rect class="read" x="550" y="316" width="320" height="12" rx="6"/>
+  <circle class="cpg unmet" cx="600" cy="336" r="5"/>
+  <circle class="cpg unmet" cx="680" cy="336" r="5"/>
+  <circle class="cpg unmet" cx="760" cy="336" r="5"/>
+  <circle class="cpg unmet" cx="840" cy="336" r="5"/>
+
+  <line class="axis" x1="530" y1="352" x2="960" y2="352" style="stroke-width:1.5"/>
+  <text class="tick zh" x="530" y="376">β 值（每個位點各自統計）</text>
+  <text class="tick mid mono bold" x="600" y="400">0.50</text>
+  <text class="tick mid mono bold" x="680" y="400">0.50</text>
+  <text class="tick mid mono bold" x="760" y="400">0.50</text>
+  <text class="tick mid mono bold" x="840" y="400">0.50</text>
+  <text class="tick bold zh met" x="530" y="426">不同的 epiallele：2 種</text>
+
+  <line class="axis" x1="20" y1="452" x2="980" y2="452"/>
+  <text class="anno zh bold" x="20" y="482">同一條分子上的四個 CpG 一起看，才分得出「一群細胞在起伏」與「兩群細胞」。</text>
+  <text class="anno zh" x="20" y="510">但「兩群」也可能是同一群細胞的兩條 haplotype，一條甲基化一條不甲基化 —— 要看它跟 HP 標籤對不對得上。</text>
+</svg>

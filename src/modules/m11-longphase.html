@@ -255,10 +255,19 @@ samtools view tagged.bam | grep -c 'HP:i:'
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">遇到 help 與實際不一致時</p>
 <p class="prose">以上差異都是在原始碼裡核對過的：help 字串與 <code>longopts</code> 註冊表<b>本來就不完全一致</b>。
-權威是原始碼裡的 <code>longopts</code> 表 —— 在 twolinin/longphase 的 repo 根目錄，
+權威是原始碼裡的 <code>longopts</code> 表 —— 在
+<a href="https://github.com/twolinin/LongPhase"><code>twolinin/longphase</code></a> 的 repo 根目錄，
 <code>phase</code> 看 <code>Phasing.cpp</code>、<code>haplotag</code> 看 <code>Haplotag.cpp</code>、
 <code>modcall</code> 看 <code>ModCall.cpp</code>。使用新參數前先檢索該表確認名稱，並記錄版本。</p>
 </div>
+
+<h3>原始文獻與程式碼</h3>
+
+<p class="prose">本章內文不預設讀者讀過這篇論文或看過這個 repo —— 上面的解釋本身是完整的，
+以下連結給想追下去的人。LongPhase：Lin JH、Chen LC、Yu SQ、Huang YT，
+<i>LongPhase: an ultra-fast chromosome-scale phasing algorithm for small and large
+variants</i>，Bioinformatics，2022。程式碼在
+<a href="https://github.com/twolinin/LongPhase"><code>github.com/twolinin/LongPhase</code></a>。</p>
 </section>
 
 
