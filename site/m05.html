@@ -997,18 +997,6 @@ R10 與 PacBio HiFi 應依所用版本文件選擇相容模型（例如 <code>--
 
 <p class="prose">在本教材流程中，germline VCF 產生後，再由後續 phasing 工具使用其中的 heterozygous 位點作為錨點。
 這是本流程的先 call、再 phase 順序；其他工具可能採用不同的整合方式。</p>
-
-<h3 id="原始文獻與程式碼">原始文獻與程式碼</h3>
-
-<p class="prose">本章內文不預設讀者讀過以下任一篇 —— 上面的解釋本身是完整的，以下連結給想追下去的人。</p>
-<ul class="prose">
-<li>Clair3：Zheng Z 等，<i>Symphonizing pileup and full-alignment for deep learning-based
-long-read variant calling</i>，Nature Computational Science，2022。程式碼在
-<a href="https://github.com/HKU-BAL/Clair3"><code>github.com/HKU-BAL/Clair3</code></a>。</li>
-<li>DeepVariant：Poplin R 等，<i>A universal SNP and small-indel variant caller using deep
-neural networks</i>，Nature Biotechnology，2018（doi 10.1038/nbt.4235）。程式碼在
-<a href="https://github.com/google/deepvariant"><code>github.com/google/deepvariant</code></a>。</li>
-</ul>
 </section>
 
 
@@ -1067,12 +1055,23 @@ bcftools view -H -v indels out.vcf | wc -l</code></pre>
 請先檢查原因，再進行 phasing，以降低問題在後續流程中傳遞的風險。</p>
 
 <section class="quiz" data-quiz="m05"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
+
+<h3 id="原始文獻與程式碼">原始文獻與程式碼</h3>
+
+<ul class="prose">
+<li>Clair3：Zheng Z 等，<i>Symphonizing pileup and full-alignment for deep learning-based
+long-read variant calling</i>，Nature Computational Science，2022。程式碼在
+<a href="https://github.com/HKU-BAL/Clair3"><code>github.com/HKU-BAL/Clair3</code></a>。</li>
+<li>DeepVariant：Poplin R 等，<i>A universal SNP and small-indel variant caller using deep
+neural networks</i>，Nature Biotechnology，2018（doi 10.1038/nbt.4235）。程式碼在
+<a href="https://github.com/google/deepvariant"><code>github.com/google/deepvariant</code></a>。</li>
+</ul>
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m04.html"><small>← 上一模組</small>資料格式讀寫能力</a><a class="next" href="m06.html"><small>下一模組 →</small>Phasing 與 haplotagging</a></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>Clair3</dt><dd>以深度學習做 germline variant calling 的工具，長 read 上常用。</dd><dt>DeepVariant</dt><dd>Google 開發的 germline variant caller，把 pileup 轉成影像再用 CNN 分類。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>haplotype（單倍型）</dt><dd>同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</dd><dt>phasing（定相）</dt><dd>為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。</dd><dt>provenance（資料來源履歷）</dt><dd>記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。</dd><dt>variant calling</dt><dd>從已比對 read 中判斷哪些位置具有足夠證據支持變異存在的過程，通常輸出 VCF。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#變異檢測的判斷內容">變異檢測的判斷內容</a></li><li class="lv3"><a href="#把-read-先分成兩群-判斷就變簡單了">把 read 先分成兩群，判斷就變簡單了</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行一次-germline-calling">執行一次 germline calling</a></li><li class="lv3"><a href="#檢查結果的合理性">檢查結果的合理性</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#變異檢測的判斷內容">變異檢測的判斷內容</a></li><li class="lv3"><a href="#把-read-先分成兩群-判斷就變簡單了">把 read 先分成兩群，判斷就變簡單了</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行一次-germline-calling">執行一次 germline calling</a></li><li class="lv3"><a href="#檢查結果的合理性">檢查結果的合理性</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">

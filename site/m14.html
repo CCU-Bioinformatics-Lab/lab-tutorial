@@ -1182,37 +1182,6 @@ M8 已經把這件事列為方法的適用範圍限制 ——
 —— 真實腫瘤的演化史沒有人知道，所以這個領域連「金標準」都得自己合成出來。M10 討論過同一個困難的另一個版本：用合成純度的樣本評估 variant caller 時，那個「正確答案」也是自己造的。
 第二，最後一列的「4 個 CpG」與「每 100 bp 一個」是兩個獨立的事實，
 把它們放在一起才看得出短讀的限制在哪裡；單獨看任何一個都不會得到這個結論。</p>
-
-<h3 id="原始文獻與程式碼">原始文獻與程式碼</h3>
-
-<p class="prose">本章內文不預設讀者讀過以下任一篇 —— 上面的解釋本身是完整的，以下清單給想追下去的人。</p>
-
-<ul class="prose">
-<li><b>SciClone</b>：Miller CA 等，<i>SciClone: inferring clonal architecture and tracking the
-spatial and temporal patterns of tumor evolution</i>，PLoS Computational Biology 10(8):e1003665，2014。</li>
-<li><b>PyClone</b>：Roth A 等，<i>PyClone: statistical inference of clonal population structure
-in cancer</i>，Nature Methods 11(4):396–398，2014。</li>
-<li><b>methclone</b>：Li S 等，<i>Dynamic evolution of clonal epialleles revealed by methclone</i>，
-Genome Biology 15:472，2014。</li>
-<li><b>PhyloWGS</b>：Deshwar AG 等，<i>PhyloWGS: reconstructing subclonal composition and
-evolution from whole-genome sequencing of tumors</i>，Genome Biology 16:35，2015。</li>
-<li><b>甲基化與突變建出的樹互相吻合</b>：Mazor T 等，<i>DNA methylation and somatic mutations
-converge on the cell cycle and define similar evolutionary histories in brain tumors</i>，
-Cancer Cell 28(3):307–317，2015。</li>
-<li><b>1/f 中性演化檢定</b>：Williams MJ 等，<i>Identification of neutral tumor evolution
-across cancer types</i>，Nature Genetics 48(3):238–244，2016。</li>
-<li><b>對中性檢定的質疑</b>：Tarabichi M 等，<i>Neutral tumor evolution?</i>，
-Nature Genetics 50(12):1630–1633，2018；以及 Bozic I 等，
-<i>On measuring selection in cancer from subclonal mutation frequencies</i>，
-PLoS Computational Biology 15(9):e1007368，2019。</li>
-<li><b>epimutation 速率的整理</b>：Chen S、Wu J、Gaiti F，<i>Methylation-based lineage tracing
-in cancer</i>，Blood，2026（doi:10.1182/blood.2024028196）。文中的速率寫成「up to」，是上界而非定值。</li>
-<li><b>大規模評比</b>：Salcedo A 等，<i>Crowd-sourced benchmarking of single-sample tumor
-subclonal reconstruction</i>，Nature Biotechnology 43(4):581–592（2024 年線上發表，2025 年刊出）。</li>
-<li><b>EVOFLUx</b>：Gabbutt C、Duran-Ferrer M 等，<i>Fluctuating DNA methylation tracks cancer
-evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
-<a href="https://github.com/Duran-FerrerM/evoflux"><code>github.com/Duran-FerrerM/evoflux</code></a>。</li>
-</ul>
 </section>
 
 
@@ -1478,14 +1447,43 @@ PY</code></pre>
 一個細胞的兩條染色體會產生兩條不同 haplotype 的 read；
 同一條染色體也可能被多條 read 覆蓋。所以「狀態 11 有 6 條 read」不等於「有 6 個細胞帶有兩個變異」
 —— 這是 M0 那個「read 是分子片段的觀測，不是細胞標籤」的警告在這一章的具體後果。</p>
-</section>
 
 <section class="quiz" data-quiz="m14"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
+
+<h3 id="原始文獻與程式碼">原始文獻與程式碼</h3>
+
+<ul class="prose">
+<li><b>SciClone</b>：Miller CA 等，<i>SciClone: inferring clonal architecture and tracking the
+spatial and temporal patterns of tumor evolution</i>，PLoS Computational Biology 10(8):e1003665，2014。</li>
+<li><b>PyClone</b>：Roth A 等，<i>PyClone: statistical inference of clonal population structure
+in cancer</i>，Nature Methods 11(4):396–398，2014。</li>
+<li><b>methclone</b>：Li S 等，<i>Dynamic evolution of clonal epialleles revealed by methclone</i>，
+Genome Biology 15:472，2014。</li>
+<li><b>PhyloWGS</b>：Deshwar AG 等，<i>PhyloWGS: reconstructing subclonal composition and
+evolution from whole-genome sequencing of tumors</i>，Genome Biology 16:35，2015。</li>
+<li><b>甲基化與突變建出的樹互相吻合</b>：Mazor T 等，<i>DNA methylation and somatic mutations
+converge on the cell cycle and define similar evolutionary histories in brain tumors</i>，
+Cancer Cell 28(3):307–317，2015。</li>
+<li><b>1/f 中性演化檢定</b>：Williams MJ 等，<i>Identification of neutral tumor evolution
+across cancer types</i>，Nature Genetics 48(3):238–244，2016。</li>
+<li><b>對中性檢定的質疑</b>：Tarabichi M 等，<i>Neutral tumor evolution?</i>，
+Nature Genetics 50(12):1630–1633，2018；以及 Bozic I 等，
+<i>On measuring selection in cancer from subclonal mutation frequencies</i>，
+PLoS Computational Biology 15(9):e1007368，2019。</li>
+<li><b>epimutation 速率的整理</b>：Chen S、Wu J、Gaiti F，<i>Methylation-based lineage tracing
+in cancer</i>，Blood，2026（doi:10.1182/blood.2024028196）。文中的速率寫成「up to」，是上界而非定值。</li>
+<li><b>大規模評比</b>：Salcedo A 等，<i>Crowd-sourced benchmarking of single-sample tumor
+subclonal reconstruction</i>，Nature Biotechnology 43(4):581–592（2024 年線上發表，2025 年刊出）。</li>
+<li><b>EVOFLUx</b>：Gabbutt C、Duran-Ferrer M 等，<i>Fluctuating DNA methylation tracks cancer
+evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
+<a href="https://github.com/Duran-FerrerM/evoflux"><code>github.com/Duran-FerrerM/evoflux</code></a>。</li>
+</ul>
+</section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m13.html"><small>← 上一模組</small>LongPhase-TO（tumor-only）</a><a class="next" href="capstone.html"><small>下一模組 →</small>Capstone：整合式位點判讀</a></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>5mC（5-甲基胞嘧啶）</dt><dd>胞嘧啶第 5 個碳上的甲基化修飾。這是常見的 DNA 甲基化形式，主要見於 CpG；可影響轉錄調控，效應依基因組位置與細胞類型而異。</dd><dt>CpG</dt><dd>序列上一個 C 後接一個 G（p 代表兩者之間的磷酸鍵）。哺乳類多數 5mC 位於 CpG，特定細胞或情況亦可見非 CpG 甲基化。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>VAF（變異等位基因頻率）</dt><dd>在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></dd><dt>clone tree（克隆演化樹）</dt><dd>描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>epiallele（表觀等位型）</dt><dd>同一條分子上一組相鄰 CpG 的甲基化組合，例如四個 CpG 的 1101。逐位點的 β 值看不到它 —— 要算 epiallele 的組成，一條 read 至少得跨過 4 個 CpG。</dd><dt>epimutation（表觀突變）</dt><dd>細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 10⁻⁵ 到 10⁻⁴，而 DNA 突變約每鹼基 10⁻⁹ 到 10⁻¹⁰，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 10⁻³ 的），應當成量級而非定值。</dd><dt>haplotype（單倍型）</dt><dd>同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</dd><dt>joint distribution（聯合分布）</dt><dd>多個變數一起看的分布，也就是「哪些組合各出現多少」。演化樹的形狀取決於聯合分布，而不是邊際分布；長讀的價值在於一條分子上的組合是直接觀測到的。</dd><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>long read（長讀）</dt><dd>單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</dd><dt>marginal distribution（邊際分布）</dt><dd>只描述單一變數的分布。VAF 與甲基化 β 值都是邊際統計：它們各自只講一個位點有多少比例帶有標記，不講兩個位點在同一個分子或同一個細胞上的搭配情形。</dd><dt>mutation frequency spectrum（突變頻率譜）</dt><dd>把一份樣本裡所有 somatic 變異的 VAF 畫成直方圖後得到的分布。分布上的峰與肩對應不同大小的細胞群，最低頻端的尾巴斜率則被用來判斷有沒有天擇。</dd><dt>mutation multiplicity</dt><dd>在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</dd><dt>parsimony（簡約法）</dt><dd>在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>read-AF（read 層級的 ALT 比例）</dt><dd>在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</dd><dt>soft clipping</dt><dd>read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd><dt>somatic variant（體細胞變異）</dt><dd>在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</dd><dt>subclone（次克隆）</dt><dd>clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#這條路線的四個轉折">這條路線的四個轉折</a></li><li class="lv3"><a href="#第一步-把一堆變異的頻率畫成一張圖-mutation-frequency-spectrum">第一步：把一堆變異的頻率畫成一張圖 —— mutation frequency spectrum</a></li><li class="lv3"><a href="#從-vaf-到-ccf-分母要自己湊出來">從 VAF 到 CCF：分母要自己湊出來</a></li><li class="lv3"><a href="#群集之後-clone-tree-還是不唯一">群集之後：clone tree 還是不唯一</a></li><li class="lv3"><a href="#根因-頻率是-marginal-distribution-樹要的是-joint-distribution">根因：頻率是 marginal distribution，樹要的是 joint distribution</a></li><li class="lv3"><a href="#甲基化也有同一個病-值與-epiallele">甲基化也有同一個病：β 值與 epiallele</a></li><li class="lv3"><a href="#而這個門檻-短讀剛好卡在上面">而這個門檻，短讀剛好卡在上面</a></li><li class="lv3"><a href="#長讀把-joint-distribution-直接觀測到了">長讀把 joint distribution 直接觀測到了</a></li><li class="lv3"><a href="#代價-分析單位變成-區域-單倍型家族">代價：分析單位變成「區域 × 單倍型家族」</a></li><li class="lv3"><a href="#read-af-頻率沒有被丟掉-只是換了位置">read-AF：頻率沒有被丟掉，只是換了位置</a></li><li class="lv3"><a href="#三條路線各自看得到什麼">三條路線各自看得到什麼</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li><li class="lv2"><a href="#先提出預測-再查看解答">先提出預測，再查看解答</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#一-畫出這份樣本的頻率譜">一、畫出這份樣本的頻率譜</a></li><li class="lv3"><a href="#二-確認-multiplicity-猜錯會差多少">二、確認 multiplicity 猜錯會差多少</a></li><li class="lv3"><a href="#三-量一下你的-read-到底跨多遠">三、量一下你的 read 到底跨多遠</a></li><li class="lv3"><a href="#四-把一個區域的狀態表抽出來">四、把一個區域的狀態表抽出來</a></li><li class="lv3"><a href="#五-排查順序">五、排查順序</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#這條路線的四個轉折">這條路線的四個轉折</a></li><li class="lv3"><a href="#第一步-把一堆變異的頻率畫成一張圖-mutation-frequency-spectrum">第一步：把一堆變異的頻率畫成一張圖 —— mutation frequency spectrum</a></li><li class="lv3"><a href="#從-vaf-到-ccf-分母要自己湊出來">從 VAF 到 CCF：分母要自己湊出來</a></li><li class="lv3"><a href="#群集之後-clone-tree-還是不唯一">群集之後：clone tree 還是不唯一</a></li><li class="lv3"><a href="#根因-頻率是-marginal-distribution-樹要的是-joint-distribution">根因：頻率是 marginal distribution，樹要的是 joint distribution</a></li><li class="lv3"><a href="#甲基化也有同一個病-值與-epiallele">甲基化也有同一個病：β 值與 epiallele</a></li><li class="lv3"><a href="#而這個門檻-短讀剛好卡在上面">而這個門檻，短讀剛好卡在上面</a></li><li class="lv3"><a href="#長讀把-joint-distribution-直接觀測到了">長讀把 joint distribution 直接觀測到了</a></li><li class="lv3"><a href="#代價-分析單位變成-區域-單倍型家族">代價：分析單位變成「區域 × 單倍型家族」</a></li><li class="lv3"><a href="#read-af-頻率沒有被丟掉-只是換了位置">read-AF：頻率沒有被丟掉，只是換了位置</a></li><li class="lv3"><a href="#三條路線各自看得到什麼">三條路線各自看得到什麼</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv2"><a href="#先提出預測-再查看解答">先提出預測，再查看解答</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#一-畫出這份樣本的頻率譜">一、畫出這份樣本的頻率譜</a></li><li class="lv3"><a href="#二-確認-multiplicity-猜錯會差多少">二、確認 multiplicity 猜錯會差多少</a></li><li class="lv3"><a href="#三-量一下你的-read-到底跨多遠">三、量一下你的 read 到底跨多遠</a></li><li class="lv3"><a href="#四-把一個區域的狀態表抽出來">四、把一個區域的狀態表抽出來</a></li><li class="lv3"><a href="#五-排查順序">五、排查順序</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">

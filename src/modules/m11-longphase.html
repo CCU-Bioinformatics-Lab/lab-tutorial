@@ -260,14 +260,6 @@ samtools view tagged.bam | grep -c 'HP:i:'
 <code>phase</code> 看 <code>Phasing.cpp</code>、<code>haplotag</code> 看 <code>Haplotag.cpp</code>、
 <code>modcall</code> 看 <code>ModCall.cpp</code>。使用新參數前先檢索該表確認名稱，並記錄版本。</p>
 </div>
-
-<h3>原始文獻與程式碼</h3>
-
-<p class="prose">本章內文不預設讀者讀過這篇論文或看過這個 repo —— 上面的解釋本身是完整的，
-以下連結給想追下去的人。LongPhase：Lin JH、Chen LC、Yu SQ、Huang YT，
-<i>LongPhase: an ultra-fast chromosome-scale phasing algorithm for small and large
-variants</i>，Bioinformatics，2022。程式碼在
-<a href="https://github.com/twolinin/LongPhase"><code>github.com/twolinin/LongPhase</code></a>。</p>
 </section>
 
 
@@ -358,4 +350,11 @@ grep -A40 'static const struct option longopts' Phasing.cpp
 {{/cli}}
 
 {{quiz:m11}}
+
+<h3>原始文獻與程式碼</h3>
+
+<p class="prose">LongPhase：Lin JH、Chen LC、Yu SQ、Huang YT，
+<i>LongPhase: an ultra-fast chromosome-scale phasing algorithm for small and large
+variants</i>，Bioinformatics，2022。程式碼在
+<a href="https://github.com/twolinin/LongPhase"><code>github.com/twolinin/LongPhase</code></a>。</p>
 </section>

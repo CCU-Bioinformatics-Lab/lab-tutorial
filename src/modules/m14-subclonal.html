@@ -367,37 +367,6 @@ M8 已經把這件事列為方法的適用範圍限制 ——
 —— 真實腫瘤的演化史沒有人知道，所以這個領域連「金標準」都得自己合成出來。M10 討論過同一個困難的另一個版本：用合成純度的樣本評估 variant caller 時，那個「正確答案」也是自己造的。
 第二，最後一列的「4 個 CpG」與「每 100 bp 一個」是兩個獨立的事實，
 把它們放在一起才看得出短讀的限制在哪裡；單獨看任何一個都不會得到這個結論。</p>
-
-<h3>原始文獻與程式碼</h3>
-
-<p class="prose">本章內文不預設讀者讀過以下任一篇 —— 上面的解釋本身是完整的，以下清單給想追下去的人。</p>
-
-<ul class="prose">
-<li><b>SciClone</b>：Miller CA 等，<i>SciClone: inferring clonal architecture and tracking the
-spatial and temporal patterns of tumor evolution</i>，PLoS Computational Biology 10(8):e1003665，2014。</li>
-<li><b>PyClone</b>：Roth A 等，<i>PyClone: statistical inference of clonal population structure
-in cancer</i>，Nature Methods 11(4):396–398，2014。</li>
-<li><b>methclone</b>：Li S 等，<i>Dynamic evolution of clonal epialleles revealed by methclone</i>，
-Genome Biology 15:472，2014。</li>
-<li><b>PhyloWGS</b>：Deshwar AG 等，<i>PhyloWGS: reconstructing subclonal composition and
-evolution from whole-genome sequencing of tumors</i>，Genome Biology 16:35，2015。</li>
-<li><b>甲基化與突變建出的樹互相吻合</b>：Mazor T 等，<i>DNA methylation and somatic mutations
-converge on the cell cycle and define similar evolutionary histories in brain tumors</i>，
-Cancer Cell 28(3):307–317，2015。</li>
-<li><b>1/f 中性演化檢定</b>：Williams MJ 等，<i>Identification of neutral tumor evolution
-across cancer types</i>，Nature Genetics 48(3):238–244，2016。</li>
-<li><b>對中性檢定的質疑</b>：Tarabichi M 等，<i>Neutral tumor evolution?</i>，
-Nature Genetics 50(12):1630–1633，2018；以及 Bozic I 等，
-<i>On measuring selection in cancer from subclonal mutation frequencies</i>，
-PLoS Computational Biology 15(9):e1007368，2019。</li>
-<li><b>epimutation 速率的整理</b>：Chen S、Wu J、Gaiti F，<i>Methylation-based lineage tracing
-in cancer</i>，Blood，2026（doi:10.1182/blood.2024028196）。文中的速率寫成「up to」，是上界而非定值。</li>
-<li><b>大規模評比</b>：Salcedo A 等，<i>Crowd-sourced benchmarking of single-sample tumor
-subclonal reconstruction</i>，Nature Biotechnology 43(4):581–592（2024 年線上發表，2025 年刊出）。</li>
-<li><b>EVOFLUx</b>：Gabbutt C、Duran-Ferrer M 等，<i>Fluctuating DNA methylation tracks cancer
-evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
-<a href="https://github.com/Duran-FerrerM/evoflux"><code>github.com/Duran-FerrerM/evoflux</code></a>。</li>
-</ul>
 </section>
 
 
@@ -681,6 +650,35 @@ PY
 一個細胞的兩條染色體會產生兩條不同 haplotype 的 read；
 同一條染色體也可能被多條 read 覆蓋。所以「狀態 11 有 6 條 read」不等於「有 6 個細胞帶有兩個變異」
 —— 這是 M0 那個「read 是分子片段的觀測，不是細胞標籤」的警告在這一章的具體後果。</p>
-</section>
 
 {{quiz:m14}}
+
+<h3>原始文獻與程式碼</h3>
+
+<ul class="prose">
+<li><b>SciClone</b>：Miller CA 等，<i>SciClone: inferring clonal architecture and tracking the
+spatial and temporal patterns of tumor evolution</i>，PLoS Computational Biology 10(8):e1003665，2014。</li>
+<li><b>PyClone</b>：Roth A 等，<i>PyClone: statistical inference of clonal population structure
+in cancer</i>，Nature Methods 11(4):396–398，2014。</li>
+<li><b>methclone</b>：Li S 等，<i>Dynamic evolution of clonal epialleles revealed by methclone</i>，
+Genome Biology 15:472，2014。</li>
+<li><b>PhyloWGS</b>：Deshwar AG 等，<i>PhyloWGS: reconstructing subclonal composition and
+evolution from whole-genome sequencing of tumors</i>，Genome Biology 16:35，2015。</li>
+<li><b>甲基化與突變建出的樹互相吻合</b>：Mazor T 等，<i>DNA methylation and somatic mutations
+converge on the cell cycle and define similar evolutionary histories in brain tumors</i>，
+Cancer Cell 28(3):307–317，2015。</li>
+<li><b>1/f 中性演化檢定</b>：Williams MJ 等，<i>Identification of neutral tumor evolution
+across cancer types</i>，Nature Genetics 48(3):238–244，2016。</li>
+<li><b>對中性檢定的質疑</b>：Tarabichi M 等，<i>Neutral tumor evolution?</i>，
+Nature Genetics 50(12):1630–1633，2018；以及 Bozic I 等，
+<i>On measuring selection in cancer from subclonal mutation frequencies</i>，
+PLoS Computational Biology 15(9):e1007368，2019。</li>
+<li><b>epimutation 速率的整理</b>：Chen S、Wu J、Gaiti F，<i>Methylation-based lineage tracing
+in cancer</i>，Blood，2026（doi:10.1182/blood.2024028196）。文中的速率寫成「up to」，是上界而非定值。</li>
+<li><b>大規模評比</b>：Salcedo A 等，<i>Crowd-sourced benchmarking of single-sample tumor
+subclonal reconstruction</i>，Nature Biotechnology 43(4):581–592（2024 年線上發表，2025 年刊出）。</li>
+<li><b>EVOFLUx</b>：Gabbutt C、Duran-Ferrer M 等，<i>Fluctuating DNA methylation tracks cancer
+evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
+<a href="https://github.com/Duran-FerrerM/evoflux"><code>github.com/Duran-FerrerM/evoflux</code></a>。</li>
+</ul>
+</section>

@@ -963,15 +963,6 @@ longphase-s somatic_haplotag \
 <p class="prose">研究本身也把這點列為限制，並指出 subclonal 的 CNV、LOH 與 aneuploidy
 可能造成部分模仿 purity 效果的等位失衡。</p>
 </div>
-
-<h3 id="原始文獻與程式碼">原始文獻與程式碼</h3>
-
-<p class="prose">本章內文不預設讀者讀過這篇論文或看過這個 repo —— 上面的解釋本身是完整的，
-以下連結給想追下去的人。本章的方法對應 LongPhase-S 的預印本
-（<a href="https://www.biorxiv.org/content/10.1101/2025.11.20.689492v1">bioRxiv, 2025，doi
-10.1101/2025.11.20.689492</a>），程式碼在
-<a href="https://github.com/CCU-Bioinformatics-Lab/longphase-s"><code>github.com/CCU-Bioinformatics-Lab/longphase-s</code></a>。
-上面的階段名稱與參數判準以<b>原始碼</b>為準；文件與論文用字若有出入，請以 <code>longopts</code> 表為準。</p>
 </section>
 
 
@@ -1056,12 +1047,20 @@ awk '!/^#/ {print $7}' tagged_sc.vcf | sort | uniq -c</code></pre>
 該位點的偽陽性疑慮會增加；仍需結合四個過濾器與其他品質指標判斷。</p>
 
 <section class="quiz" data-quiz="m12"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
+
+<h3 id="原始文獻與程式碼">原始文獻與程式碼</h3>
+
+<p class="prose">本章的方法對應 LongPhase-S 的預印本
+（<a href="https://www.biorxiv.org/content/10.1101/2025.11.20.689492v1">bioRxiv, 2025，doi
+10.1101/2025.11.20.689492</a>），程式碼在
+<a href="https://github.com/CCU-Bioinformatics-Lab/longphase-s"><code>github.com/CCU-Bioinformatics-Lab/longphase-s</code></a>。
+上面的階段名稱與參數判準以<b>原始碼</b>為準；文件與論文用字若有出入，請以 <code>longopts</code> 表為準。</p>
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m11.html"><small>← 上一模組</small>LongPhase：核心 phasing 流程</a><a class="next" href="m13.html"><small>下一模組 →</small>LongPhase-TO（tumor-only）</a></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>Clair3</dt><dd>以深度學習做 germline variant calling 的工具，長 read 上常用。</dd><dt>ClairS</dt><dd>配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</dd><dt>GHIR（生殖系單倍型失衡比）</dt><dd>Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>LongPhase-S</dt><dd>配對 tumor–normal 版本。做 tumor purity 估計、purity 感知的 somatic variant 過濾，以及 somatic haplotagging。</dd><dt>TINC（腫瘤污染正常樣本）</dt><dd>Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。</dd><dt>VAF（變異等位基因頻率）</dt><dd>在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</dd><dt>basecalling（鹼基判讀）</dt><dd>把定序儀的原始訊號（ONT 是電流）轉成 A/C/G/T 字母的步驟。不同 basecaller 版本會產生不同的錯誤特性 —— 所以「同一個細胞株、不同 basecaller」是兩份不同的資料集。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>phasing（定相）</dt><dd>為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。</dd><dt>recall（召回率）</dt><dd>在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</dd><dt>somatic haplotagging</dt><dd>把帶有 somatic 突變的 read 指派到它們源自的 germline haplotype。這是 LongPhase-S 的核心產出。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#先看懂-somatic-haplotagging-本身">先看懂 somatic haplotagging 本身</a></li><li class="lv3"><a href="#四個階段">四個階段</a></li><li class="lv3"><a href="#ghir-兩條-germline-haplotype-的-read-有多偏">GHIR：兩條 germline haplotype 的 read 有多偏</a></li><li class="lv3"><a href="#lcvf-先把不能用的位點濾掉">LCVF：先把不能用的位點濾掉</a></li><li class="lv3"><a href="#從分布到一個數字-迴歸模型">從分布到一個數字：迴歸模型</a></li><li class="lv3"><a href="#四個-somatic-variant-filter">四個 somatic variant filter</a></li><li class="lv3"><a href="#hp3-怎麼補上來源">HP3 怎麼補上來源</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#實際指令">實際指令</a></li><li class="lv3"><a href="#輸出檔案位置">輸出檔案位置</a></li><li class="lv3"><a href="#輸出結果示例">輸出結果示例</a></li><li class="lv3"><a href="#purity-估計的結果">purity 估計的結果</a></li><li class="lv3"><a href="#結果摘要">結果摘要</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行完整流程">執行完整流程</a></li><li class="lv3"><a href="#逐項檢視輸出">逐項檢視輸出</a></li><li class="lv3"><a href="#三項常見注意事項">三項常見注意事項</a></li><li class="lv3"><a href="#使用-igv-驗證輸出">使用 IGV 驗證輸出</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#先看懂-somatic-haplotagging-本身">先看懂 somatic haplotagging 本身</a></li><li class="lv3"><a href="#四個階段">四個階段</a></li><li class="lv3"><a href="#ghir-兩條-germline-haplotype-的-read-有多偏">GHIR：兩條 germline haplotype 的 read 有多偏</a></li><li class="lv3"><a href="#lcvf-先把不能用的位點濾掉">LCVF：先把不能用的位點濾掉</a></li><li class="lv3"><a href="#從分布到一個數字-迴歸模型">從分布到一個數字：迴歸模型</a></li><li class="lv3"><a href="#四個-somatic-variant-filter">四個 somatic variant filter</a></li><li class="lv3"><a href="#hp3-怎麼補上來源">HP3 怎麼補上來源</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#實際指令">實際指令</a></li><li class="lv3"><a href="#輸出檔案位置">輸出檔案位置</a></li><li class="lv3"><a href="#輸出結果示例">輸出結果示例</a></li><li class="lv3"><a href="#purity-估計的結果">purity 估計的結果</a></li><li class="lv3"><a href="#結果摘要">結果摘要</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#執行完整流程">執行完整流程</a></li><li class="lv3"><a href="#逐項檢視輸出">逐項檢視輸出</a></li><li class="lv3"><a href="#三項常見注意事項">三項常見注意事項</a></li><li class="lv3"><a href="#使用-igv-驗證輸出">使用 IGV 驗證輸出</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">
