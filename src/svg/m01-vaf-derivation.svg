@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480">
+  <title>從細胞比例算到 VAF：那個「除以 2」是從哪裡來的</title>
+  <desc>以 S1 為例，分成三步。第一步：帶有 S1 的細胞佔全樣本 50%，
+        由最早腫瘤細胞群 20%、分支 1 的 20%、分支 2 的 10% 相加而得。
+        第二步是關鍵：定序看到的不是細胞，而是 DNA 分子。
+        每個細胞在這個位置貢獻兩份拷貝 HP1 與 HP2，而 S1 只在 HP1 上，
+        所以就算是帶有 S1 的細胞，它交出來的兩份分子裡也只有一份帶 S1。
+        第三步：把分子數目當成分數的分子與分母 —— 100 個細胞交出 200 份分子，
+        其中帶 S1 的是 50 份，VAF 等於 50 除以 200，也就是 0.25。
+        因此 VAF 0.25 對應的是 50% 的細胞，不是 25% 的細胞；
+        兩者差的正是每個細胞有兩份拷貝這件事。</desc>
+
+  <!-- ══ 步驟 1：細胞層級 ══════════════════════════════════════ -->
+  <text class="ttl zh" x="20" y="34">① 先數細胞</text>
+
+  <rect class="box plain" x="20" y="52" width="940" height="76" rx="8"/>
+  <text class="anno zh" x="44" y="82">帶有 S1 的細胞群</text>
+  <rect class="bar somatic" x="240" y="66" width="120" height="20" rx="3"/>
+  <text class="tick mid" x="300" y="106">最早腫瘤 20%</text>
+  <rect class="bar hp1" x="364" y="66" width="120" height="20" rx="3"/>
+  <text class="tick mid" x="424" y="106">分支 1　20%</text>
+  <rect class="bar hp2" x="488" y="66" width="60" height="20" rx="3"/>
+  <text class="tick mid" x="518" y="106">分支 2　10%</text>
+  <text class="lbl bold somatic" x="580" y="82">合計 50% 的細胞帶有 S1</text>
+
+  <!-- ══ 步驟 2：細胞 → 分子（關鍵這一步）════════════════════ -->
+  <text class="ttl zh" x="20" y="176">② 但定序看到的是 DNA 分子，不是細胞</text>
+
+  <rect class="box accent" x="20" y="194" width="940" height="128" rx="8"/>
+
+  <!-- 帶 S1 的細胞 -->
+  <circle class="cell tumor" cx="86" cy="238" r="22"/>
+  <circle class="nucleus" cx="86" cy="238" r="10"/>
+  <text class="tick mid zh somatic" x="86" y="282">帶 S1 的細胞</text>
+  <text class="tick mid" x="86" y="300">（50% 的細胞）</text>
+
+  <line class="conn" x1="112" y1="238" x2="196" y2="238" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="154" y="228">交出</text>
+
+  <!-- 它的兩份拷貝 -->
+  <rect class="read hp1" x="212" y="216" width="240" height="16" rx="8"/>
+  <text class="tick end hp1" x="206" y="228">HP1</text>
+  <circle class="mark somatic" cx="332" cy="224" r="7"/>
+  <text class="tick somatic" x="462" y="228">← 這一份帶 S1</text>
+
+  <rect class="read hp2" x="212" y="252" width="240" height="16" rx="8"/>
+  <text class="tick end hp2" x="206" y="264">HP2</text>
+  <text class="tick" x="462" y="264">← 這一份不帶</text>
+
+  <text class="lbl bold zh accent" x="640" y="230">每個細胞兩份拷貝，</text>
+  <text class="lbl bold zh accent" x="640" y="256">變異只在其中一份上。</text>
+  <text class="anno zh" x="640" y="288">所以帶有 S1 的細胞，也只有一半的</text>
+  <text class="anno zh" x="640" y="308">分子帶著 S1 —— 這就是那個「÷2」。</text>
+
+  <!-- ══ 步驟 3：分子分母 ══════════════════════════════════════ -->
+  <text class="ttl zh" x="20" y="370">③ 把分子數當成分數</text>
+
+  <rect class="box ok" x="20" y="388" width="600" height="76" rx="8"/>
+  <text class="anno zh" x="44" y="416">假設樣本裡有 100 個細胞 → 交出 200 份 DNA 分子</text>
+  <!-- tspan 的 class 要寫成 anno somatic：diagram.css 的選擇器是 .anno.somatic，
+       只寫 somatic 不會有顏色（而且不會有任何錯誤訊息） -->
+  <text class="anno zh" x="44" y="446">其中帶 S1 的：50 個細胞 × 1 份 ＝ <tspan class="anno somatic bold">50 份</tspan></text>
+
+  <!-- 分數 -->
+  <text class="lbl mid bold somatic mono" x="734" y="410">50</text>
+  <line class="axis" x1="690" y1="422" x2="778" y2="422"/>
+  <text class="lbl mid bold mono" x="734" y="452">200</text>
+  <text class="ttl mid" x="822" y="432">=</text>
+  <text class="ttl mid bold somatic mono" x="900" y="432">0.25</text>
+
+  <text class="anno zh bad bold" x="20" y="478">注意：VAF 0.25 對應的是 50% 的細胞，不是 25% 的細胞。</text>
+</svg>

@@ -72,11 +72,11 @@
 <section data-part="concept" class="part" id="part-concept">
 <h2 data-num="②" id="概念與互動">概念與互動</h2>
 
-<h3 id="長讀long-read-長讀單條可達數千至數萬鹼基的定序片段-例如-ont-pacbio-若可靠地同時覆蓋多個-variant-可提供它們位於同一-dna-分子上的直接觀測證據-a-sequencing-read-thousands-to-tens-of-thousands-of-bases-long-its-length-lets-one-molecule-link-multiple-variants-directly-完整條目-提供的長距離資訊"><span class="term" data-term="long read" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-long-read-0">長讀<span class="term__pop" id="gd-long-read-0" role="tooltip"><b class="term__hd">long read <i>長讀</i></b><span class="term__def" data-lang="zh">單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</span><span class="term__def" data-lang="en">A sequencing read thousands to tens of thousands of bases long. Its length lets one molecule link multiple variants directly.</span><a class="term__more" href="glossary.html#long-read">完整條目 →</a></span></span>提供的長距離資訊</h3>
+<h3 id="長讀提供的長距離資訊"><span class="term" data-term="long read" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-long-read-0">長讀<span class="term__pop" id="gd-long-read-0" role="tooltip"><b class="term__hd">long read <i>長讀</i></b><span class="term__def" data-lang="zh">單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</span><span class="term__def" data-lang="en" lang="en">A sequencing read thousands to tens of thousands of bases long. Its length lets one molecule link multiple variants directly.</span><a class="term__more" href="glossary.html#long-read">完整條目 →</a></span></span>提供的長距離資訊</h3>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" class="dia-svg" role="img">
-  <title>短讀與長讀在跨越兩個變異位點時的差別</title>
-  <desc>上半部是 Illumina 短讀：本示意以約 100 bp 的 read 為例，兩個相距數千鹼基的變異位點無法被同一條 read 跨過，
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" class="dia-svg" role="img" aria-labelledby="m03-read-length__title" aria-describedby="m03-read-length__desc">
+  <title id="m03-read-length__title">短讀與長讀在跨越兩個變異位點時的差別</title>
+  <desc id="m03-read-length__desc">上半部是 Illumina 短讀：本示意以約 100 bp 的 read 為例，兩個相距數千鹼基的變異位點無法被同一條 read 跨過，
         因此看得到兩個變異各自的存在，卻無法判斷它們是否在同一條分子上。
         下半部是 Oxford Nanopore 長讀：單條 read 可達數千至數萬鹼基，可能同時跨過兩個位點，
         並可在適當的修飾辨識模型下，由同一條分子推定甲基化訊號。</desc>
@@ -150,10 +150,10 @@
 
 <div class="table-wrap">
 <table>
-<thead><tr><th></th><th>Illumina</th><th><span class="term" data-term="ONT" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ont-1">ONT<span class="term__pop" id="gd-ont-1" role="tooltip"><b class="term__hd">ONT <i>奈米孔定序</i></b><span class="term__def" data-lang="zh">Oxford Nanopore Technologies。以電流訊號讀取 DNA，可產生長 read；在 native-DNA 流程與適當模型下，可由訊號推定 5mC，通常不需 bisulfite 轉換。</span><span class="term__def" data-lang="en">Oxford Nanopore Technologies. Reads DNA through ionic-current signals, producing long reads. With native DNA and a suitable model, 5mC can be inferred without bisulfite conversion.</span><a class="term__more" href="glossary.html#ont">完整條目 →</a></span></span></th></tr></thead>
+<thead><tr><th scope="col"></th><th scope="col">Illumina</th><th scope="col"><span class="term" data-term="ONT" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ont-1">ONT<span class="term__pop" id="gd-ont-1" role="tooltip"><b class="term__hd">ONT <i>奈米孔定序</i></b><span class="term__def" data-lang="zh">Oxford Nanopore Technologies。以電流訊號讀取 DNA，可產生長 read；在 native-DNA 流程與適當模型下，可由訊號推定 5mC，通常不需 bisulfite 轉換。</span><span class="term__def" data-lang="en" lang="en">Oxford Nanopore Technologies. Reads DNA through ionic-current signals, producing long reads. With native DNA and a suitable model, 5mC can be inferred without bisulfite conversion.</span><a class="term__more" href="glossary.html#ont">完整條目 →</a></span></span></th></tr></thead>
 <tbody>
 <tr><td>讀長</td><td>常見約 100–150 bp，依平台與建庫而異</td><td>可達數千至數萬 bp，分布依流程而異</td></tr>
-<tr><td>單鹼基準確度</td><td>通常較高</td><td>依化學、basecaller 與變異類型而異；<span class="term" data-term="indel" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-indel-2">indel<span class="term__pop" id="gd-indel-2" role="tooltip"><b class="term__hd">indel <i>插入／缺失</i></b><span class="term__def" data-lang="zh">短的插入（insertion）或缺失（deletion）。在 nanopore 資料上通常比 SNV 更難可靠判讀，因為 homopolymer 與 alignment 位置漂移都可能製造假訊號。</span><span class="term__def" data-lang="en">A short insertion or deletion. It is often harder to call reliably than an SNV in nanopore data because of homopolymers and alignment ambiguity.</span><a class="term__more" href="glossary.html#indel">完整條目 →</a></span></span> 常較具挑戰</td></tr>
+<tr><td>單鹼基準確度</td><td>通常較高</td><td>依化學、basecaller 與變異類型而異；<span class="term" data-term="indel" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-indel-2">indel<span class="term__pop" id="gd-indel-2" role="tooltip"><b class="term__hd">indel <i>插入／缺失</i></b><span class="term__def" data-lang="zh">短的插入（insertion）或缺失（deletion）。在 nanopore 資料上通常比 SNV 更難可靠判讀，因為 homopolymer 與 alignment 位置漂移都可能製造假訊號。</span><span class="term__def" data-lang="en" lang="en">A short insertion or deletion. It is often harder to call reliably than an SNV in nanopore data because of homopolymers and alignment ambiguity.</span><a class="term__more" href="glossary.html#indel">完整條目 →</a></span></span> 常較具挑戰</td></tr>
 <tr><td>跨越多個變異</td><td>限於片段長度與建庫設計</td><td>較能建立長距離相位與分子連結</td></tr>
 <tr><td>甲基化</td><td>bisulfite-seq 是常見方法之一</td><td>native-DNA 流程可搭配模型由訊號推定修飾</td></tr>
 <tr><td>常見優勢</td><td>高準確度的局部變異偵測</td><td>長距離 phasing 與分子連結</td></tr>
@@ -163,14 +163,14 @@
 
 <h3 id="長讀-indel-判讀的主要限制">長讀 indel 判讀的主要限制</h3>
 
-<p class="prose">ONT 與 Illumina 的錯誤特性不同。<b><span class="term" data-term="homopolymer" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-homopolymer-3">homopolymer<span class="term__pop" id="gd-homopolymer-3" role="tooltip"><b class="term__hd">homopolymer <i>同聚物</i></b><span class="term__def" data-lang="zh">同一個鹼基連續重複的區段，例如 <code>AAAAAA</code>。nanopore 在此類區段較容易發生長度判讀錯誤，是 indel 假陽性的常見來源之一。</span><span class="term__def" data-lang="en">A run of identical bases. Nanopore miscounts their length, a major source of false indel calls.</span><a class="term__more" href="glossary.html#homopolymer">完整條目 →</a></span></span></b> 是 ONT indel 錯誤的常見高風險區域，
+<p class="prose">ONT 與 Illumina 的錯誤特性不同。<b><span class="term" data-term="homopolymer" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-homopolymer-3">homopolymer<span class="term__pop" id="gd-homopolymer-3" role="tooltip"><b class="term__hd">homopolymer <i>同聚物</i></b><span class="term__def" data-lang="zh">同一個鹼基連續重複的區段，例如 <code>AAAAAA</code>。nanopore 在此類區段較容易發生長度判讀錯誤，是 indel 假陽性的常見來源之一。</span><span class="term__def" data-lang="en" lang="en">A run of identical bases. Nanopore miscounts their length, a major source of false indel calls.</span><a class="term__more" href="glossary.html#homopolymer">完整條目 →</a></span></span></b> 是 ONT indel 錯誤的常見高風險區域，
 例如 <code>AAAAAA</code>。</p>
 
 <p class="prose">原因在判讀原理上：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 460" class="dia-svg" role="img">
-  <title>為什麼同一個鹼基連續重複的區段特別容易讀錯長度</title>
-  <desc>奈米孔定序靠電流訊號判讀鹼基。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 460" class="dia-svg" role="img" aria-labelledby="m03-homopolymer__title" aria-describedby="m03-homopolymer__desc">
+  <title id="m03-homopolymer__title">為什麼同一個鹼基連續重複的區段特別容易讀錯長度</title>
+  <desc id="m03-homopolymer__desc">奈米孔定序靠電流訊號判讀鹼基。
         當序列是各種不同鹼基交替時，每個鹼基造成的電流變化明顯，容易分辨。
         但當同一個鹼基連續重複時，電流會維持在同一個平台上，
         六個與七個造成的訊號差異可能很小，因此增加長度判讀錯誤。
@@ -264,7 +264,7 @@
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>Caller</th><th>SNV F1</th><th>INDEL F1</th></tr></thead>
+<thead><tr><th scope="col">Caller</th><th scope="col">SNV F1</th><th scope="col">INDEL F1</th></tr></thead>
 <tbody>
 <tr><td>ClairS（示例）</td><td>0.71</td><td><b>0.32</b></td></tr>
 <tr><td>DeepSomatic（示例）</td><td>0.81</td><td><b>0.53</b></td></tr>
@@ -277,26 +277,26 @@
 
 <p class="prose">除了 homopolymer，還有一個原因是 <b>alignment 位置的模糊性</b>：
 同一個 deletion 在重複序列中可有多種等價表示位置，使不同 reads 的訊號分散。
-這些差異會反映在 <span class="term" data-term="CIGAR" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cigar-4">CIGAR<span class="term__pop" id="gd-cigar-4" role="tooltip"><b class="term__hd">CIGAR</b><span class="term__def" data-lang="zh">描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。</span><span class="term__def" data-lang="en">A compact string describing how read bases and reference positions are consumed by an alignment. For example, 5M1I5M has five alignment columns, one insertion, then five alignment columns; M may contain matches or mismatches.</span><a class="term__more" href="glossary.html#cigar">完整條目 →</a></span></span>；CIGAR 是描述 read 與參考序列對齊操作的字串。</p>
+這些差異會反映在 <span class="term" data-term="CIGAR" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cigar-4">CIGAR<span class="term__pop" id="gd-cigar-4" role="tooltip"><b class="term__hd">CIGAR</b><span class="term__def" data-lang="zh">描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。</span><span class="term__def" data-lang="en" lang="en">A compact string describing how read bases and reference positions are consumed by an alignment. For example, 5M1I5M has five alignment columns, one insertion, then five alignment columns; M may contain matches or mismatches.</span><a class="term__more" href="glossary.html#cigar">完整條目 →</a></span></span>；CIGAR 是描述 read 與參考序列對齊操作的字串。</p>
 
 <h3 id="三項核心數值">三項核心數值</h3>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>量</th><th>意思</th><th>本教材示例值</th></tr></thead>
+<thead><tr><th scope="col">量</th><th scope="col">意思</th><th scope="col">本教材示例值</th></tr></thead>
 <tbody>
-<tr><td><span class="term" data-term="coverage" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-coverage-5">coverage<span class="term__pop" id="gd-coverage-5" role="tooltip"><b class="term__hd">coverage <i>覆蓋度／深度</i></b><span class="term__def" data-lang="zh">某個位置被多少條 read 覆蓋。50× 表示平均每個位置約有 50 條 read 覆蓋，不代表它們均支持同一 allele。</span><span class="term__def" data-lang="en">How many reads span a position. 50x means on average 50 reads per position.</span><a class="term__more" href="glossary.html#coverage">完整條目 →</a></span></span></td><td>某個位置被多少條 read 覆蓋</td><td>tumor 50×，normal 25×</td></tr>
-<tr><td><span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-vaf-6">VAF<span class="term__pop" id="gd-vaf-6" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span></td><td>支持 alt allele 的 read 比例</td><td>germline het 在簡化二倍體模型中 ≈ 0.5；somatic 依 purity、copy number 與 clonality 而異</td></tr>
-<tr><td><span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-purity-7">purity<span class="term__pop" id="gd-tumour-purity-7" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span></td><td>樣本中腫瘤細胞的比例</td><td>合成資料用 0.2 / 0.4 / 0.6 / 0.8 / 1.0</td></tr>
+<tr><td><span class="term" data-term="coverage" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-coverage-5">coverage<span class="term__pop" id="gd-coverage-5" role="tooltip"><b class="term__hd">coverage <i>覆蓋度／深度</i></b><span class="term__def" data-lang="zh">某個位置被多少條 read 覆蓋。50× 表示平均每個位置約有 50 條 read 覆蓋，不代表它們均支持同一 allele。</span><span class="term__def" data-lang="en" lang="en">How many reads span a position. 50x means on average 50 reads per position.</span><a class="term__more" href="glossary.html#coverage">完整條目 →</a></span></span></td><td>某個位置被多少條 read 覆蓋</td><td>tumor 50×，normal 25×</td></tr>
+<tr><td><span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-vaf-6">VAF<span class="term__pop" id="gd-vaf-6" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en" lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span></td><td>支持 alt allele 的 read 比例</td><td>germline het 在簡化二倍體模型中 ≈ 0.5；somatic 依 purity、copy number 與 clonality 而異</td></tr>
+<tr><td><span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-purity-7">purity<span class="term__pop" id="gd-tumour-purity-7" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en" lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span></td><td>樣本中腫瘤細胞的比例</td><td>合成資料用 0.2 / 0.4 / 0.6 / 0.8 / 1.0</td></tr>
 </tbody>
 </table>
 </div>
 
 <p class="prose">以下以簡化數值示例說明低腫瘤比例如何減少可用訊號：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" class="dia-svg" role="img">
-  <title>低腫瘤比例為什麼難：把數字算出來就懂了</title>
-  <desc>在本簡化模型中，定序深度相同時，腫瘤 DNA 在樣本中的佔比越低，支持一個真變異的 read 數就越少。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" class="dia-svg" role="img" aria-labelledby="m03-detection-limit__title" aria-describedby="m03-detection-limit__desc">
+  <title id="m03-detection-limit__title">低腫瘤比例為什麼難：把數字算出來就懂了</title>
+  <desc id="m03-detection-limit__desc">在本簡化模型中，定序深度相同時，腫瘤 DNA 在樣本中的佔比越低，支持一個真變異的 read 數就越少。
         在腫瘤 DNA 佔兩成且符合模型假設的樣本上，一個所有腫瘤細胞都帶有的變異期望約有五條 read 支持。
         定序本身也可能在位置產生錯誤 read；背景若接近真訊號，會增加低比例樣本的判讀困難。</desc>
 
@@ -393,14 +393,14 @@
 
 <h3 id="basecaller-是實驗變數">basecaller 是實驗變數</h3>
 
-<p class="prose"><span class="term" data-term="basecalling" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-basecalling-8">basecalling<span class="term__pop" id="gd-basecalling-8" role="tooltip"><b class="term__hd">basecalling <i>鹼基判讀</i></b><span class="term__def" data-lang="zh">把定序儀的原始訊號（ONT 是電流）轉成 A/C/G/T 字母的步驟。不同 basecaller 版本會產生不同的錯誤特性 —— 所以「同一個細胞株、不同 basecaller」是兩份不同的資料集。</span><span class="term__def" data-lang="en">Converting raw sequencer signal into A/C/G/T. Different basecallers yield different error profiles.</span><a class="term__more" href="glossary.html#basecalling">完整條目 →</a></span></span> 是把電流訊號轉成 A/C/G/T 的那一步。不同版本的 basecaller
+<p class="prose"><span class="term" data-term="basecalling" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-basecalling-8">basecalling<span class="term__pop" id="gd-basecalling-8" role="tooltip"><b class="term__hd">basecalling <i>鹼基判讀</i></b><span class="term__def" data-lang="zh">把定序儀的原始訊號（ONT 是電流）轉成 A/C/G/T 字母的步驟。不同 basecaller 版本會產生不同的錯誤特性 —— 所以「同一個細胞株、不同 basecaller」是兩份不同的資料集。</span><span class="term__def" data-lang="en" lang="en">Converting raw sequencer signal into A/C/G/T. Different basecallers yield different error profiles.</span><a class="term__more" href="glossary.html#basecalling">完整條目 →</a></span></span> 是把電流訊號轉成 A/C/G/T 的那一步。不同版本的 basecaller
 會產生<b>不同的錯誤特性</b>，所以：</p>
 
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">同一個細胞株，不同 basecaller，可視為兩份不同的資料集</p>
 <p class="prose">此記錄並非次要細節。跨 basecaller 的同株資料可作為穩健性評估的一部分；例如
 <code>HCC1395_HKU</code> 與 <code>HCC1395_NYGC</code> 來自同一細胞株，但流程不同。
-因此分析時應將 <span class="term" data-term="provenance" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-provenance-9">provenance<span class="term__pop" id="gd-provenance-9" role="tooltip"><b class="term__hd">provenance <i>資料來源履歷</i></b><span class="term__def" data-lang="zh">記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。</span><span class="term__def" data-lang="en">The full origin record of a dataset. In this lab it is a first-class experimental variable, not metadata.</span><a class="term__more" href="glossary.html#provenance">完整條目 →</a></span></span>（細胞株、平台、basecaller、<span class="term" data-term="reference genome" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-reference-genome-10">reference build<span class="term__pop" id="gd-reference-genome-10" role="tooltip"><b class="term__hd">reference genome <i>參考基因體</i></b><span class="term__def" data-lang="zh">用於比對的標準序列（人類資料常用 GRCh38）。所有座標均相對於指定版本；更換 build 會改變座標系，座標不可直接比較。</span><span class="term__def" data-lang="en">The standard sequence everything is aligned to. All coordinates are relative to it, so changing build changes coordinates.</span><a class="term__more" href="glossary.html#reference-genome">完整條目 →</a></span></span>、
+因此分析時應將 <span class="term" data-term="provenance" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-provenance-9">provenance<span class="term__pop" id="gd-provenance-9" role="tooltip"><b class="term__hd">provenance <i>資料來源履歷</i></b><span class="term__def" data-lang="zh">記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。</span><span class="term__def" data-lang="en" lang="en">The full origin record of a dataset. In this lab it is a first-class experimental variable, not metadata.</span><a class="term__more" href="glossary.html#provenance">完整條目 →</a></span></span>（細胞株、平台、basecaller、<span class="term" data-term="reference genome" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-reference-genome-10">reference build<span class="term__pop" id="gd-reference-genome-10" role="tooltip"><b class="term__hd">reference genome <i>參考基因體</i></b><span class="term__def" data-lang="zh">用於比對的標準序列（人類資料常用 GRCh38）。所有座標均相對於指定版本；更換 build 會改變座標系，座標不可直接比較。</span><span class="term__def" data-lang="en" lang="en">The standard sequence everything is aligned to. All coordinates are relative to it, so changing build changes coordinates.</span><a class="term__more" href="glossary.html#reference-genome">完整條目 →</a></span></span>、
 caller 版本、benchmark 來源與混合方式）與結果一併記錄。</p>
 </div>
 </section>
@@ -436,7 +436,7 @@ samtools index dna_frac_0.6.bam</code></pre>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>目標 tumor DNA fraction</th><th>tumor 抽樣率</th><th>normal 抽樣率</th></tr></thead>
+<thead><tr><th scope="col">目標 tumor DNA fraction</th><th scope="col">tumor 抽樣率</th><th scope="col">normal 抽樣率</th></tr></thead>
 <tbody>
 <tr><td>0.2</td><td><code>-s 1.10</code></td><td><code>-s 1.80</code></td></tr>
 <tr><td>0.4</td><td><code>-s 1.20</code></td><td><code>-s 1.60</code></td></tr>
@@ -453,11 +453,11 @@ samtools index dna_frac_0.6.bam</code></pre>
 <aside class="guardrail" id="guard-2"><p class="guardrail__hd">重要區分 #2：tumor cellular purity 不等於 tumor DNA fraction</p><p class="prose">上述配方依 coverage 近似控制 DNA 量。在來源 tumor BAM 接近純腫瘤、
 且 tumor／normal 每細胞 DNA 量與輸入深度均已校正的合成設定下，tumor DNA fraction 才可近似 cellular purity。
 此近似不能推廣至一般實際樣本。</p>
-<p class="prose">但在<b>真實腫瘤</b>裡兩者可能不同。原因包括 <span class="term" data-term="aneuploidy" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-aneuploidy-11">aneuploidy<span class="term__pop" id="gd-aneuploidy-11" role="tooltip"><b class="term__hd">aneuploidy <i>非整倍體</i></b><span class="term__def" data-lang="zh">染色體數目異常。腫瘤裡非常普遍，也可能使 cellular purity 與 DNA fraction 不一致。</span><span class="term__def" data-lang="en">An abnormal chromosome count. It is common in tumours and can make cellular purity differ from tumour DNA fraction.</span><a class="term__more" href="glossary.html#aneuploidy">完整條目 →</a></span></span> 與 whole-genome duplication：
+<p class="prose">但在<b>真實腫瘤</b>裡兩者可能不同。原因包括 <span class="term" data-term="aneuploidy" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-aneuploidy-11">aneuploidy<span class="term__pop" id="gd-aneuploidy-11" role="tooltip"><b class="term__hd">aneuploidy <i>非整倍體</i></b><span class="term__def" data-lang="zh">染色體數目異常。腫瘤裡非常普遍，也可能使 cellular purity 與 DNA fraction 不一致。</span><span class="term__def" data-lang="en" lang="en">An abnormal chromosome count. It is common in tumours and can make cellular purity differ from tumour DNA fraction.</span><a class="term__more" href="glossary.html#aneuploidy">完整條目 →</a></span></span> 與 whole-genome duplication：
 一個四倍體的腫瘤細胞含有的 DNA 是正常細胞的兩倍。所以</p>
 <ul class="prose">
-<li>50% 的細胞是腫瘤（cellular <span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-purity-12">purity<span class="term__pop" id="gd-tumour-purity-12" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span> = 0.5）</li>
-<li>但腫瘤貢獻的 DNA 佔 <code>0.5×4 ÷ (0.5×4 + 0.5×2) = 0.67</code>（<span class="term" data-term="tumour DNA fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-dna-fraction-13">tumour DNA fraction<span class="term__pop" id="gd-tumour-dna-fraction-13" role="tooltip"><b class="term__hd">tumour DNA fraction <i>腫瘤 DNA 比例</i></b><span class="term__def" data-lang="zh">樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。</span><span class="term__def" data-lang="en">The fraction of DNA originating from tumour cells; diverges from cellular purity under aneuploidy or WGD.</span><a class="term__more" href="glossary.html#tumour-dna-fraction">完整條目 →</a></span></span> = 0.67）</li>
+<li>50% 的細胞是腫瘤（cellular <span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-purity-12">purity<span class="term__pop" id="gd-tumour-purity-12" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en" lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span> = 0.5）</li>
+<li>但腫瘤貢獻的 DNA 佔 <code>0.5×4 ÷ (0.5×4 + 0.5×2) = 0.67</code>（<span class="term" data-term="tumour DNA fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-dna-fraction-13">tumour DNA fraction<span class="term__pop" id="gd-tumour-dna-fraction-13" role="tooltip"><b class="term__hd">tumour DNA fraction <i>腫瘤 DNA 比例</i></b><span class="term__def" data-lang="zh">樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。</span><span class="term__def" data-lang="en" lang="en">The fraction of DNA originating from tumour cells; diverges from cellular purity under aneuploidy or WGD.</span><a class="term__more" href="glossary.html#tumour-dna-fraction">完整條目 →</a></span></span> = 0.67）</li>
 </ul>
 <p class="prose">M8 的互動元件可將 copy number 調整為 4，以比較 cellular purity 與 tumor DNA fraction。</p></aside>
 </section>
@@ -476,7 +476,7 @@ samtools index dna_frac_0.6.bam</code></pre>
 </ul>
 <p class="prose">但請注意：<b>列為低可信候選不等於可以直接刪除。</b>
 低 purity 樣本中的 genuine somatic 變異也可能只有少數 reads 支持。
-僅依低支持度刪除候選可能降低 <span class="term" data-term="recall" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-recall-14">recall<span class="term__pop" id="gd-recall-14" role="tooltip"><b class="term__hd">recall <i>召回率</i></b><span class="term__def" data-lang="zh">在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</span><span class="term__def" data-lang="en">Within a stated evaluation scope, the fraction of true positives that were found: TP / (TP + FN). With a fixed caller candidate set, post-filtering can preserve or lower recall but cannot recover variants the caller never emitted; report the candidate-set scope explicitly.</span><a class="term__more" href="glossary.html#recall">完整條目 →</a></span></span>。</p>
+僅依低支持度刪除候選可能降低 <span class="term" data-term="recall" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-recall-14">recall<span class="term__pop" id="gd-recall-14" role="tooltip"><b class="term__hd">recall <i>召回率</i></b><span class="term__def" data-lang="zh">在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</span><span class="term__def" data-lang="en" lang="en">Within a stated evaluation scope, the fraction of true positives that were found: TP / (TP + FN). With a fixed caller candidate set, post-filtering can preserve or lower recall but cannot recover variants the caller never emitted; report the candidate-set scope explicitly.</span><a class="term__more" href="glossary.html#recall">完整條目 →</a></span></span>。</p>
 <p class="prose">因此需加入更細緻的證據，例如支持 reads 是否具有一致的 haplotype 來源，而非只依數量判定。</p>
 <p class="prose">此問題也可能受資料可辨識性限制：某些 false positives 在現有特徵下與真變異非常相近，
 使模型無法可靠區分。
@@ -516,13 +516,13 @@ mosdepth --by 500 out aln.bam &amp;&amp; head out.mosdepth.summary.txt</code></p
 <p class="prose">若期望值僅為兩至三條，可靠偵測低頻變異可能較困難。資料量是限制之一，
 仍需比較增加定序深度、改善品質與調整模型的相對效益。</p>
 
-<section class="quiz" data-quiz="m03"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+<section class="quiz" data-quiz="m03"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m02.html"><small>← 上一模組</small>癌症基因體分析的基礎生物學</a><a class="next" href="m04.html"><small>下一模組 →</small>資料格式讀寫能力</a></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>CIGAR</dt><dd>描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。</dd><dt>ONT（奈米孔定序）</dt><dd>Oxford Nanopore Technologies。以電流訊號讀取 DNA，可產生長 read；在 native-DNA 流程與適當模型下，可由訊號推定 5mC，通常不需 bisulfite 轉換。</dd><dt>VAF（變異等位基因頻率）</dt><dd>在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</dd><dt>aneuploidy（非整倍體）</dt><dd>染色體數目異常。腫瘤裡非常普遍，也可能使 cellular purity 與 DNA fraction 不一致。</dd><dt>basecalling（鹼基判讀）</dt><dd>把定序儀的原始訊號（ONT 是電流）轉成 A/C/G/T 字母的步驟。不同 basecaller 版本會產生不同的錯誤特性 —— 所以「同一個細胞株、不同 basecaller」是兩份不同的資料集。</dd><dt>coverage（覆蓋度／深度）</dt><dd>某個位置被多少條 read 覆蓋。50× 表示平均每個位置約有 50 條 read 覆蓋，不代表它們均支持同一 allele。</dd><dt>homopolymer（同聚物）</dt><dd>同一個鹼基連續重複的區段，例如 <code>AAAAAA</code>。nanopore 在此類區段較容易發生長度判讀錯誤，是 indel 假陽性的常見來源之一。</dd><dt>indel（插入／缺失）</dt><dd>短的插入（insertion）或缺失（deletion）。在 nanopore 資料上通常比 SNV 更難可靠判讀，因為 homopolymer 與 alignment 位置漂移都可能製造假訊號。</dd><dt>long read（長讀）</dt><dd>單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</dd><dt>provenance（資料來源履歷）</dt><dd>記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。</dd><dt>recall（召回率）</dt><dd>在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</dd><dt>reference genome（參考基因體）</dt><dd>用於比對的標準序列（人類資料常用 GRCh38）。所有座標均相對於指定版本；更換 build 會改變座標系，座標不可直接比較。</dd><dt>tumour DNA fraction（腫瘤 DNA 比例）</dt><dd>樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#長讀long-read-長讀單條可達數千至數萬鹼基的定序片段-例如-ont-pacbio-若可靠地同時覆蓋多個-variant-可提供它們位於同一-dna-分子上的直接觀測證據-a-sequencing-read-thousands-to-tens-of-thousands-of-bases-long-its-length-lets-one-molecule-link-multiple-variants-directly-完整條目-提供的長距離資訊">長讀long read 長讀單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。A sequencing read thousands to tens of thousands of bases long. Its length lets one molecule link multiple variants directly.完整條目 →提供的長距離資訊</a></li><li class="lv3"><a href="#長讀-indel-判讀的主要限制">長讀 indel 判讀的主要限制</a></li><li class="lv3"><a href="#三項核心數值">三項核心數值</a></li><li class="lv3"><a href="#basecaller-是實驗變數">basecaller 是實驗變數</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#合成不同-purity-的樣本">合成不同 purity 的樣本</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#檢查資料讀長">檢查資料讀長</a></li><li class="lv3"><a href="#估算簡化模型中的預期支持數">估算簡化模型中的預期支持數</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#長讀提供的長距離資訊">長讀提供的長距離資訊</a></li><li class="lv3"><a href="#長讀-indel-判讀的主要限制">長讀 indel 判讀的主要限制</a></li><li class="lv3"><a href="#三項核心數值">三項核心數值</a></li><li class="lv3"><a href="#basecaller-是實驗變數">basecaller 是實驗變數</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv3"><a href="#合成不同-purity-的樣本">合成不同 purity 的樣本</a></li><li class="lv2"><a href="#判讀練習">判讀練習</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#檢查資料讀長">檢查資料讀長</a></li><li class="lv3"><a href="#估算簡化模型中的預期支持數">估算簡化模型中的預期支持數</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">

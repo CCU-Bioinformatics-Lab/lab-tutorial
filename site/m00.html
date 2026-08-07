@@ -61,9 +61,9 @@
 <p class="prose">本模組先從基本概念開始，暫不引入癌症、EGFR 或其他縮寫。理解下列五個層次的關係後，
 即可建立後續模組所需的資料模型：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img">
-  <title>從細胞、染色體與 DNA 到定序 reads</title>
-  <desc>五個由左到右的層次。第一格是一個有細胞核的細胞。第二格把細胞核放大，顯示兩份相似的染色體。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img" aria-labelledby="m00-dna-sequencing__title" aria-describedby="m00-dna-sequencing__desc">
+  <title id="m00-dna-sequencing__title">從細胞、染色體與 DNA 到定序 reads</title>
+  <desc id="m00-dna-sequencing__desc">五個由左到右的層次。第一格是一個有細胞核的細胞。第二格把細胞核放大，顯示兩份相似的染色體。
         第三格把一條染色體展開成由 A、C、G、T 組成的長 DNA，並框出其中一段基因。
         第四格是定序儀，把抽出的 DNA 片段逐段量測。第五格是電腦收到的多條 read，
         每一條 read 通常是源自一條實體 DNA 分子的局部序列觀測。圖下方標示左側屬於人體裡的物理世界，
@@ -241,7 +241,7 @@ DNA 以 A、C、G、T 四種鹼基記錄序列資訊。多數正常常染色體�
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>read 顯示的排列</th><th>分子層次發生什麼</th><th>研究中的治療意義</th></tr></thead>
+<thead><tr><th scope="col">read 顯示的排列</th><th scope="col">分子層次發生什麼</th><th scope="col">研究中的治療意義</th></tr></thead>
 <tbody>
 <tr>
   <td><b>分開在兩份 DNA 上</b></td>
@@ -276,9 +276,9 @@ DNA 以 A、C、G、T 四種鹼基記錄序列資訊。多數正常常染色體�
 <p class="prose">前面的 EGFR 報告只說「T790M 有、C797S 也有」。要知道兩者的排列，
 需回到產生這張清單的原始 reads。在本簡化情境中，可能的判讀可分為下面三種：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img">
-  <title>同樣找到突變 A 與 B 時，read 圖可能給出的三種答案</title>
-  <desc>三個並排的 read 圖。在讀取品質足夠且無明顯嵌合的簡化前提下，左圖中多條跨越兩個位置的 reads 同時帶有 A 與 B，支持兩者位在同一份 DNA。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="m00-read-outcomes__title" aria-describedby="m00-read-outcomes__desc">
+  <title id="m00-read-outcomes__title">同樣找到突變 A 與 B 時，read 圖可能給出的三種答案</title>
+  <desc id="m00-read-outcomes__desc">三個並排的 read 圖。在讀取品質足夠且無明顯嵌合的簡化前提下，左圖中多條跨越兩個位置的 reads 同時帶有 A 與 B，支持兩者位在同一份 DNA。
         中圖中，跨越兩個位置的 reads 穩定分成只帶 A 與只帶 B 兩群，支持兩者分開在兩份 DNA。
         右圖中，reads 太短，只能各自看到 A 或 B，沒有任何一條 read 能同時觀察兩點，所以資訊不足。</desc>
 
@@ -382,9 +382,9 @@ DNA 以 A、C、G、T 四種鹼基記錄序列資訊。多數正常常染色體�
 但資料會逐層變難：先擴大到整個基因體，再加入腫瘤混合，最後還可能拿不到同一病人的正常檢體。
 <b>三項工具分別處理這三個層級的分析條件。</b></p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 570" class="dia-svg" role="img">
-  <title>同一個 read 關係問題如何對應三類分析工具</title>
-  <desc>最上方是共同問題：從大量 reads 推定哪些突變位在同一條 DNA 分子上。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 570" class="dia-svg" role="img" aria-labelledby="m00-dependency__title" aria-describedby="m00-dependency__desc">
+  <title id="m00-dependency__title">同一個 read 關係問題如何對應三類分析工具</title>
+  <desc id="m00-dependency__desc">最上方是共同問題：從大量 reads 推定哪些突變位在同一條 DNA 分子上。
         第一層 LongPhase 把兩位點的直覺擴大到一般樣本的全基因體資料。
         進入腫瘤後，資料多了正常細胞混合、低比例突變與更多錯誤訊號，並依是否有同一病人的正常檢體分岔。
         有正常檢體時使用 longphase-s 做直接對照；只有腫瘤檢體時使用 longphase-to，需整合更多間接證據。</desc>
@@ -492,7 +492,7 @@ read 4, 5, 6  → 只覆蓋右邊，看到 C797S</code></pre>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>階段</th><th>新增的問題</th></tr></thead>
+<thead><tr><th scope="col">階段</th><th scope="col">新增的問題</th></tr></thead>
 <tbody>
 <tr><td><b>M1–M3　建立資料模型</b></td><td>樣本、DNA、突變與定序片段到底是什麼？</td></tr>
 <tr><td><b>M4–M5　讀懂輸入</b></td><td>這些物件如何寫進 BAM／VCF，候選突變又怎麼被找出來？</td></tr>
@@ -511,7 +511,7 @@ read 4, 5, 6  → 只覆蓋右邊，看到 C797S</code></pre>
 後續單元將介紹如何以可檢驗的證據推定這個關係。</p>
 </div>
 
-<section class="quiz" data-quiz="m00"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+<section class="quiz" data-quiz="m00"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
 </section>
 
     <nav class="pager" aria-label="模組導覽"><span></span><a class="next" href="m01.html"><small>下一模組 →</small>腫瘤樣本的簡化區域模型</a></nav>

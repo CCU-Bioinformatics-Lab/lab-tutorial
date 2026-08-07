@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <title>同一個位置，在 BAM 裡是很多筆紀錄，在 VCF 裡只有一列</title>
+  <desc>左邊是 BAM：位置 chr7:105 被六條 read 覆蓋，每條 read 自己是一筆 alignment record，
+        每筆各自帶著一個 HP tag，標示這條 read 被指派到哪一條 haplotype；
+        六條 read 在該位置各自讀到 A 或 G。
+        右邊是 VCF：同一個位置只有一列，欄位寫的是整個位置的結論 ——
+        CHROM chr7、POS 105、REF A、ALT G，以及 sample 欄位裡的 GT 0 直線 1 與 PS 105。
+        兩邊都是形如「名稱冒號值」的短標籤，但長在不同的東西上：
+        HP 長在一條 read 上，GT 與 PS 長在一個位置上。
+        因此看到這類標籤時，要先分辨它描述的是單一分子還是整個位點。</desc>
+
+  <text class="ttl zh" x="20" y="32">同一個位置，在兩種檔案裡是兩種東西</text>
+
+  <!-- ══ 左：BAM ══════════════════════════════════════════════════ -->
+  <text class="lbl bold zh" x="20" y="72">BAM：一條 read 一筆紀錄</text>
+  <rect class="box plain" x="20" y="84" width="450" height="300" rx="8"/>
+
+  <text class="tick mid mono" x="221" y="106">chr7:105</text>
+
+  <!-- read 1 -->
+  <rect class="read hp1" x="120" y="108" width="200" height="16" rx="8"/>
+  <text class="tick mono" x="36" y="121">read_001</text>
+  <text class="tick mono hp1" x="336" y="121">HP:Z:1</text>
+  <!-- read 2 -->
+  <rect class="read hp2" x="120" y="148" width="200" height="16" rx="8"/>
+  <text class="tick mono" x="36" y="161">read_002</text>
+  <text class="tick mono hp2" x="336" y="161">HP:Z:2</text>
+  <!-- read 3 -->
+  <rect class="read hp1" x="120" y="188" width="200" height="16" rx="8"/>
+  <text class="tick mono" x="36" y="201">read_003</text>
+  <text class="tick mono hp1" x="336" y="201">HP:Z:1</text>
+  <!-- read 4 -->
+  <rect class="read hp2" x="120" y="228" width="200" height="16" rx="8"/>
+  <text class="tick mono" x="36" y="241">read_004</text>
+  <text class="tick mono hp2" x="336" y="241">HP:Z:2</text>
+  <!-- read 5 -->
+  <rect class="read hp1" x="120" y="268" width="200" height="16" rx="8"/>
+  <text class="tick mono" x="36" y="281">read_005</text>
+  <text class="tick mono hp1" x="336" y="281">HP:Z:1</text>
+  <!-- read 6 -->
+  <rect class="read hp2" x="120" y="308" width="200" height="16" rx="8"/>
+  <text class="tick mono" x="36" y="321">read_006</text>
+  <text class="tick mono hp2" x="336" y="321">HP:Z:2</text>
+
+  <!-- 候選欄：畫在 read 之後、字母之前 -->
+  <rect class="box ghost" x="208" y="102" width="26" height="228" rx="4"/>
+
+  <text class="base a mono" x="221" y="121" font-size="15">A</text>
+  <text class="base g mono" x="221" y="161" font-size="15">G</text>
+  <text class="base a mono" x="221" y="201" font-size="15">A</text>
+  <text class="base g mono" x="221" y="241" font-size="15">G</text>
+  <text class="base a mono" x="221" y="281" font-size="15">A</text>
+  <text class="base g mono" x="221" y="321" font-size="15">G</text>
+
+  <text class="tick zh" x="36" y="360">六筆紀錄，每一筆各自帶一個 HP</text>
+
+  <!-- ══ 中間：整理 ═══════════════════════════════════════════════ -->
+  <line class="conn thick" x1="480" y1="234" x2="546" y2="234" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="513" y="222">整理成</text>
+
+  <!-- ══ 右：VCF ══════════════════════════════════════════════════ -->
+  <text class="lbl bold zh" x="560" y="72">VCF：一個位置一列</text>
+  <rect class="box plain" x="560" y="84" width="420" height="300" rx="8"/>
+
+  <rect class="box sunken" x="580" y="120" width="120" height="56" rx="6"/>
+  <text class="tick mid mono" x="640" y="142">CHROM</text>
+  <text class="lbl mid bold mono" x="640" y="166">chr7</text>
+
+  <rect class="box sunken" x="710" y="120" width="120" height="56" rx="6"/>
+  <text class="tick mid mono" x="770" y="142">POS</text>
+  <text class="lbl mid bold mono" x="770" y="166">105</text>
+
+  <rect class="box sunken" x="840" y="120" width="120" height="56" rx="6"/>
+  <text class="tick mid mono" x="900" y="142">REF / ALT</text>
+  <text class="lbl mid bold mono" x="900" y="166">A / G</text>
+
+  <rect class="box sunken" x="580" y="200" width="120" height="56" rx="6"/>
+  <text class="tick mid mono" x="640" y="222">GT</text>
+  <text class="lbl mid bold mono" x="640" y="246">0|1</text>
+
+  <rect class="box sunken" x="710" y="200" width="120" height="56" rx="6"/>
+  <text class="tick mid mono" x="770" y="222">PS</text>
+  <text class="lbl mid bold mono" x="770" y="246">105</text>
+
+  <text class="tick zh" x="580" y="300">這一列是整個位置的結論，</text>
+  <text class="tick zh" x="580" y="322">不屬於其中任何一條 read。</text>
+  <text class="tick zh" x="580" y="360">一列，不是六列。</text>
+
+  <!-- ══ 底部：不要搞混 ═══════════════════════════════════════════ -->
+  <rect class="box warn" x="20" y="404" width="940" height="86" rx="8"/>
+  <text class="lbl bold zh" x="44" y="440">HP 長在一條 read 上；GT 與 PS 長在一個位置上。</text>
+  <text class="anno zh" x="44" y="472">兩者都寫成「名稱：值」，所以看到這種短標籤，要先問它描述的是一個分子還是一個位點。</text>
+</svg>

@@ -55,7 +55,9 @@
         '<div class="quiz__actions">' +
         '<button type="button" class="btn" data-qact="check">提交答案</button>' +
         (q.hint_zh ? '<button type="button" class="btn btn--ghost" data-qact="hint">顯示提示</button>' : '') +
-        '<span class="quiz__msg"></span>' +
+        /* 跟 widget 的 .widget__msg 一樣要能被朗讀出來 ——
+           不然螢幕閱讀器的使用者按下「提交答案」之後完全沒有回饋。 */
+        '<output class="quiz__msg" role="status" aria-live="polite"></output>' +
         '</div>' +
         (q.hint_zh ? '<p class="quiz__hint" hidden>提示：' + q.hint_zh + '</p>' : '') +
         (q.explain_html ? '<div class="quiz__explain">' + q.explain_html + '</div>' : '');
@@ -66,11 +68,13 @@
       /* 還原先前作答 */
       var saved = TW.progress && TW.progress.module(qid.split('.')[0]);
       var prev = saved && saved.quiz && saved.quiz[q.id];
-      if (prev && prev.picked) {
-        prev.picked.forEach(function (cid) {
-          var i = wrap.querySelector('input[value="' + cid + '"]');
-          if (i) i.checked = true;
-        });
+      if (prev && prev.picked && prev.picked.length) {
+        /* 比對 value，不要把存下來的字串拼進 querySelector ——
+           那是使用者可匯入的資料，含引號就會丟 SyntaxError。 */
+        var inputs = wrap.querySelectorAll('input[type="' + inputType + '"]');
+        for (var n = 0; n < inputs.length; n++) {
+          if (prev.picked.indexOf(inputs[n].value) >= 0) inputs[n].checked = true;
+        }
         grade(wrap, q);
       }
 
@@ -125,9 +129,24 @@
     }
   }
 
+  /* 每個測驗區塊各自隔離 —— 跟 widget 同一個原則（core.js 的 bootOne）。
+     沒有這層 try/catch 的話，只要有一筆存壞的作答（例如選項 id 裡混進
+     引號，querySelector 會直接丟 SyntaxError），整頁後面的測驗就全部
+     不會渲染，而學生只會看到幾個空白的「學習檢核」。 */
   function start() {
     var sections = document.querySelectorAll('.quiz[data-quiz]');
-    for (var i = 0; i < sections.length; i++) render(sections[i]);
+    for (var i = 0; i < sections.length; i++) {
+      try {
+        render(sections[i]);
+      } catch (e) {
+        console.error('[quiz]', sections[i].getAttribute('data-quiz'), e);
+        var host = sections[i].querySelector('.quiz__items');
+        if (host) {
+          host.innerHTML = '<p class="widget__err">這一組測驗載入失敗。' +
+            '其餘頁面內容仍可使用；點「匯出進度」備份後重設進度即可恢復。</p>';
+        }
+      }
+    }
   }
 
   if (document.readyState === 'loading') {

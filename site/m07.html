@@ -73,9 +73,9 @@
 <p class="prose">先把整件事放在一張圖裡。下圖的上下兩排<b>腫瘤 read 完全相同</b>——
 同樣六條 read、同樣四個候選位置。唯一改變的是右邊拿什麼當對照：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" class="dia-svg" role="img">
-  <title>同一批腫瘤 read，有配對正常組織與只有腫瘤時的判定差別</title>
-  <desc>上下兩排的腫瘤 read 完全相同：六條 read、四個候選位置。位置 ① 與 ③ 是這個人天生就有的
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" class="dia-svg" role="img" aria-labelledby="m07-tn-vs-to__title" aria-describedby="m07-tn-vs-to__desc">
+  <title id="m07-tn-vs-to__title">同一批腫瘤 read，有配對正常組織與只有腫瘤時的判定差別</title>
+  <desc id="m07-tn-vs-to__desc">上下兩排的腫瘤 read 完全相同：六條 read、四個候選位置。位置 ① 與 ③ 是這個人天生就有的
         germline 變異，② 是定序 artifact，④ 是真的 somatic 變異。
         上排有配對的正常組織：① 與 ③ 在正常組織裡都看得到，所以都排除，輸出只剩 ④。
         下排沒有正常組織，改查族群資料庫：① 的族群等位基因頻率 0.31，高於資料庫收錄門檻 0.001，
@@ -355,20 +355,20 @@
   <text class="anno zh" x="20" y="756">配對的正常組織查得到，因為那份對照就來自同一個人。位置 ② 兩排都靠 read 的分布排除，跟有沒有 normal 無關。</text>
 </svg><figcaption>上排用這個病人自己的正常組織，下排改查公開族群資料庫。輸出的差別只有位置 ③ —— 那是這個人自己的 germline 變異，族群裡幾乎沒人有，所以資料庫查不到，於是被留下來變成假陽性。位置 ② 兩排都靠 read 的分布排除，跟有沒有正常樣本無關。圖上的顏色是給讀者看的答案，程式看不到。</figcaption></figure>
 
-<p class="prose">請注意這張圖真正的重點：位置 ① 與 ③ <b>都是</b>這個人天生就有的 <span class="term" data-term="germline variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-germline-variant-0">germline variant<span class="term__pop" id="gd-germline-variant-0" role="tooltip"><b class="term__hd">germline variant <i>生殖系變異</i></b><span class="term__def" data-lang="zh">在生殖系形成、通常存在於多數細胞的變異；可遺傳給子代，但不代表必然傳遞。</span><span class="term__def" data-lang="en">A variant arising in the germline and therefore present in essentially every cell of the individual. It may be inherited or arise de novo, and may be passed to offspring.</span><a class="term__more" href="glossary.html#germline-variant">完整條目 →</a></span></span>，
+<p class="prose">請注意這張圖真正的重點：位置 ① 與 ③ <b>都是</b>這個人天生就有的 <span class="term" data-term="germline variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-germline-variant-0">germline variant<span class="term__pop" id="gd-germline-variant-0" role="tooltip"><b class="term__hd">germline variant <i>生殖系變異</i></b><span class="term__def" data-lang="zh">在生殖系形成、通常存在於多數細胞的變異；可遺傳給子代，但不代表必然傳遞。</span><span class="term__def" data-lang="en" lang="en">A variant arising in the germline and therefore present in essentially every cell of the individual. It may be inherited or arise de novo, and may be passed to offspring.</span><a class="term__more" href="glossary.html#germline-variant">完整條目 →</a></span></span>，
 在腫瘤樣本裡長得一模一樣（各三條支持、VAF 都是 0.5）。它們的命運不同，
 不是因為變異本身有什麼差別，而是因為<b>資料庫知不知道它</b>。</p>
 
-<p class="prose">位置 ④ 兩種模式都留得住，那是我們要的 <span class="term" data-term="somatic variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-somatic-variant-1">somatic variant<span class="term__pop" id="gd-somatic-variant-1" role="tooltip"><b class="term__hd">somatic variant <i>體細胞變異</i></b><span class="term__def" data-lang="zh">在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</span><span class="term__def" data-lang="en">A variant acquired outside the germline, usually after conception. It may be restricted to a subset of cells and is generally not passed to offspring; it is a central focus of cancer genomics.</span><a class="term__more" href="glossary.html#somatic-variant">完整條目 →</a></span></span>。
-caller 產生的是 <span class="term" data-term="candidate" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-candidate-2">候選變異<span class="term__pop" id="gd-candidate-2" role="tooltip"><b class="term__hd">candidate <i>候選變異</i></b><span class="term__def" data-lang="zh">caller 提出、但尚未被確認的變異位點。本實驗室多數工具位於 caller 之後，進行<b>再校正</b>，處理的就是這些 candidates。</span><span class="term__def" data-lang="en">A proposed but unconfirmed variant. Most tools in this lab post-process the caller's candidate set.</span><a class="term__more" href="glossary.html#candidate">完整條目 →</a></span></span>，還不是最終答案；本教材以 <span class="term" data-term="ClairS" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clairs-3">ClairS<span class="term__pop" id="gd-clairs-3" role="tooltip"><b class="term__hd">ClairS</b><span class="term__def" data-lang="zh">配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</span><span class="term__def" data-lang="en">A somatic variant caller for matched tumour–normal data; ClairS-TO is the tumour-only version.</span><a class="term__more" href="glossary.html#clairs">完整條目 →</a></span></span>、<span class="term" data-term="DeepSomatic" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-deepsomatic-4">DeepSomatic<span class="term__pop" id="gd-deepsomatic-4" role="tooltip"><b class="term__hd">DeepSomatic</b><span class="term__def" data-lang="zh">Google 的 somatic variant caller，同樣有 tumor-only 版本。</span><span class="term__def" data-lang="en">Google's somatic variant caller, also available in a tumour-only mode.</span><a class="term__more" href="glossary.html#deepsomatic">完整條目 →</a></span></span>
-作為 <b><span class="term" data-term="tumour-normal" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-normal-5">tumour-normal<span class="term__pop" id="gd-tumour-normal-5" role="tooltip"><b class="term__hd">tumour-normal <i>配對腫瘤／正常</i></b><span class="term__def" data-lang="zh">同時定序病人的腫瘤與正常組織；正常樣本提供個體 germline 背景，有助於辨識 somatic 候選。</span><span class="term__def" data-lang="en">Sequencing a patient's tumour alongside their normal tissue, which supplies the germline background.</span><a class="term__more" href="glossary.html#tumour-normal">完整條目 →</a></span></span></b>（TN）calling 的範例，<span class="term" data-term="tumour-only" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-only-6">tumour-only<span class="term__pop" id="gd-tumour-only-6" role="tooltip"><b class="term__hd">tumour-only <i>僅腫瘤</i></b><span class="term__def" data-lang="zh">只有腫瘤樣本、沒有配對正常樣本。在成本或檢體受限時很常見，但少了 germline 對照，分析難度會大幅提高。</span><span class="term__def" data-lang="en">Having only the tumour sample. Common for cost or specimen reasons, but much harder without a germline baseline.</span><a class="term__more" href="glossary.html#tumour-only">完整條目 →</a></span></span>（TO）則以 ClairS-TO 為例，
+<p class="prose">位置 ④ 兩種模式都留得住，那是我們要的 <span class="term" data-term="somatic variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-somatic-variant-1">somatic variant<span class="term__pop" id="gd-somatic-variant-1" role="tooltip"><b class="term__hd">somatic variant <i>體細胞變異</i></b><span class="term__def" data-lang="zh">在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</span><span class="term__def" data-lang="en" lang="en">A variant acquired outside the germline, usually after conception. It may be restricted to a subset of cells and is generally not passed to offspring; it is a central focus of cancer genomics.</span><a class="term__more" href="glossary.html#somatic-variant">完整條目 →</a></span></span>。
+caller 產生的是 <span class="term" data-term="candidate" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-candidate-2">候選變異<span class="term__pop" id="gd-candidate-2" role="tooltip"><b class="term__hd">candidate <i>候選變異</i></b><span class="term__def" data-lang="zh">caller 提出、但尚未被確認的變異位點。本實驗室多數工具位於 caller 之後，進行<b>再校正</b>，處理的就是這些 candidates。</span><span class="term__def" data-lang="en" lang="en">A proposed but unconfirmed variant. Most tools in this lab post-process the caller's candidate set.</span><a class="term__more" href="glossary.html#candidate">完整條目 →</a></span></span>，還不是最終答案；本教材以 <span class="term" data-term="ClairS" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clairs-3">ClairS<span class="term__pop" id="gd-clairs-3" role="tooltip"><b class="term__hd">ClairS</b><span class="term__def" data-lang="zh">配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</span><span class="term__def" data-lang="en" lang="en">A somatic variant caller for matched tumour–normal data; ClairS-TO is the tumour-only version.</span><a class="term__more" href="glossary.html#clairs">完整條目 →</a></span></span>、<span class="term" data-term="DeepSomatic" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-deepsomatic-4">DeepSomatic<span class="term__pop" id="gd-deepsomatic-4" role="tooltip"><b class="term__hd">DeepSomatic</b><span class="term__def" data-lang="zh">Google 的 somatic variant caller，同樣有 tumor-only 版本。</span><span class="term__def" data-lang="en" lang="en">Google's somatic variant caller, also available in a tumour-only mode.</span><a class="term__more" href="glossary.html#deepsomatic">完整條目 →</a></span></span>
+作為 <b><span class="term" data-term="tumour-normal" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-normal-5">tumour-normal<span class="term__pop" id="gd-tumour-normal-5" role="tooltip"><b class="term__hd">tumour-normal <i>配對腫瘤／正常</i></b><span class="term__def" data-lang="zh">同時定序病人的腫瘤與正常組織；正常樣本提供個體 germline 背景，有助於辨識 somatic 候選。</span><span class="term__def" data-lang="en" lang="en">Sequencing a patient's tumour alongside their normal tissue, which supplies the germline background.</span><a class="term__more" href="glossary.html#tumour-normal">完整條目 →</a></span></span></b>（TN）calling 的範例，<span class="term" data-term="tumour-only" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-only-6">tumour-only<span class="term__pop" id="gd-tumour-only-6" role="tooltip"><b class="term__hd">tumour-only <i>僅腫瘤</i></b><span class="term__def" data-lang="zh">只有腫瘤樣本、沒有配對正常樣本。在成本或檢體受限時很常見，但少了 germline 對照，分析難度會大幅提高。</span><span class="term__def" data-lang="en" lang="en">Having only the tumour sample. Common for cost or specimen reasons, but much harder without a germline baseline.</span><a class="term__more" href="glossary.html#tumour-only">完整條目 →</a></span></span>（TO）則以 ClairS-TO 為例，
 實際輸入與過濾流程請依版本文件確認。</p>
 
 <h3 id="沒有正常組織時-改用什麼當對照">沒有正常組織時，改用什麼當對照</h3>
 
 <p class="prose">在部分臨床或研究情境，matched normal 可能因成本、檢體量或取得條件而缺失。
 替代方案是<b>公開的族群資料庫</b>：利用 allele frequency 與已知變異紀錄提供 germline 線索。
-本教材在 LongPhase-TO／ClairS-TO 情境中將這組集合稱為 <b><span class="term" data-term="PON" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-pon-7">PON<span class="term__pop" id="gd-pon-7" role="tooltip"><b class="term__hd">PON <i>正常樣本面板／族群資料庫（依流程而異）</i></b><span class="term__def" data-lang="zh">PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</span><span class="term__def" data-lang="en">The abbreviation is workflow-dependent and the two uses are not interchangeable. In this tutorial's tumour-only workflows, PON denotes a population germline database set; in GATK Mutect2, a Panel of Normals (PoN) is built from multiple normal samples to flag recurrent technical artifacts. Either can miss a private germline variant or an unseen artifact, so neither replaces a patient's matched normal.</span><a class="term__more" href="glossary.html#pon">完整條目 →</a></span></span></b>（population database set），
+本教材在 LongPhase-TO／ClairS-TO 情境中將這組集合稱為 <b><span class="term" data-term="PON" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-pon-7">PON<span class="term__pop" id="gd-pon-7" role="tooltip"><b class="term__hd">PON <i>正常樣本面板／族群資料庫（依流程而異）</i></b><span class="term__def" data-lang="zh">PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</span><span class="term__def" data-lang="en" lang="en">The abbreviation is workflow-dependent and the two uses are not interchangeable. In this tutorial's tumour-only workflows, PON denotes a population germline database set; in GATK Mutect2, a Panel of Normals (PoN) is built from multiple normal samples to flag recurrent technical artifacts. Either can miss a private germline variant or an unseen artifact, so neither replaces a patient's matched normal.</span><a class="term__more" href="glossary.html#pon">完整條目 →</a></span></span></b>（population database set），
 它包含 1000 Genomes、gnomAD、dbSNP、CoLoRSdb 等來源。</p>
 
 <p class="prose">上圖下排的橫軸就是這件事的關鍵。資料庫有一個<b>收錄門檻</b>——
@@ -379,9 +379,9 @@ caller 產生的是 <span class="term" data-term="candidate" tabindex="0" role="
 <p class="prose">在 GATK Mutect2 語境，PoN 通常指由多個正常樣本建立的 recurrent-artifact panel。
 名稱相同、內容不同 —— 而且更重要的是，這<b>兩種</b>資料各守住一個方向，中間會留下一格：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530" class="dia-svg" role="img">
-  <title>兩種叫做 PON 的資料各守一個方向，中間留下一格涵蓋不到</title>
-  <desc>把候選變異放在兩個軸上：橫軸是這個變異在族群中的等位基因頻率，縱軸是它在多份正常樣本中
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530" class="dia-svg" role="img" aria-labelledby="m07-pon-two-axes__title" aria-describedby="m07-pon-two-axes__desc">
+  <title id="m07-pon-two-axes__title">兩種叫做 PON 的資料各守一個方向，中間留下一格涵蓋不到</title>
+  <desc id="m07-pon-two-axes__desc">把候選變異放在兩個軸上：橫軸是這個變異在族群中的等位基因頻率，縱軸是它在多份正常樣本中
         反覆出現的程度。族群資料庫（1000G、gnomAD、dbSNP、CoLoRSdb）能排除的是右半邊：族群中常見的
         germline 變異。GATK Mutect2 的 recurrent-artifact PoN 能排除的是上半邊：在很多正常樣本裡
         反覆出現的技術性 artifact。左下角那一格兩者都涵蓋不到，而那一格裡同時住著三種東西 ——
@@ -468,7 +468,7 @@ caller 產生的是 <span class="term" data-term="candidate" tabindex="0" role="
 <aside class="guardrail" id="guard-5"><p class="guardrail__hd">重要區分 #5：「PON」在不同流程中可能指兩種資料</p><p class="prose">Panel of Normals 在不同工具與教材中可能指不同資料來源，以下明確區分：</p>
 <div class="table-wrap">
 <table>
-<thead><tr><th></th><th>GATK Mutect2 的 PoN</th><th>本教材的 population database set</th></tr></thead>
+<thead><tr><th scope="col"></th><th scope="col">GATK Mutect2 的 PoN</th><th scope="col">本教材的 population database set</th></tr></thead>
 <tbody>
 <tr><td>來源</td><td>由多個正常樣本建立的統計</td><td>直接下載的族群資料庫集合</td></tr>
 <tr><td>內容</td><td>反覆出現的<b>技術性 artifact</b></td><td>族群中常見的 <b>germline 變異</b></td></tr>
@@ -489,9 +489,9 @@ caller 產生的是 <span class="term" data-term="candidate" tabindex="0" role="
 <p class="prose">前面那張圖為了講清楚缺口，把 TN 流程畫得很乾淨：normal 有訊號就排除。
 實務上不能這樣做，而且失準的地方在<b>有</b>配對正常樣本時就已經發生：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 570" class="dia-svg" role="img">
-  <title>為什麼 somatic 不等於「腫瘤 VCF 減掉正常 VCF」</title>
-  <desc>四種機制會讓「兩個 VCF 相減」的直覺失準。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 570" class="dia-svg" role="img" aria-labelledby="m07-not-a-subtraction__title" aria-describedby="m07-not-a-subtraction__desc">
+  <title id="m07-not-a-subtraction__title">為什麼 somatic 不等於「腫瘤 VCF 減掉正常 VCF」</title>
+  <desc id="m07-not-a-subtraction__desc">四種機制會讓「兩個 VCF 相減」的直覺失準。
         一、正常樣本裡混進了腫瘤 DNA，真的 somatic 變異在正常樣本中也會出現低頻支持，
         照「有訊號就刪」的規則會刪掉真答案。
         二、正常樣本的深度通常比腫瘤低；就算真有低頻訊號，25× 下期望只有 0.5 條 read，
@@ -618,11 +618,15 @@ caller 產生的是 <span class="term" data-term="candidate" tabindex="0" role="
 
 <aside class="guardrail" id="guard-6"><p class="guardrail__hd">重要區分 #6：matched-normal calling 不是把兩個 VCF 相減</p><p class="prose">上圖四項對應四個具體概念：</p>
 <ul class="prose">
-<li><b><span class="term" data-term="TINC" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tinc-8">TINC<span class="term__pop" id="gd-tinc-8" role="tooltip"><b class="term__hd">TINC <i>腫瘤污染正常樣本</i></b><span class="term__def" data-lang="zh">Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。</span><span class="term__def" data-lang="en">Tumour-in-normal contamination: tumour cells present in the matched normal, causing true somatic variants to produce signal there as well.</span><a class="term__more" href="glossary.html#tinc">完整條目 →</a></span></span></b>（tumour-in-normal contamination）—— matched normal 中存在腫瘤來源訊號。
+<li><b><span class="term" data-term="TINC" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tinc-8">TINC<span class="term__pop" id="gd-tinc-8" role="tooltip"><b class="term__hd">TINC <i>腫瘤污染正常樣本</i></b><span class="term__def" data-lang="zh">Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。</span><span class="term__def" data-lang="en" lang="en">Tumour-in-normal contamination: tumour cells present in the matched normal, causing true somatic variants to produce signal there as well.</span><a class="term__more" href="glossary.html#tinc">完整條目 →</a></span></span></b>（tumour-in-normal contamination）—— matched normal 中存在腫瘤來源訊號。
 真正的 somatic 變異可能在 normal 中呈現低頻支持；若採用「normal 有訊號即排除」的規則，可能誤刪候選。</li>
 <li><b>coverage 不對等</b> —— 本教材引用的資料就是腫瘤 50×、正常 25×。
 somatic 變異在 normal 中未被觀察到，可能只是深度不足，不代表它不存在。</li>
-<li><b><span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-copy-number-9">copy number<span class="term__pop" id="gd-copy-number-9" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span> 造成的 allelic imbalance</b> —— 讓 VAF 偏離預期，判斷門檻要跟著調。</li>
+<li><b><span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-copy-number-9">copy number<span class="term__pop" id="gd-copy-number-9" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en" lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span> 造成的 allelic imbalance</b> —— copy number 是<b>這個位置在一個細胞裡實際有幾份拷貝</b>。
+正常是兩份（父系一份、母系一份），腫瘤常常不是：整段可能只剩一份，也可能複製成三份、四份。
+份數一改，分母就跟著改 —— 一個 heterozygous germline 變異在兩份時 VAF 約 0.5，
+在「一份帶變異、兩份不帶」的三拷貝區就掉到約 0.33。所以看到 VAF 偏離 0.5 不能直接推論成 somatic，
+判斷門檻得先知道這個位置有幾份拷貝。</li>
 <li><b>caller 本身的不確定性</b> —— 兩邊的 caller 都可能漏掉或多報。</li>
 </ul></aside>
 
@@ -631,9 +635,9 @@ somatic 變異在 normal 中未被觀察到，可能只是深度不足，不代�
 <p class="prose">第一項值得單獨看一次，因為它最容易被寫成錯的規則。下圖三欄的<b>腫瘤樣本完全相同</b>
 （24 條 read、6 條帶變異、VAF 都是 0.25），差別只在配對正常樣本裡有幾條：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" class="dia-svg" role="img">
-  <title>同一個位置，在配對正常樣本裡看到訊號，有三種完全不同的意思</title>
-  <desc>三欄的腫瘤樣本完全相同：24 條 read 裡有 6 條帶變異，VAF 都是 0.25。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" class="dia-svg" role="img" aria-labelledby="m07-tinc__title" aria-describedby="m07-tinc__desc">
+  <title id="m07-tinc__title">同一個位置，在配對正常樣本裡看到訊號，有三種完全不同的意思</title>
+  <desc id="m07-tinc__desc">三欄的腫瘤樣本完全相同：24 條 read 裡有 6 條帶變異，VAF 都是 0.25。
         差別只在配對正常樣本。左欄正常樣本一條都沒有，這是最單純的 somatic。
         中欄正常樣本有 1 條，VAF 0.04 —— 這是正常組織裡混進了腫瘤細胞（tumour-in-normal
         contamination），變異仍然是 somatic，但「normal 有訊號就排除」的規則會把它刪掉。
@@ -904,16 +908,16 @@ clonality 與 depth（完整關係式見 M8）。因此不能只用「有沒有�
 
 <h3 id="沒有正常組織時-還剩下什麼證據">沒有正常組織時，還剩下什麼證據</h3>
 
-<p class="prose">回到那張 <span class="term" data-term="PON" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-pon-10">PON<span class="term__pop" id="gd-pon-10" role="tooltip"><b class="term__hd">PON <i>正常樣本面板／族群資料庫（依流程而異）</i></b><span class="term__def" data-lang="zh">PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</span><span class="term__def" data-lang="en">The abbreviation is workflow-dependent and the two uses are not interchangeable. In this tutorial's tumour-only workflows, PON denotes a population germline database set; in GATK Mutect2, a Panel of Normals (PoN) is built from multiple normal samples to flag recurrent technical artifacts. Either can miss a private germline variant or an unseen artifact, so neither replaces a patient's matched normal.</span><a class="term__more" href="glossary.html#pon">完整條目 →</a></span></span> 涵蓋不到的左下角。要把住在同一格裡的三種東西分開，
+<p class="prose">回到那張 <span class="term" data-term="PON" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-pon-10">PON<span class="term__pop" id="gd-pon-10" role="tooltip"><b class="term__hd">PON <i>正常樣本面板／族群資料庫（依流程而異）</i></b><span class="term__def" data-lang="zh">PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</span><span class="term__def" data-lang="en" lang="en">The abbreviation is workflow-dependent and the two uses are not interchangeable. In this tutorial's tumour-only workflows, PON denotes a population germline database set; in GATK Mutect2, a Panel of Normals (PoN) is built from multiple normal samples to flag recurrent technical artifacts. Either can miss a private germline variant or an unseen artifact, so neither replaces a patient's matched normal.</span><a class="term__more" href="glossary.html#pon">完整條目 →</a></span></span> 涵蓋不到的左下角。要把住在同一格裡的三種東西分開，
 必須換一個問法：不再問「這個位置別人有沒有」，而是問<b>「支持它的那些 read，彼此的結構像不像一次真的突變」</b>。</p>
 
-<p class="prose">真的變異一定是從某一條既有的 <span class="term" data-term="haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-haplotype-11">haplotype<span class="term__pop" id="gd-haplotype-11" role="tooltip"><b class="term__hd">haplotype <i>單倍型</i></b><span class="term__def" data-lang="zh">同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</span><span class="term__def" data-lang="en">A set of variants that lie on the same physical chromosome copy and are inherited together.</span><a class="term__more" href="glossary.html#haplotype">完整條目 →</a></span></span> 上長出來的，所以支持它的 read
+<p class="prose">真的變異一定是從某一條既有的 <span class="term" data-term="haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-haplotype-11">haplotype<span class="term__pop" id="gd-haplotype-11" role="tooltip"><b class="term__hd">haplotype <i>單倍型</i></b><span class="term__def" data-lang="zh">同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</span><span class="term__def" data-lang="en" lang="en">A set of variants that lie on the same physical chromosome copy and are inherited together.</span><a class="term__more" href="glossary.html#haplotype">完整條目 →</a></span></span> 上長出來的，所以支持它的 read
 應該<b>集中在一條</b> haplotype 上。如果同一個「變異」的支持 read 分散在兩條染色體上，
 那等於同一個位置各獨立突變了一次 —— 機率極低，更像比對或定序造成的問題：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" class="dia-svg" role="img">
-  <title>沒有正常組織時，改看支持 read 落在哪一條 haplotype 上</title>
-  <desc>兩欄的支持 read 總數刻意設成完全一樣：12 條 read 裡有 4 條帶著這個候選變異，
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" class="dia-svg" role="img" aria-labelledby="m07-read-level-evidence__title" aria-describedby="m07-read-level-evidence__desc">
+  <title id="m07-read-level-evidence__title">沒有正常組織時，改看支持 read 落在哪一條 haplotype 上</title>
+  <desc id="m07-read-level-evidence__desc">兩欄的支持 read 總數刻意設成完全一樣：12 條 read 裡有 4 條帶著這個候選變異，
         VAF 都是 0.33。光看數量分不出來，要看這 4 條落在哪裡。
         左欄的 4 條全部同時帶著 HP1 的 germline allele，也就是這個變異只出現在一條染色體上 ——
         跟「一次體細胞突變從一條既有 haplotype 長出來」相容。
@@ -1074,7 +1078,7 @@ clonality 與 depth（完整關係式見 M8）。因此不能只用「有沒有�
 
 <p class="prose">這個想法在兩個工具裡有不同的實作：LongPhase-S 做成 read-level 與 haplotype origin
 兩個過濾器（四個過濾器與各自的門檻見 M12）；LongPhase-TO 把它擴展成三個位點的
-<span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-triplet-graph-12">triplet graph<span class="term__pop" id="gd-triplet-graph-12" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span>，用路徑結構判斷（見 M13）。</p>
+<span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-triplet-graph-12">triplet graph<span class="term__pop" id="gd-triplet-graph-12" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en" lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span>，用路徑結構判斷（見 M13）。</p>
 
 <h3 id="一句話總結">一句話總結</h3>
 
@@ -1146,7 +1150,7 @@ haplotype 上，與「真的變異」相容（private germline 或 somatic 都�
 
 <p class="prose">要注意這個判準本身是理想化的：實務資料不會這麼乾淨，
 系統性 artifact 或 phasing error 都會造成例外，所以它是提高或降低疑慮，不是定案。
-前面提到的三位點路徑結構（<span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-triplet-graph-13">triplet graph<span class="term__pop" id="gd-triplet-graph-13" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span>）就是為了讓這個判準更穩健：
+前面提到的三位點路徑結構（<span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-triplet-graph-13">triplet graph<span class="term__pop" id="gd-triplet-graph-13" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en" lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span>）就是為了讓這個判準更穩健：
 左右鄰居都要對得上，才算得出「跟某一條既有 haplotype 只差候選這一格」的那條路徑。</p></div></details>
 </section>
 
@@ -1202,7 +1206,7 @@ pileup 字串，<code>bcftools mpileup</code> 給的是 VCF —— 後者預設<
 但仍需排除污染、比對偏差與其他模型不確定性；haplotype 分布可提示 artifact，
 但真的兩次獨立突變或 phasing error 都會造成例外。<b>沒有單一證據可以定案。</b></p>
 
-<section class="quiz" data-quiz="m07"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+<section class="quiz" data-quiz="m07"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m06.html"><small>← 上一模組</small>Phasing 與 haplotagging</a><a class="next" href="m08.html"><small>下一模組 →</small>腫瘤樣本的混合組成</a></nav>

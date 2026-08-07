@@ -87,7 +87,7 @@ TW.define('pr-threshold', function (root, cfg) {
 
     /* 門檻線 */
     var tx = L + st.thr * (R - L);
-    TW.svg('line', { 'class': 'axis', x1: tx, y1: T - 12, x2: tx, y2: B + 6, stroke: 'var(--accent)', 'stroke-width': 3 }, svg);
+    TW.svg('line', { 'class': 'axis accent', x1: tx, y1: T - 12, x2: tx, y2: B + 6 }, svg);
     TW.text(tx, T - 18, '門檻 ' + st.thr.toFixed(2), 'tick mid bold', svg);
     TW.svg('rect', { 'class': 'region bad', x: L, y: T, width: tx - L, height: B - T }, svg);
     TW.text(L + 8, T + 16, '← 被過濾掉', 'tick', svg);
@@ -107,7 +107,7 @@ TW.define('pr-threshold', function (root, cfg) {
         var y = T + 16 + i * 62;
         TW.text(X, y, r[0], 'anno', svg);
         var t = TW.text(X + 276, y + 6, r[1].toFixed(3), 'lbl end bold mono ' + r[2], svg);
-        t.setAttribute('font-size', '28');
+        t.style.fontSize = '28px';
         TW.svg('rect', { 'class': 'box plain', x: X, y: y + 14, width: 276, height: 8, rx: 4 }, svg);
         TW.svg('rect', {
           'class': 'bar ' + (r[2] === 'ok' ? 'somatic' : r[2] === 'hp1' ? 'hp1' : 'hp2'),

@@ -51,19 +51,39 @@ window.TW = window.TW || {};
     return o;
   }
 
+  /* 真正落地的那一步。debounce 與 flush 都走這裡。 */
+  function commit() {
+    if (!memory) return;
+    clearTimeout(writeTimer);
+    writeTimer = null;
+    try {
+      localStorage.setItem(KEY, JSON.stringify(memory));
+      memory = null;                /* 寫成功就不必留記憶體副本 */
+    } catch (e) {
+      if (!degraded) { degraded = true; showDegradedBanner(); }
+    }
+  }
+
   function writeRaw(o) {
     o.updated = new Date().toISOString();
     memory = o;
     clearTimeout(writeTimer);
-    writeTimer = setTimeout(function () {
-      try {
-        localStorage.setItem(KEY, JSON.stringify(o));
-        memory = null;              /* 寫成功就不必留記憶體副本 */
-      } catch (e) {
-        if (!degraded) { degraded = true; showDegradedBanner(); }
-      }
-    }, 400);
+    writeTimer = setTimeout(commit, 400);
   }
+
+  /* ★ 一定要在離開頁面前同步寫完 ★
+     瀏覽器在導覽時會直接丟掉還沒觸發的 setTimeout，所以只靠 400 ms 的
+     debounce 等於「按下一頁就不存」。最會中招的是捲動深度：
+     trackScroll 正好是在 visibilitychange 當下才呼叫 patch()，
+     接著頁面就卸載了，那筆 scrollMax 從來沒有真的寫進 localStorage。
+
+     pagehide / visibilitychange 兩個都要掛：
+       · pagehide —— 導覽與關分頁，bfcache 也算（Safari 只有這個可靠）
+       · visibilitychange → hidden —— 手機切到背景後可能不再回來 */
+  window.addEventListener('pagehide', commit);
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') commit();
+  });
 
   function showDegradedBanner() {
     if (!document.body) return;
@@ -131,6 +151,17 @@ window.TW = window.TW || {};
         if (data.score !== undefined) w.score = data.score;
         if (data.state !== undefined && data.state !== null) w.state = data.state;
         w.at = Date.now();
+      });
+    },
+
+    /** 「重來」用：只丟掉暫存的作答內容，不動 solved / attempts。
+        不清的話，按了重來、重新整理，舊答案又會被 setState 還原回來 ——
+        而 §9 說 reset 是「清使用者輸入」，不是「清掉學過的紀錄」。 */
+    clearWidgetState: function (wid) {
+      var mid = wid.split('.')[0];
+      P.patch(function (s) {
+        var m = s.modules[mid];
+        if (m && m.widgets && m.widgets[wid]) delete m.widgets[wid].state;
       });
     },
 
@@ -219,15 +250,21 @@ window.TW = window.TW || {};
       if (!ticking) { ticking = true; requestAnimationFrame(sample); }
     }, { passive: true });
 
-    /* 只在離開頁面時寫一次，不要每次捲動都打 localStorage */
-    window.addEventListener('visibilitychange', function () {
-      if (document.visibilityState === 'hidden' && max > 0) {
-        P.patch(function (s) {
-          var m = s.modules[id] = s.modules[id] || {};
-          m.scrollMax = Math.max(m.scrollMax || 0, Math.round(max * 100) / 100);
-        });
-      }
+    /* 只在離開頁面時寫一次，不要每次捲動都打 localStorage。
+       patch() 之後一定要自己 commit()：這個 handler 是在頁面即將卸載時才跑的，
+       留給 debounce 的 400 ms 根本不會到。 */
+    function saveScroll() {
+      if (max <= 0) return;
+      P.patch(function (s) {
+        var m = s.modules[id] = s.modules[id] || {};
+        m.scrollMax = Math.max(m.scrollMax || 0, Math.round(max * 100) / 100);
+      });
+      commit();
+    }
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'hidden') saveScroll();
     });
+    window.addEventListener('pagehide', saveScroll);
   }
 
   TW.progress = P;

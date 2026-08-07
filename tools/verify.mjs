@@ -336,6 +336,70 @@ for (const f of fs.existsSync(path.join(SRC, 'svg'))
   }
 }
 
+/* 12b. 同一條規則也要蓋到「用 JS 畫出來的 SVG」。
+   手繪的 .svg 檔早就在管了，但 widget 是在瀏覽器裡用 TW.svg() 生出來的，
+   一直沒有人檢查 —— 於是同一個錯誤在 8 個地方活了下來，包括 pr-threshold
+   那條「門檻線」被 .axis 蓋成跟座標軸一模一樣的灰色。
+
+   （順帶記一筆，免得下次又有人推論錯：presentation attribute 裡的 var()
+   是<b>可以</b>被代換的，Chrome 151 實測 stroke="var(--rule)" 會正確拿到
+   #D3DAE1。所以 stroke="var(--bad)" 畫出來不是紅色時，原因永遠是上面那條
+   「樣式表贏過 attribute」，不是 var() 失效 —— 只要那個 class 在
+   diagram.css 裡宣告過同名 property 就會發生。）                          */
+
+for (const f of js) {
+  const s = fs.readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const rel = path.relative(ROOT, f);
+
+  /* TW.svg('tag', { class: 'x y', stroke: '…' }) —— 只看第一層的物件字面 */
+  for (const call of s.matchAll(/TW\.svg\(\s*'(\w+)'\s*,\s*\{([^{}]*)\}/g)) {
+    const [, tag, body] = call;
+    const cm = body.match(/'?class'?\s*:\s*'([^']*)'/);
+    if (!cm) continue;
+    const classes = cm[1].split(/\s+/).filter(Boolean);
+    const styled = new Set();
+    for (const [need, props] of cssRules) {
+      if (need.every((c) => classes.includes(c))) for (const p of props) styled.add(p);
+    }
+    for (const am of body.matchAll(/'?([a-z-]+)'?\s*:\s*('[^']*'|[^,]+)/g)) {
+      const [, prop, raw] = am;
+      if (!PRESENTATION.has(prop) || !styled.has(prop)) continue;
+      fail(rel, `TW.svg('${tag}', { class: '${cm[1]}', ${prop}: ${raw.trim()} })` +
+        ` 的 ${prop} 會被 diagram.css 蓋掉 —— 改成 class 或寫進 style=""`);
+    }
+  }
+
+  /* 同一個錯誤的第二種寫法：先 TW.text()／TW.svg() 拿到節點，
+     再 el.setAttribute('font-size', …)。attribute 一樣輸給樣式表，
+     所以 .lbl（22px）上面設 font-size="54" 是完全沒有作用的。
+     踩過才知道：loh-sim 的 heterozygosity 大字就是這樣被縮回 22px 的。 */
+  const nodeClass = new Map();
+  /* class 常常是拼出來的（'lbl mid bold mono ' + (het ? 'ok' : 'bad')）；
+     只取靜態前綴就夠了 —— 動態尾綴只會再加 class，不會拿掉宣告。 */
+  for (const m of s.matchAll(
+    /(\w+)\s*=\s*TW\.text\([^;]*?,\s*'([^']*)'\s*(?:\+[^,;]*?)?,\s*\w+\s*\)/g)) {
+    nodeClass.set(m[1], m[2]);
+  }
+  for (const m of s.matchAll(/(\w+)\s*=\s*TW\.svg\(\s*'\w+'\s*,\s*\{([^{}]*)\}/g)) {
+    const cm = m[2].match(/'?class'?\s*:\s*'([^']*)'/);
+    if (cm) nodeClass.set(m[1], cm[1]);
+  }
+  for (const m of s.matchAll(/(\w+)\.setAttribute\(\s*'([a-z-]+)'\s*,\s*('[^']*'|[^)]+)\)/g)) {
+    const [, name, prop, raw] = m;
+    if (!PRESENTATION.has(prop) || !nodeClass.has(name)) continue;
+    const classes = nodeClass.get(name).split(/\s+/).filter(Boolean);
+    const styled = new Set();
+    for (const [need, props] of cssRules) {
+      if (need.every((c) => classes.includes(c))) for (const p of props) styled.add(p);
+    }
+    if (!styled.has(prop)) continue;
+    fail(rel, `${name}.setAttribute('${prop}', ${raw.trim()}) —— ${name} 是` +
+      ` class="${nodeClass.get(name)}"，${prop} 已由 diagram.css 宣告，attribute 不會生效。` +
+      ` 改用 ${name}.style`);
+  }
+
+}
+
 /* ── 13. 產出的 HTML 不得殘留沒展開的 macro 或詞彙標記 ───────────────────
    踩過才加的一項。build.mjs 的第 9 步（[[term]]）要能看到文字才展開得了，
    而 {{svg:}} / {{fig:}} / {{widget:}} 會先把整塊圖 stash 起來。圖說一旦

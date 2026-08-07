@@ -52,8 +52,8 @@ TW.define('loh-sim', function (root, cfg) {
       TW.svg('rect', { 'class': 'chr lost', x: 40 + drawn * 60, y: y0, width: 40, height: 150, rx: 18 }, svg);
       TW.text(60 + drawn * 60, y0 + 172, 'HP2 已失去', 'tick mid zh', svg);
       TW.svg('line', {
-        'class': 'conn', x1: 46 + drawn * 60, y1: y0 + 8, x2: 114 + drawn * 60 - 60, y2: y0 + 142,
-        stroke: 'var(--bad)', 'stroke-width': 3
+        'class': 'conn bad', x1: 46 + drawn * 60, y1: y0 + 8, x2: 114 + drawn * 60 - 60, y2: y0 + 142,
+        style: 'stroke-width:3'
       }, svg);
     }
 
@@ -68,7 +68,7 @@ TW.define('loh-sim', function (root, cfg) {
       x: CX, y: 200 - covH, width: 110, height: covH, rx: 4
     }, svg);
     var ct = TW.text(CX + 55, 224, (totalCN / 2).toFixed(1) + '×', 'lbl mid bold mono', svg);
-    ct.setAttribute('font-size', '24');
+    ct.style.fontSize = '24px';
     TW.text(CX + 55, 248, 'total CN = ' + totalCN, 'tick mid', svg);
 
     /* ── 右：heterozygosity ────────────────────────────────── */
@@ -77,7 +77,7 @@ TW.define('loh-sim', function (root, cfg) {
     TW.svg('rect', { 'class': 'box plain', x: HX, y: 60, width: 320, height: 160, rx: 8 }, svg);
 
     var hv = TW.text(HX + 160, 132, het.toFixed(1), 'lbl mid bold mono ' + (het ? 'ok' : 'bad'), svg);
-    hv.setAttribute('font-size', '54');
+    hv.style.fontSize = '54px';
     TW.text(HX + 160, 168, het ? '兩條 haplotype 都在' : '只剩單一 haplotype', 'anno mid zh', svg);
     TW.text(HX + 160, 196, het ? '不是 LOH' : '這就是 LOH', 'anno mid zh bold ' + (het ? '' : 'bad'), svg);
 

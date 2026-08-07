@@ -102,7 +102,11 @@ chr7   105 .  A   G   60   PASS   .    GT:PS  0|1:105</code></pre>
 </table>
 </div>
 
+{{svg:m04-four-levels | [wide] 四層是<b>由外往內</b>的，順序不能跳。縮排就是「再鑽進去一層」：先知道這是哪一種檔案，才知道一筆紀錄是什麼；知道一筆是什麼，才知道欄位在描述誰。}}
+
 <p class="prose">BAM tag 與 VCF FORMAT 欄位都像短短的鍵值，但不要把它們混為一談：<b>HP 是寫在 read record 上的 BAM tag；GT 與 PS 是寫在 VCF sample 欄位中的 FORMAT 子欄位。</b>先辨認外層格式，才不會把一個 read 的標籤誤當成整個位點的結論。</p>
+
+{{svg:m04-read-vs-site | [wide] 同一個 <code>chr7:105</code>，在 BAM 是<b>六筆</b>紀錄、每筆各帶一個 HP，在 VCF 是<b>一列</b>、整列只有一組 GT 與 PS。所以 <code>HP:Z:1</code> 講的是「這條分子來自哪一邊」，<code>GT 0|1</code> 講的是「這個位置的兩份拷貝各是什麼」——它們不是同一個層級的話。}}
 
 <h3>四、先讀 VCF 的關鍵欄位</h3>
 

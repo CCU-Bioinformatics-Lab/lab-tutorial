@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 460">
+  <title>讀任何基因體檔案的四個層級：格式、一筆紀錄、固定欄位、附加標籤</title>
+  <desc>把讀檔案拆成由外往內的四層，每一層先問一個固定的問題。
+        第一層是檔案格式，問這份檔案的一筆資料代表什麼；BAM 的一筆是對齊後的 read，VCF 的一筆是一個位點。
+        第二層是單一紀錄，問眼前這一筆究竟是誰。
+        第三層是固定欄位，問座標、序列與狀態放在哪一欄，例如 BAM 的 POS、MAPQ、CIGAR，VCF 的 REF、ALT、FILTER。
+        第四層是工具附加的標籤，例如 BAM 的 HP、MM、ML 與 VCF 的 GT、PS。
+        關鍵是層級順序不能跳：先確定外層格式，才知道內層那個短標籤描述的是一條 read 還是一個位點。</desc>
+
+  <text class="ttl zh" x="20" y="32">由外往內四層，順序不能跳</text>
+
+  <!-- 層級階梯：每一層縮排，視覺上就是「往內鑽一層」 -->
+
+  <!-- L1 -->
+  <rect class="box accent" x="20" y="56" width="940" height="82" rx="8"/>
+  <text class="lbl bold zh accent" x="44" y="86">① 檔案格式</text>
+  <text class="anno zh" x="220" y="86">這份檔案的「一筆資料」代表什麼？</text>
+  <text class="tick mono" x="600" y="80">FASTQ → 一條 read</text>
+  <text class="tick mono" x="600" y="102">BAM　 → 一條對齊後的 read</text>
+  <text class="tick mono" x="600" y="124">VCF 　→ 一個位點</text>
+
+  <!-- L2 -->
+  <rect class="box plain" x="72" y="150" width="888" height="70" rx="8"/>
+  <text class="lbl bold zh" x="96" y="180">② 一筆紀錄</text>
+  <text class="anno zh" x="272" y="180">眼前這一筆是誰？</text>
+  <text class="tick mono" x="600" y="174">BAM： read_002 這一條</text>
+  <text class="tick mono" x="600" y="204">VCF： chr7:105 這一列</text>
+
+  <!-- L3 -->
+  <rect class="box plain" x="124" y="232" width="836" height="70" rx="8"/>
+  <text class="lbl bold zh" x="148" y="262">③ 固定欄位</text>
+  <text class="anno zh" x="324" y="262">座標與狀態在哪一欄？</text>
+  <text class="tick mono" x="600" y="256">BAM： POS · MAPQ · CIGAR</text>
+  <text class="tick mono" x="600" y="286">VCF： REF · ALT · FILTER</text>
+
+  <!-- L4 -->
+  <rect class="box warn" x="176" y="314" width="784" height="70" rx="8"/>
+  <text class="lbl bold zh warn" x="200" y="344">④ 附加標籤</text>
+  <text class="anno zh" x="376" y="344">工具多寫了什麼判讀？</text>
+  <text class="tick mono" x="600" y="338">BAM tag： HP · MM · ML</text>
+  <text class="tick mono" x="600" y="368">VCF FORMAT： GT · PS</text>
+
+  <!-- 往內鑽的箭頭 -->
+  <line class="conn" x1="46" y1="142" x2="46" y2="186" marker-end="url(#arrow-sm)"/>
+  <line class="conn" x1="98" y1="224" x2="98" y2="268" marker-end="url(#arrow-sm)"/>
+  <line class="conn" x1="150" y1="306" x2="150" y2="350" marker-end="url(#arrow-sm)"/>
+
+  <text class="anno zh bad" x="20" y="420">第四層最容易出錯：HP 與 GT 都是短短的鍵值，長得很像。</text>
+  <text class="anno zh bad bold" x="20" y="446">但只要先確定第一層是哪一種格式，就不會把一條 read 的標籤當成整個位點的結論。</text>
+</svg>

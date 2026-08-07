@@ -148,7 +148,7 @@ TW.define('cigar-decoder', function (root, cfg) {
                 : 'bar';
         TW.svg('rect', { 'class': cls, x: x, y: 160, width: W - 2, height: 22, rx: 3 }, svg);
         var t3 = TW.text(x + W / 2 - 1, 176, o.op, 'tick mid bold mono', svg);
-        t3.setAttribute('font-size', '14');
+        t3.style.fontSize = '14px';
 
         col++;
       }

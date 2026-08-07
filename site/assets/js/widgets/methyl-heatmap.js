@@ -95,7 +95,7 @@ TW.define('methyl-heatmap', function (root, cfg) {
         if (rows[i][key] !== rows[i - 1][key]) {
           TW.svg('line', {
             'class': 'axis', x1: 20, y1: T + i * RH - 1,
-            x2: L + N_CPG * CW + 40, y2: T + i * RH - 1, 'stroke-width': 2
+            x2: L + N_CPG * CW + 40, y2: T + i * RH - 1
           }, svg);
         }
       }

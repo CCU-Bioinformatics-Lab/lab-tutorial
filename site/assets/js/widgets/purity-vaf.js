@@ -60,7 +60,7 @@ TW.define('purity-vaf', function (root, cfg) {
     /* 簡化假設 VAF = purity */
     TW.svg('line', {
       'class': 'guide', x1: L, y1: B, x2: R, y2: T,
-      'stroke-dasharray': '6 5'
+      style: 'stroke-dasharray:6 5'
     }, svg);
     TW.text(R - 6, T + 16, 'VAF = purity（簡化直覺）', 'tick end', svg);
 
@@ -71,14 +71,14 @@ TW.define('purity-vaf', function (root, cfg) {
       var v = vaf(p, st.cn, st.mult, st.ccf);
       pts.push((L + p * (R - L)).toFixed(1) + ',' + (B - Math.min(1, v) * (B - T)).toFixed(1));
     }
-    TW.svg('path', { 'class': 'flow', d: 'M' + pts.join(' L'), 'stroke-width': 3 }, svg);
+    TW.svg('path', { 'class': 'flow', d: 'M' + pts.join(' L'), style: 'stroke-width:3' }, svg);
 
     /* 目前的點 */
     var cv = vaf(st.purity, st.cn, st.mult, st.ccf);
     var cx = L + st.purity * (R - L);
     var cy = B - Math.min(1, cv) * (B - T);
-    TW.svg('line', { 'class': 'guide', x1: cx, y1: cy, x2: cx, y2: B, stroke: 'var(--somatic)' }, svg);
-    TW.svg('line', { 'class': 'guide', x1: L, y1: cy, x2: cx, y2: cy, stroke: 'var(--somatic)' }, svg);
+    TW.svg('line', { 'class': 'guide somatic', x1: cx, y1: cy, x2: cx, y2: B }, svg);
+    TW.svg('line', { 'class': 'guide somatic', x1: L, y1: cy, x2: cx, y2: cy }, svg);
     TW.svg('circle', { 'class': 'pt tp', cx: cx, cy: cy, r: 8 }, svg);
 
     /* 右側讀數 */
@@ -98,7 +98,7 @@ TW.define('purity-vaf', function (root, cfg) {
       var y = T + 22 + i * 36;
       TW.text(X, y, r[0], 'tick', svg);
       var t = TW.text(X + 262, y + 2, r[1], 'lbl end bold mono ' + (r[2] || ''), svg);
-      t.setAttribute('font-size', '21');
+      t.style.fontSize = '21px';
     });
 
     if (st.cn !== 2) {

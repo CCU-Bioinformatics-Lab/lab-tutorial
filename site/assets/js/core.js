@@ -68,22 +68,31 @@ window.TW = window.TW || {};
     return t;
   };
 
-  /** 建立一張標準畫布：viewBox 一律 0 0 1000 H。 */
+  /** 建立一張標準畫布：viewBox 一律 0 0 1000 H。
+      title/desc 要用 aria-labelledby / aria-describedby 接上去才會被唸出來
+      —— role="img" 但沒有名字的話，螢幕閱讀器只會說一句「圖片」。
+      （手繪的 .svg 由 build.mjs 做同一件事。）
+      widget 每次 render 都會重畫，所以 id 要帶序號，不能固定。 */
+  var stageSeq = 0;
+
   TW.stage = function (host, h, opts) {
     opts = opts || {};
     host.textContent = '';
+    var uid = 'tw-stage-' + (++stageSeq);
     var s = TW.svg('svg', {
       viewBox: '0 0 1000 ' + h,
       'class': 'dia-svg' + (opts.minWide === false ? '' : ' min-wide'),
       role: 'img'
     }, host);
     if (opts.title) {
-      var t = TW.svg('title', {}, s);
+      var t = TW.svg('title', { id: uid + '-t' }, s);
       t.textContent = opts.title;
+      s.setAttribute('aria-labelledby', uid + '-t');
     }
     if (opts.desc) {
-      var d = TW.svg('desc', {}, s);
+      var d = TW.svg('desc', { id: uid + '-d' }, s);
       d.textContent = opts.desc;
+      s.setAttribute('aria-describedby', uid + '-d');
     }
     return s;
   };
@@ -155,6 +164,8 @@ window.TW = window.TW || {};
           if (api.reset) api.reset();
           if (api.render) api.render();
           TW.msg(root, '');
+          /* 存起來的作答也要丟掉，否則重新整理會把剛剛清掉的答案救回來 */
+          if (TW.progress) TW.progress.clearWidgetState(wid);
         } else if (act === 'check') {
           var r = (api.check && api.check()) || { ok: false, message: '' };
           TW.msg(root, r.message, r.ok);

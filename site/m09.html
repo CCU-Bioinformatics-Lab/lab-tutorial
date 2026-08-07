@@ -73,19 +73,19 @@
 
 <h3 id="5mc-序列之外的表觀遺傳資訊">5mC：序列之外的表觀遺傳資訊</h3>
 
-<p class="prose"><span class="term" data-term="5mC" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-5mc-0">5mC<span class="term__pop" id="gd-5mc-0" role="tooltip"><b class="term__hd">5mC <i>5-甲基胞嘧啶</i></b><span class="term__def" data-lang="zh">胞嘧啶第 5 個碳上的甲基化修飾。這是常見的 DNA 甲基化形式，主要見於 CpG；可影響轉錄調控，效應依基因組位置與細胞類型而異。</span><span class="term__def" data-lang="en">5-methylcytosine, the commonest DNA methylation mark, usually at CpG sites. Affects expression without changing sequence.</span><a class="term__more" href="glossary.html#5mc">完整條目 →</a></span></span> 是在胞嘧啶（C）的 5 位碳上加上甲基。在序列字母表示上，<b>它不改變 C 的識別</b>；
+<p class="prose"><span class="term" data-term="5mC" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-5mc-0">5mC<span class="term__pop" id="gd-5mc-0" role="tooltip"><b class="term__hd">5mC <i>5-甲基胞嘧啶</i></b><span class="term__def" data-lang="zh">胞嘧啶第 5 個碳上的甲基化修飾。這是常見的 DNA 甲基化形式，主要見於 CpG；可影響轉錄調控，效應依基因組位置與細胞類型而異。</span><span class="term__def" data-lang="en" lang="en">5-methylcytosine, the commonest DNA methylation mark, usually at CpG sites. Affects expression without changing sequence.</span><a class="term__more" href="glossary.html#5mc">完整條目 →</a></span></span> 是在胞嘧啶（C）的 5 位碳上加上甲基。在序列字母表示上，<b>它不改變 C 的識別</b>；
 5mC 可與基因調控及表現相關，但作用取決於基因組脈絡。</p>
 
-<p class="prose">在哺乳類，5mC 主要集中於 <b><span class="term" data-term="CpG" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cpg-1">CpG<span class="term__pop" id="gd-cpg-1" role="tooltip"><b class="term__hd">CpG</b><span class="term__def" data-lang="zh">序列上一個 C 後接一個 G（p 代表兩者之間的磷酸鍵）。哺乳類多數 5mC 位於 CpG，特定細胞或情況亦可見非 CpG 甲基化。</span><span class="term__def" data-lang="en">A cytosine followed by a guanine. Most mammalian 5mC occurs at CpG sites, although non-CpG methylation is also observed in particular cells and contexts.</span><a class="term__more" href="glossary.html#cpg">完整條目 →</a></span></span></b> 位點（一個 C 後面接著一個 G），但也可能出現在非 CpG 脈絡。
+<p class="prose">在哺乳類，5mC 主要集中於 <b><span class="term" data-term="CpG" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cpg-1">CpG<span class="term__pop" id="gd-cpg-1" role="tooltip"><b class="term__hd">CpG</b><span class="term__def" data-lang="zh">序列上一個 C 後接一個 G（p 代表兩者之間的磷酸鍵）。哺乳類多數 5mC 位於 CpG，特定細胞或情況亦可見非 CpG 甲基化。</span><span class="term__def" data-lang="en" lang="en">A cytosine followed by a guanine. Most mammalian 5mC occurs at CpG sites, although non-CpG methylation is also observed in particular cells and contexts.</span><a class="term__more" href="glossary.html#cpg">完整條目 →</a></span></span></b> 位點（一個 C 後面接著一個 G），但也可能出現在非 CpG 脈絡。
 在本節的分析中，基本單位是「某個 CpG 位點上，一條 read 的 methylated 或 unmethylated 狀態」。</p>
 
 <p class="prose">bisulfite-seq 是測量甲基化的常用方法之一，會將未甲基化的 C 轉換為 U（在定序中通常讀為 T），流程較為繁複。
-<span class="term" data-term="ONT" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ont-2">ONT<span class="term__pop" id="gd-ont-2" role="tooltip"><b class="term__hd">ONT <i>奈米孔定序</i></b><span class="term__def" data-lang="zh">Oxford Nanopore Technologies。以電流訊號讀取 DNA，可產生長 read；在 native-DNA 流程與適當模型下，可由訊號推定 5mC，通常不需 bisulfite 轉換。</span><span class="term__def" data-lang="en">Oxford Nanopore Technologies. Reads DNA through ionic-current signals, producing long reads. With native DNA and a suitable model, 5mC can be inferred without bisulfite conversion.</span><a class="term__more" href="glossary.html#ont">完整條目 →</a></span></span> 可利用電流訊號搭配修飾辨識模型推定 5mC，通常不需 bisulfite 前處理；
+<span class="term" data-term="ONT" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ont-2">ONT<span class="term__pop" id="gd-ont-2" role="tooltip"><b class="term__hd">ONT <i>奈米孔定序</i></b><span class="term__def" data-lang="zh">Oxford Nanopore Technologies。以電流訊號讀取 DNA，可產生長 read；在 native-DNA 流程與適當模型下，可由訊號推定 5mC，通常不需 bisulfite 轉換。</span><span class="term__def" data-lang="en" lang="en">Oxford Nanopore Technologies. Reads DNA through ionic-current signals, producing long reads. With native DNA and a suitable model, 5mC can be inferred without bisulfite conversion.</span><a class="term__more" href="glossary.html#ont">完整條目 →</a></span></span> 可利用電流訊號搭配修飾辨識模型推定 5mC，通常不需 bisulfite 前處理；
 在完成修飾辨識且保留 MM/ML 後，同一條 read 可同時提供序列變異<b>與</b>甲基化狀態。</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" class="dia-svg" role="img">
-  <title>同一分子上的序列與甲基化資訊</title>
-  <desc>上半部區分同一段 DNA 的序列（A、C、G、T 四種鹼基）與甲基化資訊。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" class="dia-svg" role="img" aria-labelledby="m09-methylation__title" aria-describedby="m09-methylation__desc">
+  <title id="m09-methylation__title">同一分子上的序列與甲基化資訊</title>
+  <desc id="m09-methylation__desc">上半部區分同一段 DNA 的序列（A、C、G、T 四種鹼基）與甲基化資訊。
         示意中的修飾標記位於 C 後接 G 的 CpG 位點，且不改變序列字母。
         下半部示範：在完成修飾辨識且保留相應 tags 時，奈米孔定序可在同一分子上關聯序列變異與甲基化狀態，
         進而比較帶有與不帶有變異的分子之甲基化模式。</desc>
@@ -184,9 +184,9 @@
 一條 read 在一個區域內會經過好幾個 CpG 位點，每個位點上它是 methylated 或 unmethylated ——
 所以<b>一條 read 就是一個 0／1 向量</b>，一個區域就是一張 read × CpG 的表。</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 486" class="dia-svg" role="img">
-  <title>甲基化資料在程式裡的形狀：read × CpG 的 0／1 表</title>
-  <desc>左：一個區域內的六條 read，每條 read 在五個 CpG 位點上各有一個甲基化狀態，
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 486" class="dia-svg" role="img" aria-labelledby="m09-read-matrix__title" aria-describedby="m09-read-matrix__desc">
+  <title id="m09-read-matrix__title">甲基化資料在程式裡的形狀：read × CpG 的 0／1 表</title>
+  <desc id="m09-read-matrix__desc">左：一個區域內的六條 read，每條 read 在五個 CpG 位點上各有一個甲基化狀態，
         實心表示已甲基化、空心表示未甲基化。
         中：同一份資料寫成矩陣，列是 read、欄是 CpG 位點，實心記為 1、空心記為 0。
         右：把每條 read 看成一個 0／1 向量後，可以計算兩條 read 之間的差異，
@@ -399,9 +399,9 @@
 <b>somatic 變異只存在腫瘤細胞裡，所以帶著它的那些 read 全部來自同一群細胞</b>，
 而不帶它的 read 則來自腫瘤與正常細胞的混合。兩側的甲基化組成因此會不一樣。</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 690" class="dia-svg" role="img">
-  <title>甲基化當作證據：用來判斷候選變異來自哪一群細胞</title>
-  <desc>三格比較同一個候選位置的三種可能身分。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 690" class="dia-svg" role="img" aria-labelledby="m09-as-evidence__title" aria-describedby="m09-as-evidence__desc">
+  <title id="m09-as-evidence__title">甲基化當作證據：用來判斷候選變異來自哪一群細胞</title>
+  <desc id="m09-as-evidence__desc">三格比較同一個候選位置的三種可能身分。
         若候選是 somatic，帶變異的 ALT read 只會來自腫瘤細胞，因此這一側的甲基化模式偏向一致；
         不帶變異的 REF read 同時來自腫瘤與正常細胞，因此偏向混合。
         若候選是 germline，兩側都同時來自腫瘤與正常細胞，兩側都是混合。
@@ -575,9 +575,9 @@ germline 的兩側都是混合；定序錯誤的 ALT 側只是 REF 的隨機子�
 於是問題變成：<b>已知看到了哪些向量，什麼樣的「一次翻一個 0→1」的路徑能最省步數地產生它們？</b>
 那條路徑就是這個區域的候選演化順序。</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 636" class="dia-svg" role="img">
-  <title>subclone 重建在做什麼：把 read 變成 0／1 向量，再找最短的突變路徑</title>
-  <desc>以一個區域內的兩個 somatic 位置 S1 與 S2 為例。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 636" class="dia-svg" role="img" aria-labelledby="m09-subclone-basics__title" aria-describedby="m09-subclone-basics__desc">
+  <title id="m09-subclone-basics__title">subclone 重建在做什麼：把 read 變成 0／1 向量，再找最短的突變路徑</title>
+  <desc id="m09-subclone-basics__desc">以一個區域內的兩個 somatic 位置 S1 與 S2 為例。
         左：腫瘤細胞一代一代累積突變，只會多拿到突變、不會退回去，
         因此細胞的狀態從 00 變成 10，再變成 11。
         中：bulk 定序後，每條 read 在這兩個位置上就是一個 0／1 向量，
@@ -726,9 +726,9 @@ germline 的兩側都是混合；定序錯誤的 ALT 側只是 REF 的隨機子�
 
 <p class="prose">兩個題目用的是同一份 read × CpG 表，但甲基化在流程裡的位置完全不同：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" class="dia-svg" role="img">
-  <title>甲基化的兩種分析角色：模型輸入或推論後描述</title>
-  <desc>左半部：將甲基化轉為分類器輸入特徵，使其參與判斷候選是否為真變異。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" class="dia-svg" role="img" aria-labelledby="m09-two-uses__title" aria-describedby="m09-two-uses__desc">
+  <title id="m09-two-uses__title">甲基化的兩種分析角色：模型輸入或推論後描述</title>
+  <desc id="m09-two-uses__desc">左半部：將甲基化轉為分類器輸入特徵，使其參與判斷候選是否為真變異。
         若要評估模型，應使用未參與訓練或搜尋的獨立資料。
         右半部：先僅用變異證據完成推論，再附加甲基化描述結果。
         在未參與推論的前提下，甲基化可作為獨立觀察。
@@ -788,7 +788,7 @@ germline 的兩側都是混合；定序錯誤的 ALT 側只是 REF 的隨機子�
 
 <div class="table-wrap">
 <table>
-<thead><tr><th></th><th>用法一　somatic 判讀：當作<b>證據</b></th><th>用法二　subclone 重建：當作<b>註記</b></th></tr></thead>
+<thead><tr><th scope="col"></th><th scope="col">用法一　somatic 判讀：當作<b>證據</b></th><th scope="col">用法二　subclone 重建：當作<b>註記</b></th></tr></thead>
 <tbody>
 <tr><td>在流程的哪一步進來</td><td>判斷之前 —— 成為分類器的輸入特徵</td><td>候選拓撲完成<b>之後</b>才附加</td></tr>
 <tr><td>會影響結果嗎</td><td><b>會</b> —— 它可影響候選是否保留</td><td><b>在此實作中不會</b> —— 不參與搜尋、成本或排序</td></tr>
@@ -855,9 +855,9 @@ COLO829 為 9.5%、H2009 為 35.4%，資料集間差異明顯。不可評估的�
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>tag</th><th>內容</th></tr></thead>
+<thead><tr><th scope="col">tag</th><th scope="col">內容</th></tr></thead>
 <tbody>
-<tr><td><code><span class="term" data-term="MM/ML tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-mm-ml-tag-3">MM<span class="term__pop" id="gd-mm-ml-tag-3" role="tooltip"><b class="term__hd">MM/ML tag</b><span class="term__def" data-lang="zh">BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。</span><span class="term__def" data-lang="en">BAM tags carrying per-read methylation calls: MM for positions, ML for probabilities. Easily lost during processing.</span><a class="term__more" href="glossary.html#mm-ml-tag">完整條目 →</a></span></span></code></td><td>修飾類型及其相對於 read 上標準鹼基的位置與跳過規則</td></tr>
+<tr><td><code><span class="term" data-term="MM/ML tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-mm-ml-tag-3">MM<span class="term__pop" id="gd-mm-ml-tag-3" role="tooltip"><b class="term__hd">MM/ML tag</b><span class="term__def" data-lang="zh">BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。</span><span class="term__def" data-lang="en" lang="en">BAM tags carrying per-read methylation calls: MM for positions, ML for probabilities. Easily lost during processing.</span><a class="term__more" href="glossary.html#mm-ml-tag">完整條目 →</a></span></span></code></td><td>修飾類型及其相對於 read 上標準鹼基的位置與跳過規則</td></tr>
 <tr><td><code>ML</code></td><td>與 MM 項目對應的修飾機率或信心，以 0–255 的位元組值編碼</td></tr>
 </tbody>
 </table>
@@ -913,7 +913,7 @@ modkit pileup methyl.bam out_hp.bed --ref reference.fasta --partition-tag HP</co
 <b>Color alignments by</b> → <b>base modification (5mC)</b>。
 搭配前面的 <b>Group by phase</b>，即可同時檢視 haplotype 與甲基化資訊。</p>
 
-<section class="quiz" data-quiz="m09"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+<section class="quiz" data-quiz="m09"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m08.html"><small>← 上一模組</small>腫瘤樣本的混合組成</a><a class="next" href="m10.html"><small>下一模組 →</small>證據、驗證與效能評估</a></nav>

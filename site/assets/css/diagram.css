@@ -126,8 +126,12 @@
 .dia-svg .axis  { stroke: var(--rule-strong); stroke-width: 2; fill: none; }
 .dia-svg .axis.ok  { stroke: var(--ok); }
 .dia-svg .axis.bad { stroke: var(--bad); }
+/* 使用者可拖動的門檻線：必須跟它穿過的座標軸明顯分得開 */
+.dia-svg .axis.accent { stroke: var(--accent); stroke-width: 3; }
 .dia-svg .guide { stroke: var(--rule); stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; }
 .dia-svg .guide.muted { stroke: var(--muted); }
+/* 指向「目前這個點」的讀數線；跟背景導引線同形狀，靠色相分辨 */
+.dia-svg .guide.somatic { stroke: var(--somatic); }
 .dia-svg .conn  { stroke: var(--rule-strong); stroke-width: 2; fill: none; }
 .dia-svg .conn.hp1 { stroke: var(--hp1); }
 .dia-svg .conn.hp2 { stroke: var(--hp2); }

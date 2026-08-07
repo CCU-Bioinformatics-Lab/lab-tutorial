@@ -85,22 +85,22 @@
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>概念</th><th>本模組採用的定義</th></tr></thead>
+<thead><tr><th scope="col">概念</th><th scope="col">本模組採用的定義</th></tr></thead>
 <tbody>
 <tr><td><b>位點（locus）</b></td><td>DNA 序列中的特定位置；S1、S2、S3 代表三個不同位置</td></tr>
 <tr><td><b>染色體拷貝</b></td><td>本簡化模型假設每個位置有兩份 DNA 拷貝，分別標示為 HP1 與 HP2</td></tr>
 <tr><td><b>變異（variant）</b></td><td>相對於參考序列的 DNA 序列差異</td></tr>
-<tr><td><b><span class="term" data-term="read" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-read-0">read<span class="term__pop" id="gd-read-0" role="tooltip"><b class="term__hd">read</b><span class="term__def" data-lang="zh">定序儀產生的一段序列觀測。一條 read 通常來自一個 DNA 分子的片段，但不等同於一個細胞；仍需考慮重複、嵌合與定序錯誤。</span><span class="term__def" data-lang="en">A sequence observation produced by the sequencer, usually a fragment from one DNA molecule. A read is molecular evidence, not a cell; duplicates, chimeras and sequencing errors still need to be considered.</span><a class="term__more" href="glossary.html#read">完整條目 →</a></span></span></b></td><td>定序儀對單一 DNA 分子局部序列的觀測</td></tr>
-<tr><td><b><span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-vaf-1">VAF<span class="term__pop" id="gd-vaf-1" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span></b></td><td>在特定位點上，支持變異的 read 佔全部涵蓋該位點 read 的比例</td></tr>
+<tr><td><b><span class="term" data-term="read" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-read-0">read<span class="term__pop" id="gd-read-0" role="tooltip"><b class="term__hd">read</b><span class="term__def" data-lang="zh">定序儀產生的一段序列觀測。一條 read 通常來自一個 DNA 分子的片段，但不等同於一個細胞；仍需考慮重複、嵌合與定序錯誤。</span><span class="term__def" data-lang="en" lang="en">A sequence observation produced by the sequencer, usually a fragment from one DNA molecule. A read is molecular evidence, not a cell; duplicates, chimeras and sequencing errors still need to be considered.</span><a class="term__more" href="glossary.html#read">完整條目 →</a></span></span></b></td><td>定序儀對單一 DNA 分子局部序列的觀測</td></tr>
+<tr><td><b><span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-vaf-1">VAF<span class="term__pop" id="gd-vaf-1" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en" lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span></b></td><td>在特定位點上，支持變異的 read 佔全部涵蓋該位點 read 的比例</td></tr>
 </tbody>
 </table>
 </div>
 
 <h3 id="教學用簡化區段模型">教學用簡化區段模型</h3>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img">
-  <title>教學用簡化區段模型：腫瘤樣本中的四個細胞群</title>
-  <desc>左側表示樣本中的四個細胞群：正常細胞、最早出現的腫瘤細胞群，以及兩個後續分支。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img" aria-labelledby="m01-toy-locus__title" aria-describedby="m01-toy-locus__desc">
+  <title id="m01-toy-locus__title">教學用簡化區段模型：腫瘤樣本中的四個細胞群</title>
+  <desc id="m01-toy-locus__desc">左側表示樣本中的四個細胞群：正常細胞、最早出現的腫瘤細胞群，以及兩個後續分支。
         右側表示同一染色體區段的兩份 DNA 拷貝 HP1 與 HP2，以及依序出現的三個體細胞變異 S1、S2、S3。
         本模型設定 S1 位於 HP1 且由所有腫瘤細胞群共享；S2 僅位於後續分支 1；S3 僅位於後續分支 2。
         最下方表示標準 bulk 定序混合多個細胞來源的 DNA 後，各變異的預期 VAF。</desc>
@@ -227,13 +227,13 @@
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>圖中元素</th><th>代表意義</th></tr></thead>
+<thead><tr><th scope="col">圖中元素</th><th scope="col">代表意義</th></tr></thead>
 <tbody>
 <tr><td><b>灰色細胞</b></td><td>正常細胞，佔 50%</td></tr>
-<tr><td><b>紅／藍／橘色細胞</b></td><td>三個腫瘤細胞群；最早形成者為 founder <span class="term" data-term="clone" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clone-2">clone<span class="term__pop" id="gd-clone-2" role="tooltip"><b class="term__hd">clone <i>克隆</i></b><span class="term__def" data-lang="zh">源自共同祖先細胞，並共享一組可辨識 somatic mutations 的細胞群。</span><span class="term__def" data-lang="en">A population of tumour cells descended from a common ancestor and sharing the same set of somatic mutations.</span><a class="term__more" href="glossary.html#clone">完整條目 →</a></span></span>，由其分出的後續細胞群為 <span class="term" data-term="subclone" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-subclone-3">subclone<span class="term__pop" id="gd-subclone-3" role="tooltip"><b class="term__hd">subclone <i>次克隆</i></b><span class="term__def" data-lang="zh">clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。</span><span class="term__def" data-lang="en">A subset of a clone that acquired further mutations and expanded. Treatment-resistant populations are often subclones.</span><a class="term__more" href="glossary.html#subclone">完整條目 →</a></span></span></td></tr>
-<tr><td><b>藍色長條 HP1／橘色長條 HP2</b></td><td>同一段染色體的兩份 DNA 拷貝；跨多個位置的一組序列差異構成 <span class="term" data-term="haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-haplotype-4">haplotype<span class="term__pop" id="gd-haplotype-4" role="tooltip"><b class="term__hd">haplotype <i>單倍型</i></b><span class="term__def" data-lang="zh">同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</span><span class="term__def" data-lang="en">A set of variants that lie on the same physical chromosome copy and are inherited together.</span><a class="term__more" href="glossary.html#haplotype">完整條目 →</a></span></span></td></tr>
-<tr><td><b>綠點</b></td><td>由親代遺傳、存在於多數體細胞的 <span class="term" data-term="germline variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-germline-variant-5">DNA 差異<span class="term__pop" id="gd-germline-variant-5" role="tooltip"><b class="term__hd">germline variant <i>生殖系變異</i></b><span class="term__def" data-lang="zh">在生殖系形成、通常存在於多數細胞的變異；可遺傳給子代，但不代表必然傳遞。</span><span class="term__def" data-lang="en">A variant arising in the germline and therefore present in essentially every cell of the individual. It may be inherited or arise de novo, and may be passed to offspring.</span><a class="term__more" href="glossary.html#germline-variant">完整條目 →</a></span></span>；常見的單一核苷酸差異稱為 <span class="term" data-term="SNP" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-snp-6">SNP<span class="term__pop" id="gd-snp-6" role="tooltip"><b class="term__hd">SNP <i>單核苷酸多型性</i></b><span class="term__def" data-lang="zh">族群中以多型形式存在的單一鹼基差異；本教材主要以可作為 phasing 錨點的 germline SNP 為例。</span><span class="term__def" data-lang="en">A single-nucleotide polymorphism observed as a population variant. This tutorial mainly uses germline SNPs as phasing anchors.</span><a class="term__more" href="glossary.html#snp">完整條目 →</a></span></span>，可協助區分 HP1 與 HP2</td></tr>
-<tr><td><b>紅點 S1／S2／S3</b></td><td>受精後新產生、僅存在於部分細胞譜系的 <span class="term" data-term="somatic variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-somatic-variant-7">三個體細胞變異<span class="term__pop" id="gd-somatic-variant-7" role="tooltip"><b class="term__hd">somatic variant <i>體細胞變異</i></b><span class="term__def" data-lang="zh">在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</span><span class="term__def" data-lang="en">A variant acquired outside the germline, usually after conception. It may be restricted to a subset of cells and is generally not passed to offspring; it is a central focus of cancer genomics.</span><a class="term__more" href="glossary.html#somatic-variant">完整條目 →</a></span></span></td></tr>
+<tr><td><b>紅／藍／橘色細胞</b></td><td>三個腫瘤細胞群；最早形成者為 founder <span class="term" data-term="clone" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clone-2">clone<span class="term__pop" id="gd-clone-2" role="tooltip"><b class="term__hd">clone <i>克隆</i></b><span class="term__def" data-lang="zh">源自共同祖先細胞，並共享一組可辨識 somatic mutations 的細胞群。</span><span class="term__def" data-lang="en" lang="en">A population of tumour cells descended from a common ancestor and sharing the same set of somatic mutations.</span><a class="term__more" href="glossary.html#clone">完整條目 →</a></span></span>，由其分出的後續細胞群為 <span class="term" data-term="subclone" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-subclone-3">subclone<span class="term__pop" id="gd-subclone-3" role="tooltip"><b class="term__hd">subclone <i>次克隆</i></b><span class="term__def" data-lang="zh">clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。</span><span class="term__def" data-lang="en" lang="en">A subset of a clone that acquired further mutations and expanded. Treatment-resistant populations are often subclones.</span><a class="term__more" href="glossary.html#subclone">完整條目 →</a></span></span></td></tr>
+<tr><td><b>藍色長條 HP1／橘色長條 HP2</b></td><td>同一段染色體的兩份 DNA 拷貝；跨多個位置的一組序列差異構成 <span class="term" data-term="haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-haplotype-4">haplotype<span class="term__pop" id="gd-haplotype-4" role="tooltip"><b class="term__hd">haplotype <i>單倍型</i></b><span class="term__def" data-lang="zh">同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</span><span class="term__def" data-lang="en" lang="en">A set of variants that lie on the same physical chromosome copy and are inherited together.</span><a class="term__more" href="glossary.html#haplotype">完整條目 →</a></span></span></td></tr>
+<tr><td><b>綠點</b></td><td>由親代遺傳、存在於多數體細胞的 <span class="term" data-term="germline variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-germline-variant-5">DNA 差異<span class="term__pop" id="gd-germline-variant-5" role="tooltip"><b class="term__hd">germline variant <i>生殖系變異</i></b><span class="term__def" data-lang="zh">在生殖系形成、通常存在於多數細胞的變異；可遺傳給子代，但不代表必然傳遞。</span><span class="term__def" data-lang="en" lang="en">A variant arising in the germline and therefore present in essentially every cell of the individual. It may be inherited or arise de novo, and may be passed to offspring.</span><a class="term__more" href="glossary.html#germline-variant">完整條目 →</a></span></span>；常見的單一核苷酸差異稱為 <span class="term" data-term="SNP" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-snp-6">SNP<span class="term__pop" id="gd-snp-6" role="tooltip"><b class="term__hd">SNP <i>單核苷酸多型性</i></b><span class="term__def" data-lang="zh">族群中以多型形式存在的單一鹼基差異；本教材主要以可作為 phasing 錨點的 germline SNP 為例。</span><span class="term__def" data-lang="en" lang="en">A single-nucleotide polymorphism observed as a population variant. This tutorial mainly uses germline SNPs as phasing anchors.</span><a class="term__more" href="glossary.html#snp">完整條目 →</a></span></span>，可協助區分 HP1 與 HP2</td></tr>
+<tr><td><b>紅點 S1／S2／S3</b></td><td>受精後新產生、僅存在於部分細胞譜系的 <span class="term" data-term="somatic variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-somatic-variant-7">三個體細胞變異<span class="term__pop" id="gd-somatic-variant-7" role="tooltip"><b class="term__hd">somatic variant <i>體細胞變異</i></b><span class="term__def" data-lang="zh">在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</span><span class="term__def" data-lang="en" lang="en">A variant acquired outside the germline, usually after conception. It may be restricted to a subset of cells and is generally not passed to offspring; it is a central focus of cancer genomics.</span><a class="term__more" href="glossary.html#somatic-variant">完整條目 →</a></span></span></td></tr>
 </tbody>
 </table>
 </div>
@@ -247,6 +247,96 @@
 <li><b>S2</b> 出現於後續分支，僅存在於藍色細胞群。</li>
 <li><b>S3</b> 出現於另一後續分支，僅存在於橘色細胞群。</li>
 </ul>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430" class="dia-svg" role="img" aria-labelledby="m01-lineage__title" aria-describedby="m01-lineage__desc">
+  <title id="m01-lineage__title">三個變異出現的先後順序，決定了哪些細胞群帶有它</title>
+  <desc id="m01-lineage__desc">左側是細胞分裂的譜系樹：正常細胞先獲得 S1，成為最早的腫瘤細胞群；
+        這一群之後分成兩支，一支再獲得 S2，另一支再獲得 S3。
+        右側把同一件事換成「哪些細胞群帶有這個變異」的橫條：
+        S1 在分支之前就出現，所以三個腫瘤細胞群都有，合計佔樣本 50%；
+        S2 與 S3 分別只在自己那一支裡，各佔 20% 與 10%。
+        因此變異在樣本中佔的比例不是隨機的，而是由它出現在譜系樹的哪個位置決定：
+        愈早出現的變異被愈多細胞群共享，看起來就愈常見。</desc>
+
+  <!-- ══ 左：譜系樹 ══════════════════════════════════════════════ -->
+  <text class="lbl bold zh" x="20" y="26">變異出現的先後</text>
+
+  <!-- 正常細胞 -->
+  <circle class="cell normal" cx="70" cy="100" r="20"/>
+  <circle class="nucleus" cx="70" cy="100" r="9"/>
+  <text class="tick mid zh" x="70" y="138">正常細胞</text>
+
+  <!-- 正常 → founder -->
+  <line class="conn" x1="94" y1="100" x2="196" y2="100" marker-end="url(#arrow-sm)"/>
+  <circle class="mark somatic" cx="145" cy="82" r="7"/>
+  <text class="tick mid somatic bold" x="145" y="68">S1</text>
+
+  <!-- founder clone -->
+  <circle class="cell tumor" cx="220" cy="100" r="20"/>
+  <circle class="nucleus" cx="220" cy="100" r="9"/>
+  <text class="tick mid zh somatic" x="220" y="138">最早腫瘤細胞群</text>
+  <text class="tick mid" x="220" y="156">帶 S1</text>
+
+  <!-- founder → 兩個分支 -->
+  <line class="conn" x1="240" y1="90" x2="340" y2="60" marker-end="url(#arrow-sm)"/>
+  <line class="conn" x1="240" y1="112" x2="340" y2="188" marker-end="url(#arrow-sm)"/>
+  <circle class="mark somatic" cx="290" cy="73" r="7"/>
+  <text class="tick mid somatic bold" x="290" y="60">S2</text>
+  <circle class="mark somatic" cx="290" cy="150" r="7"/>
+  <text class="tick mid somatic bold" x="290" y="178">S3</text>
+
+  <!-- 分支 1 -->
+  <circle class="cell clone1" cx="366" cy="56" r="20"/>
+  <circle class="nucleus" cx="366" cy="56" r="9"/>
+  <text class="tick zh hp1" x="392" y="52">後續分支 1</text>
+  <text class="tick" x="392" y="70">帶 S1 + S2</text>
+
+  <!-- 分支 2 -->
+  <circle class="cell clone2" cx="366" cy="204" r="20"/>
+  <circle class="nucleus" cx="366" cy="204" r="9"/>
+  <text class="tick zh hp2" x="392" y="200">後續分支 2</text>
+  <text class="tick" x="392" y="218">帶 S1 + S3</text>
+
+  <text class="anno zh" x="20" y="268">分支之前發生的變異，會被之後所有細胞群繼承。</text>
+
+  <!-- ══ 右：誰帶有它 ══════════════════════════════════════════════ -->
+  <line class="guide" x1="530" y1="16" x2="530" y2="286"/>
+  <text class="lbl bold zh" x="560" y="26">哪些細胞群帶有它</text>
+
+  <!-- 刻度：整條 400px ＝ 100% 的細胞，所以 20% ＝ 80px、10% ＝ 40px -->
+  <rect class="box sunken" x="560" y="42" width="400" height="18" rx="4"/>
+  <text class="tick" x="560" y="78">0%</text>
+  <text class="tick end" x="960" y="78">100% 的細胞</text>
+
+  <!-- S1：三個腫瘤細胞群全都有。顏色刻意沿用左邊譜系樹的三個節點色 -->
+  <text class="tick somatic bold" x="560" y="112">S1</text>
+  <rect class="bar somatic" x="600" y="98" width="80" height="18" rx="3"/>
+  <rect class="bar hp1" x="680" y="98" width="80" height="18" rx="3"/>
+  <rect class="bar hp2" x="760" y="98" width="40" height="18" rx="3"/>
+  <text class="tick bold" x="812" y="112">＝ 50%</text>
+  <text class="tick mid" x="640" y="134">20%</text>
+  <text class="tick mid" x="720" y="134">20%</text>
+  <text class="tick mid" x="780" y="134">10%</text>
+
+  <!-- S2 -->
+  <text class="tick somatic bold" x="560" y="180">S2</text>
+  <rect class="bar hp1" x="600" y="166" width="80" height="18" rx="3"/>
+  <text class="tick bold" x="692" y="180">＝ 20%</text>
+  <text class="tick zh" x="600" y="202">只有後續分支 1</text>
+
+  <!-- S3 -->
+  <text class="tick somatic bold" x="560" y="248">S3</text>
+  <rect class="bar hp2" x="600" y="234" width="40" height="18" rx="3"/>
+  <text class="tick bold" x="652" y="248">＝ 10%</text>
+  <text class="tick zh" x="600" y="270">只有後續分支 2</text>
+
+  <!-- ══ 底部結論 ══════════════════════════════════════════════ -->
+  <line class="axis" x1="20" y1="300" x2="980" y2="300"/>
+  <rect class="box accent" x="20" y="318" width="940" height="94" rx="8"/>
+  <text class="lbl bold zh" x="44" y="352">愈早出現的變異，被愈多細胞群共享。</text>
+  <text class="anno zh" x="44" y="382">所以「它佔多少比例」帶著「它多早出現」的訊息 ——</text>
+  <text class="anno zh" x="44" y="404">這正是後面要從 VAF 反推腫瘤內部結構的依據。</text>
+</svg><figcaption>左邊是細胞分裂的順序，右邊是同一件事換成「佔多少細胞」的長度。S1 在分支<b>之前</b>出現，所以之後長出來的三群都繼承了它，加起來 50%；S2 與 S3 各自只在自己那一支裡。變異佔的比例不是隨機的，它帶著「這個變異在譜系樹上多早出現」的訊息。</figcaption></figure>
 
 <p class="prose">本模型另設定 <b>S1、S2、S3 均位於 HP1</b>。在此簡化情境中，每個新增變異最初發生於其中一份
 DNA 拷貝，因此可以進一步分析變異與 HP1 或 HP2 的分子連結。此處的 HP1／HP2 是方向任意的相對標籤，
@@ -262,6 +352,79 @@ DNA 拷貝，因此可以進一步分析變異與 HP1 或 HP2 的分子連結。
 <li>本模型假設每個細胞在此位置有<b>兩份</b> DNA 拷貝，而 S1 僅位於其中一份（HP1）</li>
 <li>因此，支持 S1 的預期 read 比例為 50% × ½ = <b>25%</b></li>
 </ul>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" class="dia-svg" role="img" aria-labelledby="m01-vaf-derivation__title" aria-describedby="m01-vaf-derivation__desc">
+  <title id="m01-vaf-derivation__title">從細胞比例算到 VAF：那個「除以 2」是從哪裡來的</title>
+  <desc id="m01-vaf-derivation__desc">以 S1 為例，分成三步。第一步：帶有 S1 的細胞佔全樣本 50%，
+        由最早腫瘤細胞群 20%、分支 1 的 20%、分支 2 的 10% 相加而得。
+        第二步是關鍵：定序看到的不是細胞，而是 DNA 分子。
+        每個細胞在這個位置貢獻兩份拷貝 HP1 與 HP2，而 S1 只在 HP1 上，
+        所以就算是帶有 S1 的細胞，它交出來的兩份分子裡也只有一份帶 S1。
+        第三步：把分子數目當成分數的分子與分母 —— 100 個細胞交出 200 份分子，
+        其中帶 S1 的是 50 份，VAF 等於 50 除以 200，也就是 0.25。
+        因此 VAF 0.25 對應的是 50% 的細胞，不是 25% 的細胞；
+        兩者差的正是每個細胞有兩份拷貝這件事。</desc>
+
+  <!-- ══ 步驟 1：細胞層級 ══════════════════════════════════════ -->
+  <text class="ttl zh" x="20" y="34">① 先數細胞</text>
+
+  <rect class="box plain" x="20" y="52" width="940" height="76" rx="8"/>
+  <text class="anno zh" x="44" y="82">帶有 S1 的細胞群</text>
+  <rect class="bar somatic" x="240" y="66" width="120" height="20" rx="3"/>
+  <text class="tick mid" x="300" y="106">最早腫瘤 20%</text>
+  <rect class="bar hp1" x="364" y="66" width="120" height="20" rx="3"/>
+  <text class="tick mid" x="424" y="106">分支 1　20%</text>
+  <rect class="bar hp2" x="488" y="66" width="60" height="20" rx="3"/>
+  <text class="tick mid" x="518" y="106">分支 2　10%</text>
+  <text class="lbl bold somatic" x="580" y="82">合計 50% 的細胞帶有 S1</text>
+
+  <!-- ══ 步驟 2：細胞 → 分子（關鍵這一步）════════════════════ -->
+  <text class="ttl zh" x="20" y="176">② 但定序看到的是 DNA 分子，不是細胞</text>
+
+  <rect class="box accent" x="20" y="194" width="940" height="128" rx="8"/>
+
+  <!-- 帶 S1 的細胞 -->
+  <circle class="cell tumor" cx="86" cy="238" r="22"/>
+  <circle class="nucleus" cx="86" cy="238" r="10"/>
+  <text class="tick mid zh somatic" x="86" y="282">帶 S1 的細胞</text>
+  <text class="tick mid" x="86" y="300">（50% 的細胞）</text>
+
+  <line class="conn" x1="112" y1="238" x2="196" y2="238" marker-end="url(#arrow-sm)"/>
+  <text class="tick mid zh" x="154" y="228">交出</text>
+
+  <!-- 它的兩份拷貝 -->
+  <rect class="read hp1" x="212" y="216" width="240" height="16" rx="8"/>
+  <text class="tick end hp1" x="206" y="228">HP1</text>
+  <circle class="mark somatic" cx="332" cy="224" r="7"/>
+  <text class="tick somatic" x="462" y="228">← 這一份帶 S1</text>
+
+  <rect class="read hp2" x="212" y="252" width="240" height="16" rx="8"/>
+  <text class="tick end hp2" x="206" y="264">HP2</text>
+  <text class="tick" x="462" y="264">← 這一份不帶</text>
+
+  <text class="lbl bold zh accent" x="640" y="230">每個細胞兩份拷貝，</text>
+  <text class="lbl bold zh accent" x="640" y="256">變異只在其中一份上。</text>
+  <text class="anno zh" x="640" y="288">所以帶有 S1 的細胞，也只有一半的</text>
+  <text class="anno zh" x="640" y="308">分子帶著 S1 —— 這就是那個「÷2」。</text>
+
+  <!-- ══ 步驟 3：分子分母 ══════════════════════════════════════ -->
+  <text class="ttl zh" x="20" y="370">③ 把分子數當成分數</text>
+
+  <rect class="box ok" x="20" y="388" width="600" height="76" rx="8"/>
+  <text class="anno zh" x="44" y="416">假設樣本裡有 100 個細胞 → 交出 200 份 DNA 分子</text>
+  <!-- tspan 的 class 要寫成 anno somatic：diagram.css 的選擇器是 .anno.somatic，
+       只寫 somatic 不會有顏色（而且不會有任何錯誤訊息） -->
+  <text class="anno zh" x="44" y="446">其中帶 S1 的：50 個細胞 × 1 份 ＝ <tspan class="anno somatic bold">50 份</tspan></text>
+
+  <!-- 分數 -->
+  <text class="lbl mid bold somatic mono" x="734" y="410">50</text>
+  <line class="axis" x1="690" y1="422" x2="778" y2="422"/>
+  <text class="lbl mid bold mono" x="734" y="452">200</text>
+  <text class="ttl mid" x="822" y="432">=</text>
+  <text class="ttl mid bold somatic mono" x="900" y="432">0.25</text>
+
+  <text class="anno zh bad bold" x="20" y="478">注意：VAF 0.25 對應的是 50% 的細胞，不是 25% 的細胞。</text>
+</svg><figcaption>那個「÷2」不是慣例，它是<b>單位換算</b>：第一步數的是細胞，第三步數的是 DNA 分子，而每個細胞在這個位置交出兩份分子。中間那一格就是換算率。看懂這張圖之後，「VAF 0.25 代表 25% 的細胞」為什麼是錯的，就不必背了。</figcaption></figure>
 
 <p class="prose">因此圖中標示 S1 的預期 <b>VAF 為 0.25</b>。依相同假設，S2 與 S3 的預期 VAF 分別為 0.10 與 0.05。</p>
 
@@ -298,9 +461,9 @@ DNA 片段序列。因此，無法僅由這些資料直接辨識每條 read 原�
 
 <h3 id="與-single-cell-定序比較">與 single-cell 定序比較</h3>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" class="dia-svg" role="img">
-  <title>bulk 與 single-cell 定序所保留及未保留的資訊</title>
-  <desc>左側表示 single-cell 定序：先分離並標記個別細胞，因此可保留 read 與來源細胞的對應，
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" class="dia-svg" role="img" aria-labelledby="m01-bulk-vs-singlecell__title" aria-describedby="m01-bulk-vs-singlecell__desc">
+  <title id="m01-bulk-vs-singlecell__title">bulk 與 single-cell 定序所保留及未保留的資訊</title>
+  <desc id="m01-bulk-vs-singlecell__desc">左側表示 single-cell 定序：先分離並標記個別細胞，因此可保留 read 與來源細胞的對應，
         並比較不同細胞的變異組合；其限制通常包括較高成本與較低的單細胞資料量。
         右側表示標準 bulk 定序：多個細胞來源的 DNA 混合處理後，read 通常無法對應至來源細胞。
         若 read 同時涵蓋兩個變異且判讀可靠，仍可直接支持兩者位於同一條 DNA 分子。
@@ -417,7 +580,7 @@ DNA 片段序列。因此，無法僅由這些資料直接辨識每條 read 原�
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>變異</th><th>帶有它的細胞比例</th><th>÷2（因為只在一條染色體上）</th><th>預期 VAF</th></tr></thead>
+<thead><tr><th scope="col">變異</th><th scope="col">帶有它的細胞比例</th><th scope="col">÷2（因為只在一條染色體上）</th><th scope="col">預期 VAF</th></tr></thead>
 <tbody>
 <tr><td>S1</td><td>20 + 20 + 10 = 50%</td><td>50% ÷ 2</td><td><b>0.25</b></td></tr>
 <tr><td>S2</td><td>20%</td><td>20% ÷ 2</td><td><b>0.10</b></td></tr>
@@ -437,7 +600,7 @@ DNA 片段序列。因此，無法僅由這些資料直接辨識每條 read 原�
 
 <p class="prose">分析與報告時應明確區分三個層級：<b>直接觀測、資料支持的模型推論，以及目前證據無法支持的結論。</b></p>
 
-<section class="quiz" data-quiz="m01"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+<section class="quiz" data-quiz="m01"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m00.html"><small>← 上一模組</small>研究主題與學習路徑</a><a class="next" href="m02.html"><small>下一模組 →</small>癌症基因體分析的基礎生物學</a></nav>
@@ -453,6 +616,9 @@ DNA 片段序列。因此，無法僅由這些資料直接辨識每條 read 原�
 
 <svg class="tw-defs" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
           markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+  </marker><marker id="arrow-sm" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="5" markerHeight="5" orient="auto-start-reverse">
     <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
   </marker></defs></svg>
 <script src="assets/js/progress.js"></script>

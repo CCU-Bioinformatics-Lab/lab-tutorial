@@ -123,7 +123,11 @@ a.chip:hover { border-color: var(--accent); color: var(--accent); }
 .objectives li { margin-bottom: .3em; }
 
 /* --- 五段式區塊標記 ----------------------------------------------------- */
+/* 目錄連到的是 h2/h3 的 id（不是 .part 的），所以 scroll-margin 一定要
+   下在標題上 —— 只給 .part 的話每次點目錄，標題都會剛好躲進 sticky
+   頁首底下，看起來像跳錯位置。 */
 .part { scroll-margin-top: 4.5rem; }
+.main h2[id], .main h3[id] { scroll-margin-top: 4.8rem; }
 .part > h2 { display: flex; align-items: baseline; gap: .55em; }
 .part > h2::before {
   content: attr(data-num);
@@ -284,6 +288,15 @@ a.chip:hover { border-color: var(--accent); color: var(--accent); }
   padding: .1em .6em;
 }
 .mcard__state { flex: none; margin-top: .1em; }
+
+/* 首頁卡片的進度環（JS 用 innerHTML 拼出來，見 index-page.js）。
+   顏色放在這裡而不是寫成 presentation attribute，理由跟 diagram.css
+   一樣：改一次 token，深淺色主題同步跟上。 */
+.ring { display: block; }
+.ring__track { fill: none; stroke: var(--rule); stroke-width: 3; }
+.ring__arc   { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+.ring__tick  { fill: none; stroke: var(--ok); stroke-width: 2.2;
+               stroke-linecap: round; stroke-linejoin: round; }
 
 /* --- 詞彙表 ------------------------------------------------------------- */
 .glist { display: grid; gap: var(--sp-4); }

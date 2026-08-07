@@ -95,7 +95,11 @@ caller 產生的是 [[candidate|候選變異]]，還不是最終答案；本教�
 真正的 somatic 變異可能在 normal 中呈現低頻支持；若採用「normal 有訊號即排除」的規則，可能誤刪候選。</li>
 <li><b>coverage 不對等</b> —— 本教材引用的資料就是腫瘤 50×、正常 25×。
 somatic 變異在 normal 中未被觀察到，可能只是深度不足，不代表它不存在。</li>
-<li><b>[[copy number]] 造成的 allelic imbalance</b> —— 讓 VAF 偏離預期，判斷門檻要跟著調。</li>
+<li><b>[[copy number]] 造成的 allelic imbalance</b> —— copy number 是<b>這個位置在一個細胞裡實際有幾份拷貝</b>。
+正常是兩份（父系一份、母系一份），腫瘤常常不是：整段可能只剩一份，也可能複製成三份、四份。
+份數一改，分母就跟著改 —— 一個 heterozygous germline 變異在兩份時 VAF 約 0.5，
+在「一份帶變異、兩份不帶」的三拷貝區就掉到約 0.33。所以看到 VAF 偏離 0.5 不能直接推論成 somatic，
+判斷門檻得先知道這個位置有幾份拷貝。</li>
 <li><b>caller 本身的不確定性</b> —— 兩邊的 caller 都可能漏掉或多報。</li>
 </ul>
 {{/guard}}

@@ -77,23 +77,23 @@
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>詞</th><th>指的是</th><th>例子</th></tr></thead>
+<thead><tr><th scope="col">詞</th><th scope="col">指的是</th><th scope="col">例子</th></tr></thead>
 <tbody>
-<tr><td><b><span class="term" data-term="locus" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-locus-0">locus<span class="term__pop" id="gd-locus-0" role="tooltip"><b class="term__hd">locus <i>位點</i></b><span class="term__def" data-lang="zh">基因體上的一個特定位置。講「這個 locus」時通常指某個座標，例如 <code>chr1:162,404,043</code>。</span><span class="term__def" data-lang="en">A specific position in the genome, usually given as a chromosome and coordinate.</span><a class="term__more" href="glossary.html#locus">完整條目 →</a></span></span></b></td><td>一個<b>位置</b></td><td><code>chr1:162,404,043</code></td></tr>
-<tr><td><b><span class="term" data-term="allele" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-allele-1">allele<span class="term__pop" id="gd-allele-1" role="tooltip"><b class="term__hd">allele <i>等位基因</i></b><span class="term__def" data-lang="zh">同一個 locus 上可能出現的其中一種序列版本。在一般二倍體常染色體位點，個體通常有兩份 allele；性染色體、拷貝數變化與腫瘤基因體可能不符合這個簡化模型。</span><span class="term__def" data-lang="en">One of the alternative sequence versions at a locus. At a typical diploid autosomal locus, an individual has two allele copies; sex chromosomes, copy-number changes and tumour genomes may differ.</span><a class="term__more" href="glossary.html#allele">完整條目 →</a></span></span></b></td><td>該位置上<b>其中一種</b>序列</td><td>這個 locus 可以是 <code>A</code> 或 <code>G</code>，各是一個 allele</td></tr>
-<tr><td>variant / <span class="term" data-term="SNV" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-snv-2">SNV<span class="term__pop" id="gd-snv-2" role="tooltip"><b class="term__hd">SNV <i>單核苷酸變異</i></b><span class="term__def" data-lang="zh">單一鹼基的改變。與 SNP 的差別在於 SNV 不預設它在族群中常見 —— 腫瘤裡新產生的單點突變叫 somatic SNV（sSNV），不叫 SNP。</span><span class="term__def" data-lang="en">A single-nucleotide change. Unlike SNP, it carries no implication of population frequency; new tumour mutations are sSNVs.</span><a class="term__more" href="glossary.html#snv">完整條目 →</a></span></span></td><td>variant 是相對參考序列的差異；SNV 是單一鹼基替換的 variant</td><td>參考為 <code>A</code>、樣本為 <code>G</code> → 一個 SNV</td></tr>
-<tr><td><b><span class="term" data-term="genotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-genotype-3">genotype<span class="term__pop" id="gd-genotype-3" role="tooltip"><b class="term__hd">genotype <i>基因型</i></b><span class="term__def" data-lang="zh">某個 locus 上觀察到的 allele 組合；對一般二倍體常染色體位點，通常是兩份 allele。VCF 裡寫成 <code>0/1</code>（未定相）或 <code>0|1</code>（已定相）。</span><span class="term__def" data-lang="en">The allele combination observed at a locus. At a typical diploid autosomal locus it has two copies; VCF writes these as 0/1 (unphased) or 0|1 (phased).</span><a class="term__more" href="glossary.html#genotype">完整條目 →</a></span></span></b></td><td>該位置上<b>兩份</b> allele 的組合</td><td><code>0/1</code>：一份跟參考一樣、一份不一樣</td></tr>
-<tr><td><b><span class="term" data-term="haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-haplotype-4">haplotype<span class="term__pop" id="gd-haplotype-4" role="tooltip"><b class="term__hd">haplotype <i>單倍型</i></b><span class="term__def" data-lang="zh">同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</span><span class="term__def" data-lang="en">A set of variants that lie on the same physical chromosome copy and are inherited together.</span><a class="term__more" href="glossary.html#haplotype">完整條目 →</a></span></span></b></td><td>同一條染色體拷貝上具有一致相位的一組 alleles</td><td>HP1 = <code>A…C…G</code>，HP2 = <code>T…A…C</code></td></tr>
+<tr><td><b><span class="term" data-term="locus" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-locus-0">locus<span class="term__pop" id="gd-locus-0" role="tooltip"><b class="term__hd">locus <i>位點</i></b><span class="term__def" data-lang="zh">基因體上的一個特定位置。講「這個 locus」時通常指某個座標，例如 <code>chr1:162,404,043</code>。</span><span class="term__def" data-lang="en" lang="en">A specific position in the genome, usually given as a chromosome and coordinate.</span><a class="term__more" href="glossary.html#locus">完整條目 →</a></span></span></b></td><td>一個<b>位置</b></td><td><code>chr1:162,404,043</code></td></tr>
+<tr><td><b><span class="term" data-term="allele" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-allele-1">allele<span class="term__pop" id="gd-allele-1" role="tooltip"><b class="term__hd">allele <i>等位基因</i></b><span class="term__def" data-lang="zh">同一個 locus 上可能出現的其中一種序列版本。在一般二倍體常染色體位點，個體通常有兩份 allele；性染色體、拷貝數變化與腫瘤基因體可能不符合這個簡化模型。</span><span class="term__def" data-lang="en" lang="en">One of the alternative sequence versions at a locus. At a typical diploid autosomal locus, an individual has two allele copies; sex chromosomes, copy-number changes and tumour genomes may differ.</span><a class="term__more" href="glossary.html#allele">完整條目 →</a></span></span></b></td><td>該位置上<b>其中一種</b>序列</td><td>這個 locus 可以是 <code>A</code> 或 <code>G</code>，各是一個 allele</td></tr>
+<tr><td>variant / <span class="term" data-term="SNV" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-snv-2">SNV<span class="term__pop" id="gd-snv-2" role="tooltip"><b class="term__hd">SNV <i>單核苷酸變異</i></b><span class="term__def" data-lang="zh">單一鹼基的改變。與 SNP 的差別在於 SNV 不預設它在族群中常見 —— 腫瘤裡新產生的單點突變叫 somatic SNV（sSNV），不叫 SNP。</span><span class="term__def" data-lang="en" lang="en">A single-nucleotide change. Unlike SNP, it carries no implication of population frequency; new tumour mutations are sSNVs.</span><a class="term__more" href="glossary.html#snv">完整條目 →</a></span></span></td><td>variant 是相對參考序列的差異；SNV 是單一鹼基替換的 variant</td><td>參考為 <code>A</code>、樣本為 <code>G</code> → 一個 SNV</td></tr>
+<tr><td><b><span class="term" data-term="genotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-genotype-3">genotype<span class="term__pop" id="gd-genotype-3" role="tooltip"><b class="term__hd">genotype <i>基因型</i></b><span class="term__def" data-lang="zh">某個 locus 上觀察到的 allele 組合；對一般二倍體常染色體位點，通常是兩份 allele。VCF 裡寫成 <code>0/1</code>（未定相）或 <code>0|1</code>（已定相）。</span><span class="term__def" data-lang="en" lang="en">The allele combination observed at a locus. At a typical diploid autosomal locus it has two copies; VCF writes these as 0/1 (unphased) or 0|1 (phased).</span><a class="term__more" href="glossary.html#genotype">完整條目 →</a></span></span></b></td><td>該位置上<b>兩份</b> allele 的組合</td><td><code>0/1</code>：一份跟參考一樣、一份不一樣</td></tr>
+<tr><td><b><span class="term" data-term="haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-haplotype-4">haplotype<span class="term__pop" id="gd-haplotype-4" role="tooltip"><b class="term__hd">haplotype <i>單倍型</i></b><span class="term__def" data-lang="zh">同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</span><span class="term__def" data-lang="en" lang="en">A set of variants that lie on the same physical chromosome copy and are inherited together.</span><a class="term__more" href="glossary.html#haplotype">完整條目 →</a></span></span></b></td><td>同一條染色體拷貝上具有一致相位的一組 alleles</td><td>HP1 = <code>A…C…G</code>，HP2 = <code>T…A…C</code></td></tr>
 </tbody>
 </table>
 </div>
 
 <p class="prose">上表以正常二倍體常染色體為模型，因此同一個 locus 通常有兩份 allele。
-這種具有兩份拷貝的狀態稱為 <span class="term" data-term="diploid" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-diploid-5">diploid<span class="term__pop" id="gd-diploid-5" role="tooltip"><b class="term__hd">diploid <i>二倍體</i></b><span class="term__def" data-lang="zh">正常人多數常染色體區段通常有兩份拷貝的狀態；性染色體、拷貝數變化與腫瘤細胞可能不同。</span><span class="term__def" data-lang="en">A state in which a typical autosomal locus has two copies. Sex chromosomes, copy-number-altered regions and tumour cells may differ.</span><a class="term__more" href="glossary.html#diploid">完整條目 →</a></span></span>；性染色體與腫瘤拷貝數異常將於後續模組另行處理。</p>
+這種具有兩份拷貝的狀態稱為 <span class="term" data-term="diploid" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-diploid-5">diploid<span class="term__pop" id="gd-diploid-5" role="tooltip"><b class="term__hd">diploid <i>二倍體</i></b><span class="term__def" data-lang="zh">正常人多數常染色體區段通常有兩份拷貝的狀態；性染色體、拷貝數變化與腫瘤細胞可能不同。</span><span class="term__def" data-lang="en" lang="en">A state in which a typical autosomal locus has two copies. Sex chromosomes, copy-number-altered regions and tumour cells may differ.</span><a class="term__more" href="glossary.html#diploid">完整條目 →</a></span></span>；性染色體與腫瘤拷貝數異常將於後續模組另行處理。</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440" class="dia-svg" role="img">
-  <title>locus、allele、genotype、haplotype 四個詞在同一張圖上的位置</title>
-  <desc>同一段染色體上標出三個位置。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440" class="dia-svg" role="img" aria-labelledby="m02-term-ladder__title" aria-describedby="m02-term-ladder__desc">
+  <title id="m02-term-ladder__title">locus、allele、genotype、haplotype 四個詞在同一張圖上的位置</title>
+  <desc id="m02-term-ladder__desc">同一段染色體上標出三個位置。
         locus 指的是一個位置；allele 指的是該位置上可能出現的其中一種序列（SNV 情況可由單一鹼基表示）；
         genotype 描述單一位置上兩份 allele 的組合；
         haplotype 則是跨越多個位置、同一條染色體上的一整串 allele。
@@ -179,13 +179,13 @@
 
 <p class="prose">關鍵差別在最後兩個：<b>genotype 是單一位置的，haplotype 是跨越多個位置的。</b>
 genotype 說「這裡有一份 A、一份 G」，但沒說 A 跟隔壁位置的 C 是不是在同一條染色體上。
-補上這個資訊，正是 <span class="term" data-term="phasing" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-phasing-6">phasing<span class="term__pop" id="gd-phasing-6" role="tooltip"><b class="term__hd">phasing <i>定相</i></b><span class="term__def" data-lang="zh">為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。</span><span class="term__def" data-lang="en">Determining which variants lie on the same physical chromosome, turning 0/1 into 0|1. Long reads provide direct molecular evidence.</span><a class="term__more" href="glossary.html#phasing">完整條目 →</a></span></span> 要推定的關係之一。</p>
+補上這個資訊，正是 <span class="term" data-term="phasing" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-phasing-6">phasing<span class="term__pop" id="gd-phasing-6" role="tooltip"><b class="term__hd">phasing <i>定相</i></b><span class="term__def" data-lang="zh">為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。</span><span class="term__def" data-lang="en" lang="en">Determining which variants lie on the same physical chromosome, turning 0/1 into 0|1. Long reads provide direct molecular evidence.</span><a class="term__more" href="glossary.html#phasing">完整條目 →</a></span></span> 要推定的關係之一。</p>
 
 <p class="prose">VCF 可用下列符號表示這項差異：</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>寫法</th><th>意思</th></tr></thead>
+<thead><tr><th scope="col">寫法</th><th scope="col">意思</th></tr></thead>
 <tbody>
 <tr><td><code>0/1</code>（斜線）</td><td>未定相。一份 ref、一份 alt，但不知道哪份在哪條上</td></tr>
 <tr><td><code>0|1</code>（豎線）</td><td>已定相。第一條 haplotype 是 ref，第二條是 alt</td></tr>
@@ -198,14 +198,14 @@ VCF 可使用豎線表示已推定的相位結果。</p>
 
 <h3 id="heterozygous-位點提供主要-phasing-資訊">heterozygous 位點提供主要 phasing 資訊</h3>
 
-<p class="prose">一個 locus 若兩份 allele 不同（<span class="term" data-term="heterozygous" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-heterozygous-7">heterozygous<span class="term__pop" id="gd-heterozygous-7" role="tooltip"><b class="term__hd">heterozygous <i>異型合子</i></b><span class="term__def" data-lang="zh">在一般二倍體位點上，兩份 allele 不同（例如一份 A、一份 G）。此類位點可作為區分 haplotype 的資訊錨點；複雜拷貝數情況需另行解讀。</span><span class="term__def" data-lang="en">At a typical diploid locus, carrying two different allele copies (for example A and G). These sites can anchor phasing; copy-number changes require separate interpretation.</span><a class="term__more" href="glossary.html#heterozygous">完整條目 →</a></span></span>，例如 <code>0/1</code>），
+<p class="prose">一個 locus 若兩份 allele 不同（<span class="term" data-term="heterozygous" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-heterozygous-7">heterozygous<span class="term__pop" id="gd-heterozygous-7" role="tooltip"><b class="term__hd">heterozygous <i>異型合子</i></b><span class="term__def" data-lang="zh">在一般二倍體位點上，兩份 allele 不同（例如一份 A、一份 G）。此類位點可作為區分 haplotype 的資訊錨點；複雜拷貝數情況需另行解讀。</span><span class="term__def" data-lang="en" lang="en">At a typical diploid locus, carrying two different allele copies (for example A and G). These sites can anchor phasing; copy-number changes require separate interpretation.</span><a class="term__more" href="glossary.html#heterozygous">完整條目 →</a></span></span>，例如 <code>0/1</code>），
 在讀取品質足夠的簡化模型中，可用來區分兩條 haplotype —— 看到 <code>A</code> 的 read 可歸到一條，看到 <code>G</code> 的可歸到另一條。</p>
 
-<p class="prose">若兩份相同（<span class="term" data-term="homozygous" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-homozygous-8">homozygous<span class="term__pop" id="gd-homozygous-8" role="tooltip"><b class="term__hd">homozygous <i>同型合子</i></b><span class="term__def" data-lang="zh">在一般二倍體位點上，兩份 allele 相同。此位點本身通常無法用來區分兩條 haplotype。</span><span class="term__def" data-lang="en">At a typical diploid locus, carrying two identical allele copies. The site itself usually cannot distinguish haplotypes.</span><a class="term__more" href="glossary.html#homozygous">完整條目 →</a></span></span>），該位點本身通常不能區分兩條 haplotype。</p>
+<p class="prose">若兩份相同（<span class="term" data-term="homozygous" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-homozygous-8">homozygous<span class="term__pop" id="gd-homozygous-8" role="tooltip"><b class="term__hd">homozygous <i>同型合子</i></b><span class="term__def" data-lang="zh">在一般二倍體位點上，兩份 allele 相同。此位點本身通常無法用來區分兩條 haplotype。</span><span class="term__def" data-lang="en" lang="en">At a typical diploid locus, carrying two identical allele copies. The site itself usually cannot distinguish haplotypes.</span><a class="term__more" href="glossary.html#homozygous">完整條目 →</a></span></span>），該位點本身通常不能區分兩條 haplotype。</p>
 
 <p class="prose">het 位點密度是影響 phasing 的因素之一；讀長、coverage 與錯誤率也會影響可建立的相位範圍。</p>
 
-<p class="prose">腫瘤中的 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-9">LOH<span class="term__pop" id="gd-loh-9" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span>（loss of heterozygosity，異型合子性喪失）可能使一個區段失去其中一種 allele，
+<p class="prose">腫瘤中的 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-9">LOH<span class="term__pop" id="gd-loh-9" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en" lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span>（loss of heterozygosity，異型合子性喪失）可能使一個區段失去其中一種 allele，
 使原本可用的 heterozygous 位點減少，因而降低可用的 phasing 錨點。</p>
 
 <p class="prose">因此，僅依這些錨點的 phasing 在 LOH 區段會更困難，可能需要其他證據或專門方法；
@@ -213,9 +213,9 @@ VCF 可使用豎線表示已推定的相位結果。</p>
 
 <h3 id="germline-與-somatic">germline 與 somatic</h3>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" class="dia-svg" role="img">
-  <title>germline variant 與 somatic variant 的來源差別</title>
-  <desc>左半部：父方與母方的生殖細胞各帶有變異，受精後形成的胚胎通常在多數細胞裡都有這些變異，
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" class="dia-svg" role="img" aria-labelledby="m02-germline-somatic__title" aria-describedby="m02-germline-somatic__desc">
+  <title id="m02-germline-somatic__title">germline variant 與 somatic variant 的來源差別</title>
+  <desc id="m02-germline-somatic__desc">左半部：父方與母方的生殖細胞各帶有變異，受精後形成的胚胎通常在多數細胞裡都有這些變異，
         並可能傳給下一代，這叫 germline variant。
         右半部：個體長大過程中某個非生殖系細胞分裂時新產生的變異，可只存在於它的後代細胞裡，
         通常不以遺傳方式傳遞，這叫 somatic variant。</desc>
@@ -315,33 +315,33 @@ VCF 可使用豎線表示已推定的相位結果。</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th></th><th><span class="term" data-term="germline variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-germline-variant-10">germline variant<span class="term__pop" id="gd-germline-variant-10" role="tooltip"><b class="term__hd">germline variant <i>生殖系變異</i></b><span class="term__def" data-lang="zh">在生殖系形成、通常存在於多數細胞的變異；可遺傳給子代，但不代表必然傳遞。</span><span class="term__def" data-lang="en">A variant arising in the germline and therefore present in essentially every cell of the individual. It may be inherited or arise de novo, and may be passed to offspring.</span><a class="term__more" href="glossary.html#germline-variant">完整條目 →</a></span></span></th><th><span class="term" data-term="somatic variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-somatic-variant-11">somatic variant<span class="term__pop" id="gd-somatic-variant-11" role="tooltip"><b class="term__hd">somatic variant <i>體細胞變異</i></b><span class="term__def" data-lang="zh">在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</span><span class="term__def" data-lang="en">A variant acquired outside the germline, usually after conception. It may be restricted to a subset of cells and is generally not passed to offspring; it is a central focus of cancer genomics.</span><a class="term__more" href="glossary.html#somatic-variant">完整條目 →</a></span></span></th></tr></thead>
+<thead><tr><th scope="col"></th><th scope="col"><span class="term" data-term="germline variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-germline-variant-10">germline variant<span class="term__pop" id="gd-germline-variant-10" role="tooltip"><b class="term__hd">germline variant <i>生殖系變異</i></b><span class="term__def" data-lang="zh">在生殖系形成、通常存在於多數細胞的變異；可遺傳給子代，但不代表必然傳遞。</span><span class="term__def" data-lang="en" lang="en">A variant arising in the germline and therefore present in essentially every cell of the individual. It may be inherited or arise de novo, and may be passed to offspring.</span><a class="term__more" href="glossary.html#germline-variant">完整條目 →</a></span></span></th><th scope="col"><span class="term" data-term="somatic variant" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-somatic-variant-11">somatic variant<span class="term__pop" id="gd-somatic-variant-11" role="tooltip"><b class="term__hd">somatic variant <i>體細胞變異</i></b><span class="term__def" data-lang="zh">在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</span><span class="term__def" data-lang="en" lang="en">A variant acquired outside the germline, usually after conception. It may be restricted to a subset of cells and is generally not passed to offspring; it is a central focus of cancer genomics.</span><a class="term__more" href="glossary.html#somatic-variant">完整條目 →</a></span></span></th></tr></thead>
 <tbody>
 <tr><td>來源</td><td>生殖系；可能由親代遺傳或 de novo 形成</td><td>非生殖系細胞譜系</td></tr>
 <tr><td>分布</td><td>通常存在於多數細胞（視嵌合而定）</td><td>可限於部分細胞，也可能為 clonal</td></tr>
 <tr><td>是否可傳給子代</td><td>可能，但不代表必然傳遞</td><td>通常不以遺傳方式傳遞</td></tr>
-<tr><td>典型 <span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-vaf-12">VAF<span class="term__pop" id="gd-vaf-12" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span></td><td>在二倍體且無污染／CNV 時，het 常接近 0.5</td><td>受 purity、copy number、multiplicity 與 clonality 影響</td></tr>
+<tr><td>典型 <span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-vaf-12">VAF<span class="term__pop" id="gd-vaf-12" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en" lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span></td><td>在二倍體且無污染／CNV 時，het 常接近 0.5</td><td>受 purity、copy number、multiplicity 與 clonality 影響</td></tr>
 <tr><td>在本課程示例中的角色</td><td><b>工具</b> —— 可作為 phasing 的錨點</td><td><b>分析目標</b> —— 需依流程與證據判定</td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">在特定 somatic calling 流程中，germline calls 常被排除；然而 heterozygous germline <span class="term" data-term="SNP" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-snp-13">SNP<span class="term__pop" id="gd-snp-13" role="tooltip"><b class="term__hd">SNP <i>單核苷酸多型性</i></b><span class="term__def" data-lang="zh">族群中以多型形式存在的單一鹼基差異；本教材主要以可作為 phasing 錨點的 germline SNP 為例。</span><span class="term__def" data-lang="en">A single-nucleotide polymorphism observed as a population variant. This tutorial mainly uses germline SNPs as phasing anchors.</span><a class="term__more" href="glossary.html#snp">完整條目 →</a></span></span>
+<p class="prose">在特定 somatic calling 流程中，germline calls 常被排除；然而 heterozygous germline <span class="term" data-term="SNP" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-snp-13">SNP<span class="term__pop" id="gd-snp-13" role="tooltip"><b class="term__hd">SNP <i>單核苷酸多型性</i></b><span class="term__def" data-lang="zh">族群中以多型形式存在的單一鹼基差異；本教材主要以可作為 phasing 錨點的 germline SNP 為例。</span><span class="term__def" data-lang="en" lang="en">A single-nucleotide polymorphism observed as a population variant. This tutorial mainly uses germline SNPs as phasing anchors.</span><a class="term__more" href="glossary.html#snp">完整條目 →</a></span></span>
 也可作為建立 haplotype 骨架的錨點之一。錨點不足時，區分 HP1／HP2 及連結 somatic 變異會更困難。</p>
 
 <h3 id="clone-與-subclone">clone 與 subclone</h3>
 
-<p class="prose">回到 M1 的簡化區段模型。一個細胞取得突變後增生，形成一群共享可辨識突變的細胞，稱為 <span class="term" data-term="clone" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clone-14">clone<span class="term__pop" id="gd-clone-14" role="tooltip"><b class="term__hd">clone <i>克隆</i></b><span class="term__def" data-lang="zh">源自共同祖先細胞，並共享一組可辨識 somatic mutations 的細胞群。</span><span class="term__def" data-lang="en">A population of tumour cells descended from a common ancestor and sharing the same set of somatic mutations.</span><a class="term__more" href="glossary.html#clone">完整條目 →</a></span></span>。
-其中某些細胞又取得新突變、再擴增，就形成 <span class="term" data-term="subclone" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-subclone-15">subclone<span class="term__pop" id="gd-subclone-15" role="tooltip"><b class="term__hd">subclone <i>次克隆</i></b><span class="term__def" data-lang="zh">clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。</span><span class="term__def" data-lang="en">A subset of a clone that acquired further mutations and expanded. Treatment-resistant populations are often subclones.</span><a class="term__more" href="glossary.html#subclone">完整條目 →</a></span></span>。</p>
+<p class="prose">回到 M1 的簡化區段模型。一個細胞取得突變後增生，形成一群共享可辨識突變的細胞，稱為 <span class="term" data-term="clone" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clone-14">clone<span class="term__pop" id="gd-clone-14" role="tooltip"><b class="term__hd">clone <i>克隆</i></b><span class="term__def" data-lang="zh">源自共同祖先細胞，並共享一組可辨識 somatic mutations 的細胞群。</span><span class="term__def" data-lang="en" lang="en">A population of tumour cells descended from a common ancestor and sharing the same set of somatic mutations.</span><a class="term__more" href="glossary.html#clone">完整條目 →</a></span></span>。
+其中某些細胞又取得新突變、再擴增，就形成 <span class="term" data-term="subclone" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-subclone-15">subclone<span class="term__pop" id="gd-subclone-15" role="tooltip"><b class="term__hd">subclone <i>次克隆</i></b><span class="term__def" data-lang="zh">clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。</span><span class="term__def" data-lang="en" lang="en">A subset of a clone that acquired further mutations and expanded. Treatment-resistant populations are often subclones.</span><a class="term__more" href="glossary.html#subclone">完整條目 →</a></span></span>。</p>
 
-<p class="prose">許多 somatic 變異可能是 passenger；可提高生長或存活優勢的候選變異稱為 <span class="term" data-term="driver mutation" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-driver-mutation-16">driver mutation<span class="term__pop" id="gd-driver-mutation-16" role="tooltip"><b class="term__hd">driver mutation <i>驅動突變</i></b><span class="term__def" data-lang="zh">可提升腫瘤細胞生長或存活優勢的候選變異；passenger mutation 通常不具有已知的選擇優勢。</span><span class="term__def" data-lang="en">A mutation that confers a growth advantage, as opposed to the far more numerous passenger mutations.</span><a class="term__more" href="glossary.html#driver-mutation">完整條目 →</a></span></span>，
+<p class="prose">許多 somatic 變異可能是 passenger；可提高生長或存活優勢的候選變異稱為 <span class="term" data-term="driver mutation" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-driver-mutation-16">driver mutation<span class="term__pop" id="gd-driver-mutation-16" role="tooltip"><b class="term__hd">driver mutation <i>驅動突變</i></b><span class="term__def" data-lang="zh">可提升腫瘤細胞生長或存活優勢的候選變異；passenger mutation 通常不具有已知的選擇優勢。</span><span class="term__def" data-lang="en" lang="en">A mutation that confers a growth advantage, as opposed to the far more numerous passenger mutations.</span><a class="term__more" href="glossary.html#driver-mutation">完整條目 →</a></span></span>，
 其判定需依癌別與功能證據。</p>
 
 <p class="prose">治療可能改變不同細胞群的相對比例，使具有抗藥優勢的 subclone 富集：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img">
-  <title>clone 與 subclone 如何形成，以及治療後抗藥群比例如何變化</title>
-  <desc>上排由左至右是時間軸：一個正常細胞取得第一個突變後增生，形成帶有相同突變的一群細胞，這叫 clone。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img" aria-labelledby="m02-clone-evolution__title" aria-describedby="m02-clone-evolution__desc">
+  <title id="m02-clone-evolution__title">clone 與 subclone 如何形成，以及治療後抗藥群比例如何變化</title>
+  <desc id="m02-clone-evolution__desc">上排由左至右是時間軸：一個正常細胞取得第一個突變後增生，形成帶有相同突變的一群細胞，這叫 clone。
         其中部分細胞又取得新突變並各自擴增，形成兩個 subclone，其中一個帶有抗藥突變。
         下排以簡化模型顯示治療的後果：藥物可優先減少沒有抗藥突變的細胞，
         原本只佔一小部分的抗藥 subclone 可能因此成為主要群體，並伴隨腫瘤復發。
@@ -480,7 +480,7 @@ VCF 可使用豎線表示已推定的相位結果。</p>
 </svg><figcaption>上排示意細胞取得變異、形成 clone，並再分支為兩個 subclones，其中一群帶有抗藥變異。下排是簡化治療模型：非抗藥群大幅減少後，抗藥 subclone 的相對比例由 5% 上升至 95%；真實反應仍取決於藥物、變異與腫瘤生態。</figcaption></figure>
 
 <p class="prose">因此，除列出腫瘤中的變異外，也需評估這些變異可能分布於哪些細胞群。
-這種細胞組成的不均勻，就叫 <span class="term" data-term="intratumour heterogeneity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-intratumour-heterogeneity-17">intratumour heterogeneity<span class="term__pop" id="gd-intratumour-heterogeneity-17" role="tooltip"><b class="term__hd">intratumour heterogeneity <i>腫瘤內異質性</i></b><span class="term__def" data-lang="zh">同一腫瘤內不同細胞可帶有不同突變組合，因而同時存在多種基因型。</span><span class="term__def" data-lang="en">Different cells within one tumour carrying different mutation combinations.</span><a class="term__more" href="glossary.html#intratumour-heterogeneity">完整條目 →</a></span></span>。</p>
+這種細胞組成的不均勻，就叫 <span class="term" data-term="intratumour heterogeneity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-intratumour-heterogeneity-17">intratumour heterogeneity<span class="term__pop" id="gd-intratumour-heterogeneity-17" role="tooltip"><b class="term__hd">intratumour heterogeneity <i>腫瘤內異質性</i></b><span class="term__def" data-lang="zh">同一腫瘤內不同細胞可帶有不同突變組合，因而同時存在多種基因型。</span><span class="term__def" data-lang="en" lang="en">Different cells within one tumour carrying different mutation combinations.</span><a class="term__more" href="glossary.html#intratumour-heterogeneity">完整條目 →</a></span></span>。</p>
 
 <aside class="guardrail" id="guard-1"><p class="guardrail__hd">重要區分 #1：HP1 與 HP2 不等於父系與母系</p><p class="prose">口語討論有時會將 HP1／HP2 稱為父系或母系 haplotype，但若未指定外部方向證據，
 不能據此判定其親本來源。</p>
@@ -489,13 +489,13 @@ VCF 可使用豎線表示已推定的相位結果。</p>
 
 <ul class="prose">
 <li>在未指定外部方向時，編號方向可<b>任意選定</b> —— 整組對調代表等價的相位解</li>
-<li>方向只在同一個 <b><span class="term" data-term="PS tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ps-tag-18">phase set<span class="term__pop" id="gd-ps-tag-18" role="tooltip"><b class="term__hd">PS tag <i>phase set</i></b><span class="term__def" data-lang="zh">標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</span><span class="term__def" data-lang="en">Phase set identifier grouping variants phased together. Haplotype orientation is only consistent within one PS.</span><a class="term__more" href="glossary.html#ps-tag">完整條目 →</a></span></span></b> 內部一致；跨過 phase block 的斷點之後，
+<li>方向只在同一個 <b><span class="term" data-term="PS tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ps-tag-18">phase set<span class="term__pop" id="gd-ps-tag-18" role="tooltip"><b class="term__hd">PS tag <i>phase set</i></b><span class="term__def" data-lang="zh">標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</span><span class="term__def" data-lang="en" lang="en">Phase set identifier grouping variants phased together. Haplotype orientation is only consistent within one PS.</span><a class="term__more" href="glossary.html#ps-tag">完整條目 →</a></span></span></b> 內部一致；跨過 phase block 的斷點之後，
 HP1 可能就接到原本的 HP2 上了</li>
 </ul>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 552" class="dia-svg" role="img">
-  <title>為什麼 HP1 與 HP2 可是任意編號，不代表父系與母系</title>
-  <desc>上半部：在未指定外部方向時，同一份資料可有兩種等價編號方式。演算法能確定「這些變異在同一條染色體上」，
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 552" class="dia-svg" role="img" aria-labelledby="m02-hp-arbitrary__title" aria-describedby="m02-hp-arbitrary__desc">
+  <title id="m02-hp-arbitrary__title">為什麼 HP1 與 HP2 可是任意編號，不代表父系與母系</title>
+  <desc id="m02-hp-arbitrary__desc">上半部：在未指定外部方向時，同一份資料可有兩種等價編號方式。演算法能確定「這些變異在同一條染色體上」，
         但無法決定該把那一條叫 HP1 還是 HP2，所以整組對調是等價的答案。
         下半部：編號的方向只在同一個 phase block 內部一致。
         跨過斷點之後方向重新開始，所以左邊的 HP1 不一定對應右邊的 HP1，
@@ -600,7 +600,7 @@ HP1 可能就接到原本的 HP2 上了</li>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>細胞株</th><th>癌別</th><th>常用的 truth set</th></tr></thead>
+<thead><tr><th scope="col">細胞株</th><th scope="col">癌別</th><th scope="col">常用的 truth set</th></tr></thead>
 <tbody>
 <tr><td><b>HCC1395</b></td><td>乳癌</td><td>SEQC2（示例參考集）</td></tr>
 <tr><td>COLO829</td><td>黑色素瘤</td><td>NYGC</td></tr>
@@ -616,9 +616,9 @@ HP1 可能就接到原本的 HP2 上了</li>
 實際判定仍受 coverage、污染、變異類型與參考集品質影響。</p>
 
 <p class="prose"><b>HCC1395</b> 將於後續示例中再次出現；可比較兩份資料：
-<code>HCC1395_HKU</code> 與 <code>HCC1395_NYGC</code>，<b>同一個細胞株、不同的 <span class="term" data-term="basecalling" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-basecalling-19">basecaller<span class="term__pop" id="gd-basecalling-19" role="tooltip"><b class="term__hd">basecalling <i>鹼基判讀</i></b><span class="term__def" data-lang="zh">把定序儀的原始訊號（ONT 是電流）轉成 A/C/G/T 字母的步驟。不同 basecaller 版本會產生不同的錯誤特性 —— 所以「同一個細胞株、不同 basecaller」是兩份不同的資料集。</span><span class="term__def" data-lang="en">Converting raw sequencer signal into A/C/G/T. Different basecallers yield different error profiles.</span><a class="term__more" href="glossary.html#basecalling">完整條目 →</a></span></span> 與分析流程</b>。
+<code>HCC1395_HKU</code> 與 <code>HCC1395_NYGC</code>，<b>同一個細胞株、不同的 <span class="term" data-term="basecalling" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-basecalling-19">basecaller<span class="term__pop" id="gd-basecalling-19" role="tooltip"><b class="term__hd">basecalling <i>鹼基判讀</i></b><span class="term__def" data-lang="zh">把定序儀的原始訊號（ONT 是電流）轉成 A/C/G/T 字母的步驟。不同 basecaller 版本會產生不同的錯誤特性 —— 所以「同一個細胞株、不同 basecaller」是兩份不同的資料集。</span><span class="term__def" data-lang="en" lang="en">Converting raw sequencer signal into A/C/G/T. Different basecallers yield different error profiles.</span><a class="term__more" href="glossary.html#basecalling">完整條目 →</a></span></span> 與分析流程</b>。
 兩份資料的組成相似度（0.909）可作為跨流程一致性的觀察，但不能單獨證明方法穩健性。
-因此，<span class="term" data-term="provenance" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-provenance-20">provenance<span class="term__pop" id="gd-provenance-20" role="tooltip"><b class="term__hd">provenance <i>資料來源履歷</i></b><span class="term__def" data-lang="zh">記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。</span><span class="term__def" data-lang="en">The full origin record of a dataset. In this lab it is a first-class experimental variable, not metadata.</span><a class="term__more" href="glossary.html#provenance">完整條目 →</a></span></span> 應視為重要實驗變數，而非附註。</p>
+因此，<span class="term" data-term="provenance" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-provenance-20">provenance<span class="term__pop" id="gd-provenance-20" role="tooltip"><b class="term__hd">provenance <i>資料來源履歷</i></b><span class="term__def" data-lang="zh">記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。</span><span class="term__def" data-lang="en" lang="en">The full origin record of a dataset. In this lab it is a first-class experimental variable, not metadata.</span><a class="term__more" href="glossary.html#provenance">完整條目 →</a></span></span> 應視為重要實驗變數，而非附註。</p>
 </section>
 
 
@@ -671,7 +671,7 @@ bcftools view -g het sample.vcf | grep -vc '^#'</code></pre>
 <p class="cli-note">het 位點密度會影響 phasing，亦需同時考慮讀長、coverage 與品質。
 人類全基因體中的 het 位點通常為數百萬量級，但會因族群、參考基因組、callable region 與過濾條件而異；請以資料集統計為準。</p>
 
-<section class="quiz" data-quiz="m02"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+<section class="quiz" data-quiz="m02"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m01.html"><small>← 上一模組</small>腫瘤樣本的簡化區域模型</a><a class="next" href="m03.html"><small>下一模組 →</small>定序原理與長讀的分析價值</a></nav>

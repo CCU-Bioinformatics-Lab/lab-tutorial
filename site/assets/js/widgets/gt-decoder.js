@@ -124,7 +124,7 @@ TW.define('gt-decoder', function (root, cfg) {
                        x: x, y: 40, width: 210, height: 96, rx: 8 }, svg);
       TW.text(x + 105, 66, names[i], 'lbl mid bold', svg);
       var t = TW.text(x + 105, 106, f.raw, 'lbl mid bold mono', svg);
-      t.setAttribute('font-size', '28');
+      t.style.fontSize = '28px';
       TW.text(x + 105, 156, subs[i], 'tick mid zh', svg);
 
       /* allele 標記 */

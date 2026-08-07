@@ -9,19 +9,22 @@
   var P = TW.progress;
   var MODS = window.TW_MODULES || [];
 
+  /* 顏色走 class（.ring__track / .ring__arc / .ring__tick，見 layout.css），
+     跟全專案「顏色只用 class，不寫死」一致。
+     （原本寫成 stroke="var(--accent)"，那樣其實也會正確上色 ——
+     presentation attribute 裡的 var() 是會被代換的。改成 class 只是
+     為了統一，不是修 bug。） */
   function ring(pct) {
     var r = 9, c = 2 * Math.PI * r;
-    return '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">' +
-      '<circle cx="12" cy="12" r="' + r + '" fill="none" stroke="var(--rule)" stroke-width="3"/>' +
+    return '<svg class="ring" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">' +
+      '<circle class="ring__track" cx="12" cy="12" r="' + r + '"/>' +
       (pct > 0
-        ? '<circle cx="12" cy="12" r="' + r + '" fill="none" stroke="var(--accent)" ' +
-          'stroke-width="3" stroke-linecap="round" ' +
+        ? '<circle class="ring__arc" cx="12" cy="12" r="' + r + '" ' +
           'stroke-dasharray="' + (c * pct).toFixed(2) + ' ' + c.toFixed(2) + '" ' +
           'transform="rotate(-90 12 12)"/>'
         : '') +
       (pct >= 0.999
-        ? '<path d="M8 12.5l2.6 2.6L16 9.7" fill="none" stroke="var(--ok)" ' +
-          'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'
+        ? '<path class="ring__tick" d="M8 12.5l2.6 2.6L16 9.7"/>'
         : '') +
       '</svg>';
   }

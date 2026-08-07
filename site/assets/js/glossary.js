@@ -91,8 +91,12 @@
   function place(term) {
     var pop = term.querySelector('.term__pop');
     if (!pop) return;
+    /* 三個都要清掉。只清 left/top 的話，曾經往上翻過的 tooltip 會留著
+       bottom，下一次就同時有 top 與 bottom —— 絕對定位的元素被兩邊拉住，
+       高度會被撐開成一條，而且看起來只是「這個詞的說明框壞了」。 */
     pop.style.left = '';
     pop.style.top = '';
+    pop.style.bottom = '';
 
     var r = pop.getBoundingClientRect();
     var pad = 8;

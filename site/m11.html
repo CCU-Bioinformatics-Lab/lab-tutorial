@@ -58,7 +58,7 @@
 <section data-part="why" class="part" id="part-why">
 <h2 data-num="①" id="為什麼重要">為什麼重要</h2>
 
-<p class="prose"><span class="term" data-term="LongPhase" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-longphase-0">LongPhase<span class="term__pop" id="gd-longphase-0" role="tooltip"><b class="term__hd">LongPhase</b><span class="term__def" data-lang="zh">實驗室開發的長 read phasing 工具，是後續所有工具的共同基礎。輸出 germline haplotype。</span><span class="term__def" data-lang="en">The lab's long-read phasing tool and the common foundation for everything else. Produces germline haplotypes.</span><a class="term__more" href="glossary.html#longphase">完整條目 →</a></span></span> 是本教材後續工具共用的基礎，處理的是<b>一般（非腫瘤）樣本</b>的 phasing。
+<p class="prose"><span class="term" data-term="LongPhase" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-longphase-0">LongPhase<span class="term__pop" id="gd-longphase-0" role="tooltip"><b class="term__hd">LongPhase</b><span class="term__def" data-lang="zh">實驗室開發的長 read phasing 工具，是後續所有工具的共同基礎。輸出 germline haplotype。</span><span class="term__def" data-lang="en" lang="en">The lab's long-read phasing tool and the common foundation for everything else. Produces germline haplotypes.</span><a class="term__more" href="glossary.html#longphase">完整條目 →</a></span></span> 是本教材後續工具共用的基礎，處理的是<b>一般（非腫瘤）樣本</b>的 phasing。
 開始分析腫瘤資料前，先掌握這個基本流程。</p>
 
 <p class="prose">它值得看清楚內部機制，原因是：後面 LongPhase-S 與 LongPhase-TO 的腫瘤專用處理，
@@ -73,10 +73,10 @@
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>子命令</th><th>輸入</th><th>輸出</th></tr></thead>
+<thead><tr><th scope="col">子命令</th><th scope="col">輸入</th><th scope="col">輸出</th></tr></thead>
 <tbody>
-<tr><td><code>phase</code></td><td>germline SNP VCF ＋ BAM ＋ reference；可另外加 SV VCF、甲基化 VCF</td><td>含以 <code>|</code> 表示相位的 <code>GT</code> 與 <code><span class="term" data-term="PS tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ps-tag-1">PS<span class="term__pop" id="gd-ps-tag-1" role="tooltip"><b class="term__hd">PS tag <i>phase set</i></b><span class="term__def" data-lang="zh">標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</span><span class="term__def" data-lang="en">Phase set identifier grouping variants phased together. Haplotype orientation is only consistent within one PS.</span><a class="term__more" href="glossary.html#ps-tag">完整條目 →</a></span></span></code> 的 phased VCF（每種變異各自一份）</td></tr>
-<tr><td><code>haplotag</code></td><td>已 phase 的 VCF ＋ BAM ＋ reference</td><td>每條 read 帶 <code><span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-hp-tag-2">HP<span class="term__pop" id="gd-hp-tag-2" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span></code> tag 的 BAM</td></tr>
+<tr><td><code>phase</code></td><td>germline SNP VCF ＋ BAM ＋ reference；可另外加 SV VCF、甲基化 VCF</td><td>含以 <code>|</code> 表示相位的 <code>GT</code> 與 <code><span class="term" data-term="PS tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-ps-tag-1">PS<span class="term__pop" id="gd-ps-tag-1" role="tooltip"><b class="term__hd">PS tag <i>phase set</i></b><span class="term__def" data-lang="zh">標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</span><span class="term__def" data-lang="en" lang="en">Phase set identifier grouping variants phased together. Haplotype orientation is only consistent within one PS.</span><a class="term__more" href="glossary.html#ps-tag">完整條目 →</a></span></span></code> 的 phased VCF（每種變異各自一份）</td></tr>
+<tr><td><code>haplotag</code></td><td>已 phase 的 VCF ＋ BAM ＋ reference</td><td>每條 read 帶 <code><span class="term" data-term="HP tag" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-hp-tag-2">HP<span class="term__pop" id="gd-hp-tag-2" role="tooltip"><b class="term__hd">HP tag</b><span class="term__def" data-lang="zh">BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</span><span class="term__def" data-lang="en" lang="en">BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.</span><a class="term__more" href="glossary.html#hp-tag">完整條目 →</a></span></span></code> tag 的 BAM</td></tr>
 <tr><td><code>modcall</code></td><td>帶甲基化的 BAM ＋ reference</td><td>甲基化位點的 VCF，可再餵回 <code>phase</code> 的 <code>--mod-file</code></td></tr>
 </tbody>
 </table>
@@ -92,9 +92,9 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
 一個甲基化位點、一個小的 indel 與一個 SV —— 這四件事被同一個分子綁在一起，
 分開 phasing 就把這個證據丟掉了。</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" class="dia-svg" role="img">
-  <title>四種變異進同一張圖：LongPhase 的 co-phasing 圖模型</title>
-  <desc>LongPhase 把四種輸入放進同一張圖：SNP（-s，必要）、小的 indel（--indels）、
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" class="dia-svg" role="img" aria-labelledby="m11-cophasing-graph__title" aria-describedby="m11-cophasing-graph__desc">
+  <title id="m11-cophasing-graph__title">四種變異進同一張圖：LongPhase 的 co-phasing 圖模型</title>
+  <desc id="m11-cophasing-graph__desc">LongPhase 把四種輸入放進同一張圖：SNP（-s，必要）、小的 indel（--indels）、
         結構變異（--sv-file）、以及甲基化位點（--mod-file，由 longphase modcall 產生）。
         上半部是同一段基因體上的六個位置與五條 read；第二條 read 同時跨過 SNP、甲基化、
         indel 與 SV 四種類型，所以它一條就能把四種變異連在一起 —— 這是長讀才做得到的事，
@@ -216,9 +216,9 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
 <p class="prose">邊不是「有」或「沒有」，而是<b>四個加權計數</b>。跨過兩個位置的每一條 read，
 依它在兩邊看到的 allele 落進 rr、ra、ar、aa 之一：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 710" class="dia-svg" role="img">
-  <title>一條邊的方向與去留，由四個加權計數決定</title>
-  <desc>兩個變異之間的一條邊，其實是四個加權計數。每條跨過兩個位置的 read
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 710" class="dia-svg" role="img" aria-labelledby="m11-phase-graph__title" aria-describedby="m11-phase-graph__desc">
+  <title id="m11-phase-graph__title">一條邊的方向與去留，由四個加權計數決定</title>
+  <desc id="m11-phase-graph__desc">兩個變異之間的一條邊，其實是四個加權計數。每條跨過兩個位置的 read
         會落進 rr、ra、ar、aa 之一：rr 表示兩邊都看到 ref，aa 表示兩邊都看到 alt，
         依此類推。程式把它們併成兩個數字 —— para = rr + aa（平行），cross = ra + ar（交叉），
         再算 ESR = 兩者的小除以大。para 大就平行連接，cross 大就交叉連接。
@@ -346,9 +346,9 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
 一次決定一個變異：前面最多 <code>--connectAdjacent</code>（預設 35）個變異各投一票，
 票的權重就是上面那個 20 / 1 / 0.1，兩邊加總大的一邊贏。</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 730" class="dia-svg" role="img">
-  <title>heuristic phasing：前面的變異加權投票，決定下一個變異接在哪一條上</title>
-  <desc>LongPhase 不是求全域最佳解，而是從左往右逐一決定。決定第 k 個變異時，
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 730" class="dia-svg" role="img" aria-labelledby="m11-voting__title" aria-describedby="m11-voting__desc">
+  <title id="m11-voting__title">heuristic phasing：前面的變異加權投票，決定下一個變異接在哪一條上</title>
+  <desc id="m11-voting__desc">LongPhase 不是求全域最佳解，而是從左往右逐一決定。決定第 k 個變異時，
         前面最多 35 個變異（connectAdjacent）各投一票；每票的權重來自它那條邊有多乾淨 ——
         乾淨的邊（ESR 很小）權重 20，普通的 1，串聯重複區的 indel 只有 0.1。
         兩邊權重加總，大的一邊贏，這個變異就接到那條 haplotype 上。
@@ -454,9 +454,9 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
 <p class="prose">圖定好相之後還有一步，程式把結果<b>反過來檢查一次</b>：先用變異的相位決定每條 read
 屬於哪條 haplotype，再用已標好的 read 回頭重算每個變異。兩步各有一道門檻：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" class="dia-svg" role="img">
-  <title>最後兩道信心門檻：哪些 read 拿得到 HP，哪些變異留得住 PS</title>
-  <desc>圖定好相之後還有一步：把結果反過來檢查一次。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" class="dia-svg" role="img" aria-labelledby="m11-read-correction__title" aria-describedby="m11-read-correction__desc">
+  <title id="m11-read-correction__title">最後兩道信心門檻：哪些 read 拿得到 HP，哪些變異留得住 PS</title>
+  <desc id="m11-read-correction__desc">圖定好相之後還有一步：把結果反過來檢查一次。
         左邊先決定每條 read 屬於哪一條 haplotype —— 數這條 read 上有多少 allele 站 HP1、
         多少站 HP2，比例要超過 readConfidence（預設 0.65）而且總數大於 1，才寫 HP 標籤；
         否則這條 read 的 HP 就是空的，這是 BAM 裡有些 read 沒有 HP 的直接原因。
@@ -541,9 +541,9 @@ BAM 裡有 read 沒有 <code>HP</code>，來自 0.65 那道；VCF 裡有 heteroz
 
 <h3 id="三種失敗模式">三種失敗模式</h3>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" class="dia-svg" role="img">
-  <title>phasing 的三種失敗模式與各自的徵兆</title>
-  <desc>第一種是分段破碎：read 太短或中間沒有可區分的位置，導致同一條染色體被切成多個小段。
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" class="dia-svg" role="img" aria-labelledby="m11-failure-modes__title" aria-describedby="m11-failure-modes__desc">
+  <title id="m11-failure-modes__title">phasing 的三種失敗模式與各自的徵兆</title>
+  <desc id="m11-failure-modes__desc">第一種是分段破碎：read 太短或中間沒有可區分的位置，導致同一條染色體被切成多個小段。
         第二種是方向對調：某處證據太弱，從那一點之後兩條被互換，後半段可能整體錯置。
         第三種是大量 read 無法指派：可能是局部拷貝數狀態、覆蓋度不足、或比對品質太低。
         每一種都有可以在資料上直接檢查的徵兆。</desc>
@@ -626,16 +626,16 @@ BAM 裡有 read 沒有 <code>HP</code>，來自 0.65 那道；VCF 裡有 heteroz
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>失敗</th><th>對應到上面的哪一步</th><th>徵兆</th></tr></thead>
+<thead><tr><th scope="col">失敗</th><th scope="col">對應到上面的哪一步</th><th scope="col">徵兆</th></tr></thead>
 <tbody>
-<tr><td><b><span class="term" data-term="phase block" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-phase-block-3">phase block<span class="term__pop" id="gd-phase-block-3" role="tooltip"><b class="term__hd">phase block</b><span class="term__def" data-lang="zh">一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</span><span class="term__def" data-lang="en">A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.</span><a class="term__more" href="glossary.html#phase-block">完整條目 →</a></span></span> 斷裂</b></td><td>投票平手，或沒有 read 跨過（沒有邊）</td><td>同一條染色體上出現很多不同的 <code>PS</code> 值</td></tr>
-<tr><td><b><span class="term" data-term="switch error" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-switch-error-4">switch error<span class="term__pop" id="gd-switch-error-4" role="tooltip"><b class="term__hd">switch error</b><span class="term__def" data-lang="zh">phasing 結果自某一位置起將兩條 haplotype 的方向對調，是常見的 phasing 錯誤類型。</span><span class="term__def" data-lang="en">A phasing error in which the two haplotype labels swap from some point onward; a common phasing error mode.</span><a class="term__more" href="glossary.html#switch-error">完整條目 →</a></span></span></b></td><td>某條邊的 ESR 偏高卻仍勉強過關，方向選錯</td><td>與 truth 比對時，錯誤從某一點之後系統性地發生</td></tr>
+<tr><td><b><span class="term" data-term="phase block" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-phase-block-3">phase block<span class="term__pop" id="gd-phase-block-3" role="tooltip"><b class="term__hd">phase block</b><span class="term__def" data-lang="zh">一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</span><span class="term__def" data-lang="en" lang="en">A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.</span><a class="term__more" href="glossary.html#phase-block">完整條目 →</a></span></span> 斷裂</b></td><td>投票平手，或沒有 read 跨過（沒有邊）</td><td>同一條染色體上出現很多不同的 <code>PS</code> 值</td></tr>
+<tr><td><b><span class="term" data-term="switch error" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-switch-error-4">switch error<span class="term__pop" id="gd-switch-error-4" role="tooltip"><b class="term__hd">switch error</b><span class="term__def" data-lang="zh">phasing 結果自某一位置起將兩條 haplotype 的方向對調，是常見的 phasing 錯誤類型。</span><span class="term__def" data-lang="en" lang="en">A phasing error in which the two haplotype labels swap from some point onward; a common phasing error mode.</span><a class="term__more" href="glossary.html#switch-error">完整條目 →</a></span></span></b></td><td>某條邊的 ESR 偏高卻仍勉強過關，方向選錯</td><td>與 truth 比對時，錯誤從某一點之後系統性地發生</td></tr>
 <tr><td><b>大量 read 未標記</b></td><td>沒過 <code>--readConfidence</code>（0.65）</td><td>haplotag 後很多 read 沒有 <code>HP</code></td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">第一項與第三項在<b>腫瘤</b>樣本上可能更明顯，因為 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-5">LOH<span class="term__pop" id="gd-loh-5" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 與 copy number 異常會減少可用的 phasing 錨點。
+<p class="prose">第一項與第三項在<b>腫瘤</b>樣本上可能更明顯，因為 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-5">LOH<span class="term__pop" id="gd-loh-5" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en" lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 與 copy number 異常會減少可用的 phasing 錨點。
 LongPhase-S 與 LongPhase-TO 都針對這些腫瘤資料情境提供額外處理。</p>
 </section>
 
@@ -728,7 +728,7 @@ samtools view tagged.bam | grep -c 'HP:i:'</code></pre>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>階段</th><th>參數</th><th>預設</th><th>它在做什麼</th></tr></thead>
+<thead><tr><th scope="col">階段</th><th scope="col">參數</th><th scope="col">預設</th><th scope="col">它在做什麼</th></tr></thead>
 <tbody>
 <tr><td rowspan="3">讀 BAM</td><td><code>-q, --mappingQuality</code></td><td>1</td><td>比對品質低於此值的 alignment 直接丟掉</td></tr>
 <tr><td><code>-x, --mismatchRate</code></td><td>3</td><td>錯配率過高的 read 標為不可信</td></tr>
@@ -754,7 +754,7 @@ samtools view tagged.bam | grep -c 'HP:i:'</code></pre>
 所以想看說明就要寫完整的 <code>--help</code>：</p>
 <div class="table-wrap">
 <table>
-<thead><tr><th>想做的事</th><th>寫法</th></tr></thead>
+<thead><tr><th scope="col">想做的事</th><th scope="col">寫法</th></tr></thead>
 <tbody>
 <tr><td>看說明</td><td><code>longphase-s phase --help</code></td></tr>
 <tr><td>調 SV 支持門檻</td><td><code>-h 0.15</code> 或 <code>--svThreshold 0.15</code></td></tr>
@@ -787,7 +787,7 @@ samtools view tagged.bam | grep -c 'HP:i:'</code></pre>
 <li><b>沒有票可投。</b>先看 read 長度分布（<code>samtools stats</code> 的平均與 N50）。
 如果 read 只有 2–3 kb，跨不過兩個 het 位點的邊本來就少，block 破碎可能是預期結果。</li>
 <li><b>可投票的位點太稀疏。</b>如果 VCF 裡的 het 位點本來就少（樣本雜合度低，
-或這條染色體有大段 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-6">LOH<span class="term__pop" id="gd-loh-6" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span>），可用錨點就會減少。</li>
+或這條染色體有大段 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-loh-6">LOH<span class="term__pop" id="gd-loh-6" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en" lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span>），可用錨點就會減少。</li>
 <li><b>票都被丟掉了。</b>邊的 ESR 若普遍偏高（兩種組合都差不多），
 就會大量觸發 <code>--edgeThreshold</code> 而整條邊被丟掉。這通常伴隨較高的錯配率
 或比對問題，可用 <code>--dot</code> 把圖印出來直接看有多少邊真的存在。</li>
@@ -852,7 +852,7 @@ longphase-s phase --help
 # help 與實際行為不符時，以選項表為準（檔案在 repo 根目錄）
 grep -A40 'static const struct option longopts' Phasing.cpp</code></pre>
 
-<section class="quiz" data-quiz="m11"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div></section>
+<section class="quiz" data-quiz="m11"><h2 id="學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
 </section>
 
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m10.html"><small>← 上一模組</small>證據、驗證與效能評估</a><a class="next" href="m12.html"><small>下一模組 →</small>LongPhase-S（配對 tumor–normal）</a></nav>

@@ -129,8 +129,9 @@ TW.define('pileup-phasing', function (root, cfg) {
         t.setAttribute('font-size', '15');
         t.style.pointerEvents = 'none';
         if (model.checked && r.err === k) {
+          /* 空心圈：只是把這個鹼基圈起來，不要用 artifact 的填色蓋住字母 */
           TW.svg('circle', { 'class': 'mark artifact', cx: s.x, cy: y + 8, r: 10,
-                             fill: 'none' }, svg);
+                             style: 'fill:none' }, svg);
         }
       });
 
