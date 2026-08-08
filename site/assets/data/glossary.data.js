@@ -475,8 +475,7 @@ window.TW_GLOSSARY = {
   "slug": "soft-clipping",
   "modules": [
    "m04",
-   "m13",
-   "sr1"
+   "m13"
   ]
  },
  "VCF": {
