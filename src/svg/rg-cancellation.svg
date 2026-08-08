@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+  <title>純度、拷貝數與 multiplicity 為什麼在單位內的比值裡消掉</title>
+  <desc>上半畫一個分析單位裡的分子來源。
+        正常細胞貢獻的分子在所有 somatic 位點上都是參考型，所以它們全部落在「全 0」那一格，
+        不會進到其他任何一格。兩個腫瘤 clone 各自貢獻自己的組成格。
+        中間列出觀測到的組成公式：每一格的分母都是同一個總分子數，
+        那個分母裡含有純度與拷貝數。
+        下半是關鍵一步：把任兩個非參考型格子相除，共同的分母整個消掉，
+        剩下的只有兩個 clone 的細胞比例與各自的家族拷貝數之比。
+        右下角對照傳統路線：VAF 換算成細胞比例需要純度、拷貝數與 multiplicity 三個估計值相除，
+        任何一個猜錯結果就跟著錯。
+        讀法是：HFS 數的是分子，而一個分子要嘛帶這個變異、要嘛不帶，
+        multiplicity 沒有辦法在分子計數上造成兩倍的差別。</desc>
+
+  <text class="ttl zh" x="20" y="36">為什麼三個估計值會消掉</text>
+
+  <!-- 分子來源 -->
+  <text class="lbl bold zh" x="20" y="82">一個單位裡的分子來源</text>
+
+  <rect class="box plain" x="24" y="98" width="230" height="96" rx="8"/>
+  <text class="tick bold zh mid" x="139" y="122">正常細胞</text>
+  <rect class="read hp0" x="48" y="134" width="180" height="12" rx="6"/>
+  <rect class="read hp0" x="48" y="152" width="180" height="12" rx="6"/>
+  <rect class="read hp0" x="48" y="170" width="180" height="12" rx="6"/>
+
+  <rect class="box plain" x="286" y="98" width="230" height="96" rx="8"/>
+  <text class="tick bold zh mid" x="401" y="122">clone j</text>
+  <rect class="read hp1" x="310" y="134" width="180" height="12" rx="6"/>
+  <rect class="read hp1" x="310" y="152" width="180" height="12" rx="6"/>
+  <rect class="read hp1" x="310" y="170" width="180" height="12" rx="6"/>
+
+  <rect class="box plain" x="548" y="98" width="230" height="96" rx="8"/>
+  <text class="tick bold zh mid" x="663" y="122">clone j′</text>
+  <rect class="read hp2" x="572" y="134" width="180" height="12" rx="6"/>
+  <rect class="read hp2" x="572" y="152" width="180" height="12" rx="6"/>
+  <rect class="read hp2" x="572" y="170" width="180" height="12" rx="6"/>
+
+  <text class="tick zh mid" x="139" y="214">全部落在「全 0」那一格</text>
+  <text class="tick zh mid" x="401" y="214">落在組成格 c</text>
+  <text class="tick zh mid" x="663" y="214">落在組成格 c′</text>
+
+  <path class="conn" d="M139,224 L139,252" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M401,224 L401,252" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M663,224 L663,252" marker-end="url(#arrow-sm)"/>
+
+  <!-- 相除 -->
+  <rect class="box sunken" x="24" y="262" width="754" height="66" rx="8"/>
+  <text class="lbl mono mid" x="401" y="304">p(c) / p(c′)  =  ( w_j · κ_j ) / ( w_j′ · κ_j′ )</text>
+
+  <text class="anno zh ok" x="24" y="360">共同的分母 —— 純度就住在那裡 —— 上下相除整個消掉。</text>
+  <text class="anno zh ok" x="24" y="388">若兩個 clone 在這個位置的家族拷貝數相同，比值就正好是細胞比例之比。</text>
+  <text class="anno zh ok" x="24" y="416">multiplicity 不會出現：數的是分子，一個分子要嘛帶、要嘛不帶。</text>
+
+  <rect class="box bad" x="800" y="98" width="176" height="230" rx="8"/>
+  <text class="tick bold zh mid bad" x="888" y="126">傳統路線</text>
+  <text class="tick zh mid" x="888" y="156">VAF 換細胞比例</text>
+  <text class="tick zh mid" x="888" y="182">需要三個估計值</text>
+  <text class="tick mono mid" x="888" y="212">purity</text>
+  <text class="tick mono mid" x="888" y="236">copy number</text>
+  <text class="tick mono mid" x="888" y="260">multiplicity</text>
+  <text class="tick zh mid bad" x="888" y="292">猜錯一個</text>
+  <text class="tick zh mid bad" x="888" y="316">結果就跟著錯</text>
+
+  <text class="anno zh" x="800" y="360">同一個 VAF＝0.30</text>
+  <text class="anno zh bad" x="800" y="388">可以落在 0.38 到 1.80</text>
+  <text class="tick zh" x="800" y="414">（見 M14 的換算鏈）</text>
+</svg>

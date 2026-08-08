@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>組成機率其實就是在數分子：分子是那一堆有幾條，分母是全部有幾條</title>
+  <desc>左半把一個分析單位裡的分子按組成分成四堆。
+        第一堆是兩個位點都是參考型，裡面有六條來自正常細胞的分子。
+        第二堆是只帶第一個變異，有四條，來自一個腫瘤 clone。
+        第三堆是只帶第二個變異，是空的。
+        第四堆是兩個都帶，有三條，來自另一個腫瘤 clone。
+        右半說明每一堆的高度由誰貢獻決定：
+        正常細胞只進第一堆，貢獻量是一減純度再乘上它持有的家族拷貝數；
+        每個腫瘤 clone 貢獻的量是純度乘上該 clone 的細胞比例再乘上它持有的家族拷貝數。
+        中段把公式畫成一個分數：分子是組成等於 c 的那一堆有幾條分子，
+        分母是這個單位全部的分子，兩者相除就是組成機率。
+        最下方是這張圖真正要說的事：正常細胞的分子只落在第一堆，
+        所以任兩個非第一堆的分子數相除時，分母裡的正常那一項根本不在分子上，共同分母整個消掉。
+        讀法是：公式裡那一長串符號，對應的只是「這一堆有幾條」除以「全部有幾條」。</desc>
+
+  <text class="ttl zh" x="20" y="36">公式在數什麼：一堆分子 ÷ 全部分子</text>
+
+  <!-- ── 左：分堆 ─────────────────────────────────────────────── -->
+  <rect class="box ghost" x="24" y="62" width="496" height="212" rx="8"/>
+  <text class="lbl bold zh" x="44" y="92">把分子按組成分堆</text>
+
+  <text class="anno mono mid" x="110" y="122">00</text>
+  <text class="anno mono mid" x="220" y="122">10</text>
+  <text class="anno mono mid" x="330" y="122">01</text>
+  <text class="anno mono mid" x="440" y="122">11</text>
+
+  <rect class="read hp0" x="72" y="134" width="76" height="12" rx="6"/>
+  <rect class="read hp0" x="72" y="152" width="76" height="12" rx="6"/>
+  <rect class="read hp0" x="72" y="170" width="76" height="12" rx="6"/>
+  <rect class="read hp0" x="72" y="188" width="76" height="12" rx="6"/>
+  <rect class="read hp0" x="72" y="206" width="76" height="12" rx="6"/>
+  <rect class="read hp0" x="72" y="224" width="76" height="12" rx="6"/>
+
+  <rect class="read hp1" x="182" y="134" width="76" height="12" rx="6"/>
+  <rect class="read hp1" x="182" y="152" width="76" height="12" rx="6"/>
+  <rect class="read hp1" x="182" y="170" width="76" height="12" rx="6"/>
+  <rect class="read hp1" x="182" y="188" width="76" height="12" rx="6"/>
+
+  <rect class="box ghost" x="292" y="134" width="76" height="30" rx="6"/>
+
+  <rect class="read hp2" x="402" y="134" width="76" height="12" rx="6"/>
+  <rect class="read hp2" x="402" y="152" width="76" height="12" rx="6"/>
+  <rect class="read hp2" x="402" y="170" width="76" height="12" rx="6"/>
+
+  <text class="lbl bold mono mid" x="110" y="262">6</text>
+  <text class="lbl bold mono mid" x="220" y="262">4</text>
+  <text class="lbl bold mono mid" x="330" y="262">0</text>
+  <text class="lbl bold mono mid" x="440" y="262">3</text>
+
+  <!-- ── 右：每一堆由誰貢獻 ───────────────────────────────────── -->
+  <text class="lbl bold zh" x="560" y="92">每一堆有多高，由誰貢獻決定</text>
+
+  <rect class="read hp0" x="560" y="118" width="40" height="12" rx="6"/>
+  <text class="anno zh" x="614" y="130">正常細胞　只進 00 那一堆</text>
+  <text class="tick mono" x="614" y="154">(1 − ρ) · κ_N</text>
+
+  <rect class="read hp1" x="560" y="180" width="40" height="12" rx="6"/>
+  <text class="anno zh" x="614" y="192">clone j　帶 S1，進 10</text>
+  <text class="tick mono" x="614" y="216">ρ · w_j · κ_j</text>
+
+  <rect class="read hp2" x="560" y="242" width="40" height="12" rx="6"/>
+  <text class="anno zh" x="614" y="254">clone j′　兩個都帶，進 11</text>
+  <text class="tick mono" x="614" y="278">ρ · w_j′ · κ_j′</text>
+
+  <!-- ── 分數 ─────────────────────────────────────────────────── -->
+  <text class="anno bold zh somatic" x="24" y="348">分子</text>
+  <rect class="bar somatic" x="150" y="326" width="470" height="30" rx="4"/>
+  <text class="tick zh mid" x="385" y="346">組成等於 c 的那一堆，有幾條分子</text>
+
+  <line class="axis" x1="150" y1="374" x2="620" y2="374" style="stroke-width:3"/>
+  <text class="lbl mid" x="672" y="382">＝ p(c)</text>
+
+  <text class="anno bold zh" x="24" y="414">分母</text>
+  <rect class="bar" x="150" y="392" width="470" height="30" rx="4"/>
+  <text class="tick zh mid" x="385" y="412">這個單位全部的分子（上面四堆加起來）</text>
+
+  <text class="tick zh" x="760" y="352">以圖上的數字為例</text>
+  <text class="tick mono" x="760" y="378">p(10) = 4 / 13</text>
+  <text class="tick mono" x="760" y="404">p(11) = 3 / 13</text>
+
+  <!-- ── 結論 ─────────────────────────────────────────────────── -->
+  <rect class="box ok" x="24" y="450" width="952" height="94" rx="8"/>
+  <text class="lbl bold zh ok" x="48" y="482">這張圖真正要說的事</text>
+  <text class="anno zh" x="48" y="512">正常細胞的分子<tspan class="bold">只</tspan>落在 00 那一堆。所以拿兩個非 00 的堆相除時，</text>
+  <text class="anno zh" x="48" y="538">分母裡的正常那一項根本不在分子上 —— 共同分母整個消掉，純度跟著消掉。</text>
+</svg>

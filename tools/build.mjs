@@ -482,7 +482,10 @@ function build() {
 
     const head =
       `<header class="mhead">` +
-      `<p class="mhead__kicker">模組 ${esc(meta.num ?? i)} ${meta.title_en ? '· ' + esc(meta.title_en) : ''}</p>` +
+      /* kicker 預設是「模組 N」。研究指引頁不是教學模組，
+         讓它用 modules.json 的 kicker 欄位自己說自己是什麼。 */
+      `<p class="mhead__kicker">${meta.kicker ? esc(meta.kicker) : `模組 ${esc(meta.num ?? i)}`}` +
+      ` ${meta.title_en ? '· ' + esc(meta.title_en) : ''}</p>` +
       `<h1>${esc(meta.title_zh)}</h1>` +
       (meta.sub ? `<p class="mhead__sub">${meta.sub}</p>` : '') +
       `<p class="mhead__meta">` +
@@ -607,20 +610,34 @@ function writeIndex(modules, shell) {
   /* 卡片上顯示的是「這個模組回答什麼問題」（modules.json 的 q），
      而不是術語清單 —— 零基礎的讀者第一次打開時，看到一串沒學過的詞會直接放棄。
      術語留給 sub，那是模組內頁的副標題，那裡有圖與互動撐著。 */
-  const cards = groups.map((g) =>
-    `<section class="mgroup"><h2>${esc(g.name)}</h2><ol class="mgrid">` +
-    g.items.map((m) =>
-      `<li class="mcard" data-mod="${esc(m.id)}">` +
-      `<a href="${m.id}.html">` +
-      `<span class="mcard__num">${esc(String(m.num))}</span>` +
-      `<span class="mcard__body">` +
-      `<b>${esc(m.title_zh)}</b>` +
-      (m.q ? `<small class="mcard__q">${m.q}</small>` : '') +
-      (m.est_min ? `<span class="mcard__time">約 ${m.est_min} 分鐘</span>` : '') +
-      `</span>` +
-      `<span class="mcard__state" data-state aria-hidden="true"></span>` +
-      `</a></li>`).join('') +
-    `</ol></section>`).join('');
+  const card = (m) =>
+    `<li class="mcard" data-mod="${esc(m.id)}">` +
+    `<a href="${m.id}.html">` +
+    `<span class="mcard__num">${esc(String(m.num))}</span>` +
+    `<span class="mcard__body">` +
+    `<b>${esc(m.title_zh)}</b>` +
+    (m.q ? `<small class="mcard__q">${m.q}</small>` : '') +
+    (m.est_min ? `<span class="mcard__time">約 ${m.est_min} 分鐘</span>` : '') +
+    `</span>` +
+    `<span class="mcard__state" data-state aria-hidden="true"></span>` +
+    `</a></li>`;
+
+  /* group 之下再分一層 topic：研究指引會有好幾個主題，每個主題自己好幾頁，
+     但它們都屬於同一個「這不是課程」的區塊。教材模組沒有 topic，
+     那一層就整個不出現 —— 所以這個改動對前 15 張卡片是零影響。 */
+  const cards = groups.map((g) => {
+    const clusters = [];
+    for (const m of g.items) {
+      const key = m.topic || '';
+      let c = clusters.find((x) => x.topic === key);
+      if (!c) { c = { topic: key, items: [] }; clusters.push(c); }
+      c.items.push(m);
+    }
+    const body = clusters.map((c) =>
+      (c.topic ? `<h3 class="mgroup__topic">${esc(c.topic)}</h3>` : '') +
+      `<ol class="mgrid">${c.items.map(card).join('')}</ol>`).join('');
+    return `<section class="mgroup"><h2>${esc(g.name)}</h2>${body}</section>`;
+  }).join('');
 
   const first = modules[0];
 

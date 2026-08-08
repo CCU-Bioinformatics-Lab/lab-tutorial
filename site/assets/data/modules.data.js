@@ -155,17 +155,6 @@ window.TW_MODULES = [
   "group": "實驗室工具"
  },
  {
-  "id": "m14",
-  "num": "14",
-  "title_zh": "Subclone 重建：從頻率到單倍型",
-  "title_en": "Subclonal reconstruction: from frequency to haplotype",
-  "short": "Subclone 重建",
-  "q": "同一份資料，為什麼可以畫出兩棵不同的演化樹？",
-  "sub": "從短讀時代的 VAF 與甲基化頻率譜出發，說明頻率為什麼不足以決定演化樹，再說明長讀如何把分子層級的共現關係變成直接觀測，以及隨之而來的分析單位與限制。",
-  "est_min": 60,
-  "group": "研究前沿"
- },
- {
   "id": "capstone",
   "num": "★",
   "title_zh": "Capstone：整合式位點判讀",
@@ -175,5 +164,25 @@ window.TW_MODULES = [
   "sub": "整合單一位點的多項證據，完成可重現的推論流程，並撰寫明確標示不確定性的結論。",
   "est_min": 120,
   "group": "綜合評量"
+ },
+ {
+  "id": "sr1",
+  "num": "上",
+  "title_zh": "上篇：從一堆變異到一棵腫瘤演化樹",
+  "title_en": "Part 1 — from variants to a tree",
+  "short": "Subclone 重建",
+  "q": "腫瘤裡的變異，能不能排出發生的先後順序？",
+  "sub": "先說清楚要重建的是什麼、為什麼值得重建，再說明頻率路線走到哪裡卡住、長讀把哪一件事從推論變成觀測，以及隨之而來的分析單位與限制。",
+  "group": "研究指引"
+ },
+ {
+  "id": "sr2",
+  "num": "下",
+  "title_zh": "下篇：區域拓撲重建，以及它現在錯在哪裡",
+  "title_en": "Part 2 — implementation",
+  "short": "HFS 模型",
+  "q": "一個區域的演化樹，到底是靠幾條 read 撐起來的？",
+  "sub": "從本實驗室既有實作的真實輸出出發：一個單位的有效樣本數是「每一個位點對各自的跨越深度」，不是該單位的總 read 數。由此得到三項修正 —— 缺席要有檢定力撐著、類別比例要先扣掉覆蓋幾何、頻率該用來排序候選拓撲而不是拿去分箱。",
+  "group": "研究指引"
  }
 ];

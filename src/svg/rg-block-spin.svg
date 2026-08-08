@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>H1／H2 的標號只在同一個 phase block 內有意義，跨 block 是任意的</title>
+  <desc>上排是實體事實：兩條染色體拷貝各自是連續的一整條，橫跨圖上的兩個 phase block。
+        中排是相位軟體實際輸出的東西：每個 phase block 各自把兩堆 read 標成 H1 與 H2，
+        但標號在每個 block 內獨立決定。圖上刻意讓 block A 的 H1 對應上排第一條拷貝，
+        而 block B 的 H1 對應上排第二條拷貝 —— 兩個 block 的 H1 不是同一條染色體。
+        這個任意性寫成每個 block 一個正負號，圖上標為 σ。
+        下排分成兩欄說明後果。左欄是不受影響的：clone tree 談的是細胞的祖先關係，
+        不是哪一條親源染色體帶著變異，所以每個單位內部算出來的量都與 σ 無關。
+        右欄是會出錯的：任何把不同 block 的 H1 加總在一起的統計都沒有意義，
+        跨 block 的單倍型特異拷貝數、跨 block 比較甲基化偏向也都需要先定出 σ。
+        讀法是：所有全基因體統計都必須只由「單位內部的量」組成，這樣才自動與 σ 無關。</desc>
+
+  <text class="ttl zh" x="20" y="36">H1／H2 只在同一個 phase block 內有意義</text>
+
+  <!-- 上排：實體事實 -->
+  <text class="lbl bold zh" x="20" y="86">實體上</text>
+  <text class="anno zh" x="130" y="86">兩條染色體拷貝各自是連續的一整條</text>
+  <rect class="read hp1" x="130" y="102" width="760" height="14" rx="7"/>
+  <rect class="read hp2" x="130" y="126" width="760" height="14" rx="7"/>
+  <text class="tick mid" x="920" y="113">拷貝 ①</text>
+  <text class="tick mid" x="920" y="137">拷貝 ②</text>
+
+  <!-- 中排：軟體輸出 -->
+  <text class="lbl bold zh" x="20" y="204">軟體給你</text>
+  <text class="anno zh" x="130" y="204">每個 block 各自標號，標號獨立決定</text>
+
+  <rect class="box ghost" x="126" y="216" width="360" height="96" rx="8"/>
+  <text class="tick bold mid" x="306" y="238">phase block A　σ = +1</text>
+  <rect class="read hp1" x="150" y="250" width="310" height="14" rx="7"/>
+  <rect class="read hp2" x="150" y="274" width="310" height="14" rx="7"/>
+  <text class="tick end" x="144" y="261">H1</text>
+  <text class="tick end" x="144" y="285">H2</text>
+  <text class="tick zh mid" x="306" y="306">H1 ＝ 拷貝 ①</text>
+
+  <rect class="box ghost" x="534" y="216" width="360" height="96" rx="8"/>
+  <text class="tick bold mid" x="714" y="238">phase block B　σ = −1</text>
+  <rect class="read hp2" x="558" y="250" width="310" height="14" rx="7"/>
+  <rect class="read hp1" x="558" y="274" width="310" height="14" rx="7"/>
+  <text class="tick end" x="552" y="261">H1</text>
+  <text class="tick end" x="552" y="285">H2</text>
+  <text class="tick zh mid bad" x="714" y="306">H1 ＝ 拷貝 ②</text>
+
+  <path class="conn bad" d="M486,264 L530,264" marker-end="url(#arrow-sm)"/>
+  <path class="conn bad" d="M486,280 L530,280" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh bad mid" x="508" y="336">標號在這裡翻面</text>
+
+  <!-- 下排：後果 -->
+  <rect class="box ok" x="24" y="368" width="460" height="150" rx="8"/>
+  <text class="lbl bold zh ok" x="44" y="400">不受影響</text>
+  <text class="anno zh" x="44" y="430">clone tree 談的是細胞的祖先關係，</text>
+  <text class="anno zh" x="44" y="458">不是哪一條親源染色體帶著變異。</text>
+  <text class="anno zh" x="44" y="486">單位內部算出的量與 σ 無關，可直接邊際化。</text>
+
+  <rect class="box bad" x="516" y="368" width="460" height="150" rx="8"/>
+  <text class="lbl bold zh bad" x="536" y="400">會靜靜出錯</text>
+  <text class="anno zh" x="536" y="430">把不同 block 的 H1 加總在一起的統計；</text>
+  <text class="anno zh" x="536" y="458">跨 block 的單倍型特異拷貝數；</text>
+  <text class="anno zh" x="536" y="486">跨 block 比較甲基化偏向。這些都要先定出 σ。</text>
+
+  <text class="anno zh bold" x="24" y="550">設計規則：所有全基因體統計只能由「單位內部的量」組成 —— 這樣才自動與 σ 無關。</text>
+</svg>

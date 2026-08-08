@@ -171,13 +171,20 @@ node tools/build.mjs                    # 重新產生頁面
 
 ## 已知的待補項目
 
-MVP 範圍是 M0–M13 + Capstone。以下刻意留到 v2：
+教材範圍是 **M0–M13 + Capstone**（首頁的總時數只加總這些）。
+Capstone 之後是**研究指引**區塊 —— 那不是課程，是研究方向的說明，
+所以不計時數，也不做學習檢核。
+
+研究指引在 `modules.json` 裡多一個 `topic` 欄位，首頁會據此在 group 之下再分一層。
+一個主題可以有好幾頁；目前只有「主題一 · Subclone 系統發生重建」（上／下兩篇）。
+要加新主題就給一個新的 `topic` 字串，不必動 `build.mjs`。
+
+以下刻意留到之後：
 
 | 項目 | 內容 |
 |---|---|
-| **M14** | Boolean hypercube、Camin–Sokal parsimony、Group Steiner arborescence（Deck E 的演算法基礎） |
-| **M15** | Deck C / D / E 三篇延伸論文的 case study |
-| **M16** | Capstone 第二階段：真實 pipeline 重現（合成 purity 樣本 → 跑 caller → 對 SEQC2 評估） |
+| 研究指引 主題二以後 | 尚未開始 |
+| **Capstone 第二階段** | 真實 pipeline 重現（合成 purity 樣本 → 跑 caller → 對 SEQC2 評估） |
 | mutation-tree builder widget | 展示部分覆蓋 read 造成的候選樹多解 |
 | Capstone 的 precomputed 資料 | 兩個 repo 都沒附範例資料，需要自備一份小的 BAM/VCF 切片 |
 

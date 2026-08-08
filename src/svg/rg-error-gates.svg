@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <title>觀測要經過幾道閘門：每個位點一道，最後兩個家族之間再交換一次</title>
+  <desc>兩條並排的通道分別是同一個視窗的兩個單倍型家族。
+        每條通道由左到右經過相同的幾個階段。
+        起點是真實的分子組成。
+        接著是每個位點各一道錯誤閘門，閘門會把參考型讀成變異型，也會把變異型讀成參考型，
+        兩個方向的機率不一樣，所以閘門不是對稱的。
+        k 個位點就串 k 道閘門，把它們串起來就是公式裡那個張量積。
+        最後一道是家族交換閘門：大部分的分子留在自己的通道，
+        但有一小部分會被標到另一條通道去，圖上用兩條交叉的虛線表示。
+        終點是實際觀測到的計數。
+        圖的下方指出這件事的後果：因為交換閘門把兩條通道接在一起，
+        兩個家族必須一起估。分開估會讓譜系內比例每個單位都往零點五偏一點，
+        而且幾萬個單位偏的方向相同，那不是把譜變寬，是把整條譜平移。
+        讀法是：公式裡的三個符號各對應圖上一道閘門。</desc>
+
+  <text class="ttl zh" x="20" y="36">觀測要經過幾道閘門</text>
+
+  <text class="tick bold hp1" x="20" y="156">家族 H1</text>
+  <text class="tick bold hp2" x="20" y="296">家族 H2</text>
+
+  <!-- 真實組成 -->
+  <rect class="box plain" x="96" y="122" width="106" height="56" rx="8"/>
+  <text class="anno zh mid" x="149" y="156">真實組成</text>
+  <rect class="box plain" x="96" y="262" width="106" height="56" rx="8"/>
+  <text class="anno zh mid" x="149" y="296">真實組成</text>
+
+  <path class="conn" d="M202,150 L238,150" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M202,290 L238,290" marker-end="url(#arrow-sm)"/>
+
+  <!-- 位點 1 閘門 -->
+  <rect class="box warn" x="242" y="122" width="118" height="56" rx="8"/>
+  <text class="tick zh mid" x="301" y="146">位點 1 閘門</text>
+  <text class="tick mono mid" x="301" y="168">ε₁ , η₁</text>
+  <rect class="box warn" x="242" y="262" width="118" height="56" rx="8"/>
+  <text class="tick zh mid" x="301" y="286">位點 1 閘門</text>
+  <text class="tick mono mid" x="301" y="308">ε₁ , η₁</text>
+
+  <path class="conn" d="M360,150 L396,150" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M360,290 L396,290" marker-end="url(#arrow-sm)"/>
+
+  <!-- 位點 2 閘門 -->
+  <rect class="box warn" x="400" y="122" width="118" height="56" rx="8"/>
+  <text class="tick zh mid" x="459" y="146">位點 2 閘門</text>
+  <text class="tick mono mid" x="459" y="168">ε₂ , η₂</text>
+  <rect class="box warn" x="400" y="262" width="118" height="56" rx="8"/>
+  <text class="tick zh mid" x="459" y="286">位點 2 閘門</text>
+  <text class="tick mono mid" x="459" y="308">ε₂ , η₂</text>
+
+  <text class="tick zh mid" x="380" y="204">這兩道串起來就是公式裡的 T ＝ E₁ ⊗ E₂　（k 個位點就串 k 道）</text>
+
+  <!-- 家族交換閘門 -->
+  <rect class="box bad" x="556" y="102" width="176" height="236" rx="8"/>
+  <text class="tick bold zh bad mid" x="644" y="90">家族交換閘門 δ</text>
+
+  <path class="conn ok" d="M576,150 L712,150" marker-end="url(#arrow-sm)"/>
+  <path class="conn ok" d="M576,290 L712,290" marker-end="url(#arrow-sm)"/>
+  <path class="conn bad" stroke-dasharray="7 5" style="fill:none"
+        d="M576,166 L712,274" marker-end="url(#arrow-sm)"/>
+  <path class="conn bad" stroke-dasharray="7 5" style="fill:none"
+        d="M576,274 L712,166" marker-end="url(#arrow-sm)"/>
+
+  <text class="tick mono ok mid" x="644" y="140">1 − δ</text>
+  <text class="tick mono bad mid" x="644" y="228">δ</text>
+
+  <path class="conn" d="M732,150 L768,150" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M732,290 L768,290" marker-end="url(#arrow-sm)"/>
+
+  <!-- 觀測 -->
+  <rect class="box accent" x="772" y="122" width="118" height="56" rx="8"/>
+  <text class="anno zh mid" x="831" y="156">觀測計數</text>
+  <rect class="box accent" x="772" y="262" width="118" height="56" rx="8"/>
+  <text class="anno zh mid" x="831" y="296">觀測計數</text>
+
+  <!-- 說明 -->
+  <text class="anno zh" x="24" y="382">ε 是「把 REF 讀成 ALT」，η 是「把 ALT 讀成 REF」—— 兩個方向機率不同，所以閘門不對稱。</text>
+  <text class="anno zh" x="24" y="410">兩者都可以用同一個視窗裡的 germline 雜合位點就地估出來，不必外部參數。</text>
+
+  <rect class="box bad" x="24" y="430" width="952" height="60" rx="8"/>
+  <text class="anno zh bad" x="48" y="458">交換閘門把兩條通道接在一起，所以<tspan class="bold">兩個家族必須一起估</tspan>。分開估會讓 ϱ 每個單位</text>
+  <text class="anno zh bad" x="48" y="482">都往 0.5 偏一點，而且幾萬個單位偏的方向相同 —— 那不是把譜變寬，是把整條譜平移。</text>
+</svg>

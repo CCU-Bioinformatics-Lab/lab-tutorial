@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530">
+  <title>樹成本等於潛在節點數，所以最小成本就是「補最少的看不到狀態」</title>
+  <desc>左上是成本的算式。樹的成本等於邊數，邊數等於節點數減一，
+        而節點數等於固定節點數加上潛在節點數，
+        固定節點是參考型的根加上實際觀測到的狀態，潛在節點是為了把樹接起來而補進去的狀態。
+        所以最小成本等價於最少潛在節點。
+        右邊是一個例子：觀測到的只有全參考的根與兩個變異都帶的狀態，中間什麼都沒看到。
+        因為一步只能加一個突變，中間必須補一個狀態，補哪一個資料沒有意見，
+        於是得到兩個並列的最小成本候選，兩者成本都是二。
+        正確的做法是兩個都留著，而不是挑一個。
+        最下方指出潛在節點數本身就是一個值得統計的量：
+        它數的是「這棵樹需要、但沒有任何觀測支持」的狀態，
+        把全基因體的分布畫出來，就是這份重建有多少比例來自推論的直接量度。
+        讀法是：潛在節點不是一群還沒被觀察到的細胞，它是模型為了連通而記的帳。</desc>
+
+  <text class="ttl zh" x="20" y="36">最小成本 ＝ 補最少的「看不到的狀態」</text>
+
+  <rect class="box sunken" x="24" y="62" width="450" height="118" rx="8"/>
+  <text class="lbl mono mid" x="249" y="102">cost(T) = |E| = |V| − 1</text>
+  <text class="lbl mono mid" x="249" y="140">= C + |H| − 1</text>
+  <text class="tick zh mid" x="249" y="168">C ＝ 根 ＋ 觀測到的狀態　　H ＝ 補進去的潛在節點</text>
+
+  <text class="anno bold zh accent" x="24" y="216">C 固定時，最小成本就等價於最少潛在節點。</text>
+
+  <!-- 例子 -->
+  <text class="lbl bold zh" x="530" y="88">例：只觀測到 00 與 11</text>
+
+  <circle class="mark somatic" cx="620" cy="120" r="11"/>
+  <text class="tick mono mid" x="620" y="106">00</text>
+  <circle class="mark somatic" cx="620" cy="232" r="11"/>
+  <text class="tick mono mid" x="620" y="258">11</text>
+  <circle class="box ghost" cx="566" cy="176" r="11"/>
+  <circle class="box ghost" cx="674" cy="176" r="11"/>
+  <line class="conn" x1="612" y1="129" x2="574" y2="167"/>
+  <line class="conn" x1="628" y1="129" x2="666" y2="167"/>
+  <line class="conn" x1="574" y1="185" x2="612" y2="223"/>
+  <line class="conn" x1="666" y1="185" x2="628" y2="223"/>
+  <text class="tick zh" x="530" y="288">中間一定要經過一個狀態，但補哪一個資料沒有意見</text>
+
+  <rect class="box ok" x="760" y="92" width="100" height="88" rx="8"/>
+  <text class="tick mono mid" x="810" y="118">補 10</text>
+  <text class="tick mono mid" x="810" y="146">|H| = 1</text>
+  <text class="tick mono mid" x="810" y="170">cost 2</text>
+
+  <rect class="box ok" x="876" y="92" width="100" height="88" rx="8"/>
+  <text class="tick mono mid" x="926" y="118">補 01</text>
+  <text class="tick mono mid" x="926" y="146">|H| = 1</text>
+  <text class="tick mono mid" x="926" y="170">cost 2</text>
+
+  <text class="anno zh ok" x="760" y="214">兩個都留著</text>
+
+  <!-- |H| 當統計量 -->
+  <rect class="box accent" x="24" y="318" width="952" height="122" rx="8"/>
+  <text class="lbl bold zh accent" x="48" y="350">潛在節點數本身就是一個值得統計的量</text>
+  <text class="anno zh" x="48" y="382">它數的是「這棵樹需要、但沒有任何觀測支持」的狀態。</text>
+  <text class="anno zh" x="48" y="410">把全基因體的分布畫出來，就是這份重建有多少比例來自推論的直接量度 ——</text>
+  <text class="anno zh" x="48" y="434">而且求解器本來就算出來了，它就是成本。</text>
+
+  <text class="anno zh bad" x="24" y="476">但要記住它的意思：潛在節點<tspan class="bold">不是</tspan>一群還沒被觀察到的細胞。</text>
+  <text class="anno zh bad" x="24" y="504">它可能對應真的中間世代，也可能只是模型為了連通而記的帳。</text>
+</svg>

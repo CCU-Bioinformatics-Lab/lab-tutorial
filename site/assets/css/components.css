@@ -256,3 +256,39 @@ figcaption b { color: var(--ink); font-weight: 600; }
 
 /* --- 列印用詞彙附錄：螢幕隱藏 ------------------------------------------ */
 .glossary-appendix { display: none; }
+
+/* --- 數學式 -------------------------------------------------------------
+   ★ 為什麼是 MathML，不是 KaTeX / MathJax ★
+
+   這個專案的交付物是 file://（見 CLAUDE.md §5），而那兩個都過不了：
+     · CDN 載入被 verify.mjs 第 2 項擋掉，離線也會壞
+     · KaTeX 自帶數學字型，而字型是用相對路徑載入的，在 file:// 載不起來
+       （這正是第 6 項擋的那件事）
+     · MathJax 現在是 ESM，file:// 直接載不動
+
+   MathML 是瀏覽器內建的排版：零資源、零 JS、可選取、螢幕閱讀器唸得出來，
+   而且會跟著頁面字級一起縮放（<pre> 裡的 ASCII 公式做不到這幾件事）。
+
+   分數、上下標、求和符號這些，ASCII 只能用空白對齊硬湊 ——
+   一旦讀者改了字級或用等寬以外的字型，那個對齊就散掉，而且不會有任何錯誤。 */
+.eq {
+  background: var(--paper-sunken);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: var(--sp-4);
+  margin: 0 0 1.2em;
+  overflow-x: auto;          /* 寬式子自己捲，不要把整頁撐寬 */
+  overflow-y: hidden;
+}
+.eq math { font-size: 1.15em; color: var(--ink); }
+
+/* 式子後面接一句話說明它在算什麼 —— 符號表不該是讀者唯一的線索 */
+.eq__note {
+  margin: .6em 0 0;
+  font-size: .85rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* 行內小式子：不要讓它撐開行距 */
+.prose math { font-size: 1.05em; }

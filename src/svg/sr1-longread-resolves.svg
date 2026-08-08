@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
+  <title>同樣的兩個 VAF，短讀留下兩棵樹，長讀只剩一棵</title>
+  <desc>左右兩半用的是同一顆腫瘤、同樣兩個 somatic 位點、同樣十條分子，
+        兩邊算出來的 VAF 也完全一樣：S1 是零點五零，S2 是零點三零。
+        差別只在讀長。
+        左半是短讀：兩個位點相距三 kb，沒有任何一條 read 同時蓋得到，
+        所以每條 read 只在一個位點上有值。能算出來的就只有那兩個 VAF。
+        這兩個數字同時相容於兩棵樹：一棵是 S2 長在 S1 的細胞裡，另一棵是兩者各自從起點長出來。
+        兩棵都通過檢查，所以分不出來。
+        右半是長讀：一條分子就跨過兩個位點，所以每條 read 在兩個位點上都有值，
+        可以直接數出組合。十條裡面，兩個位點都是參考型的有五條，
+        只帶 S1 的有兩條，兩個都帶的有三條，而只帶 S2 的一條也沒有。
+        只帶 S2 的分子不存在這件事，直接排除掉「兩者各自長出」那棵樹，
+        因為那棵樹必須要有只帶 S2 的細胞。於是只剩下一棵。
+        最下方點出關鍵：多出來的不是精度，是一種新的觀測 ——
+        邊際頻率永遠不會告訴你哪一格是空的，而空的那一格才是決定樹形的東西。
+        讀法是：兩邊的 VAF 刻意做成一模一樣，所以差別只可能來自組合。</desc>
+
+  <text class="ttl zh" x="20" y="36">同樣的兩個 VAF，短讀留下兩棵樹，長讀只剩一棵</text>
+  <text class="anno zh" x="20" y="64">兩邊是同一顆腫瘤、同樣十條分子。VAF 刻意做成完全一樣，所以差別只可能來自「組合看不看得到」。</text>
+
+  <!-- ══ 左：短讀 ══ -->
+  <rect class="box ghost bad" x="24" y="78" width="468" height="452" rx="8"/>
+  <text class="lbl bold zh mid" x="258" y="110">短讀：一條只蓋得到一個位點</text>
+
+  <text class="tick mid" x="150" y="138">S1</text>
+  <text class="tick zh mid" x="258" y="138">相距 3 kb</text>
+  <text class="tick mid" x="366" y="138">S2</text>
+  <line class="axis" x1="60" y1="150" x2="456" y2="150"/>
+  <line class="guide" x1="150" y1="144" x2="150" y2="156"/>
+  <line class="guide" x1="366" y1="144" x2="366" y2="156"/>
+
+  <rect class="read hp0" x="126" y="168" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="126" y="180" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="126" y="192" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="126" y="204" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="126" y="216" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="126" y="228" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="126" y="240" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="126" y="252" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="126" y="264" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="126" y="276" width="48" height="8" rx="4"/>
+  <circle class="mark ref" cx="150" cy="172" r="4"/>
+  <circle class="mark ref" cx="150" cy="184" r="4"/>
+  <circle class="mark ref" cx="150" cy="196" r="4"/>
+  <circle class="mark ref" cx="150" cy="208" r="4"/>
+  <circle class="mark ref" cx="150" cy="220" r="4"/>
+  <circle class="mark somatic" cx="150" cy="232" r="4"/>
+  <circle class="mark somatic" cx="150" cy="244" r="4"/>
+  <circle class="mark somatic" cx="150" cy="256" r="4"/>
+  <circle class="mark somatic" cx="150" cy="268" r="4"/>
+  <circle class="mark somatic" cx="150" cy="280" r="4"/>
+
+  <rect class="read hp0" x="342" y="168" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="342" y="180" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="342" y="192" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="342" y="204" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="342" y="216" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="342" y="228" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="342" y="240" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="342" y="252" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="342" y="264" width="48" height="8" rx="4"/>
+  <rect class="read hp0" x="342" y="276" width="48" height="8" rx="4"/>
+  <circle class="mark ref" cx="366" cy="172" r="4"/>
+  <circle class="mark ref" cx="366" cy="184" r="4"/>
+  <circle class="mark ref" cx="366" cy="196" r="4"/>
+  <circle class="mark ref" cx="366" cy="208" r="4"/>
+  <circle class="mark ref" cx="366" cy="220" r="4"/>
+  <circle class="mark ref" cx="366" cy="232" r="4"/>
+  <circle class="mark ref" cx="366" cy="244" r="4"/>
+  <circle class="mark somatic" cx="366" cy="256" r="4"/>
+  <circle class="mark somatic" cx="366" cy="268" r="4"/>
+  <circle class="mark somatic" cx="366" cy="280" r="4"/>
+
+  <text class="anno mono mid" x="258" y="312">VAF(S1) = 5/10 = 0.50</text>
+  <text class="anno mono mid" x="258" y="334">VAF(S2) = 3/10 = 0.30</text>
+  <text class="tick zh mid bad" x="258" y="360">能算的就只有這兩個數字 —— 組合看不到</text>
+
+  <text class="tick zh mid" x="258" y="390">相容的樹</text>
+
+  <text class="tick zh mid" x="140" y="414">S2 長在 S1 裡</text>
+  <circle class="mark ref" cx="140" cy="434" r="9"/>
+  <line class="conn" x1="140" y1="443" x2="140" y2="459"/>
+  <circle class="mark somatic" cx="140" cy="468" r="9"/>
+  <line class="conn" x1="140" y1="477" x2="140" y2="493"/>
+  <circle class="mark somatic" cx="140" cy="502" r="9"/>
+  <text class="lbl bold ok" x="176" y="474">✓</text>
+
+  <text class="tick zh mid" x="376" y="414">兩者各自長出</text>
+  <circle class="mark ref" cx="376" cy="434" r="9"/>
+  <line class="conn" x1="368" y1="442" x2="344" y2="462"/>
+  <line class="conn" x1="384" y1="442" x2="408" y2="462"/>
+  <circle class="mark somatic" cx="338" cy="470" r="9"/>
+  <circle class="mark somatic" cx="414" cy="470" r="9"/>
+  <text class="lbl bold ok" x="440" y="474">✓</text>
+
+  <!-- ══ 右：長讀 ══ -->
+  <rect class="box ghost ok" x="508" y="78" width="468" height="452" rx="8"/>
+  <text class="lbl bold zh mid" x="742" y="110">長讀：一條跨過兩個位點</text>
+
+  <text class="tick mid" x="634" y="138">S1</text>
+  <text class="tick zh mid" x="742" y="138">相距 3 kb</text>
+  <text class="tick mid" x="850" y="138">S2</text>
+  <line class="axis" x1="544" y1="150" x2="940" y2="150"/>
+  <line class="guide" x1="634" y1="144" x2="634" y2="156"/>
+  <line class="guide" x1="850" y1="144" x2="850" y2="156"/>
+
+  <rect class="read hp1" x="566" y="168" width="352" height="8" rx="4"/>
+  <rect class="read hp1" x="566" y="180" width="352" height="8" rx="4"/>
+  <rect class="read hp1" x="566" y="192" width="352" height="8" rx="4"/>
+  <rect class="read hp1" x="566" y="204" width="352" height="8" rx="4"/>
+  <rect class="read hp1" x="566" y="216" width="352" height="8" rx="4"/>
+  <rect class="read hp1" x="566" y="228" width="352" height="8" rx="4"/>
+  <rect class="read hp1" x="566" y="240" width="352" height="8" rx="4"/>
+  <rect class="read hp1" x="566" y="252" width="352" height="8" rx="4"/>
+  <rect class="read hp1" x="566" y="264" width="352" height="8" rx="4"/>
+  <rect class="read hp1" x="566" y="276" width="352" height="8" rx="4"/>
+
+  <circle class="mark ref" cx="634" cy="172" r="4"/>
+  <circle class="mark ref" cx="634" cy="184" r="4"/>
+  <circle class="mark ref" cx="634" cy="196" r="4"/>
+  <circle class="mark ref" cx="634" cy="208" r="4"/>
+  <circle class="mark ref" cx="634" cy="220" r="4"/>
+  <circle class="mark somatic" cx="634" cy="232" r="4"/>
+  <circle class="mark somatic" cx="634" cy="244" r="4"/>
+  <circle class="mark somatic" cx="634" cy="256" r="4"/>
+  <circle class="mark somatic" cx="634" cy="268" r="4"/>
+  <circle class="mark somatic" cx="634" cy="280" r="4"/>
+
+  <circle class="mark ref" cx="850" cy="172" r="4"/>
+  <circle class="mark ref" cx="850" cy="184" r="4"/>
+  <circle class="mark ref" cx="850" cy="196" r="4"/>
+  <circle class="mark ref" cx="850" cy="208" r="4"/>
+  <circle class="mark ref" cx="850" cy="220" r="4"/>
+  <circle class="mark ref" cx="850" cy="232" r="4"/>
+  <circle class="mark ref" cx="850" cy="244" r="4"/>
+  <circle class="mark somatic" cx="850" cy="256" r="4"/>
+  <circle class="mark somatic" cx="850" cy="268" r="4"/>
+  <circle class="mark somatic" cx="850" cy="280" r="4"/>
+
+  <text class="anno mono mid" x="742" y="312">VAF(S1) = 5/10 = 0.50</text>
+  <text class="anno mono mid" x="742" y="334">VAF(S2) = 3/10 = 0.30</text>
+  <text class="tick zh mid ok" x="742" y="360">一模一樣，但還數得出組合：只帶 S2 的 0 條</text>
+
+  <text class="tick zh mid" x="742" y="390">相容的樹</text>
+
+  <text class="tick zh mid" x="624" y="414">S2 長在 S1 裡</text>
+  <circle class="mark ref" cx="624" cy="434" r="9"/>
+  <line class="conn" x1="624" y1="443" x2="624" y2="459"/>
+  <circle class="mark somatic" cx="624" cy="468" r="9"/>
+  <line class="conn" x1="624" y1="477" x2="624" y2="493"/>
+  <circle class="mark somatic" cx="624" cy="502" r="9"/>
+  <text class="lbl bold ok" x="660" y="474">✓</text>
+
+  <text class="tick zh mid" x="860" y="414">兩者各自長出</text>
+  <circle class="mark ref" cx="860" cy="434" r="9"/>
+  <line class="conn bad" x1="852" y1="442" x2="828" y2="462"/>
+  <line class="conn bad" x1="868" y1="442" x2="892" y2="462"/>
+  <circle class="mark somatic" cx="822" cy="470" r="9"/>
+  <circle class="box ghost bad" cx="898" cy="470" r="9"/>
+  <text class="lbl bold bad" x="924" y="474">✗</text>
+  <text class="tick zh mid bad" x="860" y="502">這棵樹需要「只帶 S2」的細胞</text>
+  <text class="tick zh mid bad" x="860" y="522">但一條分子也沒有</text>
+
+  <!-- ══ 關鍵 ══ -->
+  <rect class="box accent" x="24" y="548" width="952" height="60" rx="8"/>
+  <text class="anno zh" x="48" y="576">長讀多給的不是精度，是<tspan class="bold">一種新的觀測</tspan>：哪一種組合是<tspan class="bold">空的</tspan>。</text>
+  <text class="anno zh" x="48" y="600">邊際頻率永遠不會告訴你這件事 —— 而空掉的那一格，正是決定樹形的那一格。</text>
+</svg>

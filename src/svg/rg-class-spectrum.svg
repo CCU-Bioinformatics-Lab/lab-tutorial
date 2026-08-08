@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540">
+  <title>已經量到的全基因體譜：七個資料集的區域拓撲類別組成</title>
+  <desc>七條堆疊長條，每一條是一個資料集，橫軸是佔全部可分析單位的百分比。
+        每條分成三段：單層無分支、多層無分支，以及其餘（分支類與未解析加起來）。
+        單層無分支的範圍是一成九點五到四成六點八，
+        多層無分支的範圍是三成八點一到五成三點三，在七個資料集裡有六個是最大的一類。
+        右側標出每個資料集的可分析單位數，從四千二百多到兩萬三千多不等。
+        下方列出重現性：同一個細胞株在不同機構、不同 basecaller 下的組成相似度是零點九零九，
+        同為乳癌的樣本之間是零點八四到零點九零，
+        兩個肺癌樣本之間是零點八六，跨癌別則掉到零點五九到零點七八。
+        一個換了 basecaller 還能維持零點九零九、卻分得開癌別的統計量，帶著真的訊號。
+        最下方提醒：這張圖尚未針對覆蓋幾何做校正，所以類別比例還不能直接當成演化結論。
+        讀法是：這已經是一個可重現的全基因體單倍型頻譜，重新設計要建在它上面。</desc>
+
+  <text class="ttl zh" x="20" y="36">已經量到的全基因體譜</text>
+  <text class="anno zh" x="20" y="66">七個資料集、六個生物樣本、chr1–22，每個單位是「區域 × 單倍型家族」。</text>
+
+  <text class="tick end" x="190" y="118">HCC1395_HKU</text>
+  <rect class="bar" x="200" y="102" width="242" height="22" rx="2"/>
+  <rect class="bar ok" x="442" y="102" width="365" height="22" rx="2"/>
+  <rect class="bar warn" x="807" y="102" width="93" height="22" rx="2"/>
+  <text class="tick mid" x="321" y="118">34.5%</text>
+  <text class="tick mid" x="624" y="118">52.2%</text>
+  <text class="tick" x="916" y="118">9,130</text>
+
+  <text class="tick end" x="190" y="158">HCC1395_NYGC</text>
+  <rect class="bar" x="200" y="142" width="252" height="22" rx="2"/>
+  <rect class="bar ok" x="452" y="142" width="366" height="22" rx="2"/>
+  <rect class="bar warn" x="818" y="142" width="82" height="22" rx="2"/>
+  <text class="tick mid" x="326" y="158">36.0%</text>
+  <text class="tick mid" x="635" y="158">52.3%</text>
+  <text class="tick" x="916" y="158">5,308</text>
+
+  <text class="tick end" x="190" y="198">HCC1937</text>
+  <rect class="bar" x="200" y="182" width="202" height="22" rx="2"/>
+  <rect class="bar ok" x="402" y="182" width="373" height="22" rx="2"/>
+  <rect class="bar warn" x="775" y="182" width="125" height="22" rx="2"/>
+  <text class="tick mid" x="301" y="198">28.8%</text>
+  <text class="tick mid" x="588" y="198">53.3%</text>
+  <text class="tick" x="916" y="198">4,245</text>
+
+  <text class="tick end" x="190" y="238">HCC1954</text>
+  <rect class="bar" x="200" y="222" width="328" height="22" rx="2"/>
+  <rect class="bar ok" x="528" y="222" width="267" height="22" rx="2"/>
+  <rect class="bar warn" x="795" y="222" width="105" height="22" rx="2"/>
+  <text class="tick mid" x="364" y="238">46.8%</text>
+  <text class="tick mid" x="661" y="238">38.1%</text>
+  <text class="tick" x="916" y="238">5,647</text>
+
+  <text class="tick end" x="190" y="278">H1437</text>
+  <rect class="bar" x="200" y="262" width="209" height="22" rx="2"/>
+  <rect class="bar ok" x="409" y="262" width="372" height="22" rx="2"/>
+  <rect class="bar warn" x="781" y="262" width="119" height="22" rx="2"/>
+  <text class="tick mid" x="304" y="278">29.8%</text>
+  <text class="tick mid" x="595" y="278">53.2%</text>
+  <text class="tick" x="916" y="278">13,740</text>
+
+  <text class="tick end" x="190" y="318">H2009</text>
+  <rect class="bar" x="200" y="302" width="137" height="22" rx="2"/>
+  <rect class="bar ok" x="337" y="302" width="365" height="22" rx="2"/>
+  <rect class="bar warn" x="702" y="302" width="198" height="22" rx="2"/>
+  <text class="tick mid" x="268" y="318">19.5%</text>
+  <text class="tick mid" x="519" y="318">52.2%</text>
+  <text class="tick" x="916" y="318">23,128</text>
+
+  <text class="tick end" x="190" y="358">COLO829</text>
+  <rect class="bar" x="200" y="342" width="300" height="22" rx="2"/>
+  <rect class="bar ok" x="500" y="342" width="320" height="22" rx="2"/>
+  <rect class="bar warn" x="820" y="342" width="80" height="22" rx="2"/>
+  <text class="tick mid" x="350" y="358">42.8%</text>
+  <text class="tick mid" x="660" y="358">45.7%</text>
+  <text class="tick" x="916" y="358">10,757</text>
+
+  <!-- 圖例 -->
+  <rect class="bar" x="200" y="386" width="20" height="14" rx="2"/>
+  <text class="tick zh" x="228" y="398">單層無分支</text>
+  <rect class="bar ok" x="360" y="386" width="20" height="14" rx="2"/>
+  <text class="tick zh" x="388" y="398">多層無分支（七個裡有六個是最大類）</text>
+  <rect class="bar warn" x="740" y="386" width="20" height="14" rx="2"/>
+  <text class="tick zh" x="768" y="398">分支類 ＋ 未解析</text>
+
+  <!-- 重現性 -->
+  <rect class="box ok" x="24" y="418" width="952" height="60" rx="8"/>
+  <text class="anno zh" x="48" y="446">重現性：同細胞株換機構換 basecaller <tspan class="bold">0.909</tspan>；乳癌之間 0.84–0.90；</text>
+  <text class="anno zh" x="48" y="470">兩個肺癌之間 0.86；跨癌別掉到 0.59–0.78。換了 basecaller 還守得住，代表訊號是真的。</text>
+
+  <text class="anno zh bad" x="24" y="516">但這張圖還沒針對覆蓋幾何校正，所以類別比例還不能直接當成演化結論。</text>
+</svg>

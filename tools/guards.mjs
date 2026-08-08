@@ -22,4 +22,6 @@ export const GUARD_TOPICS = {
   10: '後處理救不回 caller 漏掉的變異',
   11: '頻率群集不等於 clone tree',
   12: '兩群 epiallele 不一定是兩群細胞',
+  13: '不同 phase block 的 H1 不是同一條染色體',
+  14: 'trans 不等於分支演化',
 };

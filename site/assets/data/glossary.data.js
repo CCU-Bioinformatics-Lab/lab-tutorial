@@ -64,7 +64,7 @@ window.TW_GLOSSARY = {
    "m02",
    "m05",
    "m07",
-   "m14"
+   "sr1"
   ]
  },
  "diploid": {
@@ -189,7 +189,7 @@ window.TW_GLOSSARY = {
    "m01",
    "m02",
    "m07",
-   "m14"
+   "sr1"
   ]
  },
  "clone": {
@@ -203,7 +203,8 @@ window.TW_GLOSSARY = {
   "slug": "clone",
   "modules": [
    "m01",
-   "m02"
+   "m02",
+   "sr1"
   ]
  },
  "subclone": {
@@ -218,7 +219,7 @@ window.TW_GLOSSARY = {
   "modules": [
    "m01",
    "m02",
-   "m14"
+   "sr1"
   ]
  },
  "intratumour heterogeneity": {
@@ -259,7 +260,7 @@ window.TW_GLOSSARY = {
   "modules": [
    "m03",
    "m13",
-   "m14"
+   "sr1"
   ]
  },
  "read": {
@@ -341,7 +342,7 @@ window.TW_GLOSSARY = {
    "m03",
    "m08",
    "m12",
-   "m14"
+   "sr1"
   ]
  },
  "homopolymer": {
@@ -367,7 +368,7 @@ window.TW_GLOSSARY = {
   "slug": "5mc",
   "modules": [
    "m09",
-   "m14"
+   "sr1"
   ]
  },
  "CpG": {
@@ -379,7 +380,7 @@ window.TW_GLOSSARY = {
   "slug": "cpg",
   "modules": [
    "m09",
-   "m14"
+   "sr1"
   ]
  },
  "MM/ML tag": {
@@ -475,7 +476,7 @@ window.TW_GLOSSARY = {
   "modules": [
    "m04",
    "m13",
-   "m14"
+   "sr1"
   ]
  },
  "VCF": {
@@ -524,7 +525,7 @@ window.TW_GLOSSARY = {
    "m05",
    "m06",
    "m11",
-   "m14"
+   "sr1"
   ]
  },
  "phasing": {
@@ -580,7 +581,8 @@ window.TW_GLOSSARY = {
   "modules": [
    "m06",
    "m11",
-   "m14"
+   "sr1",
+   "sr2"
   ]
  },
  "switch error": {
@@ -620,7 +622,8 @@ window.TW_GLOSSARY = {
   "slug": "somatic-haplotype",
   "modules": [
    "m04",
-   "m14"
+   "sr1",
+   "sr2"
   ]
  },
  "somatic haplotagging": {
@@ -812,7 +815,7 @@ window.TW_GLOSSARY = {
    "m03",
    "m08",
    "m12",
-   "m14"
+   "sr1"
   ]
  },
  "tumour DNA fraction": {
@@ -848,7 +851,7 @@ window.TW_GLOSSARY = {
   "modules": [
    "capstone",
    "m08",
-   "m14"
+   "sr1"
   ]
  },
  "ploidy": {
@@ -898,7 +901,7 @@ window.TW_GLOSSARY = {
    "m07",
    "m08",
    "m12",
-   "m14"
+   "sr1"
   ]
  },
  "mutation multiplicity": {
@@ -912,7 +915,7 @@ window.TW_GLOSSARY = {
   "slug": "mutation-multiplicity",
   "modules": [
    "m08",
-   "m14"
+   "sr1"
   ]
  },
  "LOH": {
@@ -935,7 +938,7 @@ window.TW_GLOSSARY = {
    "m11",
    "m12",
    "m13",
-   "m14"
+   "sr1"
   ]
  },
  "BFB": {
@@ -1172,7 +1175,7 @@ window.TW_GLOSSARY = {
   ],
   "slug": "mutation-frequency-spectrum",
   "modules": [
-   "m14"
+   "sr1"
   ]
  },
  "marginal distribution": {
@@ -1186,7 +1189,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "marginal-distribution",
   "modules": [
-   "m14"
+   "sr1",
+   "sr2"
   ]
  },
  "joint distribution": {
@@ -1200,7 +1204,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "joint-distribution",
   "modules": [
-   "m14"
+   "sr1",
+   "sr2"
   ]
  },
  "clone tree": {
@@ -1215,7 +1220,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "clone-tree",
   "modules": [
-   "m14"
+   "sr1",
+   "sr2"
   ]
  },
  "parsimony": {
@@ -1229,7 +1235,7 @@ window.TW_GLOSSARY = {
   ],
   "slug": "parsimony",
   "modules": [
-   "m14"
+   "sr1"
   ]
  },
  "latent node": {
@@ -1243,7 +1249,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "latent-node",
   "modules": [
-   "m14"
+   "sr1",
+   "sr2"
   ]
  },
  "epiallele": {
@@ -1258,7 +1265,7 @@ window.TW_GLOSSARY = {
   ],
   "slug": "epiallele",
   "modules": [
-   "m14"
+   "sr1"
   ]
  },
  "epimutation": {
@@ -1272,7 +1279,7 @@ window.TW_GLOSSARY = {
   ],
   "slug": "epimutation",
   "modules": [
-   "m14"
+   "sr1"
   ]
  },
  "read-AF": {
@@ -1286,7 +1293,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "read-af",
   "modules": [
-   "m14"
+   "sr1",
+   "sr2"
   ]
  }
 };

@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540">
+  <title>研究目標：用長讀定序把 subclone 的先後順序重建出來</title>
+  <desc>上排三格由左到右說明這件事的形狀。
+        第一格是腫瘤真實的樣子：同一顆腫瘤裡有好幾群細胞，每一群帶著不同的變異組合，
+        而且群與群之間有先後關係 —— 某一群是從另一群長出來的。
+        第二格是定序實際給你的東西：細胞被打碎混在一起，
+        剩下的是一堆看不出來源的片段，以及每個位點各自的變異頻率，群的資訊在這一步掉了。
+        第三格是要重建回來的東西：一棵樹，節點是一群細胞，
+        邊代表在祖先的變異之上又多拿到一個，這棵樹叫 clone tree。
+        中排說明長讀在這裡的角色。短讀只夠告訴你每個位點各自的頻率，那是逐位點分開的資訊；
+        長讀一條分子就跨過好幾個位點，因此直接看得到「這幾個變異有沒有出現在同一個分子上」，
+        而那正是決定先後順序需要的東西。
+        最下方是這兩頁的研究目標：用長讀把 subclone 的先後順序重建出來，
+        並且說清楚重建到哪裡為止是可信的。
+        讀法是：定序把群的資訊打散，重建就是把它拼回去，而長讀多帶了一種拼得回去的線索。</desc>
+
+  <text class="ttl zh" x="20" y="36">研究目標：把 subclone 的先後順序重建出來</text>
+
+  <!-- ① 真實的腫瘤 -->
+  <rect class="box ghost" x="24" y="62" width="296" height="186" rx="8"/>
+  <text class="lbl bold zh mid" x="172" y="92">① 腫瘤真實的樣子</text>
+
+  <rect class="box plain" x="44" y="108" width="80" height="56" rx="6"/>
+  <circle class="cell tumor" cx="66" cy="128" r="10"/>
+  <circle class="cell tumor" cx="92" cy="128" r="10"/>
+  <circle class="cell tumor" cx="79" cy="150" r="10"/>
+
+  <rect class="box plain" x="136" y="108" width="80" height="56" rx="6"/>
+  <circle class="cell clone1" cx="158" cy="128" r="10"/>
+  <circle class="cell clone1" cx="184" cy="128" r="10"/>
+  <circle class="cell clone1" cx="171" cy="150" r="10"/>
+
+  <rect class="box plain" x="228" y="108" width="80" height="56" rx="6"/>
+  <circle class="cell clone2" cx="255" cy="128" r="10"/>
+  <circle class="cell clone2" cx="281" cy="128" r="10"/>
+
+  <text class="tick mid" x="84" y="184">群 A</text>
+  <text class="tick mid" x="176" y="184">群 B</text>
+  <text class="tick mid" x="268" y="184">群 C</text>
+
+  <text class="tick zh mid" x="172" y="212">好幾群細胞，各帶不同的變異組合</text>
+  <text class="tick zh mid" x="172" y="236">而且群之間有先後關係</text>
+
+  <!-- ② 定序給你的 -->
+  <rect class="box ghost" x="350" y="62" width="296" height="186" rx="8"/>
+  <text class="lbl bold zh mid" x="498" y="92">② 定序給你的</text>
+
+  <rect class="read hp0" x="372" y="110" width="120" height="12" rx="6"/>
+  <rect class="read hp0" x="504" y="110" width="120" height="12" rx="6"/>
+  <rect class="read hp0" x="386" y="128" width="120" height="12" rx="6"/>
+  <rect class="read hp0" x="516" y="128" width="108" height="12" rx="6"/>
+  <rect class="read hp0" x="372" y="146" width="132" height="12" rx="6"/>
+  <rect class="read hp0" x="512" y="146" width="112" height="12" rx="6"/>
+
+  <text class="tick mono mid" x="498" y="184">VAF  0.31 · 0.18 · 0.29</text>
+  <text class="tick zh mid" x="498" y="212">細胞被打碎，看不出誰跟誰同一群</text>
+  <text class="tick zh mid bad" x="498" y="236">群的資訊在這一步掉了</text>
+
+  <!-- ③ 要重建的 -->
+  <rect class="box accent" x="676" y="62" width="296" height="186" rx="8"/>
+  <text class="lbl bold zh mid" x="824" y="92">③ 要重建回來的</text>
+
+  <circle class="mark ref" cx="824" cy="118" r="10"/>
+  <line class="conn" x1="816" y1="126" x2="784" y2="152"/>
+  <line class="conn" x1="832" y1="126" x2="864" y2="152"/>
+  <circle class="mark somatic" cx="778" cy="160" r="10"/>
+  <circle class="mark somatic" cx="870" cy="160" r="10"/>
+  <line class="conn" x1="778" y1="170" x2="778" y2="188"/>
+  <circle class="mark somatic" cx="778" cy="196" r="10"/>
+
+  <text class="tick zh mid" x="824" y="228">誰從誰長出來 —— 一棵 clone tree</text>
+
+  <path class="conn thick" d="M324,155 L346,155" marker-end="url(#arrow)"/>
+  <path class="conn thick accent" d="M650,155 L672,155" marker-end="url(#arrow)"/>
+  <text class="tick zh mid" x="335" y="272">定序</text>
+  <text class="tick zh mid accent" x="661" y="272">重建</text>
+
+  <!-- 長讀的角色 -->
+  <line class="guide" x1="24" y1="292" x2="976" y2="292"/>
+  <text class="lbl bold zh" x="24" y="324">長讀在這裡的角色</text>
+
+  <circle class="mark somatic" cx="230" cy="352" r="6"/>
+  <circle class="mark somatic" cx="300" cy="352" r="6"/>
+  <circle class="mark somatic" cx="370" cy="352" r="6"/>
+  <text class="anno zh end" x="212" y="368">短讀</text>
+  <rect class="read hp0" x="204" y="360" width="52" height="12" rx="6"/>
+  <rect class="read hp0" x="274" y="360" width="52" height="12" rx="6"/>
+  <rect class="read hp0" x="344" y="360" width="52" height="12" rx="6"/>
+  <text class="anno zh" x="430" y="368">只夠給每個位點各自的頻率</text>
+
+  <circle class="mark somatic" cx="230" cy="396" r="6"/>
+  <circle class="mark somatic" cx="300" cy="396" r="6"/>
+  <circle class="mark somatic" cx="370" cy="396" r="6"/>
+  <text class="anno zh end" x="212" y="412">長讀</text>
+  <rect class="read hp1" x="204" y="404" width="192" height="12" rx="6"/>
+  <text class="anno zh ok" x="430" y="412">一條分子就跨過好幾個位點，</text>
+  <text class="anno zh ok" x="430" y="438">因此直接看得到「這幾個變異在不在同一個分子上」</text>
+
+  <!-- 目標 -->
+  <rect class="box accent" x="24" y="462" width="952" height="66" rx="8"/>
+  <text class="anno zh" x="48" y="492">這兩頁的研究目標：<tspan class="bold">用長讀把 subclone 的先後順序重建出來</tspan>，</text>
+  <text class="anno zh" x="48" y="518">並且說清楚重建到哪裡為止是可信的。</text>
+</svg>

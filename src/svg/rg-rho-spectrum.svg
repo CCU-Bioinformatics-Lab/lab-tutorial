@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 460">
+  <title>譜系內比例的累積曲線：中性時是直線，而且分層之後互相重疊</title>
+  <desc>左邊是主圖。橫軸是譜系內比例的倒數，縱軸是累積的配對數。
+        中性演化的預測是一條通過原點的直線，因為一個 clone 本身也是從單一細胞指數擴張的族群，
+        所以在它自己的尺度上服從同一條定律，而且常數相同。
+        圖上畫了四條線。三條實線分別來自不同大小的親代 clone 分層，它們幾乎重疊，
+        這是自相似性：中性時分層之後的譜完全一樣。
+        第四條虛線明顯偏離，代表那一層的 clone 內部有天擇。
+        右邊列出兩個可檢驗的預測。第一個是斜率要與傳統全腫瘤 VAF 擬合得到的常數相同。
+        第二個是分層之後三條線要重疊，只要出現對親代大小的依賴，就是該譜系特有的天擇。
+        右下角標出這條路線相對於傳統做法的差別：傳統的中性檢定一個腫瘤只給一個結論，
+        這裡每一個譜系各給一個。
+        讀法是：把每個 clone 放回它自己的尺度上，天擇訊號就從邊界移回可觀測的視窗裡。</desc>
+
+  <text class="ttl zh" x="20" y="36">譜系內比例的累積曲線</text>
+
+  <!-- 座標軸 -->
+  <line class="axis" x1="100" y1="360" x2="560" y2="360"/>
+  <line class="axis" x1="100" y1="360" x2="100" y2="80"/>
+  <text class="tick mid" x="100" y="384">0</text>
+  <text class="tick mid" x="215" y="384">5</text>
+  <text class="tick mid" x="330" y="384">10</text>
+  <text class="tick mid" x="445" y="384">15</text>
+  <text class="tick mid" x="560" y="384">20</text>
+  <text class="anno zh mid" x="330" y="412">橫軸：譜系內比例的倒數 1／ϱ</text>
+  <text class="tick zh" x="24" y="72">縱軸：累積配對數</text>
+
+  <!-- 三條中性線（幾乎重疊） -->
+  <line class="conn thick ok" x1="100" y1="360" x2="520" y2="106"/>
+  <line class="conn ok" x1="100" y1="360" x2="520" y2="122"/>
+  <line class="conn ok" x1="100" y1="360" x2="520" y2="94"/>
+
+  <!-- 偏離的一層 -->
+  <path class="conn bad" stroke-dasharray="8 6" style="fill:none"
+        d="M100,360 C210,320 280,300 340,246 C400,192 450,186 520,180"/>
+
+  <circle class="pt tp" cx="205" cy="298" r="4"/>
+  <circle class="pt tp" cx="290" cy="245" r="4"/>
+  <circle class="pt tp" cx="380" cy="190" r="4"/>
+  <circle class="pt tp" cx="470" cy="136" r="4"/>
+
+  <text class="tick ok" x="440" y="88">中性：三層重疊</text>
+  <text class="tick bad" x="366" y="168">這一層偏離</text>
+
+  <!-- 右側說明 -->
+  <rect class="box ok" x="600" y="76" width="376" height="122" rx="8"/>
+  <text class="lbl bold zh ok" x="620" y="108">預測 P1　斜率相符</text>
+  <text class="anno zh" x="620" y="138">這條直線的斜率，應該與傳統全腫瘤</text>
+  <text class="anno zh" x="620" y="166">VAF 擬合得到的同一個常數一致。</text>
+  <text class="tick zh" x="620" y="190">不一致就代表有天擇或未修正的偵測偏差。</text>
+
+  <rect class="box accent" x="600" y="216" width="376" height="122" rx="8"/>
+  <text class="lbl bold zh accent" x="620" y="248">預測 P2　分層後重疊</text>
+  <text class="anno zh" x="620" y="278">按親代 clone 大小分層，中性時各層</text>
+  <text class="anno zh" x="620" y="306">的譜完全一樣（自相似）。</text>
+  <text class="tick zh" x="620" y="330">出現依賴＝該譜系特有的天擇。</text>
+
+  <text class="anno zh bold" x="600" y="374">傳統中性檢定：一個腫瘤一個結論。</text>
+  <text class="anno zh bold ok" x="600" y="402">這裡：每一個譜系各一個結論。</text>
+  <text class="tick zh" x="600" y="430">直線是累積曲線的性質，不是直方圖的性質。</text>
+</svg>

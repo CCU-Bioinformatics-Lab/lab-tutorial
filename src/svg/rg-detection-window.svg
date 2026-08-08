@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 450">
+  <title>可分析的頻率視窗：傳統 VAF 擬合區間與譜系內比例區間的比較</title>
+  <desc>兩條橫軸畫的是同一件事在兩條路線上的可用範圍，範圍都以「佔細胞的比例」為單位。
+        上排是傳統做法：原始研究刻意只在 VAF 零點一二到零點二四之間擬合，
+        更低的一端混著假陽性，更高的一端已經進入 clonal 峰。
+        把它換算成細胞比例，在純度零點六的樣本上大約是零點四到零點八，是一段相當窄的區間。
+        下排是本頁的做法：下界由每一個單位自己的深度與錯誤率決定，不是一個固定常數，
+        在每個家族六十條分子、錯誤率千分之五時大約是零點零五；
+        上界則由譜系內的 clonal 堆積決定，暫定零點五。
+        右側的表列出下界怎麼隨分子數與錯誤率變化。
+        底下標出一個重要提醒：上界零點五是全文最弱的一個數字，必須由模擬重新推定。
+        讀法是：把比例改成在譜系內部量，動態範圍不但沒有變窄，反而變寬了。</desc>
+
+  <text class="ttl zh" x="20" y="36">可分析的比例視窗</text>
+
+  <!-- 上：傳統 -->
+  <text class="lbl bold zh" x="20" y="92">傳統 VAF 擬合區間</text>
+  <line class="axis" x1="60" y1="140" x2="620" y2="140"/>
+  <text class="tick mid" x="60" y="166">0</text>
+  <text class="tick mid" x="340" y="166">0.5</text>
+  <text class="tick mid" x="620" y="166">1.0</text>
+  <rect class="region bad" x="284" y="118" width="224" height="22" rx="4"/>
+  <rect class="box ghost bad" x="284" y="118" width="224" height="22" rx="4"/>
+  <text class="tick zh mid" x="396" y="112">換算成細胞比例約 0.4–0.8</text>
+
+  <!-- 下：HFS -->
+  <text class="lbl bold zh ok" x="20" y="236">HFS 譜系內比例區間</text>
+  <line class="axis ok" x1="60" y1="284" x2="620" y2="284"/>
+  <text class="tick mid" x="60" y="310">0</text>
+  <text class="tick mid" x="340" y="310">0.5</text>
+  <text class="tick mid" x="620" y="310">1.0</text>
+  <rect class="region" x="88" y="262" width="252" height="22" rx="4"/>
+  <rect class="box ghost ok" x="88" y="262" width="252" height="22" rx="4"/>
+  <text class="tick zh mid" x="214" y="256">約 0.05–0.5，且下界逐單位計算</text>
+
+  <!-- 右側：下界表 -->
+  <rect class="box" x="660" y="76" width="316" height="230" rx="8"/>
+  <text class="lbl bold zh mid" x="818" y="106">下界隨深度變化</text>
+  <text class="tick mid" x="712" y="136">分子數</text>
+  <text class="tick mid" x="798" y="136">ε=0.005</text>
+  <text class="tick mid" x="900" y="136">ε=0.01</text>
+  <line class="guide" x1="680" y1="148" x2="956" y2="148"/>
+  <text class="tick mono mid" x="712" y="176">20</text>
+  <text class="tick mono mid" x="798" y="176">0.10</text>
+  <text class="tick mono mid" x="900" y="176">0.12</text>
+  <text class="tick mono mid" x="712" y="206">30</text>
+  <text class="tick mono mid" x="798" y="206">0.08</text>
+  <text class="tick mono mid" x="900" y="206">0.10</text>
+  <text class="tick mono mid" x="712" y="236">60</text>
+  <text class="tick mono mid ok" x="798" y="236">0.05</text>
+  <text class="tick mono mid" x="900" y="236">0.07</text>
+  <text class="tick mono mid" x="712" y="266">100</text>
+  <text class="tick mono mid ok" x="798" y="266">0.04</text>
+  <text class="tick mono mid" x="900" y="266">0.05</text>
+  <text class="tick zh mid" x="818" y="294">下界不是常數，要逐單位算</text>
+
+  <text class="anno zh ok" x="20" y="356">把比例改成在譜系內部量，動態範圍不但沒有變窄，反而變寬。</text>
+  <text class="anno zh bad" x="20" y="390">但上界 0.5 是本頁最弱的一個數字：它是從傳統區間的比例類推來的，</text>
+  <text class="anno zh bad" x="20" y="418">必須由模擬重新推定，不要當成已知常數引用。</text>
+</svg>

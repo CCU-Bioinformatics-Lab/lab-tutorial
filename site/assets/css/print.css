@@ -55,7 +55,7 @@
   .quiz__why, .quiz__explain { display: block !important; }
 
   /* 分頁控制 */
-  .dia, .fig, .widget, .quiz__item, .guardrail, .reveal, .source-card, pre {
+  .dia, .fig, .widget, .quiz__item, .guardrail, .reveal, .source-card, pre, .eq {
     break-inside: avoid; page-break-inside: avoid;
   }
   h1, h2, h3 { break-after: avoid; page-break-after: avoid; }

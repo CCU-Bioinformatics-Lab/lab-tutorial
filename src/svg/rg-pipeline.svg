@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640">
+  <title>七個步驟，以及相對於現行流程改了哪兩步、加了哪一步</title>
+  <desc>左欄由上而下是七個步驟，右欄註明每一步的狀態：沿用、修正，或新增。
+        第一步前處理沿用現行的變異判定與單倍型標記。
+        第二步切分析單位沿用，鍵值必須含 phase set。
+        第三步建狀態表要修正：保留部分觀測，並且額外算出每一個位點對各自的跨越深度。
+        第四步是新增的逐對檢定力閘門：跨越深度不足的位點對標成未定，
+        不允許它的缺席去約束樹的形狀。
+        第五步列舉最小成本候選集合沿用，最小成本等價於最少潛在節點。
+        第六步排序要修正：把差值總和換成頻率的似然，讓不同形狀可以互相比較。
+        第七步輸出四個全基因體頻譜，並且逐對報出支持度。
+        最下方標注：第四步是最高優先的修正，因為它擋掉的是「把看不到當成不存在」。
+        讀法是：七步裡有四步是沿用現行流程的，真正要動的是三處。</desc>
+
+  <text class="ttl zh" x="20" y="36">七個步驟：沿用四步，修正兩步，新增一步</text>
+
+  <rect class="box" x="24" y="66" width="600" height="56" rx="8"/>
+  <text class="lbl zh" x="44" y="102">① 前處理：變異判定 ＋ 單倍型標記</text>
+  <text class="anno bold zh ok" x="668" y="102">沿用</text>
+
+  <rect class="box" x="24" y="134" width="600" height="56" rx="8"/>
+  <text class="lbl zh" x="44" y="170">② 切單位：鍵值＝染色體＋phase set＋視窗＋家族</text>
+  <text class="anno bold zh ok" x="668" y="170">沿用</text>
+
+  <rect class="box warn" x="24" y="202" width="600" height="56" rx="8"/>
+  <text class="lbl zh" x="44" y="238">③ 建狀態表 ＋ 算每一對的跨越深度</text>
+  <text class="anno bold zh warn" x="668" y="230">修正</text>
+  <text class="tick zh" x="668" y="254">保留部分觀測，並逐對計數</text>
+
+  <rect class="box bad" x="24" y="270" width="600" height="56" rx="8"/>
+  <text class="lbl bold zh" x="44" y="306">④ 逐對檢定力閘門：不足的標成「未定」</text>
+  <text class="anno bold zh bad" x="668" y="298">新增</text>
+  <text class="tick zh bad" x="668" y="322">最高優先</text>
+
+  <rect class="box" x="24" y="338" width="600" height="56" rx="8"/>
+  <text class="lbl zh" x="44" y="374">⑤ 最小成本候選集合（＝最少潛在節點）</text>
+  <text class="anno bold zh ok" x="668" y="374">沿用</text>
+
+  <rect class="box warn" x="24" y="406" width="600" height="56" rx="8"/>
+  <text class="lbl zh" x="44" y="442">⑥ 排序：改用頻率的似然</text>
+  <text class="anno bold zh warn" x="668" y="434">修正</text>
+  <text class="tick zh" x="668" y="458">取代差值總和，跨形狀可比</text>
+
+  <rect class="box accent" x="24" y="474" width="600" height="56" rx="8"/>
+  <text class="lbl zh" x="44" y="510">⑦ 輸出四個頻譜 ＋ 逐對支持度</text>
+  <text class="anno bold zh accent" x="668" y="510">延伸</text>
+
+  <path class="conn" d="M324,122 L324,132" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M324,190 L324,200" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M324,258 L324,268" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M324,326 L324,336" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M324,394 L324,404" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M324,462 L324,472" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box bad" x="24" y="552" width="952" height="66" rx="8"/>
+  <text class="anno zh" x="48" y="582">第 ④ 步是最高優先，因為它擋掉的是「把看不到當成不存在」——</text>
+  <text class="anno zh bad" x="48" y="608">而那是目前唯一會<tspan class="bold">系統性</tspan>製造假結論的地方。</text>
+</svg>

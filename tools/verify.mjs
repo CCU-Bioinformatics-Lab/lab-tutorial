@@ -414,6 +414,43 @@ for (const f of html) {
   }
 }
 
+/* ── 13.5 MathML 標籤必須完整配對 ──────────────────────────────────────
+   為什麼需要這一項：MathML 沒有 void element，每個標籤都要收。
+   但 HTML parser 對沒收的標籤非常寬容 —— 少一個 </mrow> 不會有錯誤、
+   不會有警告，它只會把後面的內容一路吞進那個沒關的元素裡，
+   於是式子後面整段內文靜靜消失。這跟 check_svg_layout.py 擋的
+   「漏一個 </text>」是同一類問題，只是換到 <math> 上。
+
+   另外擋掉字面的 < 與 > ：MathML 裡要寫 &lt; / &gt;，
+   直接寫 < 會被 parser 當成標籤開頭，同樣是靜默壞掉。          */
+
+const MATHML_VOID = new Set(['mspace', 'mprescripts', 'none']);
+
+for (const f of html) {
+  const s = fs.readFileSync(f, 'utf8');
+  for (const m of s.matchAll(/<math\b[\s\S]*?<\/math>/g)) {
+    const frag = m[0];
+    const stack = [];
+    let broken = null;
+    for (const t of frag.matchAll(/<(\/?)([a-zA-Z][\w-]*)\b[^>]*?(\/?)>/g)) {
+      const [, close, name, selfClose] = t;
+      if (selfClose || MATHML_VOID.has(name)) continue;
+      if (close) {
+        if (stack.pop() !== name) { broken = `</${name}> 沒有對應的開始標籤`; break; }
+      } else {
+        stack.push(name);
+      }
+    }
+    if (!broken && stack.length) broken = `${stack.map((x) => `<${x}>`).join(' ')} 沒有收`;
+    if (broken) {
+      fail(rel(f), `MathML 標籤沒配對好：${broken} —— HTML parser 會靜默吞掉後面的內容`);
+    }
+    /* <mo>&lt;</mo> 才對；直接寫 <mo><</mo> 會被當成標籤 */
+    const bare = frag.match(/<m[a-z]+>\s*[<>]\s*<\/m/g);
+    if (bare) fail(rel(f), `MathML 裡有字面的 < 或 >，要寫成 &lt; / &gt;（${bare.length} 處）`);
+  }
+}
+
 /* ── 14. 大小預算 ────────────────────────────────────────────────────── */
 
 let total = 0;
