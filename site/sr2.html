@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>下篇：區域拓撲重建，以及它現在錯在哪裡 · 長讀癌症基因體學入門</title>
-<meta name="description" content="從本實驗室既有實作的真實輸出出發：一個單位的有效樣本數是「每一個位點對各自的跨越深度」，不是該單位的總 read 數。由此得到三項修正 —— 缺席要有檢定力撐著、類別比例要先扣掉覆蓋幾何、頻率該用來排序候選拓撲而不是拿去分箱。">
+<title>下篇：用多變異區域的關係改善全基因體重建 · 長讀癌症基因體學入門</title>
+<meta name="description" content="那 5% 給的不是更多資料點，是資料點之間的關係。把現行實作已經算出來的串接／分岔收成三種約束，過兩道品質閘門，再餵進全基因體的混合模型 —— 而錯的約束比沒有約束更糟。">
 <link rel="stylesheet" href="assets/css/tokens.css">
 <link rel="stylesheet" href="assets/css/base.css">
 <link rel="stylesheet" href="assets/css/layout.css">
@@ -53,7 +53,7 @@
 
 <div class="wrap ">
   <main class="main" id="main">
-    <header class="mhead"><p class="mhead__kicker">研究指引 · Subclone 系統發生重建 · Part 2 — implementation</p><h1>下篇：區域拓撲重建，以及它現在錯在哪裡</h1><p class="mhead__sub">從本實驗室既有實作的真實輸出出發：一個單位的有效樣本數是「每一個位點對各自的跨越深度」，不是該單位的總 read 數。由此得到三項修正 —— 缺席要有檢定力撐著、類別比例要先扣掉覆蓋幾何、頻率該用來排序候選拓撲而不是拿去分箱。</p><p class="mhead__meta"><a class="chip" href="sr1.html">建議先修：Subclone 重建</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說出 95% 與 5% 的區域各自貢獻什麼：一個定峰的位置，一個定峰之間的關係</li><li>列出三種可以從多變異區域收出來的約束，以及每一種在全基因體重建裡各自解決什麼問題</li><li>說明為什麼「兩群大小相同」在 VAF 頻率譜上是結構性盲點，而一條「不可同群」就能打破它</li><li>說出為什麼假約束比沒有約束更糟，以及兩道品質閘門各自擋的是什麼</li><li>算出在給定突變負荷下能收到幾條約束，並說明為什麼那個數量已經夠用</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">研究指引 · Subclone 系統發生重建 · Part 2 — constraints from multi-mutation regions</p><h1>下篇：用多變異區域的關係改善全基因體重建</h1><p class="mhead__sub">那 5% 給的不是更多資料點，是資料點之間的關係。把現行實作已經算出來的串接／分岔收成三種約束，過兩道品質閘門，再餵進全基因體的混合模型 —— 而錯的約束比沒有約束更糟。</p><p class="mhead__meta"><a class="chip" href="sr1.html">建議先修：Subclone 重建</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說出 95% 與 5% 的區域各自貢獻什麼：一個定峰的位置，一個定峰之間的關係</li><li>列出三種可以從多變異區域收出來的約束，以及每一種在全基因體重建裡各自解決什麼問題</li><li>說明為什麼「兩群大小相同」在 VAF 頻率譜上是結構性盲點，而一條「不可同群」就能打破它</li><li>說出為什麼假約束比沒有約束更糟，以及兩道品質閘門各自擋的是什麼</li><li>算出在給定突變負荷下能收到幾條約束，並說明為什麼那個數量已經夠用</li></ul></section>
 
 <section data-part="why" class="part" id="part-why">
 <h2 data-num="①" id="為什麼重要">為什麼重要</h2>
