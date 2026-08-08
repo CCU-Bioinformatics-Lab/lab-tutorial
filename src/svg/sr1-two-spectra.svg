@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
+  <title>兩種頻率譜：橫軸上放的東西不一樣</title>
+  <desc>左右兩個直方圖是同一顆腫瘤的兩種整理方式，差別在橫軸放的是什麼。
+        左邊是傳統的 VAF 頻率譜：橫軸是變異頻率，每一根長條數的是「有幾個變異」落在那個頻率。
+        從峰的位置與高度讀出「腫瘤裡有幾群細胞、各佔多大」，
+        但祖先關係讀不出來，要另外用簡約性挑一棵樹；
+        而且橫軸要先除以純度、拷貝數與 multiplicity 才變得成細胞比例。
+        右邊是單倍型頻率譜：橫軸不是頻率，而是「局部拓撲的類別」，
+        每一根長條數的是「有幾個分析單位」呈現那種形狀。
+        四個類別分別是單層無分支、多層無分支、分支類與未解析。
+        每一個單位的先後關係是從同一條分子上數出來的，不是挑出來的；
+        代價是每一筆只在一條 read 跨得到的距離內成立，所以沒有「全基因體那一棵樹」。
+        最下方是關鍵對比：左邊的樹是從直方圖推論出來的結論，
+        右邊的樹形就是直方圖的橫軸本身。兩者回答的問題不同，不是誰取代誰。
+        讀法是：比較兩條路線要在頻譜這一層比，因為既有方法本來就是從頻譜的形狀做推論的。</desc>
+
+  <text class="ttl zh" x="20" y="36">兩種頻率譜：橫軸上放的東西不一樣</text>
+  <text class="anno zh" x="20" y="64">同一顆腫瘤，兩種整理方式。既有方法是從<tspan class="bold">頻譜的形狀</tspan>做推論的，所以要在這一層比。</text>
+
+  <!-- ══ 左：VAF 頻率譜 ══ -->
+  <rect class="box ghost" x="24" y="84" width="468" height="416" rx="8"/>
+  <text class="lbl bold zh mid" x="258" y="116">VAF 頻率譜</text>
+
+  <rect class="bar" x="62" y="180" width="24" height="100"/>
+  <rect class="bar" x="90" y="196" width="24" height="84"/>
+  <rect class="bar" x="118" y="210" width="24" height="70"/>
+  <rect class="bar" x="146" y="220" width="24" height="60"/>
+  <rect class="bar" x="174" y="228" width="24" height="52"/>
+  <rect class="bar" x="202" y="234" width="24" height="46"/>
+  <rect class="bar" x="230" y="225" width="24" height="55"/>
+  <rect class="bar" x="258" y="220" width="24" height="60"/>
+  <rect class="bar" x="286" y="234" width="24" height="46"/>
+  <rect class="bar" x="314" y="246" width="24" height="34"/>
+  <rect class="bar" x="342" y="228" width="24" height="52"/>
+  <rect class="bar" x="370" y="170" width="24" height="110"/>
+  <rect class="bar" x="398" y="222" width="24" height="58"/>
+  <rect class="bar" x="426" y="260" width="24" height="20"/>
+  <line class="axis" x1="56" y1="280" x2="456" y2="280"/>
+
+  <text class="tick mid" x="62" y="300">0</text>
+  <text class="tick mid" x="258" y="300">0.3</text>
+  <text class="tick mid" x="450" y="300">0.6</text>
+  <text class="tick zh mid" x="258" y="326">橫軸：變異頻率 VAF</text>
+  <text class="tick zh mid" x="258" y="348">每一根：有幾個<tspan class="bold">變異</tspan></text>
+
+  <line class="guide" x1="48" y1="366" x2="468" y2="366"/>
+
+  <text class="anno bold zh" x="48" y="392">讀得出什麼</text>
+  <text class="anno zh" x="48" y="416">有幾群細胞、各佔多大（看峰的位置與高度）</text>
+  <text class="anno zh" x="48" y="438">整顆腫瘤得到一個結論</text>
+
+  <text class="tick zh bad" x="48" y="468">橫軸要先除以純度、拷貝數與 multiplicity</text>
+  <text class="tick zh bad" x="48" y="490">祖先關係讀不出來 —— 要另外用簡約性挑一棵</text>
+
+  <!-- ══ 右：單倍型頻率譜 ══ -->
+  <rect class="box ghost ok" x="508" y="84" width="468" height="416" rx="8"/>
+  <text class="lbl bold zh mid" x="742" y="116">單倍型頻率譜</text>
+
+  <rect class="bar ok" x="560" y="190" width="70" height="90"/>
+  <rect class="bar ok" x="660" y="150" width="70" height="130"/>
+  <rect class="bar ok" x="760" y="260" width="70" height="20"/>
+  <rect class="bar warn" x="860" y="267" width="70" height="13"/>
+  <line class="axis ok" x1="540" y1="280" x2="948" y2="280"/>
+
+  <text class="tick zh mid" x="595" y="300">單層無分支</text>
+  <text class="tick zh mid" x="695" y="300">多層無分支</text>
+  <text class="tick zh mid" x="795" y="300">分支類</text>
+  <text class="tick zh mid" x="895" y="300">未解析</text>
+  <text class="tick zh mid" x="742" y="326">橫軸：局部拓撲的<tspan class="bold">類別</tspan></text>
+  <text class="tick zh mid" x="742" y="348">每一根：有幾個<tspan class="bold">分析單位</tspan></text>
+
+  <line class="guide" x1="532" y1="366" x2="952" y2="366"/>
+
+  <text class="anno bold zh" x="532" y="392">讀得出什麼</text>
+  <text class="anno zh" x="532" y="416">局部的先後關係是<tspan class="bold">數出來</tspan>的，不是挑出來的</text>
+  <text class="anno zh" x="532" y="438">幾萬筆各自獨立的局部陳述</text>
+
+  <text class="tick zh bad" x="532" y="468">每一筆只在一條 read 跨得到的距離內成立</text>
+  <text class="tick zh bad" x="532" y="490">所以沒有「全基因體那一棵樹」</text>
+
+  <!-- ══ 關鍵對比 ══ -->
+  <rect class="box accent" x="24" y="520" width="952" height="84" rx="8"/>
+  <text class="anno zh" x="48" y="550">左邊：樹是從直方圖<tspan class="bold">推論出來</tspan>的結論。　　右邊：樹的形狀<tspan class="bold">就是</tspan>直方圖的橫軸。</text>
+  <text class="anno zh" x="48" y="578">兩者回答不同的問題 —— 左邊問「整體有幾群、各多大」，右邊問「這幾個變異的先後」。</text>
+  <text class="tick zh" x="48" y="598">所以它們不是誰取代誰，而是要並著看。</text>
+</svg>

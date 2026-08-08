@@ -1410,6 +1410,120 @@ M8 已經把這件事列為方法的適用範圍限制 ——
 關鍵是<b>順序</b>：先用聯合觀測把候選集合縮到最小成本解，<b>再</b>用 read-AF 排序。
 反過來做就會退回頻率路線的老問題 —— 用邊際去猜聯合。</p>
 
+<h3 id="那這條路線的-頻率譜-長什麼樣">那這條路線的「頻率譜」長什麼樣？</h3>
+
+<p class="prose">要比較兩條路線，得先注意一件事：前面那些既有做法，<b>沒有一個是在單一位點上做推論的</b>。
+SciClone、PyClone、PhyloWGS 都是把幾千個變異的 VAF 堆成一張直方圖，
+再從<b>那張圖的形狀</b>讀出結論；1/f 中性檢定量的也是同一張圖的尾巴。
+所以該比的是<b>頻譜這一層</b>，不是「一個位點看得準不準」。</p>
+
+<p class="prose">比下去會發現，差別不在誰的頻譜比較準，而在<b>橫軸上放的東西根本不一樣</b>。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" class="dia-svg" role="img" aria-labelledby="sr1-two-spectra__title" aria-describedby="sr1-two-spectra__desc">
+  <title id="sr1-two-spectra__title">兩種頻率譜：橫軸上放的東西不一樣</title>
+  <desc id="sr1-two-spectra__desc">左右兩個直方圖是同一顆腫瘤的兩種整理方式，差別在橫軸放的是什麼。
+        左邊是傳統的 VAF 頻率譜：橫軸是變異頻率，每一根長條數的是「有幾個變異」落在那個頻率。
+        從峰的位置與高度讀出「腫瘤裡有幾群細胞、各佔多大」，
+        但祖先關係讀不出來，要另外用簡約性挑一棵樹；
+        而且橫軸要先除以純度、拷貝數與 multiplicity 才變得成細胞比例。
+        右邊是單倍型頻率譜：橫軸不是頻率，而是「局部拓撲的類別」，
+        每一根長條數的是「有幾個分析單位」呈現那種形狀。
+        四個類別分別是單層無分支、多層無分支、分支類與未解析。
+        每一個單位的先後關係是從同一條分子上數出來的，不是挑出來的；
+        代價是每一筆只在一條 read 跨得到的距離內成立，所以沒有「全基因體那一棵樹」。
+        最下方是關鍵對比：左邊的樹是從直方圖推論出來的結論，
+        右邊的樹形就是直方圖的橫軸本身。兩者回答的問題不同，不是誰取代誰。
+        讀法是：比較兩條路線要在頻譜這一層比，因為既有方法本來就是從頻譜的形狀做推論的。</desc>
+
+  <text class="ttl zh" x="20" y="36">兩種頻率譜：橫軸上放的東西不一樣</text>
+  <text class="anno zh" x="20" y="64">同一顆腫瘤，兩種整理方式。既有方法是從<tspan class="bold">頻譜的形狀</tspan>做推論的，所以要在這一層比。</text>
+
+  <!-- ══ 左：VAF 頻率譜 ══ -->
+  <rect class="box ghost" x="24" y="84" width="468" height="416" rx="8"/>
+  <text class="lbl bold zh mid" x="258" y="116">VAF 頻率譜</text>
+
+  <rect class="bar" x="62" y="180" width="24" height="100"/>
+  <rect class="bar" x="90" y="196" width="24" height="84"/>
+  <rect class="bar" x="118" y="210" width="24" height="70"/>
+  <rect class="bar" x="146" y="220" width="24" height="60"/>
+  <rect class="bar" x="174" y="228" width="24" height="52"/>
+  <rect class="bar" x="202" y="234" width="24" height="46"/>
+  <rect class="bar" x="230" y="225" width="24" height="55"/>
+  <rect class="bar" x="258" y="220" width="24" height="60"/>
+  <rect class="bar" x="286" y="234" width="24" height="46"/>
+  <rect class="bar" x="314" y="246" width="24" height="34"/>
+  <rect class="bar" x="342" y="228" width="24" height="52"/>
+  <rect class="bar" x="370" y="170" width="24" height="110"/>
+  <rect class="bar" x="398" y="222" width="24" height="58"/>
+  <rect class="bar" x="426" y="260" width="24" height="20"/>
+  <line class="axis" x1="56" y1="280" x2="456" y2="280"/>
+
+  <text class="tick mid" x="62" y="300">0</text>
+  <text class="tick mid" x="258" y="300">0.3</text>
+  <text class="tick mid" x="450" y="300">0.6</text>
+  <text class="tick zh mid" x="258" y="326">橫軸：變異頻率 VAF</text>
+  <text class="tick zh mid" x="258" y="348">每一根：有幾個<tspan class="bold">變異</tspan></text>
+
+  <line class="guide" x1="48" y1="366" x2="468" y2="366"/>
+
+  <text class="anno bold zh" x="48" y="392">讀得出什麼</text>
+  <text class="anno zh" x="48" y="416">有幾群細胞、各佔多大（看峰的位置與高度）</text>
+  <text class="anno zh" x="48" y="438">整顆腫瘤得到一個結論</text>
+
+  <text class="tick zh bad" x="48" y="468">橫軸要先除以純度、拷貝數與 multiplicity</text>
+  <text class="tick zh bad" x="48" y="490">祖先關係讀不出來 —— 要另外用簡約性挑一棵</text>
+
+  <!-- ══ 右：單倍型頻率譜 ══ -->
+  <rect class="box ghost ok" x="508" y="84" width="468" height="416" rx="8"/>
+  <text class="lbl bold zh mid" x="742" y="116">單倍型頻率譜</text>
+
+  <rect class="bar ok" x="560" y="190" width="70" height="90"/>
+  <rect class="bar ok" x="660" y="150" width="70" height="130"/>
+  <rect class="bar ok" x="760" y="260" width="70" height="20"/>
+  <rect class="bar warn" x="860" y="267" width="70" height="13"/>
+  <line class="axis ok" x1="540" y1="280" x2="948" y2="280"/>
+
+  <text class="tick zh mid" x="595" y="300">單層無分支</text>
+  <text class="tick zh mid" x="695" y="300">多層無分支</text>
+  <text class="tick zh mid" x="795" y="300">分支類</text>
+  <text class="tick zh mid" x="895" y="300">未解析</text>
+  <text class="tick zh mid" x="742" y="326">橫軸：局部拓撲的<tspan class="bold">類別</tspan></text>
+  <text class="tick zh mid" x="742" y="348">每一根：有幾個<tspan class="bold">分析單位</tspan></text>
+
+  <line class="guide" x1="532" y1="366" x2="952" y2="366"/>
+
+  <text class="anno bold zh" x="532" y="392">讀得出什麼</text>
+  <text class="anno zh" x="532" y="416">局部的先後關係是<tspan class="bold">數出來</tspan>的，不是挑出來的</text>
+  <text class="anno zh" x="532" y="438">幾萬筆各自獨立的局部陳述</text>
+
+  <text class="tick zh bad" x="532" y="468">每一筆只在一條 read 跨得到的距離內成立</text>
+  <text class="tick zh bad" x="532" y="490">所以沒有「全基因體那一棵樹」</text>
+
+  <!-- ══ 關鍵對比 ══ -->
+  <rect class="box accent" x="24" y="520" width="952" height="84" rx="8"/>
+  <text class="anno zh" x="48" y="550">左邊：樹是從直方圖<tspan class="bold">推論出來</tspan>的結論。　　右邊：樹的形狀<tspan class="bold">就是</tspan>直方圖的橫軸。</text>
+  <text class="anno zh" x="48" y="578">兩者回答不同的問題 —— 左邊問「整體有幾群、各多大」，右邊問「這幾個變異的先後」。</text>
+  <text class="tick zh" x="48" y="598">所以它們不是誰取代誰，而是要並著看。</text>
+</svg><figcaption>左邊橫軸是頻率，每一根數的是「有幾個變異」；
+右邊橫軸是局部拓撲的類別，每一根數的是「有幾個分析單位」。
+左邊的樹是從直方圖推論出來的結論，右邊的樹形就是直方圖的橫軸本身。</figcaption></figure>
+
+<p class="prose">左邊那張圖，樹是從峰的位置推論出來的<b>結論</b> ——
+而推論這一步一定要用到簡約性，因為峰的位置本身決定不了祖先關係（前面那組
+1.0／0.6／0.3 的例子就是這件事）。橫軸還要先除以純度、拷貝數與 multiplicity 才有意義。</p>
+
+<p class="prose">右邊那張圖，樹的形狀<b>不是從圖推出來的，它就是圖的橫軸</b> ——
+每一個單位的先後關係，已經在同一條分子上數過了。純度與拷貝數不必進來，
+因為每個單位裡比的都是同一個分母下的比值。</p>
+
+<p class="prose">代價同樣清楚：右邊每一筆只在一條 read 跨得到的距離內成立，
+所以它給不出「這顆腫瘤有 4 群、各佔多少」這種全域結論。
+兩張圖回答的是不同的問題 —— 這正是下一節要說的事。</p>
+
+<p class="prose">右邊那張圖這裡畫的是<b>示意</b>：四個類別的相對高度取自真實輸出的量級，
+但本實驗室的實作在七個資料集上實際量到的分布、它的重現性有多高，
+以及它為什麼<b>還不能</b>直接當成演化結論，下篇會給數字。</p>
+
 <h3 id="三條路線各自看得到什麼">三條路線各自看得到什麼</h3>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" class="dia-svg" role="img" aria-labelledby="m14-scope-honest__title" aria-describedby="m14-scope-honest__desc">
@@ -1845,7 +1959,7 @@ evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="capstone.html"><small>← 上一模組</small>Capstone：整合式位點判讀</a><a class="next" href="sr2.html"><small>下一模組 →</small>下篇：區域拓撲重建，以及它現在錯在哪裡</a></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>5mC（5-甲基胞嘧啶）</dt><dd>胞嘧啶第 5 個碳上的甲基化修飾。這是常見的 DNA 甲基化形式，主要見於 CpG；可影響轉錄調控，效應依基因組位置與細胞類型而異。</dd><dt>CpG</dt><dd>序列上一個 C 後接一個 G（p 代表兩者之間的磷酸鍵）。哺乳類多數 5mC 位於 CpG，特定細胞或情況亦可見非 CpG 甲基化。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>VAF（變異等位基因頻率）</dt><dd>在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></dd><dt>clone（克隆）</dt><dd>源自共同祖先細胞，並共享一組可辨識 somatic mutations 的細胞群。</dd><dt>clone tree（克隆演化樹）</dt><dd>描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>epiallele（表觀等位型）</dt><dd>同一條分子上一組相鄰 CpG 的甲基化組合，例如四個 CpG 的 1101。逐位點的 β 值看不到它 —— 要算 epiallele 的組成，一條 read 至少得跨過 4 個 CpG。</dd><dt>epimutation（表觀突變）</dt><dd>細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 10⁻⁵ 到 10⁻⁴，而 DNA 突變約每鹼基 10⁻⁹ 到 10⁻¹⁰，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 10⁻³ 的），應當成量級而非定值。</dd><dt>haplotype（單倍型）</dt><dd>同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</dd><dt>joint distribution（聯合分布）</dt><dd>多個變數一起看的分布，也就是「哪些組合各出現多少」。演化樹的形狀取決於聯合分布，而不是邊際分布；長讀的價值在於一條分子上的組合是直接觀測到的。</dd><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>long read（長讀）</dt><dd>單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</dd><dt>marginal distribution（邊際分布）</dt><dd>只描述單一變數的分布。VAF 與甲基化 β 值都是邊際統計：它們各自只講一個位點有多少比例帶有標記，不講兩個位點在同一個分子或同一個細胞上的搭配情形。</dd><dt>mutation frequency spectrum（突變頻率譜）</dt><dd>把一份樣本裡所有 somatic 變異的 VAF 畫成直方圖後得到的分布。分布上的峰與肩對應不同大小的細胞群，最低頻端的尾巴斜率則被用來判斷有沒有天擇。</dd><dt>mutation multiplicity</dt><dd>在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</dd><dt>parsimony（簡約法）</dt><dd>在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>read-AF（read 層級的 ALT 比例）</dt><dd>在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</dd><dt>soft clipping</dt><dd>read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd><dt>somatic variant（體細胞變異）</dt><dd>在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</dd><dt>subclone（次克隆）</dt><dd>clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv3"><a href="#要重建的是什麼">要重建的是什麼</a></li><li class="lv3"><a href="#為什麼值得重建">為什麼值得重建</a></li><li class="lv3"><a href="#m9-已經做過一次-只是規模很小">M9 已經做過一次，只是規模很小</a></li><li class="lv3"><a href="#這兩頁各講什麼">這兩頁各講什麼</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#這條路線的四個轉折">這條路線的四個轉折</a></li><li class="lv3"><a href="#第一步-把一堆變異的頻率畫成一張圖-mutation-frequency-spectrum">第一步：把一堆變異的頻率畫成一張圖 —— mutation frequency spectrum</a></li><li class="lv3"><a href="#從-vaf-到-ccf-分母要自己湊出來">從 VAF 到 CCF：分母要自己湊出來</a></li><li class="lv3"><a href="#群集之後-clone-tree-還是不唯一">群集之後：clone tree 還是不唯一</a></li><li class="lv3"><a href="#根因-頻率是-marginal-distribution-樹要的是-joint-distribution">根因：頻率是 marginal distribution，樹要的是 joint distribution</a></li><li class="lv3"><a href="#甲基化也有同一個病-值與-epiallele">甲基化也有同一個病：β 值與 epiallele</a></li><li class="lv3"><a href="#而這個門檻-短讀剛好卡在上面">而這個門檻，短讀剛好卡在上面</a></li><li class="lv3"><a href="#長讀把-joint-distribution-直接觀測到了">長讀把 joint distribution 直接觀測到了</a></li><li class="lv3"><a href="#代價-分析單位變成-區域-單倍型家族">代價：分析單位變成「區域 × 單倍型家族」</a></li><li class="lv3"><a href="#read-af-頻率沒有被丟掉-只是換了位置">read-AF：頻率沒有被丟掉，只是換了位置</a></li><li class="lv3"><a href="#三條路線各自看得到什麼">三條路線各自看得到什麼</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv2"><a href="#先提出預測-再查看解答">先提出預測，再查看解答</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#一-畫出這份樣本的頻率譜">一、畫出這份樣本的頻率譜</a></li><li class="lv3"><a href="#二-確認-multiplicity-猜錯會差多少">二、確認 multiplicity 猜錯會差多少</a></li><li class="lv3"><a href="#三-量一下你的-read-到底跨多遠">三、量一下你的 read 到底跨多遠</a></li><li class="lv3"><a href="#四-把一個區域的狀態表抽出來">四、把一個區域的狀態表抽出來</a></li><li class="lv3"><a href="#五-排查順序">五、排查順序</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li><li class="lv3"><a href="#接下來-下篇">接下來：下篇</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv3"><a href="#要重建的是什麼">要重建的是什麼</a></li><li class="lv3"><a href="#為什麼值得重建">為什麼值得重建</a></li><li class="lv3"><a href="#m9-已經做過一次-只是規模很小">M9 已經做過一次，只是規模很小</a></li><li class="lv3"><a href="#這兩頁各講什麼">這兩頁各講什麼</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#這條路線的四個轉折">這條路線的四個轉折</a></li><li class="lv3"><a href="#第一步-把一堆變異的頻率畫成一張圖-mutation-frequency-spectrum">第一步：把一堆變異的頻率畫成一張圖 —— mutation frequency spectrum</a></li><li class="lv3"><a href="#從-vaf-到-ccf-分母要自己湊出來">從 VAF 到 CCF：分母要自己湊出來</a></li><li class="lv3"><a href="#群集之後-clone-tree-還是不唯一">群集之後：clone tree 還是不唯一</a></li><li class="lv3"><a href="#根因-頻率是-marginal-distribution-樹要的是-joint-distribution">根因：頻率是 marginal distribution，樹要的是 joint distribution</a></li><li class="lv3"><a href="#甲基化也有同一個病-值與-epiallele">甲基化也有同一個病：β 值與 epiallele</a></li><li class="lv3"><a href="#而這個門檻-短讀剛好卡在上面">而這個門檻，短讀剛好卡在上面</a></li><li class="lv3"><a href="#長讀把-joint-distribution-直接觀測到了">長讀把 joint distribution 直接觀測到了</a></li><li class="lv3"><a href="#代價-分析單位變成-區域-單倍型家族">代價：分析單位變成「區域 × 單倍型家族」</a></li><li class="lv3"><a href="#read-af-頻率沒有被丟掉-只是換了位置">read-AF：頻率沒有被丟掉，只是換了位置</a></li><li class="lv3"><a href="#那這條路線的-頻率譜-長什麼樣">那這條路線的「頻率譜」長什麼樣？</a></li><li class="lv3"><a href="#三條路線各自看得到什麼">三條路線各自看得到什麼</a></li><li class="lv2"><a href="#真實證據">真實證據</a></li><li class="lv2"><a href="#先提出預測-再查看解答">先提出預測，再查看解答</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#一-畫出這份樣本的頻率譜">一、畫出這份樣本的頻率譜</a></li><li class="lv3"><a href="#二-確認-multiplicity-猜錯會差多少">二、確認 multiplicity 猜錯會差多少</a></li><li class="lv3"><a href="#三-量一下你的-read-到底跨多遠">三、量一下你的 read 到底跨多遠</a></li><li class="lv3"><a href="#四-把一個區域的狀態表抽出來">四、把一個區域的狀態表抽出來</a></li><li class="lv3"><a href="#五-排查順序">五、排查順序</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li><li class="lv3"><a href="#接下來-下篇">接下來：下篇</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">
