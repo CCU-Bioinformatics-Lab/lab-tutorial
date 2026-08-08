@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600">
+  <title>實作流程：從 read 到約束，再到全基因體的群與樹</title>
+  <desc>八個步驟由上而下，右欄註明每一步的狀態是沿用、修正還是新增。
+        第一步前處理，用現有的變異判定與單倍型標記，沿用。
+        第二步切分析單位，鍵值要含 phase set，沿用。
+        第三步抽狀態表，並且額外算出每一個位點對各自的跨越深度，這一步要修正。
+        第四步把每個區域分類成三種約束：不可同群、必定同群、有向的祖先關係，
+        這是把現行輸出重新解讀，沿用。
+        第五步是新增的兩道品質閘門：逐對檢定力不足的約束丟掉，
+        以及修正排序偏誤，因為那個偏誤會系統性地把分岔判成串接。
+        第六步給每條約束一個信心值，來源是潛在節點數與候選集合大小，這是新增的。
+        第七步把九成五區域的頻率與百分之五區域的約束一起餵進混合模型，這是新增的核心。
+        第八步輸出全基因體的群與樹，並且逐條標明哪些關係由資料決定、哪些靠偏好補。
+        最下方標注：第五步是整條流程的關鍵，因為錯的約束會強迫模型拆出不存在的群，
+        比沒有約束更糟。
+        讀法是：八步裡有四步沿用現行實作，真正要新增的是閘門、信心值與最後的接合。</desc>
+
+  <text class="ttl zh" x="20" y="36">實作流程：把已經算出來的關係接到全基因體那一層</text>
+
+  <rect class="box" x="24" y="64" width="596" height="50" rx="8"/>
+  <text class="lbl zh" x="44" y="95">① 前處理：變異判定 ＋ 單倍型標記</text>
+  <text class="anno bold zh ok" x="656" y="95">沿用</text>
+
+  <rect class="box" x="24" y="124" width="596" height="50" rx="8"/>
+  <text class="lbl zh" x="44" y="155">② 切單位：染色體＋phase set＋視窗＋家族</text>
+  <text class="anno bold zh ok" x="656" y="155">沿用</text>
+
+  <rect class="box warn" x="24" y="184" width="596" height="50" rx="8"/>
+  <text class="lbl zh" x="44" y="215">③ 抽狀態表 ＋ 算每一對的跨越深度</text>
+  <text class="anno bold zh warn" x="656" y="208">修正</text>
+  <text class="tick zh" x="656" y="230">逐對計數是後面兩道閘門的前提</text>
+
+  <rect class="box" x="24" y="244" width="596" height="50" rx="8"/>
+  <text class="lbl zh" x="44" y="275">④ 分類成三種約束：不可同群／必定同群／祖先</text>
+  <text class="anno bold zh ok" x="656" y="268">沿用</text>
+  <text class="tick zh" x="656" y="290">就是現行的串接／分岔判定</text>
+
+  <rect class="box bad" x="24" y="304" width="596" height="50" rx="8"/>
+  <text class="lbl bold zh" x="44" y="335">⑤ 兩道品質閘門：檢定力 ＋ 排序偏誤</text>
+  <text class="anno bold zh bad" x="656" y="328">新增</text>
+  <text class="tick zh bad" x="656" y="350">最關鍵的一步</text>
+
+  <rect class="box bad" x="24" y="364" width="596" height="50" rx="8"/>
+  <text class="lbl zh" x="44" y="395">⑥ 給每條約束一個信心值</text>
+  <text class="anno bold zh bad" x="656" y="388">新增</text>
+  <text class="tick zh" x="656" y="410">來源：潛在節點數、候選集合大小</text>
+
+  <rect class="box accent" x="24" y="424" width="596" height="50" rx="8"/>
+  <text class="lbl bold zh" x="44" y="455">⑦ 頻率 ＋ 約束 一起餵進混合模型</text>
+  <text class="anno bold zh accent" x="656" y="448">新增</text>
+  <text class="tick zh" x="656" y="470">這是整條路線的核心</text>
+
+  <rect class="box accent" x="24" y="484" width="596" height="50" rx="8"/>
+  <text class="lbl zh" x="44" y="515">⑧ 輸出：全基因體的群 ＋ 樹 ＋ 逐條支持度</text>
+  <text class="anno bold zh accent" x="656" y="515">新增</text>
+
+  <path class="conn" d="M322,114 L322,122" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,174 L322,182" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,234 L322,242" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,294 L322,302" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,354 L322,362" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,414 L322,422" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,474 L322,482" marker-end="url(#arrow-sm)"/>
+
+  <text class="anno zh bad" x="24" y="568">第 ⑤ 步是關鍵：錯的約束會強迫模型拆出<tspan class="bold">不存在的群</tspan> —— 比沒有約束更糟。</text>
+  <text class="tick zh" x="24" y="590">八步裡有四步沿用現行實作；真正新增的是閘門、信心值，與最後那一次接合。</text>
+</svg>

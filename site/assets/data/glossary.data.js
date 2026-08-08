@@ -914,7 +914,8 @@ window.TW_GLOSSARY = {
   "slug": "mutation-multiplicity",
   "modules": [
    "m08",
-   "sr1"
+   "sr1",
+   "sr2"
   ]
  },
  "LOH": {
@@ -1188,8 +1189,7 @@ window.TW_GLOSSARY = {
   ],
   "slug": "marginal-distribution",
   "modules": [
-   "sr1",
-   "sr2"
+   "sr1"
   ]
  },
  "joint distribution": {
@@ -1203,8 +1203,7 @@ window.TW_GLOSSARY = {
   ],
   "slug": "joint-distribution",
   "modules": [
-   "sr1",
-   "sr2"
+   "sr1"
   ]
  },
  "clone tree": {
@@ -1234,7 +1233,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "parsimony",
   "modules": [
-   "sr1"
+   "sr1",
+   "sr2"
   ]
  },
  "latent node": {
