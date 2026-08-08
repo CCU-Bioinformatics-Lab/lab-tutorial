@@ -12132,135 +12132,162 @@ SciClone、PyClone、PhyloWGS 都是把幾千個變異的 VAF 堆成一張直方
 再從<b>那張圖的形狀</b>讀出結論；1/f 中性檢定量的也是同一張圖的尾巴。
 所以該比的是<b>頻譜這一層</b>，不是「一個位點看得準不準」。</p>
 
-<p class="prose">長讀這一側也有一張頻率譜，做法完全一樣 —— 一樣是把整批數字堆成直方圖。
+<p class="prose">長讀這一側也有一張頻率譜，做法完全一樣 —— 一樣把整批數字堆成直方圖，橫軸一樣是頻率。
 換掉的只有<b>被數的那個東西</b>：不再是「一個位點的 ALT 佔多少」，
 而是「<b>一條單倍型</b>佔多少分子」。單倍型就是 somatic haplotagging 給的那些標籤
-（HP1、HP1-1、HP1-1-1、HP2-1…），每一條代表<b>一組變異的特定組合</b>。</p>
+（HP1、HP1-1、HP1-2…），每一條代表<b>一組變異的特定組合</b>。</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" class="dia-svg" role="img" aria-labelledby="sr1__sr1-two-spectra__title" aria-describedby="sr1__sr1-two-spectra__desc">
-  <title id="sr1__sr1-two-spectra__title">頻率的單位換掉：從單一位點的 VAF 換成多位點的單倍型頻率</title>
-  <desc id="sr1__sr1-two-spectra__desc">兩邊都是頻率直方圖，橫軸都是頻率，差別只在「一個數字代表什麼」。
-        左邊是傳統的 VAF 頻率譜，每一個數字來自一個 somatic 位點，是該位點 ALT read 的佔比。
-        圖上把零點一五那一格標出來：S2 與 S3 的 VAF 都是零點一五，所以落進同一格。
-        但這兩個變異其實分屬完全不同的譜系，直方圖把它們併在一起了。
-        另外 S1 的 VAF 是零點三五，那是兩群細胞加起來的結果，不對應任何單一一群細胞。
-        右邊是單倍型頻率譜，每一個數字來自一條單倍型：
-        HP1 佔零點三零，它底下的 HP1-1 佔零點二零，再底下的 HP1-1-1 佔零點一五；
-        另一側 HP2 佔零點二零，底下的 HP2-1 佔零點一五。
-        同樣有兩個零點一五，但它們的標籤不同，分別屬於 HP1 與 HP2 兩個分支。
-        一條單倍型是一組變異的特定組合，所以它的頻率只數帶著那個組合的分子，
-        那是聯合而不是邊際；而且標籤本身帶著層級，先後關係跟著頻率一起出來。
-        最下方是這條路線要回答的研究問題：把頻率的單位從單一位點換成多位點的單倍型，
-        重建出來的演化樹會不會不一樣。
-        讀法是：兩張圖的橫軸都是頻率，換掉的是「被數的那個東西」。</desc>
+<p class="prose">換掉之後，兩張圖會長得不一樣 —— 而且不一樣的地方剛好就決定了樹。
+用同一組 SNV 看：一個區域裡有六個 somatic SNV，分子組成是
+<b>45%</b> 沒有任何 somatic 變異、<b>35%</b> 帶著 A B C、<b>20%</b> 帶著 D E F，
+而且<b>沒有任何一條分子同時帶著這兩組</b>。</p>
 
-  <text class="ttl zh" x="20" y="36">頻率的單位換掉會怎樣？</text>
-  <text class="anno zh" x="20" y="64">兩邊都是頻率直方圖，橫軸都是頻率。換掉的是<tspan class="bold">「一個數字代表什麼」</tspan>。</text>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" class="dia-svg" role="img" aria-labelledby="sr1__sr1-two-spectra__title" aria-describedby="sr1__sr1-two-spectra__desc">
+  <title id="sr1__sr1-two-spectra__title">同一組 SNV，兩種頻率譜：VAF 譜留下兩棵樹，單倍型頻率譜只剩一棵</title>
+  <desc id="sr1__sr1-two-spectra__desc">同一個區域、同一組六個 somatic SNV，兩種把它們整理成直方圖的方式，橫軸都是頻率。
+        這個區域的分子組成是：四成五沒有任何體細胞變異，三成五帶著 A、B、C 三個變異，
+        兩成帶著 D、E、F 三個變異，而且沒有任何一條分子同時帶著這兩組。
+        左邊是 VAF 頻率譜：每一個數字來自一個位點，所以六個 SNV 給出六個點。
+        A、B、C 的 VAF 都是零點三五，D、E、F 都是零點二，於是得到兩根高度為三的長條。
+        讀出來是「有兩群，各佔零點三五與零點二」，
+        但這兩個數字同時相容於兩棵樹：零點二可以是零點三五的後代，也可以是它的兄弟，
+        因為兩種都通過那條算術檢查，所以分不出來。
+        右邊是單倍型頻率譜：每一個數字來自一條單倍型，所以只有三個點，每根長條高度都是一。
+        三根分別是 HP1-2 佔零點二、HP1-1 佔零點三五、HP1 佔零點四五。
+        注意零點四五那一根在左邊完全不存在，因為那群細胞在這個區域沒有任何變異，
+        沒有變異就沒有 VAF。
+        而且標籤說明 HP1-1 與 HP1-2 都直接掛在 HP1 底下，是兄弟不是祖孫，
+        於是分支那棵樹是唯一解。
+        最下方點出兩個根本差別：左邊每根長條數的是變異，右邊數的是細胞群；
+        左邊的頻率是邊際，右邊的頻率帶著隸屬關係。
+        讀法是：同一組 SNV，換掉頻率的單位之後，連樹的形狀都跟著定下來了。</desc>
+
+  <text class="ttl zh" x="20" y="36">同一組 SNV，兩種頻率譜</text>
+  <text class="anno zh" x="20" y="64">一個區域、六個 somatic SNV。組成：<tspan class="mono">45%</tspan> 沒有變異、<tspan class="mono">35%</tspan> 帶 A B C、<tspan class="mono">20%</tspan> 帶 D E F，且沒有分子同時帶兩組。</text>
 
   <!-- ══ 左：VAF 頻率譜 ══ -->
-  <rect class="box ghost" x="24" y="84" width="468" height="436" rx="8"/>
+  <rect class="box ghost" x="24" y="84" width="468" height="530" rx="8"/>
   <text class="lbl bold zh mid" x="258" y="116">VAF 頻率譜</text>
-  <text class="tick zh mid" x="258" y="142">一個數字 ＝ 一個 somatic 位點的 ALT 佔比</text>
+  <text class="tick zh mid" x="258" y="140">每一根：有幾個<tspan class="bold">變異</tspan>落在這個頻率</text>
 
-  <rect class="bar" x="62" y="204" width="28" height="96"/>
-  <rect class="bar" x="95" y="220" width="28" height="80"/>
-  <rect class="bar" x="128" y="232" width="28" height="68"/>
-  <rect class="bar somatic" x="161" y="242" width="28" height="58"/>
-  <rect class="bar" x="194" y="250" width="28" height="50"/>
-  <rect class="bar" x="227" y="256" width="28" height="44"/>
-  <rect class="bar" x="260" y="260" width="28" height="40"/>
-  <rect class="bar" x="293" y="248" width="28" height="52"/>
-  <rect class="bar" x="326" y="224" width="28" height="76"/>
-  <rect class="bar" x="359" y="256" width="28" height="44"/>
-  <rect class="bar" x="392" y="274" width="28" height="26"/>
-  <rect class="bar" x="425" y="286" width="28" height="14"/>
-  <line class="axis" x1="56" y1="300" x2="462" y2="300"/>
+  <text class="tick mono mid" x="218" y="180">D E F</text>
+  <text class="tick mono mid" x="329" y="180">A B C</text>
+  <rect class="bar somatic" x="203" y="188" width="30" height="102"/>
+  <rect class="bar somatic" x="314" y="188" width="30" height="102"/>
+  <line class="axis" x1="62" y1="290" x2="450" y2="290"/>
 
-  <text class="tick mid" x="62" y="320">0</text>
-  <text class="tick mid somatic" x="161" y="320">0.15</text>
-  <text class="tick mid" x="260" y="320">0.3</text>
-  <text class="tick mid" x="359" y="320">0.45</text>
-  <text class="tick mid" x="458" y="320">0.6</text>
+  <text class="tick mid" x="70" y="310">0</text>
+  <text class="tick mid" x="218" y="310">0.2</text>
+  <text class="tick mid" x="329" y="310">0.35</text>
+  <text class="tick mid" x="403" y="310">0.45</text>
 
-  <text class="tick zh mid somatic" x="258" y="350">↑ S2 與 S3 的 VAF 都是 0.15，落進同一格</text>
+  <text class="tick zh mid" x="258" y="338">六個 SNV → 六個點，堆成兩根</text>
 
-  <line class="guide" x1="48" y1="372" x2="468" y2="372"/>
+  <line class="guide" x1="48" y1="358" x2="468" y2="358"/>
 
-  <text class="anno bold zh" x="48" y="400">位點的 VAF 是<tspan class="bad">邊際</tspan></text>
-  <text class="tick zh" x="48" y="428">它把所有帶這個變異的細胞混在一起，</text>
-  <text class="tick zh" x="48" y="450">不管那些細胞還帶了什麼。</text>
+  <text class="anno bold zh" x="48" y="386">讀出來：有兩群，0.35 與 0.20</text>
+  <text class="tick zh" x="48" y="414">但這兩個數字同時相容於兩棵樹 ——</text>
+  <text class="tick mono" x="48" y="438">0.20 ≤ 0.35 ✓　　0.35 + 0.20 ≤ 1 ✓</text>
 
-  <text class="tick zh bad" x="48" y="480">分群會把 S2 與 S3 判成同一群 ——</text>
-  <text class="tick zh bad" x="48" y="502">但它們其實分屬完全不同的譜系。</text>
+  <text class="tick zh mid" x="150" y="472">後代</text>
+  <circle class="mark ref" cx="150" cy="492" r="8"/>
+  <line class="conn" x1="150" y1="500" x2="150" y2="516"/>
+  <circle class="mark somatic" cx="150" cy="524" r="8"/>
+  <line class="conn" x1="150" y1="532" x2="150" y2="548"/>
+  <circle class="mark somatic" cx="150" cy="556" r="8"/>
+  <text class="lbl bold ok" x="184" y="528">✓</text>
+
+  <text class="tick zh mid" x="370" y="472">兄弟</text>
+  <circle class="mark ref" cx="370" cy="492" r="8"/>
+  <line class="conn" x1="362" y1="500" x2="342" y2="518"/>
+  <line class="conn" x1="378" y1="500" x2="398" y2="518"/>
+  <circle class="mark somatic" cx="336" cy="526" r="8"/>
+  <circle class="mark somatic" cx="404" cy="526" r="8"/>
+  <text class="lbl bold ok" x="428" y="528">✓</text>
+
+  <text class="anno zh bad mid" x="258" y="594">兩棵都通過 —— 分不出來</text>
 
   <!-- ══ 右：單倍型頻率譜 ══ -->
-  <rect class="box ghost ok" x="508" y="84" width="468" height="436" rx="8"/>
+  <rect class="box ghost ok" x="508" y="84" width="468" height="530" rx="8"/>
   <text class="lbl bold zh mid" x="742" y="116">單倍型頻率譜</text>
-  <text class="tick zh mid" x="742" y="142">一個數字 ＝ 一條單倍型佔的分子比例</text>
+  <text class="tick zh mid" x="742" y="140">每一根：有幾<tspan class="bold">條單倍型</tspan>落在這個頻率</text>
 
-  <text class="tick mono" x="532" y="188">HP1</text>
-  <text class="tick mono end" x="716" y="188">0.30</text>
-  <rect class="bar hp1" x="730" y="178" width="108" height="13" rx="2"/>
+  <text class="tick mono mid" x="702" y="248">HP1-2</text>
+  <text class="tick mono mid" x="813" y="248">HP1-1</text>
+  <text class="tick mono mid" x="887" y="248">HP1</text>
+  <rect class="bar hp1" x="687" y="256" width="30" height="34"/>
+  <rect class="bar hp1" x="798" y="256" width="30" height="34"/>
+  <rect class="bar hp1" x="872" y="256" width="30" height="34"/>
+  <line class="axis ok" x1="546" y1="290" x2="934" y2="290"/>
 
-  <text class="tick mono" x="552" y="216">└ HP1-1</text>
-  <text class="tick mono end" x="716" y="216">0.20</text>
-  <rect class="bar hp1" x="730" y="206" width="72" height="13" rx="2"/>
+  <text class="tick mid" x="554" y="310">0</text>
+  <text class="tick mid" x="702" y="310">0.2</text>
+  <text class="tick mid" x="813" y="310">0.35</text>
+  <text class="tick mid" x="887" y="310">0.45</text>
 
-  <text class="tick mono" x="572" y="244">└ HP1-1-1</text>
-  <text class="tick mono end somatic" x="716" y="244">0.15</text>
-  <rect class="bar hp1" x="730" y="234" width="54" height="13" rx="2"/>
+  <text class="tick zh mid" x="742" y="338">三條單倍型 → 三個點，每根高度都是 1</text>
 
-  <text class="tick mono" x="532" y="280">HP2</text>
-  <text class="tick mono end" x="716" y="280">0.20</text>
-  <rect class="bar hp2" x="730" y="270" width="72" height="13" rx="2"/>
+  <line class="guide" x1="532" y1="358" x2="952" y2="358"/>
 
-  <text class="tick mono" x="552" y="308">└ HP2-1</text>
-  <text class="tick mono end somatic" x="716" y="308">0.15</text>
-  <rect class="bar hp2" x="730" y="298" width="54" height="13" rx="2"/>
+  <text class="anno bold zh" x="532" y="386">讀出來：三條，0.45 / 0.35 / 0.20</text>
+  <text class="tick zh" x="532" y="414">標籤說明 HP1-1 與 HP1-2 都掛在 HP1 底下，</text>
+  <text class="tick zh" x="532" y="438">而且沒有分子同時帶 A B C 與 D E F。</text>
 
-  <text class="tick zh mid somatic" x="742" y="350">同樣有兩個 0.15，但分屬 HP1 與 HP2 兩個分支</text>
+  <text class="tick zh mid" x="634" y="472">後代</text>
+  <circle class="mark ref" cx="634" cy="492" r="8"/>
+  <line class="conn bad" x1="634" y1="500" x2="634" y2="516"/>
+  <circle class="mark somatic" cx="634" cy="524" r="8"/>
+  <line class="conn bad" x1="634" y1="532" x2="634" y2="548"/>
+  <circle class="box ghost bad" cx="634" cy="556" r="8"/>
+  <text class="lbl bold bad" x="668" y="528">✗</text>
 
-  <line class="guide" x1="532" y1="372" x2="952" y2="372"/>
+  <text class="tick zh mid" x="854" y="472">兄弟</text>
+  <circle class="mark ref" cx="854" cy="492" r="8"/>
+  <line class="conn" x1="846" y1="500" x2="826" y2="518"/>
+  <line class="conn" x1="862" y1="500" x2="882" y2="518"/>
+  <circle class="mark somatic" cx="820" cy="526" r="8"/>
+  <circle class="mark somatic" cx="888" cy="526" r="8"/>
+  <text class="lbl bold ok" x="912" y="528">✓</text>
 
-  <text class="anno bold zh" x="532" y="400">單倍型的頻率是<tspan class="ok">聯合</tspan></text>
-  <text class="tick zh" x="532" y="428">一條單倍型是一組變異的特定組合，</text>
-  <text class="tick zh" x="532" y="450">所以它只數帶著那個組合的分子。</text>
+  <text class="anno zh ok mid" x="742" y="594">只剩一棵 —— 樹定下來了</text>
 
-  <text class="tick zh ok" x="532" y="480">標籤本身帶著層級：HP1-1-1 ⊂ HP1-1 ⊂ HP1，</text>
-  <text class="tick zh ok" x="532" y="502">每個數字對應一群真實的細胞。</text>
+  <!-- ══ 兩個根本差別 ══ -->
+  <rect class="box accent" x="24" y="634" width="952" height="60" rx="8"/>
+  <text class="anno zh" x="48" y="662">① 左邊每根長條數的是<tspan class="bold">變異</tspan>，右邊數的是<tspan class="bold">細胞群</tspan>。所以 0.45 那一根左邊根本畫不出來 —— 沒有變異就沒有 VAF。</text>
+  <text class="anno zh" x="48" y="686">② 左邊的頻率是邊際，右邊的頻率<tspan class="bold">帶著隸屬關係</tspan>，所以「兄弟還是祖孫」不必再猜。</text>
+</svg><figcaption>同一組六個 SNV，兩種整理方式，橫軸都是頻率。
+左邊六個位點各給一個 VAF，堆成兩根高度 3 的長條；右邊三條單倍型各給一個頻率，每根高度都是 1。
+差別剛好落在能不能定下樹：左邊兩棵都通過，右邊只剩一棵。</figcaption></figure>
 
-  <!-- ══ 研究問題 ══ -->
-  <rect class="box accent" x="24" y="544" width="952" height="90" rx="8"/>
-  <text class="anno bold zh" x="48" y="576">研究問題：把頻率的單位從<tspan class="bad">單一位點</tspan>換成<tspan class="ok">多位點的單倍型</tspan>，重建出來的樹會不會不一樣？</text>
-  <text class="anno zh" x="48" y="604">左邊那一格裡的兩個 0.15 會被分開嗎？分開之後，樹的形狀會不會跟著變？</text>
-  <text class="tick zh" x="48" y="626">同一顆腫瘤兩種都算得出來，所以這件事是可以直接比的。</text>
-</svg><figcaption>兩邊的橫軸都是頻率，換掉的是「一個數字代表什麼」。
-左邊每個數字來自一個位點；右邊每個數字來自一條單倍型。
-注意兩個 0.15：在左邊落進同一格，在右邊卻分屬 HP1 與 HP2 兩個分支。</figcaption></figure>
+<p class="prose"><b>左邊</b>：六個 SNV 各給一個 VAF。A、B、C 都是 0.35，D、E、F 都是 0.20，
+堆成兩根高度為 3 的長條。讀出來是「有兩群，各佔 0.35 與 0.20」——
+但這兩個數字<b>同時相容於兩棵樹</b>（0.20 ≤ 0.35 ✓；0.35 ＋ 0.20 ≤ 1 ✓），所以分不出來。
+這跟前面那組 1.0／0.6／0.3 是同一件事。</p>
 
-<p class="prose">差別在於：<b>位點的 VAF 是邊際</b>，它把所有帶這個變異的細胞加在一起，
-不管那些細胞還帶了什麼。圖上 S1 的 VAF 是 0.35，那其實是 HP1-1 與 HP1-1-1 兩群加起來的結果，
-<b>不對應任何單一一群細胞</b>。而<b>單倍型的頻率是聯合</b>：HP1-1-1 佔 0.15，
-數的就是「同時帶著那一組變異的分子」，它對應的是一群真實的細胞。</p>
+<p class="prose"><b>右邊</b>：三條單倍型各給一個頻率，每根長條高度都是 1。兩件事跟著出現：</p>
 
-<p class="prose">兩個 0.15 是最直接的例子。S2 與 S3 的 VAF 剛好都是 0.15，
-在左邊那張圖會落進同一格 —— 分群演算法很自然會把它們判成<b>同一個 subclone</b>。
-但右邊看得出來，一個屬於 HP1-1-1、一個屬於 HP2-1，
-分屬完全不同的分支，本來就不該併在一起。</p>
+<ul class="prose">
+<li><b>0.45 那一根，左邊根本畫不出來。</b>那群細胞在這個區域沒有任何 somatic 變異 ——
+<b>沒有變異就沒有 VAF</b>。可是它是這個區域裡最大的一群，而且它正是另外兩群的祖先。
+VAF 頻率譜看得到後代，看不到祖先。</li>
+<li><b>標籤帶著隸屬關係。</b>HP1-1 與 HP1-2 都直接掛在 HP1 底下，是<b>兄弟</b>不是祖孫。
+而這件事是從 read 上<b>數出來</b>的（沒有分子同時帶 A B C 與 D E F），不是猜的。
+於是分支那棵樹是唯一解。</li>
+</ul>
 
-<p class="prose">還有一件是跟著送的：<b>單倍型的標籤本身就帶著層級</b>
-（HP1-1-1 ⊂ HP1-1 ⊂ HP1）。左邊那張圖只給得出「有幾群、各多大」，
-祖先關係要另外用簡約性挑；右邊的頻率一列出來，誰包含誰已經寫在標籤上了。</p>
+<p class="prose">所以差別可以講得很精確：<b>左邊每一根長條數的是「變異」，右邊數的是「細胞群」</b>；
+左邊的頻率是邊際，右邊的頻率帶著隸屬關係。
+同一組 SNV，換掉頻率的單位之後，連樹的形狀都跟著定下來了。</p>
 
-<p class="prose">一個技術細節要先講清楚，否則兩張圖不對等：左邊是<b>全基因體</b>的
-（幾千個位點全丟進去），右邊畫的是<b>一個區域</b>的單倍型組成。
-要做成全基因體的版本，就是把每個區域各自算出來的單倍型頻率全部倒進同一張直方圖 ——
+<p class="prose">一個技術細節要先講清楚，否則兩張圖不對等：左邊那種圖通常是<b>全基因體</b>的
+（幾千個位點全丟進去），這裡畫的是<b>一個區域</b>。要做成全基因體的版本，
+就是把每個區域各自算出來的單倍型頻率全部倒進同一張直方圖 ——
 標籤是區域性的（跨區域的 HP1-1 並不是同一條，重要區分 #13 就是這件事的極端版本），
 但<b>頻率值可以匯總</b>。</p>
 
 <p class="prose">所以這條路線要問的是一個很具體的問題：
 <b>把頻率的單位從單一位點換成多位點的單倍型，重建出來的樹會不會不一樣？</b>
-因為同一顆腫瘤兩種都算得出來，這件事可以直接比。
+上面那個例子說<b>會</b>。而因為同一顆腫瘤兩種都算得出來，這件事可以直接比 ——
 下篇講的就是本實驗室的實作怎麼把這些單倍型頻率取出來，以及它現在卡在哪裡。</p>
 
 <h3 id="sr1__三條路線各自看得到什麼">三條路線各自看得到什麼</h3>
