@@ -180,7 +180,7 @@ window.TW_MODULES = [
   "num": "下",
   "title_zh": "下篇：用多變異區域的關係改善全基因體重建",
   "title_en": "Part 2 — constraints from multi-mutation regions",
-  "short": "HFS 模型",
+  "short": "多變異區域的約束",
   "q": "只有 5% 的區域有兩個以上變異，它們還能幫上什麼忙？",
   "sub": "那 5% 給的不是更多資料點，是資料點之間的關係。把現行實作已經算出來的串接／分岔收成三種約束，過兩道品質閘門，再餵進全基因體的混合模型 —— 而錯的約束比沒有約束更糟。",
   "group": "研究指引"

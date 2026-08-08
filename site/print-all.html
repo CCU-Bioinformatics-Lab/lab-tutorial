@@ -12872,7 +12872,8 @@ evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
 
 <p class="prose">而這一頁真正的出發點是下面這件事：
 <b>本實驗室現行的實作，其實已經在算右邊那一欄了。</b>
-它對每一個「區域 × <span class="term" data-term="somatic haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-somatic-haplotype-1">單倍型家族<span class="term__pop" id="sr2__gd-somatic-haplotype-1" role="tooltip"><b class="term__hd">somatic haplotype</b><span class="term__def" data-lang="zh">在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</span><span class="term__def" data-lang="en" lang="en">A sub-level beneath the germline haplotype: HP1-1 and HP2-1 carry somatic mutations derived from HP1 and HP2; HP3 is unassignable.</span><a class="term__more" href="glossary.html#somatic-haplotype">完整條目 →</a></span></span>」都判過是串接還是分岔 ——
+它對每一個「區域 × <span class="term" data-term="somatic haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-somatic-haplotype-1">單倍型家族<span class="term__pop" id="sr2__gd-somatic-haplotype-1" role="tooltip"><b class="term__hd">somatic haplotype</b><span class="term__def" data-lang="zh">在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</span><span class="term__def" data-lang="en" lang="en">A sub-level beneath the germline haplotype: HP1-1 and HP2-1 carry somatic mutations derived from HP1 and HP2; HP3 is unassignable.</span><a class="term__more" href="glossary.html#somatic-haplotype">完整條目 →</a></span></span>」（<b>以下簡稱一個「單位」</b>）
+都判過是串接還是分岔 ——
 那些判定<b>就是</b>約束，只是它們停在區域層級，從來沒有被送到全基因體那一層。</p>
 
 <p class="prose">所以要做的事有兩件，順序不能顛倒：</p>
@@ -12991,7 +12992,10 @@ evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
 
 <p class="prose">但只要有一對變異落在同一個區域、分屬那兩群，而且觀測到沒有分子同時帶兩者，
 就得到一條<b>硬約束</b>：這兩個變異不可能屬於同一群。混合模型被迫把那根峰拆成兩個成分。
-這是<b>可辨識性</b>的改變，不是精度的改變 —— 也是這條路線最強的一個論點。</p>
+這是<b>可辨識性</b>的改變，不是精度的改變 ——
+可辨識性講的是「資料<b>原則上</b>分不分得出這兩種情況」，
+精度講的是「分得出來，但量得準不準」。前者加再多資料也不會變，後者會。
+這也是這條路線最強的一個論點。</p>
 
 <h4 id="sr2__用途二-直接量出-峰應該多寬">用途二：直接量出「峰應該多寬」</h4>
 
@@ -13002,13 +13006,25 @@ evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
 它們就在同一批分子上，生物學離散<b>恰好是零</b>。
 所以那幾個變異之間觀測到的離散度，<b>就是純粹的技術雜訊</b>，是量出來的，不是假設的。</p>
 
-<p class="prose">按深度與拷貝數分層估出來，就得到一條經驗性的「點擴散函數」。
-拿它去對全基因體的頻率譜做解卷積，峰會變窄 —— 峰變窄，本來被埋掉的小群就浮得出來。</p>
+<p class="prose">按深度與拷貝數分層估出來，就得到一條經驗性的「<b>點擴散函數</b>」——
+這個名字借自光學：真值是一個<b>點</b>（同一條單倍型上那幾個變異的共同真實頻率），
+量出來卻是一團有寬度的<b>散布</b>，而這條函數就是那團散布的形狀。
+拿它去對全基因體的頻率譜做<b>解卷積</b>（把已知的模糊從觀測裡除掉），峰會變窄 ——
+峰變窄，本來被埋掉的小群就浮得出來。</p>
 
 <h4 id="sr2__用途三-不需要純度的相對位置">用途三：不需要純度的相對位置</h4>
 
-<p class="prose">同一個單位裡兩條單倍型的<b>比值</b>與純度、拷貝數無關（第八節寫清楚為什麼）。
-所以每一個巢狀對都直接給出「兩群的細胞比例之比」。
+<p class="prose">同一個單位裡兩條單倍型的<b>比值</b>不需要純度：
+純度只影響「正常細胞的分子有多少」，而那些分子在兩個比例的<b>分母裡是同一項</b>，
+相除的時候整個消掉（第八節把式子寫出來）。</p>
+
+<p class="prose">拷貝數則<b>不是無條件消掉的</b>，它要一個前提：
+兩個 clone 在這個位置的家族拷貝數相同 —— 也就是此處沒有 subclonal 拷貝數變異。
+好消息是這個前提<b>可以就地檢查</b>（用家族深度比），不必額外估計，
+所以它跟「需要一個全域拷貝數估計值」是兩回事。</p>
+
+<p class="prose">於是每一個<b>巢狀對</b>（其中一個變異所在的細胞群，整群包含在另一群裡面 ——
+也就是分類為「串接」的那種對）都直接給出「兩群的細胞比例之比」。
 把這些比值匯總起來，群與群的<b>相對位置</b>就定下來了，
 純度只剩下一個<b>整體縮放因子</b>的角色。</p>
 
@@ -13112,13 +13128,35 @@ evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
 <table>
 <thead><tr><th scope="col">現行輸出</th><th scope="col">對應的約束</th><th scope="col">它在全基因體那一層決定什麼</th></tr></thead>
 <tbody>
-<tr><td>分岔（沒有分子同時帶兩者）</td><td><b>不可同群</b></td><td>強迫拆峰 —— 打破一維上的簡併</td></tr>
-<tr><td>串接，且比值 ≈ 1</td><td><b>必定同群</b></td><td>把散在不同區域的同一群併起來</td></tr>
+<tr><td>分岔（沒有分子同時帶兩者）</td><td><b>不可同群</b>（硬）</td><td>強迫拆峰 —— 打破一維上的簡併。<b>但 trans 會偽造這一格，見第六節</b></td></tr>
+<tr><td>串接，且比值 ≈ 1</td><td><b>必定同群</b>（硬）</td><td>把散在不同區域的同一群併起來。<b>權重要最低，理由見下</b></td></tr>
 <tr><td>串接，且比值 &lt; 1</td><td><b>有向</b>：A 群是 B 群的祖先</td><td>群與群的先後 —— 取代<span class="term" data-term="parsimony" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-parsimony-3">簡約性<span class="term__pop" id="sr2__gd-parsimony-3" role="tooltip"><b class="term__hd">parsimony <i>簡約法</i></b><span class="term__def" data-lang="zh">在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</span><span class="term__def" data-lang="en" lang="en">Choosing, among all solutions compatible with the data, the one requiring the fewest steps or lowest cost. It is a preference rather than evidence: when several solutions tie, parsimony picks one, but the data has not ruled the others out.</span><a class="term__more" href="glossary.html#parsimony">完整條目 →</a></span></span></td></tr>
 <tr><td>不相容（四格全滿）</td><td>不產生約束</td><td>反過來估計單倍型標記的錯誤率</td></tr>
 </tbody>
 </table>
 </div>
+
+<h4 id="sr2__必定同群-這一條要小心-因為它跟用途一互相拉扯">「必定同群」這一條要小心，因為它跟用途一互相拉扯</h4>
+
+<p class="prose">上面那張表最容易被照單全收的是第二列。串接代表後者長在前者的譜系上，
+所以兩群是<b>巢狀</b>；比值 ≈ 1 只是說後者幾乎接管了前者。
+但「幾乎接管」<b>不等於同一群</b> —— 那是<b>兩個真實存在的 clone</b>，
+只是在頻率軸上分不開。而<b>頻率相同不等於同一群</b>，正是用途一整段在論證的事。
+把它們硬性合併，等於在用途一想拆開的地方主動把兩群黏起來，方向剛好相反。</p>
+
+<p class="prose">所以這一條要加兩個限制：</p>
+
+<ul class="prose">
+<li><b>「≈ 1」要寫成一個明確的容差，而且容差由檢定力決定，不是拍板的常數。</b>
+在跨越深度 <code>n</code> 之下，比值本來就有抽樣誤差；
+只有當「比值 &lt; 1」在這個 <code>n</code> 下<b>本來就分辨得出來</b>而觀測仍然落在 1 附近，
+「≈ 1」才帶資訊。<code>n</code> 小的時候，任何比值都 ≈ 1 ——
+那不是證據，是沒有解析度。</li>
+<li><b>權重要是三種約束裡最低的。</b>不可同群與有向關係都在<b>增加</b>可辨識性；
+必定同群是唯一一條在<b>減少</b>它的。錯的不可同群會逼出一個不存在的群，
+錯的必定同群則會讓一個真的群整個消失 —— 後者更難發現，
+因為多出一個群還會讓人起疑，少一個群不會有任何異常。</li>
+</ul>
 
 <h3 id="sr2__三-但約束不能照單全收">三、但約束不能照單全收</h3>
 
@@ -13481,19 +13519,11 @@ report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
 <p class="prose">修法是把差值總和換成似然：在拓撲施加的約束下擬合各節點的分子比例，
 再比最大化後的似然。這樣不同形狀才是在比「解釋同一組數字的能力」，形狀不再自己決定勝負。</p>
 
-<h3 id="sr2__六-兩個會讓約束整個錯掉的陷阱">六、兩個會讓約束整個錯掉的陷阱</h3>
+<h3 id="sr2__六-兩個會產出假約束的陷阱">六、兩個會產出假約束的陷阱</h3>
 
-<aside class="guardrail" id="sr2__guard-14"><p class="guardrail__hd">重要區分 #14：trans 不等於分支演化</p>兩個變異若分別落在同一個細胞的兩條染色體拷貝上（trans），
-它們永遠不可能出現在同一條分子上。於是計數表會呈現
-<code>00</code>、<code>10</code>、<code>01</code>，而 <code>11</code> 那一格是空的 ——
-<b>跟兩群互不包含的 subclone 長得一模一樣</b>。
-
-在約束的脈絡下這特別致命：它會產出一條<b>假的「不可同群」</b>，
-而那是硬約束，會直接逼混合模型拆出一個不存在的群。
-
-現行流程有先按單倍型家族分堆，這一點是對的 —— 而且相位讓 cis／trans 在
-<b>整個 phase block</b> 內都是已知的，不是只在一條 read 之內，
-所以這個陷阱的可解範圍比 read 跨距大約一百倍。</aside>
+<p class="prose">兩個都跟<b>相位</b>有關，而且方向相反：
+第一個講的是相位資訊<b>只在 block 內有效</b>，跨出去就沒有意義；
+第二個講的是即使在 block 內，相位<b>解得對</b>也可能被讀成錯的生物學。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img" aria-labelledby="sr2__rg-block-spin__title" aria-describedby="sr2__rg-block-spin__desc">
   <title id="sr2__rg-block-spin__title">H1／H2 的標號只在同一個 phase block 內有意義，跨 block 是任意的</title>
@@ -13571,6 +13601,18 @@ report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
 
 由此得到一條可以寫成檢查程式的規則：
 <b>每一條約束都必須在單一個單位內部產生，不得跨單位組合。</b></aside>
+
+<aside class="guardrail" id="sr2__guard-14"><p class="guardrail__hd">重要區分 #14：trans 不等於分支演化</p>兩個變異若分別落在同一個細胞的兩條染色體拷貝上（trans），
+它們永遠不可能出現在同一條分子上。於是計數表會呈現
+<code>00</code>、<code>10</code>、<code>01</code>，而 <code>11</code> 那一格是空的 ——
+<b>跟兩群互不包含的 subclone 長得一模一樣</b>。
+
+在約束的脈絡下這特別致命：它會產出一條<b>假的「不可同群」</b>，
+而那是硬約束，會直接逼混合模型拆出一個不存在的群。
+
+現行流程有先按單倍型家族分堆，這一點是對的 —— 而且相位讓 cis／trans 在
+<b>整個 phase block</b> 內都是已知的（就是上一個陷阱講的那個 block），
+不是只在一條 read 之內，所以這個陷阱的可解範圍比 read 跨距大約一百倍。</aside>
 
 <h3 id="sr2__七-約束的信心值">七、約束的信心值</h3>
 
@@ -13832,9 +13874,37 @@ report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
 
 <h3 id="sr2__九-約束預算-夠不夠用">九、約束預算：夠不夠用</h3>
 
-<p class="prose">每 Mb 5 個變異、20 kb 視窗時，落在多變異區域的變異約占 <b>9.5%</b>
-（約 1,475 個），配成同家族的約束對約 <b>369</b> 個。
-若腫瘤有三群、質量分別是 0.60／0.25／0.15：</p>
+<h4 id="sr2__先把兩個-5-分開">先把兩個 5% 分開</h4>
+
+<p class="prose">這一頁從頭到尾講的「<b>5%</b>」是<b>區域</b>的比例：含變異的區域裡，
+只有 5% 有兩個以上的變異。但下面要算的是<b>變異</b>的比例，那是另一個分母 ——
+因為每個多變異區域至少裝兩個變異，所以「5% 的區域」裝的是 <b>9.5% 的變異</b>。
+兩個數字都對，只是在數不同的東西：<b>約束的產量由後者決定</b>。</p>
+
+<h4 id="sr2__數字是怎麼來的">數字是怎麼來的</h4>
+
+<p class="prose">假設變異在基因體上是 Poisson 散布。令 λ ＝ 每個視窗的期望變異數：
+每 Mb 5 個、視窗 20 kb 時 λ ＝ 0.1；基因體 3.1 Gb 切成 155,000 個視窗。
+於是三個關鍵比例都是 λ 的閉式函數：</p>
+
+<pre><code>含變異的視窗                 155,000 × (1 − e^−λ)            = 14,750
+其中只有一個變異的比例        λe^−λ / (1 − e^−λ)              = 95.1%   ← 上篇那個 95%
+落在多變異視窗的「變異」比例   1 − e^−λ                        =  9.5%   ← 這一節要用的
+                             15,500 × 0.095                  = 1,475 個變異
+
+相鄰位點對（每個含 k 個變異的視窗貢獻 k−1 對）
+                             155,000 × (λ − (1 − e^−λ))      =   750
+兩個變異落在同一個單倍型家族   × 1/2                           =   375   ≈ 表上的 369</code></pre>
+
+<p class="prose"><b>配對慣例要釘住。</b>上面數的是<b>相鄰</b>位點對；
+若改成視窗內<b>全配對</b>（每個視窗 <code>C(k,2)</code> 對），低負荷時兩者幾乎一樣
+（5／Mb：388 vs 375），但高負荷時會分開 —— 50／Mb 時全配對給約 38,750，
+相鄰配對給約 28,500。表上的 24,500 是相鄰配對這一支。
+寫成論文之前，這個慣例要跟第四節的閘門講同一種語言，
+否則「收到幾條約束」在兩處會是兩個定義。</p>
+
+<p class="prose">按上面的模型，若腫瘤有三群、質量分別是 0.60／0.25／0.15，
+跨第 i 群與第 j 群的對數就是總對數 × 2w<sub>i</sub>w<sub>j</sub>：</p>
 
 <div class="table-wrap">
 <table>
@@ -14198,13 +14268,62 @@ report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
 
 <h3 id="sr2__十二-先把逐對跨越深度算出來">十二、先把逐對跨越深度算出來</h3>
 
-<p class="prose">這是所有後續步驟的前提，而且從現有的狀態表就算得出來，不必碰求解器：</p>
+<p class="prose">這是所有後續步驟的前提，而且從現有的狀態表就算得出來，不必碰求解器。</p>
+
+<h4 id="sr2__那張狀態表從哪裡來">那張狀態表從哪裡來</h4>
+
+<p class="prose">不必等求解器輸出，也不必知道它的內部格式 ——
+狀態表就是「<b>哪些 read 在哪些位點讀到什麼</b>」，
+從 <code>somatic_haplotag</code> 的 BAM 加上 somatic VCF 就湊得出來。先取位點：</p>
+
+<pre><code># 這個區域裡有哪些 somatic 位點（位置、REF、ALT）
+bcftools query -r chr1:1000000-1020000 -f '%POS\t%REF\t%ALT\n' somatic.vcf</code></pre>
+
+<p class="prose">再把這些位點上的 read 逐條攤開。<b>單位是「區域 × 單倍型家族」，
+所以家族篩選不能省</b> —— 混進另一個家族的 read，計數表就不是這個單位的了：</p>
+
+<pre><code>python3 - &lt;&lt;'PY'
+import collections, pysam
+
+BAM    = &quot;tumor.somatic_haplotag.bam&quot;
+CHROM  = &quot;chr1&quot;
+FAMILY = &quot;1&quot;                       # 家族 1 ＝ HP:Z:1 與它的 somatic 後代 1-1、1-2…
+SITES  = [(1_003_412, &quot;C&quot;, &quot;T&quot;),   # 上一步 bcftools 撈出來的 (位置, REF, ALT)
+          (1_009_887, &quot;G&quot;, &quot;A&quot;),
+          (1_016_204, &quot;A&quot;, &quot;G&quot;)]
+
+bam   = pysam.AlignmentFile(BAM)
+state = collections.defaultdict(lambda: [&quot;-&quot;] * len(SITES))
+
+for k, (pos, ref, alt) in enumerate(SITES):
+    for col in bam.pileup(CHROM, pos - 1, pos, truncate=True,
+                          min_base_quality=0, stepper=&quot;nofilter&quot;):
+        for p in col.pileups:
+            if p.is_del or p.is_refskip or not p.alignment.has_tag(&quot;HP&quot;):
+                continue
+            aln = p.alignment
+            # ★ somatic_haplotag 寫的是字串 HP:Z:1-1，haplotag 寫的是整數 HP:i:1。
+            #   str() 讓兩種都跑得動，但只有前者分得出家族內的 somatic 分支。
+            if str(aln.get_tag(&quot;HP&quot;)).split(&quot;-&quot;)[0] != FAMILY:
+                continue
+            b = aln.query_sequence[p.query_position]
+            state[aln.query_name][k] = &quot;A&quot; if b == alt else &quot;R&quot; if b == ref else &quot;-&quot;
+
+# 同一個狀態組合的 read 併成一列 —— 這就是下一段要用的 rows
+rows = [(*pat, n) for pat, n in
+        collections.Counter(tuple(v) for v in state.values()).most_common()]
+for r in rows:
+    print(r)
+PY</code></pre>
+
+<h4 id="sr2__然後看逐對的-n">然後看逐對的 n</h4>
 
 <pre><code>python3 - &lt;&lt;'PY'
 import itertools
 from collections import Counter
 
-# 一個單位的狀態表：(S1, S2, S3, read 數)，'-' 代表沒蓋到
+# 換成上一段印出來的 rows 就是跑自己的資料。
+# 這裡填的是「真實資料與證據」那個 194 條 read 的單位，'-' 代表沒蓋到
 rows = [(&quot;-&quot;,&quot;A&quot;,&quot;-&quot;,42), (&quot;R&quot;,&quot;-&quot;,&quot;-&quot;,31), (&quot;A&quot;,&quot;-&quot;,&quot;-&quot;,25), (&quot;-&quot;,&quot;-&quot;,&quot;R&quot;,25),
         (&quot;-&quot;,&quot;R&quot;,&quot;-&quot;,22), (&quot;-&quot;,&quot;-&quot;,&quot;A&quot;,15), (&quot;R&quot;,&quot;A&quot;,&quot;-&quot;, 9), (&quot;-&quot;,&quot;A&quot;,&quot;A&quot;, 6),
         (&quot;-&quot;,&quot;A&quot;,&quot;R&quot;, 6), (&quot;A&quot;,&quot;R&quot;,&quot;-&quot;, 5), (&quot;-&quot;,&quot;R&quot;,&quot;R&quot;, 5), (&quot;R&quot;,&quot;A&quot;,&quot;R&quot;, 3)]
@@ -14254,6 +14373,64 @@ PY</code></pre>
 </table>
 </div>
 
+<h4 id="sr2__把上一段的腳本再往前推十行">①：把上一段的腳本再往前推十行</h4>
+
+<p class="prose">①被列成最該先做的一件事，而它其實就是第十二節那支腳本加上「套門檻、按類型數」：</p>
+
+<pre><code>python3 - &lt;&lt;'PY'
+import itertools, math
+from collections import Counter
+
+RHO_MIN, PI_STAR = 0.05, 0.95      # 要偵測到「佔該譜系 5%」的狀態，檢定力要 95%
+n_min = math.ceil(math.log(1 - PI_STAR) / math.log(1 - RHO_MIN))
+
+# 門檻對參數有多敏感 —— 先看這張表，再決定 RHO_MIN 與 PI_STAR
+print(&quot;每一對最少需要的跨越 read 數 n&quot;)
+print(&quot;  ϱ_min ＼ π*      0.80   0.90   0.95&quot;)
+for rho in (0.05, 0.10, 0.20):
+    ns = [math.ceil(math.log(1 - p) / math.log(1 - rho)) for p in (0.80, 0.90, 0.95)]
+    print(f&quot;    {rho:.2f}       &quot; + &quot;&quot;.join(f&quot;{n:7d}&quot; for n in ns))
+print(f&quot;\n目前設定 → n_min = {n_min}\n&quot;)
+
+# 換成全部單位就是真的產量。key 是單位名，value 是第十二節那個 rows
+units = {&quot;unit_A&quot;: [(&quot;-&quot;,&quot;A&quot;,&quot;-&quot;,42), (&quot;R&quot;,&quot;-&quot;,&quot;-&quot;,31), (&quot;A&quot;,&quot;-&quot;,&quot;-&quot;,25), (&quot;-&quot;,&quot;-&quot;,&quot;R&quot;,25),
+                    (&quot;-&quot;,&quot;R&quot;,&quot;-&quot;,22), (&quot;-&quot;,&quot;-&quot;,&quot;A&quot;,15), (&quot;R&quot;,&quot;A&quot;,&quot;-&quot;, 9), (&quot;-&quot;,&quot;A&quot;,&quot;A&quot;, 6),
+                    (&quot;-&quot;,&quot;A&quot;,&quot;R&quot;, 6), (&quot;A&quot;,&quot;R&quot;,&quot;-&quot;, 5), (&quot;-&quot;,&quot;R&quot;,&quot;R&quot;, 5), (&quot;R&quot;,&quot;A&quot;,&quot;R&quot;, 3)]}
+
+def classify(seen):
+    if len(seen) == 4:                            return &quot;不相容（不產生約束）&quot;
+    if &quot;AA&quot; not in seen and {&quot;AR&quot;, &quot;RA&quot;} &lt;= seen:  return &quot;不可同群&quot;
+    if &quot;AA&quot; in seen:                              return &quot;祖先關係／必定同群&quot;
+    return &quot;資訊不足&quot;
+
+kept, dropped = Counter(), Counter()
+for name, rows in units.items():
+    k = len(rows[0]) - 1
+    for i, j in itertools.combinations(range(k), 2):
+        sub = [r for r in rows if r[i] != &quot;-&quot; and r[j] != &quot;-&quot;]
+        n   = sum(r[-1] for r in sub)
+        if n &lt; n_min:
+            dropped[f&quot;檢定力不足 (n={n})&quot;] += 1
+            continue
+        pat = Counter()
+        for r in sub:
+            pat[r[i] + r[j]] += r[-1]
+        kept[classify({s for s, v in pat.items() if v &gt; 0})] += 1
+
+print(&quot;通過閘門：&quot;, dict(kept) or &quot;（一條都沒有）&quot;)
+print(&quot;丟掉：    &quot;, dict(dropped))
+PY</code></pre>
+
+<p class="prose">拿這個單位跑出來的結果是<b>三對全滅</b> ——
+n ＝ 20、17、3，而 ϱ_min ＝ 0.05、π* ＝ 0.95 要求 <b>n ≥ 59</b>。
+（這跟第十一節那張圖是同一件事的兩種說法：每個家族 60 條分子時，可偵測下界約 0.05。）</p>
+
+<p class="prose">所以①的輸出<b>不會</b>是「6%–22% 的分支類」那個數字，
+會小得多，而且小多少完全由 <code>RHO_MIN</code> 與 <code>PI_STAR</code> 決定 ——
+這正是為什麼要先印那張敏感度表再選門檻。
+如果全基因體掃完真的一條都不剩，那不是腳本壞了，
+是<b>視窗太寬</b>：回到第十一節改跑一輪窄視窗，讓多數 read 蓋得到兩端。</p>
+
 <h3 id="sr2__十四-排查順序">十四、排查順序</h3>
 
 <div class="table-wrap">
@@ -14261,6 +14438,7 @@ PY</code></pre>
 <thead><tr><th scope="col">症狀</th><th scope="col">先查什麼</th></tr></thead>
 <tbody>
 <tr><td>混合模型多出一個很小的群</td><td>先查是不是某一條「不可同群」逼出來的。追回那條約束所屬的單位，看它的逐對跨越深度</td></tr>
+<tr><td>加了約束之後群數<b>反而變少</b></td><td>反方向的同一件事：查「必定同群」。跨越深度不足時比值一律 ≈ 1，會把兩個真的群黏成一個。見第二節那個容差</td></tr>
 <tr><td>約束幾乎全是「祖先關係」</td><td>第五節那個排序偏誤。分支類被系統性地判成串接了</td></tr>
 <tr><td>通過閘門的約束少得離譜</td><td>視窗太寬。回到第十一節，改跑一輪窄視窗</td></tr>
 <tr><td>某條染色體完全沒有約束</td><td>看那個區域的突變間距。距離遠 → 跨越深度低 → 全被閘門擋掉，那是對的</td></tr>
@@ -14278,8 +14456,11 @@ PY</code></pre>
 確認只用 VAF 的分群必定合併，再量出要幾條約束、閘門要多嚴，才拆得開而且不拆錯。</li>
 <li><b>點擴散函數那一項需要同一條單倍型上有多個變異</b>，而那正是最稀缺的區域。
 低突變負荷時可能根本估不出來。</li>
-<li><b>約束的來源有偏。</b>它們只來自變異密集的區域，而 kataegis 一叢會貢獻大量
-彼此高度相關的約束。要先偵測並降權成一叢一個有效觀測。</li>
+<li><b>約束的來源有偏。</b>它們只來自變異密集的區域 ——
+而變異密集有時候不是巧合：<b>kataegis</b> 是一種局部超突變，
+同一次事件在幾十 kb 內一口氣打出一串變異。
+那一串幾乎必然同時發生、同屬一群，所以它會貢獻大量<b>彼此高度相關</b>的約束，
+在統計上卻被當成幾十個獨立觀測。要先偵測並降權成一叢一個有效觀測。</li>
 <li><b>一個群不見得只有一群細胞。</b>本實驗室的甲基化觀測已經看到：
 單一個「單倍型 ＋ 等位」狀態底下還分得出五群甲基化模式。
 所以群數的正確讀法永遠是「<b>至少</b>這麼多」。</li>

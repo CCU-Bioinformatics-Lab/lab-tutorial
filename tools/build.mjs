@@ -662,8 +662,12 @@ function writeIndex(modules, shell) {
   /* 自學者最先問的四件事：給誰、需要先會什麼、要多久、讀完能做什麼。
      原本是開場圖後面的四格區塊，放在那裡太重（第一次打開的人只想知道這在幹嘛），
      所以收成 CTA 下面一個可展開的問句 —— 資訊留著，但不擋路。
-     ★ 時數一律由 est_min 加總算出。手寫的數字會過期，而且沒有人會發現。 */
-  const totalHr = Math.round(modules.reduce((s, m) => s + (m.est_min || 0), 0) / 60);
+     ★ 時數一律由 est_min 加總算出。手寫的數字會過期，而且沒有人會發現。
+     ★ 單元數也要跟著只數課程模組。研究指引（sr*）刻意不給 est_min ——
+       它們不是課程的一部分，所以不該算進「要多久」。但單元數若用 modules.length，
+       就會變成「17 個單元合計約 12 小時」：分子數了研究指引，分母沒有。 */
+  const course = modules.filter((m) => m.est_min);
+  const totalHr = Math.round(course.reduce((s, m) => s + m.est_min, 0) / 60);
 
   const body =
     `<header class="mhead">` +
@@ -697,7 +701,10 @@ function writeIndex(modules, shell) {
     `<div><dt>適合對象</dt><dd>資訊工程背景、沒有受過癌症生物學與定序訓練的自學者</dd></div>` +
     `<div><dt>先備能力</dt><dd>不要求生物學背景。M0–M3 只需閱讀與操作互動元件；` +
     `M4 起需要能在終端機執行基本指令</dd></div>` +
-    `<div><dt>預計時間</dt><dd>${modules.length} 個單元合計約 ${totalHr} 小時，建議分 6 週完成</dd></div>` +
+    `<div><dt>預計時間</dt><dd>${course.length} 個單元合計約 ${totalHr} 小時，建議分 6 週完成` +
+    (modules.length > course.length
+      ? `；另有 ${modules.length - course.length} 篇研究指引，不計入課程時數` : '') +
+    `</dd></div>` +
     `<div><dt>完成後能做什麼</dt><dd>獨立判讀一個位點的證據，並寫出明確標示不確定性的結論</dd></div>` +
     `</dl></div></details>` +
 
