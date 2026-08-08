@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
+  <title>讓 5% 的多變異區域去改善 95% 的單變異頻率譜</title>
+  <desc>上排左邊是 95% 單獨做不到的事：兩群細胞如果佔的比例剛好一樣，
+        在一維的頻率軸上它們就是同一個點，堆成同一根長條。
+        這種簡併跟定序深度無關 —— 再深也分不開，因為兩群的頻率本來就相等。
+        上排右邊是多變異區域給的東西：一條分子同時跨過兩個變異，
+        發現沒有任何分子同時帶著兩者，於是這兩個變異不可能屬於同一群細胞。
+        這一個觀測就足以把那根長條拆成兩群。
+        中排列出三種約束。第一種是分岔，給出不可同群的硬約束。
+        第二種是同一條單倍型上的變異，它們的真實頻率完全相同，
+        所以觀測到的離散度就是純粹的技術雜訊，可以直接量出峰應該多寬。
+        第三種是巢狀對，它們的比值不需要純度就算得出來，
+        因此群與群之間的相對位置可以直接量到，純度只剩下一個整體縮放因子。
+        下排是約束預算：每 Mb 五個變異時，全基因體約有三百六十九個同家族的約束對，
+        分配到三群之間的三個配對上分別是一百一十一、六十六與二十八個。
+        之所以夠用，是因為要定的是群與群之間那幾個關係，不是一萬五千個點各自的歸屬。
+        最下方是警告：假的分岔會變成假的硬約束，而硬約束錯了比沒有更糟，
+        所以逐對檢定力閘門是這整套做法的前提。
+        讀法是：5% 提供的不是更多資料點，是資料點之間的關係，而關係不需要多。</desc>
+
+  <text class="ttl zh" x="20" y="36">讓 5% 去改善 95%</text>
+  <text class="anno zh" x="20" y="64">多變異區域很少，但它給的是<tspan class="bold">約束</tspan> —— 而約束不需要多。</text>
+
+  <!-- 問題 -->
+  <rect class="box ghost bad" x="24" y="84" width="468" height="200" rx="8"/>
+  <text class="lbl bold zh mid" x="258" y="114">95% 單獨做不到的事</text>
+
+  <rect class="bar" x="120" y="190" width="34" height="46"/>
+  <rect class="bar" x="158" y="170" width="34" height="66"/>
+  <rect class="bar somatic" x="196" y="140" width="34" height="96"/>
+  <rect class="bar" x="234" y="176" width="34" height="60"/>
+  <rect class="bar" x="272" y="200" width="34" height="36"/>
+  <rect class="bar" x="310" y="214" width="34" height="22"/>
+  <line class="axis" x1="110" y1="236" x2="380" y2="236"/>
+  <text class="tick zh" x="396" y="196">一根峰</text>
+
+  <text class="tick zh mid bad" x="258" y="258">這一根其實是<tspan class="bold">兩群</tspan>，而且兩群佔的比例一樣</text>
+  <text class="tick zh mid" x="258" y="278">在一維軸上它們是同一個點 —— 再深的定序也分不開</text>
+
+  <!-- 解法 -->
+  <rect class="box ghost ok" x="508" y="84" width="468" height="200" rx="8"/>
+  <text class="lbl bold zh mid" x="742" y="114">多變異區域給的東西</text>
+
+  <circle class="mark somatic" cx="600" cy="146" r="6"/>
+  <circle class="mark somatic" cx="800" cy="146" r="6"/>
+  <text class="tick mono mid" x="600" y="136">S1</text>
+  <text class="tick mono mid" x="800" y="136">S2</text>
+  <rect class="read hp1" x="560" y="158" width="300" height="10" rx="5"/>
+  <rect class="read hp1" x="560" y="174" width="300" height="10" rx="5"/>
+  <rect class="read hp1" x="560" y="190" width="300" height="10" rx="5"/>
+  <circle class="mark somatic" cx="600" cy="163" r="4"/>
+  <circle class="mark ref" cx="800" cy="163" r="4"/>
+  <circle class="mark ref" cx="600" cy="179" r="4"/>
+  <circle class="mark somatic" cx="800" cy="179" r="4"/>
+  <circle class="mark ref" cx="600" cy="195" r="4"/>
+  <circle class="mark ref" cx="800" cy="195" r="4"/>
+
+  <text class="tick zh mid" x="742" y="222">沒有任何分子同時帶 S1 與 S2</text>
+  <text class="anno bold zh ok mid" x="742" y="252">⇒ 兩者不可能同一群 ⇒ 峰必須拆開</text>
+  <text class="tick zh mid" x="742" y="276">只要一個這樣的觀測就夠了</text>
+
+  <!-- 三種約束 -->
+  <text class="lbl bold zh" x="24" y="322">5% 能給的三種約束</text>
+
+  <rect class="box" x="24" y="336" width="304" height="112" rx="8"/>
+  <text class="anno bold zh" x="44" y="366">① 分岔 → 不可同群</text>
+  <text class="tick zh" x="44" y="394">硬約束。直接打破一維上</text>
+  <text class="tick zh" x="44" y="416">分不開的簡併。</text>
+
+  <rect class="box" x="348" y="336" width="304" height="112" rx="8"/>
+  <text class="anno bold zh" x="368" y="366">② 同單倍型 → 量雜訊</text>
+  <text class="tick zh" x="368" y="394">它們的真實頻率<tspan class="bold">完全相同</tspan>，</text>
+  <text class="tick zh" x="368" y="416">所以離散度就是純技術雜訊。</text>
+
+  <rect class="box" x="672" y="336" width="304" height="112" rx="8"/>
+  <text class="anno bold zh" x="692" y="366">③ 巢狀 → 相對位置</text>
+  <text class="tick zh" x="692" y="394">比值不需要純度，群與群的</text>
+  <text class="tick zh" x="692" y="416">相對位置可以直接量到。</text>
+
+  <!-- 預算 -->
+  <rect class="box accent" x="24" y="470" width="952" height="72" rx="8"/>
+  <text class="anno zh" x="48" y="500">約束預算（5/Mb）：全基因體約 <tspan class="bold">369</tspan> 個同家族約束對，分到三群之間的三個配對是 <tspan class="mono">111 / 66 / 28</tspan>。</text>
+  <text class="anno zh" x="48" y="528">夠用的理由：要定的是<tspan class="bold">群與群之間那幾個關係</tspan>，不是 15,500 個點各自的歸屬。</text>
+
+  <rect class="box bad" x="24" y="556" width="952" height="52" rx="8"/>
+  <text class="anno zh bad" x="48" y="588">前提：假的分岔會變成假的硬約束，而<tspan class="bold">硬約束錯了比沒有更糟</tspan> —— 逐對檢定力閘門必須先做。</text>
+</svg>

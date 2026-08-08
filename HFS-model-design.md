@@ -388,6 +388,71 @@ That is a real retraction of a v2 claim, and the deck's data is what forced it.
 
 ---
 
+## 5.5 Using the 5 % to improve the 95 % — a proposed estimator
+
+§5.0 is a discouraging result: at 5 SNV/Mb, 95 % of mutation-containing regions hold one mutation, so
+an unlabelled haplotype spectrum nearly reproduces the VAF spectrum. But the multi-mutation minority
+supplies something the majority cannot: **relations between data points**, and relations do not need
+to be numerous.
+
+### 5.5.1 The identifiability gain
+
+The VAF spectrum has a *structural* blind spot: **two clones of equal size are the same point on the
+frequency axis.** No amount of depth or mutation count separates them — the marginal likelihood is
+flat in that direction.
+
+One spanning pair whose two mutations belong to those clones and show a fork (no molecule carries
+both) yields a hard **cannot-link**, forcing the mixture to split that component. This is a change in
+*identifiability*, not in precision, and it is the strongest single argument for the route.
+
+Three constraint types are harvestable:
+
+| observation | constraint | what it settles |
+|---|---|---|
+| fork | cannot-link | splits degenerate components |
+| nested, ϱ ≈ 1 | must-link | merges one clone split across regions |
+| nested, ϱ < 1 | directed: cluster(A) ≻ cluster(B) | cluster ancestry — replaces parsimony |
+
+### 5.5.2 Measuring the point-spread function *(the most novel piece)*
+
+In a VAF spectrum a cluster's width is *biological spread + technical noise*, confounded and not
+separable. But **mutations on the same somatic haplotype have identical true frequency by
+construction** — they sit on the same molecules, so the biological spread is exactly zero.
+
+Their observed dispersion is therefore **pure technical noise, measured rather than modelled**.
+Stratify by depth and copy state to obtain an empirical point-spread function, then deconvolve it out
+of the genome-wide spectrum. Narrower peaks ⇒ small clones that were buried become detectable.
+
+I am not aware of an existing method that obtains a noise model this way. It is assumption-free and
+self-calibrating within the sample.
+
+### 5.5.3 Purity-free relative positions
+
+§4.2's cancellation, reused: the ratio of two haplotype frequencies inside one unit is purity- and
+CN-free. Each nested pair therefore measures a **CCF ratio between two clones** directly. Pooling the
+ratios fixes the clusters' *relative* positions, leaving purity as a single global scale factor — a
+conversion error then translates all clusters together and leaves the relations intact.
+
+### 5.5.4 Constraint budget
+
+At 5 SNV/Mb, 20 kb windows: 9.5 % of mutations (~1,475 of 15,500) fall in multi-mutation regions,
+giving ~**369** same-family constrained pairs. For clusters of mass (0.60, 0.25, 0.15) these
+distribute over the three cluster-pairs as roughly **111 / 66 / 28**. The sparsest pair still gets 28
+independent observations, because — as in §4 — the unknowns are the O(J²) cluster relations, not the
+15,500 individual assignments. At 20 SNV/Mb the budget rises to ~5,100 pairs.
+
+### 5.5.5 Preconditions and risks
+
+- **A false constraint is worse than no constraint.** A hard cannot-link built on a spurious fork
+  forces a clone that does not exist. Spurious forks are exactly what §3.2's power gate exists to
+  catch, so **the gate is a precondition of this estimator, not an optional refinement**. Safer still:
+  admit constraints with weights rather than as logical conditions.
+- **Constraints are a biased sample** — they come only from mutation-dense regions, and kataegis
+  contributes many mutually correlated ones. Down-weight to one effective observation per burst.
+- **None of this is tested.** Minimal validation: simulate two subclones of *equal* size, confirm
+  VAF-only clustering necessarily merges them, then measure how many constraints are needed to split
+  them as a function of gate stringency and error rate.
+
 ## 6. The window-width knob
 
 v2 never modelled this. It is the central design trade-off:
