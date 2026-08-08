@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 590">
+  <title>單倍型頻率譜要不要保留標籤：丟掉標籤就塌回 VAF 譜</title>
+  <desc>左右兩欄是兩種都成立的做法。
+        左邊是丟掉標籤：把所有 somatic 單倍型的頻率倒進同一張直方圖，不管它是哪一條。
+        這是跟 VAF 譜嚴格的一對一替換 —— VAF 譜丟掉「變異在哪一條 haplotype 上」，
+        這裡丟掉「頻率屬於哪一條單倍型」。
+        得到的峰位置跟 VAF 譜幾乎一樣，唯一的實質差別是分母：
+        VAF 的分母是該位點全部的 read，含兩個家族；單倍型頻率的分母只有同一個家族，
+        而且那個分母是就地量到的，不必用全域的純度與拷貝數換算。
+        右邊是保留標籤：多出來的不是頻率，而是一個偏序 —— 誰包含誰、誰跟誰是兄弟。
+        這是 VAF 譜沒有對應物的東西，兄弟還是祖孫不必再用簡約性猜。
+        代價是標籤只在區域內有定義，跨區域匯總不了，所以全基因體的譜只能是不看標籤那一種。
+        最下方是關鍵的量化：在二十 kb 的視窗下，含變異的區域裡有兩個以上變異的比例，
+        每 Mb 五個變異時只有百分之四點九，十個時百分之九點七，
+        二十個時百分之十八點七，五十個時百分之四十一點八。
+        也就是說典型實體腫瘤有九成五的區域只有一個變異，
+        那種區域裡一條單倍型就等於一個變異，是一對一的。
+        所以丟掉標籤之後這張譜幾乎就是換了分母的 VAF 譜，
+        真正多出來的資訊在標籤裡，而標籤是區域性的。</desc>
+
+  <text class="ttl zh" x="20" y="36">要不要保留標籤？</text>
+  <text class="anno zh" x="20" y="64">兩種都成立，但給的東西差很多 —— 而且差別的大小由突變負荷決定。</text>
+
+  <!-- ① 丟掉標籤 -->
+  <rect class="box ghost" x="24" y="84" width="468" height="288" rx="8"/>
+  <text class="lbl bold zh mid" x="258" y="116">① 丟掉標籤</text>
+  <text class="tick zh mid" x="258" y="142">把所有 somatic 單倍型的頻率倒進同一張直方圖</text>
+
+  <text class="anno zh" x="48" y="180">這是跟 VAF 譜<tspan class="bold">嚴格的一對一替換</tspan>：</text>
+  <text class="tick zh" x="48" y="206">VAF 譜丟掉「變異在哪一條 haplotype 上」，</text>
+  <text class="tick zh" x="48" y="228">這裡丟掉「頻率屬於哪一條單倍型」。</text>
+
+  <text class="anno bold zh" x="48" y="262">峰的位置跟 VAF 譜幾乎一樣</text>
+  <text class="tick zh" x="48" y="290">唯一的實質差別是<tspan class="bold">分母</tspan>：VAF 用該位點全部</text>
+  <text class="tick zh" x="48" y="312">的 read（兩個家族），單倍型頻率只用同一家族。</text>
+  <text class="tick zh ok" x="48" y="342">而那個分母是就地量到的，不必全域換算。</text>
+
+  <!-- ② 保留標籤 -->
+  <rect class="box ghost ok" x="508" y="84" width="468" height="288" rx="8"/>
+  <text class="lbl bold zh mid" x="742" y="116">② 保留標籤</text>
+  <text class="tick zh mid" x="742" y="142">HP1-1、HP1-2、HP2-1 各自是誰</text>
+
+  <text class="anno zh" x="532" y="180">多出來的不是頻率，是一個<tspan class="bold">偏序</tspan>：</text>
+  <text class="tick zh" x="532" y="206">誰包含誰、誰跟誰是兄弟。</text>
+  <text class="tick mono" x="532" y="228">HP1-1 ⊂ HP1　HP1-1 ∥ HP1-2</text>
+
+  <text class="anno bold zh" x="532" y="262">這是 VAF 譜沒有對應物的東西</text>
+  <text class="tick zh" x="532" y="290">兄弟還是祖孫，不必再用簡約性猜。</text>
+  <text class="tick zh bad" x="532" y="320">代價：標籤只在區域內有定義，跨區域匯總不了</text>
+  <text class="tick zh bad" x="532" y="342">（重要區分 #13）。全基因體的譜只能用 ①。</text>
+
+  <!-- 量化：丟掉標籤為什麼會塌回去 -->
+  <rect class="box accent" x="24" y="396" width="952" height="174" rx="8"/>
+  <text class="lbl bold zh" x="48" y="428">為什麼「丟掉標籤」幾乎就塌回 VAF 譜</text>
+
+  <text class="tick zh" x="48" y="462">突變負荷（視窗 20 kb）</text>
+  <text class="tick mono mid" x="420" y="462">5/Mb</text>
+  <text class="tick mono mid" x="560" y="462">10/Mb</text>
+  <text class="tick mono mid" x="700" y="462">20/Mb</text>
+  <text class="tick mono mid" x="840" y="462">50/Mb</text>
+  <line class="guide" x1="48" y1="474" x2="928" y2="474"/>
+  <text class="tick zh" x="48" y="500">含變異的區域裡有 ≥2 個變異</text>
+  <text class="tick mono mid bad" x="420" y="500">4.9%</text>
+  <text class="tick mono mid" x="560" y="500">9.7%</text>
+  <text class="tick mono mid" x="700" y="500">18.7%</text>
+  <text class="tick mono mid ok" x="840" y="500">41.8%</text>
+
+  <text class="anno zh" x="48" y="534">典型實體腫瘤（約 5/Mb）有 <tspan class="bold">95%</tspan> 的區域只有一個變異 —— 那種區域裡「一條單倍型」就是「一個變異」。</text>
+  <text class="anno zh bold" x="48" y="560">所以真正多出來的資訊在<tspan class="ok">標籤</tspan>裡，不在頻率值裡；而標籤是<tspan class="bad">區域性</tspan>的。</text>
+</svg>

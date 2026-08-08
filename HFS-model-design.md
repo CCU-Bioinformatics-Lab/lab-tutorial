@@ -327,6 +327,51 @@ produce it, and it costs nothing — the solver already computes it as the cost.
 **S1 must be reported twice**: raw, and after the §3.2 gating. The difference between the two *is*
 the geometry correction, and publishing both is more informative than publishing either.
 
+### 5.0 Labelled vs unlabelled — and why the distinction decides the whole case
+
+A question that looks cosmetic but is not. VAF is *label-agnostic*: it discards which haplotype the
+mutation sits on and reports one number per locus. Should the haplotype frequency spectrum do the
+same — pool the frequency values of all somatic haplotypes and throw away whether each was HP1-1,
+HP1-2, HP2-1?
+
+Both constructions are legitimate, and they are **different objects**.
+
+**Unlabelled** is the strict one-for-one swap, and it is the only version that can be pooled
+genome-wide (labels do not survive across regions — §7). Its peak *positions* are essentially those
+of the VAF spectrum. The one real gain is the denominator: VAF divides by all reads at the locus
+across both families, whereas a haplotype frequency divides by its own family's reads, measured in
+place — no global purity/CN estimate required.
+
+**But the unlabelled spectrum very nearly collapses back into the VAF spectrum**, and the reason is
+arithmetic. With a 20 kb window:
+
+| burden | λ | regions with ≥2 mutations, given ≥1 |
+|---:|---:|---:|
+| 5/Mb | 0.10 | **4.9 %** |
+| 10/Mb | 0.20 | 9.7 % |
+| 20/Mb | 0.40 | 18.7 % |
+| 50/Mb | 1.00 | 41.8 % |
+
+At typical solid-tumour burden, **95 % of mutation-containing regions hold exactly one mutation** —
+and there "one somatic haplotype" *is* "one mutation", one-for-one. So the unlabelled spectrum
+inherits the VAF spectrum's shape almost entirely; only the denominator improves.
+
+**Labelled** adds something with no VAF counterpart: a **partial order** (HP1-1 ⊂ HP1; HP1-1 ∥
+HP1-2). The worked six-SNV example resolves its tree on that partial order, not on the three
+frequency values. But the order is regional and cannot be aggregated.
+
+Two consequences, and they should be stated whenever this route is described:
+
+1. **The added information lives in the labels, not in the frequency values.** A pitch built on
+   "haplotype frequencies are better-estimated frequencies" is largely wrong at typical burden.
+2. **Usable signal is tied directly to mutation burden**, via the table above. This is the same
+   burden dependence as §12's unit counts, arriving from a different direction — which is a
+   consistency check on both.
+
+This also corrects a claim made earlier in this document's own §1.3–1.5 framing: the genome-wide
+haplotype-derived spectrum is *not* automatically richer than the VAF spectrum. It is richer only
+where k ≥ 2.
+
 ### 5.1 Neutral-evolution predictions, revised
 
 v2's P1/P2/P3 were built on the ϱ-spectrum and mostly do not survive contact with §1.1.
@@ -440,6 +485,8 @@ rather than shared biology — which would be important to know.
 | "report a candidate set, not one tree" as a novelty | **withdrawn** — the deck already does this |
 | falsification report as a novelty | **withdrawn** — 87.53 % enumerability is the same discipline |
 | latent-node count as a genome-wide spectrum | **new** (S2) |
+| unlabelled haplotype spectrum is richer than the VAF spectrum | **retracted** — it collapses back at low burden (§5.0) |
+| the gain lives in the labels' partial order, not in the frequency values | **new** (§5.0) |
 | pairwise spanning-depth gating | **new** (§3.2), highest-priority fix |
 | score shape-bias correction | **new** (§4.1) |
 | window-width as an explicit two-pass knob | **new** (§6) |
