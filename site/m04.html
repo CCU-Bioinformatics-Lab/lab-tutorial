@@ -159,7 +159,7 @@
 
 <p class="prose">假設我們只看 <code>chr7</code> 上一小段 toy reference。為了讓字串短一點，下面的座標從 100 開始；真實檔案會有完整的 chromosome sequence、header 與更多欄位。</p>
 
-<h4>1. FASTA：比對的參考序列</h4>
+<h4 id="1-fasta-比對的參考序列">1. FASTA：比對的參考序列</h4>
 
 <pre><code>reference.fasta
 &gt;chr7
@@ -167,7 +167,7 @@ ACCTGATC</code></pre>
 
 <p class="prose">這段序列的 <code>chr7:100–107</code> 依序是 <code>A C C T G A T C</code>。FASTA 告訴我們「參考是什麼」，但還沒有任何 sample read，也沒有變異結論。</p>
 
-<h4>2. FASTQ：尚未定位的 read 觀測</h4>
+<h4 id="2-fastq-尚未定位的-read-觀測">2. FASTQ：尚未定位的 read 觀測</h4>
 
 <pre><code>reads.fastq
 @read_001
@@ -181,7 +181,7 @@ IIIIIIII</code></pre>
 
 <p class="prose">每筆 FASTQ record 有四行：名稱、序列、<code>+</code> 分隔線、每個鹼基的品質字串。這裡的 <code>I</code> 只是 toy example 的品質字元；重點是 read 還沒有 <code>chr7:105</code> 這種參考座標。</p>
 
-<h4>3. BAM：把每條 read 放回參考座標</h4>
+<h4 id="3-bam-把每條-read-放回參考座標">3. BAM：把每條 read 放回參考座標</h4>
 
 <p class="prose">BAM 是二進位檔，不能像文字檔一樣直接讀出一整列。為了教學，下面用「從 SAM／<code>samtools view</code> 選出的欄位」簡化顯示；這不是 BAM 的二進位內容：</p>
 
@@ -191,7 +191,7 @@ read_002   chr7  100  60   8M    ACCTGGTC  HP:i:2</code></pre>
 
 <p class="prose">這兩條 read 都從 <code>chr7:100</code> 開始，並各自跨過 <code>chr7:105</code>。第二條 read 在這個位置讀到 <code>G</code>，而 reference 是 <code>A</code>。此時我們仍在讀<b>每條 read 的觀測</b>；還沒有把它們壓縮成一列 VCF。</p>
 
-<h4>4. VCF：把同一位置整理成一列變異紀錄</h4>
+<h4 id="4-vcf-把同一位置整理成一列變異紀錄">4. VCF：把同一位置整理成一列變異紀錄</h4>
 
 <pre><code>sample.vcf
 ##fileformat=VCFv4.3
@@ -654,7 +654,7 @@ minimap2 -ax map-ont -y reference.fasta methylcall.raw.fastq</code></pre>
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="m03.html"><small>← 上一模組</small>定序原理與長讀的分析價值</a><a class="next" href="m05.html"><small>下一模組 →</small>Germline variant calling：從證據到判定</a></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>BAM</dt><dd>已比對到參考基因體的 read 的二進位格式（SAM 的壓縮版）。每一列是一條 read，帶著它的位置、CIGAR、品質與各種 tag。</dd><dt>CIGAR</dt><dd>描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。</dd><dt>FASTA</dt><dd>以文字保存 DNA 或 RNA 序列的格式；在本模組中，FASTA 主要用來提供比對所需的參考基因體序列。</dd><dt>FASTQ</dt><dd>存放 read 序列與每個鹼基品質分數的文字格式；每筆紀錄由四行組成。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>MM/ML tag</dt><dd>BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。</dd><dt>PS tag（phase set）</dt><dd>標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。</dd><dt>VCF</dt><dd>存放 variant 的文字格式。每一列是一個位點，記錄位置、ref/alt allele、品質、FILTER 與各種 FORMAT 欄位。</dd><dt>reference genome（參考基因體）</dt><dd>用於比對的標準序列（人類資料常用 GRCh38）。所有座標均相對於指定版本；更換 build 會改變座標系，座標不可直接比較。</dd><dt>soft clipping</dt><dd>read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#一-先建立檔案地圖">一、先建立檔案地圖</a></li><li class="lv3"><a href="#二-用同一個小例子追過四種格式">二、用同一個小例子追過四種格式</a></li><li class="lv3"><a href="#三-從檔案讀到細節-四個層級">三、從檔案讀到細節：四個層級</a></li><li class="lv3"><a href="#四-先讀-vcf-的關鍵欄位">四、先讀 VCF 的關鍵欄位</a></li><li class="lv3"><a href="#五-再讀-bam-cigar-只是其中一個欄位">五、再讀 BAM：CIGAR 只是其中一個欄位</a></li><li class="lv3"><a href="#六-soft-clip-bam-對齊資訊的一個判讀例子">六、soft clip：BAM 對齊資訊的一個判讀例子</a></li><li class="lv3"><a href="#七-bam-tags-hp-mm-ml-tag-與-somatic-haplotype">七、BAM tags：HP、MM/ML tag 與 somatic haplotype</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#把命令和它讀寫的格式對上">把命令和它讀寫的格式對上</a></li><li class="lv3"><a href="#把-vcf-位點回溯到-bam-read">把 VCF 位點回溯到 BAM read</a></li><li class="lv3"><a href="#轉換-bam-時保留-mm-ml">轉換 BAM 時保留 MM/ML</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#練習一-從一列-vcf-開始追證據">練習一：從一列 VCF 開始追證據</a></li><li class="lv3"><a href="#練習二-讀-cigar-的兩個總和">練習二：讀 CIGAR 的兩個總和</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#一-先建立檔案地圖">一、先建立檔案地圖</a></li><li class="lv3"><a href="#二-用同一個小例子追過四種格式">二、用同一個小例子追過四種格式</a></li><li class="lv4"><a href="#1-fasta-比對的參考序列">1. FASTA：比對的參考序列</a></li><li class="lv4"><a href="#2-fastq-尚未定位的-read-觀測">2. FASTQ：尚未定位的 read 觀測</a></li><li class="lv4"><a href="#3-bam-把每條-read-放回參考座標">3. BAM：把每條 read 放回參考座標</a></li><li class="lv4"><a href="#4-vcf-把同一位置整理成一列變異紀錄">4. VCF：把同一位置整理成一列變異紀錄</a></li><li class="lv3"><a href="#三-從檔案讀到細節-四個層級">三、從檔案讀到細節：四個層級</a></li><li class="lv3"><a href="#四-先讀-vcf-的關鍵欄位">四、先讀 VCF 的關鍵欄位</a></li><li class="lv3"><a href="#五-再讀-bam-cigar-只是其中一個欄位">五、再讀 BAM：CIGAR 只是其中一個欄位</a></li><li class="lv3"><a href="#六-soft-clip-bam-對齊資訊的一個判讀例子">六、soft clip：BAM 對齊資訊的一個判讀例子</a></li><li class="lv3"><a href="#七-bam-tags-hp-mm-ml-tag-與-somatic-haplotype">七、BAM tags：HP、MM/ML tag 與 somatic haplotype</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#把命令和它讀寫的格式對上">把命令和它讀寫的格式對上</a></li><li class="lv3"><a href="#把-vcf-位點回溯到-bam-read">把 VCF 位點回溯到 BAM read</a></li><li class="lv3"><a href="#轉換-bam-時保留-mm-ml">轉換 BAM 時保留 MM/ML</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv2"><a href="#實作練習">實作練習</a></li><li class="lv3"><a href="#練習一-從一列-vcf-開始追證據">練習一：從一列 VCF 開始追證據</a></li><li class="lv3"><a href="#練習二-讀-cigar-的兩個總和">練習二：讀 CIGAR 的兩個總和</a></li><li class="lv2"><a href="#學習檢核">學習檢核</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">

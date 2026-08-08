@@ -69,6 +69,7 @@
 .toc--sticky ol { list-style: none; margin: 0; padding: 0; }
 .toc--sticky li { margin-bottom: .35em; }
 .toc--sticky li.lv3 { padding-left: .9em; font-size: .95em; }
+.toc--sticky li.lv4 { padding-left: 1.8em; font-size: .9em; }
 .toc--sticky a { color: var(--muted); text-decoration: none; }
 .toc--sticky a:hover { color: var(--accent); }
 .toc--sticky a[aria-current="true"] { color: var(--accent); font-weight: 600; }

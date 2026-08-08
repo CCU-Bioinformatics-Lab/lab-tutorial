@@ -400,7 +400,9 @@ function decorateSections(html, ctx) {
 
   /* 自動補 heading id + 收集 TOC */
   const toc = [];
-  html = html.replace(/<(h2|h3)\b([^>]*)>([\s\S]*?)<\/\1>/g, (m0, tag, attrs, text) => {
+  /* h4 也要收進 TOC —— 研究指引頁的小節（用途一／二／三）是 h4，
+     只收到 h3 的話那些小節在側欄完全看不見。m04 也有同樣的狀況。 */
+  html = html.replace(/<(h2|h3|h4)\b([^>]*)>([\s\S]*?)<\/\1>/g, (m0, tag, attrs, text) => {
     let id = /\bid="([^"]+)"/.exec(attrs)?.[1];
     /* 先剪掉 tooltip 再去標籤，否則整段詞彙定義會被當成標題文字 */
     const plain = stripPops(text).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
@@ -420,7 +422,7 @@ function decorateSections(html, ctx) {
 function tocHtml(toc) {
   if (toc.length < 3) return '';
   const items = toc.map((t) =>
-    `<li class="${t.tag === 'h3' ? 'lv3' : 'lv2'}">` +
+    `<li class="lv${t.tag === 'h4' ? 4 : t.tag === 'h3' ? 3 : 2}">` +
     `<a href="#${t.id}">${esc(t.text)}</a></li>`).join('');
   return `<nav class="toc--sticky" aria-label="本頁目錄">` +
          `<h2>本頁目錄</h2><ol>${items}</ol></nav>`;

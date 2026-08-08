@@ -2278,7 +2278,7 @@ mosdepth --by 500 out aln.bam &amp;&amp; head out.mosdepth.summary.txt</code></p
 
 <p class="prose">假設我們只看 <code>chr7</code> 上一小段 toy reference。為了讓字串短一點，下面的座標從 100 開始；真實檔案會有完整的 chromosome sequence、header 與更多欄位。</p>
 
-<h4>1. FASTA：比對的參考序列</h4>
+<h4 id="m04__1-fasta-比對的參考序列">1. FASTA：比對的參考序列</h4>
 
 <pre><code>reference.fasta
 &gt;chr7
@@ -2286,7 +2286,7 @@ ACCTGATC</code></pre>
 
 <p class="prose">這段序列的 <code>chr7:100–107</code> 依序是 <code>A C C T G A T C</code>。FASTA 告訴我們「參考是什麼」，但還沒有任何 sample read，也沒有變異結論。</p>
 
-<h4>2. FASTQ：尚未定位的 read 觀測</h4>
+<h4 id="m04__2-fastq-尚未定位的-read-觀測">2. FASTQ：尚未定位的 read 觀測</h4>
 
 <pre><code>reads.fastq
 @read_001
@@ -2300,7 +2300,7 @@ IIIIIIII</code></pre>
 
 <p class="prose">每筆 FASTQ record 有四行：名稱、序列、<code>+</code> 分隔線、每個鹼基的品質字串。這裡的 <code>I</code> 只是 toy example 的品質字元；重點是 read 還沒有 <code>chr7:105</code> 這種參考座標。</p>
 
-<h4>3. BAM：把每條 read 放回參考座標</h4>
+<h4 id="m04__3-bam-把每條-read-放回參考座標">3. BAM：把每條 read 放回參考座標</h4>
 
 <p class="prose">BAM 是二進位檔，不能像文字檔一樣直接讀出一整列。為了教學，下面用「從 SAM／<code>samtools view</code> 選出的欄位」簡化顯示；這不是 BAM 的二進位內容：</p>
 
@@ -2310,7 +2310,7 @@ read_002   chr7  100  60   8M    ACCTGGTC  HP:i:2</code></pre>
 
 <p class="prose">這兩條 read 都從 <code>chr7:100</code> 開始，並各自跨過 <code>chr7:105</code>。第二條 read 在這個位置讀到 <code>G</code>，而 reference 是 <code>A</code>。此時我們仍在讀<b>每條 read 的觀測</b>；還沒有把它們壓縮成一列 VCF。</p>
 
-<h4>4. VCF：把同一位置整理成一列變異紀錄</h4>
+<h4 id="m04__4-vcf-把同一位置整理成一列變異紀錄">4. VCF：把同一位置整理成一列變異紀錄</h4>
 
 <pre><code>sample.vcf
 ##fileformat=VCFv4.3
@@ -13821,7 +13821,7 @@ report: 每個單位有幾對未定、是哪幾對</code></pre>
 再深的定序也分不開。而一個「沒有分子同時帶兩者」的觀測，就足以把那根峰拆開。
 下方是約束預算與它成立的前提。</figcaption></figure>
 
-<h4>用途一：打破一維上的簡併</h4>
+<h4 id="sr2__用途一-打破一維上的簡併">用途一：打破一維上的簡併</h4>
 
 <p class="prose">VAF 頻率譜有一個<b>結構性</b>的盲點：兩群細胞如果佔的比例一樣，
 它們在頻率軸上就是<b>同一個點</b>。這不是精度問題，加深定序、增加變異數都沒有用。</p>
@@ -13843,7 +13843,7 @@ report: 每個單位有幾對未定、是哪幾對</code></pre>
 </table>
 </div>
 
-<h4>用途二：直接量出「峰應該多寬」</h4>
+<h4 id="sr2__用途二-直接量出-峰應該多寬">用途二：直接量出「峰應該多寬」</h4>
 
 <p class="prose">這一項最值得做，而且它不需要任何假設。</p>
 
@@ -13855,7 +13855,7 @@ report: 每個單位有幾對未定、是哪幾對</code></pre>
 <p class="prose">把它按深度與拷貝數分層估出來，就得到一條經驗性的「點擴散函數」。
 拿它去對全基因體的頻率譜做解卷積，峰會變窄 —— 峰變窄，本來被埋掉的小群就浮得出來。</p>
 
-<h4>用途三：不需要純度的相對位置</h4>
+<h4 id="sr2__用途三-不需要純度的相對位置">用途三：不需要純度的相對位置</h4>
 
 <p class="prose">第八節那個消去在這裡再用一次：同一個單位裡兩條單倍型的<b>比值</b>與純度、拷貝數無關。
 所以每一個巢狀對都直接給出「兩群的細胞比例之比」。
@@ -13865,7 +13865,7 @@ report: 每個單位有幾對未定、是哪幾對</code></pre>
 <p class="prose">這把上篇說的第一層不確定性（換算需要純度、拷貝數與 multiplicity 三個估計值）
 降級成一個純量：換算錯了，整排群一起平移，<b>相對關係不變</b>。</p>
 
-<h4>約束夠不夠用？</h4>
+<h4 id="sr2__約束夠不夠用">約束夠不夠用？</h4>
 
 <p class="prose">算一遍。每 Mb 5 個變異、20 kb 視窗時，落在多變異區域的變異約占 <b>9.5%</b>
 （約 1,475 個），配成同家族的約束對約 <b>369</b> 個。
@@ -13876,7 +13876,7 @@ report: 每個單位有幾對未定、是哪幾對</code></pre>
 不是 15,500 個點各自的歸屬。最稀疏的那一對也有 28 個獨立觀測。
 而且突變負荷一上去就寬鬆很多 —— 20/Mb 時同家族約束對跳到約 5,100 個。</p>
 
-<h4>這個方向的前提與風險</h4>
+<h4 id="sr2__這個方向的前提與風險">這個方向的前提與風險</h4>
 
 <ul class="prose">
 <li><b>假約束比沒有約束更糟。</b>硬約束一旦錯了，會強迫模型拆出一個不存在的群。
