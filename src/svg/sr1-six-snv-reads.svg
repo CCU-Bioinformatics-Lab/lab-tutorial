@@ -1,0 +1,191 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530">
+  <title>這 20 條分子長什麼樣：六個位點上的等位組合</title>
+  <desc>一個區域裡有六個 somatic 位點，由左到右標為 A 到 F，共二十條分子跨過全部六個位點。
+        二十條分成三群。第一群九條，六個位點全是參考型，佔四成五。
+        第二群七條，在 A、B、C 三個位點是變異型，D、E、F 是參考型，佔三成五。
+        第三群四條，反過來在 D、E、F 是變異型，A、B、C 是參考型，佔兩成。
+        關鍵是沒有任何一條分子同時帶著 A B C 與 D E F 這兩組。
+        下半列出同一批分子的兩種數法。
+        第一種逐位點數，得到 A、B、C 的 VAF 都是七除以二十等於零點三五，
+        D、E、F 都是四除以二十等於零點二。
+        第二種逐單倍型數，得到沒有變異的那群佔九除以二十等於零點四五，
+        帶 A B C 的那群佔零點三五，帶 D E F 的那群佔零點二。
+        最下方指出：因為沒有分子同時帶兩組，帶 A B C 與帶 D E F 的兩群是兄弟不是祖孫，
+        而這件事只有在一條分子跨得過這六個位點時才數得出來。
+        讀法是：兩種頻率譜的數字都從這一張圖來，差別只在數的時候把什麼當成一個單位。</desc>
+
+  <text class="ttl zh" x="20" y="36">先看原始的 read</text>
+  <text class="anno zh" x="20" y="64">一個區域、六個 somatic 位點、20 條跨得過全部六個位點的分子。</text>
+
+  <text class="tick mono mid" x="180" y="100">A</text>
+  <text class="tick mono mid" x="288" y="100">B</text>
+  <text class="tick mono mid" x="396" y="100">C</text>
+  <text class="tick mono mid" x="504" y="100">D</text>
+  <text class="tick mono mid" x="612" y="100">E</text>
+  <text class="tick mono mid" x="720" y="100">F</text>
+  <line class="axis" x1="140" y1="116" x2="760" y2="116"/>
+
+  <rect class="read hp1" x="150" y="132" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="135" r="3"/>
+  <circle class="mark ref" cx="288" cy="135" r="3"/>
+  <circle class="mark ref" cx="396" cy="135" r="3"/>
+  <circle class="mark ref" cx="504" cy="135" r="3"/>
+  <circle class="mark ref" cx="612" cy="135" r="3"/>
+  <circle class="mark ref" cx="720" cy="135" r="3"/>
+  <rect class="read hp1" x="150" y="141" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="144" r="3"/>
+  <circle class="mark ref" cx="288" cy="144" r="3"/>
+  <circle class="mark ref" cx="396" cy="144" r="3"/>
+  <circle class="mark ref" cx="504" cy="144" r="3"/>
+  <circle class="mark ref" cx="612" cy="144" r="3"/>
+  <circle class="mark ref" cx="720" cy="144" r="3"/>
+  <rect class="read hp1" x="150" y="150" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="153" r="3"/>
+  <circle class="mark ref" cx="288" cy="153" r="3"/>
+  <circle class="mark ref" cx="396" cy="153" r="3"/>
+  <circle class="mark ref" cx="504" cy="153" r="3"/>
+  <circle class="mark ref" cx="612" cy="153" r="3"/>
+  <circle class="mark ref" cx="720" cy="153" r="3"/>
+  <rect class="read hp1" x="150" y="159" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="162" r="3"/>
+  <circle class="mark ref" cx="288" cy="162" r="3"/>
+  <circle class="mark ref" cx="396" cy="162" r="3"/>
+  <circle class="mark ref" cx="504" cy="162" r="3"/>
+  <circle class="mark ref" cx="612" cy="162" r="3"/>
+  <circle class="mark ref" cx="720" cy="162" r="3"/>
+  <rect class="read hp1" x="150" y="168" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="171" r="3"/>
+  <circle class="mark ref" cx="288" cy="171" r="3"/>
+  <circle class="mark ref" cx="396" cy="171" r="3"/>
+  <circle class="mark ref" cx="504" cy="171" r="3"/>
+  <circle class="mark ref" cx="612" cy="171" r="3"/>
+  <circle class="mark ref" cx="720" cy="171" r="3"/>
+  <rect class="read hp1" x="150" y="177" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="180" r="3"/>
+  <circle class="mark ref" cx="288" cy="180" r="3"/>
+  <circle class="mark ref" cx="396" cy="180" r="3"/>
+  <circle class="mark ref" cx="504" cy="180" r="3"/>
+  <circle class="mark ref" cx="612" cy="180" r="3"/>
+  <circle class="mark ref" cx="720" cy="180" r="3"/>
+  <rect class="read hp1" x="150" y="186" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="189" r="3"/>
+  <circle class="mark ref" cx="288" cy="189" r="3"/>
+  <circle class="mark ref" cx="396" cy="189" r="3"/>
+  <circle class="mark ref" cx="504" cy="189" r="3"/>
+  <circle class="mark ref" cx="612" cy="189" r="3"/>
+  <circle class="mark ref" cx="720" cy="189" r="3"/>
+  <rect class="read hp1" x="150" y="195" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="198" r="3"/>
+  <circle class="mark ref" cx="288" cy="198" r="3"/>
+  <circle class="mark ref" cx="396" cy="198" r="3"/>
+  <circle class="mark ref" cx="504" cy="198" r="3"/>
+  <circle class="mark ref" cx="612" cy="198" r="3"/>
+  <circle class="mark ref" cx="720" cy="198" r="3"/>
+  <rect class="read hp1" x="150" y="204" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="207" r="3"/>
+  <circle class="mark ref" cx="288" cy="207" r="3"/>
+  <circle class="mark ref" cx="396" cy="207" r="3"/>
+  <circle class="mark ref" cx="504" cy="207" r="3"/>
+  <circle class="mark ref" cx="612" cy="207" r="3"/>
+  <circle class="mark ref" cx="720" cy="207" r="3"/>
+  <rect class="read hp1" x="150" y="216" width="600" height="6" rx="3"/>
+  <circle class="mark somatic" cx="180" cy="219" r="3"/>
+  <circle class="mark somatic" cx="288" cy="219" r="3"/>
+  <circle class="mark somatic" cx="396" cy="219" r="3"/>
+  <circle class="mark ref" cx="504" cy="219" r="3"/>
+  <circle class="mark ref" cx="612" cy="219" r="3"/>
+  <circle class="mark ref" cx="720" cy="219" r="3"/>
+  <rect class="read hp1" x="150" y="225" width="600" height="6" rx="3"/>
+  <circle class="mark somatic" cx="180" cy="228" r="3"/>
+  <circle class="mark somatic" cx="288" cy="228" r="3"/>
+  <circle class="mark somatic" cx="396" cy="228" r="3"/>
+  <circle class="mark ref" cx="504" cy="228" r="3"/>
+  <circle class="mark ref" cx="612" cy="228" r="3"/>
+  <circle class="mark ref" cx="720" cy="228" r="3"/>
+  <rect class="read hp1" x="150" y="234" width="600" height="6" rx="3"/>
+  <circle class="mark somatic" cx="180" cy="237" r="3"/>
+  <circle class="mark somatic" cx="288" cy="237" r="3"/>
+  <circle class="mark somatic" cx="396" cy="237" r="3"/>
+  <circle class="mark ref" cx="504" cy="237" r="3"/>
+  <circle class="mark ref" cx="612" cy="237" r="3"/>
+  <circle class="mark ref" cx="720" cy="237" r="3"/>
+  <rect class="read hp1" x="150" y="243" width="600" height="6" rx="3"/>
+  <circle class="mark somatic" cx="180" cy="246" r="3"/>
+  <circle class="mark somatic" cx="288" cy="246" r="3"/>
+  <circle class="mark somatic" cx="396" cy="246" r="3"/>
+  <circle class="mark ref" cx="504" cy="246" r="3"/>
+  <circle class="mark ref" cx="612" cy="246" r="3"/>
+  <circle class="mark ref" cx="720" cy="246" r="3"/>
+  <rect class="read hp1" x="150" y="252" width="600" height="6" rx="3"/>
+  <circle class="mark somatic" cx="180" cy="255" r="3"/>
+  <circle class="mark somatic" cx="288" cy="255" r="3"/>
+  <circle class="mark somatic" cx="396" cy="255" r="3"/>
+  <circle class="mark ref" cx="504" cy="255" r="3"/>
+  <circle class="mark ref" cx="612" cy="255" r="3"/>
+  <circle class="mark ref" cx="720" cy="255" r="3"/>
+  <rect class="read hp1" x="150" y="261" width="600" height="6" rx="3"/>
+  <circle class="mark somatic" cx="180" cy="264" r="3"/>
+  <circle class="mark somatic" cx="288" cy="264" r="3"/>
+  <circle class="mark somatic" cx="396" cy="264" r="3"/>
+  <circle class="mark ref" cx="504" cy="264" r="3"/>
+  <circle class="mark ref" cx="612" cy="264" r="3"/>
+  <circle class="mark ref" cx="720" cy="264" r="3"/>
+  <rect class="read hp1" x="150" y="270" width="600" height="6" rx="3"/>
+  <circle class="mark somatic" cx="180" cy="273" r="3"/>
+  <circle class="mark somatic" cx="288" cy="273" r="3"/>
+  <circle class="mark somatic" cx="396" cy="273" r="3"/>
+  <circle class="mark ref" cx="504" cy="273" r="3"/>
+  <circle class="mark ref" cx="612" cy="273" r="3"/>
+  <circle class="mark ref" cx="720" cy="273" r="3"/>
+  <rect class="read hp1" x="150" y="282" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="285" r="3"/>
+  <circle class="mark ref" cx="288" cy="285" r="3"/>
+  <circle class="mark ref" cx="396" cy="285" r="3"/>
+  <circle class="mark somatic" cx="504" cy="285" r="3"/>
+  <circle class="mark somatic" cx="612" cy="285" r="3"/>
+  <circle class="mark somatic" cx="720" cy="285" r="3"/>
+  <rect class="read hp1" x="150" y="291" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="294" r="3"/>
+  <circle class="mark ref" cx="288" cy="294" r="3"/>
+  <circle class="mark ref" cx="396" cy="294" r="3"/>
+  <circle class="mark somatic" cx="504" cy="294" r="3"/>
+  <circle class="mark somatic" cx="612" cy="294" r="3"/>
+  <circle class="mark somatic" cx="720" cy="294" r="3"/>
+  <rect class="read hp1" x="150" y="300" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="303" r="3"/>
+  <circle class="mark ref" cx="288" cy="303" r="3"/>
+  <circle class="mark ref" cx="396" cy="303" r="3"/>
+  <circle class="mark somatic" cx="504" cy="303" r="3"/>
+  <circle class="mark somatic" cx="612" cy="303" r="3"/>
+  <circle class="mark somatic" cx="720" cy="303" r="3"/>
+  <rect class="read hp1" x="150" y="309" width="600" height="6" rx="3"/>
+  <circle class="mark ref" cx="180" cy="312" r="3"/>
+  <circle class="mark ref" cx="288" cy="312" r="3"/>
+  <circle class="mark ref" cx="396" cy="312" r="3"/>
+  <circle class="mark somatic" cx="504" cy="312" r="3"/>
+  <circle class="mark somatic" cx="612" cy="312" r="3"/>
+  <circle class="mark somatic" cx="720" cy="312" r="3"/>
+
+  <text class="tick zh" x="772" y="164">9 條（45%）</text>
+  <text class="tick zh" x="772" y="186">沒有變異 → HP1</text>
+  <text class="tick zh" x="772" y="239">7 條（35%）</text>
+  <text class="tick zh" x="772" y="261">帶 A B C → HP1-1</text>
+  <text class="tick zh" x="772" y="291">4 條（20%）</text>
+  <text class="tick zh" x="772" y="313">帶 D E F → HP1-2</text>
+
+  <line class="guide" x1="24" y1="340" x2="976" y2="340"/>
+
+  <text class="anno bold zh" x="24" y="368">① 逐<tspan class="bad">位點</tspan>數 → VAF</text>
+  <text class="tick mono" x="24" y="398">VAF(A) = VAF(B) = VAF(C) = 7/20 = 0.35</text>
+  <text class="tick mono" x="24" y="422">VAF(D) = VAF(E) = VAF(F) = 4/20 = 0.20</text>
+  <text class="tick zh" x="24" y="450">六個位點 → 六個數字</text>
+
+  <text class="anno bold zh" x="532" y="368">② 逐<tspan class="ok">單倍型</tspan>數 → 單倍型頻率</text>
+  <text class="tick mono" x="532" y="398">HP1   = 9/20 = 0.45</text>
+  <text class="tick mono" x="532" y="422">HP1-1 = 7/20 = 0.35</text>
+  <text class="tick mono" x="532" y="446">HP1-2 = 4/20 = 0.20</text>
+  <text class="tick zh" x="532" y="472">三條單倍型 → 三個數字</text>
+
+  <rect class="box accent" x="24" y="486" width="952" height="36" rx="8"/>
+  <text class="tick zh" x="48" y="510">沒有分子同時帶 A B C 與 D E F，所以 HP1-1 與 HP1-2 是<tspan class="bold">兄弟</tspan> —— 而這只有在一條分子跨得過這六個位點時才數得出來。</text>
+</svg>
