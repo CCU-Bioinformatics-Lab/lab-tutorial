@@ -12793,7 +12793,7 @@ evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
   </article>
 <hr>
 <article class="module" id="sr2">
-    <header class="mhead"><p class="mhead__kicker">研究指引 · Subclone 系統發生重建 · Part 2 — constraints from multi-mutation regions</p><h1>下篇：用多變異區域的關係改善全基因體重建</h1><p class="mhead__sub">那 5% 給的不是更多資料點，是資料點之間的關係。把現行實作已經算出來的串接／分岔收成三種約束，過兩道品質閘門，再餵進全基因體的混合模型 —— 而錯的約束比沒有約束更糟。</p><p class="mhead__meta"><a class="chip" href="sr1.html">建議先修：Subclone 重建</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>說出 95% 與 5% 的區域各自貢獻什麼：一個定峰的位置，一個定峰之間的關係</li><li>列出三種可以從多變異區域收出來的約束，以及每一種在全基因體重建裡各自解決什麼問題</li><li>說明為什麼「兩群大小相同」在 VAF 頻率譜上是結構性盲點，而一條「不可同群」就能打破它</li><li>說出為什麼假約束比沒有約束更糟，以及兩道品質閘門各自擋的是什麼</li><li>算出在給定突變負荷下能收到幾條約束，並說明為什麼那個數量已經夠用</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">研究指引 · Subclone 系統發生重建 · Part 2 — constraints from multi-mutation regions</p><h1>下篇：用多變異區域的關係改善全基因體重建</h1><p class="mhead__sub">那 5% 給的不是更多資料點，是資料點之間的關係。把現行實作已經算出來的串接／分岔收成三種約束，過兩道品質閘門，再餵進全基因體的混合模型 —— 而錯的約束比沒有約束更糟。</p><p class="mhead__meta"><a class="chip" href="sr1.html">建議先修：Subclone 重建</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>寫出「只用 VAF 頻率譜重建 subclone」的估計式，並指出它三個弱點各落在哪一個參數上</li><li>說明 5% 的多變異區域為什麼不是第二批資料，以及它與 95% 的接合點是哪一個變數</li><li>用一個具體的數字例子說明：兩群細胞比例相同時 K 為什麼不可辨識，而一條「不可同群」怎麼把線性樹改回分支樹</li><li>說出一條約束改變了什麼、沒改變什麼 —— 為什麼幾百條就夠，而它不能拿來分配一萬五千個變異</li><li>說出假約束為什麼比沒有約束更糟，以及兩道品質閘門各自擋的是什麼</li></ul></section>
 
 <section data-part="why" class="part" id="sr2__part-why">
 <h2 data-num="①" id="sr2__為什麼重要">為什麼重要</h2>
@@ -12870,19 +12870,17 @@ evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
 5% 的區域給關係，決定哪些峰真的是分開的、峰該多寬、峰之間的比例，以及誰是誰的祖先。
 兩者餵進同一個混合模型，輸出才是全基因體的群與樹。</figcaption></figure>
 
+<p class="prose">但「餵進同一個混合模型」這句話本身沒有任何資訊量。
+<b>這一頁要回答的是：那個混合模型具體長什麼樣，5% 到底接在它的哪一個地方，
+接上去之後輸出有什麼不同。</b>
+所以第一節不談 5%，先把只用 VAF 的那條路線從 read 一路寫到樹 ——
+沒有那個對象，「改善」就無從說起。</p>
+
 <p class="prose">而這一頁真正的出發點是下面這件事：
 <b>本實驗室現行的實作，其實已經在算右邊那一欄了。</b>
 它對每一個「區域 × <span class="term" data-term="somatic haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-somatic-haplotype-1">單倍型家族<span class="term__pop" id="sr2__gd-somatic-haplotype-1" role="tooltip"><b class="term__hd">somatic haplotype</b><span class="term__def" data-lang="zh">在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</span><span class="term__def" data-lang="en" lang="en">A sub-level beneath the germline haplotype: HP1-1 and HP2-1 carry somatic mutations derived from HP1 and HP2; HP3 is unassignable.</span><a class="term__more" href="glossary.html#somatic-haplotype">完整條目 →</a></span></span>」（<b>以下簡稱一個「單位」</b>）
 都判過是串接還是分岔 ——
 那些判定<b>就是</b>約束，只是它們停在區域層級，從來沒有被送到全基因體那一層。</p>
-
-<p class="prose">所以要做的事有兩件，順序不能顛倒：</p>
-
-<ol class="prose">
-<li><b>把那些判定變得可信。</b>直接拿現行輸出當約束會出事 ——
-真實資料裡有相當比例的判定是在證據不足的情況下做出來的，而<b>錯的約束比沒有約束更糟</b>。</li>
-<li><b>把它們接到全基因體的混合模型上。</b>頻率定位置，約束定個數、寬度、比例與先後。</li>
-</ol>
 
 <p class="prose"><b>這一頁不是教材。</b>它假設你讀完上篇，給的是式子、參數與失敗模式。
 範圍限定在<b>單倍型</b>；甲基化只在最後出現一次，而且是當成解讀上限，不是一條資料通道。</p>
@@ -12892,7 +12890,253 @@ evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
 <section data-part="concept" class="part" id="sr2__part-concept">
 <h2 data-num="②" id="sr2__概念與互動">概念與互動</h2>
 
-<h3 id="sr2__一-5-能做的三件事">一、5% 能做的三件事</h3>
+<h3 id="sr2__一-先把-vaf-那條路線的估計式寫出來">一、先把 VAF 那條路線的估計式寫出來</h3>
+
+<p class="prose">這一節講的是<b>不用任何長讀關係</b>、只靠一維頻率譜做重建的標準做法 ——
+PyClone、SciClone、MOBSTER 那一系的共同骨架。四步。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" class="dia-svg" role="img" aria-labelledby="sr2__sr2-vaf-route__title" aria-describedby="sr2__sr2-vaf-route__desc">
+  <title id="sr2__sr2-vaf-route__title">只用 VAF 頻率譜重建 subclone 的四個步驟，以及三個弱點各落在哪一個參數上</title>
+  <desc id="sr2__sr2-vaf-route__desc">由左而右四個步驟，這是不使用任何長讀關係、只靠一維頻率譜的標準做法。
+        第一步是換算：一個位點的 read 分成帶變異與不帶變異兩堆，比值是 VAF，
+        再除以純度的一半換算成癌細胞比例。這一步需要三個外部估計值，
+        分別是全樣本一個的純度、每個區段一個的拷貝數、每個變異一個的 multiplicity。
+        第二步是把一萬五千個換算後的數值疊成一維直方圖，配上混合模型，
+        每一群有位置、高度與寬度三個參數，而每個變異屬於哪一群是看不到的潛在變數，
+        在這個式子裡被加總積掉了。
+        第三步是決定總共有幾群，用的是模型選擇準則而不是參數估計。
+        第四步是從各群的細胞比例建樹，規則是父節點的比例不能小於子節點的比例總和，
+        但這條規則通常無法把候選縮到只剩一棵，剩下的要靠簡約性之類的偏好挑。
+        圖的下方列出三個弱點，各自用箭頭指回它所在的步驟：
+        群數不可辨識，落在潛在變數與群數上；
+        寬度參數與群數互相吃，落在寬度上；
+        細胞比例要靠三個外部估計值換算，落在位置上。
+        讀法是：這三個弱點就是後面三個用途各自要補的格子，一項對一個。</desc>
+
+  <text class="ttl zh" x="20" y="38">只用 VAF：從 read 到樹的四步</text>
+  <text class="anno zh" x="20" y="66">這是要被改善的對象。三個弱點在最下方，各對應後面一個用途。</text>
+
+  <!-- ─────────── 步驟橫幅 ─────────── -->
+  <line class="axis" x1="20" y1="86" x2="980" y2="86"/>
+
+  <!-- ① 換算 -->
+  <text class="lbl bold zh" x="20" y="118">① 換算</text>
+  <text class="tick zh" x="20" y="142">每個變異 → 一個細胞比例</text>
+
+  <rect class="box plain" x="20" y="158" width="200" height="150" rx="6"/>
+  <!-- 一個位點的 read 堆 -->
+  <rect class="bar somatic" x="38" y="176" width="16" height="26"/>
+  <rect class="bar somatic" x="58" y="176" width="16" height="26"/>
+  <rect class="bar somatic" x="78" y="176" width="16" height="26"/>
+  <rect class="bar" x="98"  y="176" width="16" height="26"/>
+  <rect class="bar" x="118" y="176" width="16" height="26"/>
+  <rect class="bar" x="138" y="176" width="16" height="26"/>
+  <rect class="bar" x="158" y="176" width="16" height="26"/>
+  <rect class="bar" x="178" y="176" width="16" height="26"/>
+  <text class="tick mid somatic" x="66" y="220">a = 3</text>
+  <text class="tick mid" x="146" y="220">d = 8</text>
+
+  <text class="lbl mono" x="38" y="252">VAF = a/d</text>
+  <text class="tick zh" x="38" y="276">再換算成 CCF：</text>
+  <text class="lbl mono" x="38" y="300">c = 2·VAF / ρ</text>
+
+  <!-- 外部估計值 -->
+  <rect class="box sunken" x="20" y="322" width="200" height="96" rx="6"/>
+  <text class="tick bold zh" x="34" y="344">要三個外部估計值</text>
+  <text class="tick mono" x="34" y="366">ρ    純度 · 全樣本一個</text>
+  <text class="tick mono" x="34" y="386">CN   拷貝數 · 每區段一個</text>
+  <text class="tick mono" x="34" y="406">μ    multiplicity · 每變異</text>
+
+  <path class="conn" d="M228,240 L262,240" marker-end="url(#arrow)"/>
+
+  <!-- ② 混合模型 -->
+  <text class="lbl bold zh" x="272" y="118">② 配混合模型</text>
+  <text class="tick zh" x="272" y="142">15,500 個 c 疊成一維直方圖</text>
+
+  <rect class="box plain" x="272" y="158" width="228" height="150" rx="6"/>
+  <rect class="bar" x="292" y="262" width="17" height="24"/>
+  <rect class="bar" x="311" y="248" width="17" height="38"/>
+  <rect class="bar hp1" x="330" y="212" width="17" height="74"/>
+  <rect class="bar hp1" x="349" y="196" width="17" height="90"/>
+  <rect class="bar hp1" x="368" y="216" width="17" height="70"/>
+  <rect class="bar" x="387" y="252" width="17" height="34"/>
+  <rect class="bar" x="406" y="244" width="17" height="42"/>
+  <rect class="bar hp2" x="425" y="204" width="17" height="82"/>
+  <rect class="bar hp2" x="444" y="186" width="17" height="100"/>
+  <rect class="bar hp2" x="463" y="228" width="17" height="58"/>
+  <line class="axis" x1="286" y1="286" x2="488" y2="286"/>
+  <text class="tick mid" x="387" y="304">CCF →</text>
+
+  <text class="tick mono" x="272" y="336">a_m | z_m=k ~ BetaBin(d_m, θ_k, φ)</text>
+  <text class="tick mono" x="272" y="360">θ_k 位置 · π_k 高度 · φ 寬度</text>
+  <rect class="box ghost bad" x="268" y="372" width="236" height="46" rx="6"/>
+  <text class="tick bold zh bad" x="280" y="392">z_m 在這一步被「積掉」了</text>
+  <text class="tick zh" x="280" y="410">—— 5% 要接的正是它</text>
+
+  <path class="conn" d="M508,240 L542,240" marker-end="url(#arrow)"/>
+
+  <!-- ③ 決定 K -->
+  <text class="lbl bold zh" x="552" y="118">③ 決定 K</text>
+  <text class="tick zh" x="552" y="142">總共幾群？</text>
+
+  <rect class="box plain" x="548" y="158" width="184" height="150" rx="6"/>
+  <text class="tick zh" x="562" y="184">BIC</text>
+  <text class="tick zh" x="562" y="206">Dirichlet process</text>
+  <text class="tick zh" x="562" y="228">MOBSTER 的冪次尾</text>
+  <rect class="box ghost bad" x="558" y="242" width="164" height="52" rx="6"/>
+  <text class="tick bold zh bad" x="570" y="264">這是模型選擇，</text>
+  <text class="tick bold zh bad" x="570" y="284">不是參數估計</text>
+
+  <path class="conn" d="M736,240 L770,240" marker-end="url(#arrow)"/>
+
+  <!-- ④ 建樹 -->
+  <text class="lbl bold zh" x="780" y="118">④ 建樹</text>
+  <text class="tick zh" x="780" y="142">從 {c_k} 排出先後</text>
+
+  <rect class="box plain" x="780" y="158" width="200" height="150" rx="6"/>
+  <circle class="mark germline" cx="880" cy="190" r="13"/>
+  <text class="tick mid" x="880" y="195">A</text>
+  <path class="conn" d="M880,203 L840,232"/>
+  <path class="conn" d="M880,203 L920,232"/>
+  <circle class="mark hp1" cx="836" cy="242" r="13"/>
+  <text class="tick mid" x="836" y="247">B</text>
+  <circle class="mark hp2" cx="924" cy="242" r="13"/>
+  <text class="tick mid" x="924" y="247">C</text>
+  <text class="tick mono mid" x="880" y="284">c_A ≥ c_B + c_C</text>
+
+  <rect class="box ghost bad" x="776" y="322" width="204" height="96" rx="6"/>
+  <text class="tick bold zh bad" x="790" y="346">pigeonhole 通常縮不到</text>
+  <text class="tick bold zh bad" x="790" y="368">只剩一棵樹</text>
+  <text class="tick zh" x="790" y="392">剩下的靠簡約性之類的</text>
+  <text class="tick zh" x="790" y="410">偏好挑 —— 那不是資料</text>
+
+  <!-- ─────────── 三個弱點 ─────────── -->
+  <line class="axis" x1="20" y1="448" x2="980" y2="448"/>
+  <text class="lbl bold zh" x="20" y="482">這條路線的三個弱點 —— 5% 的三個用途正好一項對一個</text>
+
+  <rect class="box bad" x="20" y="500" width="308" height="176" rx="6"/>
+  <text class="lbl bold zh bad" x="38" y="530">弱點一：K 不可辨識</text>
+  <text class="anno zh" x="38" y="558">兩群的 c 相同時，似然對</text>
+  <text class="anno zh" x="38" y="582">「一群還是兩群」完全不變。</text>
+  <text class="anno zh" x="38" y="606">加深定序也進不到這個方向。</text>
+  <text class="tick bold mono" x="38" y="638">參數：z → K</text>
+  <text class="tick bold zh ok" x="38" y="662">→ 用途一補</text>
+
+  <rect class="box bad" x="346" y="500" width="308" height="176" rx="6"/>
+  <text class="lbl bold zh bad" x="364" y="530">弱點二：φ 與 K 互相吃</text>
+  <text class="anno zh" x="364" y="558">一個寬峰，和兩個靠近的</text>
+  <text class="anno zh" x="364" y="582">窄峰，配出幾乎一樣的圖。</text>
+  <text class="anno zh" x="364" y="606">選哪一個取決於懲罰項。</text>
+  <text class="tick bold mono" x="364" y="638">參數：φ</text>
+  <text class="tick bold zh ok" x="364" y="662">→ 用途二補</text>
+
+  <rect class="box bad" x="672" y="500" width="308" height="176" rx="6"/>
+  <text class="lbl bold zh bad" x="690" y="530">弱點三：c 要靠換算</text>
+  <text class="anno zh" x="690" y="558">ρ 錯了整排一起平移；</text>
+  <text class="anno zh" x="690" y="582">CN 或 μ 錯了是逐個變異</text>
+  <text class="anno zh" x="690" y="606">跑位，會把群染髒。</text>
+  <text class="tick bold mono" x="690" y="638">參數：c</text>
+  <text class="tick bold zh ok" x="690" y="662">→ 用途三補</text>
+</svg><figcaption>只用 VAF 的四步：換算、配混合模型、決定 K、用 pigeonhole 建樹。
+三個灰底方塊是外部估計值，三個紅字是這條路線的弱點 ——
+它們分別落在 K、φ 與 c 上，而 5% 的三個用途正好一項對一個。</figcaption></figure>
+
+<h4 id="sr2__第一步-每個變異換成一個細胞比例">第一步：每個變異換成一個細胞比例</h4>
+
+<p class="prose">位點 <code>m</code> 有 <code>d_m</code> 條 read，其中 <code>a_m</code> 條帶變異，
+<code>VAF_m = a_m / d_m</code>。但 VAF 不能直接互相比較，因為它同時被三件事稀釋：
+正常細胞、該處的拷貝數、以及變異在每個帶原細胞裡有幾份拷貝。換算式是：</p>
+
+<pre><code>E[VAF_m]  =        ρ · c_m · μ_m
+             ───────────────────────
+             ρ · CN_m  +  2 · (1 − ρ)
+
+  ρ    純度（全樣本一個）
+  c_m  帶有這個變異的癌細胞比例 —— 這才是要拿去分群的量（CCF）
+  CN_m 該區段的腫瘤拷貝數（每個區段一個）
+  μ_m  multiplicity：帶原細胞裡這個變異有幾份（每個變異一個）
+
+二倍體、拷貝數正常、μ = 1 時整式塌成   E[VAF] = ρ·c / 2   →   c = 2·VAF / ρ</code></pre>
+
+<p class="prose">注意這一步就要<b>三個外部估計值</b>，而且尺度不同：ρ 是全樣本一個，
+CN 是每個區段一個，μ 是<b>每個變異</b>一個。上篇說的第一層不確定性就是這裡。</p>
+
+<h4 id="sr2__第二步-把一萬五千個-c-疊成一維直方圖-配混合模型">第二步：把一萬五千個 c 疊成一維直方圖，配混合模型</h4>
+
+<p class="prose">假設有 <code>K</code> 群，細胞比例 <code>c_1 … c_K</code>；
+每個變異有一個看不到的群歸屬 <code>z_m ∈ {1…K}</code>，各群佔的變異比例是 <code>π_k</code>。
+分群做的事就是把下面這個式子最大化：</p>
+
+<pre><code>a_m | z_m = k   ~   BetaBinomial( d_m ,  θ_k = ρ·c_k / 2 ,  φ )
+
+ℒ(K, π, c, φ)  =  Σ_m  log  Σ_k  π_k · BetaBin( a_m ; d_m , ρ·c_k/2 , φ )
+                            └──────┬──────┘
+                          z_m 被「積掉」了 —— 這一點等一下是關鍵
+
+  θ_k  第 k 群在 VAF 軸上的位置（峰落在哪）
+  π_k  第 k 群佔多少個變異（峰多高）
+  φ    超離散度：峰有多寬。通常跟著一起擬合</code></pre>
+
+<h4 id="sr2__第三步-決定-k">第三步：決定 K</h4>
+
+<p class="prose">用 BIC、Dirichlet process，或 MOBSTER 那種把中性演化的尾巴另外用冪次分布吸走的做法。
+<b>這是整條路線最脆弱的一步</b>，因為它不是參數估計而是<b>模型選擇</b> ——
+它問的是「幾群」，而不是「這幾群在哪」。</p>
+
+<h4 id="sr2__第四步-從-c_k-建樹">第四步：從 {c_k} 建樹</h4>
+
+<p class="prose">用 pigeonhole：節點 <code>k</code> 要能當一組子節點 <code>S</code> 的父節點，
+必須 <code>c_k ≥ Σ_{j∈S} c_j</code> —— 子代細胞是父代的子集，加起來不能超過父代。
+但這條規則<b>通常縮不到只剩一棵樹</b>，剩下的由<span class="term" data-term="parsimony" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-parsimony-2">簡約性<span class="term__pop" id="sr2__gd-parsimony-2" role="tooltip"><b class="term__hd">parsimony <i>簡約法</i></b><span class="term__def" data-lang="zh">在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</span><span class="term__def" data-lang="en" lang="en">Choosing, among all solutions compatible with the data, the one requiring the fewest steps or lowest cost. It is a preference rather than evidence: when several solutions tie, parsimony picks one, but the data has not ruled the others out.</span><a class="term__more" href="glossary.html#parsimony">完整條目 →</a></span></span>之類的偏好挑掉。
+（上篇那一題問的就是這件事：「通過檢查」與「被證明」是兩回事。）</p>
+
+<h4 id="sr2__這條路線的三個弱點-而它們正好各對應一個用途">這條路線的三個弱點 —— 而它們正好各對應一個用途</h4>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">弱點</th><th scope="col">具體是什麼</th><th scope="col">落在哪個參數</th><th scope="col">誰來補</th></tr></thead>
+<tbody>
+<tr><td><b>K 不可辨識</b></td><td>兩群的 c 相同時，似然對「一群還是兩群」完全不變</td><td><code>z</code> → <code>K</code></td><td>用途一</td></tr>
+<tr><td><b>φ 與 K 互相吃</b></td><td>一個寬峰與兩個靠近的窄峰，配出幾乎一樣的直方圖</td><td><code>φ</code></td><td>用途二</td></tr>
+<tr><td><b>c 要靠三個估計值換算</b></td><td>ρ 錯了整排平移；CN／μ 錯了是逐個變異跑位</td><td><code>c</code></td><td>用途三</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">接下來三節就是逐一補這三格。</p>
+
+<h3 id="sr2__二-5-的變異就在那一萬五千個點裡面">二、5% 的變異就在那一萬五千個點裡面</h3>
+
+<p class="prose">這一節回答「怎麼融入」，而答案比想像中小 —— 小到不需要新框架。</p>
+
+<p class="prose">最容易誤解的一點：多變異區域<b>不是第二批資料</b>。
+那 1,475 個變異本來就在上一節那 15,500 個點裡面，
+它們照樣有自己的 <code>a_m</code>、<code>d_m</code>，照樣進同一個直方圖、
+照樣被第二步那個式子算過。
+<b>5% 多給的不是新的觀測值，是對這些點的 <code>z_m</code> 的限制。</b></p>
+
+<p class="prose">所以接合點就是 <code>z_m</code> <b>這一個變數</b>。它同時出現在兩邊：</p>
+
+<ul class="prose">
+<li><b>頻率那一邊</b>：<code>z_m</code> 決定 <code>a_m</code> 該從哪一個成分抽出來 —— 第一節第二步。</li>
+<li><b>關係那一邊</b>：一條「不可同群 (i, j)」說的就是 <code>z_i ≠ z_j</code>。</li>
+</ul>
+
+<p class="prose">而第一節那個式子把 <code>z_m</code> <b>積掉了</b>（<code>Σ_k π_k …</code> 那一步）。
+要接上 5%，唯一要做的結構性改動就是<b>不要積掉它</b> ——
+把 <code>z</code> 從「被邊際化的潛在變數」改成「被約束的潛在變數」。
+沒有第二個似然、沒有兩種資料怎麼加權的問題，因為它們本來就是同一批點。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">用途</th><th scope="col">動的是估計式的哪一項</th><th scope="col">動法</th></tr></thead>
+<tbody>
+<tr><td><b>一</b></td><td><code>z</code>（連帶 <code>K</code>）</td><td>加不等式限制，讓 K 從不可辨識變成可辨識</td></tr>
+<tr><td><b>二</b></td><td><code>φ</code></td><td>從自由參數改成量出來、代進去的常數</td></tr>
+<tr><td><b>三</b></td><td><code>c</code> 之間的比值</td><td>加等式限制，把 ρ 從換算因子降成整體縮放</td></tr>
+</tbody>
+</table>
+</div>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" class="dia-svg" role="img" aria-labelledby="sr2__sr2-five-percent__title" aria-describedby="sr2__sr2-five-percent__desc">
   <title id="sr2__sr2-five-percent__title">讓 5% 的多變異區域去改善 95% 的單變異頻率譜</title>
@@ -12980,722 +13224,246 @@ evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
 
   <rect class="box bad" x="24" y="556" width="952" height="52" rx="8"/>
   <text class="anno zh bad" x="48" y="588">前提：假的分岔會變成假的硬約束，而<tspan class="bold">硬約束錯了比沒有更糟</tspan> —— 逐對檢定力閘門必須先做。</text>
-</svg><figcaption>兩群細胞若佔的比例剛好一樣，在一維頻率軸上就是同一個點，
-再深的定序也分不開。而一個「沒有分子同時帶兩者」的觀測，就足以把那根峰拆開。
-下方是約束預算與它成立的前提。</figcaption></figure>
+</svg><figcaption>三個用途的來源與代價一次看完。
+上排是簡併的機制與破解它的一個觀測，中排是三種約束，
+下排是約束預算 —— 以及它成立的前提：假的分岔會變成假的硬約束。</figcaption></figure>
 
-<h4 id="sr2__用途一-打破一維上的簡併">用途一：打破一維上的簡併</h4>
+<h3 id="sr2__三-用途一-讓-有幾群-變得可辨識">三、用途一：讓「有幾群」變得可辨識</h3>
 
-<p class="prose">VAF 頻率譜有一個<b>結構性</b>的盲點：兩群細胞如果佔的比例一樣，
-它們在頻率軸上就是<b>同一個點</b>。這不是精度問題 —— 加深定序、增加變異數、
-換更好的 caller 都沒有用，因為那個方向上的似然本來就是平的。</p>
+<h4 id="sr2__先把-似然是平的-寫成式子">先把「似然是平的」寫成式子</h4>
 
-<p class="prose">但只要有一對變異落在同一個區域、分屬那兩群，而且觀測到沒有分子同時帶兩者，
-就得到一條<b>硬約束</b>：這兩個變異不可能屬於同一群。混合模型被迫把那根峰拆成兩個成分。
-這是<b>可辨識性</b>的改變，不是精度的改變 ——
-可辨識性講的是「資料<b>原則上</b>分不分得出這兩種情況」，
-精度講的是「分得出來，但量得準不準」。前者加再多資料也不會變，後者會。
-這也是這條路線最強的一個論點。</p>
+<p class="prose">假設真相是兩群 B、C，細胞比例剛好相同：<code>c_B = c_C = c</code>。
+那麼它們在 VAF 軸上的位置也相同：<code>θ_B = θ_C = ρc/2</code>。
+代進第一節第二步那個混合式：</p>
 
-<h4 id="sr2__用途二-直接量出-峰應該多寬">用途二：直接量出「峰應該多寬」</h4>
+<pre><code>π_B · BetaBin(a; d, θ, φ)  +  π_C · BetaBin(a; d, θ, φ)
+      =  (π_B + π_C) · BetaBin(a; d, θ, φ)
 
-<p class="prose">這一項不需要任何假設，值得優先做。</p>
+左邊是兩群，右邊是一群 —— 而它們對「任何一筆可能出現的資料」給出的機率完全相同。</code></pre>
 
-<p class="prose">在 VAF 頻率譜裡，一群的寬度 ＝ 生物學上的離散 ＋ 技術雜訊，兩者混在一起分不開。
-但是<b>同一條單倍型上的幾個變異，真實頻率完全相同</b> ——
+<p class="prose">不是接近，是<b>相等</b>。似然只透過 <code>π_B + π_C</code> 依賴這兩個參數，
+所以 <code>(π_B, π_C)</code> 本身<b>不可辨識</b>。
+再加上 BIC 這類準則會罰多出來的參數，模型選擇必然挑 K 小的那一個。</p>
+
+<p class="prose">這就是「加深定序沒有用」的精確意思：
+資料量只透過似然影響結論，而似然在這個方向上是<b>常數</b>。
+換 caller、加變異數、提高深度，全部進不到這個方向裡。</p>
+
+<h4 id="sr2__一個具體的例子">一個具體的例子</h4>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 660" class="dia-svg" role="img" aria-labelledby="sr2__sr2-degeneracy__title" aria-describedby="sr2__sr2-degeneracy__desc">
+  <title id="sr2__sr2-degeneracy__title">一個具體例子：兩群細胞比例相同時只用 VAF 會少數一群並把樹判成線性，一條不可同群就改回分支</title>
+  <desc id="sr2__sr2-degeneracy__desc">純度百分之六十、二倍體、每個帶原細胞只有一份變異拷貝。
+        左欄是真相：三群細胞，A 佔全部腫瘤細胞，B 與 C 各佔百分之四十，
+        而 B 與 C 是兩個分開的分支，都直接長在 A 底下。
+        中欄是只看 VAF 直方圖會得到的結果：
+        A 的期望 VAF 是零點三零，B 與 C 的期望 VAF 都是零點一二，
+        因為兩群的細胞比例相同，所以它們在頻率軸上疊成同一根峰。
+        混合模型配出兩群，樹是 A 到 B 一條線。
+        這不是擬合失敗，兩群就是這組資料的最大似然解，
+        因為把一個成分拆成兩個位置相同的成分，似然完全不變，
+        而模型選擇準則會罰多出來的參數。
+        右欄是加上一條約束之後：B 裡的變異 i 與 C 裡的變異 j 落在同一個分析單位裡，
+        觀測到沒有任何分子同時帶著兩者，於是 i 與 j 不可能屬於同一群。
+        兩群的解在零點一二那根峰上只有一個成分，必然把 i 與 j 指到同一群，
+        所以那個解變成不可行，最好的可行解是三群，
+        其中兩個成分落在同一個位置。
+        這時父節點的比例零點四加零點四等於零點八，不超過 A 的一點零，
+        所以分支的樹才被允許。
+        最下方標注：改變的是樹的形狀與群的個數，不是某個數字的小數點；
+        而且這一條約束只釘住 i 與 j 兩個變異，
+        那根峰裡其餘的變異歸屬仍然分不出來。</desc>
+
+  <text class="ttl zh" x="20" y="38">ρ ＝ 0.60、二倍體、μ ＝ 1：一條約束把線性樹改回分支樹</text>
+  <text class="anno zh" x="20" y="66">三欄的直方圖是同一組資料。差別只在有沒有那一條「不可同群」。</text>
+  <line class="axis" x1="20" y1="86" x2="980" y2="86"/>
+
+  <!-- ══════════ 左欄：真相 ══════════ -->
+  <text class="lbl bold zh" x="20" y="120">真相</text>
+  <rect class="box plain" x="20" y="136" width="292" height="238" rx="6"/>
+
+  <circle class="mark germline" cx="166" cy="176" r="16"/>
+  <text class="tick mid" x="166" y="182">A</text>
+  <path class="conn" d="M166,192 L112,228" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M166,192 L220,228" marker-end="url(#arrow-sm)"/>
+  <circle class="mark hp1" cx="106" cy="240" r="16"/>
+  <text class="tick mid" x="106" y="246">B</text>
+  <circle class="mark hp2" cx="226" cy="240" r="16"/>
+  <text class="tick mid" x="226" y="246">C</text>
+
+  <text class="tick mono mid" x="166" y="290">CCF   A 1.00</text>
+  <text class="tick mono mid hp1" x="106" y="314">B 0.40</text>
+  <text class="tick mono mid hp2" x="226" y="314">C 0.40</text>
+  <text class="tick bold zh mid" x="166" y="348">B 與 C 是兩個分開的分支，</text>
+  <text class="tick bold zh mid" x="166" y="366">但細胞比例剛好一樣</text>
+
+  <!-- ══════════ 中欄：只用 VAF ══════════ -->
+  <text class="lbl bold zh bad" x="354" y="120">只用 VAF 直方圖</text>
+  <rect class="box bad" x="354" y="136" width="292" height="238" rx="6"/>
+
+  <rect class="bar" x="376" y="270" width="16" height="22"/>
+  <rect class="bar" x="394" y="258" width="16" height="34"/>
+  <rect class="bar warn" x="412" y="206" width="16" height="86"/>
+  <rect class="bar warn" x="430" y="180" width="16" height="112"/>
+  <rect class="bar warn" x="448" y="212" width="16" height="80"/>
+  <rect class="bar" x="466" y="264" width="16" height="28"/>
+  <rect class="bar" x="484" y="272" width="16" height="20"/>
+  <rect class="bar" x="502" y="268" width="16" height="24"/>
+  <rect class="bar germline" x="520" y="228" width="16" height="64"/>
+  <rect class="bar germline" x="538" y="200" width="16" height="92"/>
+  <rect class="bar germline" x="556" y="240" width="16" height="52"/>
+  <rect class="bar" x="574" y="276" width="16" height="16"/>
+  <rect class="bar" x="592" y="282" width="16" height="10"/>
+  <line class="axis" x1="370" y1="292" x2="620" y2="292"/>
+  <text class="tick mono mid" x="430" y="312">0.12</text>
+  <text class="tick mono mid" x="538" y="312">0.30</text>
+  <text class="tick mid" x="620" y="312">VAF</text>
+
+  <text class="tick bold zh bad mid" x="430" y="166">B 與 C 疊在這裡</text>
+
+  <circle class="mark germline" cx="470" cy="342" r="13"/>
+  <text class="tick mid" x="470" y="347">A</text>
+  <path class="conn" d="M483,342 L513,342" marker-end="url(#arrow-sm)"/>
+  <circle class="mark hp1" cx="526" cy="342" r="13"/>
+  <text class="tick mid" x="526" y="347">B</text>
+  <text class="tick bold zh bad" x="372" y="347">估出 K ＝ 2</text>
+  <text class="tick zh bad" x="548" y="347">線性樹</text>
+
+  <!-- ══════════ 右欄：加一條約束 ══════════ -->
+  <text class="lbl bold zh ok" x="688" y="120">＋ 一條「不可同群」</text>
+  <rect class="box ok" x="688" y="136" width="292" height="238" rx="6"/>
+
+  <rect class="bar" x="710" y="270" width="16" height="22"/>
+  <rect class="bar" x="728" y="258" width="16" height="34"/>
+  <rect class="bar warn" x="746" y="206" width="16" height="86"/>
+  <rect class="bar warn" x="764" y="180" width="16" height="112"/>
+  <rect class="bar warn" x="782" y="212" width="16" height="80"/>
+  <rect class="bar" x="800" y="264" width="16" height="28"/>
+  <rect class="bar" x="818" y="272" width="16" height="20"/>
+  <rect class="bar" x="836" y="268" width="16" height="24"/>
+  <rect class="bar germline" x="854" y="228" width="16" height="64"/>
+  <rect class="bar germline" x="872" y="200" width="16" height="92"/>
+  <rect class="bar germline" x="890" y="240" width="16" height="52"/>
+  <rect class="bar" x="908" y="276" width="16" height="16"/>
+  <rect class="bar" x="926" y="282" width="16" height="10"/>
+  <line class="axis" x1="704" y1="292" x2="954" y2="292"/>
+  <text class="tick mono mid" x="764" y="312">0.12</text>
+  <text class="tick mono mid" x="872" y="312">0.30</text>
+
+  <!-- 同一批長條，改成兩個成分來解釋 —— 資料沒變，模型變了 -->
+  <circle class="mark hp1" cx="748" cy="164" r="11"/>
+  <text class="tick mid" x="748" y="169">B</text>
+  <circle class="mark hp2" cx="780" cy="164" r="11"/>
+  <text class="tick mid" x="780" y="169">C</text>
+  <path class="conn ok" d="M748,175 L764,196" marker-end="url(#arrow-sm)"/>
+  <path class="conn ok" d="M780,175 L764,196" marker-end="url(#arrow-sm)"/>
+  <text class="tick bold zh ok" x="800" y="169">同一根峰，兩個成分</text>
+
+  <circle class="mark germline" cx="800" cy="336" r="13"/>
+  <text class="tick mid" x="800" y="341">A</text>
+  <path class="conn" d="M800,349 L772,362" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M800,349 L828,362" marker-end="url(#arrow-sm)"/>
+  <circle class="mark hp1" cx="766" cy="366" r="12"/>
+  <text class="tick mid" x="766" y="371">B</text>
+  <circle class="mark hp2" cx="834" cy="366" r="12"/>
+  <text class="tick mid" x="834" y="371">C</text>
+  <text class="tick bold zh ok" x="704" y="341">K = 3</text>
+  <text class="tick zh ok" x="856" y="341">分支樹</text>
+
+  <!-- ══════════ 下半：為什麼 ══════════ -->
+  <line class="axis" x1="20" y1="398" x2="980" y2="398"/>
+
+  <text class="lbl bold zh" x="20" y="432">為什麼「只用 VAF」必然估出 K ＝ 2</text>
+  <rect class="box sunken" x="20" y="448" width="480" height="118" rx="6"/>
+  <text class="tick mono" x="36" y="478">π_B·BetaBin(a; d, θ, φ) + π_C·BetaBin(a; d, θ, φ)</text>
+  <text class="tick mono" x="36" y="504">      = (π_B + π_C)·BetaBin(a; d, θ, φ)</text>
+  <text class="anno zh" x="36" y="534">兩群與一群對<tspan class="bold">任何一筆</tspan>可能的資料給出相同的機率。</text>
+  <text class="anno zh" x="36" y="556">不是接近，是相等 —— 所以 (π_B, π_C) 本身不可辨識。</text>
+
+  <text class="lbl bold zh" x="520" y="432">那一條約束做了什麼</text>
+  <rect class="box sunken" x="520" y="448" width="460" height="118" rx="6"/>
+  <text class="tick mono" x="536" y="478">i ∈ B, j ∈ C, 同一單位, 無分子同時帶 → z_i ≠ z_j</text>
+  <text class="anno zh" x="536" y="508">K ＝ 2 時那根峰只有一個成分 → 必然 z_i ＝ z_j</text>
+  <text class="anno zh" x="536" y="530">→ 該解<tspan class="bold">不可行</tspan>。最好的可行解是 K ＝ 3。</text>
+  <text class="anno zh" x="536" y="552">pigeonhole 這時才准分支：0.40 ＋ 0.40 ≤ 1.00 ✓</text>
+
+  <rect class="box ghost accent" x="20" y="582" width="960" height="62" rx="6"/>
+  <text class="lbl bold zh" x="38" y="612">改變的是樹的形狀與群的個數，不是某個數字的小數點。</text>
+  <text class="anno zh" x="38" y="636">但這一條只釘住 i 與 j 兩個變異 —— 那根峰裡其餘幾百個的歸屬，仍然分不出來，也不需要分。</text>
+</svg><figcaption>純度 0.60、二倍體。三群的真相裡有兩群細胞比例相同，
+所以只看 VAF 直方圖時它們疊在同一根峰上，最大似然解是兩群、線性樹。
+一條「不可同群」讓兩群的解不可行，K 被迫變成 3，pigeonhole 這時才准分支 ——
+改變的是樹的形狀，不是某個數字的小數點。</figcaption></figure>
+
+<p class="prose">設 ρ ＝ 0.60、二倍體、μ ＝ 1，真相是三群：</p>
+
+<pre><code>clone A   CCF 1.00   →  期望 VAF 0.30      （所有腫瘤細胞都帶）
+clone B   CCF 0.40   →  期望 VAF 0.12
+clone C   CCF 0.40   →  期望 VAF 0.12      ← 跟 B 一樣
+
+真相的樹：      A ─┬─ B          直方圖看到的：   0.30 一根、0.12 一根
+                   └─ C          最大似然解：     K = 2，樹是 A → B</code></pre>
+
+<p class="prose">錯了兩件事：<b>群數少一個</b>，而且<b>拓撲從分支變成線性</b>。
+而且沒有任何內部檢查抓得到 —— <b>估出來的 <code>K = 2</code> 對這組資料就是最大似然解</b>，
+殘差、擬合優度、後驗預測全部正常。</p>
+
+<p class="prose">現在加一條約束。B 裡有一個變異 <code>i</code>、C 裡有一個變異 <code>j</code>，
+兩個剛好落在同一個單位裡，而且觀測到<b>沒有分子同時帶兩者</b> —— 於是 <code>z_i ≠ z_j</code>。</p>
+
+<p class="prose"><code>K = 2</code> 的解在 0.12 那根峰上只有一個成分，
+所以它必然把 <code>i</code> 與 <code>j</code> 指到同一群 —— <b>這個解不可行了</b>。
+可行解裡最好的是 <code>K = 3</code>，其中兩個成分落在同一個位置 <code>θ = 0.12</code>。
+pigeonhole 這時才准分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code> ✓。</p>
+
+<p class="prose"><b>一條約束改的是樹的形狀，不是某個數字的小數點。</b>
+這也是為什麼這條路線的賣點不在精度 —— 精度講「分得出來，但量得準不準」，
+可辨識性講「資料<b>原則上</b>分不分得出這兩種情況」。前者加資料會改善，後者不會。</p>
+
+<h4 id="sr2__但要說清楚它沒有做到什麼">但要說清楚它<b>沒有</b>做到什麼</h4>
+
+<p class="prose">0.12 那根峰裡如果有 1,000 個變異，這一條約束只釘住其中<b>兩個</b>。
+其餘 998 個對兩個成分的似然完全相同（它們的 <code>θ</code> 一樣），
+所以它們的歸屬仍然分不出來，除非各自也有約束連到 <code>i</code> 或 <code>j</code>。</p>
+
+<p class="prose">所以這條路線真正的產出是<b>「有幾群、群跟群什麼關係」</b>，
+<b>不是</b>每個變異的歸屬。而這恰好就是系統發生重建要的東西 ——
+也是為什麼第十二節那個「最稀疏的一對只有 28 條約束」還算夠用：
+28 條足以確立<b>兩個成分存在且不同</b>，離「分配 1,000 個變異」還差得很遠，
+但重建本來就不需要後者。</p>
+
+<h3 id="sr2__四-用途二-把峰寬從自由參數改成量出來的常數">四、用途二：把峰寬從自由參數改成量出來的常數</h3>
+
+<p class="prose"><code>φ</code> 在第一節裡是<b>跟著一起擬合的自由參數</b>，
+而它跟 <code>K</code> 直接互吃：一個 φ 大的寬成分，
+和兩個 φ 小、位置靠近的窄成分，可以配出幾乎一樣的直方圖。
+擬合會在兩者之間選一個，而選哪一個很大程度取決於懲罰項與初始值 ——
+不是取決於生物學。</p>
+
+<p class="prose">5% 給的是一個<b>對 φ 的直接量測</b>：
+同一個單位、同一條單倍型上的幾個變異，真實頻率<b>完全相同</b> ——
 它們就在同一批分子上，生物學離散<b>恰好是零</b>。
-所以那幾個變異之間觀測到的離散度，<b>就是純粹的技術雜訊</b>，是量出來的，不是假設的。</p>
+所以它們之間觀測到的離散度<b>全部</b>是技術雜訊。
+按深度與拷貝數分層，就得到 <code>φ_hat(d, CN)</code>。</p>
 
-<p class="prose">按深度與拷貝數分層估出來，就得到一條經驗性的「<b>點擴散函數</b>」——
-這個名字借自光學：真值是一個<b>點</b>（同一條單倍型上那幾個變異的共同真實頻率），
-量出來卻是一團有寬度的<b>散布</b>，而這條函數就是那團散布的形狀。
-拿它去對全基因體的頻率譜做<b>解卷積</b>（把已知的模糊從觀測裡除掉），峰會變窄 ——
-峰變窄，本來被埋掉的小群就浮得出來。</p>
+<p class="prose">操作上的改動只有一行：<b>把 <code>φ</code> 從待估參數改成代進去的常數。</b>
+後果是模型不能再用「這一群比較吵」去吸收結構 ——
+原本被配成一個寬峰的東西，若 <code>φ_hat</code> 比擬合出來的 φ 小，就必須改用兩個成分解釋。
+<b>K 又往上走一格</b>，只是這次是從雜訊那一端進去的。</p>
 
-<h4 id="sr2__用途三-不需要純度的相對位置">用途三：不需要純度的相對位置</h4>
+<p class="prose">（「點擴散函數」是這件事的比喻說法：真值是一個點，量出來是一團有寬度的散布。
+但操作上就是把一個 nuisance 參數從擬合改成量測，<b>不需要真的做解卷積</b> ——
+上一版把它寫成解卷積是誤導。）</p>
 
-<p class="prose">同一個單位裡兩條單倍型的<b>比值</b>不需要純度：
-純度只影響「正常細胞的分子有多少」，而那些分子在兩個比例的<b>分母裡是同一項</b>，
-相除的時候整個消掉（第八節把式子寫出來）。</p>
+<h3 id="sr2__五-用途三-把群的間距定下來-純度只剩一個縮放">五、用途三：把群的間距定下來，純度只剩一個縮放</h3>
 
-<p class="prose">拷貝數則<b>不是無條件消掉的</b>，它要一個前提：
-兩個 clone 在這個位置的家族拷貝數相同 —— 也就是此處沒有 subclonal 拷貝數變異。
-好消息是這個前提<b>可以就地檢查</b>（用家族深度比），不必額外估計，
-所以它跟「需要一個全域拷貝數估計值」是兩回事。</p>
-
-<p class="prose">於是每一個<b>巢狀對</b>（其中一個變異所在的細胞群，整群包含在另一群裡面 ——
-也就是分類為「串接」的那種對）都直接給出「兩群的細胞比例之比」。
-把這些比值匯總起來，群與群的<b>相對位置</b>就定下來了，
-純度只剩下一個<b>整體縮放因子</b>的角色。</p>
-
-<p class="prose">這把上篇說的第一層不確定性（換算需要純度、拷貝數與
-<span class="term" data-term="mutation multiplicity" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-mutation-multiplicity-2">multiplicity<span class="term__pop" id="sr2__gd-mutation-multiplicity-2" role="tooltip"><b class="term__hd">mutation multiplicity</b><span class="term__def" data-lang="zh">在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</span><span class="term__def" data-lang="en" lang="en">How many mutant-allele copies are present in a cell carrying the mutation; a necessary term when converting VAF to cancer cell fraction.</span><a class="term__more" href="glossary.html#mutation-multiplicity">完整條目 →</a></span></span> 三個估計值）降級成一個純量：
-換算錯了，整排群一起平移，<b>相對關係不變</b>。</p>
-
-<h3 id="sr2__二-約束從哪裡來-現行實作已經算出來了">二、約束從哪裡來：現行實作已經算出來了</h3>
-
-<p class="prose">好消息是不必從頭寫。現行流程對每個單位做的分類，直接就對應三種約束：</p>
-
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="sr2__rg-unit-classes__title" aria-describedby="sr2__rg-unit-classes__desc">
-  <title id="sr2__rg-unit-classes__title">一個 k＝2 單位的聯合計數表只會落入三類：串接、分岔、不相容</title>
-  <desc id="sr2__rg-unit-classes__desc">三欄各是一個分析單位的聯合計數表，表格是二乘二，
-        行代表第一個位點是參考型或變異型，列代表第二個位點是參考型或變異型。
-        三欄的邊際計數刻意做成一樣，差別只在四個格子怎麼分配。
-        左欄是串接：只有全參考、只帶第一個、兩個都帶三種分子，
-        沒有任何分子只帶第二個，所以第二個變異一定發生在第一個變異的後代裡，樹是一條線。
-        中欄是分岔：只帶第二個那一格有分子，兩個都帶那一格是空的，
-        所以兩群細胞互不包含，樹分岔。
-        右欄是不相容：四個格子都有分子，這在每個變異只發生一次的假設下不可能，
-        代表某個變異判定是假的，或有 read 被分到錯的單倍型家族。
-        右欄因此不是生物學結果，而是品質指標，可以反過來估計分型錯誤率。
-        讀法是：三欄的邊際完全一樣，只有聯合計數分得出來。</desc>
-
-  <text class="ttl zh" x="20" y="36">同一組邊際，三種聯合計數表</text>
-  <text class="anno zh" x="20" y="66">三欄的邊際計數刻意相同 —— 重點正是「光看邊際分不出來」。</text>
-
-  <!-- ── 左：串接 ─────────────────────────────────────────────── -->
-  <rect class="box ghost" x="24" y="84" width="296" height="330" rx="8"/>
-  <text class="lbl bold zh ok mid" x="172" y="114">串接 chain</text>
-  <text class="tick mid" x="136" y="150">S2 = R</text>
-  <text class="tick mid" x="212" y="150">S2 = A</text>
-  <text class="tick end" x="90" y="194">S1 = R</text>
-  <text class="tick end" x="90" y="246">S1 = A</text>
-  <rect class="box plain" x="100" y="166" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="176" y="166" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="100" y="218" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="176" y="218" width="72" height="44" rx="6"/>
-  <text class="lbl mono mid" x="136" y="196">41</text>
-  <text class="lbl mono mid ok" x="212" y="196">0</text>
-  <text class="lbl mono mid" x="136" y="248">22</text>
-  <text class="lbl mono mid" x="212" y="248">17</text>
-  <circle class="mark ref" cx="172" cy="292" r="8"/>
-  <line class="conn" x1="172" y1="300" x2="172" y2="326"/>
-  <circle class="mark somatic" cx="172" cy="334" r="8"/>
-  <line class="conn" x1="172" y1="342" x2="172" y2="368"/>
-  <circle class="mark somatic" cx="172" cy="376" r="8"/>
-  <text class="tick zh mid" x="172" y="402">S2 長在 S1 的後代裡</text>
-
-  <!-- ── 中：分岔 ─────────────────────────────────────────────── -->
-  <rect class="box ghost" x="352" y="84" width="296" height="330" rx="8"/>
-  <text class="lbl bold zh accent mid" x="500" y="114">分岔 fork</text>
-  <text class="tick mid" x="464" y="150">S2 = R</text>
-  <text class="tick mid" x="540" y="150">S2 = A</text>
-  <text class="tick end" x="418" y="194">S1 = R</text>
-  <text class="tick end" x="418" y="246">S1 = A</text>
-  <rect class="box plain" x="428" y="166" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="504" y="166" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="428" y="218" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="504" y="218" width="72" height="44" rx="6"/>
-  <text class="lbl mono mid" x="464" y="196">41</text>
-  <text class="lbl mono mid" x="540" y="196">17</text>
-  <text class="lbl mono mid" x="464" y="248">22</text>
-  <text class="lbl mono mid accent" x="540" y="248">0</text>
-  <circle class="mark ref" cx="500" cy="292" r="8"/>
-  <line class="conn" x1="500" y1="300" x2="452" y2="330"/>
-  <line class="conn" x1="500" y1="300" x2="548" y2="330"/>
-  <circle class="mark somatic" cx="448" cy="338" r="8"/>
-  <circle class="mark somatic" cx="552" cy="338" r="8"/>
-  <text class="tick zh mid" x="500" y="378">兩群細胞互不包含</text>
-  <text class="tick zh mid" x="500" y="402">S2 另外長出來</text>
-
-  <!-- ── 右：不相容 ───────────────────────────────────────────── -->
-  <rect class="box ghost bad" x="680" y="84" width="296" height="330" rx="8"/>
-  <text class="lbl bold zh bad mid" x="828" y="114">不相容 incompatible</text>
-  <text class="tick mid" x="792" y="150">S2 = R</text>
-  <text class="tick mid" x="868" y="150">S2 = A</text>
-  <text class="tick end" x="746" y="194">S1 = R</text>
-  <text class="tick end" x="746" y="246">S1 = A</text>
-  <rect class="box plain" x="756" y="166" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="832" y="166" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="756" y="218" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="832" y="218" width="72" height="44" rx="6"/>
-  <text class="lbl mono mid" x="792" y="196">38</text>
-  <text class="lbl mono mid bad" x="868" y="196">15</text>
-  <text class="lbl mono mid" x="792" y="248">20</text>
-  <text class="lbl mono mid bad" x="868" y="248">9</text>
-  <text class="ttl bad mid" x="828" y="316">✗</text>
-  <text class="tick zh mid bad" x="828" y="352">四格全滿 —— 在「每個變異</text>
-  <text class="tick zh mid bad" x="828" y="376">只發生一次」下不可能</text>
-  <text class="tick zh mid" x="828" y="402">這是品質指標，不是生物學</text>
-
-  <text class="anno zh" x="24" y="450">右欄的出現率可以反過來估計單倍型分型的錯誤率 —— 模型因此自帶一個校正用的觀測量。</text>
-  <text class="anno zh" x="24" y="482">分類要用似然比檢定，不是對原始計數設門檻：在偵測極限附近，兩種假設只差幾條 read。</text>
-</svg><figcaption>三欄的邊際計數刻意做成一樣 —— 重點正是「光看邊際分不出來」。
-左邊是串接，給出有向的祖先關係；中間是分岔，給出「不可同群」；
-右邊四格全滿是不相容，那不是生物學結果而是品質訊號。</figcaption></figure>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th scope="col">現行輸出</th><th scope="col">對應的約束</th><th scope="col">它在全基因體那一層決定什麼</th></tr></thead>
-<tbody>
-<tr><td>分岔（沒有分子同時帶兩者）</td><td><b>不可同群</b>（硬）</td><td>強迫拆峰 —— 打破一維上的簡併。<b>但 trans 會偽造這一格，見第六節</b></td></tr>
-<tr><td>串接，且比值 ≈ 1</td><td><b>必定同群</b>（硬）</td><td>把散在不同區域的同一群併起來。<b>權重要最低，理由見下</b></td></tr>
-<tr><td>串接，且比值 &lt; 1</td><td><b>有向</b>：A 群是 B 群的祖先</td><td>群與群的先後 —— 取代<span class="term" data-term="parsimony" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-parsimony-3">簡約性<span class="term__pop" id="sr2__gd-parsimony-3" role="tooltip"><b class="term__hd">parsimony <i>簡約法</i></b><span class="term__def" data-lang="zh">在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</span><span class="term__def" data-lang="en" lang="en">Choosing, among all solutions compatible with the data, the one requiring the fewest steps or lowest cost. It is a preference rather than evidence: when several solutions tie, parsimony picks one, but the data has not ruled the others out.</span><a class="term__more" href="glossary.html#parsimony">完整條目 →</a></span></span></td></tr>
-<tr><td>不相容（四格全滿）</td><td>不產生約束</td><td>反過來估計單倍型標記的錯誤率</td></tr>
-</tbody>
-</table>
-</div>
-
-<h4 id="sr2__必定同群-這一條要小心-因為它跟用途一互相拉扯">「必定同群」這一條要小心，因為它跟用途一互相拉扯</h4>
-
-<p class="prose">上面那張表最容易被照單全收的是第二列。串接代表後者長在前者的譜系上，
-所以兩群是<b>巢狀</b>；比值 ≈ 1 只是說後者幾乎接管了前者。
-但「幾乎接管」<b>不等於同一群</b> —— 那是<b>兩個真實存在的 clone</b>，
-只是在頻率軸上分不開。而<b>頻率相同不等於同一群</b>，正是用途一整段在論證的事。
-把它們硬性合併，等於在用途一想拆開的地方主動把兩群黏起來，方向剛好相反。</p>
-
-<p class="prose">所以這一條要加兩個限制：</p>
+<p class="prose">回到第一節第一步那三個估計值，它們壞掉的方式不一樣：</p>
 
 <ul class="prose">
-<li><b>「≈ 1」要寫成一個明確的容差，而且容差由檢定力決定，不是拍板的常數。</b>
-在跨越深度 <code>n</code> 之下，比值本來就有抽樣誤差；
-只有當「比值 &lt; 1」在這個 <code>n</code> 下<b>本來就分辨得出來</b>而觀測仍然落在 1 附近，
-「≈ 1」才帶資訊。<code>n</code> 小的時候，任何比值都 ≈ 1 ——
-那不是證據，是沒有解析度。</li>
-<li><b>權重要是三種約束裡最低的。</b>不可同群與有向關係都在<b>增加</b>可辨識性；
-必定同群是唯一一條在<b>減少</b>它的。錯的不可同群會逼出一個不存在的群，
-錯的必定同群則會讓一個真的群整個消失 —— 後者更難發現，
-因為多出一個群還會讓人起疑，少一個群不會有任何異常。</li>
+<li><b>ρ 錯了</b>：所有 <code>c</code> 一起等比例縮放。樹的形狀多半不變，
+但 pigeonhole 是<b>絕對比較</b>（<code>c_B + c_C ≤ c_A</code>），所以判定還是會翻。</li>
+<li><b>CN 或 μ 錯了</b>：那是<b>逐個變異</b>的，錯掉的變異直接跑到別的峰裡，把群染髒。這個更糟。</li>
 </ul>
-
-<h3 id="sr2__三-但約束不能照單全收">三、但約束不能照單全收</h3>
-
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" class="dia-svg" role="img" aria-labelledby="sr2__rg-partial-reads__title" aria-describedby="sr2__rg-partial-reads__desc">
-  <title id="sr2__rg-partial-reads__title">一個真實區域的 read 覆蓋：八成的分子只看得到一個位點</title>
-  <desc id="sr2__rg-partial-reads__desc">上半是一個真實分析單位裡 read 覆蓋情況的統計。
-        這個單位有三個 somatic 位點、一百九十四條 read，視窗寬三十九點四 kb。
-        三條長條由上而下分別是：同時蓋到三個位點的 read 只有三條，佔百分之一點五；
-        蓋到兩個位點的三十一條，佔百分之十六；只蓋到一個位點的一百六十條，佔百分之八十二點五。
-        下半把同一批 read 按位點對拆開，看每一對到底有幾條 read 同時蓋到。
-        第一對與第二對各有十七條與二十條，分別判出分岔與串接；
-        第三對只有三條，而且三條都是參考型，什麼也判不出來。
-        最下方是這張圖的結論：這個單位的演化樹靠的是十七與二十這兩個數字，不是一百九十四；
-        而第三對其實沒有資料，卻仍然被演算法決定了關係。
-        讀法是：有效樣本數是「每一個位點對各自的跨越深度」，不是這個單位的總 read 數。</desc>
-
-  <text class="ttl zh" x="20" y="36">真實資料長什麼樣</text>
-  <text class="tick mono" x="20" y="62">HCC1395_HKU · chr12:981,725–1,021,146 · HP1 · k=3 · 194 reads · 視窗 39.4 kb</text>
-
-  <!-- 覆蓋統計 -->
-  <text class="lbl bold zh" x="20" y="106">一條 read 蓋得到幾個位點</text>
-
-  <text class="anno zh end" x="196" y="140">蓋到 3 個</text>
-  <rect class="bar ok" x="212" y="126" width="9" height="18" rx="3"/>
-  <text class="anno mono" x="240" y="140">3 條　1.5%</text>
-
-  <text class="anno zh end" x="196" y="180">蓋到 2 個</text>
-  <rect class="bar warn" x="212" y="166" width="97" height="18" rx="3"/>
-  <text class="anno mono" x="328" y="180">31 條　16.0%</text>
-
-  <text class="anno zh end" x="196" y="220">只蓋到 1 個</text>
-  <rect class="bar bad" x="212" y="206" width="500" height="18" rx="3"/>
-  <text class="anno mono" x="730" y="220">160 條　82.5%</text>
-
-  <text class="anno zh bad" x="212" y="256">八成的分子只看得到一個位點 —— 它對「兩個位點的共現」完全沒有意見。</text>
-
-  <!-- 位點對拆解 -->
-  <line class="guide" x1="20" y1="278" x2="980" y2="278"/>
-  <text class="lbl bold zh" x="20" y="312">把同一批 read 按位點對拆開</text>
-
-  <rect class="box ok" x="24" y="330" width="300" height="120" rx="8"/>
-  <text class="anno bold mono mid" x="174" y="358">S1 × S3</text>
-  <text class="lbl bold mono mid bad" x="174" y="392">n = 3</text>
-  <text class="tick zh mid" x="174" y="418">三條都是參考型</text>
-  <text class="tick zh mid bad" x="174" y="440">什麼也判不出來</text>
-
-  <rect class="box ok" x="350" y="330" width="300" height="120" rx="8"/>
-  <text class="anno bold mono mid" x="500" y="358">S1 × S2</text>
-  <text class="lbl bold mono mid" x="500" y="392">n = 17</text>
-  <text class="tick mono mid" x="500" y="418">RA 12 · AR 5 · 沒有 AA</text>
-  <text class="tick zh mid accent" x="500" y="440">判為分岔</text>
-
-  <rect class="box ok" x="676" y="330" width="300" height="120" rx="8"/>
-  <text class="anno bold mono mid" x="826" y="358">S2 × S3</text>
-  <text class="lbl bold mono mid" x="826" y="392">n = 20</text>
-  <text class="tick mono mid" x="826" y="418">AA 6 · AR 9 · RR 5</text>
-  <text class="tick zh mid ok" x="826" y="440">判為串接</text>
-
-  <!-- 結論 -->
-  <rect class="box bad" x="24" y="466" width="952" height="62" rx="8"/>
-  <text class="anno zh" x="48" y="494">這個單位的樹靠的是 <tspan class="bold">17 與 20</tspan>，不是 194。而 S1 × S3 那一對<tspan class="bold">沒有資料</tspan>，</text>
-  <text class="anno zh bad" x="48" y="520">卻一樣被演算法決定了關係 —— 「沒看到」被當成了「不存在」。</text>
-</svg><figcaption>八成的 read 只看得到三個位點裡的一個。
-把同一批 read 按位點對拆開之後才看得出來：這個單位的判定靠的是 17 與 20 兩個數字，不是 194，
-而其中一對只有 3 條 read，卻一樣被判了關係。</figcaption></figure>
-
-<p class="prose">一個單位的有效樣本數<b>不是</b>它的總 read 數，
-而是<b>每一個位點對各自有幾條 read 同時蓋到</b>。
-上圖那個單位的三個位點對，跨越深度分別是 20、17 與 <b>3</b> ——
-而那個 <code>n = 3</code> 的位點對，照樣產出了一條約束。</p>
-
-<p class="prose">假設那條譜系裡有三成的分子帶著某個狀態，三條 read 全部錯過的機率是
-<code>0.7³ ≈ 0.34</code>。<b>三分之一的機率會把「有」看成「沒有」</b> ——
-而「沒看到」正是判定分岔的依據。也就是說，這條約束有三分之一的機率是假的。</p>
-
-<p class="prose">為什麼可跨越的範圍這麼小，要回到下面這個結構：</p>
-
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" class="dia-svg" role="img" aria-labelledby="sr2__rg-three-tiers__title" aria-describedby="sr2__rg-three-tiers__desc">
-  <title id="sr2__rg-three-tiers__title">三層資訊：全基因體只有邊際、phase block 知道 cis／trans、read 跨距內才數得到共現</title>
-  <desc id="sr2__rg-three-tiers__desc">三層由下而上代表資訊愈來愈完整，但涵蓋範圍愈來愈小。
-        最下層是全基因體，任何兩個位點之間都只有各自的邊際頻率，沒有共現關係。
-        中間層是 phase block，典型長度一到五個 Mb，在這個範圍內兩個位點是在同一條染色體
-        還是分開在兩條，是已知的，即使沒有任何一條 read 同時蓋到它們。
-        最上層是 read 跨距，典型二十個 kb，只有在這個範圍內才數得出「同時帶有兩個變異的分子有幾條」。
-        右側標出每一層在一個典型樣本裡各有多少筆可用觀測：
-        read 跨距內的聯合計數約數百到數萬筆，phase block 內的 cis／trans 判定約多一百倍，
-        全基因體邊際則涵蓋全部變異。
-        讀法是：read 長度限制的是「數得到共現」，phase block 限制的是「知道在不在同一條染色體上」，
-        這兩件事的範圍差了兩個數量級，常被混為一談。</desc>
-
-  <text class="ttl zh" x="20" y="36">三層資訊：範圍愈小，資訊愈完整</text>
-
-  <!-- 第三層：全基因體 -->
-  <rect class="box" x="24" y="330" width="700" height="86" rx="8"/>
-  <text class="lbl bold zh" x="44" y="362">③ 全基因體</text>
-  <text class="anno zh" x="44" y="392">只有邊際頻率（VAF、β）—— 傳統路線整個住在這一層</text>
-  <text class="anno zh mid" x="860" y="362">全部變異</text>
-  <text class="tick zh mid" x="860" y="390">數百萬筆</text>
-
-  <!-- 第二層：phase block -->
-  <rect class="box accent" x="24" y="216" width="520" height="86" rx="8"/>
-  <text class="lbl bold zh" x="44" y="248">② phase block（1–5 Mb）</text>
-  <text class="anno zh" x="44" y="278">cis／trans 已知，但數不到共現分子數</text>
-  <text class="anno zh mid" x="860" y="248">cis／trans 判定</text>
-  <text class="tick zh mid" x="860" y="276">約 7 萬筆</text>
-
-  <!-- 第一層：read 跨距 -->
-  <rect class="box ok" x="24" y="102" width="240" height="86" rx="8"/>
-  <text class="lbl bold zh" x="44" y="134">① read 跨距（20 kb）</text>
-  <text class="anno zh" x="44" y="164">聯合計數看得到</text>
-  <text class="anno zh mid" x="860" y="134">聯合計數</text>
-  <text class="tick zh mid" x="860" y="162">數百到數萬筆</text>
-
-  <line class="guide muted" x1="600" y1="120" x2="740" y2="120"/>
-  <line class="guide muted" x1="600" y1="234" x2="740" y2="234"/>
-  <line class="guide muted" x1="740" y1="348" x2="740" y2="348"/>
-
-  <path class="conn thick ok" d="M290,145 L560,145" marker-end="url(#arrow)"/>
-  <text class="tick zh ok" x="300" y="130">資訊最完整</text>
-  <path class="conn thick" d="M570,259 L700,259" marker-end="url(#arrow)"/>
-  <text class="tick zh" x="580" y="244">涵蓋最廣</text>
-
-  <text class="anno zh bad" x="24" y="450">最常見的誤解：把 ① 與 ② 當成同一件事。read 長度限制的是「數得到共現」，</text>
-  <text class="tick zh bad" x="24" y="472">phase block 限制的是「知不知道在同一條染色體上」—— 兩者範圍差約一百倍。</text>
-</svg><figcaption>read 跨距限制的是「數不數得到共現」，
-<span class="term" data-term="phase block" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-phase-block-4">phase block<span class="term__pop" id="sr2__gd-phase-block-4" role="tooltip"><b class="term__hd">phase block</b><span class="term__def" data-lang="zh">一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</span><span class="term__def" data-lang="en" lang="en">A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.</span><a class="term__more" href="glossary.html#phase-block">完整條目 →</a></span></span> 限制的是「知不知道兩個位點在不在同一條染色體上」。
-約束只能從最上層那一格產生 —— 那也是三層裡範圍最小的一層。</figcaption></figure>
-
-<h3 id="sr2__四-閘門一-逐對檢定力">四、閘門一：逐對檢定力</h3>
-
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="sr2__rg-pairwise-gate__title" aria-describedby="sr2__rg-pairwise-gate__desc">
-  <title id="sr2__rg-pairwise-gate__title">兩種「沒看到」：真的沒有那種細胞，與沒有 read 跨得到</title>
-  <desc id="sr2__rg-pairwise-gate__desc">左邊是跨越深度隨距離衰減的曲線。
-        兩個位點靠得愈近，同時蓋到它們的 read 就愈多；距離接近讀長時，跨越深度掉到接近零。
-        圖上標出真實例子的三個位點對，跨越深度分別是二十、十七與三。
-        右邊說明問題所在：演算法看到某個狀態沒有出現，有兩種完全不同的原因。
-        第一種是真的沒有細胞帶著那個組合，那是生物學結論。
-        第二種是根本沒有 read 同時蓋到那兩個位點，那只是看不到。
-        目前的做法把兩者當成同一件事，於是把看不到當成不存在。
-        最下方是修正方式：每一個位點對先用自己的跨越深度算檢定力，
-        檢定力不足的對標成未定，不允許它去約束樹的形狀，並且在報告裡列出來。
-        讀法是：缺席要有足夠的觀測撐著，才能當成證據。</desc>
-
-  <text class="ttl zh" x="20" y="36">兩種「沒看到」</text>
-
-  <!-- 左：跨越深度衰減 -->
-  <text class="lbl bold zh" x="20" y="76">跨越深度隨距離掉得很快</text>
-  <line class="axis" x1="80" y1="270" x2="440" y2="270"/>
-  <line class="axis" x1="80" y1="270" x2="80" y2="100"/>
-  <text class="tick zh mid" x="260" y="296">兩個位點的距離 →</text>
-  <text class="tick zh" x="20" y="96">跨越深度</text>
-
-  <path class="conn thick ok" style="fill:none"
-        d="M80,112 C150,130 200,180 260,214 C320,246 380,262 430,266"/>
-
-  <circle class="pt tp" cx="140" cy="140" r="5"/>
-  <text class="tick mono" x="152" y="136">n=20</text>
-  <circle class="pt tp" cx="196" cy="178" r="5"/>
-  <text class="tick mono" x="208" y="174">n=17</text>
-  <circle class="pt fp" cx="372" cy="261" r="5"/>
-  <text class="tick mono bad" x="300" y="252">n=3</text>
-
-  <line class="guide muted" x1="80" y1="238" x2="440" y2="238"/>
-  <text class="tick zh bad" x="86" y="232">檢定力門檻</text>
-
-  <!-- 右：兩種原因 -->
-  <text class="lbl bold zh" x="500" y="76">同樣是「這個狀態沒出現」</text>
-
-  <rect class="box ok" x="500" y="94" width="476" height="82" rx="8"/>
-  <text class="anno bold zh ok" x="524" y="126">① 真的沒有細胞帶著那個組合</text>
-  <text class="anno zh" x="524" y="158">這是生物學結論，可以拿來決定樹的形狀。</text>
-
-  <rect class="box bad" x="500" y="190" width="476" height="82" rx="8"/>
-  <text class="anno bold zh bad" x="524" y="222">② 根本沒有 read 同時蓋到那兩個位點</text>
-  <text class="anno zh" x="524" y="254">這只是看不到，不能拿來決定任何事。</text>
-
-  <path class="conn bad" d="M738,282 L738,306" marker-end="url(#arrow-sm)"/>
-  <text class="anno zh bad mid" x="738" y="330">目前的做法把兩者當成同一件事</text>
-
-  <!-- 修正 -->
-  <rect class="box accent" x="24" y="352" width="952" height="128" rx="8"/>
-  <text class="lbl bold zh accent" x="48" y="384">修正：每一對先過檢定力這一關</text>
-  <text class="anno zh" x="48" y="416">用該位點對自己的跨越深度算檢定力；不足的標成「未定」，</text>
-  <text class="anno zh" x="48" y="444">不允許它的「缺席」去約束樹，並且在報告裡逐條列出來。</text>
-  <text class="tick zh" x="48" y="470">預期效果：目前被歸進「單層無分支」的單位，會有一部分正確地移到「未解析」。</text>
-</svg><figcaption>「這個狀態沒出現」有兩種完全不同的原因：真的沒有那種細胞，
-或根本沒有 read 跨得到。目前的解法把兩者當成同一件事 ——
-而在約束的脈絡下，第二種會直接變成一條假的硬約束。</figcaption></figure>
-
-<pre><code>for each pair (i, j) in the unit:
-    n_ij  = 同時蓋到 i 與 j 的 read 數
-    π_ij  = 在 n_ij 與錯誤率 ε 下，偵測到「佔該譜系 ϱ_min」的狀態的檢定力
-    if π_ij &lt; π*:
-        這一對不產生約束（標成 UNDETERMINED）
-report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
-
-<p class="prose">ε 與 η 要就地估，不要用全域常數。錯誤模型本身不變 ——
-每個位點一道閘門，加上兩個家族之間的交換：</p>
-
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="sr2__rg-error-gates__title" aria-describedby="sr2__rg-error-gates__desc">
-  <title id="sr2__rg-error-gates__title">觀測要經過幾道閘門：每個位點一道，最後兩個家族之間再交換一次</title>
-  <desc id="sr2__rg-error-gates__desc">兩條並排的通道分別是同一個視窗的兩個單倍型家族。
-        每條通道由左到右經過相同的幾個階段。
-        起點是真實的分子組成。
-        接著是每個位點各一道錯誤閘門，閘門會把參考型讀成變異型，也會把變異型讀成參考型，
-        兩個方向的機率不一樣，所以閘門不是對稱的。
-        k 個位點就串 k 道閘門，把它們串起來就是公式裡那個張量積。
-        最後一道是家族交換閘門：大部分的分子留在自己的通道，
-        但有一小部分會被標到另一條通道去，圖上用兩條交叉的虛線表示。
-        終點是實際觀測到的計數。
-        圖的下方指出這件事的後果：因為交換閘門把兩條通道接在一起，
-        兩個家族必須一起估。分開估會讓譜系內比例每個單位都往零點五偏一點，
-        而且幾萬個單位偏的方向相同，那不是把譜變寬，是把整條譜平移。
-        讀法是：公式裡的三個符號各對應圖上一道閘門。</desc>
-
-  <text class="ttl zh" x="20" y="36">觀測要經過幾道閘門</text>
-
-  <text class="tick bold hp1" x="20" y="156">家族 H1</text>
-  <text class="tick bold hp2" x="20" y="296">家族 H2</text>
-
-  <!-- 真實組成 -->
-  <rect class="box plain" x="96" y="122" width="106" height="56" rx="8"/>
-  <text class="anno zh mid" x="149" y="156">真實組成</text>
-  <rect class="box plain" x="96" y="262" width="106" height="56" rx="8"/>
-  <text class="anno zh mid" x="149" y="296">真實組成</text>
-
-  <path class="conn" d="M202,150 L238,150" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M202,290 L238,290" marker-end="url(#arrow-sm)"/>
-
-  <!-- 位點 1 閘門 -->
-  <rect class="box warn" x="242" y="122" width="118" height="56" rx="8"/>
-  <text class="tick zh mid" x="301" y="146">位點 1 閘門</text>
-  <text class="tick mono mid" x="301" y="168">ε₁ , η₁</text>
-  <rect class="box warn" x="242" y="262" width="118" height="56" rx="8"/>
-  <text class="tick zh mid" x="301" y="286">位點 1 閘門</text>
-  <text class="tick mono mid" x="301" y="308">ε₁ , η₁</text>
-
-  <path class="conn" d="M360,150 L396,150" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M360,290 L396,290" marker-end="url(#arrow-sm)"/>
-
-  <!-- 位點 2 閘門 -->
-  <rect class="box warn" x="400" y="122" width="118" height="56" rx="8"/>
-  <text class="tick zh mid" x="459" y="146">位點 2 閘門</text>
-  <text class="tick mono mid" x="459" y="168">ε₂ , η₂</text>
-  <rect class="box warn" x="400" y="262" width="118" height="56" rx="8"/>
-  <text class="tick zh mid" x="459" y="286">位點 2 閘門</text>
-  <text class="tick mono mid" x="459" y="308">ε₂ , η₂</text>
-
-  <text class="tick zh mid" x="380" y="204">這兩道串起來就是公式裡的 T ＝ E₁ ⊗ E₂　（k 個位點就串 k 道）</text>
-
-  <!-- 家族交換閘門 -->
-  <rect class="box bad" x="556" y="102" width="176" height="236" rx="8"/>
-  <text class="tick bold zh bad mid" x="644" y="90">家族交換閘門 δ</text>
-
-  <path class="conn ok" d="M576,150 L712,150" marker-end="url(#arrow-sm)"/>
-  <path class="conn ok" d="M576,290 L712,290" marker-end="url(#arrow-sm)"/>
-  <path class="conn bad" stroke-dasharray="7 5" style="fill:none"
-        d="M576,166 L712,274" marker-end="url(#arrow-sm)"/>
-  <path class="conn bad" stroke-dasharray="7 5" style="fill:none"
-        d="M576,274 L712,166" marker-end="url(#arrow-sm)"/>
-
-  <text class="tick mono ok mid" x="644" y="140">1 − δ</text>
-  <text class="tick mono bad mid" x="644" y="228">δ</text>
-
-  <path class="conn" d="M732,150 L768,150" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M732,290 L768,290" marker-end="url(#arrow-sm)"/>
-
-  <!-- 觀測 -->
-  <rect class="box accent" x="772" y="122" width="118" height="56" rx="8"/>
-  <text class="anno zh mid" x="831" y="156">觀測計數</text>
-  <rect class="box accent" x="772" y="262" width="118" height="56" rx="8"/>
-  <text class="anno zh mid" x="831" y="296">觀測計數</text>
-
-  <!-- 說明 -->
-  <text class="anno zh" x="24" y="382">ε 是「把 REF 讀成 ALT」，η 是「把 ALT 讀成 REF」—— 兩個方向機率不同，所以閘門不對稱。</text>
-  <text class="anno zh" x="24" y="410">兩者都可以用同一個視窗裡的 germline 雜合位點就地估出來，不必外部參數。</text>
-
-  <rect class="box bad" x="24" y="430" width="952" height="60" rx="8"/>
-  <text class="anno zh bad" x="48" y="458">交換閘門把兩條通道接在一起，所以<tspan class="bold">兩個家族必須一起估</tspan>。分開估會讓 ϱ 每個單位</text>
-  <text class="anno zh bad" x="48" y="482">都往 0.5 偏一點，而且幾萬個單位偏的方向相同 —— 那不是把譜變寬，是把整條譜平移。</text>
-</svg><figcaption>每個位點一道錯誤閘門；最後一道是家族交換閘門，
-一小部分分子被標到另一條通道去。交換閘門把兩條通道接在一起，所以兩個家族必須一起估。</figcaption></figure>
-
-<h3 id="sr2__五-閘門二-排序偏誤會系統性地把分岔判成串接">五、閘門二：排序偏誤會系統性地把分岔判成串接</h3>
-
-<p class="prose">第二道閘門比第一道隱蔽，而且方向很不利。
-最小成本候選常常不只一個，現行流程用 <span class="term" data-term="read-AF" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-read-af-5">read-AF<span class="term__pop" id="sr2__gd-read-af-5" role="tooltip"><b class="term__hd">read-AF <i>read 層級的 ALT 比例</i></b><span class="term__def" data-lang="zh">在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</span><span class="term__def" data-lang="en" lang="en">The fraction of reads carrying the ALT allele at a somatic site, computed within one analysis window and one haplotype family. Because the denominator is already restricted, no purity or copy-number correction is needed; it is used to rank candidate trees of equal cost.</span><a class="term__more" href="glossary.html#read-af">完整條目 →</a></span></span> 的差值總和排序 ——
-問題出在<b>相加的項數由形狀決定</b>：</p>
-
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" class="dia-svg" role="img" aria-labelledby="sr2__rg-score-bias__title" aria-describedby="sr2__rg-score-bias__desc">
-  <title id="sr2__rg-score-bias__title">read-AF 差值總和有形狀偏誤：星狀永遠得零分，串接永遠贏</title>
-  <desc id="sr2__rg-score-bias__desc">目前排序候選樹的分數，是把樹上每一組「祖先與後代」的 read-AF 相減再全部加起來。
-        問題在於相加的項數本身由樹的形狀決定。
-        圖上三個形狀由左到右：三個突變串成一條線、一條線加一個分支、三個都從根長出來的星狀。
-        它們的祖先後代配對數分別是三、一、零。
-        因此串接的分數是第一個減第三個的兩倍，中間的形狀只有一項，
-        而星狀因為沒有任何祖先後代配對，分數恆等於零。
-        結論寫在下方：只要 read-AF 不完全相等，串接的分數就是正的，
-        而星狀永遠是零，所以當最小成本候選裡同時有這兩種形狀時，分支永遠贏不了。
-        觀測到的最多的類別正好是多層無分支，佔三成八到五成三，
-        這個偏誤剛好往那個方向推。
-        最下方是替代方案：改用機率模型比較各個形狀解釋同一組 read-AF 的能力，
-        而不是加總差值。
-        讀法是：分數要能跨形狀比較，才不會讓形狀自己決定勝負。</desc>
-
-  <text class="ttl zh" x="20" y="36">分數的形狀偏誤</text>
-  <text class="anno zh" x="20" y="66">分數＝把樹上每一組「祖先→後代」的 read-AF 相減，全部加起來。項數由形狀決定。</text>
-
-  <!-- 串接 -->
-  <rect class="box ghost" x="24" y="88" width="300" height="230" rx="8"/>
-  <text class="anno bold zh mid" x="174" y="118">串接</text>
-  <circle class="mark somatic" cx="174" cy="150" r="10"/>
-  <line class="conn" x1="174" y1="160" x2="174" y2="188"/>
-  <circle class="mark somatic" cx="174" cy="198" r="10"/>
-  <line class="conn" x1="174" y1="208" x2="174" y2="236"/>
-  <circle class="mark somatic" cx="174" cy="246" r="10"/>
-  <text class="tick zh mid" x="174" y="278">祖先後代配對：3 組</text>
-  <text class="lbl mono mid ok" x="174" y="306">2(a₁ − a₃)</text>
-
-  <!-- 一線一分支 -->
-  <rect class="box ghost" x="350" y="88" width="300" height="230" rx="8"/>
-  <text class="anno bold zh mid" x="500" y="118">一線加一分支</text>
-  <circle class="mark somatic" cx="500" cy="150" r="10"/>
-  <line class="conn" x1="492" y1="158" x2="452" y2="190"/>
-  <line class="conn" x1="508" y1="158" x2="548" y2="190"/>
-  <circle class="mark somatic" cx="446" cy="198" r="10"/>
-  <circle class="mark somatic" cx="554" cy="198" r="10"/>
-  <line class="conn" x1="446" y1="208" x2="446" y2="236"/>
-  <circle class="mark somatic" cx="446" cy="246" r="10"/>
-  <text class="tick zh mid" x="500" y="278">祖先後代配對：1 組</text>
-  <text class="lbl mono mid" x="500" y="306">a₁ − a₂</text>
-
-  <!-- 星狀 -->
-  <rect class="box ghost bad" x="676" y="88" width="300" height="230" rx="8"/>
-  <text class="anno bold zh mid" x="826" y="118">星狀（全分支）</text>
-  <circle class="mark somatic" cx="826" cy="150" r="10"/>
-  <line class="conn" x1="818" y1="158" x2="756" y2="192"/>
-  <line class="conn" x1="826" y1="160" x2="826" y2="188"/>
-  <line class="conn" x1="834" y1="158" x2="896" y2="192"/>
-  <circle class="mark somatic" cx="750" cy="198" r="10"/>
-  <circle class="mark somatic" cx="826" cy="198" r="10"/>
-  <circle class="mark somatic" cx="902" cy="198" r="10"/>
-  <text class="tick zh mid" x="826" y="278">祖先後代配對：0 組</text>
-  <text class="lbl mono mid bad" x="826" y="306">恆等於 0</text>
-
-  <rect class="box bad" x="24" y="336" width="952" height="60" rx="8"/>
-  <text class="anno zh" x="48" y="364">只要 read-AF 不完全相等，串接就是正分，星狀恆為 0 ——</text>
-  <text class="anno zh bad" x="48" y="388">所以最小成本候選裡同時有這兩種形狀時，<tspan class="bold">分支永遠贏不了</tspan>。</text>
-
-  <text class="anno zh" x="24" y="428">觀測到最多的類別正好是「多層無分支」（38–53%），而這個偏誤剛好往那個方向推。</text>
-  <text class="anno zh ok" x="24" y="458">替代方案：用機率模型比較各形狀解釋同一組 read-AF 的能力，而不是加總差值。</text>
-</svg><figcaption>三個形狀的祖先後代配對數分別是 3、1、0。
-串接得到正分，星狀恆等於 0 —— 所以最小成本候選裡同時有這兩種形狀時，分支永遠贏不了。</figcaption></figure>
-
-<p class="prose">放進約束的脈絡，後果很具體：
-<b>該產出「不可同群」的單位，會改成產出「祖先關係」。</b>
-而「不可同群」正是用途一唯一的來源 ——
-所以這個偏誤會系統性地<b>抽掉拆峰的能力</b>，讓該分開的群留在一起。</p>
-
-<p class="prose">修法是把差值總和換成似然：在拓撲施加的約束下擬合各節點的分子比例，
-再比最大化後的似然。這樣不同形狀才是在比「解釋同一組數字的能力」，形狀不再自己決定勝負。</p>
-
-<h3 id="sr2__六-兩個會產出假約束的陷阱">六、兩個會產出假約束的陷阱</h3>
-
-<p class="prose">兩個都跟<b>相位</b>有關，而且方向相反：
-第一個講的是相位資訊<b>只在 block 內有效</b>，跨出去就沒有意義；
-第二個講的是即使在 block 內，相位<b>解得對</b>也可能被讀成錯的生物學。</p>
-
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img" aria-labelledby="sr2__rg-block-spin__title" aria-describedby="sr2__rg-block-spin__desc">
-  <title id="sr2__rg-block-spin__title">H1／H2 的標號只在同一個 phase block 內有意義，跨 block 是任意的</title>
-  <desc id="sr2__rg-block-spin__desc">上排是實體事實：兩條染色體拷貝各自是連續的一整條，橫跨圖上的兩個 phase block。
-        中排是相位軟體實際輸出的東西：每個 phase block 各自把兩堆 read 標成 H1 與 H2，
-        但標號在每個 block 內獨立決定。圖上刻意讓 block A 的 H1 對應上排第一條拷貝，
-        而 block B 的 H1 對應上排第二條拷貝 —— 兩個 block 的 H1 不是同一條染色體。
-        這個任意性寫成每個 block 一個正負號，圖上標為 σ。
-        下排分成兩欄說明後果。左欄是不受影響的：clone tree 談的是細胞的祖先關係，
-        不是哪一條親源染色體帶著變異，所以每個單位內部算出來的量都與 σ 無關。
-        右欄是會出錯的：任何把不同 block 的 H1 加總在一起的統計都沒有意義，
-        跨 block 的單倍型特異拷貝數、跨 block 比較甲基化偏向也都需要先定出 σ。
-        讀法是：所有全基因體統計都必須只由「單位內部的量」組成，這樣才自動與 σ 無關。</desc>
-
-  <text class="ttl zh" x="20" y="36">H1／H2 只在同一個 phase block 內有意義</text>
-
-  <!-- 上排：實體事實 -->
-  <text class="lbl bold zh" x="20" y="86">實體上</text>
-  <text class="anno zh" x="130" y="86">兩條染色體拷貝各自是連續的一整條</text>
-  <rect class="read hp1" x="130" y="102" width="760" height="14" rx="7"/>
-  <rect class="read hp2" x="130" y="126" width="760" height="14" rx="7"/>
-  <text class="tick mid" x="920" y="113">拷貝 ①</text>
-  <text class="tick mid" x="920" y="137">拷貝 ②</text>
-
-  <!-- 中排：軟體輸出 -->
-  <text class="lbl bold zh" x="20" y="204">軟體給你</text>
-  <text class="anno zh" x="130" y="204">每個 block 各自標號，標號獨立決定</text>
-
-  <rect class="box ghost" x="126" y="216" width="360" height="96" rx="8"/>
-  <text class="tick bold mid" x="306" y="238">phase block A　σ = +1</text>
-  <rect class="read hp1" x="150" y="250" width="310" height="14" rx="7"/>
-  <rect class="read hp2" x="150" y="274" width="310" height="14" rx="7"/>
-  <text class="tick end" x="144" y="261">H1</text>
-  <text class="tick end" x="144" y="285">H2</text>
-  <text class="tick zh mid" x="306" y="306">H1 ＝ 拷貝 ①</text>
-
-  <rect class="box ghost" x="534" y="216" width="360" height="96" rx="8"/>
-  <text class="tick bold mid" x="714" y="238">phase block B　σ = −1</text>
-  <rect class="read hp2" x="558" y="250" width="310" height="14" rx="7"/>
-  <rect class="read hp1" x="558" y="274" width="310" height="14" rx="7"/>
-  <text class="tick end" x="552" y="261">H1</text>
-  <text class="tick end" x="552" y="285">H2</text>
-  <text class="tick zh mid bad" x="714" y="306">H1 ＝ 拷貝 ②</text>
-
-  <path class="conn bad" d="M486,264 L530,264" marker-end="url(#arrow-sm)"/>
-  <path class="conn bad" d="M486,280 L530,280" marker-end="url(#arrow-sm)"/>
-  <text class="tick zh bad mid" x="508" y="336">標號在這裡翻面</text>
-
-  <!-- 下排：後果 -->
-  <rect class="box ok" x="24" y="368" width="460" height="150" rx="8"/>
-  <text class="lbl bold zh ok" x="44" y="400">不受影響</text>
-  <text class="anno zh" x="44" y="430">clone tree 談的是細胞的祖先關係，</text>
-  <text class="anno zh" x="44" y="458">不是哪一條親源染色體帶著變異。</text>
-  <text class="anno zh" x="44" y="486">單位內部算出的量與 σ 無關，可直接邊際化。</text>
-
-  <rect class="box bad" x="516" y="368" width="460" height="150" rx="8"/>
-  <text class="lbl bold zh bad" x="536" y="400">會靜靜出錯</text>
-  <text class="anno zh" x="536" y="430">把不同 block 的 H1 加總在一起的統計；</text>
-  <text class="anno zh" x="536" y="458">跨 block 的單倍型特異拷貝數；</text>
-  <text class="anno zh" x="536" y="486">跨 block 比較甲基化偏向。這些都要先定出 σ。</text>
-
-  <text class="anno zh bold" x="24" y="550">設計規則：所有全基因體統計只能由「單位內部的量」組成 —— 這樣才自動與 σ 無關。</text>
-</svg><figcaption>上排是實體事實：兩條染色體拷貝各自連續。
-中排是軟體輸出：block A 的 H1 對應拷貝 ①，block B 的 H1 對應拷貝 ② —— 兩個 H1 不是同一條。</figcaption></figure>
-
-<aside class="guardrail" id="sr2__guard-13"><p class="guardrail__hd">重要區分 #13：不同 phase block 的 H1 不是同一條染色體</p>相位軟體在每個 block 內把 read 分成兩堆並標上 H1、H2，
-但<b>標號在每個 block 內獨立決定</b>。
-
-<b>好消息</b>：約束談的是<b>細胞</b>的祖先關係，不是哪一條親源染色體帶著變異。
-每條約束都在單一個單位內產生，所以它與標號方向無關 —— 核心推論不受影響。
-
-<b>壞消息</b>：任何把不同 block 的 H1 加總在一起的判斷都沒有意義，而且不會有錯誤訊息。
-所以<b>不能</b>用「兩個變異都在 H1 上」當成它們同群的理由 ——
-跨 block 的 H1 根本不是同一條。
-
-由此得到一條可以寫成檢查程式的規則：
-<b>每一條約束都必須在單一個單位內部產生，不得跨單位組合。</b></aside>
-
-<aside class="guardrail" id="sr2__guard-14"><p class="guardrail__hd">重要區分 #14：trans 不等於分支演化</p>兩個變異若分別落在同一個細胞的兩條染色體拷貝上（trans），
-它們永遠不可能出現在同一條分子上。於是計數表會呈現
-<code>00</code>、<code>10</code>、<code>01</code>，而 <code>11</code> 那一格是空的 ——
-<b>跟兩群互不包含的 subclone 長得一模一樣</b>。
-
-在約束的脈絡下這特別致命：它會產出一條<b>假的「不可同群」</b>，
-而那是硬約束，會直接逼混合模型拆出一個不存在的群。
-
-現行流程有先按單倍型家族分堆，這一點是對的 —— 而且相位讓 cis／trans 在
-<b>整個 phase block</b> 內都是已知的（就是上一個陷阱講的那個 block），
-不是只在一條 read 之內，所以這個陷阱的可解範圍比 read 跨距大約一百倍。</aside>
-
-<h3 id="sr2__七-約束的信心值">七、約束的信心值</h3>
-
-<p class="prose">通過兩道閘門之後，約束還是有強有弱。兩個現成的量可以當信心值，
-而且求解器本來就算出來了：</p>
-
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530" class="dia-svg" role="img" aria-labelledby="sr2__rg-steiner-latent__title" aria-describedby="sr2__rg-steiner-latent__desc">
-  <title id="sr2__rg-steiner-latent__title">樹成本等於潛在節點數，所以最小成本就是「補最少的看不到狀態」</title>
-  <desc id="sr2__rg-steiner-latent__desc">左上是成本的算式。樹的成本等於邊數，邊數等於節點數減一，
-        而節點數等於固定節點數加上潛在節點數，
-        固定節點是參考型的根加上實際觀測到的狀態，潛在節點是為了把樹接起來而補進去的狀態。
-        所以最小成本等價於最少潛在節點。
-        右邊是一個例子：觀測到的只有全參考的根與兩個變異都帶的狀態，中間什麼都沒看到。
-        因為一步只能加一個突變，中間必須補一個狀態，補哪一個資料沒有意見，
-        於是得到兩個並列的最小成本候選，兩者成本都是二。
-        正確的做法是兩個都留著，而不是挑一個。
-        最下方指出潛在節點數本身就是一個值得統計的量：
-        它數的是「這棵樹需要、但沒有任何觀測支持」的狀態，
-        把全基因體的分布畫出來，就是這份重建有多少比例來自推論的直接量度。
-        讀法是：潛在節點不是一群還沒被觀察到的細胞，它是模型為了連通而記的帳。</desc>
-
-  <text class="ttl zh" x="20" y="36">最小成本 ＝ 補最少的「看不到的狀態」</text>
-
-  <rect class="box sunken" x="24" y="62" width="450" height="118" rx="8"/>
-  <text class="lbl mono mid" x="249" y="102">cost(T) = |E| = |V| − 1</text>
-  <text class="lbl mono mid" x="249" y="140">= C + |H| − 1</text>
-  <text class="tick zh mid" x="249" y="168">C ＝ 根 ＋ 觀測到的狀態　　H ＝ 補進去的潛在節點</text>
-
-  <text class="anno bold zh accent" x="24" y="216">C 固定時，最小成本就等價於最少潛在節點。</text>
-
-  <!-- 例子 -->
-  <text class="lbl bold zh" x="530" y="88">例：只觀測到 00 與 11</text>
-
-  <circle class="mark somatic" cx="620" cy="120" r="11"/>
-  <text class="tick mono mid" x="620" y="106">00</text>
-  <circle class="mark somatic" cx="620" cy="232" r="11"/>
-  <text class="tick mono mid" x="620" y="258">11</text>
-  <circle class="box ghost" cx="566" cy="176" r="11"/>
-  <circle class="box ghost" cx="674" cy="176" r="11"/>
-  <line class="conn" x1="612" y1="129" x2="574" y2="167"/>
-  <line class="conn" x1="628" y1="129" x2="666" y2="167"/>
-  <line class="conn" x1="574" y1="185" x2="612" y2="223"/>
-  <line class="conn" x1="666" y1="185" x2="628" y2="223"/>
-  <text class="tick zh" x="530" y="288">中間一定要經過一個狀態，但補哪一個資料沒有意見</text>
-
-  <rect class="box ok" x="760" y="92" width="100" height="88" rx="8"/>
-  <text class="tick mono mid" x="810" y="118">補 10</text>
-  <text class="tick mono mid" x="810" y="146">|H| = 1</text>
-  <text class="tick mono mid" x="810" y="170">cost 2</text>
-
-  <rect class="box ok" x="876" y="92" width="100" height="88" rx="8"/>
-  <text class="tick mono mid" x="926" y="118">補 01</text>
-  <text class="tick mono mid" x="926" y="146">|H| = 1</text>
-  <text class="tick mono mid" x="926" y="170">cost 2</text>
-
-  <text class="anno zh ok" x="760" y="214">兩個都留著</text>
-
-  <!-- |H| 當統計量 -->
-  <rect class="box accent" x="24" y="318" width="952" height="122" rx="8"/>
-  <text class="lbl bold zh accent" x="48" y="350">潛在節點數本身就是一個值得統計的量</text>
-  <text class="anno zh" x="48" y="382">它數的是「這棵樹需要、但沒有任何觀測支持」的狀態。</text>
-  <text class="anno zh" x="48" y="410">把全基因體的分布畫出來，就是這份重建有多少比例來自推論的直接量度 ——</text>
-  <text class="anno zh" x="48" y="434">而且求解器本來就算出來了，它就是成本。</text>
-
-  <text class="anno zh bad" x="24" y="476">但要記住它的意思：潛在節點<tspan class="bold">不是</tspan>一群還沒被觀察到的細胞。</text>
-  <text class="anno zh bad" x="24" y="504">它可能對應真的中間世代，也可能只是模型為了連通而記的帳。</text>
-</svg><figcaption>樹成本等於固定節點數加潛在節點數減一，
-所以最小成本等價於最少潛在節點。潛在節點是「這棵樹需要、但沒有任何觀測支持」的狀態。</figcaption></figure>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th scope="col">量</th><th scope="col">意思</th><th scope="col">怎麼用</th></tr></thead>
-<tbody>
-<tr><td>潛在節點數 <code>|H|</code></td><td>這個區域的拓撲需要幾個沒被觀測到的中間狀態</td><td><code>|H|</code> 越大，該區域的約束越間接，權重要越低</td></tr>
-<tr><td>候選集合大小</td><td>最小成本解有幾個並列</td><td>並列越多代表資料縮不動；只採所有候選都同意的那些約束</td></tr>
-</tbody>
-</table>
-</div>
-
-<p class="prose">這也是 <span class="term" data-term="latent node" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-latent-node-6">latent node<span class="term__pop" id="sr2__gd-latent-node-6" role="tooltip"><b class="term__hd">latent node <i>潛在節點</i></b><span class="term__def" data-lang="zh">建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</span><span class="term__def" data-lang="en" lang="en">An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.</span><a class="term__more" href="glossary.html#latent-node">完整條目 →</a></span></span> 那個警告的具體用法：
-潛在節點<b>不是</b>一群還沒被觀察到的細胞，所以不能拿它當證據 —— 但可以拿它來<b>扣分</b>。</p>
-
-<h3 id="sr2__八-用途三的基礎-單位內的比值消掉純度">八、用途三的基礎：單位內的比值消掉純度</h3>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img" aria-labelledby="sr2__rg-composition-count__title" aria-describedby="sr2__rg-composition-count__desc">
   <title id="sr2__rg-composition-count__title">組成機率其實就是在數分子：分子是那一堆有幾條，分母是全部有幾條</title>
@@ -13867,12 +13635,778 @@ report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
     <mrow><msub><mi>w</mi><mrow><mi>j</mi><mo>′</mo></mrow></msub><mo>&#8290;</mo><msub><mi>κ</mi><mrow><mi>j</mi><mo>′</mo></mrow></msub></mrow>
   </mfrac>
 </math>
-<p class="eq__note">ρ 就住在那個共同分母裡，所以它消掉。
-前提是兩個 clone 在這個位置的家族拷貝數相同 —— 也就是此處沒有 subclonal 拷貝數變異，
-而這件事用家族深度比就地檢查得出來。</p>
+<p class="eq__note">ρ 只影響「正常細胞的分子有多少」，而那些分子在兩個比例的<b>分母裡是同一項</b>，
+相除時整個消掉。拷貝數則不是無條件消掉的：它要「兩個 clone 在這裡的家族拷貝數相同」
+（也就是此處沒有 subclonal 拷貝數變異）—— 但這個前提用家族深度比就地檢查得出來，
+不必額外估一個全域值。</p>
 </div>
 
-<h3 id="sr2__九-約束預算-夠不夠用">九、約束預算：夠不夠用</h3>
+<p class="prose">進到估計式裡，它是一條<b>對 <code>c</code> 的等式約束</b>：
+<code>c[z_j] / c[z_i] = ϱ</code>。
+效果是把 <code>K</code> 個各自自由的位置參數，換成<b>一組比值加一個全域縮放</b> ——
+<code>ρ</code> 從「每個變異換算時都要用到的因子」降級成「最後才乘上去的一個純量」。
+換算錯了，整排群一起平移，<b>相對關係不變</b>。</p>
+
+<h3 id="sr2__六-三個用途合起來-完整的估計式">六、三個用途合起來：完整的估計式</h3>
+
+<p class="prose">把三節的改動疊上第一節那個式子，就是這條路線的全部：</p>
+
+<pre><code>ℒ(K, c, π, z, T)  =   Σ_m  log [ π_{z_m} · BetaBin( a_m ; d_m , ρ·c_{z_m}/2 , φ_hat ) ]
+                    + Σ_r  ω_r · log P( R_r | z , T )
+
+第一項 ── 就是第一節第二步，只有兩處不同：
+          · z 不再被積掉（Σ_k 沒了）—— 它現在是被約束的對象
+          · φ_hat 不再是自由參數 —— 用途二量出來直接代進去
+
+第二項 ── 5% 進來的地方。R_r 是第 r 條約束，ω_r 是它的信心權重</code></pre>
+
+<p class="prose">四種約束各自翻譯成什麼：</p>
+
+<pre><code>不可同群 (i, j)      →  z_i ≠ z_j                              ← 用途一，讓 K 可辨識
+必定同群 (i, j)      →  z_i = z_j
+祖先關係 (i → j)     →  T 上 z_i 是 z_j 的祖先，且 c[z_i] &gt; c[z_j]
+巢狀比值 ϱ(i, j)     →  c[z_j] / c[z_i] = ϱ                    ← 用途三，不需要純度</code></pre>
+
+<p class="prose">關鍵是<b>權重</b>而不是硬條件。閘門（第八、九節）已經擋掉大部分假約束，但擋不乾淨；
+把剩下的不確定性放進 <code>ω_r</code>，一條錯的約束只會被稀釋，
+不會像硬條件那樣直接逼出一個不存在的群。</p>
+
+<p class="prose">推論方式沒有特別之處：帶約束的 EM，或直接對 <code>(T, c, z)</code> 取樣。
+但<b>輸出必須包含「每個群配對是由幾條約束決定的」</b> ——
+沒有約束支持的關係就是靠 pigeonhole 加偏好補的，跟第一節第四步是同一個狀態，要標出來。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" class="dia-svg" role="img" aria-labelledby="sr2__sr2-flow__title" aria-describedby="sr2__sr2-flow__desc">
+  <title id="sr2__sr2-flow__title">實作流程：從 read 到約束，再到全基因體的群與樹</title>
+  <desc id="sr2__sr2-flow__desc">八個步驟由上而下，右欄註明每一步的狀態是沿用、修正還是新增。
+        第一步前處理，用現有的變異判定與單倍型標記，沿用。
+        第二步切分析單位，鍵值要含 phase set，沿用。
+        第三步抽狀態表，並且額外算出每一個位點對各自的跨越深度，這一步要修正。
+        第四步把每個區域分類成三種約束：不可同群、必定同群、有向的祖先關係，
+        這是把現行輸出重新解讀，沿用。
+        第五步是新增的兩道品質閘門：逐對檢定力不足的約束丟掉，
+        以及修正排序偏誤，因為那個偏誤會系統性地把分岔判成串接。
+        第六步給每條約束一個信心值，來源是潛在節點數與候選集合大小，這是新增的。
+        第七步把九成五區域的頻率與百分之五區域的約束一起餵進混合模型，這是新增的核心。
+        第八步輸出全基因體的群與樹，並且逐條標明哪些關係由資料決定、哪些靠偏好補。
+        最下方標注：第五步是整條流程的關鍵，因為錯的約束會強迫模型拆出不存在的群，
+        比沒有約束更糟。
+        讀法是：八步裡有四步沿用現行實作，真正要新增的是閘門、信心值與最後的接合。</desc>
+
+  <text class="ttl zh" x="20" y="36">實作流程：把已經算出來的關係接到全基因體那一層</text>
+
+  <rect class="box" x="24" y="64" width="596" height="50" rx="8"/>
+  <text class="lbl zh" x="44" y="95">① 前處理：變異判定 ＋ 單倍型標記</text>
+  <text class="anno bold zh ok" x="656" y="95">沿用</text>
+
+  <rect class="box" x="24" y="124" width="596" height="50" rx="8"/>
+  <text class="lbl zh" x="44" y="155">② 切單位：染色體＋phase set＋視窗＋家族</text>
+  <text class="anno bold zh ok" x="656" y="155">沿用</text>
+
+  <rect class="box warn" x="24" y="184" width="596" height="50" rx="8"/>
+  <text class="lbl zh" x="44" y="215">③ 抽狀態表 ＋ 算每一對的跨越深度</text>
+  <text class="anno bold zh warn" x="656" y="208">修正</text>
+  <text class="tick zh" x="656" y="230">逐對計數是後面兩道閘門的前提</text>
+
+  <rect class="box" x="24" y="244" width="596" height="50" rx="8"/>
+  <text class="lbl zh" x="44" y="275">④ 分類成三種約束：不可同群／必定同群／祖先</text>
+  <text class="anno bold zh ok" x="656" y="268">沿用</text>
+  <text class="tick zh" x="656" y="290">就是現行的串接／分岔判定</text>
+
+  <rect class="box bad" x="24" y="304" width="596" height="50" rx="8"/>
+  <text class="lbl bold zh" x="44" y="335">⑤ 兩道品質閘門：檢定力 ＋ 排序偏誤</text>
+  <text class="anno bold zh bad" x="656" y="328">新增</text>
+  <text class="tick zh bad" x="656" y="350">最關鍵的一步</text>
+
+  <rect class="box bad" x="24" y="364" width="596" height="50" rx="8"/>
+  <text class="lbl zh" x="44" y="395">⑥ 給每條約束一個信心值</text>
+  <text class="anno bold zh bad" x="656" y="388">新增</text>
+  <text class="tick zh" x="656" y="410">來源：潛在節點數、候選集合大小</text>
+
+  <rect class="box accent" x="24" y="424" width="596" height="50" rx="8"/>
+  <text class="lbl bold zh" x="44" y="455">⑦ 頻率 ＋ 約束 一起餵進混合模型</text>
+  <text class="anno bold zh accent" x="656" y="448">新增</text>
+  <text class="tick zh" x="656" y="470">這是整條路線的核心</text>
+
+  <rect class="box accent" x="24" y="484" width="596" height="50" rx="8"/>
+  <text class="lbl zh" x="44" y="515">⑧ 輸出：全基因體的群 ＋ 樹 ＋ 逐條支持度</text>
+  <text class="anno bold zh accent" x="656" y="515">新增</text>
+
+  <path class="conn" d="M322,114 L322,122" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,174 L322,182" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,234 L322,242" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,294 L322,302" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,354 L322,362" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,414 L322,422" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,474 L322,482" marker-end="url(#arrow-sm)"/>
+
+  <text class="anno zh bad" x="24" y="568">第 ⑤ 步是關鍵：錯的約束會強迫模型拆出<tspan class="bold">不存在的群</tspan> —— 比沒有約束更糟。</text>
+  <text class="tick zh" x="24" y="590">八步裡有四步沿用現行實作；真正新增的是閘門、信心值，與最後那一次接合。</text>
+</svg><figcaption>整條流程八步，其中四步沿用現行實作。
+真正要新增的是兩道閘門、約束的信心值，以及最後那一次接合。
+第五步是關鍵 —— 錯的約束會強迫模型拆出不存在的群。</figcaption></figure>
+
+<h3 id="sr2__七-約束從哪裡來-現行實作已經算出來了">七、約束從哪裡來：現行實作已經算出來了</h3>
+
+<p class="prose">以上是機制。<b>以下是它能不能真的落地</b> ——
+而第一個問題是：那些 <code>R_r</code> 從哪裡生出來。
+好消息是不必從頭寫，現行流程對每個單位做的分類直接就對應這四種：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="sr2__rg-unit-classes__title" aria-describedby="sr2__rg-unit-classes__desc">
+  <title id="sr2__rg-unit-classes__title">一個 k＝2 單位的聯合計數表只會落入三類：串接、分岔、不相容</title>
+  <desc id="sr2__rg-unit-classes__desc">三欄各是一個分析單位的聯合計數表，表格是二乘二，
+        行代表第一個位點是參考型或變異型，列代表第二個位點是參考型或變異型。
+        三欄的邊際計數刻意做成一樣，差別只在四個格子怎麼分配。
+        左欄是串接：只有全參考、只帶第一個、兩個都帶三種分子，
+        沒有任何分子只帶第二個，所以第二個變異一定發生在第一個變異的後代裡，樹是一條線。
+        中欄是分岔：只帶第二個那一格有分子，兩個都帶那一格是空的，
+        所以兩群細胞互不包含，樹分岔。
+        右欄是不相容：四個格子都有分子，這在每個變異只發生一次的假設下不可能，
+        代表某個變異判定是假的，或有 read 被分到錯的單倍型家族。
+        右欄因此不是生物學結果，而是品質指標，可以反過來估計分型錯誤率。
+        讀法是：三欄的邊際完全一樣，只有聯合計數分得出來。</desc>
+
+  <text class="ttl zh" x="20" y="36">同一組邊際，三種聯合計數表</text>
+  <text class="anno zh" x="20" y="66">三欄的邊際計數刻意相同 —— 重點正是「光看邊際分不出來」。</text>
+
+  <!-- ── 左：串接 ─────────────────────────────────────────────── -->
+  <rect class="box ghost" x="24" y="84" width="296" height="330" rx="8"/>
+  <text class="lbl bold zh ok mid" x="172" y="114">串接 chain</text>
+  <text class="tick mid" x="136" y="150">S2 = R</text>
+  <text class="tick mid" x="212" y="150">S2 = A</text>
+  <text class="tick end" x="90" y="194">S1 = R</text>
+  <text class="tick end" x="90" y="246">S1 = A</text>
+  <rect class="box plain" x="100" y="166" width="72" height="44" rx="6"/>
+  <rect class="box plain" x="176" y="166" width="72" height="44" rx="6"/>
+  <rect class="box plain" x="100" y="218" width="72" height="44" rx="6"/>
+  <rect class="box plain" x="176" y="218" width="72" height="44" rx="6"/>
+  <text class="lbl mono mid" x="136" y="196">41</text>
+  <text class="lbl mono mid ok" x="212" y="196">0</text>
+  <text class="lbl mono mid" x="136" y="248">22</text>
+  <text class="lbl mono mid" x="212" y="248">17</text>
+  <circle class="mark ref" cx="172" cy="292" r="8"/>
+  <line class="conn" x1="172" y1="300" x2="172" y2="326"/>
+  <circle class="mark somatic" cx="172" cy="334" r="8"/>
+  <line class="conn" x1="172" y1="342" x2="172" y2="368"/>
+  <circle class="mark somatic" cx="172" cy="376" r="8"/>
+  <text class="tick zh mid" x="172" y="402">S2 長在 S1 的後代裡</text>
+
+  <!-- ── 中：分岔 ─────────────────────────────────────────────── -->
+  <rect class="box ghost" x="352" y="84" width="296" height="330" rx="8"/>
+  <text class="lbl bold zh accent mid" x="500" y="114">分岔 fork</text>
+  <text class="tick mid" x="464" y="150">S2 = R</text>
+  <text class="tick mid" x="540" y="150">S2 = A</text>
+  <text class="tick end" x="418" y="194">S1 = R</text>
+  <text class="tick end" x="418" y="246">S1 = A</text>
+  <rect class="box plain" x="428" y="166" width="72" height="44" rx="6"/>
+  <rect class="box plain" x="504" y="166" width="72" height="44" rx="6"/>
+  <rect class="box plain" x="428" y="218" width="72" height="44" rx="6"/>
+  <rect class="box plain" x="504" y="218" width="72" height="44" rx="6"/>
+  <text class="lbl mono mid" x="464" y="196">41</text>
+  <text class="lbl mono mid" x="540" y="196">17</text>
+  <text class="lbl mono mid" x="464" y="248">22</text>
+  <text class="lbl mono mid accent" x="540" y="248">0</text>
+  <circle class="mark ref" cx="500" cy="292" r="8"/>
+  <line class="conn" x1="500" y1="300" x2="452" y2="330"/>
+  <line class="conn" x1="500" y1="300" x2="548" y2="330"/>
+  <circle class="mark somatic" cx="448" cy="338" r="8"/>
+  <circle class="mark somatic" cx="552" cy="338" r="8"/>
+  <text class="tick zh mid" x="500" y="378">兩群細胞互不包含</text>
+  <text class="tick zh mid" x="500" y="402">S2 另外長出來</text>
+
+  <!-- ── 右：不相容 ───────────────────────────────────────────── -->
+  <rect class="box ghost bad" x="680" y="84" width="296" height="330" rx="8"/>
+  <text class="lbl bold zh bad mid" x="828" y="114">不相容 incompatible</text>
+  <text class="tick mid" x="792" y="150">S2 = R</text>
+  <text class="tick mid" x="868" y="150">S2 = A</text>
+  <text class="tick end" x="746" y="194">S1 = R</text>
+  <text class="tick end" x="746" y="246">S1 = A</text>
+  <rect class="box plain" x="756" y="166" width="72" height="44" rx="6"/>
+  <rect class="box plain" x="832" y="166" width="72" height="44" rx="6"/>
+  <rect class="box plain" x="756" y="218" width="72" height="44" rx="6"/>
+  <rect class="box plain" x="832" y="218" width="72" height="44" rx="6"/>
+  <text class="lbl mono mid" x="792" y="196">38</text>
+  <text class="lbl mono mid bad" x="868" y="196">15</text>
+  <text class="lbl mono mid" x="792" y="248">20</text>
+  <text class="lbl mono mid bad" x="868" y="248">9</text>
+  <text class="ttl bad mid" x="828" y="316">✗</text>
+  <text class="tick zh mid bad" x="828" y="352">四格全滿 —— 在「每個變異</text>
+  <text class="tick zh mid bad" x="828" y="376">只發生一次」下不可能</text>
+  <text class="tick zh mid" x="828" y="402">這是品質指標，不是生物學</text>
+
+  <text class="anno zh" x="24" y="450">右欄的出現率可以反過來估計單倍型分型的錯誤率 —— 模型因此自帶一個校正用的觀測量。</text>
+  <text class="anno zh" x="24" y="482">分類要用似然比檢定，不是對原始計數設門檻：在偵測極限附近，兩種假設只差幾條 read。</text>
+</svg><figcaption>三欄的邊際計數刻意做成一樣 —— 重點正是「光看邊際分不出來」。
+左邊是串接，給出有向的祖先關係；中間是分岔，給出「不可同群」；
+右邊四格全滿是不相容，那不是生物學結果而是品質訊號。</figcaption></figure>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">現行輸出</th><th scope="col">對應的約束</th><th scope="col">它在全基因體那一層決定什麼</th></tr></thead>
+<tbody>
+<tr><td>分岔（沒有分子同時帶兩者）</td><td><b>不可同群</b>（硬）</td><td>強迫拆峰 —— 用途一唯一的原料。<b>但 trans 會偽造這一格，見第十節</b></td></tr>
+<tr><td>串接，且比值 ≈ 1</td><td><b>必定同群</b>（硬）</td><td>把散在不同區域的同一群併起來。<b>權重要最低，理由見下</b></td></tr>
+<tr><td>串接，且比值 &lt; 1</td><td><b>有向</b>：A 群是 B 群的祖先</td><td>群與群的先後 —— 取代第一節第四步那個簡約性偏好</td></tr>
+<tr><td>不相容（四格全滿）</td><td>不產生約束</td><td>反過來估計單倍型標記的錯誤率</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4 id="sr2__必定同群-這一條要小心-因為它跟用途一互相拉扯">「必定同群」這一條要小心，因為它跟用途一互相拉扯</h4>
+
+<p class="prose">上面那張表最容易被照單全收的是第二列。串接代表後者長在前者的譜系上，
+所以兩群是<b>巢狀</b>；比值 ≈ 1 只是說後者幾乎接管了前者。
+但「幾乎接管」<b>不等於同一群</b> —— 那是<b>兩個真實存在的 clone</b>，
+只是在頻率軸上分不開。而<b>頻率相同不等於同一群</b>，正是第三節整節在論證的事。
+把它們硬性合併，等於在用途一想拆開的地方主動把兩群黏起來，方向剛好相反。</p>
+
+<ul class="prose">
+<li><b>「≈ 1」要寫成一個明確的容差，而且容差由檢定力決定，不是拍板的常數。</b>
+在跨越深度 <code>n</code> 之下，比值本來就有抽樣誤差；
+只有當「比值 &lt; 1」在這個 <code>n</code> 下<b>本來就分辨得出來</b>而觀測仍然落在 1 附近，
+「≈ 1」才帶資訊。<code>n</code> 小的時候任何比值都 ≈ 1 —— 那不是證據，是沒有解析度。</li>
+<li><b>權重要是三種約束裡最低的。</b>不可同群與有向關係都在<b>增加</b>可辨識性；
+必定同群是唯一一條在<b>減少</b>它的。錯的不可同群會逼出一個不存在的群，
+錯的必定同群則會讓一個真的群整個消失 —— 後者更難發現，
+因為多出一個群還會讓人起疑，少一個群不會有任何異常。</li>
+</ul>
+
+<h3 id="sr2__八-閘門一-一個單位的有效樣本數比它看起來小得多">八、閘門一：一個單位的有效樣本數比它看起來小得多</h3>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" class="dia-svg" role="img" aria-labelledby="sr2__rg-partial-reads__title" aria-describedby="sr2__rg-partial-reads__desc">
+  <title id="sr2__rg-partial-reads__title">一個真實區域的 read 覆蓋：八成的分子只看得到一個位點</title>
+  <desc id="sr2__rg-partial-reads__desc">上半是一個真實分析單位裡 read 覆蓋情況的統計。
+        這個單位有三個 somatic 位點、一百九十四條 read，視窗寬三十九點四 kb。
+        三條長條由上而下分別是：同時蓋到三個位點的 read 只有三條，佔百分之一點五；
+        蓋到兩個位點的三十一條，佔百分之十六；只蓋到一個位點的一百六十條，佔百分之八十二點五。
+        下半把同一批 read 按位點對拆開，看每一對到底有幾條 read 同時蓋到。
+        第一對與第二對各有十七條與二十條，分別判出分岔與串接；
+        第三對只有三條，而且三條都是參考型，什麼也判不出來。
+        最下方是這張圖的結論：這個單位的演化樹靠的是十七與二十這兩個數字，不是一百九十四；
+        而第三對其實沒有資料，卻仍然被演算法決定了關係。
+        讀法是：有效樣本數是「每一個位點對各自的跨越深度」，不是這個單位的總 read 數。</desc>
+
+  <text class="ttl zh" x="20" y="36">真實資料長什麼樣</text>
+  <text class="tick mono" x="20" y="62">HCC1395_HKU · chr12:981,725–1,021,146 · HP1 · k=3 · 194 reads · 視窗 39.4 kb</text>
+
+  <!-- 覆蓋統計 -->
+  <text class="lbl bold zh" x="20" y="106">一條 read 蓋得到幾個位點</text>
+
+  <text class="anno zh end" x="196" y="140">蓋到 3 個</text>
+  <rect class="bar ok" x="212" y="126" width="9" height="18" rx="3"/>
+  <text class="anno mono" x="240" y="140">3 條　1.5%</text>
+
+  <text class="anno zh end" x="196" y="180">蓋到 2 個</text>
+  <rect class="bar warn" x="212" y="166" width="97" height="18" rx="3"/>
+  <text class="anno mono" x="328" y="180">31 條　16.0%</text>
+
+  <text class="anno zh end" x="196" y="220">只蓋到 1 個</text>
+  <rect class="bar bad" x="212" y="206" width="500" height="18" rx="3"/>
+  <text class="anno mono" x="730" y="220">160 條　82.5%</text>
+
+  <text class="anno zh bad" x="212" y="256">八成的分子只看得到一個位點 —— 它對「兩個位點的共現」完全沒有意見。</text>
+
+  <!-- 位點對拆解 -->
+  <line class="guide" x1="20" y1="278" x2="980" y2="278"/>
+  <text class="lbl bold zh" x="20" y="312">把同一批 read 按位點對拆開</text>
+
+  <rect class="box ok" x="24" y="330" width="300" height="120" rx="8"/>
+  <text class="anno bold mono mid" x="174" y="358">S1 × S3</text>
+  <text class="lbl bold mono mid bad" x="174" y="392">n = 3</text>
+  <text class="tick zh mid" x="174" y="418">三條都是參考型</text>
+  <text class="tick zh mid bad" x="174" y="440">什麼也判不出來</text>
+
+  <rect class="box ok" x="350" y="330" width="300" height="120" rx="8"/>
+  <text class="anno bold mono mid" x="500" y="358">S1 × S2</text>
+  <text class="lbl bold mono mid" x="500" y="392">n = 17</text>
+  <text class="tick mono mid" x="500" y="418">RA 12 · AR 5 · 沒有 AA</text>
+  <text class="tick zh mid accent" x="500" y="440">判為分岔</text>
+
+  <rect class="box ok" x="676" y="330" width="300" height="120" rx="8"/>
+  <text class="anno bold mono mid" x="826" y="358">S2 × S3</text>
+  <text class="lbl bold mono mid" x="826" y="392">n = 20</text>
+  <text class="tick mono mid" x="826" y="418">AA 6 · AR 9 · RR 5</text>
+  <text class="tick zh mid ok" x="826" y="440">判為串接</text>
+
+  <!-- 結論 -->
+  <rect class="box bad" x="24" y="466" width="952" height="62" rx="8"/>
+  <text class="anno zh" x="48" y="494">這個單位的樹靠的是 <tspan class="bold">17 與 20</tspan>，不是 194。而 S1 × S3 那一對<tspan class="bold">沒有資料</tspan>，</text>
+  <text class="anno zh bad" x="48" y="520">卻一樣被演算法決定了關係 —— 「沒看到」被當成了「不存在」。</text>
+</svg><figcaption>八成的 read 只看得到三個位點裡的一個。
+把同一批 read 按位點對拆開之後才看得出來：這個單位的判定靠的是 17 與 20 兩個數字，不是 194，
+而其中一對只有 3 條 read，卻一樣被判了關係。</figcaption></figure>
+
+<p class="prose">一個單位的有效樣本數<b>不是</b>它的總 read 數，
+而是<b>每一個位點對各自有幾條 read 同時蓋到</b>。
+上圖那個單位的三個位點對，跨越深度分別是 20、17 與 <b>3</b> ——
+而那個 <code>n = 3</code> 的位點對，照樣產出了一條約束。</p>
+
+<p class="prose">假設那條譜系裡有三成的分子帶著某個狀態，三條 read 全部錯過的機率是
+<code>0.7³ ≈ 0.34</code>。<b>三分之一的機率會把「有」看成「沒有」</b> ——
+而「沒看到」正是判定分岔的依據。也就是說，這條約束有三分之一的機率是假的，
+而它會直接被第六節那個式子當成一條硬的 <code>z_i ≠ z_j</code>。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="sr2__rg-pairwise-gate__title" aria-describedby="sr2__rg-pairwise-gate__desc">
+  <title id="sr2__rg-pairwise-gate__title">兩種「沒看到」：真的沒有那種細胞，與沒有 read 跨得到</title>
+  <desc id="sr2__rg-pairwise-gate__desc">左邊是跨越深度隨距離衰減的曲線。
+        兩個位點靠得愈近，同時蓋到它們的 read 就愈多；距離接近讀長時，跨越深度掉到接近零。
+        圖上標出真實例子的三個位點對，跨越深度分別是二十、十七與三。
+        右邊說明問題所在：演算法看到某個狀態沒有出現，有兩種完全不同的原因。
+        第一種是真的沒有細胞帶著那個組合，那是生物學結論。
+        第二種是根本沒有 read 同時蓋到那兩個位點，那只是看不到。
+        目前的做法把兩者當成同一件事，於是把看不到當成不存在。
+        最下方是修正方式：每一個位點對先用自己的跨越深度算檢定力，
+        檢定力不足的對標成未定，不允許它去約束樹的形狀，並且在報告裡列出來。
+        讀法是：缺席要有足夠的觀測撐著，才能當成證據。</desc>
+
+  <text class="ttl zh" x="20" y="36">兩種「沒看到」</text>
+
+  <!-- 左：跨越深度衰減 -->
+  <text class="lbl bold zh" x="20" y="76">跨越深度隨距離掉得很快</text>
+  <line class="axis" x1="80" y1="270" x2="440" y2="270"/>
+  <line class="axis" x1="80" y1="270" x2="80" y2="100"/>
+  <text class="tick zh mid" x="260" y="296">兩個位點的距離 →</text>
+  <text class="tick zh" x="20" y="96">跨越深度</text>
+
+  <path class="conn thick ok" style="fill:none"
+        d="M80,112 C150,130 200,180 260,214 C320,246 380,262 430,266"/>
+
+  <circle class="pt tp" cx="140" cy="140" r="5"/>
+  <text class="tick mono" x="152" y="136">n=20</text>
+  <circle class="pt tp" cx="196" cy="178" r="5"/>
+  <text class="tick mono" x="208" y="174">n=17</text>
+  <circle class="pt fp" cx="372" cy="261" r="5"/>
+  <text class="tick mono bad" x="300" y="252">n=3</text>
+
+  <line class="guide muted" x1="80" y1="238" x2="440" y2="238"/>
+  <text class="tick zh bad" x="86" y="232">檢定力門檻</text>
+
+  <!-- 右：兩種原因 -->
+  <text class="lbl bold zh" x="500" y="76">同樣是「這個狀態沒出現」</text>
+
+  <rect class="box ok" x="500" y="94" width="476" height="82" rx="8"/>
+  <text class="anno bold zh ok" x="524" y="126">① 真的沒有細胞帶著那個組合</text>
+  <text class="anno zh" x="524" y="158">這是生物學結論，可以拿來決定樹的形狀。</text>
+
+  <rect class="box bad" x="500" y="190" width="476" height="82" rx="8"/>
+  <text class="anno bold zh bad" x="524" y="222">② 根本沒有 read 同時蓋到那兩個位點</text>
+  <text class="anno zh" x="524" y="254">這只是看不到，不能拿來決定任何事。</text>
+
+  <path class="conn bad" d="M738,282 L738,306" marker-end="url(#arrow-sm)"/>
+  <text class="anno zh bad mid" x="738" y="330">目前的做法把兩者當成同一件事</text>
+
+  <!-- 修正 -->
+  <rect class="box accent" x="24" y="352" width="952" height="128" rx="8"/>
+  <text class="lbl bold zh accent" x="48" y="384">修正：每一對先過檢定力這一關</text>
+  <text class="anno zh" x="48" y="416">用該位點對自己的跨越深度算檢定力；不足的標成「未定」，</text>
+  <text class="anno zh" x="48" y="444">不允許它的「缺席」去約束樹，並且在報告裡逐條列出來。</text>
+  <text class="tick zh" x="48" y="470">預期效果：目前被歸進「單層無分支」的單位，會有一部分正確地移到「未解析」。</text>
+</svg><figcaption>「這個狀態沒出現」有兩種完全不同的原因：真的沒有那種細胞，
+或根本沒有 read 跨得到。目前的解法把兩者當成同一件事 ——
+而在約束的脈絡下，第二種會直接變成一條假的硬約束。</figcaption></figure>
+
+<pre><code>for each pair (i, j) in the unit:
+    n_ij  = 同時蓋到 i 與 j 的 read 數
+    π_ij  = 在 n_ij 與錯誤率 ε 下，偵測到「佔該譜系 ϱ_min」的狀態的檢定力
+    if π_ij &lt; π*:
+        這一對不產生約束（標成 UNDETERMINED）
+report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
+
+<p class="prose">門檻不是小事：ϱ_min ＝ 0.05、π* ＝ 0.95 要求 <code>n ≥ 59</code>，
+上面那個單位<b>三對全滅</b>。ε 與 η 要就地估，不要用全域常數 ——
+錯誤模型本身不變，每個位點一道閘門，加上兩個家族之間的交換：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="sr2__rg-error-gates__title" aria-describedby="sr2__rg-error-gates__desc">
+  <title id="sr2__rg-error-gates__title">觀測要經過幾道閘門：每個位點一道，最後兩個家族之間再交換一次</title>
+  <desc id="sr2__rg-error-gates__desc">兩條並排的通道分別是同一個視窗的兩個單倍型家族。
+        每條通道由左到右經過相同的幾個階段。
+        起點是真實的分子組成。
+        接著是每個位點各一道錯誤閘門，閘門會把參考型讀成變異型，也會把變異型讀成參考型，
+        兩個方向的機率不一樣，所以閘門不是對稱的。
+        k 個位點就串 k 道閘門，把它們串起來就是公式裡那個張量積。
+        最後一道是家族交換閘門：大部分的分子留在自己的通道，
+        但有一小部分會被標到另一條通道去，圖上用兩條交叉的虛線表示。
+        終點是實際觀測到的計數。
+        圖的下方指出這件事的後果：因為交換閘門把兩條通道接在一起，
+        兩個家族必須一起估。分開估會讓譜系內比例每個單位都往零點五偏一點，
+        而且幾萬個單位偏的方向相同，那不是把譜變寬，是把整條譜平移。
+        讀法是：公式裡的三個符號各對應圖上一道閘門。</desc>
+
+  <text class="ttl zh" x="20" y="36">觀測要經過幾道閘門</text>
+
+  <text class="tick bold hp1" x="20" y="156">家族 H1</text>
+  <text class="tick bold hp2" x="20" y="296">家族 H2</text>
+
+  <!-- 真實組成 -->
+  <rect class="box plain" x="96" y="122" width="106" height="56" rx="8"/>
+  <text class="anno zh mid" x="149" y="156">真實組成</text>
+  <rect class="box plain" x="96" y="262" width="106" height="56" rx="8"/>
+  <text class="anno zh mid" x="149" y="296">真實組成</text>
+
+  <path class="conn" d="M202,150 L238,150" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M202,290 L238,290" marker-end="url(#arrow-sm)"/>
+
+  <!-- 位點 1 閘門 -->
+  <rect class="box warn" x="242" y="122" width="118" height="56" rx="8"/>
+  <text class="tick zh mid" x="301" y="146">位點 1 閘門</text>
+  <text class="tick mono mid" x="301" y="168">ε₁ , η₁</text>
+  <rect class="box warn" x="242" y="262" width="118" height="56" rx="8"/>
+  <text class="tick zh mid" x="301" y="286">位點 1 閘門</text>
+  <text class="tick mono mid" x="301" y="308">ε₁ , η₁</text>
+
+  <path class="conn" d="M360,150 L396,150" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M360,290 L396,290" marker-end="url(#arrow-sm)"/>
+
+  <!-- 位點 2 閘門 -->
+  <rect class="box warn" x="400" y="122" width="118" height="56" rx="8"/>
+  <text class="tick zh mid" x="459" y="146">位點 2 閘門</text>
+  <text class="tick mono mid" x="459" y="168">ε₂ , η₂</text>
+  <rect class="box warn" x="400" y="262" width="118" height="56" rx="8"/>
+  <text class="tick zh mid" x="459" y="286">位點 2 閘門</text>
+  <text class="tick mono mid" x="459" y="308">ε₂ , η₂</text>
+
+  <text class="tick zh mid" x="380" y="204">這兩道串起來就是公式裡的 T ＝ E₁ ⊗ E₂　（k 個位點就串 k 道）</text>
+
+  <!-- 家族交換閘門 -->
+  <rect class="box bad" x="556" y="102" width="176" height="236" rx="8"/>
+  <text class="tick bold zh bad mid" x="644" y="90">家族交換閘門 δ</text>
+
+  <path class="conn ok" d="M576,150 L712,150" marker-end="url(#arrow-sm)"/>
+  <path class="conn ok" d="M576,290 L712,290" marker-end="url(#arrow-sm)"/>
+  <path class="conn bad" stroke-dasharray="7 5" style="fill:none"
+        d="M576,166 L712,274" marker-end="url(#arrow-sm)"/>
+  <path class="conn bad" stroke-dasharray="7 5" style="fill:none"
+        d="M576,274 L712,166" marker-end="url(#arrow-sm)"/>
+
+  <text class="tick mono ok mid" x="644" y="140">1 − δ</text>
+  <text class="tick mono bad mid" x="644" y="228">δ</text>
+
+  <path class="conn" d="M732,150 L768,150" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M732,290 L768,290" marker-end="url(#arrow-sm)"/>
+
+  <!-- 觀測 -->
+  <rect class="box accent" x="772" y="122" width="118" height="56" rx="8"/>
+  <text class="anno zh mid" x="831" y="156">觀測計數</text>
+  <rect class="box accent" x="772" y="262" width="118" height="56" rx="8"/>
+  <text class="anno zh mid" x="831" y="296">觀測計數</text>
+
+  <!-- 說明 -->
+  <text class="anno zh" x="24" y="382">ε 是「把 REF 讀成 ALT」，η 是「把 ALT 讀成 REF」—— 兩個方向機率不同，所以閘門不對稱。</text>
+  <text class="anno zh" x="24" y="410">兩者都可以用同一個視窗裡的 germline 雜合位點就地估出來，不必外部參數。</text>
+
+  <rect class="box bad" x="24" y="430" width="952" height="60" rx="8"/>
+  <text class="anno zh bad" x="48" y="458">交換閘門把兩條通道接在一起，所以<tspan class="bold">兩個家族必須一起估</tspan>。分開估會讓 ϱ 每個單位</text>
+  <text class="anno zh bad" x="48" y="482">都往 0.5 偏一點，而且幾萬個單位偏的方向相同 —— 那不是把譜變寬，是把整條譜平移。</text>
+</svg><figcaption>每個位點一道錯誤閘門；最後一道是家族交換閘門，
+一小部分分子被標到另一條通道去。交換閘門把兩條通道接在一起，所以兩個家族必須一起估。</figcaption></figure>
+
+<p class="prose">為什麼可跨越的範圍這麼小，要回到下面這個結構：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" class="dia-svg" role="img" aria-labelledby="sr2__rg-three-tiers__title" aria-describedby="sr2__rg-three-tiers__desc">
+  <title id="sr2__rg-three-tiers__title">三層資訊：全基因體只有邊際、phase block 知道 cis／trans、read 跨距內才數得到共現</title>
+  <desc id="sr2__rg-three-tiers__desc">三層由下而上代表資訊愈來愈完整，但涵蓋範圍愈來愈小。
+        最下層是全基因體，任何兩個位點之間都只有各自的邊際頻率，沒有共現關係。
+        中間層是 phase block，典型長度一到五個 Mb，在這個範圍內兩個位點是在同一條染色體
+        還是分開在兩條，是已知的，即使沒有任何一條 read 同時蓋到它們。
+        最上層是 read 跨距，典型二十個 kb，只有在這個範圍內才數得出「同時帶有兩個變異的分子有幾條」。
+        右側標出每一層在一個典型樣本裡各有多少筆可用觀測：
+        read 跨距內的聯合計數約數百到數萬筆，phase block 內的 cis／trans 判定約多一百倍，
+        全基因體邊際則涵蓋全部變異。
+        讀法是：read 長度限制的是「數得到共現」，phase block 限制的是「知道在不在同一條染色體上」，
+        這兩件事的範圍差了兩個數量級，常被混為一談。</desc>
+
+  <text class="ttl zh" x="20" y="36">三層資訊：範圍愈小，資訊愈完整</text>
+
+  <!-- 第三層：全基因體 -->
+  <rect class="box" x="24" y="330" width="700" height="86" rx="8"/>
+  <text class="lbl bold zh" x="44" y="362">③ 全基因體</text>
+  <text class="anno zh" x="44" y="392">只有邊際頻率（VAF、β）—— 傳統路線整個住在這一層</text>
+  <text class="anno zh mid" x="860" y="362">全部變異</text>
+  <text class="tick zh mid" x="860" y="390">數百萬筆</text>
+
+  <!-- 第二層：phase block -->
+  <rect class="box accent" x="24" y="216" width="520" height="86" rx="8"/>
+  <text class="lbl bold zh" x="44" y="248">② phase block（1–5 Mb）</text>
+  <text class="anno zh" x="44" y="278">cis／trans 已知，但數不到共現分子數</text>
+  <text class="anno zh mid" x="860" y="248">cis／trans 判定</text>
+  <text class="tick zh mid" x="860" y="276">約 7 萬筆</text>
+
+  <!-- 第一層：read 跨距 -->
+  <rect class="box ok" x="24" y="102" width="240" height="86" rx="8"/>
+  <text class="lbl bold zh" x="44" y="134">① read 跨距（20 kb）</text>
+  <text class="anno zh" x="44" y="164">聯合計數看得到</text>
+  <text class="anno zh mid" x="860" y="134">聯合計數</text>
+  <text class="tick zh mid" x="860" y="162">數百到數萬筆</text>
+
+  <line class="guide muted" x1="600" y1="120" x2="740" y2="120"/>
+  <line class="guide muted" x1="600" y1="234" x2="740" y2="234"/>
+  <line class="guide muted" x1="740" y1="348" x2="740" y2="348"/>
+
+  <path class="conn thick ok" d="M290,145 L560,145" marker-end="url(#arrow)"/>
+  <text class="tick zh ok" x="300" y="130">資訊最完整</text>
+  <path class="conn thick" d="M570,259 L700,259" marker-end="url(#arrow)"/>
+  <text class="tick zh" x="580" y="244">涵蓋最廣</text>
+
+  <text class="anno zh bad" x="24" y="450">最常見的誤解：把 ① 與 ② 當成同一件事。read 長度限制的是「數得到共現」，</text>
+  <text class="tick zh bad" x="24" y="472">phase block 限制的是「知不知道在同一條染色體上」—— 兩者範圍差約一百倍。</text>
+</svg><figcaption>read 跨距限制的是「數不數得到共現」，
+<span class="term" data-term="phase block" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-phase-block-3">phase block<span class="term__pop" id="sr2__gd-phase-block-3" role="tooltip"><b class="term__hd">phase block</b><span class="term__def" data-lang="zh">一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</span><span class="term__def" data-lang="en" lang="en">A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.</span><a class="term__more" href="glossary.html#phase-block">完整條目 →</a></span></span> 限制的是「知不知道兩個位點在不在同一條染色體上」。
+約束只能從最上層那一格產生 —— 那也是三層裡範圍最小的一層。</figcaption></figure>
+
+<h3 id="sr2__九-閘門二-排序偏誤會系統性地抽掉-不可同群">九、閘門二：排序偏誤會系統性地抽掉「不可同群」</h3>
+
+<p class="prose">第二道閘門比第一道隱蔽，而且方向很不利。
+最小成本候選常常不只一個，現行流程用 <span class="term" data-term="read-AF" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-read-af-4">read-AF<span class="term__pop" id="sr2__gd-read-af-4" role="tooltip"><b class="term__hd">read-AF <i>read 層級的 ALT 比例</i></b><span class="term__def" data-lang="zh">在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</span><span class="term__def" data-lang="en" lang="en">The fraction of reads carrying the ALT allele at a somatic site, computed within one analysis window and one haplotype family. Because the denominator is already restricted, no purity or copy-number correction is needed; it is used to rank candidate trees of equal cost.</span><a class="term__more" href="glossary.html#read-af">完整條目 →</a></span></span> 的差值總和排序 ——
+問題出在<b>相加的項數由形狀決定</b>：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" class="dia-svg" role="img" aria-labelledby="sr2__rg-score-bias__title" aria-describedby="sr2__rg-score-bias__desc">
+  <title id="sr2__rg-score-bias__title">read-AF 差值總和有形狀偏誤：星狀永遠得零分，串接永遠贏</title>
+  <desc id="sr2__rg-score-bias__desc">目前排序候選樹的分數，是把樹上每一組「祖先與後代」的 read-AF 相減再全部加起來。
+        問題在於相加的項數本身由樹的形狀決定。
+        圖上三個形狀由左到右：三個突變串成一條線、一條線加一個分支、三個都從根長出來的星狀。
+        它們的祖先後代配對數分別是三、一、零。
+        因此串接的分數是第一個減第三個的兩倍，中間的形狀只有一項，
+        而星狀因為沒有任何祖先後代配對，分數恆等於零。
+        結論寫在下方：只要 read-AF 不完全相等，串接的分數就是正的，
+        而星狀永遠是零，所以當最小成本候選裡同時有這兩種形狀時，分支永遠贏不了。
+        觀測到的最多的類別正好是多層無分支，佔三成八到五成三，
+        這個偏誤剛好往那個方向推。
+        最下方是替代方案：改用機率模型比較各個形狀解釋同一組 read-AF 的能力，
+        而不是加總差值。
+        讀法是：分數要能跨形狀比較，才不會讓形狀自己決定勝負。</desc>
+
+  <text class="ttl zh" x="20" y="36">分數的形狀偏誤</text>
+  <text class="anno zh" x="20" y="66">分數＝把樹上每一組「祖先→後代」的 read-AF 相減，全部加起來。項數由形狀決定。</text>
+
+  <!-- 串接 -->
+  <rect class="box ghost" x="24" y="88" width="300" height="230" rx="8"/>
+  <text class="anno bold zh mid" x="174" y="118">串接</text>
+  <circle class="mark somatic" cx="174" cy="150" r="10"/>
+  <line class="conn" x1="174" y1="160" x2="174" y2="188"/>
+  <circle class="mark somatic" cx="174" cy="198" r="10"/>
+  <line class="conn" x1="174" y1="208" x2="174" y2="236"/>
+  <circle class="mark somatic" cx="174" cy="246" r="10"/>
+  <text class="tick zh mid" x="174" y="278">祖先後代配對：3 組</text>
+  <text class="lbl mono mid ok" x="174" y="306">2(a₁ − a₃)</text>
+
+  <!-- 一線一分支 -->
+  <rect class="box ghost" x="350" y="88" width="300" height="230" rx="8"/>
+  <text class="anno bold zh mid" x="500" y="118">一線加一分支</text>
+  <circle class="mark somatic" cx="500" cy="150" r="10"/>
+  <line class="conn" x1="492" y1="158" x2="452" y2="190"/>
+  <line class="conn" x1="508" y1="158" x2="548" y2="190"/>
+  <circle class="mark somatic" cx="446" cy="198" r="10"/>
+  <circle class="mark somatic" cx="554" cy="198" r="10"/>
+  <line class="conn" x1="446" y1="208" x2="446" y2="236"/>
+  <circle class="mark somatic" cx="446" cy="246" r="10"/>
+  <text class="tick zh mid" x="500" y="278">祖先後代配對：1 組</text>
+  <text class="lbl mono mid" x="500" y="306">a₁ − a₂</text>
+
+  <!-- 星狀 -->
+  <rect class="box ghost bad" x="676" y="88" width="300" height="230" rx="8"/>
+  <text class="anno bold zh mid" x="826" y="118">星狀（全分支）</text>
+  <circle class="mark somatic" cx="826" cy="150" r="10"/>
+  <line class="conn" x1="818" y1="158" x2="756" y2="192"/>
+  <line class="conn" x1="826" y1="160" x2="826" y2="188"/>
+  <line class="conn" x1="834" y1="158" x2="896" y2="192"/>
+  <circle class="mark somatic" cx="750" cy="198" r="10"/>
+  <circle class="mark somatic" cx="826" cy="198" r="10"/>
+  <circle class="mark somatic" cx="902" cy="198" r="10"/>
+  <text class="tick zh mid" x="826" y="278">祖先後代配對：0 組</text>
+  <text class="lbl mono mid bad" x="826" y="306">恆等於 0</text>
+
+  <rect class="box bad" x="24" y="336" width="952" height="60" rx="8"/>
+  <text class="anno zh" x="48" y="364">只要 read-AF 不完全相等，串接就是正分，星狀恆為 0 ——</text>
+  <text class="anno zh bad" x="48" y="388">所以最小成本候選裡同時有這兩種形狀時，<tspan class="bold">分支永遠贏不了</tspan>。</text>
+
+  <text class="anno zh" x="24" y="428">觀測到最多的類別正好是「多層無分支」（38–53%），而這個偏誤剛好往那個方向推。</text>
+  <text class="anno zh ok" x="24" y="458">替代方案：用機率模型比較各形狀解釋同一組 read-AF 的能力，而不是加總差值。</text>
+</svg><figcaption>三個形狀的祖先後代配對數分別是 3、1、0。
+串接得到正分，星狀恆等於 0 —— 所以最小成本候選裡同時有這兩種形狀時，分支永遠贏不了。</figcaption></figure>
+
+<p class="prose">後果很具體：<b>該產出「不可同群」的單位，會改成產出「祖先關係」。</b>
+而「不可同群」是用途一<b>唯一</b>的原料 ——
+所以這個偏誤系統性地<b>抽掉拆峰的能力</b>，讓第三節那個「估出 <code>K = 2</code>」繼續留著。</p>
+
+<p class="prose">修法是把差值總和換成似然：在拓撲施加的約束下擬合各節點的分子比例，
+再比最大化後的似然。這樣不同形狀才是在比「解釋同一組數字的能力」，形狀不再自己決定勝負。</p>
+
+<h3 id="sr2__十-兩個會產出假約束的陷阱">十、兩個會產出假約束的陷阱</h3>
+
+<p class="prose">兩個都跟<b>相位</b>有關，而且方向相反：
+第一個講的是相位資訊<b>只在 block 內有效</b>，跨出去就沒有意義；
+第二個講的是即使在 block 內，相位<b>解得對</b>也可能被讀成錯的生物學。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img" aria-labelledby="sr2__rg-block-spin__title" aria-describedby="sr2__rg-block-spin__desc">
+  <title id="sr2__rg-block-spin__title">H1／H2 的標號只在同一個 phase block 內有意義，跨 block 是任意的</title>
+  <desc id="sr2__rg-block-spin__desc">上排是實體事實：兩條染色體拷貝各自是連續的一整條，橫跨圖上的兩個 phase block。
+        中排是相位軟體實際輸出的東西：每個 phase block 各自把兩堆 read 標成 H1 與 H2，
+        但標號在每個 block 內獨立決定。圖上刻意讓 block A 的 H1 對應上排第一條拷貝，
+        而 block B 的 H1 對應上排第二條拷貝 —— 兩個 block 的 H1 不是同一條染色體。
+        這個任意性寫成每個 block 一個正負號，圖上標為 σ。
+        下排分成兩欄說明後果。左欄是不受影響的：clone tree 談的是細胞的祖先關係，
+        不是哪一條親源染色體帶著變異，所以每個單位內部算出來的量都與 σ 無關。
+        右欄是會出錯的：任何把不同 block 的 H1 加總在一起的統計都沒有意義，
+        跨 block 的單倍型特異拷貝數、跨 block 比較甲基化偏向也都需要先定出 σ。
+        讀法是：所有全基因體統計都必須只由「單位內部的量」組成，這樣才自動與 σ 無關。</desc>
+
+  <text class="ttl zh" x="20" y="36">H1／H2 只在同一個 phase block 內有意義</text>
+
+  <!-- 上排：實體事實 -->
+  <text class="lbl bold zh" x="20" y="86">實體上</text>
+  <text class="anno zh" x="130" y="86">兩條染色體拷貝各自是連續的一整條</text>
+  <rect class="read hp1" x="130" y="102" width="760" height="14" rx="7"/>
+  <rect class="read hp2" x="130" y="126" width="760" height="14" rx="7"/>
+  <text class="tick mid" x="920" y="113">拷貝 ①</text>
+  <text class="tick mid" x="920" y="137">拷貝 ②</text>
+
+  <!-- 中排：軟體輸出 -->
+  <text class="lbl bold zh" x="20" y="204">軟體給你</text>
+  <text class="anno zh" x="130" y="204">每個 block 各自標號，標號獨立決定</text>
+
+  <rect class="box ghost" x="126" y="216" width="360" height="96" rx="8"/>
+  <text class="tick bold mid" x="306" y="238">phase block A　σ = +1</text>
+  <rect class="read hp1" x="150" y="250" width="310" height="14" rx="7"/>
+  <rect class="read hp2" x="150" y="274" width="310" height="14" rx="7"/>
+  <text class="tick end" x="144" y="261">H1</text>
+  <text class="tick end" x="144" y="285">H2</text>
+  <text class="tick zh mid" x="306" y="306">H1 ＝ 拷貝 ①</text>
+
+  <rect class="box ghost" x="534" y="216" width="360" height="96" rx="8"/>
+  <text class="tick bold mid" x="714" y="238">phase block B　σ = −1</text>
+  <rect class="read hp2" x="558" y="250" width="310" height="14" rx="7"/>
+  <rect class="read hp1" x="558" y="274" width="310" height="14" rx="7"/>
+  <text class="tick end" x="552" y="261">H1</text>
+  <text class="tick end" x="552" y="285">H2</text>
+  <text class="tick zh mid bad" x="714" y="306">H1 ＝ 拷貝 ②</text>
+
+  <path class="conn bad" d="M486,264 L530,264" marker-end="url(#arrow-sm)"/>
+  <path class="conn bad" d="M486,280 L530,280" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh bad mid" x="508" y="336">標號在這裡翻面</text>
+
+  <!-- 下排：後果 -->
+  <rect class="box ok" x="24" y="368" width="460" height="150" rx="8"/>
+  <text class="lbl bold zh ok" x="44" y="400">不受影響</text>
+  <text class="anno zh" x="44" y="430">clone tree 談的是細胞的祖先關係，</text>
+  <text class="anno zh" x="44" y="458">不是哪一條親源染色體帶著變異。</text>
+  <text class="anno zh" x="44" y="486">單位內部算出的量與 σ 無關，可直接邊際化。</text>
+
+  <rect class="box bad" x="516" y="368" width="460" height="150" rx="8"/>
+  <text class="lbl bold zh bad" x="536" y="400">會靜靜出錯</text>
+  <text class="anno zh" x="536" y="430">把不同 block 的 H1 加總在一起的統計；</text>
+  <text class="anno zh" x="536" y="458">跨 block 的單倍型特異拷貝數；</text>
+  <text class="anno zh" x="536" y="486">跨 block 比較甲基化偏向。這些都要先定出 σ。</text>
+
+  <text class="anno zh bold" x="24" y="550">設計規則：所有全基因體統計只能由「單位內部的量」組成 —— 這樣才自動與 σ 無關。</text>
+</svg><figcaption>上排是實體事實：兩條染色體拷貝各自連續。
+中排是軟體輸出：block A 的 H1 對應拷貝 ①，block B 的 H1 對應拷貝 ② —— 兩個 H1 不是同一條。</figcaption></figure>
+
+<aside class="guardrail" id="sr2__guard-13"><p class="guardrail__hd">重要區分 #13：不同 phase block 的 H1 不是同一條染色體</p>相位軟體在每個 block 內把 read 分成兩堆並標上 H1、H2，
+但<b>標號在每個 block 內獨立決定</b>。
+
+<b>好消息</b>：約束談的是<b>細胞</b>的祖先關係，不是哪一條親源染色體帶著變異。
+每條約束都在單一個單位內產生，所以它與標號方向無關 —— 核心推論不受影響。
+
+<b>壞消息</b>：任何把不同 block 的 H1 加總在一起的判斷都沒有意義，而且不會有錯誤訊息。
+所以<b>不能</b>用「兩個變異都在 H1 上」當成它們同群的理由 ——
+跨 block 的 H1 根本不是同一條。
+
+由此得到一條可以寫成檢查程式的規則：
+<b>每一條約束都必須在單一個單位內部產生，不得跨單位組合。</b></aside>
+
+<aside class="guardrail" id="sr2__guard-14"><p class="guardrail__hd">重要區分 #14：trans 不等於分支演化</p>兩個變異若分別落在同一個細胞的兩條染色體拷貝上（trans），
+它們永遠不可能出現在同一條分子上。於是計數表會呈現
+<code>00</code>、<code>10</code>、<code>01</code>，而 <code>11</code> 那一格是空的 ——
+<b>跟兩群互不包含的 subclone 長得一模一樣</b>。
+
+在約束的脈絡下這特別致命：它會產出一條<b>假的「不可同群」</b>，
+而那是硬約束，會直接逼混合模型拆出一個不存在的群。
+
+現行流程有先按單倍型家族分堆，這一點是對的 —— 而且相位讓 cis／trans 在
+<b>整個 phase block</b> 內都是已知的（就是上一個陷阱講的那個 block），
+不是只在一條 read 之內，所以這個陷阱的可解範圍比 read 跨距大約一百倍。</aside>
+
+<h3 id="sr2__十一-約束的信心值-_r">十一、約束的信心值 ω_r</h3>
+
+<p class="prose">通過兩道閘門之後，約束還是有強有弱。
+第六節那個 <code>ω_r</code> 不必另外設計 —— 兩個現成的量求解器本來就算出來了：</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530" class="dia-svg" role="img" aria-labelledby="sr2__rg-steiner-latent__title" aria-describedby="sr2__rg-steiner-latent__desc">
+  <title id="sr2__rg-steiner-latent__title">樹成本等於潛在節點數，所以最小成本就是「補最少的看不到狀態」</title>
+  <desc id="sr2__rg-steiner-latent__desc">左上是成本的算式。樹的成本等於邊數，邊數等於節點數減一，
+        而節點數等於固定節點數加上潛在節點數，
+        固定節點是參考型的根加上實際觀測到的狀態，潛在節點是為了把樹接起來而補進去的狀態。
+        所以最小成本等價於最少潛在節點。
+        右邊是一個例子：觀測到的只有全參考的根與兩個變異都帶的狀態，中間什麼都沒看到。
+        因為一步只能加一個突變，中間必須補一個狀態，補哪一個資料沒有意見，
+        於是得到兩個並列的最小成本候選，兩者成本都是二。
+        正確的做法是兩個都留著，而不是挑一個。
+        最下方指出潛在節點數本身就是一個值得統計的量：
+        它數的是「這棵樹需要、但沒有任何觀測支持」的狀態，
+        把全基因體的分布畫出來，就是這份重建有多少比例來自推論的直接量度。
+        讀法是：潛在節點不是一群還沒被觀察到的細胞，它是模型為了連通而記的帳。</desc>
+
+  <text class="ttl zh" x="20" y="36">最小成本 ＝ 補最少的「看不到的狀態」</text>
+
+  <rect class="box sunken" x="24" y="62" width="450" height="118" rx="8"/>
+  <text class="lbl mono mid" x="249" y="102">cost(T) = |E| = |V| − 1</text>
+  <text class="lbl mono mid" x="249" y="140">= C + |H| − 1</text>
+  <text class="tick zh mid" x="249" y="168">C ＝ 根 ＋ 觀測到的狀態　　H ＝ 補進去的潛在節點</text>
+
+  <text class="anno bold zh accent" x="24" y="216">C 固定時，最小成本就等價於最少潛在節點。</text>
+
+  <!-- 例子 -->
+  <text class="lbl bold zh" x="530" y="88">例：只觀測到 00 與 11</text>
+
+  <circle class="mark somatic" cx="620" cy="120" r="11"/>
+  <text class="tick mono mid" x="620" y="106">00</text>
+  <circle class="mark somatic" cx="620" cy="232" r="11"/>
+  <text class="tick mono mid" x="620" y="258">11</text>
+  <circle class="box ghost" cx="566" cy="176" r="11"/>
+  <circle class="box ghost" cx="674" cy="176" r="11"/>
+  <line class="conn" x1="612" y1="129" x2="574" y2="167"/>
+  <line class="conn" x1="628" y1="129" x2="666" y2="167"/>
+  <line class="conn" x1="574" y1="185" x2="612" y2="223"/>
+  <line class="conn" x1="666" y1="185" x2="628" y2="223"/>
+  <text class="tick zh" x="530" y="288">中間一定要經過一個狀態，但補哪一個資料沒有意見</text>
+
+  <rect class="box ok" x="760" y="92" width="100" height="88" rx="8"/>
+  <text class="tick mono mid" x="810" y="118">補 10</text>
+  <text class="tick mono mid" x="810" y="146">|H| = 1</text>
+  <text class="tick mono mid" x="810" y="170">cost 2</text>
+
+  <rect class="box ok" x="876" y="92" width="100" height="88" rx="8"/>
+  <text class="tick mono mid" x="926" y="118">補 01</text>
+  <text class="tick mono mid" x="926" y="146">|H| = 1</text>
+  <text class="tick mono mid" x="926" y="170">cost 2</text>
+
+  <text class="anno zh ok" x="760" y="214">兩個都留著</text>
+
+  <!-- |H| 當統計量 -->
+  <rect class="box accent" x="24" y="318" width="952" height="122" rx="8"/>
+  <text class="lbl bold zh accent" x="48" y="350">潛在節點數本身就是一個值得統計的量</text>
+  <text class="anno zh" x="48" y="382">它數的是「這棵樹需要、但沒有任何觀測支持」的狀態。</text>
+  <text class="anno zh" x="48" y="410">把全基因體的分布畫出來，就是這份重建有多少比例來自推論的直接量度 ——</text>
+  <text class="anno zh" x="48" y="434">而且求解器本來就算出來了，它就是成本。</text>
+
+  <text class="anno zh bad" x="24" y="476">但要記住它的意思：潛在節點<tspan class="bold">不是</tspan>一群還沒被觀察到的細胞。</text>
+  <text class="anno zh bad" x="24" y="504">它可能對應真的中間世代，也可能只是模型為了連通而記的帳。</text>
+</svg><figcaption>樹成本等於固定節點數加潛在節點數減一，
+所以最小成本等價於最少潛在節點。潛在節點是「這棵樹需要、但沒有任何觀測支持」的狀態。</figcaption></figure>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">量</th><th scope="col">意思</th><th scope="col">怎麼用</th></tr></thead>
+<tbody>
+<tr><td>潛在節點數 <code>|H|</code></td><td>這個區域的拓撲需要幾個沒被觀測到的中間狀態</td><td><code>|H|</code> 越大，該區域的約束越間接，<code>ω_r</code> 越低</td></tr>
+<tr><td>候選集合大小</td><td>最小成本解有幾個並列</td><td>並列越多代表資料縮不動；只採所有候選都同意的那些約束</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">這也是 <span class="term" data-term="latent node" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-latent-node-5">latent node<span class="term__pop" id="sr2__gd-latent-node-5" role="tooltip"><b class="term__hd">latent node <i>潛在節點</i></b><span class="term__def" data-lang="zh">建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</span><span class="term__def" data-lang="en" lang="en">An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.</span><a class="term__more" href="glossary.html#latent-node">完整條目 →</a></span></span> 那個警告的具體用法：
+潛在節點<b>不是</b>一群還沒被觀察到的細胞，所以不能拿它當證據 —— 但可以拿它來<b>扣分</b>。</p>
+
+<h3 id="sr2__十二-約束預算-夠不夠用">十二、約束預算：夠不夠用</h3>
 
 <h4 id="sr2__先把兩個-5-分開">先把兩個 5% 分開</h4>
 
@@ -13900,7 +14434,7 @@ report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
 若改成視窗內<b>全配對</b>（每個視窗 <code>C(k,2)</code> 對），低負荷時兩者幾乎一樣
 （5／Mb：388 vs 375），但高負荷時會分開 —— 50／Mb 時全配對給約 38,750，
 相鄰配對給約 28,500。表上的 24,500 是相鄰配對這一支。
-寫成論文之前，這個慣例要跟第四節的閘門講同一種語言，
+寫成論文之前，這個慣例要跟第八節的閘門講同一種語言，
 否則「收到幾條約束」在兩處會是兩個定義。</p>
 
 <p class="prose">按上面的模型，若腫瘤有三群、質量分別是 0.60／0.25／0.15，
@@ -13917,49 +14451,13 @@ report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
 </table>
 </div>
 
-<p class="prose">夠用的理由是：要定的是<b>群與群之間那幾個關係</b>，不是 15,500 個點各自的歸屬。
-最稀疏的那一對也有 28 個獨立觀測。
-<b>但這是通過閘門「之前」的數字</b> —— 閘門會砍掉一部分，
+<p class="prose">夠用的理由第三節已經講完了：這些約束的工作是<b>確立成分存在且不同</b>，
+不是分配 15,500 個點。最稀疏的那一對有 28 個獨立觀測，
+對「這兩個成分是不是同一個」這個是非題綽綽有餘。
+<b>但這是通過閘門「之前」的數字</b> —— 第八節那個 <code>n ≥ 59</code> 會砍掉一大部分，
 所以報告一定要把「收到幾條、丟掉幾條」列出來。</p>
 
-<h3 id="sr2__十-估計式-把約束餵進混合模型">十、估計式：把約束餵進混合模型</h3>
-
-<p class="prose">混合模型本體不變：每個變異的頻率來自某一群，加上量測雜訊。約束以權重項進去：</p>
-
-<div class="eq">
-<math display="block">
-  <mi>ℒ</mi><mo>=</mo>
-  <munder><mo>∑</mo><mi>m</mi></munder>
-  <mi>log</mi><mo>&#8290;</mo>
-  <mi>P</mi><mo>(</mo><msub><mi>f</mi><mi>m</mi></msub><mo>∣</mo>
-  <msub><mi>c</mi><mrow><msub><mi>z</mi><mi>m</mi></msub></mrow></msub><mo>,</mo>
-  <mi>PSF</mi><mo>)</mo>
-  <mo>+</mo>
-  <munder><mo>∑</mo><mi>r</mi></munder>
-  <msub><mi>ω</mi><mi>r</mi></msub><mo>&#8290;</mo>
-  <mi>log</mi><mo>&#8290;</mo>
-  <mi>P</mi><mo>(</mo><msub><mi>R</mi><mi>r</mi></msub><mo>∣</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo>
-</math>
-<p class="eq__note">第一項是 95% 給的：每個變異的頻率 <code>f_m</code> 落在它所屬群的位置 <code>c</code> 上，
-雜訊寬度由用途二量到的點擴散函數 <code>PSF</code> 決定 —— 那不是自由參數。
-第二項是 5% 給的：每條約束 <code>R_r</code> 帶著信心權重 <code>ω_r</code>，
-限制的是變異的群歸屬 <code>z</code> 與樹 <code>T</code>。</p>
-</div>
-
-<pre><code>不可同群 (i, j)      →  z_i ≠ z_j
-必定同群 (i, j)      →  z_i = z_j
-祖先關係 (i → j)     →  T 上 z_i 是 z_j 的祖先，且 c[z_i] &gt; c[z_j]
-巢狀比值 ϱ(i, j)     →  c[z_j] / c[z_i] = ϱ        ← 不需要純度的相對位置</code></pre>
-
-<p class="prose">關鍵是<b>權重</b>而不是硬條件。閘門已經擋掉大部分假約束，但擋不乾淨；
-把剩下的不確定性放進 <code>ω_r</code>，一條錯的約束只會被稀釋，
-不會像硬條件那樣直接逼出一個不存在的群。</p>
-
-<p class="prose">推論方式沒有特別之處：帶約束的 EM，或直接對 <code>(T, c, z)</code> 取樣。
-輸出必須包含<b>每個群配對是由幾條約束決定的</b> ——
-沒有約束支持的關係就是靠偏好補的，要標出來。</p>
-
-<h3 id="sr2__十一-視窗寬度-約束產量與品質的取捨">十一、視窗寬度：約束產量與品質的取捨</h3>
+<h3 id="sr2__十三-視窗寬度-約束產量與品質的取捨">十三、視窗寬度：約束產量與品質的取捨</h3>
 
 <div class="table-wrap">
 <table>
@@ -14036,7 +14534,7 @@ report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
 可偵測的比例下界約 0.05。下界要逐單位算，不能用固定常數。</figcaption></figure>
 
 <p class="prose"><b>建議兩輪都跑</b>：寬視窗先把候選收齊，窄視窗產出高信心的那一批。
-兩批都進模型，但權重不同。</p>
+兩批都進模型，但 <code>ω_r</code> 不同。</p>
 </section>
 
 
@@ -14046,7 +14544,7 @@ report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
 <h3 id="sr2__現行實作已經量到的東西-也就是約束的庫存">現行實作已經量到的東西 —— 也就是約束的庫存</h3>
 
 <p class="prose">下面每個數字都來自本實驗室既有實作在七個資料集、六個生物樣本、chr1–22 上的輸出。
-在這一頁的脈絡下，它們就是<b>可以收成約束的原料清單</b>。</p>
+在這一頁的脈絡下，它們就是<b>可以收成 <code>R_r</code> 的原料清單</b>。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" class="dia-svg" role="img" aria-labelledby="sr2__rg-class-spectrum__title" aria-describedby="sr2__rg-class-spectrum__desc">
   <title id="sr2__rg-class-spectrum__title">已經量到的全基因體譜：七個資料集的區域拓撲類別組成</title>
@@ -14144,7 +14642,7 @@ report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
 <thead><tr><th scope="col">觀測</th><th scope="col">數值</th><th scope="col">在這一頁的意義</th></tr></thead>
 <tbody>
 <tr><td>可分析單位總數</td><td>85,941 個含突變的「區域 × 單倍型家族」</td><td>原料是夠的，不必重新定序</td></tr>
-<tr><td>候選集合可完整列舉</td><td>75,224 個（<b>87.53%</b>）</td><td>給得出信心值的比例；其餘直接排除</td></tr>
+<tr><td>候選集合可完整列舉</td><td>75,224 個（<b>87.53%</b>）</td><td>給得出 <code>ω_r</code> 的比例；其餘直接排除</td></tr>
 <tr><td>分支類的比例</td><td>各資料集 <b>6%–22%</b></td><td>「不可同群」的來源。最稀缺，但它是用途一唯一的原料</td></tr>
 <tr><td>多層無分支的比例</td><td>38.1%–53.3%</td><td>祖先關係約束的來源，數量最多</td></tr>
 <tr><td>換 basecaller 的重現性</td><td>同細胞株不同機構 <b>0.909</b></td><td>這些分類不是流程雜訊</td></tr>
@@ -14177,285 +14675,31 @@ report: 收到幾條約束、丟掉幾條、丟掉的是哪些</code></pre>
 請問：鬆的那一版會不會比較好？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>不一定，而且很可能更糟 —— 因為約束的兩種錯誤代價不對稱。</b></p>
 
 <p class="prose">一條<b>漏掉</b>的約束，代價是「本來可以定下來的關係，現在要靠偏好補」——
-退回沒有這條路線之前的狀態，損失有限。</p>
+退回第一節第四步那個狀態，損失有限。</p>
 
 <p class="prose">但一條<b>錯誤</b>的「不可同群」，代價是<b>逼混合模型拆出一個不存在的群</b>。
-而且它不會自己露餡：拆出來的那個群有頻率、有變異、看起來完全正常。
+第三節那個機制反過來跑：<code>z_i ≠ z_j</code> 讓正確的 <code>K</code> 不可行，
+模型只好多開一個成分。而且它不會自己露餡 ——
+拆出來的那個群有頻率、有變異、看起來完全正常，
 下游的樹、演化順序、臨床解讀全部跟著錯，報告上不會有任何異常。</p>
 
 <p class="prose">所以取捨不是「多 vs 少」，是<b>「漏掉 vs 造假」</b>，而兩者代價差很多。
-正確的做法是<b>寧嚴勿鬆</b>，並且把剩下的不確定性放進權重 <code>ω_r</code>，
+正確的做法是<b>寧嚴勿鬆</b>，並且把剩下的不確定性放進 <code>ω_r</code>，
 而不是當成硬條件 —— 一條被稀釋的錯約束不會單獨改變結論。</p>
 
 <p class="prose">要怎麼知道調到哪裡？用重現性當外部檢查：
 在不同 basecaller／不同機構的同一個細胞株上掃過一系列閘門嚴格度，
 看哪一段的<b>群與樹</b>最一致。這不需要金標準 —— 而那正是這個領域最缺的東西。</p></div></details>
-</section>
 
-
-<section data-part="practice" class="part" id="sr2__part-practice">
-<h2 data-num="⑤" id="sr2__實作練習">實作練習</h2>
-
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" class="dia-svg" role="img" aria-labelledby="sr2__sr2-flow__title" aria-describedby="sr2__sr2-flow__desc">
-  <title id="sr2__sr2-flow__title">實作流程：從 read 到約束，再到全基因體的群與樹</title>
-  <desc id="sr2__sr2-flow__desc">八個步驟由上而下，右欄註明每一步的狀態是沿用、修正還是新增。
-        第一步前處理，用現有的變異判定與單倍型標記，沿用。
-        第二步切分析單位，鍵值要含 phase set，沿用。
-        第三步抽狀態表，並且額外算出每一個位點對各自的跨越深度，這一步要修正。
-        第四步把每個區域分類成三種約束：不可同群、必定同群、有向的祖先關係，
-        這是把現行輸出重新解讀，沿用。
-        第五步是新增的兩道品質閘門：逐對檢定力不足的約束丟掉，
-        以及修正排序偏誤，因為那個偏誤會系統性地把分岔判成串接。
-        第六步給每條約束一個信心值，來源是潛在節點數與候選集合大小，這是新增的。
-        第七步把九成五區域的頻率與百分之五區域的約束一起餵進混合模型，這是新增的核心。
-        第八步輸出全基因體的群與樹，並且逐條標明哪些關係由資料決定、哪些靠偏好補。
-        最下方標注：第五步是整條流程的關鍵，因為錯的約束會強迫模型拆出不存在的群，
-        比沒有約束更糟。
-        讀法是：八步裡有四步沿用現行實作，真正要新增的是閘門、信心值與最後的接合。</desc>
-
-  <text class="ttl zh" x="20" y="36">實作流程：把已經算出來的關係接到全基因體那一層</text>
-
-  <rect class="box" x="24" y="64" width="596" height="50" rx="8"/>
-  <text class="lbl zh" x="44" y="95">① 前處理：變異判定 ＋ 單倍型標記</text>
-  <text class="anno bold zh ok" x="656" y="95">沿用</text>
-
-  <rect class="box" x="24" y="124" width="596" height="50" rx="8"/>
-  <text class="lbl zh" x="44" y="155">② 切單位：染色體＋phase set＋視窗＋家族</text>
-  <text class="anno bold zh ok" x="656" y="155">沿用</text>
-
-  <rect class="box warn" x="24" y="184" width="596" height="50" rx="8"/>
-  <text class="lbl zh" x="44" y="215">③ 抽狀態表 ＋ 算每一對的跨越深度</text>
-  <text class="anno bold zh warn" x="656" y="208">修正</text>
-  <text class="tick zh" x="656" y="230">逐對計數是後面兩道閘門的前提</text>
-
-  <rect class="box" x="24" y="244" width="596" height="50" rx="8"/>
-  <text class="lbl zh" x="44" y="275">④ 分類成三種約束：不可同群／必定同群／祖先</text>
-  <text class="anno bold zh ok" x="656" y="268">沿用</text>
-  <text class="tick zh" x="656" y="290">就是現行的串接／分岔判定</text>
-
-  <rect class="box bad" x="24" y="304" width="596" height="50" rx="8"/>
-  <text class="lbl bold zh" x="44" y="335">⑤ 兩道品質閘門：檢定力 ＋ 排序偏誤</text>
-  <text class="anno bold zh bad" x="656" y="328">新增</text>
-  <text class="tick zh bad" x="656" y="350">最關鍵的一步</text>
-
-  <rect class="box bad" x="24" y="364" width="596" height="50" rx="8"/>
-  <text class="lbl zh" x="44" y="395">⑥ 給每條約束一個信心值</text>
-  <text class="anno bold zh bad" x="656" y="388">新增</text>
-  <text class="tick zh" x="656" y="410">來源：潛在節點數、候選集合大小</text>
-
-  <rect class="box accent" x="24" y="424" width="596" height="50" rx="8"/>
-  <text class="lbl bold zh" x="44" y="455">⑦ 頻率 ＋ 約束 一起餵進混合模型</text>
-  <text class="anno bold zh accent" x="656" y="448">新增</text>
-  <text class="tick zh" x="656" y="470">這是整條路線的核心</text>
-
-  <rect class="box accent" x="24" y="484" width="596" height="50" rx="8"/>
-  <text class="lbl zh" x="44" y="515">⑧ 輸出：全基因體的群 ＋ 樹 ＋ 逐條支持度</text>
-  <text class="anno bold zh accent" x="656" y="515">新增</text>
-
-  <path class="conn" d="M322,114 L322,122" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M322,174 L322,182" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M322,234 L322,242" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M322,294 L322,302" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M322,354 L322,362" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M322,414 L322,422" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M322,474 L322,482" marker-end="url(#arrow-sm)"/>
-
-  <text class="anno zh bad" x="24" y="568">第 ⑤ 步是關鍵：錯的約束會強迫模型拆出<tspan class="bold">不存在的群</tspan> —— 比沒有約束更糟。</text>
-  <text class="tick zh" x="24" y="590">八步裡有四步沿用現行實作；真正新增的是閘門、信心值，與最後那一次接合。</text>
-</svg><figcaption>八個步驟裡四步沿用現行實作。
-真正要新增的是兩道閘門、約束的信心值，以及最後那一次接合。
-第五步是關鍵 —— 錯的約束會強迫模型拆出不存在的群。</figcaption></figure>
-
-<h3 id="sr2__十二-先把逐對跨越深度算出來">十二、先把逐對跨越深度算出來</h3>
-
-<p class="prose">這是所有後續步驟的前提，而且從現有的狀態表就算得出來，不必碰求解器。</p>
-
-<h4 id="sr2__那張狀態表從哪裡來">那張狀態表從哪裡來</h4>
-
-<p class="prose">不必等求解器輸出，也不必知道它的內部格式 ——
-狀態表就是「<b>哪些 read 在哪些位點讀到什麼</b>」，
-從 <code>somatic_haplotag</code> 的 BAM 加上 somatic VCF 就湊得出來。先取位點：</p>
-
-<pre><code># 這個區域裡有哪些 somatic 位點（位置、REF、ALT）
-bcftools query -r chr1:1000000-1020000 -f '%POS\t%REF\t%ALT\n' somatic.vcf</code></pre>
-
-<p class="prose">再把這些位點上的 read 逐條攤開。<b>單位是「區域 × 單倍型家族」，
-所以家族篩選不能省</b> —— 混進另一個家族的 read，計數表就不是這個單位的了：</p>
-
-<pre><code>python3 - &lt;&lt;'PY'
-import collections, pysam
-
-BAM    = &quot;tumor.somatic_haplotag.bam&quot;
-CHROM  = &quot;chr1&quot;
-FAMILY = &quot;1&quot;                       # 家族 1 ＝ HP:Z:1 與它的 somatic 後代 1-1、1-2…
-SITES  = [(1_003_412, &quot;C&quot;, &quot;T&quot;),   # 上一步 bcftools 撈出來的 (位置, REF, ALT)
-          (1_009_887, &quot;G&quot;, &quot;A&quot;),
-          (1_016_204, &quot;A&quot;, &quot;G&quot;)]
-
-bam   = pysam.AlignmentFile(BAM)
-state = collections.defaultdict(lambda: [&quot;-&quot;] * len(SITES))
-
-for k, (pos, ref, alt) in enumerate(SITES):
-    for col in bam.pileup(CHROM, pos - 1, pos, truncate=True,
-                          min_base_quality=0, stepper=&quot;nofilter&quot;):
-        for p in col.pileups:
-            if p.is_del or p.is_refskip or not p.alignment.has_tag(&quot;HP&quot;):
-                continue
-            aln = p.alignment
-            # ★ somatic_haplotag 寫的是字串 HP:Z:1-1，haplotag 寫的是整數 HP:i:1。
-            #   str() 讓兩種都跑得動，但只有前者分得出家族內的 somatic 分支。
-            if str(aln.get_tag(&quot;HP&quot;)).split(&quot;-&quot;)[0] != FAMILY:
-                continue
-            b = aln.query_sequence[p.query_position]
-            state[aln.query_name][k] = &quot;A&quot; if b == alt else &quot;R&quot; if b == ref else &quot;-&quot;
-
-# 同一個狀態組合的 read 併成一列 —— 這就是下一段要用的 rows
-rows = [(*pat, n) for pat, n in
-        collections.Counter(tuple(v) for v in state.values()).most_common()]
-for r in rows:
-    print(r)
-PY</code></pre>
-
-<h4 id="sr2__然後看逐對的-n">然後看逐對的 n</h4>
-
-<pre><code>python3 - &lt;&lt;'PY'
-import itertools
-from collections import Counter
-
-# 換成上一段印出來的 rows 就是跑自己的資料。
-# 這裡填的是「真實資料與證據」那個 194 條 read 的單位，'-' 代表沒蓋到
-rows = [(&quot;-&quot;,&quot;A&quot;,&quot;-&quot;,42), (&quot;R&quot;,&quot;-&quot;,&quot;-&quot;,31), (&quot;A&quot;,&quot;-&quot;,&quot;-&quot;,25), (&quot;-&quot;,&quot;-&quot;,&quot;R&quot;,25),
-        (&quot;-&quot;,&quot;R&quot;,&quot;-&quot;,22), (&quot;-&quot;,&quot;-&quot;,&quot;A&quot;,15), (&quot;R&quot;,&quot;A&quot;,&quot;-&quot;, 9), (&quot;-&quot;,&quot;A&quot;,&quot;A&quot;, 6),
-        (&quot;-&quot;,&quot;A&quot;,&quot;R&quot;, 6), (&quot;A&quot;,&quot;R&quot;,&quot;-&quot;, 5), (&quot;-&quot;,&quot;R&quot;,&quot;R&quot;, 5), (&quot;R&quot;,&quot;A&quot;,&quot;R&quot;, 3)]
-k = 3
-total = sum(r[-1] for r in rows)
-
-for i, j in itertools.combinations(range(k), 2):
-    sub = [r for r in rows if r[i] != &quot;-&quot; and r[j] != &quot;-&quot;]
-    n = sum(r[-1] for r in sub)
-    pat = Counter()
-    for r in sub:
-        pat[r[i] + r[j]] += r[-1]
-    # 這一對能不能產生約束，看的是 n，不是 total
-    print(f&quot;S{i+1}xS{j+1}: n={n:3d} ({n / total * 100:4.1f}%)  {dict(pat)}&quot;)
-PY</code></pre>
-
-<p class="prose">要看的是<b>逐對的 n 之間差多少</b>。差一個數量級是常態 ——
-而那代表這個單位產出的幾條約束，可信度完全不同。</p>
-
-<h3 id="sr2__十三-四個可以馬上做的分析">十三、四個可以馬上做的分析</h3>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th scope="col">分析</th><th scope="col">怎麼做</th><th scope="col">會回答什麼</th></tr></thead>
-<tbody>
-<tr>
-<td><b>① 約束的實際產量</b></td>
-<td>對每個單位算逐對跨越深度，套一組閘門門檻，數還剩幾條約束、分別是哪一種</td>
-<td>把「6%–22% 的分支類」變成真正可用的數字。<b>這是最該先做的一件事</b></td>
-</tr>
-<tr>
-<td><b>② 分類是不是幾何造成的</b></td>
-<td>把單位按中位跨越深度分層，畫每一層的分類組成</td>
-<td>分支比例若隨跨越深度上升，現在的分類有一部分是假的，約束會跟著假</td>
-</tr>
-<tr>
-<td><b>③ 排序偏誤抽掉了多少「不可同群」</b></td>
-<td>把候選集合用「除以配對數」的分數重排，數分支類多出幾個</td>
-<td>直接量出第五節那個偏誤讓我們損失了多少最稀缺的約束</td>
-</tr>
-<tr>
-<td><b>④ 重現性撐不撐得住閘門</b></td>
-<td>掃一系列閘門嚴格度，重算同細胞株跨機構的一致性</td>
-<td>沒有金標準時，最實際的調參依據</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<h4 id="sr2__把上一段的腳本再往前推十行">①：把上一段的腳本再往前推十行</h4>
-
-<p class="prose">①被列成最該先做的一件事，而它其實就是第十二節那支腳本加上「套門檻、按類型數」：</p>
-
-<pre><code>python3 - &lt;&lt;'PY'
-import itertools, math
-from collections import Counter
-
-RHO_MIN, PI_STAR = 0.05, 0.95      # 要偵測到「佔該譜系 5%」的狀態，檢定力要 95%
-n_min = math.ceil(math.log(1 - PI_STAR) / math.log(1 - RHO_MIN))
-
-# 門檻對參數有多敏感 —— 先看這張表，再決定 RHO_MIN 與 PI_STAR
-print(&quot;每一對最少需要的跨越 read 數 n&quot;)
-print(&quot;  ϱ_min ＼ π*      0.80   0.90   0.95&quot;)
-for rho in (0.05, 0.10, 0.20):
-    ns = [math.ceil(math.log(1 - p) / math.log(1 - rho)) for p in (0.80, 0.90, 0.95)]
-    print(f&quot;    {rho:.2f}       &quot; + &quot;&quot;.join(f&quot;{n:7d}&quot; for n in ns))
-print(f&quot;\n目前設定 → n_min = {n_min}\n&quot;)
-
-# 換成全部單位就是真的產量。key 是單位名，value 是第十二節那個 rows
-units = {&quot;unit_A&quot;: [(&quot;-&quot;,&quot;A&quot;,&quot;-&quot;,42), (&quot;R&quot;,&quot;-&quot;,&quot;-&quot;,31), (&quot;A&quot;,&quot;-&quot;,&quot;-&quot;,25), (&quot;-&quot;,&quot;-&quot;,&quot;R&quot;,25),
-                    (&quot;-&quot;,&quot;R&quot;,&quot;-&quot;,22), (&quot;-&quot;,&quot;-&quot;,&quot;A&quot;,15), (&quot;R&quot;,&quot;A&quot;,&quot;-&quot;, 9), (&quot;-&quot;,&quot;A&quot;,&quot;A&quot;, 6),
-                    (&quot;-&quot;,&quot;A&quot;,&quot;R&quot;, 6), (&quot;A&quot;,&quot;R&quot;,&quot;-&quot;, 5), (&quot;-&quot;,&quot;R&quot;,&quot;R&quot;, 5), (&quot;R&quot;,&quot;A&quot;,&quot;R&quot;, 3)]}
-
-def classify(seen):
-    if len(seen) == 4:                            return &quot;不相容（不產生約束）&quot;
-    if &quot;AA&quot; not in seen and {&quot;AR&quot;, &quot;RA&quot;} &lt;= seen:  return &quot;不可同群&quot;
-    if &quot;AA&quot; in seen:                              return &quot;祖先關係／必定同群&quot;
-    return &quot;資訊不足&quot;
-
-kept, dropped = Counter(), Counter()
-for name, rows in units.items():
-    k = len(rows[0]) - 1
-    for i, j in itertools.combinations(range(k), 2):
-        sub = [r for r in rows if r[i] != &quot;-&quot; and r[j] != &quot;-&quot;]
-        n   = sum(r[-1] for r in sub)
-        if n &lt; n_min:
-            dropped[f&quot;檢定力不足 (n={n})&quot;] += 1
-            continue
-        pat = Counter()
-        for r in sub:
-            pat[r[i] + r[j]] += r[-1]
-        kept[classify({s for s, v in pat.items() if v &gt; 0})] += 1
-
-print(&quot;通過閘門：&quot;, dict(kept) or &quot;（一條都沒有）&quot;)
-print(&quot;丟掉：    &quot;, dict(dropped))
-PY</code></pre>
-
-<p class="prose">拿這個單位跑出來的結果是<b>三對全滅</b> ——
-n ＝ 20、17、3，而 ϱ_min ＝ 0.05、π* ＝ 0.95 要求 <b>n ≥ 59</b>。
-（這跟第十一節那張圖是同一件事的兩種說法：每個家族 60 條分子時，可偵測下界約 0.05。）</p>
-
-<p class="prose">所以①的輸出<b>不會</b>是「6%–22% 的分支類」那個數字，
-會小得多，而且小多少完全由 <code>RHO_MIN</code> 與 <code>PI_STAR</code> 決定 ——
-這正是為什麼要先印那張敏感度表再選門檻。
-如果全基因體掃完真的一條都不剩，那不是腳本壞了，
-是<b>視窗太寬</b>：回到第十一節改跑一輪窄視窗，讓多數 read 蓋得到兩端。</p>
-
-<h3 id="sr2__十四-排查順序">十四、排查順序</h3>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th scope="col">症狀</th><th scope="col">先查什麼</th></tr></thead>
-<tbody>
-<tr><td>混合模型多出一個很小的群</td><td>先查是不是某一條「不可同群」逼出來的。追回那條約束所屬的單位，看它的逐對跨越深度</td></tr>
-<tr><td>加了約束之後群數<b>反而變少</b></td><td>反方向的同一件事：查「必定同群」。跨越深度不足時比值一律 ≈ 1，會把兩個真的群黏成一個。見第二節那個容差</td></tr>
-<tr><td>約束幾乎全是「祖先關係」</td><td>第五節那個排序偏誤。分支類被系統性地判成串接了</td></tr>
-<tr><td>通過閘門的約束少得離譜</td><td>視窗太寬。回到第十一節，改跑一輪窄視窗</td></tr>
-<tr><td>某條染色體完全沒有約束</td><td>看那個區域的突變間距。距離遠 → 跨越深度低 → 全被閘門擋掉，那是對的</td></tr>
-<tr><td>兩個家族的結果系統性不對稱</td><td>檢查是不是分開估了。標記錯誤率把兩個家族耦合起來，必須一起估</td></tr>
-<tr><td>約束彼此矛盾</td><td>先看不相容單位比例。矛盾多半來自單倍型標記錯誤，不是生物學</td></tr>
-</tbody>
-</table>
-</div>
-
-<h3 id="sr2__十五-還沒解決的問題">十五、還沒解決的問題</h3>
+<h3 id="sr2__還沒解決的問題">還沒解決的問題</h3>
 
 <ul class="prose">
 <li><b>整條路線都還沒有實測。</b>上面每一項都有結構性的理由，但沒有一項在真實資料上驗證過。
-最小的驗證是模擬：合成兩群<b>比例相同</b>的 subclone，
-確認只用 VAF 的分群必定合併，再量出要幾條約束、閘門要多嚴，才拆得開而且不拆錯。</li>
-<li><b>點擴散函數那一項需要同一條單倍型上有多個變異</b>，而那正是最稀缺的區域。
-低突變負荷時可能根本估不出來。</li>
+最小的驗證就是第三節那個例子：合成 ρ ＝ 0.60、CCF 分別是 1.00／0.40／0.40 的三群，
+確認只用 VAF 的分群必定給出 <code>K = 2</code> 與線性樹，
+再量出要幾條約束、閘門要多嚴，才拆得開而且不拆錯。</li>
+<li><b>用途二需要同一條單倍型上有多個變異</b>，而那正是最稀缺的區域。
+低突變負荷時 <code>φ_hat</code> 可能根本估不出來 —— 那時用途二整項失效，只剩用途一與三。</li>
 <li><b>約束的來源有偏。</b>它們只來自變異密集的區域 ——
 而變異密集有時候不是巧合：<b>kataegis</b> 是一種局部超突變，
 同一次事件在幾十 kb 內一口氣打出一串變異。
@@ -14463,8 +14707,9 @@ n ＝ 20、17、3，而 ϱ_min ＝ 0.05、π* ＝ 0.95 要求 <b>n ≥ 59</b>。
 在統計上卻被當成幾十個獨立觀測。要先偵測並降權成一叢一個有效觀測。</li>
 <li><b>一個群不見得只有一群細胞。</b>本實驗室的甲基化觀測已經看到：
 單一個「單倍型 ＋ 等位」狀態底下還分得出五群甲基化模式。
-所以群數的正確讀法永遠是「<b>至少</b>這麼多」。</li>
-<li><b>跨 read 跨距的關係仍然看不到。</b>相距 100 kb 的兩個變異產不出約束，不管定序多深。</li>
+所以 <code>K</code> 的正確讀法永遠是「<b>至少</b>這麼多」。</li>
+<li><b>跨 read 跨距的關係仍然看不到。</b>相距 100 kb 的兩個變異產不出約束，不管定序多深 ——
+第八節那三層結構是硬上限。</li>
 </ul>
 
 <h3 id="sr2__原始文獻與程式碼">原始文獻與程式碼</h3>
@@ -14473,20 +14718,23 @@ n ＝ 20、17、3，而 ϱ_min ＝ 0.05、π* ＝ 0.95 要求 <b>n ≥ 59</b>。
 廖子游，<i>Subclonal reconstruction using somatic haplotagging and methylation profiles with
 Nanopore sequencing</i>，國立中正大學資訊工程學系碩士學位口試，2026 年 7 月 30 日。</p>
 
-<p class="prose">簡約假設的原始出處是 Camin JH, Sokal RR,
-<i>A method for deducing branching sequences in phylogeny</i>, <i>Evolution</i> 1965;19:311–326；
-有向最小成本 Steiner 樹形圖的標準參考是 Charikar M et al.,
-<i>Approximation algorithms for directed Steiner problems</i>, <i>J Algorithms</i> 1999;33:73–91。
-帶約束的分群（must-link／cannot-link）見 Wagstaff K et al.,
-<i>Constrained k-means clustering with background knowledge</i>, ICML 2001:577–584。</p>
-
-<p class="prose">混合模型的擬合機制見 MOBSTER，Caravagna G et al., <i>Nat Genet</i> 2020;52:898–907
+<p class="prose">第一節那條路線的代表性實作：SciClone，Miller CA et al., <i>PLoS Comput Biol</i>
+2014;10:e1003665；PyClone，Roth A et al., <i>Nat Methods</i> 2014;11:396–398；
+MOBSTER，Caravagna G et al., <i>Nat Genet</i> 2020;52:898–907
 （<a href="https://doi.org/10.1038/s41588-020-0675-5">doi 10.1038/s41588-020-0675-5</a>），
 程式碼在 <a href="https://github.com/caravagnalab/mobster"><code>github.com/caravagnalab/mobster</code></a>。
 換算式與檢定力指標見 Tarabichi M et al., <i>Nat Methods</i> 2021;18:144–155
 （<a href="https://doi.org/10.1038/s41592-020-01013-2">doi 10.1038/s41592-020-01013-2</a>）；
 評比數據見 Salcedo A et al., <i>Nat Biotechnol</i> 2024
 （<a href="https://doi.org/10.1038/s41587-024-02250-y">doi 10.1038/s41587-024-02250-y</a>）。</p>
+
+<p class="prose">簡約假設的原始出處是 Camin JH, Sokal RR,
+<i>A method for deducing branching sequences in phylogeny</i>, <i>Evolution</i> 1965;19:311–326；
+有向最小成本 Steiner 樹形圖的標準參考是 Charikar M et al.,
+<i>Approximation algorithms for directed Steiner problems</i>, <i>J Algorithms</i> 1999;33:73–91。
+帶約束的分群（must-link／cannot-link）見 Wagstaff K et al.,
+<i>Constrained k-means clustering with background knowledge</i>, ICML 2001:577–584 ——
+第六節那個式子就是這一系的做法搬到 subclone 上。</p>
 
 <p class="prose">前處理所依賴的單倍型標記見 LongPhase-S 預印本
 （<a href="https://www.biorxiv.org/content/10.1101/2025.11.20.689492v1">bioRxiv, 2025，doi 10.1101/2025.11.20.689492</a>），
@@ -14495,7 +14743,7 @@ Nanopore sequencing</i>，國立中正大學資訊工程學系碩士學位口試
 </section>
 
     
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>clone tree（克隆演化樹）</dt><dd>描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</dd><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>mutation multiplicity</dt><dd>在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</dd><dt>parsimony（簡約法）</dt><dd>在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>read-AF（read 層級的 ALT 比例）</dt><dd>在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>clone tree（克隆演化樹）</dt><dd>描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</dd><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>parsimony（簡約法）</dt><dd>在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>read-AF（read 層級的 ALT 比例）</dt><dd>在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd></dl></section>
   </article>
     
     

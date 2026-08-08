@@ -914,8 +914,7 @@ window.TW_GLOSSARY = {
   "slug": "mutation-multiplicity",
   "modules": [
    "m08",
-   "sr1",
-   "sr2"
+   "sr1"
   ]
  },
  "LOH": {
