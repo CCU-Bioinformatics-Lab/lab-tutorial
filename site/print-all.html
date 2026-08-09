@@ -2037,7 +2037,7 @@ bcftools view -g het sample.vcf | grep -vc '^#'</code></pre>
 </svg><figcaption>每個方塊代表一條支持變異的 read。在本模型中，tumor DNA fraction 為 100% 時期望約 25 條，20% 時約 5 條；下方另以每個位置約 1–2 條錯誤 read 作為背景假設。少量背景錯誤可能與低比例變異訊號重疊。</figcaption></figure>
 
 <p class="prose">在二倍體、單拷貝、clonal、無偏取樣且 tumor DNA fraction 為 0.2 的簡化模型中，
-期望支持數為 <code>50 × 0.2 ÷ 2 = 5</code> 條。訊號數量不足是主要限制之一；背景錯誤、品質與演算法也會影響可靠性。</p>
+期望支持數為 <math><mn>50</mn><mo>×</mo><mn>0.2</mn><mo>÷</mo><mn>2</mn><mo>=</mo><mn>5</mn></math> 條。訊號數量不足是主要限制之一；背景錯誤、品質與演算法也會影響可靠性。</p>
 
 <h3 id="m03__basecaller-是實驗變數">basecaller 是實驗變數</h3>
 
@@ -2105,7 +2105,7 @@ samtools index dna_frac_0.6.bam</code></pre>
 一個四倍體的腫瘤細胞含有的 DNA 是正常細胞的兩倍。所以</p>
 <ul class="prose">
 <li>50% 的細胞是腫瘤（cellular <span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="m03__gd-tumour-purity-12">purity<span class="term__pop" id="m03__gd-tumour-purity-12" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en" lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span> = 0.5）</li>
-<li>但腫瘤貢獻的 DNA 佔 <code>0.5×4 ÷ (0.5×4 + 0.5×2) = 0.67</code>（<span class="term" data-term="tumour DNA fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="m03__gd-tumour-dna-fraction-13">tumour DNA fraction<span class="term__pop" id="m03__gd-tumour-dna-fraction-13" role="tooltip"><b class="term__hd">tumour DNA fraction <i>腫瘤 DNA 比例</i></b><span class="term__def" data-lang="zh">樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。</span><span class="term__def" data-lang="en" lang="en">The fraction of DNA originating from tumour cells; diverges from cellular purity under aneuploidy or WGD.</span><a class="term__more" href="glossary.html#tumour-dna-fraction">完整條目 →</a></span></span> = 0.67）</li>
+<li>但腫瘤貢獻的 DNA 佔 <math><mn>0.5</mn><mo>×</mo><mn>4</mn><mo>÷</mo><mo>(</mo><mn>0.5</mn><mo>×</mo><mn>4</mn><mo>+</mo><mn>0.5</mn><mo>×</mo><mn>2</mn><mo>)</mo><mo>=</mo><mn>0.67</mn></math>（<span class="term" data-term="tumour DNA fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="m03__gd-tumour-dna-fraction-13">tumour DNA fraction<span class="term__pop" id="m03__gd-tumour-dna-fraction-13" role="tooltip"><b class="term__hd">tumour DNA fraction <i>腫瘤 DNA 比例</i></b><span class="term__def" data-lang="zh">樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。</span><span class="term__def" data-lang="en" lang="en">The fraction of DNA originating from tumour cells; diverges from cellular purity under aneuploidy or WGD.</span><a class="term__more" href="glossary.html#tumour-dna-fraction">完整條目 →</a></span></span> = 0.67）</li>
 </ul>
 <p class="prose">M8 的互動元件可將 copy number 調整為 4，以比較 cellular purity 與 tumor DNA fraction。</p></aside>
 </section>
@@ -2156,10 +2156,7 @@ mosdepth --by 500 out aln.bam &amp;&amp; head out.mosdepth.summary.txt</code></p
 <p class="prose">可使用資料的 coverage，估算在二倍體、單拷貝、clonal 與無偏取樣假設下的預期支持 read 數；
 這不是經驗證的 detection limit：</p>
 
-<pre><code>預期支持 read 數 = 覆蓋度 × tumor DNA fraction ÷ 2
-
-例：覆蓋度 50×、tumor DNA fraction 為 20%
-    → 50 × 0.2 ÷ 2 = 5 條</code></pre>
+<div class="eq"><math display="block"><mtext>預期支持 read 數</mtext><mo>=</mo><mtext>覆蓋度</mtext><mo>×</mo><mtext>tumor DNA fraction</mtext><mo>÷</mo><mn>2</mn></math><p class="eq__note">例：覆蓋度 50×、tumor DNA fraction 為 20% 時 <math><mn>50</mn><mo>×</mo><mn>0.2</mn><mo>÷</mo><mn>2</mn><mo>=</mo><mn>5</mn></math> 條。</p></div>
 
 <p class="prose">若期望值僅為兩至三條，可靠偵測低頻變異可能較困難。資料量是限制之一，
 仍需比較增加定序深度、改善品質與調整模型的相對效益。</p>
@@ -5726,9 +5723,7 @@ technologies with DeepSomatic</i>，Nature Biotechnology，2025。程式碼在
 
 <p class="prose">M1 使用了簡化情境：「purity=0.5、樣本為 diploid，且每個腫瘤細胞帶有一份變異拷貝，因此 VAF 為 0.25」。在一般情況下，關係式為：</p>
 
-<pre><code>VAF = purity × multiplicity × CCF
-      ────────────────────────────────────
-      purity × totalCN + (1 − purity) × 2</code></pre>
+<div class="eq"><math display="block"><mi>VAF</mi><mo>=</mo><mfrac><mrow><mi>purity</mi><mo>×</mo><mi>multiplicity</mi><mo>×</mo><mi>CCF</mi></mrow><mrow><mi>purity</mi><mo>×</mo><mi>totalCN</mi><mo>+</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>purity</mi><mo>)</mo><mo>×</mo><mn>2</mn></mrow></mfrac></math></div>
 
 <p class="prose">這是理想化模型：正常細胞的拷貝數設為 2，tumor totalCN 在此位置可代表腫瘤群體，且 read depth 與 DNA 量近似成正比；
 實務上仍需考慮 allele-specific copy number、mapping／定序偏差與估計不確定性。</p>
@@ -5823,17 +5818,17 @@ technologies with DeepSomatic</i>，Nature Biotechnology，2025。程式碼在
 <li>purity 0.8、diploid、CCF 只有 0.5 的 subclonal 突變</li>
 </ul>
 <p class="prose">三種情況的生物意義不同；第三例的 CCF=0.5 表示 subclonal，但 VAF 仍然相同。
-可用上面的關係式逐一驗算：<code>0.4 ÷ 2</code>、<code>0.5 ÷ (0.5×3 + 0.5×2)</code>、
-<code>0.8×0.5 ÷ 2</code>，三者都是 0.20。</p>
+可用上面的關係式逐一驗算：<math><mn>0.4</mn><mo>÷</mo><mn>2</mn></math>、<math><mn>0.5</mn><mo>÷</mo><mo>(</mo><mn>0.5</mn><mo>×</mo><mn>3</mn><mo>+</mo><mn>0.5</mn><mo>×</mo><mn>2</mn><mo>)</mo></math>、
+<math><mn>0.8</mn><mo>×</mo><mn>0.5</mn><mo>÷</mo><mn>2</mn></math>，三者都是 0.20。</p>
 <p class="prose">此限制已被列為後續工作：可納入 allele-specific CNV、LOH、tumor purity、DNA fraction 與 mutation multiplicity，
 以建立 CN-aware 的 read-AF 解讀。這是方法適用範圍的重要限制。</p></aside>
 
 <aside class="guardrail" id="m08__guard-2"><p class="guardrail__hd">重要區分 #2：tumor cellular purity 不等於 tumor DNA fraction</p><p class="prose">注意上面關係式的<b>分母</b>：腫瘤細胞貢獻 <code>totalCN</code> 份 allele，
-正常細胞貢獻 2 份。當 <code>totalCN ≠ 2</code> 時，兩者就不成比例了。</p>
+正常細胞貢獻 2 份。當 <math><mi>totalCN</mi><mo>≠</mo><mn>2</mn></math> 時，兩者就不成比例了。</p>
 <p class="prose">具體例子：一個四倍體腫瘤，50% 的細胞是腫瘤。</p>
 <ul class="prose">
 <li>cellular purity = <b>0.50</b>（一半的細胞）</li>
-<li>DNA fraction = <code>0.5×4 ÷ (0.5×4 + 0.5×2)</code> = <b>0.67</b>（三分之二的 DNA）</li>
+<li>DNA fraction ＝ <math><mn>0.5</mn><mo>×</mo><mn>4</mn><mo>÷</mo><mo>(</mo><mn>0.5</mn><mo>×</mo><mn>4</mn><mo>+</mo><mn>0.5</mn><mo>×</mo><mn>2</mn><mo>)</mo></math> ＝ <b>0.67</b>（三分之二的 DNA）</li>
 </ul>
 <p class="prose">在<b>依 coverage 混合 BAM</b> 的合成資料中，文件可能分別以 purity 或 DNA fraction 描述混合比例；
 這種命名差異不代表兩者在一般實際樣本中等同。只有在來源樣本接近純腫瘤、輸入深度已校正，且 tumor／normal 每細胞 DNA 量相近時，read fraction 才可近似目標 purity。</p></aside>
@@ -6055,8 +6050,9 @@ technologies with DeepSomatic</i>，Nature Biotechnology，2025。程式碼在
 
 <p class="prose">以下把最左邊那一格算清楚：50× coverage、purity 0.2，以及一個 clonal 的 diploid somatic 變異：</p>
 
-<pre><code>預期 VAF   = 0.2 × 1 ÷ (0.2×2 + 0.8×2) = 0.10
-支持 read 數 = 50 × 0.10 = 5 條</code></pre>
+<div class="eq"><math display="block"><mtext>預期 VAF</mtext><mo>=</mo><mn>0.2</mn><mo>×</mo><mn>1</mn><mo>÷</mo><mo>(</mo><mn>0.2</mn><mo>×</mo><mn>2</mn><mo>+</mo><mn>0.8</mn><mo>×</mo><mn>2</mn><mo>)</mo><mo>=</mo><mn>0.10</mn></math></div>
+
+<div class="eq"><math display="block"><mtext>支持 read 數</mtext><mo>=</mo><mn>50</mn><mo>×</mo><mn>0.10</mn><mo>=</mo><mn>5</mn></math></div>
 
 <p class="prose">因此預期僅有約五條支持 read。ONT 的錯誤率受 basecaller、序列脈絡與 read 品質影響；
 在此深度下，少量錯誤 read 可能與變異訊號重疊，降低可分辨性。</p>
@@ -7251,7 +7247,7 @@ benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
 
 <p class="prose">因此它改用以下任務導向分數挑 epoch：</p>
 
-<pre><code>score = (成功移除的 FP − λ × 誤刪的 TP) ÷ FP 總數</code></pre>
+<div class="eq"><math display="block"><mi>score</mi><mo>=</mo><mo>(</mo><mtext>成功移除的 FP</mtext><mo>−</mo><mi>λ</mi><mo>×</mo><mtext>誤刪的 TP</mtext><mo>)</mo><mo>÷</mo><mtext>FP 總數</mtext></math></div>
 
 <p class="prose">λ 由 benchmark 與驗證集的正負比例估計，而非人工指定（該資料約為 1.45）；
 應同時說明估計資料、FP 總數為零時的處理，以及權重敏感度。</p>
@@ -8483,7 +8479,7 @@ LongPhase-S 是接在它們後面的一層。</p>
 
 <p class="prose"><span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-ghir-9">GHIR<span class="term__pop" id="m12__gd-ghir-9" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</span><span class="term__def" data-lang="en" lang="en">Germline Haplotype Imbalance Ratio: the normalized balance of reads assigned to HP1 and HP2 at a germline site. Under the tutorial's illustrative definition, an ideal unbiased sample is near 0.5. It is not a direct purity measurement; somatic branches, LOH/CNV, TINC, phasing errors, mapping bias and sparse sampling can all shift it. LongPhase-S estimates purity from its distribution only after filtering and model calibration.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span>（Germline Haplotype Imbalance Ratio）在<b>每一個候選 somatic 位點上各算一次</b>：</p>
 
-<pre><code>GHIR = max(HP1 read 數, HP2 read 數) ÷ (HP1 read 數 + HP2 read 數)</code></pre>
+<div class="eq"><math display="block"><mi>GHIR</mi><mo>=</mo><mfrac><mrow><mi>max</mi><mo>(</mo><mtext>HP1 read 數</mtext><mo>,</mo><mtext>HP2 read 數</mtext><mo>)</mo></mrow><mrow><mtext>HP1 read 數</mtext><mo>+</mo><mtext>HP2 read 數</mtext></mrow></mfrac></math></div>
 
 <p class="prose">所以它的範圍是 0.5 到 1：<b>0.5 表示兩條完全平衡，1.0 表示 read 全部偏向其中一條。</b>
 分母只算被分到 HP1 或 HP2 的 read —— 這是關鍵，因為帶 somatic allele 的 read 會被改標成
@@ -10239,7 +10235,7 @@ bcftools query -f '[%GT\t%GT2]\n' phased_prefix.vcf | \
 <ul class="prose">
 <li><b>VAF 與簡化模型相容。</b>觀測 VAF = 11/50 = 0.22。
 在 tumor DNA fraction = 0.6、diploid、無拷貝數變化、單拷貝且 clonal 的合成假設下，
-理論預期為 <code>0.6 × 1 ÷ 2 = 0.30</code>。0.22 略低於此值，可能與
+理論預期為 <math><mn>0.6</mn><mo>×</mo><mn>1</mn><mo>÷</mo><mn>2</mn><mo>=</mo><mn>0.30</mn></math>。0.22 略低於此值，可能與
 <span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="capstone__gd-cancer-cell-fraction-4">CCF<span class="term__pop" id="capstone__gd-cancer-cell-fraction-4" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en" lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span> 約 0.73 的次要 clone 或取樣波動相容；這不是對 CCF 的直接量測。</li>
 <li><b>normal 樣本未觀測到 ALT。</b>25× 深度、0 條 ALT。若此位點是典型 het germline，
 在相同覆蓋與取樣假設下原本可預期約一半 read 支持 ALT；觀測到 0 條會降低此解釋的可能性，
@@ -13045,39 +13041,47 @@ PyClone、SciClone 與 MOBSTER 一系共同的骨架，共四個步驟。</p>
 
 <h4 id="sr2__第一步-將每個變異換算為細胞比例">第一步：將每個變異換算為細胞比例</h4>
 
-<p class="prose">位點 <code>m</code> 的深度為 <code>d_m</code>，其中 <code>a_m</code> 條 read 帶變異，
-<code>VAF_m = a_m / d_m</code>。VAF 不可直接互相比較，因為它同時受三個因素稀釋：
+<p class="prose">位點 <math><mi>m</mi></math> 的深度為 <math><msub><mi>d</mi><mi>m</mi></msub></math>，其中 <math><msub><mi>a</mi><mi>m</mi></msub></math> 條 read 帶變異，
+<math><msub><mi>VAF</mi><mi>m</mi></msub><mo>=</mo><msub><mi>a</mi><mi>m</mi></msub><mo>/</mo><msub><mi>d</mi><mi>m</mi></msub></math>。VAF 不可直接互相比較，因為它同時受三個因素稀釋：
 正常細胞的混入、該處的拷貝數，以及變異在每個帶原細胞中的拷貝數。換算關係為：</p>
 
-<pre><code>E[VAF_m]  =        ρ · c_m · μ_m
-             ───────────────────────
-             ρ · CN_m  +  2 · (1 − ρ)
+<div class="eq"><math display="block"><mi>E</mi><mo>[</mo><msub><mi>VAF</mi><mi>m</mi></msub><mo>]</mo><mo>=</mo><mfrac><mrow><mi>ρ</mi><mo>·</mo><msub><mi>c</mi><mi>m</mi></msub><mo>·</mo><msub><mi>μ</mi><mi>m</mi></msub></mrow><mrow><mi>ρ</mi><mo>·</mo><msub><mi>CN</mi><mi>m</mi></msub><mo>+</mo><mn>2</mn><mo>·</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>ρ</mi><mo>)</mo></mrow></mfrac></math><p class="eq__note">二倍體、拷貝數正常、<math><mi>μ</mi><mo>=</mo><mn>1</mn></math> 時化簡為 <math><mi>E</mi><mo>[</mo><mi>VAF</mi><mo>]</mo><mo>=</mo><mi>ρ</mi><mo>·</mo><mi>c</mi><mo>/</mo><mn>2</mn></math>，即 <math><mi>c</mi><mo>=</mo><mn>2</mn><mo>·</mo><mi>VAF</mi><mo>/</mo><mi>ρ</mi></math>。</p></div>
 
-  ρ    純度（全樣本單一值）
-  c_m  帶有此變異的癌細胞比例，即分群所針對的量（CCF）
-  CN_m 該區段的腫瘤拷貝數（每區段一個值）
-  μ_m  multiplicity：帶原細胞中此變異的拷貝數（每個變異一個值）
-
-二倍體、拷貝數正常、μ = 1 時化簡為   E[VAF] = ρ·c / 2   →   c = 2·VAF / ρ</code></pre>
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">符號</th><th scope="col">意義</th><th scope="col">尺度</th></tr></thead>
+<tbody>
+<tr><td><math><mi>ρ</mi></math></td><td>純度</td><td>全樣本單一值</td></tr>
+<tr><td><math><msub><mi>c</mi><mi>m</mi></msub></math></td><td>帶有此變異的癌細胞比例，即分群所針對的量（CCF）</td><td>每個變異一個值</td></tr>
+<tr><td><math><msub><mi>CN</mi><mi>m</mi></msub></math></td><td>該區段的腫瘤拷貝數</td><td>每區段一個值</td></tr>
+<tr><td><math><msub><mi>μ</mi><mi>m</mi></msub></math></td><td>multiplicity：帶原細胞中此變異的拷貝數</td><td>每個變異一個值</td></tr>
+</tbody>
+</table>
+</div>
 
 <p class="prose">此步驟需要<b>三個外部估計值</b>，且三者的尺度不同：ρ 為全樣本單一值，
 CN 為每區段一個值，μ 則為<b>每個變異</b>一個值。上篇所述的第一層不確定性即源於此。</p>
 
 <h4 id="sr2__第二步-將一萬五千個-c-匯總為一維直方圖並擬合混合模型">第二步：將一萬五千個 c 匯總為一維直方圖並擬合混合模型</h4>
 
-<p class="prose">設共有 <code>K</code> 群，細胞比例為 <code>c_1 … c_K</code>；
-每個變異帶有一個未觀測的群歸屬 <code>z_m ∈ {1…K}</code>，各群所佔的變異比例為 <code>π_k</code>。
+<p class="prose">設共有 <math><mi>K</mi></math> 群，細胞比例為 <math><msub><mi>c</mi><mn>1</mn></msub><mo>…</mo><msub><mi>c</mi><mi>K</mi></msub></math>；
+每個變異帶有一個未觀測的群歸屬 <math><msub><mi>z</mi><mi>m</mi></msub><mo>∈</mo><mo>{</mo><mn>1</mn><mo>…</mo><mi>K</mi><mo>}</mo></math>，各群所佔的變異比例為 <math><msub><mi>π</mi><mi>k</mi></msub></math>。
 分群即為下式的最大化：</p>
 
-<pre><code>a_m | z_m = k   ~   BetaBinomial( d_m ,  θ_k = ρ·c_k / 2 ,  φ )
+<div class="eq"><math display="block"><msub><mi>a</mi><mi>m</mi></msub><mo>∣</mo><msub><mi>z</mi><mi>m</mi></msub><mo>=</mo><mi>k</mi><mo>∼</mo><mi>BetaBinomial</mi><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>θ</mi><mi>k</mi></msub><mo>=</mo><mi>ρ</mi><mo>·</mo><msub><mi>c</mi><mi>k</mi></msub><mo>/</mo><mn>2,</mn><mi>φ</mi><mo>)</mo></math></div>
 
-ℒ(K, π, c, φ)  =  Σ_m  log  Σ_k  π_k · BetaBin( a_m ; d_m , ρ·c_k/2 , φ )
-                            └──────┬──────┘
-                          z_m 於此處被邊際化 —— 此點為後續關鍵
+<div class="eq"><math display="block"><mi>ℒ</mi><mo>(</mo><mi>K</mi><mo>,</mo><mi>π</mi><mo>,</mo><mi>c</mi><mo>,</mo><mi>φ</mi><mo>)</mo><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><mi>log</mi><munder><mo>∑</mo><mi>k</mi></munder><msub><mi>π</mi><mi>k</mi></msub><mo>·</mo><mi>BetaBin</mi><mo>(</mo><msub><mi>a</mi><mi>m</mi></msub><mo>;</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><mi>ρ</mi><mo>·</mo><msub><mi>c</mi><mi>k</mi></msub><mo>/</mo><mn>2,</mn><mi>φ</mi><mo>)</mo></math><p class="eq__note">內層的 <math><msub><mo>∑</mo><mi>k</mi></msub></math> 即為 <math><msub><mi>z</mi><mi>m</mi></msub></math> 被<b>邊際化</b>之處 —— 此點為後續關鍵。</p></div>
 
-  θ_k  第 k 群在 VAF 軸上的位置（峰的位置）
-  π_k  第 k 群所含的變異比例（峰的高度）
-  φ    超離散度，即峰的寬度。通常與其他參數一併擬合</code></pre>
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">參數</th><th scope="col">意義</th></tr></thead>
+<tbody>
+<tr><td><math><msub><mi>θ</mi><mi>k</mi></msub></math></td><td>第 k 群在 VAF 軸上的位置（峰的位置）</td></tr>
+<tr><td><math><msub><mi>π</mi><mi>k</mi></msub></math></td><td>第 k 群所含的變異比例（峰的高度）</td></tr>
+<tr><td><math><mi>φ</mi></math></td><td>超離散度，即峰的寬度。通常與其他參數一併擬合</td></tr>
+</tbody>
+</table>
+</div>
 
 <h4 id="sr2__第三步-決定-k">第三步：決定 K</h4>
 
@@ -13087,8 +13091,8 @@ CN 為每區段一個值，μ 則為<b>每個變異</b>一個值。上篇所述�
 
 <h4 id="sr2__第四步-由-c_k-建樹">第四步：由 {c_k} 建樹</h4>
 
-<p class="prose">依 pigeonhole 原則：節點 <code>k</code> 得為子節點集合 <code>S</code> 的父節點，
-必要條件為 <code>c_k ≥ Σ_{j∈S} c_j</code> —— 子代細胞為父代的子集，其總和不得超過父代。
+<p class="prose">依 pigeonhole 原則：節點 <math><mi>k</mi></math> 得為子節點集合 <math><mi>S</mi></math> 的父節點，
+必要條件為 <math><msub><mi>c</mi><mi>k</mi></msub><mo>≥</mo><msub><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>S</mi></mrow></msub><msub><mi>c</mi><mi>j</mi></msub></math> —— 子代細胞為父代的子集，其總和不得超過父代。
 此條件<b>通常無法將候選收斂至唯一一棵樹</b>，其餘由<span class="term" data-term="parsimony" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-parsimony-2">簡約性<span class="term__pop" id="sr2__gd-parsimony-2" role="tooltip"><b class="term__hd">parsimony <i>簡約法</i></b><span class="term__def" data-lang="zh">在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</span><span class="term__def" data-lang="en" lang="en">Choosing, among all solutions compatible with the data, the one requiring the fewest steps or lowest cost. It is a preference rather than evidence: when several solutions tie, parsimony picks one, but the data has not ruled the others out.</span><a class="term__more" href="glossary.html#parsimony">完整條目 →</a></span></span>等偏好決定。
 上篇的測驗即針對此點：通過相容性檢查與被資料證成是兩回事。</p>
 
@@ -13098,9 +13102,9 @@ CN 為每區段一個值，μ 則為<b>每個變異</b>一個值。上篇所述�
 <table>
 <thead><tr><th scope="col">限制</th><th scope="col">內容</th><th scope="col">所在參數</th><th scope="col">對應用途</th></tr></thead>
 <tbody>
-<tr><td><b>K 不可辨識</b></td><td>兩群的 c 相等時，似然對「一群或兩群」完全不變</td><td><code>z</code> → <code>K</code></td><td>用途一</td></tr>
-<tr><td><b>φ 與 K 不可區辨</b></td><td>單一寬成分與兩個鄰近窄成分可擬合出近乎相同的直方圖</td><td><code>φ</code></td><td>用途二</td></tr>
-<tr><td><b>c 依賴三個外部估計值</b></td><td>ρ 偏誤導致整體平移；CN 與 μ 偏誤則為逐變異的位移</td><td><code>c</code></td><td>用途三</td></tr>
+<tr><td><b>K 不可辨識</b></td><td>兩群的 c 相等時，似然對「一群或兩群」完全不變</td><td><math><mi>z</mi></math> → <math><mi>K</mi></math></td><td>用途一</td></tr>
+<tr><td><b>φ 與 K 不可區辨</b></td><td>單一寬成分與兩個鄰近窄成分可擬合出近乎相同的直方圖</td><td><math><mi>φ</mi></math></td><td>用途二</td></tr>
+<tr><td><b>c 依賴三個外部估計值</b></td><td>ρ 偏誤導致整體平移；CN 與 μ 偏誤則為逐變異的位移</td><td><math><mi>c</mi></math></td><td>用途三</td></tr>
 </tbody>
 </table>
 </div>
@@ -13109,18 +13113,18 @@ CN 為每區段一個值，μ 則為<b>每個變異</b>一個值。上篇所述�
 
 <p class="prose">多變異區域<b>並非第二批資料</b>。
 其中的 1,475 個變異原已包含在前述 15,500 個點之內，
-各自具備 <code>a_m</code> 與 <code>d_m</code>，進入同一個直方圖，並由第二步的式子一併處理。
-<b>5% 所額外提供的不是新的觀測值，而是對這些點的 <code>z_m</code> 的限制。</b></p>
+各自具備 <math><msub><mi>a</mi><mi>m</mi></msub></math> 與 <math><msub><mi>d</mi><mi>m</mi></msub></math>，進入同一個直方圖，並由第二步的式子一併處理。
+<b>5% 所額外提供的不是新的觀測值，而是對這些點的 <math><msub><mi>z</mi><mi>m</mi></msub></math> 的限制。</b></p>
 
-<p class="prose">因此兩者的接合點是 <code>z_m</code> <b>這一個變數</b>，它同時出現於兩處：</p>
+<p class="prose">因此兩者的接合點是 <math><msub><mi>z</mi><mi>m</mi></msub></math> <b>這一個變數</b>，它同時出現於兩處：</p>
 
 <ul class="prose">
-<li><b>頻率側</b>：<code>z_m</code> 決定 <code>a_m</code> 由哪一個成分產生，即第一節第二步。</li>
-<li><b>關係側</b>：一條「不可同群 (i, j)」即 <code>z_i ≠ z_j</code>。</li>
+<li><b>頻率側</b>：<math><msub><mi>z</mi><mi>m</mi></msub></math> 決定 <math><msub><mi>a</mi><mi>m</mi></msub></math> 由哪一個成分產生，即第一節第二步。</li>
+<li><b>關係側</b>：一條「不可同群 (i, j)」即 <math><msub><mi>z</mi><mi>i</mi></msub><mo>≠</mo><msub><mi>z</mi><mi>j</mi></msub></math>。</li>
 </ul>
 
-<p class="prose">第一節的式子將 <code>z_m</code> <b>邊際化</b>（即 <code>Σ_k π_k …</code> 一項）。
-接上 5% 所需的唯一結構性改動，是<b>保留 <code>z</code> 不予邊際化</b>，
+<p class="prose">第一節的式子將 <math><msub><mi>z</mi><mi>m</mi></msub></math> <b>邊際化</b>（即 <math><msub><mo>∑</mo><mi>k</mi></msub><msub><mi>π</mi><mi>k</mi></msub><mo>…</mo></math> 一項）。
+接上 5% 所需的唯一結構性改動，是<b>保留 <math><mi>z</mi></math> 不予邊際化</b>，
 使其由被積分的潛在變數轉為被約束的潛在變數。
 兩者不構成兩個獨立的似然，也不涉及跨資料型態的加權，因為它們本就是同一組觀測。</p>
 
@@ -13128,9 +13132,9 @@ CN 為每區段一個值，μ 則為<b>每個變異</b>一個值。上篇所述�
 <table>
 <thead><tr><th scope="col">用途</th><th scope="col">作用的參數</th><th scope="col">作用方式</th></tr></thead>
 <tbody>
-<tr><td><b>一</b></td><td><code>z</code>（連帶 <code>K</code>）</td><td>加入不等式限制，使 K 由不可辨識轉為可辨識</td></tr>
-<tr><td><b>二</b></td><td><code>φ</code></td><td>由自由參數改為外部量測所得的常數</td></tr>
-<tr><td><b>三</b></td><td><code>c</code> 之間的比值</td><td>加入等式限制，使 ρ 由換算因子退化為整體縮放</td></tr>
+<tr><td><b>一</b></td><td><math><mi>z</mi></math>（連帶 <math><mi>K</mi></math>）</td><td>加入不等式限制，使 K 由不可辨識轉為可辨識</td></tr>
+<tr><td><b>二</b></td><td><math><mi>φ</mi></math></td><td>由自由參數改為外部量測所得的常數</td></tr>
+<tr><td><b>三</b></td><td><math><mi>c</mi></math> 之間的比值</td><td>加入等式限制，使 ρ 由換算因子退化為整體縮放</td></tr>
 </tbody>
 </table>
 </div>
@@ -13229,17 +13233,14 @@ CN 為每區段一個值，μ 則為<b>每個變異</b>一個值。上篇所述�
 
 <h4 id="sr2__不可辨識性的代數形式">不可辨識性的代數形式</h4>
 
-<p class="prose">設真實情形為兩群 B 與 C，且細胞比例相等：<code>c_B = c_C = c</code>，
-則兩者在 VAF 軸上的位置亦相等：<code>θ_B = θ_C = ρc/2</code>。
+<p class="prose">設真實情形為兩群 B 與 C，且細胞比例相等：<math><msub><mi>c</mi><mi>B</mi></msub><mo>=</mo><msub><mi>c</mi><mi>C</mi></msub><mo>=</mo><mi>c</mi></math>，
+則兩者在 VAF 軸上的位置亦相等：<math><msub><mi>θ</mi><mi>B</mi></msub><mo>=</mo><msub><mi>θ</mi><mi>C</mi></msub><mo>=</mo><mi>ρ</mi><mi>c</mi><mo>/</mo><mn>2</mn></math>。
 代入第一節第二步的混合式：</p>
 
-<pre><code>π_B · BetaBin(a; d, θ, φ)  +  π_C · BetaBin(a; d, θ, φ)
-      =  (π_B + π_C) · BetaBin(a; d, θ, φ)
+<div class="eq"><math display="block"><msub><mi>π</mi><mi>B</mi></msub><mo>·</mo><mi>BetaBin</mi><mo>(</mo><mi>a</mi><mo>;</mo><mi>d</mi><mo>,</mo><mi>θ</mi><mo>,</mo><mi>φ</mi><mo>)</mo><mo>+</mo><msub><mi>π</mi><mi>C</mi></msub><mo>·</mo><mi>BetaBin</mi><mo>(</mo><mi>a</mi><mo>;</mo><mi>d</mi><mo>,</mo><mi>θ</mi><mo>,</mo><mi>φ</mi><mo>)</mo><mo>=</mo><mo>(</mo><msub><mi>π</mi><mi>B</mi></msub><mo>+</mo><msub><mi>π</mi><mi>C</mi></msub><mo>)</mo><mo>·</mo><mi>BetaBin</mi><mo>(</mo><mi>a</mi><mo>;</mo><mi>d</mi><mo>,</mo><mi>θ</mi><mo>,</mo><mi>φ</mi><mo>)</mo></math><p class="eq__note">左式為兩群，右式為一群，兩者對任何一組可能的觀測給出相同的機率。</p></div>
 
-左式為兩群，右式為一群，兩者對任何一組可能的觀測給出相同的機率。</code></pre>
-
-<p class="prose">兩者並非近似相等，而是<b>恆等</b>。似然僅透過 <code>π_B + π_C</code> 依賴這兩個參數，
-故 <code>(π_B, π_C)</code> 本身<b>不可辨識</b>。
+<p class="prose">兩者並非近似相等，而是<b>恆等</b>。似然僅透過 <math><msub><mi>π</mi><mi>B</mi></msub><mo>+</mo><msub><mi>π</mi><mi>C</mi></msub></math> 依賴這兩個參數，
+故 <math><mo>(</mo><msub><mi>π</mi><mi>B</mi></msub><mo>,</mo><msub><mi>π</mi><mi>C</mi></msub><mo>)</mo></math> 本身<b>不可辨識</b>。
 又因 BIC 一類準則對額外參數施以懲罰，模型選擇必然取 K 較小者。</p>
 
 <p class="prose">此即「增加定序深度無助於此」的精確意義：
@@ -13394,24 +13395,31 @@ CN 為每區段一個值，μ 則為<b>每個變異</b>一個值。上篇所述�
 
 <p class="prose">設 ρ ＝ 0.60、二倍體、μ ＝ 1，真實情形為三群：</p>
 
-<pre><code>clone A   CCF 1.00   →  期望 VAF 0.30      （全部腫瘤細胞皆帶有）
-clone B   CCF 0.40   →  期望 VAF 0.12
-clone C   CCF 0.40   →  期望 VAF 0.12      ← 與 B 相等
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">clone</th><th scope="col">CCF</th><th scope="col">期望 VAF</th><th scope="col">備註</th></tr></thead>
+<tbody>
+<tr><td>A</td><td><math><mn>1.00</mn></math></td><td><math><mn>0.30</mn></math></td><td>全部腫瘤細胞皆帶有</td></tr>
+<tr><td>B</td><td><math><mn>0.40</mn></math></td><td><math><mn>0.12</mn></math></td><td></td></tr>
+<tr><td>C</td><td><math><mn>0.40</mn></math></td><td><math><mn>0.12</mn></math></td><td><b>與 B 相等</b></td></tr>
+</tbody>
+</table>
+</div>
 
-真實的樹：      A ─┬─ B          直方圖所見：     0.30 與 0.12 各一根
-                   └─ C          最大似然解：     K = 2，樹為 A → B</code></pre>
+<p class="prose">真實的樹為 A 分支至 B 與 C。但直方圖上只見 <math><mn>0.30</mn></math> 與 <math><mn>0.12</mn></math> 各一根峰，
+最大似然解為 <math><mi>K</mi><mo>=</mo><mn>2</mn></math>，樹為 A → B 的線性形式。</p>
 
 <p class="prose">此結果有兩處錯誤：<b>群數少計一群</b>，且<b>拓撲由分支誤判為線性</b>。
-兩者皆無法由內部檢查發現 —— <code>K = 2</code> 對此組資料即為最大似然解，
+兩者皆無法由內部檢查發現 —— <math><mi>K</mi><mo>=</mo><mn>2</mn></math> 對此組資料即為最大似然解，
 殘差、擬合優度與後驗預測檢查均無異常。</p>
 
-<p class="prose">今加入一條約束：B 中的變異 <code>i</code> 與 C 中的變異 <code>j</code>
-落於同一個單位，且觀測到<b>無任何分子同時帶有兩者</b>，故 <code>z_i ≠ z_j</code>。</p>
+<p class="prose">今加入一條約束：B 中的變異 <math><mi>i</mi></math> 與 C 中的變異 <math><mi>j</mi></math>
+落於同一個單位，且觀測到<b>無任何分子同時帶有兩者</b>，故 <math><msub><mi>z</mi><mi>i</mi></msub><mo>≠</mo><msub><mi>z</mi><mi>j</mi></msub></math>。</p>
 
-<p class="prose"><code>K = 2</code> 的解在 0.12 一峰上僅有單一成分，
-必然將 <code>i</code> 與 <code>j</code> 指派至同一群，因此<b>該解不可行</b>。
-可行解中最優者為 <code>K = 3</code>，其中兩個成分位於同一位置 <code>θ = 0.12</code>。
-pigeonhole 至此容許分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code>。</p>
+<p class="prose"><math><mi>K</mi><mo>=</mo><mn>2</mn></math> 的解在 0.12 一峰上僅有單一成分，
+必然將 <math><mi>i</mi></math> 與 <math><mi>j</mi></math> 指派至同一群，因此<b>該解不可行</b>。
+可行解中最優者為 <math><mi>K</mi><mo>=</mo><mn>3</mn></math>，其中兩個成分位於同一位置 <math><mi>θ</mi><mo>=</mo><mn>0.12</mn></math>。
+pigeonhole 至此容許分支：<math><msub><mi>c</mi><mi>B</mi></msub><mo>+</mo><msub><mi>c</mi><mi>C</mi></msub><mo>=</mo><mn>0.80</mn><mo>≤</mo><msub><mi>c</mi><mi>A</mi></msub><mo>=</mo><mn>1.00</mn></math>。</p>
 
 <p class="prose">因此，<b>單一條約束所改變的是樹的拓撲與群的個數，而非參數的數值</b>。
 這也是此路線的論據不在精度的原因：精度指「可區分，但量測是否準確」，
@@ -13420,8 +13428,8 @@ pigeonhole 至此容許分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code>。<
 <h4 id="sr2__此約束的作用範圍">此約束的作用範圍</h4>
 
 <p class="prose">若 0.12 一峰含 1,000 個變異，該約束僅確定其中<b>兩個</b>。
-其餘 998 個對兩個成分的似然完全相同（其 <code>θ</code> 相等），
-故其歸屬仍不可辨識，除非各自另有約束連至 <code>i</code> 或 <code>j</code>。</p>
+其餘 998 個對兩個成分的似然完全相同（其 <math><mi>θ</mi></math> 相等），
+故其歸屬仍不可辨識，除非各自另有約束連至 <math><mi>i</mi></math> 或 <math><mi>j</mi></math>。</p>
 
 <p class="prose">是故此路線的產出為<b>群的個數與群間關係</b>，而非個別變異的歸屬。
 而這正是系統發生重建所需的量。
@@ -13431,20 +13439,20 @@ pigeonhole 至此容許分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code>。<
 
 <h3 id="sr2__四-用途二-以量測值取代自由參數">四、用途二：以量測值取代自由參數 φ</h3>
 
-<p class="prose"><code>φ</code> 在第一節中為<b>與其他參數一併擬合的自由參數</b>，
-且與 <code>K</code> 不可區辨：一個 φ 較大的寬成分，
+<p class="prose"><math><mi>φ</mi></math> 在第一節中為<b>與其他參數一併擬合的自由參數</b>，
+且與 <math><mi>K</mi></math> 不可區辨：一個 φ 較大的寬成分，
 與兩個 φ 較小、位置相鄰的窄成分，可擬合出近乎相同的直方圖。
 擬合結果取決於懲罰項與初始值，而非取決於生物學。</p>
 
-<p class="prose">5% 的區域提供 <code>φ</code> 的<b>直接量測</b>：
+<p class="prose">5% 的區域提供 <math><mi>φ</mi></math> 的<b>直接量測</b>：
 同一單位、同一條單倍型上的數個變異，其真實頻率<b>完全相等</b> ——
 它們位於同一批分子上，生物學離散<b>恰為零</b>，
 故其間觀測到的離散度<b>全部</b>來自技術雜訊。
-依深度與拷貝數分層估計，即得 <code>φ_hat(d, CN)</code>。</p>
+依深度與拷貝數分層估計，即得 <math><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mo>(</mo><mi>d</mi><mo>,</mo><mi>CN</mi><mo>)</mo></math>。</p>
 
-<p class="prose">實作上的改動僅一處：<b>將 <code>φ</code> 由待估參數改為代入的常數</b>。
+<p class="prose">實作上的改動僅一處：<b>將 <math><mi>φ</mi></math> 由待估參數改為代入的常數</b>。
 其後果是模型不再能以「該群雜訊較大」吸收結構 ——
-原先擬合為單一寬峰者，若 <code>φ_hat</code> 小於擬合所得的 φ，即須改由兩個成分解釋，
+原先擬合為單一寬峰者，若 <math><mover accent="true"><mi>φ</mi><mo>^</mo></mover></math> 小於擬合所得的 φ，即須改由兩個成分解釋，
 <b>K 因而增加</b>。此路徑與用途一殊途同歸，惟其作用點在雜訊一端。</p>
 
 <p class="prose">「點擴散函數」是此機制的比喻：真值為一個點，量測結果為具有寬度的散布。
@@ -13455,8 +13463,8 @@ pigeonhole 至此容許分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code>。<
 <p class="prose">第一節第一步的三個估計值，其偏誤的作用方式並不相同：</p>
 
 <ul class="prose">
-<li><b>ρ 偏誤</b>：所有 <code>c</code> 等比例縮放。樹的拓撲多半不變，
-但 pigeonhole 為<b>絕對比較</b>（<code>c_B + c_C ≤ c_A</code>），判定結果仍可能翻轉。</li>
+<li><b>ρ 偏誤</b>：所有 <math><mi>c</mi></math> 等比例縮放。樹的拓撲多半不變，
+但 pigeonhole 為<b>絕對比較</b>（<math><msub><mi>c</mi><mi>B</mi></msub><mo>+</mo><msub><mi>c</mi><mi>C</mi></msub><mo>≤</mo><msub><mi>c</mi><mi>A</mi></msub></math>），判定結果仍可能翻轉。</li>
 <li><b>CN 或 μ 偏誤</b>：其作用為<b>逐變異</b>的位移，受影響的變異將落入其他峰，汙染群的組成。
 此類偏誤的後果較前者嚴重。</li>
 </ul>
@@ -13637,37 +13645,53 @@ pigeonhole 至此容許分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code>。<
 不需另行估計全域值。</p>
 </div>
 
-<p class="prose">在估計式中，此項為一條<b>對 <code>c</code> 的等式約束</b>：
-<code>c[z_j] / c[z_i] = ϱ</code>。
-其效果是將 <code>K</code> 個各自自由的位置參數，改寫為<b>一組比值與一個整體縮放</b>；
-<code>ρ</code> 由「每個變異換算時皆須用到的因子」退化為「最後施加的單一純量」。
+<p class="prose">在估計式中，此項為一條<b>對 <math><mi>c</mi></math> 的等式約束</b>：
+<math><mi>c</mi><mo>[</mo><msub><mi>z</mi><mi>j</mi></msub><mo>]</mo><mo>/</mo><mi>c</mi><mo>[</mo><msub><mi>z</mi><mi>i</mi></msub><mo>]</mo><mo>=</mo><mi>ϱ</mi></math>。
+其效果是將 <math><mi>K</mi></math> 個各自自由的位置參數，改寫為<b>一組比值與一個整體縮放</b>；
+<math><mi>ρ</mi></math> 由「每個變異換算時皆須用到的因子」退化為「最後施加的單一純量」。
 換算偏誤僅使各群整體平移，<b>相對關係不變</b>。</p>
 
 <h3 id="sr2__六-完整的估計式">六、完整的估計式</h3>
 
 <p class="prose">將前三節的改動疊加於第一節的式子，即得此路線的完整形式：</p>
 
-<pre><code>ℒ(K, c, π, z, T)  =   Σ_m  log [ π_{z_m} · BetaBin( a_m ; d_m , ρ·c_{z_m}/2 , φ_hat ) ]
-                    + Σ_r  ω_r · log P( R_r | z , T )
+<div class="eq"><math display="block"><mi>ℒ</mi><mo>(</mo><mi>K</mi><mo>,</mo><mi>c</mi><mo>,</mo><mi>π</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><mi>log</mi><mo>[</mo><msub><mi>π</mi><msub><mi>z</mi><mi>m</mi></msub></msub><mo>·</mo><mi>BetaBin</mi><mo>(</mo><msub><mi>a</mi><mi>m</mi></msub><mo>;</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><mi>ρ</mi><mo>·</mo><msub><mi>c</mi><msub><mi>z</mi><mi>m</mi></msub></msub><mo>/</mo><mn>2,</mn><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mo>)</mo><mo>]</mo><mo>+</mo><munder><mo>∑</mo><mi>r</mi></munder><msub><mi>ω</mi><mi>r</mi></msub><mo>·</mo><mi>log</mi><mi>P</mi><mo>(</mo><msub><mi>R</mi><mi>r</mi></msub><mo>∣</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo></math></div>
 
-第一項 ── 即第一節第二步，惟有兩處相異：
-          · z 不再被邊際化（Σ_k 已移除），改為受約束的對象
-          · φ_hat 不再是自由參數，由用途二量測後代入
-
-第二項 ── 5% 的作用位置。R_r 為第 r 條約束，ω_r 為其信心權重</code></pre>
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">項</th><th scope="col">來源</th><th scope="col">與第一節的差異</th></tr></thead>
+<tbody>
+<tr>
+<td>第一項</td><td>95% 的區域（頻率）</td>
+<td>即第一節第二步，惟有兩處相異：<math><mi>z</mi></math> 不再被邊際化（<math><msub><mo>∑</mo><mi>k</mi></msub></math> 已移除），改為受約束的對象；<math><mover accent="true"><mi>φ</mi><mo>^</mo></mover></math> 不再是自由參數，由用途二量測後代入</td>
+</tr>
+<tr>
+<td>第二項</td><td>5% 的區域（關係）</td>
+<td><math><msub><mi>R</mi><mi>r</mi></msub></math> 為第 <math><mi>r</mi></math> 條約束，<math><msub><mi>ω</mi><mi>r</mi></msub></math> 為其信心權重</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 <p class="prose">四種約束對應的形式為：</p>
 
-<pre><code>不可同群 (i, j)      →  z_i ≠ z_j                              ← 用途一，使 K 可辨識
-必定同群 (i, j)      →  z_i = z_j
-祖先關係 (i → j)     →  T 上 z_i 為 z_j 的祖先，且 c[z_i] &gt; c[z_j]
-巢狀比值 ϱ(i, j)     →  c[z_j] / c[z_i] = ϱ                    ← 用途三，不需純度</code></pre>
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">約束 <math><msub><mi>R</mi><mi>r</mi></msub></math></th><th scope="col">對估計式的形式</th><th scope="col">備註</th></tr></thead>
+<tbody>
+<tr><td>不可同群 <math><mo>(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo>)</mo></math></td><td><math><msub><mi>z</mi><mi>i</mi></msub><mo>≠</mo><msub><mi>z</mi><mi>j</mi></msub></math></td><td>用途一，使 K 可辨識</td></tr>
+<tr><td>必定同群 <math><mo>(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo>)</mo></math></td><td><math><msub><mi>z</mi><mi>i</mi></msub><mo>=</mo><msub><mi>z</mi><mi>j</mi></msub></math></td><td></td></tr>
+<tr><td>祖先關係 <math><mo>(</mo><mi>i</mi><mo>→</mo><mi>j</mi><mo>)</mo></math></td><td><math><mi>T</mi></math> 上 <math><msub><mi>z</mi><mi>i</mi></msub></math> 為 <math><msub><mi>z</mi><mi>j</mi></msub></math> 的祖先，且 <math><mi>c</mi><mo>[</mo><msub><mi>z</mi><mi>i</mi></msub><mo>]</mo><mo>&gt;</mo><mi>c</mi><mo>[</mo><msub><mi>z</mi><mi>j</mi></msub><mo>]</mo></math></td><td></td></tr>
+<tr><td>巢狀比值 <math><mi>ϱ</mi><mo>(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo>)</mo></math></td><td><math><mi>c</mi><mo>[</mo><msub><mi>z</mi><mi>j</mi></msub><mo>]</mo><mo>/</mo><mi>c</mi><mo>[</mo><msub><mi>z</mi><mi>i</mi></msub><mo>]</mo><mo>=</mo><mi>ϱ</mi></math></td><td>用途三，不需純度</td></tr>
+</tbody>
+</table>
+</div>
 
 <p class="prose">此處採<b>加權</b>而非硬性條件。第八、九節的閘門雖可排除多數假約束，但無法完全排除；
-將殘餘的不確定性納入 <code>ω_r</code>，單一條錯誤約束僅被稀釋，
+將殘餘的不確定性納入 <math><msub><mi>ω</mi><mi>r</mi></msub></math>，單一條錯誤約束僅被稀釋，
 而不致如硬性條件般直接迫使模型產生不存在的群。</p>
 
-<p class="prose">推論方法為帶約束的 EM，或直接對 <code>(T, c, z)</code> 取樣。
+<p class="prose">推論方法為帶約束的 EM，或直接對 <math><mo>(</mo><mi>T</mi><mo>,</mo><mi>c</mi><mo>,</mo><mi>z</mi><mo>)</mo></math> 取樣。
 <b>輸出須載明每一組群配對由幾條約束支持</b>；
 未獲約束支持的關係係由 pigeonhole 與偏好補足，其狀態等同第一節第四步，應予標示。</p>
 
@@ -13743,7 +13767,7 @@ pigeonhole 至此容許分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code>。<
 
 <h3 id="sr2__七-約束的來源-現行實作的分類輸出">七、約束的來源：現行實作的分類輸出</h3>
 
-<p class="prose">前六節建立機制，以下各節處理其可行性。首要問題是 <code>R_r</code> 的來源。
+<p class="prose">前六節建立機制，以下各節處理其可行性。首要問題是 <math><msub><mi>R</mi><mi>r</mi></msub></math> 的來源。
 現行流程對每個單位所做的分類，已直接對應上述四種約束：</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="sr2__rg-unit-classes__title" aria-describedby="sr2__rg-unit-classes__desc">
@@ -13856,9 +13880,9 @@ pigeonhole 至此容許分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code>。<
 
 <ul class="prose">
 <li><b>「≈ 1」須定為明確的容差，且該容差應由檢定力決定，而非任意設定的常數。</b>
-在跨越深度 <code>n</code> 之下，比值本身即帶有抽樣誤差；
-唯有當「比值 &lt; 1」在該 <code>n</code> 下本即可分辨、而觀測仍落於 1 附近時，
-「≈ 1」才承載資訊。<code>n</code> 較小時任何比值皆近似於 1，
+在跨越深度 <math><mi>n</mi></math> 之下，比值本身即帶有抽樣誤差；
+唯有當「比值 &lt; 1」在該 <math><mi>n</mi></math> 下本即可分辨、而觀測仍落於 1 附近時，
+「≈ 1」才承載資訊。<math><mi>n</mi></math> 較小時任何比值皆近似於 1，
 此為解析度不足，不構成證據。</li>
 <li><b>其權重應為三種約束中最低者。</b>不可同群與有向關係皆<b>增加</b>可辨識性；
 必定同群為唯一<b>降低</b>可辨識性者。錯誤的不可同群將產生不存在的群；
@@ -13934,12 +13958,12 @@ pigeonhole 至此容許分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code>。<
 <p class="prose">一個單位的有效樣本數<b>並非其總 read 數</b>，
 而是<b>各位點對分別有幾條 read 同時覆蓋</b>。
 上圖單位的三個位點對，跨越深度分別為 20、17 與 <b>3</b>；
-其中 <code>n = 3</code> 的位點對仍產出了一條約束。</p>
+其中 <math><mi>n</mi><mo>=</mo><mn>3</mn></math> 的位點對仍產出了一條約束。</p>
 
 <p class="prose">設該譜系中有三成的分子帶有某一狀態，則三條 read 全數未取樣到的機率為
-<code>0.7³ ≈ 0.34</code>。<b>約三分之一的機率會將「存在」誤判為「不存在」</b>，
+<math><msup><mn>0.7</mn><mn>3</mn></msup><mo>≈</mo><mn>0.34</mn></math>。<b>約三分之一的機率會將「存在」誤判為「不存在」</b>，
 而「未觀測到」正是判定分岔的依據。
-換言之，該條約束有約三分之一的機率為假，並將以硬性 <code>z_i ≠ z_j</code> 的形式
+換言之，該條約束有約三分之一的機率為假，並將以硬性 <math><msub><mi>z</mi><mi>i</mi></msub><mo>≠</mo><msub><mi>z</mi><mi>j</mi></msub></math> 的形式
 進入第六節的估計式。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="sr2__rg-pairwise-gate__title" aria-describedby="sr2__rg-pairwise-gate__desc">
@@ -14008,7 +14032,7 @@ pigeonhole 至此容許分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code>。<
         此對不產生約束（標為 UNDETERMINED）
 report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 
-<p class="prose">門檻的影響甚大：ϱ_min ＝ 0.05、π* ＝ 0.95 要求 <code>n ≥ 59</code>，
+<p class="prose">門檻的影響甚大：ϱ_min ＝ 0.05、π* ＝ 0.95 要求 <math><mi>n</mi><mo>≥</mo><mn>59</mn></math>，
 上述單位的三個位點對將全數不通過。
 ε 與 η 應就地估計，不宜採用全域常數。錯誤模型的結構不變 ——
 每個位點一道閘門，另加兩個家族之間的交換：</p>
@@ -14328,7 +14352,7 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 <h3 id="sr2__十一-約束的信心值-_r">十一、約束的信心值 ω_r</h3>
 
 <p class="prose">通過兩道閘門之後，約束的強度仍有差異。
-第六節的 <code>ω_r</code> 不需另行設計，可直接取用求解器既有的兩個量：</p>
+第六節的 <math><msub><mi>ω</mi><mi>r</mi></msub></math> 不需另行設計，可直接取用求解器既有的兩個量：</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530" class="dia-svg" role="img" aria-labelledby="sr2__rg-steiner-latent__title" aria-describedby="sr2__rg-steiner-latent__desc">
   <title id="sr2__rg-steiner-latent__title">樹成本等於潛在節點數，所以最小成本就是「補最少的看不到狀態」</title>
@@ -14397,7 +14421,7 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 <table>
 <thead><tr><th scope="col">量</th><th scope="col">意義</th><th scope="col">用法</th></tr></thead>
 <tbody>
-<tr><td>潛在節點數 <code>|H|</code></td><td>該區域的拓撲所需的未觀測中間狀態數</td><td><code>|H|</code> 越大，該區域的約束越間接，<code>ω_r</code> 應越低</td></tr>
+<tr><td>潛在節點數 <math><mo>|</mo><mi>H</mi><mo>|</mo></math></td><td>該區域的拓撲所需的未觀測中間狀態數</td><td><math><mo>|</mo><mi>H</mi><mo>|</mo></math> 越大，該區域的約束越間接，<math><msub><mi>ω</mi><mi>r</mi></msub></math> 應越低</td></tr>
 <tr><td>候選集合大小</td><td>最小成本解的並列數目</td><td>並列越多表示資料的鑑別力越低；僅採用所有候選一致同意的約束</td></tr>
 </tbody>
 </table>
@@ -14421,17 +14445,22 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 每 Mb 5 個、視窗 20 kb 時 λ ＝ 0.1；基因體 3.1 Gb 切分為 155,000 個視窗。
 三個關鍵比例皆為 λ 的閉式函數：</p>
 
-<pre><code>含變異的視窗                 155,000 × (1 − e^−λ)            = 14,750
-其中僅含單一變異的比例        λe^−λ / (1 − e^−λ)              = 95.1%   ← 上篇所述的 95%
-落於多變異視窗的「變異」比例   1 − e^−λ                        =  9.5%   ← 本節所用者
-                             15,500 × 0.095                  = 1,475 個變異
-
-相鄰位點對（每個含 k 個變異的視窗貢獻 k−1 對）
-                             155,000 × (λ − (1 − e^−λ))      =   750
-兩個變異落於同一單倍型家族     × 1/2                           =   375   ≈ 表列的 369</code></pre>
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">量</th><th scope="col">閉式</th><th scope="col">數值</th></tr></thead>
+<tbody>
+<tr><td>含變異的視窗</td><td><math><mn>155,000</mn><mo>×</mo><mo>(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup><mo>)</mo></math></td><td><math><mn>14,750</mn></math></td></tr>
+<tr><td>其中僅含單一變異的比例</td><td><math><mi>λ</mi><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup><mo>/</mo><mo>(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup><mo>)</mo></math></td><td><math><mn>95.1%</mn></math>（上篇所述的 95%）</td></tr>
+<tr><td>落於多變異視窗的<b>變異</b>比例</td><td><math><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup></math></td><td><math><mn>9.5%</mn></math>（本節所用者）</td></tr>
+<tr><td>　即多變異區域的變異數</td><td><math><mn>15,500</mn><mo>×</mo><mn>0.095</mn></math></td><td><math><mn>1,475</mn></math> 個變異</td></tr>
+<tr><td>相鄰位點對（每個含 <math><mi>k</mi></math> 個變異的視窗貢獻 <math><mi>k</mi><mo>−</mo><mn>1</mn></math> 對）</td><td><math><mn>155,000</mn><mo>×</mo><mo>(</mo><mi>λ</mi><mo>−</mo><mo>(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup><mo>)</mo><mo>)</mo></math></td><td><math><mn>750</mn></math></td></tr>
+<tr><td>　再乘上「兩個變異落於同一單倍型家族」</td><td><math><mo>×</mo><mn>1</mn><mo>/</mo><mn>2</mn></math></td><td><math><mn>375</mn></math>，約當表列的 369</td></tr>
+</tbody>
+</table>
+</div>
 
 <p class="prose"><b>配對慣例須明確界定。</b>上式所計為<b>相鄰</b>位點對；
-若改為視窗內<b>全配對</b>（每個視窗 <code>C(k,2)</code> 對），在低負荷下兩者相近
+若改為視窗內<b>全配對</b>（每個視窗 <math><mi>C</mi><mo>(</mo><mi>k</mi><mo>,</mo><mn>2</mn><mo>)</mo></math> 對），在低負荷下兩者相近
 （5／Mb：388 與 375），但在高負荷下顯著分離 —— 50／Mb 時全配對約為 38,750，
 相鄰配對約為 28,500。表列的 24,500 屬相鄰配對。
 此慣例須與第八節的閘門採同一定義，否則「收得幾條約束」在兩處將指涉不同的量。</p>
@@ -14453,7 +14482,7 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 <p class="prose">充足性的依據已見於第三節：這些約束的作用在於<b>確立成分存在且相異</b>，
 而非指派 15,500 個點。最稀疏的一對有 28 個獨立觀測，
 對「兩個成分是否相同」此一是非判定為充足。
-<b>惟上述為通過閘門之前的數值</b> —— 第八節的 <code>n ≥ 59</code> 將排除相當比例，
+<b>惟上述為通過閘門之前的數值</b> —— 第八節的 <math><mi>n</mi><mo>≥</mo><mn>59</mn></math> 將排除相當比例，
 故報告須載明收得與排除的條數。</p>
 
 <h3 id="sr2__十三-視窗寬度-約束產量與品質的取捨">十三、視窗寬度：約束產量與品質的取捨</h3>
@@ -14533,7 +14562,7 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 可偵測的比例下界約為 0.05。該下界應逐單位計算，不宜採用固定常數。</figcaption></figure>
 
 <p class="prose">建議兩種視窗並行：寬視窗用於收齊候選，窄視窗用於產出高信心的一批。
-兩批皆納入模型，惟 <code>ω_r</code> 不同。</p>
+兩批皆納入模型，惟 <math><msub><mi>ω</mi><mi>r</mi></msub></math> 不同。</p>
 </section>
 
 
@@ -14543,7 +14572,7 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 <h3 id="sr2__現行實作的量測結果-約束的可用庫存">現行實作的量測結果：約束的可用庫存</h3>
 
 <p class="prose">以下數值皆來自本實驗室既有實作在七個資料集、六個生物樣本、chr1–22 上的輸出，
-在本頁的脈絡下構成可收成 <code>R_r</code> 的原料清單。</p>
+在本頁的脈絡下構成可收成 <math><msub><mi>R</mi><mi>r</mi></msub></math> 的原料清單。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" class="dia-svg" role="img" aria-labelledby="sr2__rg-class-spectrum__title" aria-describedby="sr2__rg-class-spectrum__desc">
   <title id="sr2__rg-class-spectrum__title">已經量到的全基因體譜：七個資料集的區域拓撲類別組成</title>
@@ -14641,7 +14670,7 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 <thead><tr><th scope="col">觀測</th><th scope="col">數值</th><th scope="col">在本頁的意義</th></tr></thead>
 <tbody>
 <tr><td>可分析單位總數</td><td>85,941 個含突變的「區域 × 單倍型家族」</td><td>原料充足，不需重新定序</td></tr>
-<tr><td>候選集合可完整列舉</td><td>75,224 個（<b>87.53%</b>）</td><td>可給出 <code>ω_r</code> 的比例；其餘予以排除</td></tr>
+<tr><td>候選集合可完整列舉</td><td>75,224 個（<b>87.53%</b>）</td><td>可給出 <math><msub><mi>ω</mi><mi>r</mi></msub></math> 的比例；其餘予以排除</td></tr>
 <tr><td>分支類的比例</td><td>各資料集 <b>6%–22%</b></td><td>「不可同群」的來源，最為稀缺，且為用途一唯一的原料</td></tr>
 <tr><td>多層無分支的比例</td><td>38.1%–53.3%</td><td>祖先關係約束的來源，數量最多</td></tr>
 <tr><td>更換 basecaller 的重現性</td><td>同細胞株跨機構 <b>0.909</b></td><td>此分類非流程雜訊</td></tr>
@@ -14677,13 +14706,13 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 即退回第一節第四步的狀態，損失有限。</p>
 
 <p class="prose">一條<b>錯誤</b>的「不可同群」，其代價為<b>迫使混合模型分出一個不存在的群</b>。
-其機制為第三節的反向運作：<code>z_i ≠ z_j</code> 使正確的 <code>K</code> 不可行，
+其機制為第三節的反向運作：<math><msub><mi>z</mi><mi>i</mi></msub><mo>≠</mo><msub><mi>z</mi><mi>j</mi></msub></math> 使正確的 <math><mi>K</mi></math> 不可行，
 模型只能增加一個成分。
 此錯誤不會自行顯現 —— 所分出的群具備頻率與變異，形態正常，
 而下游的樹、演化次序與臨床解讀將一併錯誤，報告上不留任何異常跡象。</p>
 
 <p class="prose">因此取捨並非「多與少」，而是<b>「遺漏與虛構」</b>，兩者代價相差甚大。
-正確的做法為<b>從嚴</b>，並將殘餘的不確定性納入權重 <code>ω_r</code>，
+正確的做法為<b>從嚴</b>，並將殘餘的不確定性納入權重 <math><msub><mi>ω</mi><mi>r</mi></msub></math>，
 而非採硬性條件 —— 經稀釋的單一條錯誤約束不足以改變結論。</p>
 
 <p class="prose">閘門的實際強度可藉重現性外部檢驗：
@@ -14696,10 +14725,10 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 <ul class="prose">
 <li><b>整條路線尚未經實測驗證。</b>上述各項皆有結構性的理由，但均未在真實資料上檢驗。
 最小的驗證即第三節的數值例：合成 ρ ＝ 0.60、CCF 分別為 1.00／0.40／0.40 的三群，
-確認僅用 VAF 的分群必然給出 <code>K = 2</code> 與線性樹，
+確認僅用 VAF 的分群必然給出 <math><mi>K</mi><mo>=</mo><mn>2</mn></math> 與線性樹，
 再量測需要多少條約束、閘門需多嚴格，方能正確分離而不誤拆。</li>
 <li><b>用途二需要同一條單倍型上存在多個變異</b>，而該條件對應的正是最稀缺的區域。
-低突變負荷時 <code>φ_hat</code> 可能無法估計，此時用途二失效，僅餘用途一與用途三。</li>
+低突變負荷時 <math><mover accent="true"><mi>φ</mi><mo>^</mo></mover></math> 可能無法估計，此時用途二失效，僅餘用途一與用途三。</li>
 <li><b>約束的來源具有偏性。</b>它們僅來自變異密集的區域，
 而變異密集有時並非偶然：<b>kataegis</b> 為一種局部超突變，
 單次事件於數十 kb 內產生一連串變異。
@@ -14707,7 +14736,7 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 在統計上卻被計為數十個獨立觀測。應先偵測並降權為每叢一個有效觀測。</li>
 <li><b>一個群未必對應單一細胞群體。</b>本實驗室的甲基化觀測顯示：
 單一個「單倍型 ＋ 等位」狀態之下仍可區分出五群甲基化模式。
-故 <code>K</code> 的正確讀法恆為「<b>至少</b>此數」。</li>
+故 <math><mi>K</mi></math> 的正確讀法恆為「<b>至少</b>此數」。</li>
 <li><b>超出 read 跨距的關係仍不可觀測。</b>相距 100 kb 的兩個變異無法產生約束，
 與定序深度無關；第八節的三層結構為此設下硬上限。</li>
 </ul>

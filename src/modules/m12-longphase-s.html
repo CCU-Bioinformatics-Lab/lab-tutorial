@@ -84,7 +84,9 @@ LongPhase-S 是接在它們後面的一層。</p>
 
 <p class="prose">[[GHIR]]（Germline Haplotype Imbalance Ratio）在<b>每一個候選 somatic 位點上各算一次</b>：</p>
 
-<pre><code>GHIR = max(HP1 read 數, HP2 read 數) ÷ (HP1 read 數 + HP2 read 數)</code></pre>
+{{eq}}
+GHIR = \frac{\max(\text{HP1 read 數}, \text{HP2 read 數})}{\text{HP1 read 數} + \text{HP2 read 數}}
+{{/eq}}
 
 <p class="prose">所以它的範圍是 0.5 到 1：<b>0.5 表示兩條完全平衡，1.0 表示 read 全部偏向其中一條。</b>
 分母只算被分到 HP1 或 HP2 的 read —— 這是關鍵，因為帶 somatic allele 的 read 會被改標成

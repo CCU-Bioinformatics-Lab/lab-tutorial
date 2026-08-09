@@ -22,6 +22,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GUARD_TOPICS } from './guards.mjs';
+import { toMathML } from './mathml.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'src');
@@ -104,6 +105,46 @@ class Stash {
   restore(html) {
     return html.replace(/\uE000STASH(\d+)\uE000/g, (_, i) => this.items[+i]);
   }
+}
+
+/* {{m: 式子}} → MathML。
+   ★ 這裡不能用 regex ★ 式子本身就含大括號（\frac{a}{b}、\hat{φ}），
+   所以 /\{\{m:(.*?)\}\}/ 會停在 "…{b}" 的那個 }} 上，把式子剪斷。
+   要自己數深度，並且跳過 \{ \} 這種跳脫。
+   wrap 讓呼叫端決定要不要把結果收進 stash（模組內文要，glossary 不用）。 */
+function expandInlineMath(s, where, wrap = (x) => x) {
+  for (let i = s.indexOf('{{m:'); i >= 0; i = s.indexOf('{{m:', i)) {
+    let j = i + 4, depth = 0, end = -1;
+    while (j < s.length) {
+      if (s[j] === '\\') { j += 2; continue; }
+      if (s[j] === '{') depth++;
+      else if (s[j] === '}') {
+        if (depth > 0) depth--;
+        else if (s[j + 1] === '}') { end = j; break; }
+      }
+      j++;
+    }
+    if (end < 0) { err(where, `{{m: …}} 沒有收尾`); break; }
+    const src = s.slice(i + 4, end).trim();
+    let out;
+    try { out = wrap(toMathML(src, false)); }
+    catch (e) { err(where, `${e.message}（{{m: ${src}}}）`); out = wrap(`<code>${esc(src)}</code>`); }
+    s = s.slice(0, i) + out + s.slice(end + 2);
+    i += out.length;
+  }
+  return s;
+}
+
+/* JSON 裡的字串（glossary 定義、quiz 題幹與解說）也要能寫數學 */
+function expandMathDeep(node, where) {
+  if (typeof node === 'string') return expandInlineMath(node, where);
+  if (Array.isArray(node)) return node.map((x) => expandMathDeep(x, where));
+  if (node && typeof node === 'object') {
+    const o = {};
+    for (const [k, v] of Object.entries(node)) o[k] = expandMathDeep(v, where);
+    return o;
+  }
+  return node;
 }
 
 /* ------------------------------------------------------------ SVG inline -- */
@@ -322,6 +363,22 @@ function expand(raw, ctx) {
     `<div class="source-card__body">${body.trim()}</div></div>`
   );
 
+  /* 7.2) 數學：{{m: 式子}} 行內、{{eq}}式子{{note}}說明{{/eq}} 獨立一行。
+     語法見 tools/mathml.mjs。式子編不出來就讓建置失敗 ——
+     一條壞掉的公式如果只是靜靜印出原始碼，沒有人會發現。 */
+  s = expandInlineMath(s, ctx.id, (h) => stash.put(h));
+
+  s = s.replace(/\{\{eq\}\}([\s\S]*?)\{\{\/eq\}\}/g, (m0, body) => {
+    const [expr, note] = body.split(/\{\{note\}\}/);
+    let ml;
+    try { ml = toMathML(expr.trim(), true); }
+    catch (e) { err(ctx.id, `${e.message}（{{eq}} ${expr.trim().slice(0, 60)}）`); return m0; }
+    /* 式子進 stash（不可被 [[term]] 掃到），說明不進 —— 說明裡常有術語連結 */
+    return stash.put(`<div class="eq">${ml}`) +
+           (note ? `<p class="eq__note">${note.trim()}</p>` : '') +
+           stash.put(`</div>`);
+  });
+
   s = s.replace(/\{\{cli\}\}([\s\S]*?)\{\{\/cli\}\}/g, (m0, code) =>
     stash.put(`<pre><code>${esc(code.trim())}</code></pre>`)
   );
@@ -434,10 +491,10 @@ function build() {
   errors.length = 0; warnings.length = 0;
   const t0 = Date.now();
 
-  const glossary = JSON.parse(read(path.join(P.data, 'glossary.json')));
+  const glossary = expandMathDeep(JSON.parse(read(path.join(P.data, 'glossary.json'))), 'glossary.json');
   const modules = JSON.parse(read(path.join(P.data, 'modules.json')));
   const quizFile = path.join(P.data, 'quizzes.json');
-  const quiz = exists(quizFile) ? JSON.parse(read(quizFile)) : {};
+  const quiz = exists(quizFile) ? expandMathDeep(JSON.parse(read(quizFile)), 'quizzes.json') : {};
   const figFile = path.join(P.data, 'figures.manifest.json');
   const figures = exists(figFile) ? JSON.parse(read(figFile)) : {};
 

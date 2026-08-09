@@ -95,7 +95,7 @@
 {{svg:m03-detection-limit | [wide] 每個方塊代表一條支持變異的 read。在本模型中，tumor DNA fraction 為 100% 時期望約 25 條，20% 時約 5 條；下方另以每個位置約 1–2 條錯誤 read 作為背景假設。少量背景錯誤可能與低比例變異訊號重疊。}}
 
 <p class="prose">在二倍體、單拷貝、clonal、無偏取樣且 tumor DNA fraction 為 0.2 的簡化模型中，
-期望支持數為 <code>50 × 0.2 ÷ 2 = 5</code> 條。訊號數量不足是主要限制之一；背景錯誤、品質與演算法也會影響可靠性。</p>
+期望支持數為 {{m: 50 × 0.2 ÷ 2 = 5}} 條。訊號數量不足是主要限制之一；背景錯誤、品質與演算法也會影響可靠性。</p>
 
 <h3>basecaller 是實驗變數</h3>
 
@@ -166,7 +166,7 @@ samtools index dna_frac_0.6.bam
 一個四倍體的腫瘤細胞含有的 DNA 是正常細胞的兩倍。所以</p>
 <ul class="prose">
 <li>50% 的細胞是腫瘤（cellular [[tumour purity|purity]] = 0.5）</li>
-<li>但腫瘤貢獻的 DNA 佔 <code>0.5×4 ÷ (0.5×4 + 0.5×2) = 0.67</code>（[[tumour DNA fraction]] = 0.67）</li>
+<li>但腫瘤貢獻的 DNA 佔 {{m: 0.5 × 4 ÷ (0.5 × 4 + 0.5 × 2) = 0.67}}（[[tumour DNA fraction]] = 0.67）</li>
 </ul>
 <p class="prose">M8 的互動元件可將 copy number 調整為 4，以比較 cellular purity 與 tumor DNA fraction。</p>
 {{/guard}}
@@ -224,10 +224,11 @@ mosdepth --by 500 out aln.bam && head out.mosdepth.summary.txt
 <p class="prose">可使用資料的 coverage，估算在二倍體、單拷貝、clonal 與無偏取樣假設下的預期支持 read 數；
 這不是經驗證的 detection limit：</p>
 
-<pre><code>預期支持 read 數 = 覆蓋度 × tumor DNA fraction ÷ 2
-
-例：覆蓋度 50×、tumor DNA fraction 為 20%
-    → 50 × 0.2 ÷ 2 = 5 條</code></pre>
+{{eq}}
+\text{預期支持 read 數} = \text{覆蓋度} × \text{tumor DNA fraction} ÷ 2
+{{note}}
+例：覆蓋度 50×、tumor DNA fraction 為 20% 時 {{m: 50 × 0.2 ÷ 2 = 5}} 條。
+{{/eq}}
 
 <p class="prose">若期望值僅為兩至三條，可靠偵測低頻變異可能較困難。資料量是限制之一，
 仍需比較增加定序深度、改善品質與調整模型的相對效益。</p>

@@ -219,7 +219,7 @@
   "zh_gloss": "變異等位基因頻率",
   "zh": "在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。",
   "en": "Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.",
-  "long_zh": "在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<br><br><b>最常見的誤解是把 VAF 當成「有多少比例的細胞帶這個突變」。</b>實際上還受到 tumor purity、該位置的 local copy number、mutation multiplicity 與 mapping bias 影響。理想的 diploid、單一拷貝突變情況下：<br><code>VAF = purity × multiplicity / total copy number</code><br>所以 purity 0.4、diploid、單拷貝時 VAF 只有 0.2。",
+  "long_zh": "在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<br><br><b>最常見的誤解是把 VAF 當成「有多少比例的細胞帶這個突變」。</b>實際上還受到 tumor purity、該位置的 local copy number、mutation multiplicity 與 mapping bias 影響。理想的 diploid、單一拷貝突變情況下：<br>{{m: VAF = purity × multiplicity / \\text{total copy number}}}<br>所以 purity 0.4、diploid、單拷貝時 VAF 只有 0.2。",
   "aka": [
    "allele fraction"
   ],

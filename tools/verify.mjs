@@ -451,6 +451,31 @@ for (const f of html) {
   }
 }
 
+/* ── 13.8 數學不得留在 <code> 裡 ─────────────────────────────────────────
+   `components.css` 的 .eq 註解已經寫過理由：ASCII 公式只能用空白硬湊對齊，
+   讀者一改字級或換字型就散掉，而且不會有任何錯誤訊息。
+   但手寫 MathML 太長，所以式子很容易退化成
+   <code>c_k ≥ Σ_{j∈S} c_j</code> 這種「看起來像 LaTeX 的純文字」——
+   sr2 整頁都這樣寫過一輪。tools/mathml.mjs 就是為了拿掉那個藉口，
+   所以這一項擋的是「明明可以寫成 {{m: …}} 卻留在 <code> 裡」。
+
+   判準刻意抓得保守：要同時有數學運算子（或下標語法）而且不像 shell／程式碼。
+   HP:i:1、GT:0/1、chr1:1000-2000 這類欄位值不該被誤判，所以先排除。   */
+
+const MATH_SIGN = /[≥≤≠∈∑∏≈∝√±×÷·⋅]|_\{|\^\{/;
+const LOOKS_CODE = /(^|\n)\s*(\$|#|python3?|samtools|bcftools|awk|sed|grep|longphase|node|npm|for |while |if |wget|curl|import |print|docker|minimap|whatshap|bgzip|tabix|report:|def |return )/;
+const FIELDY = /^[\w.-]+:[\w./-]+$|^[A-Z]{2,}:[a-z]:/;   /* HP:i:1、chr1:100-200 */
+
+for (const f of html) {
+  const s = fs.readFileSync(f, 'utf8');
+  for (const m of s.matchAll(/<code>([\s\S]*?)<\/code>/g)) {
+    const body = m[1].replace(/<[^>]+>/g, '').trim();
+    if (!MATH_SIGN.test(body) || LOOKS_CODE.test(body) || FIELDY.test(body)) continue;
+    fail(rel(f), `數學留在 <code> 裡：「${body.slice(0, 46)}」` +
+                 ` —— 改用 {{m: …}}（行內）或 {{eq}}…{{/eq}}（獨立一行），語法見 tools/mathml.mjs`);
+  }
+}
+
 /* ── 14. 大小預算 ────────────────────────────────────────────────────── */
 
 let total = 0;

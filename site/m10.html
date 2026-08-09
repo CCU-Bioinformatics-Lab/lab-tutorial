@@ -277,7 +277,7 @@ benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
 
 <p class="prose">因此它改用以下任務導向分數挑 epoch：</p>
 
-<pre><code>score = (成功移除的 FP − λ × 誤刪的 TP) ÷ FP 總數</code></pre>
+<div class="eq"><math display="block"><mi>score</mi><mo>=</mo><mo>(</mo><mtext>成功移除的 FP</mtext><mo>−</mo><mi>λ</mi><mo>×</mo><mtext>誤刪的 TP</mtext><mo>)</mo><mo>÷</mo><mtext>FP 總數</mtext></math></div>
 
 <p class="prose">λ 由 benchmark 與驗證集的正負比例估計，而非人工指定（該資料約為 1.45）；
 應同時說明估計資料、FP 總數為零時的處理，以及權重敏感度。</p>

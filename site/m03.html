@@ -389,7 +389,7 @@
 </svg><figcaption>每個方塊代表一條支持變異的 read。在本模型中，tumor DNA fraction 為 100% 時期望約 25 條，20% 時約 5 條；下方另以每個位置約 1–2 條錯誤 read 作為背景假設。少量背景錯誤可能與低比例變異訊號重疊。</figcaption></figure>
 
 <p class="prose">在二倍體、單拷貝、clonal、無偏取樣且 tumor DNA fraction 為 0.2 的簡化模型中，
-期望支持數為 <code>50 × 0.2 ÷ 2 = 5</code> 條。訊號數量不足是主要限制之一；背景錯誤、品質與演算法也會影響可靠性。</p>
+期望支持數為 <math><mn>50</mn><mo>×</mo><mn>0.2</mn><mo>÷</mo><mn>2</mn><mo>=</mo><mn>5</mn></math> 條。訊號數量不足是主要限制之一；背景錯誤、品質與演算法也會影響可靠性。</p>
 
 <h3 id="basecaller-是實驗變數">basecaller 是實驗變數</h3>
 
@@ -457,7 +457,7 @@ samtools index dna_frac_0.6.bam</code></pre>
 一個四倍體的腫瘤細胞含有的 DNA 是正常細胞的兩倍。所以</p>
 <ul class="prose">
 <li>50% 的細胞是腫瘤（cellular <span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-purity-12">purity<span class="term__pop" id="gd-tumour-purity-12" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en" lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span> = 0.5）</li>
-<li>但腫瘤貢獻的 DNA 佔 <code>0.5×4 ÷ (0.5×4 + 0.5×2) = 0.67</code>（<span class="term" data-term="tumour DNA fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-dna-fraction-13">tumour DNA fraction<span class="term__pop" id="gd-tumour-dna-fraction-13" role="tooltip"><b class="term__hd">tumour DNA fraction <i>腫瘤 DNA 比例</i></b><span class="term__def" data-lang="zh">樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。</span><span class="term__def" data-lang="en" lang="en">The fraction of DNA originating from tumour cells; diverges from cellular purity under aneuploidy or WGD.</span><a class="term__more" href="glossary.html#tumour-dna-fraction">完整條目 →</a></span></span> = 0.67）</li>
+<li>但腫瘤貢獻的 DNA 佔 <math><mn>0.5</mn><mo>×</mo><mn>4</mn><mo>÷</mo><mo>(</mo><mn>0.5</mn><mo>×</mo><mn>4</mn><mo>+</mo><mn>0.5</mn><mo>×</mo><mn>2</mn><mo>)</mo><mo>=</mo><mn>0.67</mn></math>（<span class="term" data-term="tumour DNA fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-tumour-dna-fraction-13">tumour DNA fraction<span class="term__pop" id="gd-tumour-dna-fraction-13" role="tooltip"><b class="term__hd">tumour DNA fraction <i>腫瘤 DNA 比例</i></b><span class="term__def" data-lang="zh">樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。</span><span class="term__def" data-lang="en" lang="en">The fraction of DNA originating from tumour cells; diverges from cellular purity under aneuploidy or WGD.</span><a class="term__more" href="glossary.html#tumour-dna-fraction">完整條目 →</a></span></span> = 0.67）</li>
 </ul>
 <p class="prose">M8 的互動元件可將 copy number 調整為 4，以比較 cellular purity 與 tumor DNA fraction。</p></aside>
 </section>
@@ -508,10 +508,7 @@ mosdepth --by 500 out aln.bam &amp;&amp; head out.mosdepth.summary.txt</code></p
 <p class="prose">可使用資料的 coverage，估算在二倍體、單拷貝、clonal 與無偏取樣假設下的預期支持 read 數；
 這不是經驗證的 detection limit：</p>
 
-<pre><code>預期支持 read 數 = 覆蓋度 × tumor DNA fraction ÷ 2
-
-例：覆蓋度 50×、tumor DNA fraction 為 20%
-    → 50 × 0.2 ÷ 2 = 5 條</code></pre>
+<div class="eq"><math display="block"><mtext>預期支持 read 數</mtext><mo>=</mo><mtext>覆蓋度</mtext><mo>×</mo><mtext>tumor DNA fraction</mtext><mo>÷</mo><mn>2</mn></math><p class="eq__note">例：覆蓋度 50×、tumor DNA fraction 為 20% 時 <math><mn>50</mn><mo>×</mo><mn>0.2</mn><mo>÷</mo><mn>2</mn><mo>=</mo><mn>5</mn></math> 條。</p></div>
 
 <p class="prose">若期望值僅為兩至三條，可靠偵測低頻變異可能較困難。資料量是限制之一，
 仍需比較增加定序深度、改善品質與調整模型的相對效益。</p>
