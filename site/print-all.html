@@ -13429,15 +13429,190 @@ pigeonhole 至此容許分支：<math><msub><mi>c</mi><mi>B</mi></msub><mo>+</mo
 
 <h4 id="sr2__此約束的作用範圍">此約束的作用範圍</h4>
 
-<p class="prose">若 0.12 一峰含 1,000 個變異，該約束僅確定其中<b>兩個</b>。
-其餘 998 個對兩個成分的似然完全相同（其 <math><mi>θ</mi></math> 相等），
-故其歸屬仍不可辨識，除非各自另有約束連至 <math><mi>i</mi></math> 或 <math><mi>j</mi></math>。</p>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 730" class="dia-svg" role="img" aria-labelledby="sr2__sr2-constraint-scope__title" aria-describedby="sr2__sr2-constraint-scope__desc">
+  <title id="sr2__sr2-constraint-scope__title">一條約束確定了什麼、沒有確定什麼：K 與群間關係被定下來，個別變異的歸屬仍不可辨識</title>
+  <desc id="sr2__sr2-constraint-scope__desc">上排是同一根峰的前後對照，該峰位於 VAF 零點一二，其中含約一千個變異，
+        圖上以四十個小圓示意。
+        左格是加入約束之前：整根峰由單一個成分解釋，一千個變異全部被指派到同一群，
+        小圓全部是實心的同一種顏色 —— 表面上全部有解，實際上是把兩群併成了一群。
+        中格是加入的那一條約束：變異 i 與變異 j 落在同一個分析單位裡，
+        觀測到沒有任何分子同時帶有兩者，於是 i 與 j 不可能屬於同一群。
+        右格是加入之後：峰的位置沒有變，但必須由兩個成分解釋，
+        i 被釘在其中一群、j 被釘在另一群，圖上分別是藍色與橘色的實心圓；
+        其餘九百九十八個轉為空心圓，因為兩個成分位於同一個位置，
+        它們對這兩個成分的似然完全相同，歸屬無從分辨 —— 空心代表誠實標記為未定。
+        下排是這條約束的收支：左邊列出被確定的三件事 ——
+        群數由一變二、兩群確實相異、以及樹由線性改為分支；
+        右邊列出沒有被確定的兩件事 ——
+        其餘九百九十八個變異各屬哪一群，以及兩群各自的大小比例。
+        最下方是結論：系統發生重建要的是群數與群間關係，不是逐一指派變異，
+        所以最稀疏的一對只有二十八條約束仍然足夠 ——
+        二十八條遠不足以指派一千個變異，但對「這兩個成分是不是同一個」
+        這種是非判定則已然充足。</desc>
 
-<p class="prose">是故此路線的產出為<b>群的個數與群間關係</b>，而非個別變異的歸屬。
-而這正是系統發生重建所需的量。
-第十二節「最稀疏的一對僅有 28 條約束」之所以足夠，理由亦在於此：
-28 條足以確立兩個成分存在且相異，遠不足以指派 1,000 個變異，
-但重建並不需要後者。</p>
+  <text class="ttl zh" x="20" y="38">一條約束確定了什麼、沒有確定什麼</text>
+  <text class="anno zh" x="20" y="66">同一根峰（VAF ＝ 0.12，約 1,000 個變異）加入一條「不可同群」的前後對照。</text>
+  <line class="axis" x1="20" y1="86" x2="980" y2="86"/>
+
+  <!-- ══════════ 左：加入之前 ══════════ -->
+  <text class="lbl bold zh" x="20" y="120">加入之前</text>
+  <rect class="box plain" x="20" y="136" width="290" height="212" rx="8"/>
+
+  <text class="tick zh mid" x="165" y="164">單一成分解釋整根峰</text>
+
+  <!-- 40 個示意變異：全部同一群 -->
+  <g>
+    <circle class="mark somatic" cx="52" cy="196" r="7"/>
+    <circle class="mark somatic" cx="80" cy="196" r="7"/>
+    <circle class="mark somatic" cx="108" cy="196" r="7"/>
+    <circle class="mark somatic" cx="136" cy="196" r="7"/>
+    <circle class="mark somatic" cx="164" cy="196" r="7"/>
+    <circle class="mark somatic" cx="192" cy="196" r="7"/>
+    <circle class="mark somatic" cx="220" cy="196" r="7"/>
+    <circle class="mark somatic" cx="248" cy="196" r="7"/>
+    <circle class="mark somatic" cx="276" cy="196" r="7"/>
+    <circle class="mark somatic" cx="52" cy="222" r="7"/>
+    <circle class="mark somatic" cx="80" cy="222" r="7"/>
+    <circle class="mark somatic" cx="108" cy="222" r="7"/>
+    <circle class="mark somatic" cx="136" cy="222" r="7"/>
+    <circle class="mark somatic" cx="164" cy="222" r="7"/>
+    <circle class="mark somatic" cx="192" cy="222" r="7"/>
+    <circle class="mark somatic" cx="220" cy="222" r="7"/>
+    <circle class="mark somatic" cx="248" cy="222" r="7"/>
+    <circle class="mark somatic" cx="276" cy="222" r="7"/>
+    <circle class="mark somatic" cx="52" cy="248" r="7"/>
+    <circle class="mark somatic" cx="80" cy="248" r="7"/>
+    <circle class="mark somatic" cx="108" cy="248" r="7"/>
+    <circle class="mark somatic" cx="136" cy="248" r="7"/>
+    <circle class="mark somatic" cx="164" cy="248" r="7"/>
+    <circle class="mark somatic" cx="192" cy="248" r="7"/>
+    <circle class="mark somatic" cx="220" cy="248" r="7"/>
+    <circle class="mark somatic" cx="248" cy="248" r="7"/>
+    <circle class="mark somatic" cx="276" cy="248" r="7"/>
+  </g>
+  <text class="tick mid" x="165" y="278">27 個小圓示意約 1,000 個變異</text>
+
+  <text class="tick bold zh mid bad" x="165" y="306">估出 K ＝ 1（此峰）</text>
+  <text class="tick zh mid" x="165" y="330">1,000 個全部有解 —— 但併成一群</text>
+
+  <path class="conn" d="M318,242 L352,242" marker-end="url(#arrow)"/>
+
+  <!-- ══════════ 中：那一條約束 ══════════ -->
+  <text class="lbl bold zh ok" x="360" y="120">加入的那一條約束</text>
+  <rect class="box ok" x="360" y="136" width="270" height="212" rx="8"/>
+
+  <text class="tick zh" x="376" y="164">i 與 j 落在<tspan class="bold">同一個單位</tspan>裡</text>
+
+  <!-- 兩條分子，各只帶一個 -->
+  <rect class="read hp1" x="376" y="182" width="112" height="14" rx="7"/>
+  <circle class="mark somatic" cx="404" cy="189" r="6"/>
+  <text class="tick" x="496" y="194">帶 i，不帶 j</text>
+
+  <rect class="read hp2" x="376" y="210" width="112" height="14" rx="7"/>
+  <circle class="mark somatic" cx="460" cy="217" r="6"/>
+  <text class="tick" x="496" y="222">帶 j，不帶 i</text>
+
+  <rect class="box ghost bad" x="372" y="234" width="246" height="40" rx="6"/>
+  <text class="tick bold zh bad" x="384" y="259">沒有任何分子同時帶有兩者</text>
+
+  <text class="lbl mono mid" x="495" y="300">z_i ≠ z_j</text>
+  <text class="tick zh mid" x="495" y="330">兩者不可能屬於同一群</text>
+
+  <path class="conn" d="M638,242 L672,242" marker-end="url(#arrow)"/>
+
+  <!-- ══════════ 右：加入之後 ══════════ -->
+  <text class="lbl bold zh" x="680" y="120">加入之後</text>
+  <rect class="box plain" x="680" y="136" width="300" height="212" rx="8"/>
+
+  <text class="tick zh mid" x="830" y="164">兩個成分，位置仍然相同</text>
+
+  <!-- 同一批圓：只有 i 與 j 被釘住 -->
+  <g>
+    <circle class="mark hp1" cx="712" cy="196" r="7"/>
+    <circle class="mark ref" cx="740" cy="196" r="7"/>
+    <circle class="mark ref" cx="768" cy="196" r="7"/>
+    <circle class="mark ref" cx="796" cy="196" r="7"/>
+    <circle class="mark ref" cx="824" cy="196" r="7"/>
+    <circle class="mark ref" cx="852" cy="196" r="7"/>
+    <circle class="mark ref" cx="880" cy="196" r="7"/>
+    <circle class="mark ref" cx="908" cy="196" r="7"/>
+    <circle class="mark hp2" cx="936" cy="196" r="7"/>
+    <circle class="mark ref" cx="712" cy="222" r="7"/>
+    <circle class="mark ref" cx="740" cy="222" r="7"/>
+    <circle class="mark ref" cx="768" cy="222" r="7"/>
+    <circle class="mark ref" cx="796" cy="222" r="7"/>
+    <circle class="mark ref" cx="824" cy="222" r="7"/>
+    <circle class="mark ref" cx="852" cy="222" r="7"/>
+    <circle class="mark ref" cx="880" cy="222" r="7"/>
+    <circle class="mark ref" cx="908" cy="222" r="7"/>
+    <circle class="mark ref" cx="936" cy="222" r="7"/>
+    <circle class="mark ref" cx="712" cy="248" r="7"/>
+    <circle class="mark ref" cx="740" cy="248" r="7"/>
+    <circle class="mark ref" cx="768" cy="248" r="7"/>
+    <circle class="mark ref" cx="796" cy="248" r="7"/>
+    <circle class="mark ref" cx="824" cy="248" r="7"/>
+    <circle class="mark ref" cx="852" cy="248" r="7"/>
+    <circle class="mark ref" cx="880" cy="248" r="7"/>
+    <circle class="mark ref" cx="908" cy="248" r="7"/>
+    <circle class="mark ref" cx="936" cy="248" r="7"/>
+  </g>
+  <text class="tick mid hp1" x="712" y="182">i</text>
+  <text class="tick mid hp2" x="936" y="182">j</text>
+  <text class="tick mid" x="830" y="278">實心 ＝ 已釘住 2 個　空心 ＝ 未定 998 個</text>
+
+  <text class="tick bold zh mid ok" x="830" y="306">K ＝ 2（此峰）</text>
+  <text class="tick zh mid" x="830" y="330">但只有 2 個變異的歸屬被決定</text>
+
+  <!-- ══════════ 下：收支 ══════════ -->
+  <line class="axis" x1="20" y1="382" x2="980" y2="382"/>
+
+  <rect class="box ok" x="20" y="404" width="470" height="182" rx="8"/>
+  <text class="lbl bold zh ok" x="40" y="436">確定了這三件事</text>
+  <text class="anno zh" x="40" y="470">① 此峰的成分數由 1 變成 2</text>
+  <text class="anno zh" x="40" y="500">② 這兩個成分<tspan class="bold">確實相異</tspan>，不是同一群的雜訊</text>
+  <text class="anno zh" x="40" y="530">③ 樹的拓撲由線性改為分支</text>
+  <text class="tick zh" x="40" y="562">—— 三件都是<tspan class="bold">群層級</tspan>的性質</text>
+
+  <rect class="box bad" x="510" y="404" width="470" height="182" rx="8"/>
+  <text class="lbl bold zh bad" x="530" y="436">沒有確定這兩件事</text>
+  <text class="anno zh" x="530" y="470">① 其餘 998 個變異各屬哪一群</text>
+  <text class="anno zh" x="530" y="500">② 兩群各自佔多少（π_B 與 π_C 的分配）</text>
+  <text class="tick zh" x="530" y="532">兩個成分的 θ 相等，所以那 998 個對它們的</text>
+  <text class="tick zh" x="530" y="556">似然完全相同 —— 除非各自另有約束連到 i 或 j</text>
+
+  <rect class="box ghost accent" x="20" y="606" width="960" height="98" rx="8"/>
+  <text class="lbl bold zh" x="40" y="638">系統發生重建要的是「有幾群、群間什麼關係」，不是逐一指派變異。</text>
+  <text class="anno zh" x="40" y="666">所以最稀疏的一對只有 28 條約束仍然足夠 —— 28 條遠不足以指派 1,000 個變異，</text>
+  <text class="anno zh" x="40" y="692">但對「這兩個成分是不是同一個」這個是非判定則已然充足。</text>
+</svg><figcaption>同一根峰加入一條「不可同群」的前後對照。
+峰的位置沒有改變，改變的是它需要幾個成分 —— 而 1,000 個變異中僅有 i 與 j
+兩個的歸屬被釘住，其餘 998 個轉為未定。
+下排是這條約束的收支：確定的三件事都在群層級，未確定的兩件都在個別變異層級。</figcaption></figure>
+
+<p class="prose">加入約束之前，該峰的 1,000 個變異全部被指派至同一群 ——
+表面上全部有解，實際上是將兩群併為一群。
+加入之後該峰須由兩個成分解釋，但兩個成分的 <math><mi>θ</mi></math> 相等，
+故除了被約束釘住的 <math><mi>i</mi></math> 與 <math><mi>j</mi></math>，
+其餘 998 個對這兩個成分的似然<b>完全相同</b>，歸屬轉為不可辨識 ——
+除非各自另有約束連至 <math><mi>i</mi></math> 或 <math><mi>j</mi></math>。</p>
+
+<p class="prose">換言之，一條約束所買到的全部位於<b>群層級</b>：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">被確定（群層級）</th><th scope="col">未被確定（變異層級）</th></tr></thead>
+<tbody>
+<tr><td>此峰的成分數由 1 增為 2</td><td>其餘 998 個變異各屬哪一群</td></tr>
+<tr><td>兩個成分<b>確實相異</b>，而非同一群的雜訊</td><td>兩群各佔多少，即 <math><msub><mi>π</mi><mi>B</mi></msub></math> 與 <math><msub><mi>π</mi><mi>C</mi></msub></math> 的分配</td></tr>
+<tr><td>樹的拓撲由線性改為分支</td><td>—</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">系統發生重建所需者正是左欄三項，而非右欄。
+第十二節「最稀疏的一對僅有 28 條約束」之所以足夠，理由即在於此：
+28 條遠不足以指派 1,000 個變異，但對「這兩個成分是否相同」
+此一是非判定則已然充足。</p>
 
 <h3 id="sr2__四-用途二-以量測值取代自由參數">四、用途二：以量測值取代自由參數 φ</h3>
 
@@ -13696,6 +13871,156 @@ pigeonhole 至此容許分支：<math><msub><mi>c</mi><mi>B</mi></msub><mo>+</mo
 <p class="prose">推論方法為帶約束的 EM，或直接對 <math><mo>(</mo><mi>T</mi><mo>,</mo><mi>c</mi><mo>,</mo><mi>z</mi><mo>)</mo></math> 取樣。
 <b>輸出須載明每一組群配對由幾條約束支持</b>；
 未獲約束支持的關係係由 pigeonhole 與偏好補足，其狀態等同第一節第四步，應予標示。</p>
+
+<h4 id="sr2__數百個單位的局部拓撲形狀不同-這是預期-不是矛盾">數百個單位的局部拓撲形狀不同 —— 這是預期，不是矛盾</h4>
+
+<p class="prose">前三節的說明均以單一個單位為例。實際上通過閘門的單位有數百個，
+而它們的局部拓撲<b>形狀各不相同</b>：有的是一條線，有的是分岔，有的只有一個節點。
+此現象本身不構成衝突。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" class="dia-svg" role="img" aria-labelledby="sr2__sr2-units-compose__title" aria-describedby="sr2__sr2-units-compose__desc">
+  <title id="sr2__sr2-units-compose__title">數百個單位的局部拓撲形狀不同是預期結果：它們是同一棵 clone tree 在不同變異子集上的投影</title>
+  <desc id="sr2__sr2-units-compose__desc">上排是三個不同的分析單位，各自的局部拓撲形狀完全不同。
+        單位甲含有屬於 clone A 與 clone B 的變異，局部拓撲是一條線；
+        單位乙含有屬於 clone B 與 clone C 的變異，兩者互不包含，局部拓撲是分岔；
+        單位丙含有三個都屬於 clone C 的變異，局部拓撲只有一個節點。
+        中排說明它們為何不互相矛盾：每個單位只裝得下落在該視窗內的那幾個變異，
+        所以每個局部拓撲都是同一棵全基因體 clone tree 在不同變異子集上的投影。
+        形狀不同是因為子集不同，不是因為證據衝突。
+        右排是那棵全域的 clone tree，A 分支到 B 與 C。
+        下排標出兩件事。左邊：可以合併的是約束，不可以合併的是標籤 ——
+        局部的 HP1-1 只在該區域內有定義，跨區域的同名標籤並非同一條，
+        所以永遠不要把局部拓撲拼起來，要合併的是它們對全域變數的限制。
+        右邊：真正的矛盾不是形狀不同，而是約束集合找不到任何一組
+        指派與樹能同時滿足，具體有三種形式 ——
+        直接對立、違反傳遞性、以及祖先關係成環。</desc>
+
+  <text class="ttl zh" x="20" y="38">局部拓撲形狀不同，不等於互相矛盾</text>
+  <text class="anno zh" x="20" y="66">每個單位只裝得下落在該視窗內的變異，所以它看到的是同一棵樹的<tspan class="bold">一個子集</tspan>。</text>
+  <line class="axis" x1="20" y1="86" x2="980" y2="86"/>
+
+  <!-- ══════════ 左：三個單位，三種形狀 ══════════ -->
+  <text class="lbl bold zh" x="20" y="118">三個單位各自看到的</text>
+
+  <rect class="box plain" x="20" y="134" width="300" height="88" rx="8"/>
+  <text class="tick bold zh" x="36" y="158">單位甲　變異屬於 A 與 B</text>
+  <circle class="mark germline" cx="60" cy="190" r="12"/><text class="tick mid" x="60" y="195">A</text>
+  <path class="conn" d="M73,190 L101,190" marker-end="url(#arrow-sm)"/>
+  <circle class="mark hp1" cx="114" cy="190" r="12"/><text class="tick mid" x="114" y="195">B</text>
+  <text class="tick zh" x="140" y="195">→ 串接，給出祖先關係</text>
+
+  <rect class="box plain" x="20" y="234" width="300" height="106" rx="8"/>
+  <text class="tick bold zh" x="36" y="258">單位乙　變異屬於 B 與 C</text>
+  <circle class="mark hp1" cx="70" cy="292" r="12"/><text class="tick mid" x="70" y="297">B</text>
+  <circle class="mark hp2" cx="126" cy="292" r="12"/><text class="tick mid" x="126" y="297">C</text>
+  <path class="conn bad" d="M84,292 L112,292"/>
+  <path class="conn bad" d="M91,285 L105,299"/>
+  <text class="tick zh" x="152" y="297">→ 分岔，給出不可同群</text>
+  <text class="tick zh" x="36" y="326">（此單位沒有 A 的變異，故 A 不在圖上）</text>
+
+  <rect class="box plain" x="20" y="352" width="300" height="88" rx="8"/>
+  <text class="tick bold zh" x="36" y="376">單位丙　三個變異都屬於 C</text>
+  <circle class="mark hp2" cx="70" cy="408" r="12"/><text class="tick mid" x="70" y="413">C</text>
+  <text class="tick zh" x="96" y="413">→ 單一節點，不產生關係約束</text>
+
+  <path class="conn" d="M330,288 L370,288" marker-end="url(#arrow)"/>
+
+  <!-- ══════════ 中：為什麼不矛盾 ══════════ -->
+  <text class="lbl bold zh" x="384" y="118">為什麼不矛盾</text>
+  <rect class="box sunken" x="384" y="134" width="286" height="306" rx="8"/>
+
+  <text class="anno zh" x="402" y="170">三張圖形狀不同，是因為</text>
+  <text class="anno zh bold" x="402" y="198">它們裝的變異子集不同，</text>
+  <text class="anno zh bold" x="402" y="226">不是因為證據互相衝突。</text>
+
+  <line class="guide" x1="402" y1="248" x2="652" y2="248"/>
+
+  <text class="anno zh" x="402" y="282">每個局部拓撲都是同一棵</text>
+  <text class="anno zh" x="402" y="310">全域 clone tree 在該子集</text>
+  <text class="anno zh" x="402" y="338">上的<tspan class="bold">投影</tspan>。</text>
+
+  <text class="tick zh" x="402" y="378">甲看到 {A, B}，乙看到 {B, C}，</text>
+  <text class="tick zh" x="402" y="402">丙只看到 {C} —— 三者的投影</text>
+  <text class="tick zh" x="402" y="426">合起來才還原出右邊那棵樹。</text>
+
+  <path class="conn" d="M680,288 L720,288" marker-end="url(#arrow)"/>
+
+  <!-- ══════════ 右：全域 clone tree ══════════ -->
+  <text class="lbl bold zh ok" x="734" y="118">全域的 clone tree</text>
+  <rect class="box ok" x="734" y="134" width="246" height="306" rx="8"/>
+
+  <circle class="mark germline" cx="857" cy="200" r="18"/><text class="lbl mid" x="857" y="207">A</text>
+  <path class="conn thick" d="M857,220 L805,268" marker-end="url(#arrow-sm)"/>
+  <path class="conn thick" d="M857,220 L909,268" marker-end="url(#arrow-sm)"/>
+  <circle class="mark hp1" cx="797" cy="282" r="18"/><text class="lbl mid" x="797" y="289">B</text>
+  <circle class="mark hp2" cx="917" cy="282" r="18"/><text class="lbl mid" x="917" y="289">C</text>
+
+  <text class="tick zh mid" x="857" y="334">只有這一棵是全域的，</text>
+  <text class="tick zh mid" x="857" y="358">而且是<tspan class="bold">估計式的輸出</tspan>，</text>
+  <text class="tick zh mid" x="857" y="382">不是把三張局部圖拼出來的。</text>
+
+  <!-- ══════════ 下：兩個要點 ══════════ -->
+  <line class="axis" x1="20" y1="470" x2="980" y2="470"/>
+
+  <rect class="box warn" x="20" y="492" width="470" height="188" rx="8"/>
+  <text class="lbl bold zh warn" x="40" y="524">可以合併的是約束，不是標籤</text>
+  <text class="anno zh" x="40" y="558">局部標籤（HP1-1）<tspan class="bold">只在該區域內有定義</tspan>，</text>
+  <text class="anno zh" x="40" y="586">跨區域的同名標籤並不是同一條。</text>
+  <text class="tick zh" x="40" y="618">所以永遠不要把局部拓撲拼起來 ——</text>
+  <text class="tick zh" x="40" y="642">要合併的是它們對全域變數 z 與 T 的限制，</text>
+  <text class="tick zh" x="40" y="666">而 z 與 T 本來就只有一份。</text>
+
+  <rect class="box bad" x="510" y="492" width="470" height="188" rx="8"/>
+  <text class="lbl bold zh bad" x="530" y="524">真正的矛盾長這樣</text>
+  <text class="anno zh" x="530" y="558">不是形狀不同，而是<tspan class="bold">找不到任何一組 (z, T)</tspan></text>
+  <text class="anno zh" x="530" y="586">能同時滿足全部約束。三種形式：</text>
+  <text class="tick zh" x="530" y="618">① 直接對立：一邊不可同群、另一邊必定同群</text>
+  <text class="tick zh" x="530" y="642">② 違反傳遞性：i＝j、j＝k，卻又 i≠k</text>
+  <text class="tick zh" x="530" y="666">③ 祖先關係成環：a → b → c → a</text>
+</svg><figcaption>三個單位各自看到的局部拓撲形狀完全不同，
+因為每個單位只裝得下落在該視窗內的變異 ——
+三者都是同一棵全域 clone tree 在不同變異子集上的投影。
+下排是兩個要點：可以合併的是約束而非標籤，以及真正的矛盾長什麼樣。</figcaption></figure>
+
+<p class="prose">成因是每個單位只裝得下落在該視窗內的那幾個變異。
+含有 A 群與 B 群變異的單位給出串接；含有 B 群與 C 群變異的單位給出分岔；
+三個變異都屬於 C 群的單位則不產生關係約束。
+三者皆為<b>同一棵全域 clone tree 在不同變異子集上的投影</b> ——
+形狀相異是因為子集相異，而非證據衝突。</p>
+
+<p class="prose">由此導出一條實作規則，與第十節那條互為表裡：
+<b>可以合併的是約束，不是標籤。</b>
+局部標籤（HP1-1）僅在該區域內有定義，跨區域的同名標籤並非同一條，
+故不得將局部拓撲拼接成一棵大樹。所要合併者是它們對 <math><mi>z</mi></math> 與 <math><mi>T</mi></math> 的限制 ——
+而 <math><mi>z</mi></math> 與 <math><mi>T</mi></math> 本就只有一份，合併因此在估計式中自動完成，
+不需要任何對齊步驟。</p>
+
+<p class="prose">真正的矛盾並非形狀相異，而是<b>整個約束集合找不到任何一組
+<math><mo>(</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo></math> 能同時滿足</b>。其形式有三：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">形式</th><th scope="col">例</th><th scope="col">成因</th></tr></thead>
+<tbody>
+<tr><td>直接對立</td><td>一個單位給不可同群 <math><mo>(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo>)</mo></math>，另一個給必定同群 <math><mo>(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo>)</mo></math></td><td>其中一條為假，多為第八節的檢定力不足</td></tr>
+<tr><td>違反傳遞性</td><td>必定同群 <math><mo>(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo>)</mo></math>、必定同群 <math><mo>(</mo><mi>j</mi><mo>,</mo><mi>k</mi><mo>)</mo></math>，卻又不可同群 <math><mo>(</mo><mi>i</mi><mo>,</mo><mi>k</mi><mo>)</mo></math></td><td>同上，惟須三條方能顯現</td></tr>
+<tr><td>祖先關係成環</td><td><math><msub><mi>z</mi><mi>a</mi></msub><mo>→</mo><msub><mi>z</mi><mi>b</mi></msub><mo>→</mo><msub><mi>z</mi><mi>c</mi></msub><mo>→</mo><msub><mi>z</mi><mi>a</mi></msub></math></td><td>任何樹皆不可能，通常是第九節的排序偏誤將分岔判為串接</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">處理方式已內建於估計式：由於約束是<b>加權項</b>而非硬性條件，
+求解器不會因矛盾而無解，它取總和最大的那組 <math><mo>(</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo></math>，
+少數錯誤的約束被多數蓋過。此即本節開頭堅持採 <math><msub><mi>ω</mi><mi>r</mi></msub></math> 而非硬性條件的理由。</p>
+
+<p class="prose">而<b>矛盾率本身是一個診斷量</b>：它估計的是整條約束產線的錯誤率，
+邏輯與第七節以「不相容單位」估計單倍型標記錯誤率相同，僅是提升至全域這一層。
+報告應予載明。</p>
+
+<p class="prose">惟此處有一個陷阱：<b>矛盾率低不代表約束正確。</b>
+系統性偏誤（例如第九節的排序偏誤）會使錯誤的約束<b>彼此一致</b> ——
+它們朝同一方向偏，因而完全不互相矛盾，卻一併使結論偏移。
+矛盾率只偵測得到隨機錯誤。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" class="dia-svg" role="img" aria-labelledby="sr2__sr2-flow__title" aria-describedby="sr2__sr2-flow__desc">
   <title id="sr2__sr2-flow__title">實作流程：從 read 到約束，再到全基因體的群與樹</title>

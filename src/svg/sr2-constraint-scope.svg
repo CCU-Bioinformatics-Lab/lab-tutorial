@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 730">
+  <title>一條約束確定了什麼、沒有確定什麼：K 與群間關係被定下來，個別變異的歸屬仍不可辨識</title>
+  <desc>上排是同一根峰的前後對照，該峰位於 VAF 零點一二，其中含約一千個變異，
+        圖上以四十個小圓示意。
+        左格是加入約束之前：整根峰由單一個成分解釋，一千個變異全部被指派到同一群，
+        小圓全部是實心的同一種顏色 —— 表面上全部有解，實際上是把兩群併成了一群。
+        中格是加入的那一條約束：變異 i 與變異 j 落在同一個分析單位裡，
+        觀測到沒有任何分子同時帶有兩者，於是 i 與 j 不可能屬於同一群。
+        右格是加入之後：峰的位置沒有變，但必須由兩個成分解釋，
+        i 被釘在其中一群、j 被釘在另一群，圖上分別是藍色與橘色的實心圓；
+        其餘九百九十八個轉為空心圓，因為兩個成分位於同一個位置，
+        它們對這兩個成分的似然完全相同，歸屬無從分辨 —— 空心代表誠實標記為未定。
+        下排是這條約束的收支：左邊列出被確定的三件事 ——
+        群數由一變二、兩群確實相異、以及樹由線性改為分支；
+        右邊列出沒有被確定的兩件事 ——
+        其餘九百九十八個變異各屬哪一群，以及兩群各自的大小比例。
+        最下方是結論：系統發生重建要的是群數與群間關係，不是逐一指派變異，
+        所以最稀疏的一對只有二十八條約束仍然足夠 ——
+        二十八條遠不足以指派一千個變異，但對「這兩個成分是不是同一個」
+        這種是非判定則已然充足。</desc>
+
+  <text class="ttl zh" x="20" y="38">一條約束確定了什麼、沒有確定什麼</text>
+  <text class="anno zh" x="20" y="66">同一根峰（VAF ＝ 0.12，約 1,000 個變異）加入一條「不可同群」的前後對照。</text>
+  <line class="axis" x1="20" y1="86" x2="980" y2="86"/>
+
+  <!-- ══════════ 左：加入之前 ══════════ -->
+  <text class="lbl bold zh" x="20" y="120">加入之前</text>
+  <rect class="box plain" x="20" y="136" width="290" height="212" rx="8"/>
+
+  <text class="tick zh mid" x="165" y="164">單一成分解釋整根峰</text>
+
+  <!-- 40 個示意變異：全部同一群 -->
+  <g>
+    <circle class="mark somatic" cx="52" cy="196" r="7"/>
+    <circle class="mark somatic" cx="80" cy="196" r="7"/>
+    <circle class="mark somatic" cx="108" cy="196" r="7"/>
+    <circle class="mark somatic" cx="136" cy="196" r="7"/>
+    <circle class="mark somatic" cx="164" cy="196" r="7"/>
+    <circle class="mark somatic" cx="192" cy="196" r="7"/>
+    <circle class="mark somatic" cx="220" cy="196" r="7"/>
+    <circle class="mark somatic" cx="248" cy="196" r="7"/>
+    <circle class="mark somatic" cx="276" cy="196" r="7"/>
+    <circle class="mark somatic" cx="52" cy="222" r="7"/>
+    <circle class="mark somatic" cx="80" cy="222" r="7"/>
+    <circle class="mark somatic" cx="108" cy="222" r="7"/>
+    <circle class="mark somatic" cx="136" cy="222" r="7"/>
+    <circle class="mark somatic" cx="164" cy="222" r="7"/>
+    <circle class="mark somatic" cx="192" cy="222" r="7"/>
+    <circle class="mark somatic" cx="220" cy="222" r="7"/>
+    <circle class="mark somatic" cx="248" cy="222" r="7"/>
+    <circle class="mark somatic" cx="276" cy="222" r="7"/>
+    <circle class="mark somatic" cx="52" cy="248" r="7"/>
+    <circle class="mark somatic" cx="80" cy="248" r="7"/>
+    <circle class="mark somatic" cx="108" cy="248" r="7"/>
+    <circle class="mark somatic" cx="136" cy="248" r="7"/>
+    <circle class="mark somatic" cx="164" cy="248" r="7"/>
+    <circle class="mark somatic" cx="192" cy="248" r="7"/>
+    <circle class="mark somatic" cx="220" cy="248" r="7"/>
+    <circle class="mark somatic" cx="248" cy="248" r="7"/>
+    <circle class="mark somatic" cx="276" cy="248" r="7"/>
+  </g>
+  <text class="tick mid" x="165" y="278">27 個小圓示意約 1,000 個變異</text>
+
+  <text class="tick bold zh mid bad" x="165" y="306">估出 K ＝ 1（此峰）</text>
+  <text class="tick zh mid" x="165" y="330">1,000 個全部有解 —— 但併成一群</text>
+
+  <path class="conn" d="M318,242 L352,242" marker-end="url(#arrow)"/>
+
+  <!-- ══════════ 中：那一條約束 ══════════ -->
+  <text class="lbl bold zh ok" x="360" y="120">加入的那一條約束</text>
+  <rect class="box ok" x="360" y="136" width="270" height="212" rx="8"/>
+
+  <text class="tick zh" x="376" y="164">i 與 j 落在<tspan class="bold">同一個單位</tspan>裡</text>
+
+  <!-- 兩條分子，各只帶一個 -->
+  <rect class="read hp1" x="376" y="182" width="112" height="14" rx="7"/>
+  <circle class="mark somatic" cx="404" cy="189" r="6"/>
+  <text class="tick" x="496" y="194">帶 i，不帶 j</text>
+
+  <rect class="read hp2" x="376" y="210" width="112" height="14" rx="7"/>
+  <circle class="mark somatic" cx="460" cy="217" r="6"/>
+  <text class="tick" x="496" y="222">帶 j，不帶 i</text>
+
+  <rect class="box ghost bad" x="372" y="234" width="246" height="40" rx="6"/>
+  <text class="tick bold zh bad" x="384" y="259">沒有任何分子同時帶有兩者</text>
+
+  <text class="lbl mono mid" x="495" y="300">z_i ≠ z_j</text>
+  <text class="tick zh mid" x="495" y="330">兩者不可能屬於同一群</text>
+
+  <path class="conn" d="M638,242 L672,242" marker-end="url(#arrow)"/>
+
+  <!-- ══════════ 右：加入之後 ══════════ -->
+  <text class="lbl bold zh" x="680" y="120">加入之後</text>
+  <rect class="box plain" x="680" y="136" width="300" height="212" rx="8"/>
+
+  <text class="tick zh mid" x="830" y="164">兩個成分，位置仍然相同</text>
+
+  <!-- 同一批圓：只有 i 與 j 被釘住 -->
+  <g>
+    <circle class="mark hp1" cx="712" cy="196" r="7"/>
+    <circle class="mark ref" cx="740" cy="196" r="7"/>
+    <circle class="mark ref" cx="768" cy="196" r="7"/>
+    <circle class="mark ref" cx="796" cy="196" r="7"/>
+    <circle class="mark ref" cx="824" cy="196" r="7"/>
+    <circle class="mark ref" cx="852" cy="196" r="7"/>
+    <circle class="mark ref" cx="880" cy="196" r="7"/>
+    <circle class="mark ref" cx="908" cy="196" r="7"/>
+    <circle class="mark hp2" cx="936" cy="196" r="7"/>
+    <circle class="mark ref" cx="712" cy="222" r="7"/>
+    <circle class="mark ref" cx="740" cy="222" r="7"/>
+    <circle class="mark ref" cx="768" cy="222" r="7"/>
+    <circle class="mark ref" cx="796" cy="222" r="7"/>
+    <circle class="mark ref" cx="824" cy="222" r="7"/>
+    <circle class="mark ref" cx="852" cy="222" r="7"/>
+    <circle class="mark ref" cx="880" cy="222" r="7"/>
+    <circle class="mark ref" cx="908" cy="222" r="7"/>
+    <circle class="mark ref" cx="936" cy="222" r="7"/>
+    <circle class="mark ref" cx="712" cy="248" r="7"/>
+    <circle class="mark ref" cx="740" cy="248" r="7"/>
+    <circle class="mark ref" cx="768" cy="248" r="7"/>
+    <circle class="mark ref" cx="796" cy="248" r="7"/>
+    <circle class="mark ref" cx="824" cy="248" r="7"/>
+    <circle class="mark ref" cx="852" cy="248" r="7"/>
+    <circle class="mark ref" cx="880" cy="248" r="7"/>
+    <circle class="mark ref" cx="908" cy="248" r="7"/>
+    <circle class="mark ref" cx="936" cy="248" r="7"/>
+  </g>
+  <text class="tick mid hp1" x="712" y="182">i</text>
+  <text class="tick mid hp2" x="936" y="182">j</text>
+  <text class="tick mid" x="830" y="278">實心 ＝ 已釘住 2 個　空心 ＝ 未定 998 個</text>
+
+  <text class="tick bold zh mid ok" x="830" y="306">K ＝ 2（此峰）</text>
+  <text class="tick zh mid" x="830" y="330">但只有 2 個變異的歸屬被決定</text>
+
+  <!-- ══════════ 下：收支 ══════════ -->
+  <line class="axis" x1="20" y1="382" x2="980" y2="382"/>
+
+  <rect class="box ok" x="20" y="404" width="470" height="182" rx="8"/>
+  <text class="lbl bold zh ok" x="40" y="436">確定了這三件事</text>
+  <text class="anno zh" x="40" y="470">① 此峰的成分數由 1 變成 2</text>
+  <text class="anno zh" x="40" y="500">② 這兩個成分<tspan class="bold">確實相異</tspan>，不是同一群的雜訊</text>
+  <text class="anno zh" x="40" y="530">③ 樹的拓撲由線性改為分支</text>
+  <text class="tick zh" x="40" y="562">—— 三件都是<tspan class="bold">群層級</tspan>的性質</text>
+
+  <rect class="box bad" x="510" y="404" width="470" height="182" rx="8"/>
+  <text class="lbl bold zh bad" x="530" y="436">沒有確定這兩件事</text>
+  <text class="anno zh" x="530" y="470">① 其餘 998 個變異各屬哪一群</text>
+  <text class="anno zh" x="530" y="500">② 兩群各自佔多少（π_B 與 π_C 的分配）</text>
+  <text class="tick zh" x="530" y="532">兩個成分的 θ 相等，所以那 998 個對它們的</text>
+  <text class="tick zh" x="530" y="556">似然完全相同 —— 除非各自另有約束連到 i 或 j</text>
+
+  <rect class="box ghost accent" x="20" y="606" width="960" height="98" rx="8"/>
+  <text class="lbl bold zh" x="40" y="638">系統發生重建要的是「有幾群、群間什麼關係」，不是逐一指派變異。</text>
+  <text class="anno zh" x="40" y="666">所以最稀疏的一對只有 28 條約束仍然足夠 —— 28 條遠不足以指派 1,000 個變異，</text>
+  <text class="anno zh" x="40" y="692">但對「這兩個成分是不是同一個」這個是非判定則已然充足。</text>
+</svg>
