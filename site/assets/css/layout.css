@@ -244,13 +244,59 @@ a.chip:hover { border-color: var(--accent); color: var(--accent); }
   color: var(--muted); margin: 0 0 var(--sp-3);
   padding-bottom: .4em; border-bottom: 1px solid var(--rule);
 }
-/* 研究指引底下的主題標題：比 group 的 h2 重、比卡片輕，
-   因為一個 group 裡會有好幾個主題，讀者要一眼看出邊界在哪。 */
-.mgroup__topic {
-  font-size: .95rem; font-weight: 650; color: var(--ink);
-  margin: var(--sp-5) 0 var(--sp-3);
+/* --- 研究指引：課程之外的區塊 -------------------------------------------
+   為什麼要跟課程 group 長得不一樣：前面五個 group 是同一條路徑上的段落，
+   研究指引不是 —— 它不計時數、沒有學習檢核、語體也不同。
+   如果它跟「基礎／工具／核心」用同一套樣式，捲到這裡的人會以為課程還沒完。
+   所以整段沉一階、上緣用虛線（跟首頁路徑圖第六格的虛線框同一個語彙）。 */
+.mgroup--research {
+  margin-top: var(--sp-7);
+  padding: var(--sp-5) var(--sp-4) var(--sp-4);
+  border-top: 2px dashed var(--rule);
+  background: var(--paper-sunken);
+  border-radius: 12px;
 }
-.mgroup__topic:first-of-type { margin-top: 0; }
+.mgroup--research > h2 { border-bottom: none; padding-bottom: 0; }
+.mgroup__intro {
+  margin: 0 0 var(--sp-5);
+  font-size: .88rem; line-height: 1.85; color: var(--muted);
+  max-width: 46rem;
+}
+
+/* 一個主題自成一塊。兩個主題並列之後才看得出來的問題：卡片編號是
+   「上／中／下」，捲下來會讀到 上 中 下 上 下，兩個「上」相鄰而卡片上
+   沒有任何東西指出它們分屬不同主題。把每個主題包成一塊，編號就只在
+   塊內被讀，不會跨主題連起來。 */
+.topic + .topic { margin-top: var(--sp-5); padding-top: var(--sp-5); border-top: 1px solid var(--rule); }
+.topic__name {
+  font-size: 1.02rem; font-weight: 700; color: var(--ink);
+  margin: 0 0 var(--sp-2);
+}
+.topic__sub {
+  margin: 0 0 var(--sp-3);
+  font-size: .87rem; line-height: 1.8; color: var(--muted);
+  max-width: 46rem;
+}
+.topic__meta {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: .5rem var(--sp-3);
+  margin: 0 0 var(--sp-3);
+  font-size: .76rem; color: var(--muted);
+}
+.topic__pre { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .35rem; }
+.topic__count::before { content: "◇"; margin-inline-end: .4em; }
+
+/* 窄螢幕把左右內距收掉：卡片本身已經有內距，再套一層會讓 19rem 的
+   grid 欄位被擠到換行。上下內距與虛線上緣保留，那才是「這裡換了一種東西」
+   的訊號。 */
+@media (max-width: 34rem) {
+  .mgroup--research {
+    padding-inline: 0;
+    border-radius: 0;
+    background: none;
+    padding-block: var(--sp-4) 0;
+  }
+}
 
 .mgrid {
   list-style: none; margin: 0; padding: 0;

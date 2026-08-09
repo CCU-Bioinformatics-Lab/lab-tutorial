@@ -683,7 +683,32 @@ function writeIndex(modules, shell) {
 
   /* group 之下再分一層 topic：研究指引會有好幾個主題，每個主題自己好幾頁，
      但它們都屬於同一個「這不是課程」的區塊。教材模組沒有 topic，
-     那一層就整個不出現 —— 所以這個改動對前 15 張卡片是零影響。 */
+     那一層就整個不出現 —— 所以這個改動對前 15 張卡片是零影響。
+
+     ★ 一個主題要自成一塊，不能只靠一行小標題把兩批卡片分開。
+       兩個主題並列之後才看得出來的問題：num 是「上／中／下」，
+       所以捲下來會看到 上 中 下 上 下 —— 兩個「上」相鄰，
+       而卡片本身沒有任何東西指出它們屬於不同的主題。
+       所以每個主題包成一個 .topic 區塊，自己帶標題、一句說明、
+       先修條件與篇數；「上中下」的編號因而被限制在該區塊之內讀。 */
+  const topicBlock = (c) => {
+    const first = c.items[0] || {};
+    const pre = (first.prereq || [])
+      .map((pid) => modules.find((m) => m.id === pid))
+      .filter(Boolean)
+      .map((p) => `<a class="chip" href="${p.id}.html">${esc(p.short || p.title_zh)}</a>`)
+      .join('');
+    return `<div class="topic">` +
+      `<h3 class="topic__name">${esc(c.topic)}</h3>` +
+      (first.topic_sub ? `<p class="topic__sub">${first.topic_sub}</p>` : '') +
+      `<p class="topic__meta">` +
+      `<span class="topic__count">共 ${c.items.length} 篇，依序閱讀</span>` +
+      (pre ? `<span class="topic__pre">建議先修 ${pre}</span>` : '') +
+      `</p>` +
+      `<ol class="mgrid">${c.items.map(card).join('')}</ol>` +
+      `</div>`;
+  };
+
   const cards = groups.map((g) => {
     const clusters = [];
     for (const m of g.items) {
@@ -692,10 +717,19 @@ function writeIndex(modules, shell) {
       if (!c) { c = { topic: key, items: [] }; clusters.push(c); }
       c.items.push(m);
     }
+    /* 有 topic 的 group（目前只有研究指引）整組換一種呈現：
+       它不是課程的一部分，所以不該長得跟「基礎／工具／核心」一模一樣。 */
+    const hasTopic = clusters.some((c) => c.topic);
     const body = clusters.map((c) =>
-      (c.topic ? `<h3 class="mgroup__topic">${esc(c.topic)}</h3>` : '') +
-      `<ol class="mgrid">${c.items.map(card).join('')}</ol>`).join('');
-    return `<section class="mgroup"><h2>${esc(g.name)}</h2>${body}</section>`;
+      c.topic ? topicBlock(c) : `<ol class="mgrid">${c.items.map(card).join('')}</ol>`).join('');
+    return `<section class="mgroup${hasTopic ? ' mgroup--research' : ''}">` +
+      `<h2>${esc(g.name)}</h2>` +
+      (hasTopic
+        ? `<p class="mgroup__intro">以下不是課程，是研究方向的說明，也不計入時數與學習檢核。` +
+          `讀者設定為實驗室成員與論文審閱者，內容以估計式、參數與失效模式為主，` +
+          `語體與前面的教學模組不同。建議完成綜合評量之後再讀。</p>`
+        : '') +
+      body + `</section>`;
   }).join('');
 
   const first = modules[0];
