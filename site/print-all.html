@@ -12898,7 +12898,7 @@ PyClone、SciClone 與 MOBSTER 一系共同的骨架，共四個步驟。</p>
         每一群具有位置、高度與寬度三個參數；每個變異的群歸屬為未觀測的潛在變數，
         在該式中被邊際化。
         第三步為決定群數，所依據者為模型選擇準則而非參數估計。
-        第四步為由各群的細胞比例建樹，其條件為父節點的比例不得小於子節點的比例總和；
+        第四步為由各群的細胞比例建樹，其條件為父節點的細胞比例不得小於各子節點的比例總和；
         此條件通常無法將候選收斂至唯一一棵，其餘由簡約性等偏好決定。
         圖的下方列出三項限制，各以箭頭指回其所在的步驟：
         群數不可辨識，位於潛在變數與群數；
@@ -12998,7 +12998,7 @@ PyClone、SciClone 與 MOBSTER 一系共同的骨架，共四個步驟。</p>
   <text class="tick mono mid" x="880" y="284">c_A ≥ c_B + c_C</text>
 
   <rect class="box ghost bad" x="776" y="322" width="204" height="96" rx="6"/>
-  <text class="tick bold zh bad" x="790" y="346">pigeonhole 通常無法</text>
+  <text class="tick bold zh bad" x="790" y="346">此條件通常無法</text>
   <text class="tick bold zh bad" x="790" y="368">收斂至唯一一棵</text>
   <text class="tick zh" x="790" y="392">其餘由簡約性等偏好</text>
   <text class="tick zh" x="790" y="410">決定，非由資料決定</text>
@@ -13030,7 +13030,7 @@ PyClone、SciClone 與 MOBSTER 一系共同的骨架，共四個步驟。</p>
   <text class="anno zh" x="690" y="606">位移，將汙染群的組成。</text>
   <text class="tick bold mono" x="690" y="638">參數：c</text>
   <text class="tick bold zh ok" x="690" y="662">→ 由用途三補足</text>
-</svg><figcaption>僅用 VAF 的四個步驟：換算、擬合混合模型、決定 K、以 pigeonhole 建樹。
+</svg><figcaption>僅用 VAF 的四個步驟：換算、擬合混合模型、決定 K、由各群的細胞比例建樹。
 三個灰底方塊為外部估計值，三處紅字為此路線的限制 ——
 它們分別落在 K、φ 與 c 上，與 5% 所提供的三個用途一一對應。</figcaption></figure>
 
@@ -13084,11 +13084,18 @@ CN 為每區段一個值，μ 則為<b>每個變異</b>一個值。上篇所述�
 <b>此步驟為整條路線最脆弱的環節</b>，因為它屬於<b>模型選擇</b>而非參數估計 ——
 它所回答的是「有幾群」，而非「這幾群位於何處」。</p>
 
-<h4 id="sr2__第四步-由-c_k-建樹">第四步：由 {c_k} 建樹</h4>
+<h4 id="sr2__第四步-由各群的細胞比例建樹">第四步：由各群的細胞比例建樹</h4>
 
-<p class="prose">依 pigeonhole 原則：節點 <math><mi>k</mi></math> 得為子節點集合 <math><mi>S</mi></math> 的父節點，
-必要條件為 <math><msub><mi>c</mi><mi>k</mi></msub><mo>≥</mo><msub><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>S</mi></mrow></msub><msub><mi>c</mi><mi>j</mi></msub></math> —— 子代細胞為父代的子集，其總和不得超過父代。
-此條件<b>通常無法將候選收斂至唯一一棵樹</b>，其餘由<span class="term" data-term="parsimony" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-parsimony-2">簡約性<span class="term__pop" id="sr2__gd-parsimony-2" role="tooltip"><b class="term__hd">parsimony <i>簡約法</i></b><span class="term__def" data-lang="zh">在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</span><span class="term__def" data-lang="en" lang="en">Choosing, among all solutions compatible with the data, the one requiring the fewest steps or lowest cost. It is a preference rather than evidence: when several solutions tie, parsimony picks one, but the data has not ruled the others out.</span><a class="term__more" href="glossary.html#parsimony">完整條目 →</a></span></span>等偏好決定。
+<p class="prose">可用的約束只有一條，且屬純粹的算術：
+<b>一個細胞至多屬於某個父節點底下的一個子節點</b>，
+所以各子節點的細胞比例加起來不得超過父節點。形式化之後，
+節點 <math><mi>k</mi></math> 得為子節點集合 <math><mi>S</mi></math> 的父節點，必要條件為：</p>
+
+<div class="eq"><math display="block"><msub><mi>c</mi><mi>k</mi></msub><mo>≥</mo><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>S</mi></mrow></munder><msub><mi>c</mi><mi>j</mi></msub></math><p class="eq__note">此即 <span class="term" data-term="pigeonhole" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-pigeonhole-2">pigeonhole 原則<span class="term__pop" id="sr2__gd-pigeonhole-2" role="tooltip"><b class="term__hd">pigeonhole <i>鴿籠原理</i></b><span class="term__def" data-lang="zh">由父代與子代的細胞比例限制樹形的算術規則：一個細胞至多屬於父節點底下的<b>一個</b>子節點，所以各子節點的細胞比例加起來不得超過父節點。名稱來自鴿籠原理 —— 東西放進籠子，總量不會憑空變多。在 subclone 重建的文獻中也稱為 sum rule 或 crossing rule。<b>它只能排除樹，不能挑出樹</b>：通過檢查的候選通常仍不只一棵，其餘要靠 parsimony 之類的偏好決定。</span><span class="term__def" data-lang="en" lang="en">The arithmetic constraint that limits tree shape from parent and child cell fractions: a cell belongs to at most one child of a given parent, so the children's cell fractions cannot sum to more than the parent's. The name comes from the pigeonhole principle. Also called the sum rule or crossing rule in the subclonal reconstruction literature. It can only rule trees out, never select one: the surviving candidates are usually more than one, and the choice among them falls to a preference such as parsimony.</span><a class="term__more" href="glossary.html#pigeonhole">完整條目 →</a></span></span>（鴿籠原理：東西放進籠子，總量不會憑空變多）。
+subclone 重建的文獻中亦稱 sum rule 或 crossing rule，本頁一律用前者。</p></div>
+
+<p class="prose">關鍵在於它<b>只能排除樹，不能挑出樹</b>：
+通過此檢查的候選<b>通常不只一棵</b>，其餘由<span class="term" data-term="parsimony" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-parsimony-3">簡約性<span class="term__pop" id="sr2__gd-parsimony-3" role="tooltip"><b class="term__hd">parsimony <i>簡約法</i></b><span class="term__def" data-lang="zh">在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</span><span class="term__def" data-lang="en" lang="en">Choosing, among all solutions compatible with the data, the one requiring the fewest steps or lowest cost. It is a preference rather than evidence: when several solutions tie, parsimony picks one, but the data has not ruled the others out.</span><a class="term__more" href="glossary.html#parsimony">完整條目 →</a></span></span>等偏好決定。
 上篇的測驗即針對此點：通過相容性檢查與被資料證成是兩回事。</p>
 
 <h4 id="sr2__三項限制與其對應的用途">三項限制與其對應的用途</h4>
@@ -14166,13 +14173,13 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
   <text class="anno zh bad" x="24" y="450">最常見的誤解：把 ① 與 ② 當成同一件事。read 長度限制的是「數得到共現」，</text>
   <text class="tick zh bad" x="24" y="472">phase block 限制的是「知不知道在同一條染色體上」—— 兩者範圍差約一百倍。</text>
 </svg><figcaption>read 跨距限制的是能否計數共現，
-<span class="term" data-term="phase block" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-phase-block-3">phase block<span class="term__pop" id="sr2__gd-phase-block-3" role="tooltip"><b class="term__hd">phase block</b><span class="term__def" data-lang="zh">一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</span><span class="term__def" data-lang="en" lang="en">A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.</span><a class="term__more" href="glossary.html#phase-block">完整條目 →</a></span></span> 限制的是能否確定兩個位點是否位於同一條染色體。
+<span class="term" data-term="phase block" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-phase-block-4">phase block<span class="term__pop" id="sr2__gd-phase-block-4" role="tooltip"><b class="term__hd">phase block</b><span class="term__def" data-lang="zh">一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</span><span class="term__def" data-lang="en" lang="en">A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.</span><a class="term__more" href="glossary.html#phase-block">完整條目 →</a></span></span> 限制的是能否確定兩個位點是否位於同一條染色體。
 約束僅能自最上層產生，而該層亦為三者中範圍最小者。</figcaption></figure>
 
 <h3 id="sr2__九-閘門二-候選排序偏誤對-不可同群-的系統性損耗">九、閘門二：候選排序偏誤對「不可同群」的系統性損耗</h3>
 
 <p class="prose">第二道閘門較第一道隱蔽，且偏誤方向不利。
-最小成本候選常不只一個，現行流程以 <span class="term" data-term="read-AF" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-read-af-4">read-AF<span class="term__pop" id="sr2__gd-read-af-4" role="tooltip"><b class="term__hd">read-AF <i>read 層級的 ALT 比例</i></b><span class="term__def" data-lang="zh">在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</span><span class="term__def" data-lang="en" lang="en">The fraction of reads carrying the ALT allele at a somatic site, computed within one analysis window and one haplotype family. Because the denominator is already restricted, no purity or copy-number correction is needed; it is used to rank candidate trees of equal cost.</span><a class="term__more" href="glossary.html#read-af">完整條目 →</a></span></span> 的差值總和排序；
+最小成本候選常不只一個，現行流程以 <span class="term" data-term="read-AF" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-read-af-5">read-AF<span class="term__pop" id="sr2__gd-read-af-5" role="tooltip"><b class="term__hd">read-AF <i>read 層級的 ALT 比例</i></b><span class="term__def" data-lang="zh">在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</span><span class="term__def" data-lang="en" lang="en">The fraction of reads carrying the ALT allele at a somatic site, computed within one analysis window and one haplotype family. Because the denominator is already restricted, no purity or copy-number correction is needed; it is used to rank candidate trees of equal cost.</span><a class="term__more" href="glossary.html#read-af">完整條目 →</a></span></span> 的差值總和排序；
 問題在於<b>相加的項數由拓撲形狀決定</b>：</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" class="dia-svg" role="img" aria-labelledby="sr2__rg-score-bias__title" aria-describedby="sr2__rg-score-bias__desc">
@@ -14422,7 +14429,7 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 </table>
 </div>
 
-<p class="prose">此亦為 <span class="term" data-term="latent node" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-latent-node-5">latent node<span class="term__pop" id="sr2__gd-latent-node-5" role="tooltip"><b class="term__hd">latent node <i>潛在節點</i></b><span class="term__def" data-lang="zh">建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</span><span class="term__def" data-lang="en" lang="en">An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.</span><a class="term__more" href="glossary.html#latent-node">完整條目 →</a></span></span> 一項警告的具體應用：
+<p class="prose">此亦為 <span class="term" data-term="latent node" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2__gd-latent-node-6">latent node<span class="term__pop" id="sr2__gd-latent-node-6" role="tooltip"><b class="term__hd">latent node <i>潛在節點</i></b><span class="term__def" data-lang="zh">建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</span><span class="term__def" data-lang="en" lang="en">An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.</span><a class="term__more" href="glossary.html#latent-node">完整條目 →</a></span></span> 一項警告的具體應用：
 潛在節點<b>並非</b>一群尚未被觀測到的細胞，故不得作為證據，但可作為扣分依據。</p>
 
 <h3 id="sr2__十二-約束預算">十二、約束預算</h3>
@@ -14767,7 +14774,7 @@ MOBSTER，Caravagna G et al., <i>Nat Genet</i> 2020;52:898–907
 </section>
 
     
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>clone tree（克隆演化樹）</dt><dd>描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</dd><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>parsimony（簡約法）</dt><dd>在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>read-AF（read 層級的 ALT 比例）</dt><dd>在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>clone tree（克隆演化樹）</dt><dd>描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</dd><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>parsimony（簡約法）</dt><dd>在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>pigeonhole（鴿籠原理）</dt><dd>由父代與子代的細胞比例限制樹形的算術規則：一個細胞至多屬於父節點底下的<b>一個</b>子節點，所以各子節點的細胞比例加起來不得超過父節點。名稱來自鴿籠原理 —— 東西放進籠子，總量不會憑空變多。在 subclone 重建的文獻中也稱為 sum rule 或 crossing rule。<b>它只能排除樹，不能挑出樹</b>：通過檢查的候選通常仍不只一棵，其餘要靠 parsimony 之類的偏好決定。</dd><dt>read-AF（read 層級的 ALT 比例）</dt><dd>在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd></dl></section>
   </article>
     
     

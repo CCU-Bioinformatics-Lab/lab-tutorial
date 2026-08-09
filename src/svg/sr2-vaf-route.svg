@@ -8,7 +8,7 @@
         每一群具有位置、高度與寬度三個參數；每個變異的群歸屬為未觀測的潛在變數，
         在該式中被邊際化。
         第三步為決定群數，所依據者為模型選擇準則而非參數估計。
-        第四步為由各群的細胞比例建樹，其條件為父節點的比例不得小於子節點的比例總和；
+        第四步為由各群的細胞比例建樹，其條件為父節點的細胞比例不得小於各子節點的比例總和；
         此條件通常無法將候選收斂至唯一一棵，其餘由簡約性等偏好決定。
         圖的下方列出三項限制，各以箭頭指回其所在的步驟：
         群數不可辨識，位於潛在變數與群數；
@@ -108,7 +108,7 @@
   <text class="tick mono mid" x="880" y="284">c_A ≥ c_B + c_C</text>
 
   <rect class="box ghost bad" x="776" y="322" width="204" height="96" rx="6"/>
-  <text class="tick bold zh bad" x="790" y="346">pigeonhole 通常無法</text>
+  <text class="tick bold zh bad" x="790" y="346">此條件通常無法</text>
   <text class="tick bold zh bad" x="790" y="368">收斂至唯一一棵</text>
   <text class="tick zh" x="790" y="392">其餘由簡約性等偏好</text>
   <text class="tick zh" x="790" y="410">決定，非由資料決定</text>
