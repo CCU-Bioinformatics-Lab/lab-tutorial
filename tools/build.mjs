@@ -902,6 +902,7 @@ function writePrintAll(modules, shell) {
 
     /* 移除逐頁的上下篇導覽（整本連讀時沒有意義） */
     body = body.replace(/<nav class="pager"[\s\S]*?<\/nav>/g, '');
+    body = body.replace(/[ \t]+$/gm, '');
 
     /* widget 在紙本上不能運作，而且它的 data-wid 會與單頁版撞名
        （progress 的 localStorage key 就是那個 id）。改成保留說明的靜態區塊。 */

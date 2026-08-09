@@ -5,8 +5,8 @@
         核心模組處理腫瘤資料的分析限制，實驗室工具介紹三項程式，
         課程以綜合評量的整合式判讀作結。
         第六格以虛線框與虛線箭頭表示，代表它不屬於課程：
-        研究指引目前有兩個主題，各分上下兩篇，
-        一個是 subclone 系統發生重建，另一個是純度、倍體與腫瘤 DNA 比例，
+        研究指引目前有兩個主題；subclone 系統發生重建含三篇，
+        純度、倍體與腫瘤 DNA 比例含四篇，
         內容為研究方向的說明而非教材，建議在完成綜合評量之後閱讀。
         下方標出兩個轉折點：自第四個模組開始需要能操作終端機，
         以及本教材不預設先備癌症生物學知識。</desc>
@@ -43,7 +43,7 @@
   <rect class="box ghost" x="835" y="52" width="145" height="92" rx="8"/>
   <text class="anno mid bold zh" x="907" y="82">研究指引</text>
   <text class="tick mid zh" x="907" y="106">兩個主題</text>
-  <text class="tick mid zh" x="907" y="130">各分上下兩篇</text>
+  <text class="tick mid zh" x="907" y="130">三篇與四篇</text>
 
   <!-- 箭頭：課程內為實線，跨到研究指引為虛線 -->
   <path class="flow" d="M167,98 L179,98" marker-end="url(#arrow-sm)"/>

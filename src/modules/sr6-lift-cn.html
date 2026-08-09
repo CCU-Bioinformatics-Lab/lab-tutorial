@@ -1,0 +1,948 @@
+<!--tw
+{
+  "objectives": [
+    "界定 LiFT-CN 的估計目標，並區分 cellular purity、tumour DNA fraction、tumour ploidy 與局部分子比例",
+    "寫出由 clone tree、實體 copy lineage 與 mutation timing 到長讀分子觀測的完整生成模型",
+    "說明 marked-fragment factorization 如何同時使用深度與多位點狀態而不重複計算同一條 read",
+    "把 CCF 與突變多重度由自由 nuisance 改為 clone tree 與 copy history 的衍生量",
+    "列出 WGD、purity、clone fraction、phase orientation 與 segmentation 的可辨識條件",
+    "定義分段推論、模式保留、輸入輸出、QC 狀態與失敗停止條件",
+    "以 D、E 與 E-shuffle 的對照驗證多位點 somatic haplotype 是否改善 purity 與 ploidy，而非只改善 subclone topology"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<h3>兩條規格之間的循環依賴</h3>
+
+<p class="prose"><code>sr5</code> 的單位點四格表可在 germline haplotype 內量測 somatic 比例，
+但每個 mutation 的 CCF {{m: c_i}} 與 multiplicity {{m: μ_i}} 仍須由外部 subclone 模型提供先驗。
+<code>sr2b</code> 的多位點狀態表可限制 clone 數、clone tree 與相對比例，
+其 VAF 位置卻又依賴 purity、allele-specific copy number 與 multiplicity。
+前者需要後者的 clone 結果，後者需要前者或既有工具的 purity／CN 結果，形成直接的循環依賴。</p>
+
+<p class="prose">LiFT-CN（<b>Li</b>nked-<b>F</b>ragment <b>T</b>umour tree and <b>C</b>opy-<b>N</b>umber model）
+以單一生成模型取代兩個互相提供外部參數的估計器。
+somatic mutation 不再具有彼此獨立的 {{m: (c_i,μ_i)}}；每個 mutation 被放置於
+clone tree 的一條 edge、某一條實體 copy lineage，以及相對於 gain、loss 或 WGD 的時間位置。
+clone inheritance 與 copy history 隨後<b>決定</b>其 CCF 與 multiplicity。</p>
+
+{{svg:sr6-generative-chain | [wide] LiFT-CN 的生成鏈由 clone tree 與 branch exposure 開始，
+先產生 ordered CN／WGD history 與各 timing slot 可用的 physical lineages，再將 mutation 放到
+edge／timing／extant lineage，最後投影至 raw molecules；
+read-start depth 與 conditional marks 最後共同限制 {{m: p,κ,f}}、clone fractions 與 copy histories。}}
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">模型名稱與 novelty 的位階</p>
+<p class="prose">LiFT-CN 為實作規格的工作名稱，不構成方法已完成或「首次」的證據。
+可檢驗的新意是特定的統計閉合：以原始長讀分子的 germline–somatic 聯合 marks，
+同時限制 clone tree、實體 copy lineage、clone-specific allele CN、purity、DNA fraction、ploidy 與 WGD modes。
+任一個輸出本身均已有既有方法；候選 novelty 位於它們共享同一個 raw-molecule posterior 的交集。</p>
+</div>
+
+<h3>多位點資訊的預期作用</h3>
+
+<p class="prose">單位點四格表只提供邊際比例。若 {{m: c_i}} 可自由變動，
+purity 與 CCF 可沿同一方向縮放；若 {{m: μ_i}} 未知，mutation timing 與 CN gain 亦可交換解釋。
+同一分子上的 {{m: 00}}、{{m: 10}}、{{m: 01}}、{{m: 11}} 或更高維狀態新增的是
+mutation 間的共現、互斥與巢狀關係。這些關係限制共享的 clone tree 與 copy history，
+再間接縮小 purity／ploidy 的可行集合。</p>
+
+{{svg:rg-cancellation | [wide] 多位點非參考狀態的比例可消去共同的 purity 與 copy-number 分母，
+直接限制 clone 間的相對比例。絕對 purity 仍須由 truncal mutation、涵蓋全部腫瘤細胞的 branch 聯集、
+allelic imbalance 或外部 DNA-content evidence 確立尺度。}}
+
+<p class="prose">因此，稀疏 multi-SNV haplotypes 的主要用途不是增加大量計數，
+而是排除原本完全等價的參數模式。若這些單位未連到 truncal scale、post-WGD mutation 或
+informative allele-specific CN，預期結果為 clone topology 改善，而非 absolute purity／ploidy 改善。</p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>一、估計目標與模型邊界</h3>
+
+<p class="prose">核心分析單位為一份 tumour–matched-normal long-read WGS。
+全模型允許 clone-specific CN、tree edge 上的 segmental gain／loss、每條 root-to-leaf path 至多一次 WGD、
+局部 phase orientation 不確定性與 tumour-in-normal contamination。
+第一版實作限於 autosomes、單一 tumour sample、matched normal、SNV／short indel、
+clonal CNA 與 clonal WGD；clone-specific CNA、subclonal WGD、sex chromosomes 與 tumour-only mode
+依序於後續階段解除。此限制避免單一 bulk sample 一開始即承擔任意多個 CN mixtures。</p>
+
+<p class="prose">設 cellular [[tumour purity]] 為 {{m: p}}，可偵測的 tumour clone 數為 {{m: K}}，
+clone {{m: g}} 在 tumour 細胞內的 exclusive fraction 為 {{m: π_g}}：</p>
+
+{{eq}}
+w_0 = 1 − p, \qquad w_g = pπ_g, \qquad \sum_g π_g = 1
+{{note}}
+{{m: w_0}} 是正常細胞比例；{{m: π_g}} 的分母只含 tumour cells。
+因此 purity 不再與 normal clone weight 重複參數化。
+{{/eq}}
+
+<p class="prose">令 {{m: C_{sgh}}} 為 segment {{m: s}}、clone {{m: g}}、parental haplotype
+{{m: h∈\{1,2\}}} 的整數 copy number，{{m: L_s}} 為 callable length。
+tumour [[ploidy]] 與 [[tumour DNA fraction]] 均為衍生量：</p>
+
+{{eq}}
+κ = \frac{\sum_s L_s \sum_g π_g(C_{sg1}+C_{sg2})}{\sum_s L_s}
+{{/eq}}
+
+{{eq}}
+f = \frac{pκ}{2(1−p)+pκ}
+{{note}}
+{{m: p}} 是細胞比例，{{m: f}} 是 callable genome 上、technical sampling 之前的生物學 DNA 分子比例。
+當 {{m: κ≠2}} 時兩者不可互換；observed read-origin fraction 另受 segment coverage 與 capture bias 影響。
+{{/eq}}
+
+<p class="prose">令 {{m: C_s^T=\sum_gπ_g(C_{sg1}+C_{sg2})}}。當 origin-specific capture
+{{m: a_{uso}=1}} 時，inference reads 中預期的 tumour-origin fraction 為：</p>
+
+{{eq}}
+r_{read}=\frac{p\sum_sL_sq_sC_s^T}{\sum_sL_sq_s[2(1−p)+pC_s^T]}
+{{note}}
+{{m: r_{read}}} 是 sequencing／BAM mixture 上的 read fraction，不是 {{m: f}}。
+若 {{m: a_{uso}}} 不等於 1，則以完整 origin weights {{m: α_{uso}}} 對 segment-start probabilities 積分。
+約束 {{m: \sum_sL_s\log q_s=0}} 只固定 {{m: q}} 的幾何尺度，不保證 {{m: r_{read}=f}}。
+{{/eq}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>量</th><th>模型身分</th><th>主要資料來源</th><th>必要輸出</th></tr></thead>
+<tbody>
+<tr><td>{{m: p}}</td><td>全樣本自由參數</td><td>depth、germline allele marks、truncal／covering somatic states</td><td>mode-specific posterior</td></tr>
+<tr><td>{{m: π_g}}</td><td>tumour 內 exclusive clone fractions</td><td>marginal VAF 與 multi-locus co-occurrence</td><td>posterior 與 detection limit</td></tr>
+<tr><td>{{m: C_{sgh}}}</td><td>segment × clone × parental haplotype 整數狀態</td><td>depth、germline marks、SV marks</td><td>state probabilities</td></tr>
+<tr><td>{{m: κ}}</td><td>由 {{m: π}} 與 {{m: C}} 導出</td><td>全基因體 CN posterior</td><td>與 {{m: p,f}} 同 mode</td></tr>
+<tr><td>{{m: f}}</td><td>由 {{m: p,κ}} 導出</td><td>分子 mixture identity</td><td>與 cellular purity 分欄</td></tr>
+<tr><td>{{m: r_{read}}}</td><td>由 {{m: p,C,q,a}} 導出</td><td>sequencing／BAM mixture</td><td>只作 read-level truth 與 posterior prediction</td></tr>
+<tr><td>WGD</td><td>clone-tree edge event</td><td>copy history、post-WGD mutations、外部 DNA index</td><td>mode mass，不只 yes／no</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>二、輸入資料契約</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>輸入</th><th>必要欄位</th><th>模型用途</th><th>不得替代之物</th></tr></thead>
+<tbody>
+<tr><td>tumour／normal BAM 或 CRAM</td><td>alignment、base quality、mapping quality、read identity</td><td>read-start depth 與原始 allele／SV marks</td><td>不得只輸入彙總 HP counts</td></tr>
+<tr><td>reference 與 callable mask</td><td>reference build、mappability、excluded regions</td><td>depth exposure 與 mutation-process denominator</td><td>不得以整條 chromosome length 代替 callable length</td></tr>
+<tr><td>germline candidate VCF</td><td>candidate coordinates、alleles、phase set proposal（若有）</td><td>parental haplotype proposal</td><td>genotype／phase likelihood 由 raw reads 重算，不重用 VCF likelihood</td></tr>
+<tr><td>somatic discovery catalogue</td><td>candidate、filter、depth、context、discovery split</td><td>mutation loci 與 ascertainment metadata</td><td>PASS-only VCF 不足以校正 selection</td></tr>
+<tr><td>raw SV-support records</td><td>breakpoint、support／reference molecules、quality</td><td>CN boundary 與 copy-lineage event</td><td>SV VCF 不可同時作 hard boundary 與獨立證據</td></tr>
+<tr><td>platform metadata</td><td>platform、chemistry、basecaller、library mode</td><td>error 與 capture strata</td><td>不得使用未標示來源的全域 error constant</td></tr>
+<tr><td>optional external evidence</td><td>assay、value、standard error、segment（若適用）</td><td>DNA index／flow／FISH auxiliary likelihood</td><td>沒有 assay uncertainty 時只作 validation，不進 posterior</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">主要推論使用每條 read 上的原始 germline 與 somatic bases；
+normal genotype 與 phase likelihood 亦由這些 raw reads 重新計算，VCF 只供候選座標與 proposal。
+既有 HP tag 是這些 bases 的演算法摘要，只用於初始化與 QC；若同時把 HP tag 與產生該 tag 的 anchor bases
+當作條件獨立觀測，會重複計算同一份 phasing evidence。
+tag-only compatibility mode 必須改用 HP confusion matrix，並從該 read 的 mark likelihood 移除原始 anchor bases。</p>
+
+<div class="guardrail">
+<p class="guardrail__hd">somatic catalogue 的 selection 必須顯式界定</p>
+<p class="prose">caller sensitivity 隨 VAF、depth、context、platform 與 purity 改變，
+	故 called mutations 並非隨機抽樣。第一版以 pre-registered read identity hash 將 molecules 固定分成
+	discovery、inference 與 evaluation 三 folds：前者只建立候選 catalogue 與 candidate boundaries，
+	中者只估計 posterior，後者只計算 predictive diagnostics。三 folds 不交換，evaluation fold 不進 posterior，
+	也不相乘或平均不同 folds 的 posterior；不同 split seeds 只作敏感度分析。各 likelihood 另含已知 sampling-fraction exposure offset。
+如此可避免同一條 read 同時決定「位點被納入」與「位點支持哪個參數」。
+此版本估計的是<b>catalogue-visible clone tree</b>；完整版本再以 thinned mutation process 整合未偵測事件。</p>
+</div>
+
+<h4>matched-normal genotype 與 phase state</h4>
+
+<p class="prose">每個 germline candidate locus {{m: j}} 具有 normal genotype
+{{m: G^N_j∈\{0/0,0/1,1/1\}}}。population allele frequency 可提供 Hardy–Weinberg prior；
+缺少 population frequency 時採明列的弱對稱 prior。若 {{m: G^N_j=0/1}}，
+true phase state {{m: H_j∈\{1,2\}}} 表示 ALT 位於哪一條 parental lineage；
+不同 loci 的 ALT carrier 不需相同，也不服從「維持長 run」的 prior。
+每個 phase-connected component {{m: b}} 選定一個 deterministic anchor {{m: j_b}} 並固定
+{{m: H_{j_b}=1}}，其餘 {{m: H_j}} 才給對稱 prior；這是 label gauge，不是生物學假設。
+{{m: (G^N,H)}} 直接構成 read-origin allele {{m: X_{oj}}}，並由 matched-normal raw-base emission 更新，
+不另乘 VCF genotype likelihood。</p>
+
+{{eq}}
+P(H_j=1)=P(H_j=2)=\frac{1}{2}, \quad j≠j_b, \qquad H_{j_b}=1
+{{note}}
+primary raw-read mode 固定 {{m: σ_b=0}} 且不建立 {{m: F}}，因此每個 biological state 只有一個
+canonical label representation。raw-read linkage 只更新 gauge-fixed {{m: H}}。
+{{/eq}}
+
+<p class="prose">compatibility mode 才使用獨立 phase call 的 observed label {{m: O_j}}。
+此時 {{m: σ_b∼Bernoulli(0.5)}} 表示外部 HP1／HP2 與 internal canonical labels 的 block orientation，
+並固定 {{m: F_{j_b}=0}}；switch trajectory 滿足
+{{m: P(F_j≠F_{j−1})=ρ_{sw}}} 與 {{m: ρ_{sw}∼Beta(a_{sw},b_{sw})}}。
+固定 {{m: F_{j_b}}} 後，{{m: F}} 與 {{m: σ_b}} 不再重複。由同一批 raw bases 產生的 phase call
+仍只用於初始化與 QC，不得再乘入 likelihood。</p>
+
+<h3>三、clone tree 與實體 copy lineage</h3>
+
+<p class="prose">每個 autosomal segment 的 tumour founder 具有兩條 parental copy lineages。
+clone-tree edge 上的 loss 刪除一條具名 lineage，gain 複製一條具名 lineage，
+[[whole-genome doubling]] 複製該 edge 當時存在的全部 lineages。
+事件序列決定所有 {{m: C_{sgh}}}，而不只決定最後的 total CN。</p>
+
+<p class="prose">固定 atomic-bin grid 後，令 {{m: B}} 為相鄰 bins 的 boundary indicators，
+{{m: S(B)}} 為其導出的 CN-segment partition。所有 copy-event records 均以 {{m: S(B)}} 中的 segment
+為 target；因此 segmentation 改變時，copy-history 的 support 與 normalizer 亦隨之改變。</p>
+
+<p class="prose">令 {{m: H^{CN}_e=(h^{CN}_{e1},…,h^{CN}_{eJ_e})}} 為 edge {{m: e}} 上的
+ordered copy-event history，其中 {{m: J_e=N^{CN}_e+W_e}}。每個 segmental event record
+包含 segment、gain／loss type 與在該時點存在的 target lineage；若 {{m: W_e=1}}，history 中另含一個
+WGD token。由 founder lineages 依序 replay {{m: H^{CN}}}，唯一導出每一時點可用的 physical lineages
+與最終 {{m: C}}。</p>
+
+<p class="prose">somatic mutation {{m: m}} 的 placement 為
+{{m: z_m=(e_m,ℓ_m,t_m)}}：acquisition edge {{m: e_m}}、physical lineage {{m: ℓ_m}}，
+以及相對於該 edge 上 CN events 的 timing slot {{m: t_m}}。
+mutation 由後代繼承；帶 mutation 的 lineage 被 gain 或 WGD 複製時，multiplicity 隨之增加；
+該 lineage 被 deletion 移除時，mutation 訊號消失。</p>
+
+{{eq}}
+μ_{mg} = \sum_{ℓ} G_{gℓm}, \qquad CCF_m = \sum_g π_g · 1(μ_{mg}>0)
+{{note}}
+{{m: G_{gℓm}}} 表示 clone {{m: g}} 的 physical lineage {{m: ℓ}} 是否攜帶 mutation {{m: m}}。
+CCF 與 multiplicity 均由 event history 導出，不再有彼此獨立的先驗。
+{{/eq}}
+
+<p class="prose">第一版的 tree component 採 one-acquisition、no-back-mutation boundary。
+每個 candidate mutation 另有 mutation-level class
+{{m: R_m∈\{tree,artifact,recurrent\}}}：<code>tree</code> 使用單一 acquisition；
+<code>artifact</code> 使用由 negative controls 校準的 site／read artifact emission；
+<code>recurrent</code> 允許至多兩個 acquisition edges 並接受額外 event penalty。
+如此可表達多 molecules 一致支持的 recurrent event，而不把它混入 whole-read background 或強迫建立新 clone。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>{{m: R_m}}</th><th>genotype construction</th><th>emission</th><th>complexity control</th></tr></thead>
+<tbody>
+<tr><td><code>tree</code></td><td>一個 edge／lineage／timing placement</td><td>標準 marked-fragment emission</td><td>tree 與 event priors</td></tr>
+<tr><td><code>artifact</code></td><td>不改變任何 clone genotype</td><td>由 matched-normal sites、repeat／chimera controls 固定的 site-context artifact matrix</td><td>calibrated categorical prior</td></tr>
+<tr><td><code>recurrent</code></td><td>兩個位於不可互相比較 branches 的 acquisition placements，其聯集構成 carriers</td><td>相同 marked-fragment emission，但使用兩次 acquisition 後的 genotype</td><td>normalized pair prior、第二次 event penalty 與最高兩次 acquisition cap</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>完整 posterior contract</h4>
+
+	<p class="prose">令 {{m: Z_0}} 為 no-tumour indicator。{{m: Z_0=1}} 時固定 {{m: p=0,K=0,χ=0}}，
+	並移除 tumour-origin、clone tree、tumour CN／WGD、mutation placement 與相應 event-rate latents；
+	tumour 與 matched-normal likelihood 此時均只含 diploid normal origin 與已校準的 technical background。
+	若需表達外源腫瘤污染，必須另建不依賴 LiFT-CN clone states 的 contaminant component。{{m: Z_0=0}} 時：</p>
+
+{{eq}}
+p \sim Beta(a_p,b_p), \qquad
+P(K=k\mid Z_0=0,K≤6)=\frac{λ_K^{k−1}/(k−1)!}{\sum_{j=0}^{5}λ_K^j/j!}, \quad k∈\{1,…,6\}
+
+π \sim Dirichlet(α_π/K)
+{{note}}
+production v1 的 {{m: K≤6}} 是明示的 truncated-Poisson support；分母不得省略，因為 tumour component
+evidence 會與 {{m: Z_0=1}} 比較。full model 若提高 cap，必須以新 cap 重新正規化，或另設 overflow state。
+{{/eq}}
+
+<p class="prose">{{m: Z_0∼Bernoulli(ω_0)}} 使 matched-normal-only negative control 可落在真正的 no-tumour component。
+conditional on {{m: K}}，{{m: T}} 採明列的 uniform rooted-tree prior；branch exposures
+在 production v1 中，{{m: b^{cat}}} 是 called catalogue 內的 edge-placement weights，採 centered Dirichlet
+prior 並限制總和為 1。full clone-specific-CN stage 才加入獨立的 CN-event branch exposure {{m: b^{CN}}}；
+兩者不得由相同 latent vector 同時承擔。完整 ascertainment stage 另引入 biological exposure {{m: b^{evo}}}
+與 mutation-rate scale {{m: λ_m}}；只有 detection likelihood 已納入時，mutation 與 CN processes
+才可在明示的共同演化假設下共享 {{m: b^{evo}}}。</p>
+
+{{eq}}
+N^{CN}_{e_0} \sim Poisson(λ_{CN}), \qquad W_{e_0}\sim Bernoulli(ω_W),
+
+N^{CN}_e=W_e=0 \quad (e≠e_0) \qquad \text{production v1}
+{{note}}
+{{m: e_0}} 是所有 tumour clones 共同繼承的 trunk edge。此 support 使 v1 的 CNA 與 WGD 均為 clonal；
+trunk Bernoulli 與 Poisson 是下列 viability conditioning 之前的 base priors；founder diploid state 下每個 finite
+{{m: (N^{CN}_{e_0},W_{e_0})}} 均有 valid history，故 conditioning 不改變其 normalizer，且不對其他 tree edges
+留下任何 subclonal event mass。
+{{m: λ_{CN}}} 採 Gamma hyperprior，{{m: ω_W}} 採 calibrated Beta hyperprior；
+{{m: λ_m}} 僅屬完整 ascertainment stage。
+posterior 必須另行回報 prior 與 likelihood 的資訊貢獻，避免把 prior-driven 解誤稱為 data-identified。
+{{/eq}}
+
+{{eq}}
+N^{CN}_e \sim Poisson(λ_{CN}b^{CN}_e), \qquad
+P(W_e=1\mid W_{anc(e)},T)=ω_W I_e \qquad \text{full clone-specific-CN stage}
+{{note}}
+{{m: I_e=1}} 當且僅當 edge {{m: e}} 的所有 ancestral edges 均無 WGD；若 {{m: I_e=0}}，
+則固定 {{m: W_e=0}}。此 top-down conditional prior 在給定 {{m: T}} 時已正規化，並保證每條
+root-to-leaf path 至多一次 WGD。{{m: b^{CN}}} 只存在於此 full stage。
+此處 Poisson 與 top-down Bernoulli 是 base weights；child edge 繼承的 copy state 可能使部分
+{{m: (N^{CN}_e,W_e)}} 組合不可行，實際 joint prior 依下式在 feasible pairs 上重新正規化。
+{{/eq}}
+
+{{eq}}
+g_e(H^{CN}_e\mid C^{par}_e,T,B)=
+∏_{k:h^{CN}_{ek}≠WGD}P(s_{ek}\mid B)P(y_{ek})P(ℓ_{ek}\mid H^{CN}_{e,<k},C^{par}_e,T,B)
+
+Z^H_e(n,w,C^{par}_e,T,B)=
+\sum_{H∈Ω^{CN}_e(n,w;C^{par}_e,B)}g_e(H\mid C^{par}_e,T,B)
+
+P(H^{CN}_e\mid n,w,C^{par}_e,T,B)=
+\frac{g_e(H^{CN}_e\mid C^{par}_e,T,B)}{Z^H_e(n,w,C^{par}_e,T,B)}
+{{note}}
+{{m: C^{par}_e}} 是 edge {{m: e}} 開始時由 parent clone 繼承的 physical-copy state。
+{{m: Ω^{CN}_e(n,w;C^{par}_e,B)}} 含所有恰有 {{m: n}} 個 segmental events 與 {{m: w∈\{0,1\}}}
+個 WGD token 的 completion-valid ordered histories；WGD slot 亦在這個集合內共同枚舉，不先獨立均勻抽取。
+segment {{m: s_{ek}∈S(B)}} 依 callable length 與 mappability mask 選擇，
+event type {{m: y_{ek}}} 採 calibrated gain／loss categorical prior，target {{m: ℓ_{ek}}}
+只在繼承 state 與 prefix replay 後仍存在的 lineages 中選擇。集合內每個 intermediate allele-specific CN
+均須在 0–8；WGD 後超出 cap、過早耗盡 lineages 或無法完成剩餘 slots 的 histories 均不屬 {{m: Ω^{CN}_e}}。
+每個 edge 的 final state 另須在全 autosomes 至少保留一條 physical lineage；zero-genome clone state
+機率固定為 0。因而任何 valid parent state 至少保留 {{m: (n=0,w=0)}} 這一個 feasible child-edge choice，
+上游 denominator 不會成為 0。
+{{m: Z^H_e}} 以 backward dynamic programming 計算；它同時正規化 event order、WGD slot 與 target choices。
+discovery-fold SV support 只影響 boundary-candidate prior，inference-fold SV marks 只影響 likelihood。
+{{/eq}}
+
+{{eq}}
+P^0_e(n,w)=Poisson(n;λ_e)P_W(w\mid W_{anc(e)},T,ω_W)
+
+P(n,w\mid C^{par}_e,T,B,λ_e,ω_W)=
+\frac{P^0_e(n,w)1[Z^H_e(n,w,C^{par}_e,T,B)>0]}
+{\sum_{n'=0}^{∞}\sum_{w'=0}^{1}P^0_e(n',w')1[Z^H_e(n',w',C^{par}_e,T,B)>0]}
+{{note}}
+production v1 的 trunk 使用 {{m: λ_e=λ_{CN}}} 與 ordinary Bernoulli {{m: P_W}}；full stage 使用
+{{m: λ_e=λ_{CN}b^{CN}_e}} 與 top-down {{m: P_W}}。edge 依 tree topological order 產生，
+使 {{m: C^{par}_e}} 與 ancestral WGD state 在抽取 child-edge {{m: (n,w,H^{CN}_e)}} 前已確定。
+infeasible WGD slots 與整組不可行的 {{m: (n,w)}} 質量均為 0，分母則把 base prior 在 feasible pairs 上重新正規化。
+實作以 Poisson recurrence 累加 denominator，直到剩餘 tail 的 certified upper bound 低於 {{m: 10^{-12}}}；
+若計算 cap 先被觸及，輸出 <code>STATE_CAP_REACHED</code> 而非使用未校正的截斷和。
+{{/eq}}
+
+{{eq}}
+M \sim Poisson(λ_m L_{call}), \qquad S_m \sim Bernoulli(d_m)
+{{note}}
+	此式只屬完整 ascertainment stage：先在 callable length {{m: L_{call}}} 上產生總 mutation count，
+	再依下列 lineage-eligible branch exposure 指派 acquisition edge，
+	再以依 VAF、depth、context 與 platform 而變的 detection probability {{m: d_m}} 決定是否進入 catalogue。
+production v1 則條件於 discovery fold 給定的 catalogue {{m: Γ}}；{{m: Γ_m=1}} 表示 mutation {{m: m}}
+已列入 catalogue。此版本省略 {{m: M,S_m,d_m}} 與 callable-genome integral，
+	並使用獨立的 {{m: P(e_m=e\mid Γ_m=1)=b^{cat}_e}}。{{m: b^{cat}}} 只能解讀為
+	「catalogue-visible edge weights」，不得解讀為未經 selection 校正的 branch exposure。
+	cross-fitting 避免 read reuse，但不使 ascertainment 成為可忽略。
+{{/eq}}
+
+{{eq}}
+J_{e,s}=N^{segCN}_{e,s}+W_e, \qquad
+V_{e,s}=\{t∈\{0,…,J_{e,s}\}:L_{e,s,t}>0\}
+
+P(t_m=t\mid e,s(m),H^{CN})=1/|V_{e,s(m)}| \quad (t∈V_{e,s(m)}),
+
+P(t_m=t\mid e,s(m),H^{CN})=0 \quad (t∉V_{e,s(m)}), \qquad
+P(ℓ_m \mid e,s(m),t_m,H^{CN})=\frac{1}{L_{e,s(m),t_m}}
+{{note}}
+{{m: N^{segCN}_{e,s(m)}}} 只計該 edge 上影響 {{m: s(m)}} 的 segmental CN events；
+{{m: J_{e,s(m)}}} 再加上作用於所有 segments 的 {{m: W_e}}。
+timing slot 位於這些 segment-relevant events 之前、之間或之後；{{m: L_{e,s(m),t_m}}}
+由 {{m: H^{CN}}} 的 prefix replay 計算，且只計該 slot 真正存在的 physical lineages。
+{{m: V_{e,s}}} 只保留至少一條 lineage 的 valid slots，因此 mutation placement 不會出現除以 0。
+因而 gain 後才出現的 lineage 不會被 pre-gain mutation 選取，
+已 loss 的 lineage 亦不會被其後 mutation 選取。其他 segments 的 events 不得創造 timing slots。
+{{m: R_m}} 採三類 categorical prior，其 artifact／recurrent mass 由 truth sets 與 negative controls 校準。
+{{/eq}}
+
+{{eq}}
+E_m(H^{CN},B)=\{e:|V_{e,s(m)}|>0\}, \qquad
+P(e_m=e\mid b,H^{CN},B)=\frac{b_e}{\sum_{e'∈E_m}b_{e'}} \quad (e∈E_m)
+
+P(e_m=e\mid b,H^{CN},B)=0 \quad (e∉E_m)
+{{note}}
+production v1 使用 {{m: b=b^{cat}}}；完整 ascertainment stage 使用 {{m: b=b^{evo}}}。
+因此已在祖先 edge homozygous deletion、且整條 descendant edge 都沒有 physical lineage 的 segment，
+不會再由未校正的 branch weight 抽到。若 {{m: E_m}} 為空，<code>tree</code> 與 <code>recurrent</code>
+classes 的 placement probability 均為 0，只能由已校準的 <code>artifact</code> class 解釋該 catalogue record。
+{{/eq}}
+
+<p class="prose">令 {{m: Z_m^{(1)}}} 為由上述 edge、valid timing slot 與 extant lineage 所構成的完整
+single-acquisition placements，{{m: P_1(z)}} 為三個已正規化 factors 的乘積。
+recurrent class 的 support {{m: Q_m}} 是 {{m: Z_m^{(1)}}} 中兩個 acquisition placements 的 unordered pairs，
+並限制兩條 edges 不相同且互非 ancestor／descendant。其 pair kernel 為：</p>
+
+{{eq}}
+P(z_{m1},z_{m2}\mid R_m=recurrent,H^{CN},B,T)=
+\frac{P_1(z_{m1})P_1(z_{m2})}{\sum_{(z_a,z_b)∈Q_m}P_1(z_a)P_1(z_b)} \quad ((z_{m1},z_{m2})∈Q_m)
+{{note}}
+pair order 以 deterministic edge／timing／lineage order canonicalize，不另產生兩倍 label mass。
+若 {{m: Q_m}} 為空，recurrent class probability 為 0。令 calibrated base masses 為 {{m: ρ_{tree},ρ_{artifact},ρ_{recurrent}}}；
+{{m: ρ_{recurrent}}} 已包含預先登錄的第二次 acquisition penalty，
+每個 mutation 只在 support 非空的 classes 間重新正規化 {{m: ρ}}。因此 {{m: E_m}} 為空時
+{{m: P(R_m=artifact)=1}}；{{m: E_m}} 非空但 {{m: Q_m}} 為空時，只在 tree 與 artifact 間正規化。
+{{/eq}}
+
+{{eq}}
+P(Θ_{v1} \mid D,Γ) ∝ P(D \mid Θ_{v1},Γ) P_{clone} P_{copy} P_{placement} P_{phase} P_{boundary} P_{error}
+{{note}}
+	{{m: Γ}} 是固定 discovery catalogue；{{m: C}} 專指由 copy history 導出的 allele-specific CN states。
+	{{m: P_{clone}}} 含 {{m: Z_0,p,K,T,π}}；
+	{{m: P_{copy}}} 為下列條件於 {{m: (T,B)}} 的 stage-specific factor；
+	{{m: P_{placement}(z,R,b^{cat}\mid H^{CN},B,T,Γ)}} 只含 catalogue records，並經 {{m: E_m}} 限制；
+	{{m: P_{phase}}} 含 normal genotype、component-gauge-fixed true carrier states {{m: H}}，以及 compatibility mode
+	才啟用的 orientation-error HMM {{m: F,σ_b}}；
+	{{m: P_{boundary}}} 為 atomic-bin merge 的 geometric-duration／break penalty；
+	{{m: P_{error}}} 含 {{m: χ,q,δ_u,μ_h,τ_h}}。capture factor {{m: a}}、{{m: E,E^{SV},B_u}}
+	及其 hyperparameters 在 v1 由 calibration 固定，不屬 {{m: Θ_{v1}}}。
+	完整 ascertainment stage 的 target 再乘上 mutation-count、detection 與 callable-genome factors，並把
+	{{m: λ_m}} 納入 {{m: Θ_{full}}}；兩個 targets 不得混用。
+	沒有列入此 factorization 的量不得在 optimizer 或 sampler 中自由更新。
+{{/eq}}
+
+{{eq}}
+P^{v1}_{copy}=P(λ_{CN})P(ω_W)
+P(N^{CN}_{e_0},W_{e_0}\mid C^{founder},T,B,λ_{CN},ω_W)
+
+P(H^{CN}_{e_0}\mid N^{CN}_{e_0},W_{e_0},C^{founder},T,B)
+1[N^{CN}_e=W_e=0 \quad ∀e≠e_0]1[C=derive(T,B,H^{CN}_{e_0})]
+{{note}}
+{{m: Θ_{v1}}} 明確包含 {{m: λ_{CN},ω_W,N^{CN}_{e_0},W_{e_0},H^{CN}_{e_0},B,C}}，
+但不含 {{m: b^{CN}}} 或 off-trunk copy events。
+最後的 deterministic indicator 要求 stored CN states 等於 ordered history replay 的結果；
+mutation timing 與 lineage eligibility 亦讀取同一個 {{m: H^{CN}}}，不得使用另一套未記錄的 event order。
+{{/eq}}
+
+{{eq}}
+P^{full}_{copy}=P(b^{CN})P(λ_{CN})P(ω_W)
+∏_e[P(N^{CN}_e,W_e\mid C^{par}_e,T,B,λ_{CN}b^{CN}_e,ω_W)
+P(H^{CN}_e\mid N^{CN}_e,W_e,C^{par}_e,T,B)]1[C=derive(T,B,H^{CN})]
+{{note}}
+此 factor 只屬 clone-specific-CN stage。{{m: P^{full}_{copy}}} 對 {{m: T}} 與 {{m: B}} 均為 conditional；
+edge product 依 tree topological order 評估，因此每個 child factor 使用已 replay 的 {{m: C^{par}_e}}。
+{{m: P_{boundary}(B)}} 仍單獨列出，但不得把 {{m: P^{full}_{copy}}} 的 normalizer 當作與 {{m: B}} 無關。
+{{/eq}}
+
+<p class="prose">令 {{m: B_s=1}} 表示相鄰 atomic bins 之間保留 CN boundary，並形成前述 {{m: S(B)}}。
+{{m: B_s∼Bernoulli(ω_{B,s})}}，其中 {{m: ω_{B,s}}} 由 discovery fold 的 SV support 與固定 guard-grid
+calibration 預先決定；連續 {{m: B_s=0}} 的 run length 對應 geometric segment-duration prior。
+inference fold 只更新 {{m: B_s}}，不重新選 candidate coordinates。</p>
+
+<h3>四、marked-fragment observation model</h3>
+
+<p class="prose">同一批 reads 同時產生 total depth、germline alleles、somatic states、HP tags 與 SV support。
+將五種摘要似然直接相乘會重複計算。LiFT-CN 改以 marked-fragment process：
+每條 read 只以唯一的 start anchor 進入 depth count 一次；其覆蓋的 germline、somatic 與 breakpoint pattern
+則作為該 fragment 在已知 start／mask 下的條件 mark。</p>
+
+{{svg:sr6-marked-fragment | [wide] 每條 read 只以一個 start anchor 進入 depth process；
+同一 read 的 germline bases、somatic bases 與 SV support 隨後作為 conditional marks。
+per-site VAF、HP counts 與 joint haplotype tables 都是這些 marks 的摘要，不得再作獨立 factors 相乘。}}
+
+{{eq}}
+P(D \mid Θ) = ∏_{A∈\{T,N\}}[P(N_A \mid Θ)∏_{r∈R_A}P(Y_r \mid M_r,s(r),u(r),Θ)]
+{{note}}
+{{m: A∈\{T,N\}}} 表示 tumour 與 matched normal，{{m: R_A}} 是 sample {{m: A}} 的 reads，
+{{m: N_A}} 為 disjoint start bins 的 counts；{{m: s(r)}} 是 read-start 所在 CN segment，
+{{m: u(r)}} 是其 multi-locus likelihood unit，{{m: M_r}} 是 read 真正覆蓋的 loci 與 alignment features，
+{{m: Y_r}} 是 observed bases 與 SV marks。
+此式為同一 marked process 的 factorization，因此 depth 與 composition 可同時使用而不重複計數。
+{{/eq}}
+
+<h4>read-origin mixture</h4>
+
+<p class="prose">origin {{m: o}} 為 normal parental copy，或 tumour clone {{m: g}} 的 physical copy lineage。
+加入 region／origin-specific capture factor {{m: a_{uso}}} 後，molecule weight 為：</p>
+
+<p class="prose">未正規化 origin weight {{m: α^*_{uso}}} 由細胞 mixture 直接指定：
+每條 normal parental copy 各貢獻 {{m: 1−p}}，每條 clone-copy lineage 各貢獻 {{m: pπ_g}}。
+加入 capture factor 後正規化：</p>
+
+{{eq}}
+α_{uso} = \frac{α^*_{uso}a_{uso}}{\sum_{o'}α^*_{uso'}a_{uso'}}
+{{/eq}}
+
+<p class="prose">共同的 segment coverage bias 只由 depth term 的 {{m: q_s}} 表達；
+{{m: a_{uso}}} 僅表達 origin 間的相對 allelic mapping／capture bias，並在每個 segment 內限制其加權平均為 1。
+{{m: \log a_{uso}=γ^Tx_{uso}+u_{uso}}}，其中 covariates 只含 observed mapping quality、read length、
+reference allele 與 sequence context，不得含 clone、CN 或 observed ALT fraction；{{m: u_{uso}}} 使用
+matched normal-derived、強烈收縮至 0 的 Gaussian prior，{{m: γ}} 使用同一 calibration 產生的 Gaussian prior。
+另對 {{m: q_s}} 加入 callable-length-weighted
+{{m: \sum_s L_s\log q_s=0}} 的中心化約束，避免 {{m: a}}、{{m: q}} 與 CN scale 彼此任意吸收。</p>
+
+<p class="prose">matched normal 以 TINC {{m: χ}} 取代 tumour purity：normal-origin weight 為 {{m: 1−χ}}，
+tumour-origin weight 為 {{m: χπ_g}}。若污染 normal 的 clone composition 與 tumour specimen 不同，
+該 composition 需有獨立先驗；單一 normal sample 不足以自由估計另一組完整 clone mixture。</p>
+
+<h4>multi-locus emission</h4>
+
+{{eq}}
+P(Y_r \mid M_r,Θ) = (1−δ_{u(r)})\sum_o α_{u(r),s(r),o}∏_{j∈M^{base}_r}E_{rj}(Y_{rj}\mid X_{oj})∏_{v∈M^{SV}_r}E^{SV}_{rv}(B_{rv}\mid Z_{ov}) + δ_{u(r)}B_{u(r)}(Y_r)
+{{note}}
+{{m: X_{oj}}} 是 origin {{m: o}} 在 locus {{m: j}} 的 true allele；
+{{m: E_{rj}}} 是依 base quality、context 與 mapping stratum 決定的 per-site error matrix；
+{{m: Z_{ov}}} 表示 origin 是否具有 breakpoint／rearranged adjacency，{{m: E^{SV}}} 為
+support、reference、uninformative 三類 alignment mark 的 calibrated categorical emission；
+{{m: δ_{u(r)}B_{u(r)}}} 是整條 read 的 mis-mapping、chimera 或 family-mistag background。
+{{/eq}}
+
+{{svg:sr2b-emission | [wide] 全域 clone 與 copy states 投影成局部 {{m: 2^k}} haplotype states，
+再依每條 read 的 coverage mask 邊際化並通過觀測錯誤通道。LiFT-CN 的差別是 local state weights
+由 purity、clone fractions 與 physical copy lineages 共同決定，中間沒有可自由吸收資料的 local proportion。}}
+
+<p class="prose">未覆蓋 loci 不出現在 {{m: M_r}} 的乘積中，等同將所有相容完整 states 邊際化，
+不得補為 REF。同一 origin mixture 同時作用於所有 covered loci，因而自然產生 cross-locus dependence；
+此處 {{m: k}} 專指 somatic loci 數：{{m: k=1}} 且同一 read 另覆蓋至少一個 informative germline anchor 時，
+沿 parental origin × somatic REF／ALT 聚合即為四格表；沒有 germline anchor 時只有 somatic REF／ALT 兩格。
+{{m: k≥2}} 才新增 somatic loci 間的共現與互斥資訊。</p>
+
+<p class="prose">primary raw-read mode 直接使用 gauge-fixed {{m: H}} 構成 {{m: X_{oj}}}，
+不再以 {{m: σ_b}} 重複置換 parental labels。compatibility mode 才將外部 HP1／HP2 經
+{{m: (σ_b,F)}} 映射到 internal canonical labels。沒有 bridging evidence 的 components 標記為
+<code>PHASE_DISCONNECTED</code>，但不複製成 label-switched posterior modes。</p>
+
+<p class="prose">{{m: E,E^{SV}}} 的 hyperparameters 與 {{m: B_u}} 由 matched-normal-only samples、
+excluded repeats、known chimeras 與 spike-ins 預先校準並在 v1 固定。
+whole-read artifact probability 則採 stratum-pooled hierarchy：</p>
+
+{{eq}}
+logit(δ_u) \sim Normal(μ_{h(u)},τ_{h(u)}^2), \qquad τ_h \sim HalfNormal(s_δ)
+{{note}}
+{{m: h(u)}} 是 platform、mapping-quality、repeat／chimera class 所定義的 calibration stratum；
+{{m: μ_h}} 的 informative prior 與 {{m: s_δ}} 由 negative controls 預先校準。
+所有 {{m: δ_u}} 必須透過共享 {{m: (μ_h,τ_h)}} partial pooling 更新，不得各自只靠 sparse unit reads 自由擬合。
+{{m: B_u}} 仍固定，否則 {{m: δ_uB_u}} 可吸收任何 coherent low-frequency clone state。
+主要結論另做 fixed-{{m: δ_u}} 與 prior-scale sensitivity analysis。
+{{/eq}}
+
+{{svg:sr2b-mistag | [wide] per-site base error 與 whole-read artifact 具有不同的機率形狀。
+相差三個 loci 的假 state 在獨立 base-error 模型下約為 {{m: ε^3}}，
+但整條 molecule 誤標的機率仍為一次 {{m: δ_u}}；漏掉後者會把 coherent false state 誤判為新 clone。}}
+
+<h4>depth marks 的條件分布</h4>
+
+{{eq}}
+v_{Ts} ∝ L_s q_s [2(1−p)+p\sum_g π_g(C_{sg1}+C_{sg2})]
+{{/eq}}
+
+{{eq}}
+v_{Ns} ∝ L_s q_s [2(1−χ)+χ\sum_g π_g(C_{sg1}+C_{sg2})]
+{{/eq}}
+
+<p class="prose">{{m: v_{Ts},v_{Ns}}} 分別為 tumour 與 normal read start 落入 segment {{m: s}} 的相對機率。
+{{m: χ}} 為 TINC；若 preflight 支持無 TINC，可將其固定為 0，否則採強烈偏向低值的 calibrated Beta prior。
+{{m: \log q_s=β^Tx_s+u_s}}，其中 {{m: x_s}} 含 GC、mappability、replication timing 與 platform covariates，
+{{m: β}} 採 normal-derived Gaussian shrinkage prior，{{m: σ_q}} 採 half-normal prior，
+{{m: u_s∼Normal(0,σ_q^2)}} 並服從前述加權中心化約束；matched normal 主要識別 {{m: β,u_s}}。
+	在固定 tumour total reads 下，segment counts 採 multinomial；evaluation-fold residual 若顯示額外離散，再改為
+Dirichlet-multinomial。此條件 likelihood 保留深度形狀，也明確呈現 global CN scaling 的限制。</p>
+
+<h4>segmentation 與 SV evidence</h4>
+
+<p class="prose">candidate boundaries 由 discovery fold 的 depth change points、germline allele imbalance、
+raw SV-support molecules 與固定寬度 guard grid 的聯集產生，形成不可再細分的 atomic bins；
+inference fold 才提供 boundary likelihood。此 candidate catalogue 在 production v1 中固定，
+輸出的 breakpoint intervals 明確標為 conditional on catalogue，並以 guard-grid width 與 split seed 作敏感度分析。
+相鄰 bins 是否合併為同一 CN segment 是 latent merge indicator，
+而非預處理後固定的事實。SV-support pattern 直接包含於 {{m: Y_r}}；同一 SV call 不再同時作 hard breakpoint
+與另一個獨立 likelihood。</p>
+
+{{svg:sr5-segmentation | [wide] CN boundaries 與 phase-block boundaries 回答不同問題。
+atomic CN bins 由 depth、allelic change 與 SV evidence 建立；phase-connected components 僅提供每個 bin 內的
+gauge-fixed local phase。外部 HP labels 只有在 compatibility mode 才經 {{m: (σ_b,F)}} 映射。}}
+
+<h3>五、SR5 與 SR2b 式子的共同邊界</h3>
+
+<p class="prose">對 segment {{m: s}}，tumour 與 normal molecules 的期望總量為：</p>
+
+{{eq}}
+D_s = 2(1−p)+p\sum_g π_g(C_{sg1}+C_{sg2})
+{{/eq}}
+
+<p class="prose">mutation {{m: m}} 在 clone {{m: g}} 的 multiplicity 已由 copy history 給定，故 marginal VAF 為：</p>
+
+{{eq}}
+VAF_m = \frac{p\sum_g π_g μ_{mg}}{D_s}
+{{/eq}}
+
+<p class="prose">若 mutation 位於 parental haplotype {{m: h}}，其 within-haplotype fraction 為：</p>
+
+{{eq}}
+s_{mh} = \frac{p\sum_g π_g μ_{mg}}{(1−p)+p\sum_g π_g C_{sgh}}
+{{note}}
+SR5 的 {{m: p·c·μ}} 結構為此式在 clonal CN 與單一 carrier group 下的 marginal；
+SR2b 的 local {{m: 2^k}} state table 為同一 origin mixture 在多個 loci 上的 joint distribution。
+兩者不再需要互相匯入外部 point estimates。
+{{/eq}}
+
+<h3>六、可辨識條件與輸出語義</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>目標</th><th>data-identified 的最低條件</th><th>條件不足時的輸出</th></tr></thead>
+<tbody>
+<tr><td>absolute purity</td><td>informative allele-specific CN，或 multiplicity 可定的 truncal／covering somatic states</td><td><code>PURITY_LOWER_BOUND</code> 或多模式 posterior</td></tr>
+<tr><td>ploidy／WGD scale</td><td>multiplicity 不隨 doubled mode 加倍的 post-WGD mutations，或 assay-specific DNA-content likelihood</td><td><code>WGD_EQUIVALENT</code> 與各 mode mass</td></tr>
+<tr><td>clone fractions</td><td>至少兩個 clones 在 observed units 上具有不同 emission columns</td><td>只回報可辨識 clones 的合併比例</td></tr>
+<tr><td>clone tree</td><td>nesting／co-occurrence 或足以排除替代樹的 prevalence constraints</td><td>tree equivalence class</td></tr>
+<tr><td>phase orientation</td><td>跨 blocks 的 allele-informative bridging molecules，或同時連結 breakpoint 與 parental alleles 的 reads</td><td><code>PHASE_DISCONNECTED</code></td></tr>
+<tr><td>clone-specific CN</td><td>depth、allele marks 或 linked states 可區分混合 CN states</td><td>退回 clonal-CN mode 或 <code>CN_UNRESOLVED</code></td></tr>
+<tr><td>clone completeness</td><td>ascertainment model 或獨立 discovery／inference data</td><td>限定為 catalogue-visible clones</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">WGD 前發生的 mutation 與 CN 同時加倍時，depth、allele ratio 與 somatic fraction 可完全不變。
+多個 pre-WGD mutations 位於同一 haplotype 亦不自動打破此對稱。
+只有 mutation timing 或外部 DNA-content evidence 使 doubled mode 預測不同，WGD 才是 data-identified。
+奇數 CN 或最低事件數偏好若只透過 prior 選出一個 mode，輸出須標為 <code>PRIOR_RESOLVED</code>。</p>
+
+{{eq}}
+DI \sim Normal(κ/2,σ_{DI}^2)
+{{note}}
+standard flow-cytometry DNA index {{m: DI}} 定義為 tumour G0／G1 peak 相對 diploid-normal G0／G1 peak
+的比值，故 diploid 為 1、copy-number scale 的 {{m: κ}} 為 2。input 必須標示 unit 並包含 {{m: σ_{DI}}}；
+若 assay 已預先轉成 copies-per-cell，則另命名 {{m: X_κ=2DI}} 並使用 {{m: X_κ∼Normal(κ,σ_κ^2)}}。
+FISH、karyotype 或未純化 flow data 需各自的 mixture-aware forward model；
+未提供該模型與 uncertainty 時只作外部 validation，不進 posterior。
+{{/eq}}
+
+{{svg:sr5-multimodal | [wide] posterior 可能同時保留 diploid、doubled 與其他 clone-specific CN modes。
+單一平均值可能落在沒有任何 posterior support 的中間位置；輸出以 mode-separated summaries、mode mass
+與 mode 內 credible interval 表達，而非強制壓成一個點。}}
+
+<h4>information audit</h4>
+
+<p class="prose">每個 mode 另計 depth、single-locus marks、multi-locus co-occurrence、SV marks、external evidence
+與 priors 的 log-posterior contribution。移除某一 evidence class 後 mode ranking 的改變，
+用以區分 data-identified、prior-resolved 與 observationally equivalent。
+窄 posterior 本身不證明資料具資訊；強 clonal prior 亦可產生窄但 prior-dominated 的區間。</p>
+
+<h3>七、推論演算法</h3>
+
+<ol class="prose">
+	<li><b>precomputation。</b>依固定 genome grid 建立 disjoint read-start bins；
+	由 discovery fold 建立 atomic CN candidate bins，再由 inference fold 建立 read coverage masks、
+	observed allele-pattern sufficient statistics 與 phase-connectivity graph；evaluation fold 只建立相同格式的
+	predictive summaries，不參與 posterior。不同 split seeds 只作獨立敏感度分析。</li>
+	<li><b>calibration。</b>由 matched normal、high-confidence homozygous loci、spike-ins 與 excluded repeat strata
+	估計並在 SMC 前固定 {{m: a,E,E^{SV},B_u}} 及其 hyperparameters；另建立
+	{{m: χ,q,(δ_u,μ_h,τ_h)}} 的 priors 與 TINC initial range。這些 fixed calibration objects 不列入
+	{{m: Θ_{v1}}}。{{m: ω_0,a_p,b_p,λ_K,α_π,a_{sw},b_{sw}}}、CN event-type probabilities、
+	boundary probabilities 與 artifact／recurrent class probabilities 亦在 run 前固定。</li>
+	<li><b>component-stratified initialization。</b>{{m: Z_0=1}} 與 {{m: Z_0=0}} 各配置預先登錄的最低粒子數；
+	proposal 配額只改善數值覆蓋，不代表 component prior mass。每個 component 內的 initial weights
+	各自對 conditional prior {{m: P(Θ_z∣Z_0=z)}} 正規化；{{m: (ω_0,1−ω_0)}} 只在最終 evidence
+	合併時乘入一次。各 component 分別從 prior 取樣大部分 particles；depth＋germline grid、marginal VAF clusters 與
+	multi-locus local trees 只提供少部分 {{m: Z_0=0}} proposal seeds。所有 data-derived seeds 必須來自可計算密度
+	{{m: q_z(Θ)}} 的 stochastic proposal，initial importance weight 取
+	{{m: P(Θ∣Z_0=z)/q_z(Θ)}}；若混合 prior 與多個 proposals，分母使用完整 mixture density。
+	deterministic optimizer seed 必須以已知密度 jitter，否則只能作不承擔 evidence weight 的診斷起點。</li>
+	<li><b>annealed target。</b>production v1 固定使用 annealed sequential Monte Carlo：
+	{{m: P_t(Θ)∝P(Θ)P(D∣Θ)^{β_t}}}，{{m: β_0=0}}、{{m: β_T=1}}。
+	兩個 {{m: Z_0}} components 各自選擇 tempering schedule 與 systematic resampling，並估計 component evidence；
+	最後以 {{m: P(Z_0=z∣D)∝P(Z_0=z)P(D∣Z_0=z)}} 合併。下一個 {{m: β_t}} 自適應選至
+	predicted ESS 為 component particle 數的 0.8；actual ESS 低於 0.5 時 resampling。</li>
+	<li><b>analytic marginalization。</b>read origins 在 emission 的 {{m: \sum_o}} 中精確加總，不另抽樣 responsibilities；
+	germline local phase states 與 atomic-bin merge indicators 在可行時用 forward-filter backward-sample 更新。</li>
+	<li><b>continuous rejuvenation。</b>production v1 更新 {{m: p,π,χ,b^{cat},λ_{CN},ω_W}}、
+	{{m: q=(β,u_s,σ_q)}} 與 {{m: (δ_u,μ_h,τ_h)}} 經 logit／simplex／positive transform 後
+	使用固定的 HMC kernel；full clone-specific-CN stage 才加入 {{m: b^{CN}}}。step size 與 mass matrix
+	只在 {{m: β_t<0.5}} 的 adaptation phase 更新，之後凍結。</li>
+	<li><b>discrete rejuvenation。</b>每個 fixed-{{m: Z_0}} component 內更新 {{m: G^N,H,B_s}}；
+	compatibility mode 另更新 {{m: F,σ_b}}。{{m: R_m}} 與 mutation edge／lineage／timing
+	以 tree message-passing Gibbs 或 enumerated Metropolis update；CN histories 以 segment dynamic programming
+	proposal 在 v1 僅聯合更新 trunk {{m: (N^{CN}_{e_0},H^{CN}_{e_0},C)}}；{{m: K,T}} 以
+	subtree-prune-regraft 與 clone split／merge proposals 更新，{{m: W_{e_0}}} 只作 trunk Bernoulli-compatible move。
+	full clone-specific-CN stage 才開放所有 edges 的 {{m: (N^{CN},H^{CN},C,W)}} 與符合 top-down WGD prior 的
+	reversible proposals。普通 {{m: Z_0}} toggle 不在 kernel contract 中；跨 component 質量由 evidence 合併。</li>
+	<li><b>fixed versus sampled audit。</b>每個 {{m: Θ_{v1}}} variable 必須對應上列 kernel；
+	{{m: a,E,E^{SV},B_u}} 與 calibration hyperparameters 明列為 fixed。
+	完整 ascertainment stage 另加入 {{m: λ_m,M,S_m,d_m}} 的 conjugate／Metropolis updates，v1 不得更新這些量。</li>
+<li><b>mode extraction。</b>最終 weighted particles 依 {{m: K,T,WGD}} 與 length-weighted major CN states 分群，
+phase labels 先依每個 component 的 anchor gauge canonicalize，再估計 mode mass；不得只保留最高 MAP mode
+或以跨 mode posterior mean 取代。</li>
+</ol>
+
+<p class="prose">production v1 固定 candidate atomic boundaries、使用已正規化的 {{m: K≤6}} truncated prior、copy number 上限為 8、
+每條 root-to-leaf path 至多一次 WGD，且先以 clonal CN 與 clonal WGD 運行；此階段只有所有 tumour clones
+共同繼承的 trunk edge 可承擔 CN events 或作 WGD candidate，off-trunk event counts 與 WGD indicators 固定為 0。
+開放 clone-specific CN／subclonal WGD 後才加入 {{m: b^{CN}}} 並使用前述 top-down path prior。
+觸及計算上限的 posterior mass 必須產生 <code>STATE_CAP_REACHED</code>，不得在邊界值截斷後仍回報 PASS。
+full model 再開放 clone-specific CN 與 breakpoint birth／death proposals。</p>
+
+<h4>convergence contract</h4>
+
+<ul class="prose">
+<li>至少四個 independent SMC runs 對 major mode masses 的 absolute difference 不超過 0.05，
+且各 primary mode 內 {{m: p,κ,f}} 的 effective sample size 至少 200；</li>
+<li>{{m: Z_0=0}} 與 {{m: Z_0=1}} 各自回報 initial quota、component ESS、evidence uncertainty 與
+resampling ancestry；任一 component 的 effective particles 低於預先登錄下限時，不回報可靠的 no-tumour odds；</li>
+<li>proposal kernels 的 acceptance、particle ancestry 與 terminal weight concentration 均寫入 diagnostics；</li>
+	<li>evaluation fold 的 fragment log predictive density 在相鄰兩次完整 run 間差異低於預先登錄閾值；</li>
+<li>posterior predictive checks 同時涵蓋 depth、germline imbalance、single-site VAF、multi-locus state 與 SV support；</li>
+<li>任一 observation class 持續出現系統性 residual 時輸出 <code>MODEL_MISFIT</code>，即使 sampler 已收斂亦停止生物學解讀。</li>
+</ul>
+
+<h3>八、輸出與檔案契約</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>輸出檔</th><th>主要欄位</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td><code>sample.summary.tsv</code></td><td>mode、mass、{{m: p,κ,f,r_{read}}}、WGD edge、{{m: Z_0}} evidence、CI、QC status</td><td>樣本層結論，cell、DNA 與 read scales 分欄</td></tr>
+<tr><td><code>sample.cn.tsv</code></td><td>segment interval、clone、HP、integer CN posterior、boundary interval</td><td>allele／clone-specific CN</td></tr>
+<tr><td><code>sample.clones.tsv</code></td><td>clone id、parent、{{m: π_g}}、detectability、supporting units</td><td>clone tree 與 exclusive fractions</td></tr>
+<tr><td><code>sample.mutations.tsv</code></td><td>mutation、edge、lineage、CCF、multiplicity、timing、posterior</td><td>mutation placement 與 pre/post-WGD evidence</td></tr>
+<tr><td><code>sample.units.tsv.gz</code></td><td>unit、mask、state counts、effective molecules、error stratum、shuffle stratum size、valid partners、permutable／changed flags</td><td>multi-locus likelihood 與 E-shuffle audit</td></tr>
+<tr><td><code>sample.modes.json</code></td><td>mode graph、equivalence links、evidence contributions、prior contributions</td><td>保留不可合併的解</td></tr>
+	<tr><td><code>sample.ppc.json</code></td><td>evaluation-fold metrics、replicated-data residuals、misfit flags</td><td>posterior predictive QC</td></tr>
+<tr><td><code>sample.provenance.json</code></td><td>reference、input digests、platform、DNA-index unit、fold／shuffle seeds、constraints、software version</td><td>可重現性</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose"><code>summary.tsv</code> 的 primary status 為
+<code>PASS</code>、<code>AMBIGUOUS</code>、<code>LOW_INFORMATION</code> 或 <code>MODEL_MISFIT</code>；
+secondary flags 可包含 <code>WGD_EQUIVALENT</code>、<code>PURITY_LOWER_BOUND</code>、
+<code>PHASE_DISCONNECTED</code>、<code>PRIOR_DOMINATED</code>、<code>DETECTION_LIMITED</code>、
+<code>CN_UNRESOLVED</code>、<code>SHUFFLE_UNDERPOWERED</code> 與 <code>STATE_CAP_REACHED</code>。
+同一樣本可有多個 PASS-quality modes；AMBIGUOUS 描述 mode 間無法選擇，不表示每個 mode 的內部估計低品質。</p>
+
+<h3>九、實作分期</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>階段</th><th>開放的狀態</th><th>可單獨驗證的內容</th><th>不得宣稱之事</th></tr></thead>
+<tbody>
+<tr><td>0 · exact kernel</td><td>單 segment、已知 tree／CN</td><td>normalization、mask marginalization、marked factorization</td><td>真實樣本準確度</td></tr>
+<tr><td>1 · clonal CN</td><td>未知 {{m: p,K,T,π}}、clonal allele CN、clonal WGD</td><td>single-site D 與 multi-site E 的資訊差</td><td>subclonal CNA</td></tr>
+<tr><td>2 · copy timing</td><td>mutation-to-lineage 與 pre/post-gain／WGD timing</td><td>multiplicity、WGD mode elimination</td><td>任意複雜 rearrangement</td></tr>
+<tr><td>3 · clone-specific CN</td><td>tree edge gain／loss、sparse subclonal CNA</td><td>clone-specific allele CN</td><td>連續 clone spectrum</td></tr>
+<tr><td>4 · joint boundaries</td><td>atomic-bin merge、breakpoint intervals</td><td>segmentation uncertainty</td><td>base-pair exact breakpoint without support</td></tr>
+<tr><td>5 · ascertainment</td><td>thinned mutation process、uncalled events</td><td>clone completeness 與 detection limit</td><td>低於 assay detection limit 的 clones</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+
+<section data-part="evidence">
+<h2>真實資料與證據</h2>
+
+<h3>既有方法所占據的邊界</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>既有能力</th><th>代表方法</th><th>LiFT-CN 不可據此宣稱之 novelty</th></tr></thead>
+<tbody>
+<tr><td>purity、ploidy 與 allele-specific CN 聯合估計</td><td>ASCAT、PURPLE</td><td>不可宣稱首次 joint purity/ploidy</td></tr>
+<tr><td>長讀 purity／ploidy 與 single-haplotype SCNA</td><td>SAVANA</td><td>不可宣稱長讀本身即構成新意</td></tr>
+<tr><td>phasing-assisted allele／subclonal CN</td><td>Battenberg、Refphase、HATCHet2</td><td>不可宣稱 phased CN 本身為新意</td></tr>
+<tr><td>mutation pairs 的 clone number、genotype、fraction 與 tree</td><td>PairClone、TreeClone</td><td>不可宣稱 multi-SNV co-occurrence 本身為新意</td></tr>
+<tr><td>point mutations、CN、purity、ploidy 與 WGD timing</td><td>ABSOLUTE 及後續 timing methods</td><td>不可宣稱 mutation timing 本身為新意</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">候選 novelty 為<b>raw long-read marked-fragment／physical-copy-lineage closure</b>：
+同一 molecule likelihood 同時包含 germline–somatic linkage、任意 {{m: k}} 位點共現、allele／clone-specific CN、
+mutation inheritance 與 copy timing，並讓 {{m: p,f,κ}} 成為同一 posterior 中彼此一致的量。
+「首次」仍須在系統性文獻檢索與實作比較後才能使用。</p>
+
+{{svg:sr6-novelty-matrix | [wide] prior-art matrix 分列比較 joint mutation molecule states、clone tree、
+allele-specific CN、clone／subclonal CN、purity／ploidy 與 copy timing。PairClone／TreeClone 的 check
+只代表 mutation-pair joint states；ABSOLUTE／SAVANA grouped column 的 check 只表示至少一個列名方法具有該能力。
+LiFT-CN 的候選新意只位於六列能力的交集，
+並不把 ASCAT／PURPLE、Battenberg／Refphase／HATCHet2、PairClone／TreeClone、ABSOLUTE 或 SAVANA 的既有能力重新命名。}}
+
+<h3>多位點資料的 eligibility report</h3>
+
+<p class="prose">模型啟動前不以固定的「至少幾個 multi-SNV units」門檻宣告可用，
+而是產生 information inventory。必要欄位包括：</p>
+
+<ul class="prose">
+<li>single-locus 與 multi-locus molecules 的互斥計數，以及每個 coverage mask 的數量；</li>
+<li>每個 phase-connected component 的 loci、units、independent molecules 與 Hamming-separated states；</li>
+<li>可能連到 truncal scale、互斥 branch covering set、post-gain 或 post-WGD timing 的候選 units；</li>
+<li>copy-number-neutral、LOH、gain、amplification 與 excluded regions 內的單位數；</li>
+	<li>discovery、inference 與 evaluation folds 的 candidate retention、VAF、depth 與 context 分布；</li>
+<li>base-error 與 whole-read artifact posterior，以及低頻 states 相對於 error floor 的距離。</li>
+<li>E-shuffle strata 的 molecule-count distribution、singleton fraction、size 至少 2 的 strata 數、
+實際可置換 molecules／somatic-locus pairs 比例、每個 seed 的實際 changed fraction 與 unique non-identity shuffles 數。</li>
+</ul>
+
+<p class="prose">少量但連接不同 clone branches 或 WGD timing 的 units 可能排除完整 posterior mode；
+大量集中於同一 mutation pair 的 molecules 則主要提高該 local state frequency 的精度。
+獨立資訊量由 connected graph position 與 state contrast 決定，不由 raw read count 單獨決定。</p>
+
+<h3>決定性 ablation</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>版本</th><th>保留的資訊</th><th>檢驗問題</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>depth + unphased germline allele fractions</td><td>ASCAT／PURPLE 類基準</td></tr>
+<tr><td>B</td><td>A + ordinary somatic marginal VAF</td><td>somatic VAF anchor 的增益</td></tr>
+<tr><td>C</td><td>depth + raw phased germline molecule marks，無 somatic linkage</td><td>Battenberg／phased-CN 類增益</td></tr>
+<tr><td>D</td><td>C + single-locus germline–somatic joint marks</td><td>SR5 四格表的增益</td></tr>
+<tr><td>E</td><td>D +完整 multi-locus molecule marks 與 copy-lineage model</td><td>LiFT-CN 完整模型</td></tr>
+<tr><td>E-shuffle</td><td>以 constrained randomization 保留 E 的 depth、每站 somatic marginals、
+每站 germline–somatic contingency、每條 read 的 SV marks、每站 somatic–SV contingency、segment、mask、quality bin
+與 platform；只打散 somatic–somatic 同分子配對</td><td>只移除 co-occurrence 的負對照</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">主要因果對照為 E 對 E-shuffle，而非只比較 E 與資料量較少的 D。
+shuffle 不使用 derived HP tag；優先以 restricted swaps／Markov moves 精確保存每站 raw
+germline–somatic contingency。每條 read 的 SV marks 固定，somatic swaps 另受每站 somatic–SV contingency 約束；
+因此此對照只移除 somatic–somatic pairing，而不移除 SV linkage。完整 anchor pattern 不必完全相同。
+若計算限制迫使 strata 依 deterministic hierarchy 合併，必須逐層記錄被放寬的 invariant 及其最大偏差。
+{{m: N_{eligible}}} 明定為 inference fold 中覆蓋至少兩個 somatic loci、通過 mask／quality filters，
+且位於 E-analysis units 的 molecules 數。
+令 {{m: N_{permutable}}} 為至少具有一個 non-identity、constraint-valid partner 的 molecules 數，
+{{m: φ=N_{permutable}/N_{eligible}}}。第 {{m: b}} 個 shuffle 另定義
+{{m: ψ_b=N^{(b)}_{changed}/N_{eligible}}}；{{m: R_{unique}}} 為實際產生的 unique non-identity shuffled datasets 數。
+只有 {{m: φ≥φ_{min}}}、{{m: median_b(ψ_b)≥ψ_{min}}} 且 {{m: R_{unique}≥R_{min}}}
+三者同時成立，E-shuffle 才具解釋效力。任一條件未達時
+輸出 <code>SHUFFLE_UNDERPOWERED</code>，
+不得將 E 與近乎恆等的 E-shuffle 比較解讀為沒有 co-occurrence gain。
+只有 E 相對 E-shuffle 改變正確 posterior mode、提高 WGD calibration、降低 purity／ploidy bias，
+或修正 clone／mutation assignment，才能歸因於 joint haplotype。
+若 mode 數不變而 credible interval 變窄，應報告為 precision gain；
+若只改善 tree relationship metrics，應報告為 subclone gain，不可轉述為 purity/ploidy gain。</p>
+
+<p class="prose">單次 E-shuffle fit 只提供 ablation effect size。若宣稱 randomization-test significance，
+必須預先指定 scalar statistic {{m: T_E}}，產生多個符合相同 constraints 的 independent shuffles，
+只以 {{m: R_{unique}}} 個 non-identity datasets 建立 empirical null distribution 並計算 tail probability；
+不得以單一 seed 或重複的 shuffled datasets 稱為 permutation test。</p>
+
+{{svg:sr6-ablation | [wide] A 分成 marginal-VAF baseline B 與 raw-phased-germline baseline C；
+只有 C→D→E 是巢狀 linked-molecule path。D 的 joint marks 已包含 B 的 somatic marginals，
+但不另乘 B factor；E-shuffle 保留 D 層 invariants，只移除 somatic–somatic pairing。
+permutable、changed 與 unique-shuffle 三項門檻任一未達時，對照停止於 <code>SHUFFLE_UNDERPOWERED</code>。}}
+</section>
+
+
+<section data-part="predict">
+<h2>預測與結果檢視</h2>
+
+<h3>數學與軟體驗收條件</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>層級</th><th>必須通過的測試</th><th>失敗意義</th></tr></thead>
+<tbody>
+<tr><td>probability kernel</td><td>每個 mask 的 emission probabilities 加總為 1；origin weights 加總為 1</td><td>似然未正規化</td></tr>
+<tr><td>WGD／v1 support</td><td>v1 的 off-trunk {{m: (N^{CN}_e,W_e)}} 機率嚴格為 0，trunk Bernoulli 加總為 1；full stage 對小型 tree 枚舉 valid {{m: W}}，驗證 top-down prior 正規化</td><td>v1 偷渡 subclonal copy events，或 full tree prior normalizer 遺漏</td></tr>
+<tr><td>copy-history kernel</td><td>對小型 {{m: (N^{CN},W,T,B,C^{par})}} 枚舉 ordered {{m: H^{CN}}}，驗證 completion-valid histories 機率加總為 1、WGD slots 與會提前耗盡 lineages 的 prefixes 在不可行時質量為 0；以 inherited CN=8、{{m: W=1,N=0}} 驗證 upstream {{m: (N,W)}} prior 會重新正規化，且 replay 唯一導出 {{m: C}}</td><td>inherited state、WGD slot、event order、future viability 或 final CN 未閉合</td></tr>
+<tr><td>catalogue conditioning</td><td>v1 的 mutation placements 只更新 {{m: b^{cat}}}；edge mass 只在 {{m: E_m}} 內重新正規化，{{m: E_m}} 為空時 tree／recurrent mass 為 0；改變 detection severity 不改變 full-stage {{m: b^{CN}}} prior calibration</td><td>ascertainment 污染 CN／WGD，或 mutation 被放到 zero-lineage edge</td></tr>
+<tr><td>recurrent placement</td><td>枚舉 {{m: Q_m}} 的 unordered incomparable placement pairs，驗證 pair kernel 加總為 1 且 permutation 不重複；{{m: Q_m}} 為空時 recurrent class mass 為 0，所有 biological support 為空時 artifact mass 為 1</td><td>兩次 acquisition 未正規化或 class mixture 留有缺失質量</td></tr>
+<tr><td>phase gauge</td><td>翻轉外部 HP labels 後，canonical {{m: H}}、mode mass 與 ESS 不增加重複模式</td><td>{{m: H}} 與 {{m: σ_b}} 重複參數化</td></tr>
+<tr><td>copy timing</td><td>只在 {{m: L_{e,s,t}>0}} 的 timing slots 上正規化；gain 前、loss 後與 zero-lineage slots 的非法 placements 機率為 0</td><td>multiplicity prior 錯置或除以 0</td></tr>
+<tr><td>artifact pooling</td><td>sparse units 的 {{m: δ_u}} 向 stratum mean 收縮；固定-{{m: δ_u}} sensitivity 不翻轉主要 clone mode</td><td>artifact scale 吸收 co-occurrence</td></tr>
+<tr><td>missing coverage</td><td>部分覆蓋 read 與完整 states 的顯式邊際化結果一致</td><td>未覆蓋 loci 被誤當 REF</td></tr>
+<tr><td>event derivation</td><td>已知 tree／copy history 可精確回算 CN、CCF、multiplicity、{{m: κ,f}}</td><td>latent 與 estimands 未閉合</td></tr>
+<tr><td>read accounting</td><td>每條 read 具有唯一 depth anchor，且每個 allele／SV mark 只出現於一個 conditional emission</td><td>重複計數</td></tr>
+<tr><td>fraction scale</td><td>diploid／tetraploid controls 分別回收 {{m: DI=1}} 與 {{m: DI=2}}；BAM mixtures 回收 {{m: r_{read}}}，不以 {{m: f}} 代替</td><td>DNA index 或 read fraction 尺度錯誤</td></tr>
+<tr><td>symmetry</td><td>無 post-WGD／外部 evidence 時，刻意構造的 doubled modes 具有相同 likelihood</td><td>程式以 hidden prior 或 bug 假造 identifiability</td></tr>
+<tr><td>clone-count cap</td><td>枚舉 {{m: K=1,…,6}} 的 truncated-Poisson prior 加總為 1；改變 cap 時，以重新正規化後的 prior 比較 component evidence</td><td>{{m: Z_0}} odds 受未計入的 Poisson tail 偏移</td></tr>
+<tr><td>no-tumour boundary</td><td>{{m: p=0,K=0}} normal-only data 在兩個 stratified SMC components 中產生校準的 evidence ratio；改變最低粒子配額或 proposal mixture 不改變結果</td><td>component evidence、proposal correction 或 initialization 失準</td></tr>
+<tr><td>shuffle power</td><td>每個 E-shuffle seed 回報 {{m: φ,ψ_b,R_{unique}}} 與 invariant deviation；任一預登錄門檻未達時必須 abstain</td><td>負對照退化為 E 或沒有足夠 randomization support</td></tr>
+<tr><td>end-to-end WGD boundary</td><td>pure diploid 與 observationally equivalent pure doubled genome 通過完整 preprocessing 後維持正確等價關係</td><td>candidate selection／segmentation 人為破解對稱</td></tr>
+<tr><td>posterior calibration</td><td>90%／95% intervals 在 simulation grid 達到對應 coverage</td><td>不確定性失準</td></tr>
+	<tr><td>posterior prediction</td><td>evaluation-fold depth、marginals、joint states 與 SV support 無系統 residual</td><td>模型假設不符合資料</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>simulation matrix 與評比量</h3>
+
+<p class="prose">simulation 必須交叉改變 cellular purity、ploidy、clone 數、clonal／subclonal WGD、
+gain／loss timing、mutation burden、depth、read-length distribution、phase switch、mapping bias、TINC、
+ONT／PacBio error profile 與 somatic ascertainment severity。至少另設四個 identifiability strata：</p>
+
+<ul class="prose">
+<li>存在與不存在可靠 truncal mutation；</li>
+<li>{{m: p=0}} normal-only、近零 purity 與 pure tumour boundary；</li>
+<li>chain、branch 與相同 marginal VAF 但不同 joint state；</li>
+<li>pure diploid 對 observationally equivalent pure doubled genome、全數 pre-WGD、混合 pre/post-WGD 與 timing 不確定；</li>
+<li>clonal CN、單一 subclonal CNA 與無法由有限 clone mixture 表達的連續 spectrum。</li>
+</ul>
+
+<p class="prose">主要 metrics 為 {{m: p,κ,f,r_{read},π}} 的 bias／RMSE 與 interval coverage、
+allele-specific CN accuracy、WGD mode calibration、clone-number accuracy、mutation assignment ARI、
+	ancestor／descendant relationship error、evaluation-fold log predictive density、abstention calibration 與 runtime／memory scaling。
+每一項均須同時報 E、E-shuffle 與對應 baseline。</p>
+
+<h3>真實與半合成資料的真值邊界</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>資料設計</th><th>可作真值的量</th><th>不可直接作真值的量</th></tr></thead>
+<tbody>
+<tr><td>in-silico BAM／read mixture</td><td>輸入的 read-origin fraction {{m: r_{read}}}</td><td>生物學 {{m: f,p}}，除非來源 CN、{{m: q}} 與 sampling model 已知</td></tr>
+<tr><td>wet-lab DNA-mass mixture</td><td>實驗配置的 DNA mass fraction；校正 callable genome 後可對應 {{m: f}}</td><td>{{m: p}}，除非來源 {{m: κ}} 已知</td></tr>
+<tr><td>cell-count mixture + flow DNA index</td><td>{{m: p}} 與平均 DNA content</td><td>clone tree，除非來源 clones 已知</td></tr>
+<tr><td>single-cell DNA／colony clones</td><td>clone-specific CN 與部分 tree</td><td>bulk capture bias 的全部參數</td></tr>
+<tr><td>FISH／karyotype／flow</td><td>特定位點或全域 ploidy mode</td><td>全基因體 allele-specific CN profile</td></tr>
+<tr><td>technical replicates／basecallers</td><td>reproducibility</td><td>accuracy</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>預期結果模式</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>資料情境</th><th>預期 posterior</th><th>正確結論</th></tr></thead>
+<tbody>
+<tr><td>1+1、truncal multiplicity 1、足夠 spanning reads</td><td>{{m: p}} 可識別；E 可能只小幅優於 D</td><td>multi-locus 主要作 consistency check</td></tr>
+<tr><td>多個 subclones、相同 marginal VAF、branch／chain joint states 不同</td><td>E 排除 D 與 E-shuffle 保留的替代 trees</td><td>clone structure gain；是否轉成 purity gain 另行檢驗</td></tr>
+<tr><td>所有 informative mutations 均 pre-WGD</td><td>diploid／doubled equivalence 保留</td><td><code>WGD_EQUIVALENT</code></td></tr>
+<tr><td>可靠 post-WGD states linked to allele CN</td><td>E 改變 WGD mode mass，{{m: κ,p}} 同時收斂</td><td>data-supported ploidy gain</td></tr>
+<tr><td>沒有 truncal 或 covering set</td><td>clone ratios 可識別，absolute scale 保留</td><td><code>PURITY_LOWER_BOUND</code></td></tr>
+<tr><td>coherent low-frequency state 與 family-mistag floor 相容</td><td>artifact mixture 吸收，clone posterior 不增加</td><td>不得以 {{m: 111}} 單獨建立 clone</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>尚未解決的問題</h3>
+
+<ul class="prose">
+<li><b>full clone-specific CN 的可計算性。</b>tree、copy lineage、segmentation 與 WGD 的聯合狀態空間極大；
+production v1 的 clonal-CN restriction 是否保留關鍵 joint-haplotype gain，須由 simulation 確認。</li>
+	<li><b>mutation discovery split 的效率。</b>低 purity 下將 reads 分成三 folds 會降低 recall；
+cross-fitting 的 bias–variance trade-off 尚無實測。</li>
+<li><b>copy-lineage equivalence。</b>不同 event orders 可能產生相同 final CN 與 mutation multiplicity；
+輸出需合併 observationally equivalent histories，而非回報任意一條。</li>
+<li><b>genome-graph events。</b>chromothripsis、ecDNA、templated insertions 與複雜 rearrangements
+不一定可由 segmental gain／loss tree 表達。</li>
+<li><b>normal-cell baseline。</b>germline CNV、mosaic normal 或非二倍體正常細胞將破壞 normal CN=2 的預設。</li>
+<li><b>continuous subclone spectrum。</b>離散有限 clones 對某些 tumour evolution 並不合適；
+posterior predictive failure 必須優先於增加 {{m: K}}。</li>
+<li><b>novelty 搜尋範圍。</b>在使用「first」之前，仍須系統性涵蓋 HATCHet／HATCHet2、PhyloWGS、
+PyClone、TITAN、cloneHD、BayClone2、WEAVER、JaBbA、SAVANA、Refphase 與 genome-graph mixture models。</li>
+</ul>
+
+<h3>原始文獻與程式碼</h3>
+
+<ul class="prose">
+<li>Van Loo P. et al. <i>Allele-specific copy number analysis of tumors</i>. Proceedings of the National Academy of Sciences, 2010.
+<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2947907/">ASCAT 原始論文</a>。</li>
+<li>Carter S. L. et al. <i>Absolute quantification of somatic DNA alterations in human cancer</i>. Nature Biotechnology, 2012.
+<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4383288/">ABSOLUTE 原始論文</a>。</li>
+<li>Gerstung M. et al. <i>The evolutionary history of 2,658 cancers</i>. Nature, 2020.
+<a href="https://www.nature.com/articles/s41586-019-1907-7">PCAWG purity、CN 與 mutation timing 分析</a>。</li>
+<li>Zhou T. et al. <i>PairClone: A Bayesian Subclone Caller Based on Mutation Pairs</i>. Journal of the Royal Statistical Society Series C, 2019.
+<a href="https://academic.oup.com/jrsssc/article/68/3/705/7058355">PairClone 原始論文</a>。</li>
+<li>Zhou T. et al. <i>TreeClone: Reconstruction of Tumor Subclone Phylogeny Based on Mutation Pairs</i>. Annals of Applied Statistics, 2019.
+<a href="https://arxiv.org/abs/1703.03853">TreeClone manuscript</a>。</li>
+<li>Watkins T. B. K. et al. <i>Pervasive chromosomal instability and karyotype order in tumour evolution</i>. Nature, 2020.
+<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7615497/">Battenberg 與 subclonal CN 應用</a>。</li>
+<li>Chen X. et al. <i>HATCHet2: clone- and haplotype-specific copy-number inference from bulk tumor sequencing</i>. Genome Biology, 2023.
+<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10370020/">HATCHet2 原始論文</a>。</li>
+<li>Gundem G. et al. <i>Refphase: Multi-sample phasing reveals haplotype-specific copy number heterogeneity</i>. PLOS Computational Biology, 2023.
+<a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1011379">Refphase 原始論文</a>。</li>
+<li>Cortes-Ciriano I. et al. <i>SAVANA: reliable analysis of somatic structural variants and copy number aberrations using long-read sequencing</i>. Nature Biotechnology, 2025.
+<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12240814/">SAVANA 原始論文與程式碼連結</a>。</li>
+</ul>
+</section>

@@ -323,5 +323,22 @@
       "sr4"
     ],
     "topic": "主題二 · 純度、倍體與腫瘤 DNA 比例"
+  },
+  {
+    "id": "sr6",
+    "num": "整合",
+    "src": "sr6-lift-cn.html",
+    "group": "研究指引",
+    "short": "LiFT-CN 的實作規格",
+    "kicker": "研究指引 · 純度、倍體與腫瘤 DNA 比例",
+    "title_zh": "整合篇：LiFT-CN 的生成模型與實作規格",
+    "title_en": "Integration — the LiFT-CN generative model and implementation specification",
+    "q": "同一批長讀資料，如何同時推回癌細胞比例、染色體份數與腫瘤內的細胞族群？",
+    "sub": "以原始長讀分子的 germline–somatic 聯合 marks 建立 marked-fragment likelihood，將 clone tree、實體 copy lineage、allele-specific CN、mutation timing、cellular purity、tumour DNA fraction、ploidy 與 WGD modes 納入同一個 posterior，並定義可辨識條件、推論演算法、輸入輸出、ablation 與驗證標準。",
+    "prereq": [
+      "sr2b",
+      "sr5"
+    ],
+    "topic": "主題二 · 純度、倍體與腫瘤 DNA 比例"
   }
 ]

@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
+  <title>Branched ablation design with E-shuffle negative control</title>
+  <desc>The ablation is not a single nested staircase. A contains depth and unphased germline allele fractions. B is one branch from A that adds ordinary somatic marginal VAF. C is a separate branch from A that uses raw phased germline molecule marks without somatic linkage. The linked path continues from C to D, which adds single-locus germline-somatic marks; those joint emissions contain the marginal somatic information measured by B without multiplying a second B likelihood. E adds complete multi-locus molecule marks and the copy-lineage model. E-shuffle keeps structural-variant marks fixed and preserves depth, per-locus somatic marginals, germline-somatic and somatic-SV contingencies, masks, quality, and platform while permuting only somatic-somatic pairing across molecules. Eligibility requires preregistered minimums for permutable fraction, actually changed fraction, and unique nonidentity shuffled datasets.</desc>
+
+  <text class="ttl" x="20" y="36">Branched information ablation</text>
+  <text class="anno" x="20" y="64">B and C are alternative branches; the linked path is C → D → E, followed by E-shuffle.</text>
+
+  <rect class="box ghost" x="20" y="92" width="620" height="498" rx="8"/>
+  <text class="lbl bold" x="44" y="124">A branches to B and C</text>
+  <text class="anno end" x="618" y="124">only C → D → E is nested</text>
+
+  <rect class="box plain" x="60" y="144" width="526" height="52" rx="6"/>
+  <text class="lbl bold" x="80" y="166">A</text>
+  <text class="tick" x="116" y="166">depth + unphased germline fractions</text>
+  <text class="tick" x="116" y="186">purity / ploidy baseline</text>
+
+  <path class="flow" d="M323,196 L323,210 L185,210 L185,224" marker-end="url(#arrow-sm)"/>
+  <path class="flow" d="M323,210 L456,210 L456,224" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box plain" x="60" y="224" width="250" height="72" rx="6"/>
+  <text class="lbl bold" x="80" y="248">B</text>
+  <text class="tick" x="116" y="248">ordinary somatic</text>
+  <text class="tick" x="116" y="270">marginal VAF branch</text>
+  <text class="tick" x="116" y="288">comparison baseline</text>
+
+  <rect class="box plain" x="326" y="224" width="260" height="72" rx="6"/>
+  <text class="lbl bold" x="346" y="248">C</text>
+  <text class="tick" x="382" y="248">raw phased germline</text>
+  <text class="tick" x="382" y="270">molecule marks</text>
+  <text class="tick" x="382" y="288">no somatic linkage</text>
+
+  <path class="flow" d="M456,296 L456,312 L323,312 L323,326" marker-end="url(#arrow-sm)"/>
+  <text class="tick end" x="310" y="316">B marginals are contained in D marks</text>
+
+  <rect class="box plain" x="60" y="326" width="526" height="60" rx="6"/>
+  <text class="lbl bold" x="80" y="350">D</text>
+  <text class="tick" x="116" y="350">C + single-locus germline–somatic joint marks</text>
+  <text class="tick" x="116" y="374">contains somatic marginals; no second B factor</text>
+
+  <line class="flow" x1="323" y1="386" x2="323" y2="408" marker-end="url(#arrow-sm)"/>
+  <rect class="box accent" x="60" y="408" width="526" height="60" rx="6"/>
+  <text class="lbl bold" x="80" y="432">E</text>
+  <text class="tick" x="116" y="432">D + multi-locus marks + copy-lineage model</text>
+  <text class="tick" x="116" y="456">full LiFT-CN</text>
+
+  <line class="guide" x1="323" y1="468" x2="323" y2="490" marker-end="url(#arrow-sm)"/>
+  <rect class="box warn" x="60" y="490" width="526" height="82" rx="6"/>
+  <text class="lbl bold" x="80" y="514">E-shuffle</text>
+  <text class="tick" x="202" y="514">co-occurrence negative control</text>
+  <rect class="box ok" x="82" y="528" width="230" height="30" rx="6"/>
+  <text class="tick mid" x="197" y="548">preserve D-level invariants</text>
+  <rect class="box bad" x="326" y="528" width="238" height="30" rx="6"/>
+  <text class="tick bad mid" x="445" y="548">permute somatic pairing only</text>
+
+  <!-- eligibility gate -->
+  <rect class="box ghost" x="660" y="92" width="320" height="498" rx="8"/>
+  <text class="lbl bold mid" x="820" y="124">E-shuffle eligibility</text>
+  <rect class="box plain" x="690" y="150" width="260" height="82" rx="6"/>
+  <text class="lbl mono mid" x="820" y="178">φ · median ψ · R_unique</text>
+  <text class="tick mid" x="820" y="204">permutable · changed · unique</text>
+
+  <rect class="box ok" x="690" y="252" width="260" height="102" rx="6"/>
+  <text class="tick ok bold mid" x="820" y="278">all three gates pass</text>
+  <text class="tick mid" x="820" y="306">E − E-shuffle can attribute</text>
+  <text class="tick mid" x="820" y="330">same-molecule information</text>
+
+  <rect class="box bad" x="690" y="374" width="260" height="102" rx="6"/>
+  <text class="tick bad bold mid" x="820" y="400">any gate fails</text>
+  <text class="tick mid" x="820" y="428">SHUFFLE_UNDERPOWERED</text>
+  <text class="tick mid" x="820" y="452">do not claim co-occurrence gain</text>
+
+  <rect class="box ghost accent" x="690" y="500" width="260" height="70" rx="6"/>
+  <text class="tick mid" x="820" y="526">Gate uses actual changes,</text>
+  <text class="tick mid" x="820" y="550">not total coverage alone.</text>
+</svg>

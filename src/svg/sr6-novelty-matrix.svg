@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 550">
+  <title>Novelty and prior-art matrix for LiFT-CN candidate intersection</title>
+  <desc>The matrix separates evidence units from claims of novelty. Rows are joint mutation molecule states, clone tree, allele-specific copy number, clone-specific or subclonal copy number, purity or ploidy, and copy timing. Allele-specific copy number is separated from clone-specific copy number so that ASCAT and PURPLE receive explicit credit for the former. Columns list ASCAT or PURPLE, Battenberg or Refphase or HATCHet2, PairClone or TreeClone, ABSOLUTE or SAVANA, and the LiFT-CN candidate intersection. Check marks indicate that at least one representative in a grouped column addresses the row; open circles indicate an adjacent or partial relation. The highlighted final column is a candidate statistical closure, not a claim that any individual output is unprecedented.</desc>
+
+  <text class="ttl" x="20" y="36">Novelty / prior-art matrix</text>
+  <text class="anno" x="20" y="64">Existing methods occupy individual rows; the candidate is their raw-molecule intersection.</text>
+
+  <rect class="box plain" x="20" y="90" width="960" height="368" rx="8"/>
+  <rect class="box accent" x="815" y="90" width="165" height="368" rx="8"/>
+
+  <!-- grid -->
+  <line class="axis" x1="220" y1="90" x2="220" y2="458"/>
+  <line class="axis" x1="355" y1="90" x2="355" y2="458"/>
+  <line class="axis" x1="530" y1="90" x2="530" y2="458"/>
+  <line class="axis" x1="665" y1="90" x2="665" y2="458"/>
+  <line class="axis" x1="815" y1="90" x2="815" y2="458"/>
+  <line class="axis" x1="20" y1="170" x2="980" y2="170"/>
+  <line class="guide" x1="20" y1="218" x2="980" y2="218"/>
+  <line class="guide" x1="20" y1="266" x2="980" y2="266"/>
+  <line class="guide" x1="20" y1="314" x2="980" y2="314"/>
+  <line class="guide" x1="20" y1="362" x2="980" y2="362"/>
+  <line class="guide" x1="20" y1="410" x2="980" y2="410"/>
+
+  <!-- column headers -->
+  <text class="anno bold mid" x="120" y="126">Evidence unit</text>
+  <text class="tick bold mid" x="287" y="116">ASCAT /</text>
+  <text class="tick bold mid" x="287" y="140">PURPLE</text>
+  <text class="tick bold mid" x="442" y="110">Battenberg /</text>
+  <text class="tick bold mid" x="442" y="130">Refphase /</text>
+  <text class="tick bold mid" x="442" y="150">HATCHet2</text>
+  <text class="tick bold mid" x="597" y="116">PairClone /</text>
+  <text class="tick bold mid" x="597" y="140">TreeClone</text>
+  <text class="tick bold mid" x="740" y="116">ABSOLUTE /</text>
+  <text class="tick bold mid" x="740" y="140">SAVANA</text>
+  <text class="tick accent bold mid" x="897" y="110">LiFT-CN</text>
+  <text class="tick accent bold mid" x="897" y="130">candidate</text>
+  <text class="tick accent bold mid" x="897" y="150">intersection</text>
+
+  <!-- row labels -->
+  <text class="anno" x="34" y="196">joint mutation</text>
+  <text class="anno" x="34" y="214">molecule states</text>
+  <text class="anno" x="34" y="246">clone tree</text>
+  <text class="anno" x="34" y="294">allele-specific CN</text>
+  <text class="anno" x="34" y="342">clone / subclonal CN</text>
+  <text class="anno" x="34" y="390">purity / ploidy</text>
+  <text class="anno" x="34" y="438">copy timing</text>
+
+  <!-- cells: existing capability, partial relation, or not the same unit -->
+  <text class="lbl mid" x="287" y="200">—</text>
+  <text class="lbl warn mid" x="442" y="200">○</text>
+  <text class="lbl ok mid" x="597" y="200">✓</text>
+  <text class="lbl warn mid" x="740" y="200">○</text>
+  <text class="lbl accent mid" x="897" y="200">✓</text>
+
+  <text class="lbl mid" x="287" y="248">—</text>
+  <text class="lbl mid" x="442" y="248">—</text>
+  <text class="lbl ok mid" x="597" y="248">✓</text>
+  <text class="lbl warn mid" x="740" y="248">○</text>
+  <text class="lbl accent mid" x="897" y="248">✓</text>
+
+  <text class="lbl ok mid" x="287" y="296">✓</text>
+  <text class="lbl ok mid" x="442" y="296">✓</text>
+  <text class="lbl warn mid" x="597" y="296">○</text>
+  <text class="lbl ok mid" x="740" y="296">✓</text>
+  <text class="lbl accent mid" x="897" y="296">✓</text>
+
+  <text class="lbl warn mid" x="287" y="344">○</text>
+  <text class="lbl ok mid" x="442" y="344">✓</text>
+  <text class="lbl warn mid" x="597" y="344">○</text>
+  <text class="lbl warn mid" x="740" y="344">○</text>
+  <text class="lbl accent mid" x="897" y="344">✓</text>
+
+  <text class="lbl ok mid" x="287" y="392">✓</text>
+  <text class="lbl warn mid" x="442" y="392">○</text>
+  <text class="lbl mid" x="597" y="392">—</text>
+  <text class="lbl ok mid" x="740" y="392">✓</text>
+  <text class="lbl accent mid" x="897" y="392">✓</text>
+
+  <text class="lbl mid" x="287" y="440">—</text>
+  <text class="lbl mid" x="442" y="440">—</text>
+  <text class="lbl mid" x="597" y="440">—</text>
+  <text class="lbl ok mid" x="740" y="440">✓</text>
+  <text class="lbl accent mid" x="897" y="440">✓</text>
+
+  <rect class="box ghost" x="20" y="476" width="960" height="54" rx="8"/>
+  <text class="anno" x="40" y="500">✓ at least one named method · ○ adjacent / partial · — not the same evidence unit</text>
+  <text class="anno" x="40" y="522">Grouped columns do not imply that every named method has every checked capability.</text>
+</svg>

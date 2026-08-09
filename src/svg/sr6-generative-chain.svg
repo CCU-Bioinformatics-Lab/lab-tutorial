@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540">
+  <title>LiFT-CN generative chain from evolutionary history to posterior estimands</title>
+  <desc>Seven linked stages define the proposed LiFT-CN generative direction. A clone tree supplies clone fractions and inheritance edges. Each edge first receives an ordered copy-number and whole-genome-doubling history. Replaying that history creates the physical copy lineages available at every timing slot and determines final allele-specific copy number. A mutation is then placed on an edge, timing slot, and lineage that exists at that slot; later gains or losses determine mutation multiplicity. The resulting history generates raw molecules. Each molecule contributes one read-start depth anchor and conditional base or structural-variant marks. A joint posterior reports cellular purity p, tumour ploidy kappa, biological tumour DNA fraction f, sequencing read fraction r-read, and clone states with uncertainty.</desc>
+
+  <text class="ttl" x="20" y="36">LiFT-CN generative chain</text>
+  <text class="anno" x="20" y="64">Evolutionary history → physical copies → marked molecules → one joint posterior.</text>
+
+  <!-- first row: latent evolutionary history -->
+  <rect class="box accent" x="20" y="96" width="226" height="120" rx="8"/>
+  <text class="lbl bold mid" x="133" y="126">Clone tree</text>
+  <text class="tick mid" x="133" y="156">clone g · fraction π_g</text>
+  <text class="tick mid" x="133" y="180">inheritance edges</text>
+
+  <rect class="box accent" x="258" y="96" width="226" height="120" rx="8"/>
+  <text class="lbl bold mid" x="371" y="122">Ordered CN/WGD</text>
+  <text class="lbl bold mid" x="371" y="148">history</text>
+  <text class="tick mid" x="371" y="174">gain · loss · WGD</text>
+  <text class="tick mono mid" x="371" y="198">H^CN event sequence</text>
+
+  <rect class="box accent" x="496" y="96" width="226" height="120" rx="8"/>
+  <text class="lbl bold mid" x="609" y="126">Physical lineages</text>
+  <text class="tick mid" x="609" y="156">available at each slot</text>
+  <text class="tick mono mid" x="609" y="180">final allele CN C_sgh</text>
+
+  <rect class="box accent" x="734" y="96" width="246" height="120" rx="8"/>
+  <text class="lbl bold mid" x="857" y="126">Mutation placement</text>
+  <text class="tick mid" x="857" y="156">edge · timing · extant lineage</text>
+  <text class="tick mono mid" x="857" y="180">z_m=(e_m,t_m,ℓ_m)</text>
+
+  <line class="flow" x1="246" y1="156" x2="258" y2="156" marker-end="url(#arrow-sm)"/>
+  <line class="flow" x1="484" y1="156" x2="496" y2="156" marker-end="url(#arrow-sm)"/>
+  <line class="flow" x1="722" y1="156" x2="734" y2="156" marker-end="url(#arrow-sm)"/>
+
+  <!-- turn into the observation process -->
+  <path class="flow" d="M857,216 L857,254 L150,254 L150,282" marker-end="url(#arrow)"/>
+
+  <!-- second row: raw observation and inference -->
+  <rect class="box plain" x="20" y="282" width="260" height="126" rx="8"/>
+  <text class="lbl bold mid" x="150" y="314">Raw molecule</text>
+  <text class="tick mid" x="150" y="344">bases · SV marks</text>
+  <text class="tick mid" x="150" y="368">read identity</text>
+  <text class="tick mid" x="150" y="392">physical fragment</text>
+
+  <rect class="box plain" x="304" y="282" width="304" height="126" rx="8"/>
+  <text class="lbl bold mid" x="456" y="314">Marked fragment</text>
+  <text class="tick mid" x="456" y="344">one depth start anchor</text>
+  <text class="tick mid" x="456" y="368">conditional marks</text>
+  <text class="tick mid" x="456" y="392">coverage mask M_r</text>
+
+  <rect class="box ok" x="632" y="282" width="348" height="126" rx="8"/>
+  <text class="lbl bold mid" x="806" y="314">Joint posterior</text>
+  <text class="tick mid" x="806" y="344">p · κ · f · r_read · clones</text>
+  <text class="tick mid" x="806" y="368">mode mass + intervals</text>
+  <text class="tick mid" x="806" y="392">CCF and μ from history</text>
+
+  <line class="flow" x1="280" y1="345" x2="304" y2="345" marker-end="url(#arrow-sm)"/>
+  <line class="flow" x1="608" y1="345" x2="632" y2="345" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box ghost" x="20" y="446" width="960" height="70" rx="8"/>
+  <text class="anno" x="40" y="474">Ordered copy history and mutation placement determine CCF and multiplicity.</text>
+  <text class="anno" x="40" y="500">These are derived states, not independent post-likelihood nuisance parameters.</text>
+</svg>

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>Marked-fragment factorization with one depth anchor and conditional marks</title>
+  <desc>The factorization treats tumour and matched-normal observations as one marked-fragment process. For sample A in T or N, every read r in read set R_A is counted once through the read-start depth process. Given segment s(r), likelihood unit u(r), and coverage mask M_r, the same read contributes one conditional emission for observed bases and structural-variant marks Y_r. Germline and somatic states are therefore conditional marks, not additional independent VAF data. A second VAF factor or an HP factor derived from the same bases would duplicate evidence and is explicitly prohibited.</desc>
+
+  <text class="ttl" x="20" y="36">Marked-fragment factorization</text>
+  <text class="anno" x="20" y="64">One molecule enters once: a unique start anchor, then conditional base/SV marks.</text>
+
+  <rect class="box accent" x="20" y="84" width="960" height="112" rx="8"/>
+  <text class="lbl mono mid" x="500" y="116">P(D | Θ) = ∏A∈{T,N} [ P(N_A | Θ)</text>
+  <text class="lbl mono mid" x="500" y="142">× ∏r∈R_A P(Y_r | M_r, s(r), u(r), Θ) ]</text>
+  <text class="tick mono" x="42" y="166">R_A = reads in sample A;  s(r) = start segment;  u(r) = likelihood unit</text>
+  <text class="tick mono" x="42" y="186">M_r = covered loci / mask;  Y_r = conditional observed bases and SV marks</text>
+
+  <!-- observed read and its marks -->
+  <rect class="box ghost" x="20" y="216" width="460" height="258" rx="8"/>
+  <text class="lbl bold mid" x="250" y="246">Observed fragment r</text>
+  <text class="anno mid" x="250" y="270">one read identity; one start anchor</text>
+
+  <line class="conn thick" x1="90" y1="284" x2="90" y2="322"/>
+  <circle class="pt tp" cx="90" cy="278" r="7"/>
+  <text class="tick mid" x="90" y="338">s(r)</text>
+  <text class="tick" x="106" y="286">depth count</text>
+
+  <circle class="mark germline" cx="188" cy="307" r="7"/>
+  <circle class="mark somatic" cx="274" cy="307" r="7"/>
+  <rect class="region" x="322" y="322" width="58" height="16" rx="4"/>
+  <text class="tick mid" x="351" y="303">SV</text>
+  <rect class="read hp1" x="90" y="322" width="320" height="16" rx="8"/>
+  <text class="base a" x="150" y="335">A</text>
+  <text class="base c" x="208" y="335">C</text>
+  <text class="base g" x="266" y="335">G</text>
+  <text class="base t" x="324" y="335">T</text>
+  <text class="base n" x="382" y="335">N</text>
+  <text class="tick mid" x="188" y="360">germline mark</text>
+  <text class="tick mid" x="274" y="382">somatic mark</text>
+  <text class="tick mid" x="351" y="360">conditional SV mark</text>
+  <text class="anno mono" x="42" y="420">Y_r = {base states, SV support}</text>
+  <text class="tick" x="42" y="446">The same molecule is not re-entered as a VAF table.</text>
+
+  <!-- factor map -->
+  <rect class="box ghost" x="500" y="216" width="480" height="258" rx="8"/>
+  <text class="lbl bold mid" x="740" y="246">Conditional decomposition</text>
+  <rect class="box plain" x="530" y="268" width="420" height="48" rx="6"/>
+  <text class="tick mono mid" x="740" y="298">P(N_A | Θ): start-depth count</text>
+  <rect class="box accent" x="530" y="330" width="420" height="70" rx="6"/>
+  <text class="lbl mono mid" x="740" y="358">P(Y_r | M_r, s(r), u(r), Θ)</text>
+  <text class="tick mid" x="740" y="384">conditional base and SV emission</text>
+  <rect class="box bad" x="530" y="414" width="420" height="44" rx="6"/>
+  <text class="tick bad bold mid" x="740" y="442">No second VAF or HP factor</text>
+
+  <rect class="box ghost bad" x="20" y="496" width="960" height="44" rx="8"/>
+  <text class="anno bad mid" x="500" y="524">VAF and HP tags derived from these bases are summaries, not independent observations.</text>
+</svg>
