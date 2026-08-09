@@ -19,8 +19,8 @@
   "deck": "A",
   "slide": 27,
   "src": "assets/img/a/a-s27-purity.webp",
-  "alt": "tumor purity 估計結果：虛線為理想值，紅線為 ASCAT，藍線為 LongPhase-S",
-  "caption": "purity 估計結果。虛線是理想值、紅線是 ASCAT、藍線是 LongPhase-S（不同 marker 對應不同的 somatic variant caller 作為輸入）。<b>在此資料中，低 purity 區段的差距較明顯。</b>",
+  "alt": "腫瘤 DNA 比例的估計結果：虛線為理想值，紅線為 ASCAT，藍線為 LongPhase-S",
+  "caption": "腫瘤 DNA 比例的估計結果。虛線是理想值、紅線是 ASCAT、藍線是 LongPhase-S（不同 marker 對應不同的 somatic variant caller 作為輸入）。橫軸是合成樣本的混合比例，也就是 <b>DNA 比例 f</b>；ASCAT 輸出的 (p, κ) 已先換算到同一個尺度。<b>在此資料中，低比例區段的差距較明顯。</b>",
   "src2x": "assets/img/a/a-s27-purity@2x.webp"
  },
  "a-s31-f1-purity": {

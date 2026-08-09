@@ -1,14 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
-  <title>LongPhase-S 的四個階段與 purity 回饋</title>
+  <title>LongPhase-S 的四個階段與比例回饋</title>
   <desc>流程從左到右分成四個階段。
         輸入是 tumor 與 normal 的長讀資料：normal 用來呼叫 germline 變異並定相成 HP1 與 HP2，
         tumor 用來呼叫 somatic 候選變異。
         階段一做初步 somatic haplotagging，讓每條 read 先拿到一個暫時標籤。
-        階段二用全基因體的 germline haplotype 失衡分布估計 tumor purity。
-        階段三用估到的 purity 決定四個過濾器的門檻鬆緊，重新校準 somatic 變異。
+        階段二用全基因體的 germline haplotype 失衡分布估計腫瘤 DNA 比例。
+        階段三用估到的比例決定四個過濾器的門檻鬆緊，重新校準 somatic 變異。
         階段四用校準後的變異重建 germline 與 somatic haplotype，並處理沒有 germline 錨點的 read。
-        圖中紅色回饋線標出關鍵順序：purity 必須先估出來，才能決定過濾要多嚴格。
-        原因是低 purity 樣本裡真變異的支持 read 很少，固定門檻會把它濾掉。</desc>
+        圖中紅色回饋線標出關鍵順序：比例必須先估出來，才能決定過濾要多嚴格。
+        原因是低比例樣本裡真變異的支持 read 很少，固定門檻會把它濾掉。
+        輸出的量是腫瘤 DNA 比例，不是腫瘤細胞比例，因為模型裡沒有倍體。</desc>
 
   <text class="lbl bold zh" x="20" y="32">LongPhase-S 的四個階段</text>
   <text class="tick zh" x="20" y="58">輸入是 tumor 與 normal 兩邊的長讀資料與變異；輸出是 read 層級的 germline 與 somatic haplotype。</text>
@@ -30,16 +31,16 @@
 
   <rect class="box accent" x="420" y="96" width="172" height="170" rx="10"/>
   <text class="anno bold mid" x="506" y="126">②</text>
-  <text class="anno bold zh mid" x="506" y="152">purity 估計</text>
+  <text class="anno bold zh mid" x="506" y="152">DNA 比例估計</text>
   <text class="tick zh" x="436" y="182">全基因體 GHIR 分布</text>
   <text class="tick zh" x="436" y="206">→ median 與 IQR</text>
-  <text class="tick zh" x="436" y="230">→ 一個 purity 值</text>
+  <text class="tick zh" x="436" y="230">→ 一個比例值 f</text>
 
   <rect class="box warn" x="608" y="96" width="172" height="170" rx="10"/>
   <text class="anno bold mid" x="694" y="126">③</text>
   <text class="anno bold zh mid" x="694" y="152">變異重校準</text>
   <text class="tick zh" x="624" y="182">四個過濾器</text>
-  <text class="tick zh" x="624" y="206">門檻依 purity 調整</text>
+  <text class="tick zh" x="624" y="206">門檻依 f 調整</text>
   <text class="tick zh" x="624" y="230">→ somatic VCF</text>
 
   <rect class="box ok" x="796" y="96" width="172" height="170" rx="10"/>
@@ -56,17 +57,17 @@
   <path class="flow" d="M780,180 L794,180" marker-end="url(#arrow)"/>
 
   <path class="conn somatic thick" d="M506,270 L506,300 L694,300 L694,272" marker-end="url(#arrow)"/>
-  <text class="tick mid zh somatic bold" x="600" y="322">② 估到的 purity 決定 ③ 的門檻鬆緊</text>
+  <text class="tick mid zh somatic bold" x="600" y="322">② 估到的 f 決定 ③ 的門檻鬆緊</text>
 
   <path class="flow" d="M882,270 L882,344" marker-end="url(#arrow)"/>
   <rect class="box ok" x="700" y="348" width="284" height="96" rx="8"/>
   <text class="tick bold zh" x="718" y="374">最終輸出</text>
   <text class="tick" x="718" y="398">BAM: HP:Z:1-1 / 2-1 / 3（字串）</text>
-  <text class="tick zh" x="718" y="422">purity 文字檔、重校準後的 VCF</text>
+  <text class="tick zh" x="718" y="422">_purity.out 文字檔、重校準後的 VCF</text>
 
   <line class="guide" x1="20" y1="348" x2="680" y2="348"/>
-  <text class="anno bold zh" x="20" y="378">為什麼 purity 一定要排在過濾之前？</text>
-  <text class="tick zh" x="20" y="404">purity 0.2、50× 覆蓋度時，一個 clonal somatic 變異只有約 5 條支持 read。</text>
-  <text class="tick zh" x="20" y="428">套用適合純腫瘤的嚴格門檻會把它一起濾掉；一律放寬又會讓高 purity 樣本多出假陽性。</text>
-  <text class="tick zh somatic bold" x="20" y="452">所以門檻不是一組固定數字，而是每個 purity 級距各有一組。</text>
+  <text class="anno bold zh" x="20" y="378">為什麼比例一定要排在過濾之前？</text>
+  <text class="tick zh" x="20" y="404">DNA 比例 0.2、50× 覆蓋度時，一個 clonal somatic 變異只有約 5 條支持 read。</text>
+  <text class="tick zh" x="20" y="428">套用適合純腫瘤的嚴格門檻會把它一起濾掉；一律放寬又會讓高比例樣本多出假陽性。</text>
+  <text class="tick zh somatic bold" x="20" y="452">所以門檻不是一組固定數字，而是每個比例級距各有一組。</text>
 </svg>

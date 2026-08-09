@@ -1012,19 +1012,19 @@ window.TW_QUIZ = {
   {
    "id": "m12.q1",
    "type": "single",
-   "stem_html": "未手動指定 purity 時，為什麼 LongPhase-S 流程要先估計 purity，再進行 variant filtering？",
+   "stem_html": "未手動指定比例時，為什麼 LongPhase-S 流程要先估腫瘤 DNA 比例，再進行 variant filtering？",
    "choices": [
     {
      "id": "a",
-     "html": "因為 purity 估計比較快",
+     "html": "因為比例估計比較快",
      "correct": false,
      "why": "與速度無關。"
     },
     {
      "id": "b",
-     "html": "因為過濾門檻的嚴格程度必須依 purity 調整，否則低 purity 樣本會增加真變異漏檢",
+     "html": "因為過濾門檻的嚴格程度必須依比例調整，否則低比例樣本會增加真變異漏檢",
      "correct": true,
-     "why": "正確。purity 0.2 時一個 clonal somatic 變異可能只有約 5 條 read 支持；若套用適合 purity 1.0 的門檻，recall 可能顯著下降。"
+     "why": "正確。DNA 比例 0.2 時一個 clonal somatic 變異可能只有約 5 條 read 支持；若套用適合純腫瘤的門檻，recall 可能顯著下降。這一步需要的正是 DNA 比例 —— 它決定支持 read 會有幾條。"
     },
     {
      "id": "c",
@@ -1034,16 +1034,16 @@ window.TW_QUIZ = {
     },
     {
      "id": "d",
-     "html": "因為 purity 要寫進 BAM header",
+     "html": "因為估到的比例要寫進 BAM header",
      "correct": false,
-     "why": "purity 寫在 <code>_purity.out</code> 檔案裡，而且與順序無關。"
+     "why": "它寫在 <code>_purity.out</code> 檔案裡，而且與順序無關。"
     }
    ]
   },
   {
    "id": "m12.q2",
    "type": "single",
-   "stem_html": "跑完 <code>estimate_purity</code>，purity 值出現在哪裡？",
+   "stem_html": "跑完 <code>estimate_purity</code>，估計值出現在哪裡？",
    "choices": [
     {
      "id": "a",
@@ -1071,6 +1071,38 @@ window.TW_QUIZ = {
     }
    ],
    "explain_html": "S 與 TO 在輸出位置上有多項差異，建議參照 M13 的對照表逐項核對。"
+  },
+  {
+   "id": "m12.q3",
+   "type": "single",
+   "stem_html": "<code>_purity.out</code> 讀到 <code>Tumor purity: 0.60</code>。這個 0.60 是什麼？",
+   "choices": [
+    {
+     "id": "a",
+     "html": "腫瘤 DNA 比例 <math><mi>f</mi></math>：樣本的<b>分子</b>裡有六成來自腫瘤細胞",
+     "correct": true,
+     "why": "正確。迴歸的訓練標籤是合成樣本的 read 混合比例，也就是 <math><mi>f</mi></math>，所以學到的曲線輸出的也是 <math><mi>f</mi></math>。欄位名稱寫 purity 是命名與量不一致。"
+    },
+    {
+     "id": "b",
+     "html": "cellular purity <math><mi>p</mi></math>：樣本的<b>細胞</b>裡有六成是腫瘤細胞",
+     "correct": false,
+     "why": "不是。要由 <math><mi>f</mi></math> 得到 <math><mi>p</mi></math> 需要腫瘤倍體 <math><mi>κ</mi></math>：<math><mi>p</mi><mo>=</mo><mn>2</mn><mi>f</mi><mo>/</mo><mo>(</mo><mi>κ</mi><mo>(</mo><mn>1</mn><mo>−</mo><mi>f</mi><mo>)</mo><mo>+</mo><mn>2</mn><mi>f</mi><mo>)</mo></math>。若來源是 <math><mi>κ</mi><mo>=</mo><mn>3.2</mn></math> 的腫瘤，<math><mi>f</mi><mo>=</mo><mn>0.60</mn></math> 只對應 <math><mi>p</mi><mo>=</mo><mn>0.484</mn></math>。"
+    },
+    {
+     "id": "c",
+     "html": "兩者皆是 —— 這兩個量本來就相等",
+     "correct": false,
+     "why": "只有 <math><mi>κ</mi><mo>=</mo><mn>2</mn></math> 時相等（重要區分 #2）。腫瘤多為非整倍體，此條件通常不成立；連合成混合樣本也不例外，因為來源細胞株自己就不是二倍體。"
+    },
+    {
+     "id": "d",
+     "html": "帶有 somatic 變異的 read 佔全部 read 的比例",
+     "correct": false,
+     "why": "不是。那個量取決於突變負荷與 read 長度，跟腫瘤佔多少是兩件事 —— 而且它正好是 GHIR 的一個已知混淆項。"
+    }
+   ],
+   "explain_html": "要把這個輸出拿去跟流式細胞術、FISH 或病理判讀的腫瘤細胞百分比比較，得先用倍體換算 —— 而這個模型不產生倍體。反過來，流程下游（過濾門檻、偵測極限）需要的本來就是 <math><mi>f</mi></math>，所以在 LongPhase-S 自己的流程裡這個量是對的那一個。"
   }
  ],
  "m13": [

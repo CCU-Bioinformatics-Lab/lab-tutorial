@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
+  <title>迴歸的標籤與統計量的自變數不是同一個量</title>
+  <desc>三段由左到右。
+        左段是一個混合樣本的兩層計數：六個細胞裡兩個是腫瘤細胞，故細胞比例是零點三三；
+        倍體為四時，分子層的腫瘤佔比變成零點五，那是 DNA 比例。
+        兩層之間隔著的就是腫瘤的倍體。
+        中段是單倍型失衡比在一個兩個等位各一份的位置上量到什麼：
+        每個正常細胞在兩條單倍型上各貢獻一份，每個腫瘤細胞按拷貝數貢獻，
+        所以式子裡的自變數是細胞比例，分母裡沒有任何一項是 DNA 比例。
+        右段是迴歸擬合的目標：合成樣本依 read 數混合，
+        所以標籤是 DNA 比例，學到的曲線輸出的也是 DNA 比例。
+        中段與右段之間刻意畫成兩個不同的量，中間隔著倍體這個模型裡不存在的參數。
+        最下方是同一個兩個等位各一份的位置在三種來源倍體之下實際給出的值：
+        標籤同為零點六時，二倍體來源給零點七一四，四倍體來源給零點六三六，
+        跨度零點零七八，與突變負荷和折疊偏移同一個數量級。
+        讀法是：迴歸能擬合得很好，是因為一條曲線同時吸收了兩段關係，
+        代價是係數裡含有訓練面板的倍體組成。</desc>
+
+  <text class="ttl zh" x="20" y="36">標籤是 f，自變數是 p</text>
+  <text class="anno zh" x="20" y="66">同一條迴歸的兩端量的不是同一件事，中間隔著一個模型裡不存在的參數。</text>
+
+  <!-- ══ 左：一份檢體的兩層 ══ -->
+  <rect class="box ghost" x="20" y="88" width="292" height="234" rx="8"/>
+  <text class="lbl bold zh mid" x="166" y="118">一份混合樣本</text>
+
+  <text class="tick zh" x="40" y="150">① 細胞層　<tspan class="mono">p = 2/6 = 0.33</tspan></text>
+  <circle class="cell tumor" cx="70" cy="180" r="13"/>
+  <circle class="cell tumor" cx="102" cy="180" r="13"/>
+  <circle class="cell normal" cx="134" cy="180" r="13"/>
+  <circle class="cell normal" cx="166" cy="180" r="13"/>
+  <circle class="cell normal" cx="198" cy="180" r="13"/>
+  <circle class="cell normal" cx="230" cy="180" r="13"/>
+  <text class="lbl mono accent bold" x="252" y="188">p</text>
+
+  <line class="conn" x1="166" y1="200" x2="166" y2="228" marker-end="url(#arrow)"/>
+  <text class="tick zh warn bold" x="180" y="222">× 倍體 κ</text>
+
+  <text class="tick zh" x="40" y="256">② 分子層　<tspan class="mono">f = 0.50</tspan>（此例 <tspan class="mono">κ = 4</tspan>）</text>
+  <rect class="bar somatic" x="70" y="270" width="112" height="22"/>
+  <rect class="bar" x="182" y="270" width="112" height="22"/>
+  <text class="lbl mono somatic bold" x="298" y="288">f</text>
+  <text class="tick zh" x="40" y="310">腫瘤細胞每個貢獻 <tspan class="mono">κ</tspan> 份，正常細胞 2 份</text>
+
+  <!-- ══ 中：GHIR 讀的是 p ══ -->
+  <rect class="box accent" x="332" y="88" width="292" height="234" rx="8"/>
+  <text class="lbl bold zh mid" x="478" y="118">GHIR 在 1+1 位點上量到什麼</text>
+
+  <text class="tick zh" x="352" y="152">每個正常細胞在兩條單倍型上<tspan class="bold">各一份</tspan>；</text>
+  <text class="tick zh" x="352" y="176">每個腫瘤細胞按 <tspan class="mono">n₁</tspan>、<tspan class="mono">n₂</tspan> 貢獻。</text>
+
+  <text class="tick zh" x="352" y="212">H1</text>
+  <rect class="bar hp1" x="392" y="196" width="60" height="22"/>
+  <text class="tick mono" x="460" y="214">1 − p</text>
+
+  <text class="tick zh" x="352" y="252">H2</text>
+  <rect class="bar hp2" x="392" y="236" width="150" height="22"/>
+  <text class="tick mono" x="550" y="254">1</text>
+
+  <text class="anno bold mono mid" x="478" y="292">GHIR = 1 ÷ (2 − <tspan class="accent">p</tspan>)</text>
+  <text class="tick zh bold mid" x="478" y="314">分母裡沒有任何一項是 <tspan class="mono somatic">f</tspan></text>
+
+  <!-- ══ 右：迴歸擬合的是 f ══ -->
+  <rect class="box warn" x="644" y="88" width="336" height="234" rx="8"/>
+  <text class="lbl bold zh mid" x="812" y="118">迴歸擬合的標籤</text>
+
+  <text class="tick zh" x="664" y="152">合成樣本依 <tspan class="mono">read</tspan> 數混合，</text>
+  <text class="tick zh" x="664" y="176">所以已知的那個數字是<tspan class="bold">分子</tspan>的比例。</text>
+
+  <line class="axis" x1="700" y1="286" x2="960" y2="286"/>
+  <line class="axis" x1="700" y1="286" x2="700" y2="196"/>
+  <path class="flow" d="M706,280 C752,266 790,240 828,222 C862,208 908,204 954,202"/>
+  <circle class="pt tp" cx="740" cy="262"  r="4"/>
+  <circle class="pt tp" cx="790" cy="238" r="4"/>
+  <circle class="pt tp" cx="850" cy="216" r="4"/>
+  <circle class="pt tp" cx="910" cy="206" r="4"/>
+  <text class="lbl mono somatic bold" x="664" y="202">f</text>
+  <text class="tick zh mid" x="830" y="308">GHIR 的中位數與四分位距 →</text>
+
+  <path class="conn somatic thick" d="M624,205 L640,205" marker-end="url(#arrow)"/>
+
+  <!-- ══ 底：實際的跨度 ══ -->
+  <rect class="box ghost" x="20" y="336" width="960" height="106" rx="8"/>
+  <text class="anno bold zh" x="40" y="366">同一個 <tspan class="mono">1+1</tspan> 位點，標籤同為 <tspan class="mono">f = 0.60</tspan>，來源細胞株的倍體不同</text>
+
+  <text class="tick zh mid" x="200" y="396">來源 κ = 2.0</text>
+  <text class="tick mono mid" x="200" y="420">p = 0.600 → GHIR 0.714</text>
+  <text class="tick zh mid" x="500" y="396">來源 κ = 3.2</text>
+  <text class="tick mono mid" x="500" y="420">p = 0.484 → GHIR 0.660</text>
+  <text class="tick zh mid" x="800" y="396">來源 κ = 4.0</text>
+  <text class="tick mono mid" x="800" y="420">p = 0.429 → GHIR 0.636</text>
+
+  <rect class="box accent" x="20" y="454" width="960" height="56" rx="8"/>
+  <text class="anno zh" x="40" y="480">跨度 <tspan class="mono bold">0.078</tspan>，與突變負荷的 <tspan class="mono">0.089</tspan> 及深度 20 的折疊偏移 <tspan class="mono">0.088</tspan> 同一個數量級。</text>
+  <text class="anno zh" x="40" y="504">一條曲線吸收得了這段落差 —— <tspan class="bold">代價是係數裡含有訓練面板的倍體組成</tspan>。</text>
+</svg>

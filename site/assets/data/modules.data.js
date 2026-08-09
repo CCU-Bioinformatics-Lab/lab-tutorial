@@ -139,7 +139,7 @@ window.TW_MODULES = [
   "title_en": "LongPhase-S: matched tumour–normal",
   "short": "LongPhase-S",
   "q": "有配對正常組織時，完整的腫瘤分析流程如何運作？",
-  "sub": "依序說明 GHIR、LCVF、purity 迴歸、purity-aware 過濾與最終 somatic haplotagging，並標示模型假設與限制。",
+  "sub": "依序說明 GHIR、LCVF、DNA 比例迴歸、比例感知過濾與最終 somatic haplotagging；並說明這個迴歸估的為何是 tumor DNA fraction，不是 cellular purity。",
   "est_min": 80,
   "group": "實驗室工具"
  },
@@ -212,7 +212,7 @@ window.TW_MODULES = [
   "title_en": "Part 2 — the closed form and three channels",
   "short": "失衡的閉式與通道",
   "q": "同一個失衡數字，可能是腫瘤變多了，也可能是拷貝數不平均 —— 怎麼分？",
-  "sub": "由原始碼寫出單倍型失衡的閉式，說明它與等位比例式同形；指出 somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位點分別量測；並給出一個對另一條單倍型免疫的純度訊號。",
+  "sub": "先界定現行迴歸的四項限制 —— 輸出只有 DNA 比例、兩種成因壓在同一個數上、折疊偏移進入特徵、係數含突變負荷；再由原始碼寫出單倍型失衡的閉式，並給出一個對另一條單倍型免疫的純度訊號。",
   "group": "研究指引"
  },
  {

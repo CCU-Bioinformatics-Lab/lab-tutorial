@@ -860,7 +860,9 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
 以及位於 phase block 邊界。三者皆使 read 落入 <code>H3</code>。
 <b>這些位點不得計入分母而以零充數</b> —— 那會使純度被系統性低估。</figcaption></figure>
 
-<h3 id="七-與現行迴歸的對照">七、與現行迴歸的對照</h3>
+<h3 id="七-與現行方法的對照">七、與現行方法的對照</h3>
+
+<h4 id="與現行迴歸-同一條資料路線之內">與現行迴歸：同一條資料路線之內</h4>
 
 <div class="table-wrap">
 <table>
@@ -885,6 +887,256 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
 
 <p class="prose">可宣稱的論據限於三項：<b>把兩種成因分開量測</b>、<b>多輸出三個量</b>、
 以及<b>失效模式可診斷</b>；<b>不可</b>宣稱精度改善。</p>
+
+<h4 id="與-ascat-purple-真正的對照基準">與 ASCAT／PURPLE：真正的對照基準</h4>
+
+<p class="prose">現行迴歸不是唯一的比較對象，甚至不是最重要的那一個。
+上篇所述的 ASCAT 與 PURPLE 是這個問題的既有標準，
+而本規格的三個通道<b>有兩個與它們重疊</b> —— 總深度與等位比例 ——
+所用的代數也是同一套。因此差異必須逐項指出，不能以「資料型態不同」帶過。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">項目</th><th scope="col">ASCAT</th><th scope="col">PURPLE</th><th scope="col">本頁規格</th></tr></thead>
+<tbody>
+<tr><td>等位訊號</td>
+<td>germline heterozygous 位點的 BAF，<b>刻意不做相位</b>，A／B 標號隨機化，軌道對稱於 0.5</td>
+<td>AMBER 取兩者較大值，值域 <math><mo>[</mo><mn>0.5</mn><mo>,</mo><mn>1</mn><mo>]</mo></math></td>
+<td>覆蓋該位點的 read 已帶單倍型標籤，故 phase block 之內<b>不需折疊</b></td></tr>
+
+<tr><td>折疊偏移</td>
+<td>逐位點折疊後再分段</td>
+<td>以二項分布算出平衡區段的期望值，觀測低於 0.535 時比較兩種解釋</td>
+<td>折疊前的聚合單位由<b>一個位點</b>放大為<b>一個 phase block</b>，偏移隨區塊內總計數下降</td></tr>
+
+<tr><td>somatic 通道</td>
+<td><b>不使用</b></td>
+<td>兩用：低純度解的懲罰，以及高度二倍體樣本的 VAF 退路（限推得拷貝數 1.8–2.2）</td>
+<td>與另兩者<b>同級的似然項</b>；統計量為 <math><mi>s</mi></math>，分母不含 <math><msub><mi>n</mi><mn>2</mn></msub></math>，故不需該區域限制</td></tr>
+
+<tr><td>分段</td>
+<td>等位特異的分段（ASPCF），深度與等位聯合</td>
+<td>深度、等位與結構變異斷點</td>
+<td>同 PURPLE 的三項依據 —— <b>此為沿用，不是新增</b></td></tr>
+
+<tr><td>加倍簡併的處置</td>
+<td>硬性倍體界限；四道條件皆不通過即回傳 <code>NA</code></td>
+<td>連續的事件懲罰，加上一條來自 somatic 的約束</td>
+<td><b>不選解</b>：兩個模式各自附機率一併輸出</td></tr>
+
+<tr><td>不確定性</td>
+<td>點估計，或 <code>NA</code></td>
+<td><b>已輸出</b> <code>minPurity</code>／<code>maxPurity</code>（來自分數曲面）</td>
+<td>後驗區間。差別不在「有沒有」，而在<b>它是似然而非分數</b>，因而可回報多峰</td></tr>
+
+<tr><td>subclonality</td>
+<td>嚴格 clonal</td>
+<td>允許非整數拷貝數，但擬合中無混合模型</td>
+<td><math><mi>c</mi></math> 顯式建模並給先驗；<math><mi>s</mi></math> 的多峰結構本身即訊號</td></tr>
+
+<tr><td>輸入需求</td>
+<td>陣列或短讀；標準用法為配對正常樣本</td>
+<td>短讀全基因體；另有 tumor-only 模式</td>
+<td><b>長讀，且需可用的相位區塊</b> —— 短讀資料上不適用</td></tr>
+
+<tr><td><b>已驗證程度</b></td>
+<td>原始文獻 79 例，其後為泛癌標準工具</td>
+<td>逾兩千例轉移性全基因體隊列</td>
+<td><b>尚未執行</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580" class="dia-svg" role="img" aria-labelledby="sr5-baselines__title" aria-describedby="sr5-baselines__desc">
+  <title id="sr5-baselines__title">四個方法各自使用哪些觀測統計量</title>
+  <desc id="sr5-baselines__desc">把 ASCAT、PURPLE、現行迴歸與本頁規格放在同一張表上，
+        每一列是一個可以從資料算出來的統計量，每一欄是一個方法，
+        格子填色代表該方法有用這個量，虛線代表沒有用，橘框代表有條件地用。
+        看下來會發現重疊的部分比想像中多：總深度比、逐位點折疊的等位比例、
+        結構變異斷點，這三個量 ASCAT 或 PURPLE 至少有一個已經在用。
+        真正只有本頁規格在用的是兩列：相位後不折疊的單倍型深度比，
+        以及分母只涵蓋一條單倍型的體細胞佔比。
+        現行迴歸所用的 GHIR 也自成一列，它量在體細胞位點上，
+        但分母涵蓋兩條單倍型而且經過折疊，所以跟上面兩個新增的量都不同。
+        PURPLE 的體細胞 VAF 那一格是橘框，因為它只在推得拷貝數落於
+        一點八到二點二之間時才啟用。
+        讀法是：要說明新意在哪裡，指的應該是那兩列，而不是整張表。</desc>
+
+  <text class="ttl zh" x="20" y="36">四個方法用到哪些觀測統計量</text>
+  <text class="anno zh" x="20" y="66">填色＝使用，虛線＝不使用，橘框＝有條件使用。</text>
+
+  <!-- 高亮欄：本頁規格。region 是 10% 底色，必須畫在所有方框之前 -->
+  <rect class="region" x="835" y="128" width="165" height="372"/>
+
+  <text class="lbl bold zh mid" x="422" y="112">ASCAT</text>
+  <text class="lbl bold zh mid" x="587" y="112">PURPLE</text>
+  <text class="lbl bold zh mid" x="752" y="112">現行迴歸</text>
+  <text class="lbl bold zh mid accent" x="917" y="112">本頁規格</text>
+  <line class="axis" x1="20" y1="128" x2="980" y2="128"/>
+
+  <!-- ── 第一列：總深度比 ─────────────────────────────────────────── -->
+  <text class="tick zh" x="24" y="170">總深度比：視窗全體</text>
+  <rect class="box accent" x="352" y="146" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="517" y="146" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="682" y="146" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="847" y="146" width="140" height="28" rx="6"/>
+
+  <!-- ── 第二列：逐位點折疊的等位比例 ─────────────────────────────── -->
+  <text class="tick zh" x="24" y="222">BAF（germline 位點，逐位點折疊）</text>
+  <rect class="box accent" x="352" y="198" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="517" y="198" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="682" y="198" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="847" y="198" width="140" height="28" rx="6"/>
+
+  <!-- ── 第三列：相位後不折疊 ★新增 ──────────────────────────────── -->
+  <text class="tick zh bold accent" x="24" y="274">單倍型深度比（germline 位點，不折疊）</text>
+  <rect class="box ghost"  x="352" y="250" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="517" y="250" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="682" y="250" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="847" y="250" width="140" height="28" rx="6"/>
+
+  <!-- ── 第四列：somatic VAF ─────────────────────────────────────── -->
+  <text class="tick zh" x="24" y="326">somatic VAF：分母涵蓋兩條單倍型</text>
+  <rect class="box ghost" x="352" y="302" width="140" height="28" rx="6"/>
+  <rect class="box warn"  x="517" y="302" width="140" height="28" rx="6"/>
+  <text class="tick warn mid" x="587" y="322">限 CN 1.8–2.2</text>
+  <rect class="box ghost" x="682" y="302" width="140" height="28" rx="6"/>
+  <rect class="box ghost" x="847" y="302" width="140" height="28" rx="6"/>
+
+  <!-- ── 第五列：GHIR ────────────────────────────────────────────── -->
+  <text class="tick zh" x="24" y="378">GHIR：somatic 位點，分母兩條且折疊</text>
+  <rect class="box ghost"  x="352" y="354" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="517" y="354" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="682" y="354" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="847" y="354" width="140" height="28" rx="6"/>
+
+  <!-- ── 第六列：單倍型內佔比 ★新增 ──────────────────────────────── -->
+  <text class="tick zh bold accent" x="24" y="430">單倍型內佔比 s：分母只有一條</text>
+  <rect class="box ghost"  x="352" y="406" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="517" y="406" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="682" y="406" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="847" y="406" width="140" height="28" rx="6"/>
+
+  <!-- ── 第七列：結構變異斷點 ─────────────────────────────────────── -->
+  <text class="tick zh" x="24" y="482">結構變異斷點（供分段）</text>
+  <rect class="box ghost"  x="352" y="458" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="517" y="458" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="682" y="458" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="847" y="458" width="140" height="28" rx="6"/>
+
+  <!-- 高亮欄的邊框畫在最上層，10% 底色在螢幕上還是偏淡 -->
+  <rect class="box ghost" x="835" y="128" width="165" height="372"/>
+
+  <rect class="box accent" x="20" y="512" width="960" height="52" rx="8"/>
+  <text class="anno zh" x="40" y="546">第 3 與第 6 列是本規格唯一新增的兩個量 —— 其餘五列 ASCAT 或 PURPLE 已在用。</text>
+</svg><figcaption>每一列是一個可由資料算出的統計量，每一欄是一個方法。
+填色為使用、虛線為不使用、橘框為有條件使用。
+重疊的部分比預期多：<b>總深度、逐位點折疊的等位比例與結構變異斷點，
+ASCAT 或 PURPLE 至少有一個已經在用</b>。
+只有第三列（相位後不折疊的單倍型深度比）與第六列（分母只涵蓋一條的 <math><mi>s</mi></math>）是新增的。
+現行迴歸的 GHIR 自成一列 —— 它量在 somatic 位點上，但分母涵蓋兩條且經過折疊，
+故與新增的兩者皆不同。</figcaption></figure>
+
+<h4 id="三項可宣稱的新意-與三項不是新意的事">三項可宣稱的新意，與三項不是新意的事</h4>
+
+<p class="prose">上表的重疊處提示了一件事：把「換一種資料重做同一件事」講成「解決了別人解不了的問題」，
+是最容易犯的錯。以下逐項界定。</p>
+
+<p class="prose"><b>① 相位由分子本身給出。</b>
+ASCAT 與 PURPLE 的等位軌道都是折疊的，其代價已在中篇量化：深度 20 時折疊偏移為 0.088，
+大於 <math><mi>p</mi><mo>=</mo><mn>0.20</mn></math> 二倍體位點的整段訊號 0.056。
+須註明的是<b>兩者對此的處置並不相同</b>：PURPLE 以二項分布明確校正（0.535 的比較），ASCAT 則無此步驟。
+單倍型標籤使折疊前的聚合單位由一個位點放大為一個 phase block，
+偏移隨區塊內的總計數而非單位點深度下降。<br>
+<b>邊界</b>：這是<b>量的改變，不是質的消除</b>。區塊之間的 H1／H2 標號仍然任意（第六節），
+跨區塊連結是未解問題；而<b>相位輔助的等位失衡估計本身並不新</b> ——
+Battenberg 早以參考面板 imputation 達成同一方向的效果。</p>
+
+<p class="prose"><b>② germline 錨與 somatic 位點落在同一條分子上。</b>
+這是短讀與陣列<b>做不到</b>的一件事，也是三項之中唯一長讀獨有者：
+參考面板可以把 germline 位點相位化，但 <b>somatic 變異不在任何面板裡</b>，
+面板 imputation 因此推不出四格表。四格表使 somatic 通道的統計量由 VAF（分母兩條單倍型）
+變為 <math><mi>s</mi></math>（分母一條），PURPLE 的拷貝數 1.8–2.2 區域限制隨之不再需要。<br>
+<b>邊界</b>：<math><mi>s</mi></math> 只消去 <math><msub><mi>n</mi><mn>2</mn></msub></math>，仍依賴 <math><msub><mi>n</mi><mn>1</mn></msub></math>、<math><mi>c</mi></math> 與 <math><mi>μ</mi></math>（中篇第五節）；
+且它取代的是 PURPLE 的<b>退路</b>，不是其主要擬合。</p>
+
+<p class="prose"><b>③ 三個通道進同一個似然，共用一個 <math><mi>p</mi></math>。</b>
+PURPLE 的 somatic 輸入是懲罰項與退路，不是帶自身抽樣模型的似然項；
+本規格把它升格為與另兩者同級的一項。<br>
+<b>邊界</b>：<b>「有不確定性」不是新的</b> —— PURPLE 已輸出 <code>minPurity</code>／<code>maxPurity</code>。
+新的是它是似然而非分數，因而可回報<b>多峰</b>而非單一區間；
+而此優點以模型正確為前提，模型錯時區間會過窄。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" class="dia-svg" role="img" aria-labelledby="sr5-novelty__title" aria-describedby="sr5-novelty__desc">
+  <title id="sr5-novelty__title">三項可宣稱的新意及其邊界，與三項早已存在的技術</title>
+  <desc id="sr5-novelty__desc">左欄是本頁規格真正新增的三件事，每一件都附上它的邊界。
+        第一件是相位由分子本身給出，所以折疊之前的聚合單位從單一個位點放大到整個相位區塊；
+        它的邊界是區塊之間的單倍型標號仍然任意，跨區塊連結沒有解決。
+        第二件是兩類位點落在同一條分子上，四格表因而存在，
+        體細胞佔比的分母只涵蓋一條單倍型；它的邊界是這只消去另一條的拷貝數，
+        仍然依賴帶有變異那一條的拷貝數、帶原細胞比例與多重度。
+        第三件是三個通道進同一個似然，因而可以回報多個模式而不是一個區間；
+        它的邊界是這以模型正確為前提，模型錯的時候區間會過窄。
+        右欄是三件早已存在的技術，列出來是為了避免把它們算成新意：
+        純度與倍體的聯合網格擬合在 ASCAT 就有，
+        體細胞變異當純度錨是 PURPLE 的做法，
+        而用相位輔助等位失衡估計，Battenberg 以參考面板 imputation 早已做到。
+        讀法是：三件新增的事情裡，只有第二件是長讀獨有的，
+        因為體細胞變異不在任何參考面板裡，面板 imputation 相位不出四格表。</desc>
+
+  <text class="ttl zh" x="20" y="36">哪些是新的，哪些不是</text>
+  <text class="anno zh" x="20" y="66">左為本規格新增者，每項附其邊界；右為既有技術與其出處。</text>
+
+  <text class="lbl bold zh accent" x="20" y="112">新增（各附邊界）</text>
+  <text class="lbl bold zh" x="510" y="112">既有技術（出處）</text>
+
+  <!-- ── 左：三項新增 ─────────────────────────────────────────────── -->
+  <rect class="box accent" x="20" y="128" width="460" height="104" rx="8"/>
+  <text class="lbl bold zh" x="44" y="162">① 相位由分子本身給出</text>
+  <text class="tick zh" x="44" y="190">折疊前的聚合單位：一個位點 → 一個 phase block</text>
+  <text class="tick warn zh" x="44" y="216">邊界：區塊之間的 H1／H2 標號仍然任意</text>
+
+  <rect class="box accent" x="20" y="244" width="460" height="104" rx="8"/>
+  <text class="lbl bold zh" x="44" y="278">② 兩類位點在同一條分子上</text>
+  <text class="tick zh" x="44" y="306">四格表因而存在：s 的分母只有一條單倍型</text>
+  <text class="tick warn zh" x="44" y="332">邊界：只消去 n₂，仍依賴 n₁、c 與 μ</text>
+
+  <rect class="box accent" x="20" y="360" width="460" height="104" rx="8"/>
+  <text class="lbl bold zh" x="44" y="394">③ 三個通道進同一個似然</text>
+  <text class="tick zh" x="44" y="422">可回報多個模式，而非一個區間</text>
+  <text class="tick warn zh" x="44" y="448">邊界：以模型正確為前提，模型錯時區間過窄</text>
+
+  <!-- ── 右：三項既有 ─────────────────────────────────────────────── -->
+  <rect class="box sunken" x="510" y="128" width="470" height="104" rx="8"/>
+  <text class="lbl zh" x="534" y="168">純度與倍體的聯合網格擬合</text>
+  <text class="tick zh" x="534" y="200">ASCAT 已有；PURPLE 用同一組代數</text>
+
+  <rect class="box sunken" x="510" y="244" width="470" height="104" rx="8"/>
+  <text class="lbl zh" x="534" y="284">somatic 變異作為純度錨</text>
+  <text class="tick zh" x="534" y="316">PURPLE 的低純度懲罰與二倍體退路</text>
+
+  <rect class="box sunken" x="510" y="360" width="470" height="104" rx="8"/>
+  <text class="lbl zh" x="534" y="400">相位輔助的等位失衡估計</text>
+  <text class="tick zh" x="534" y="432">Battenberg：參考面板 imputation</text>
+
+  <rect class="box accent" x="20" y="476" width="960" height="52" rx="8"/>
+  <text class="anno zh" x="40" y="510">只有 ② 是長讀獨有的：somatic 變異不在任何參考面板裡，面板相位推不出四格表。</text>
+</svg><figcaption>左為三項新增，每項附其邊界；右為三項既有技術及其出處。
+把右欄寫出來的理由是：<b>純度與倍體的聯合網格擬合、somatic 變異當純度錨、
+相位輔助的等位失衡估計，三者都已有人做過</b>。
+底列為結論 —— 只有第二項是長讀獨有的。</figcaption></figure>
+
+<div class="guardrail">
+<p class="guardrail__hd">不可宣稱「取代 ASCAT／PURPLE」</p>
+<p class="prose">三項限制同時成立：其一，本規格<b>需要長讀與可用的相位區塊</b>，
+在短讀與陣列資料上不適用，故它不是同一個生態位的替代品；
+其二，它<b>尚未執行任何驗證</b>，而對照的兩者各有 79 例與逾兩千例的紀錄；
+其三，上表九列之中，資訊上真正新增的<b>只有兩個統計量</b>，其餘皆為既有技術的重新組合。</p>
+<p class="prose">可宣稱的是一句範圍明確的話：<b>在長讀資料上，somatic 錨不再受拷貝數區域限制，
+且輸出多一組 <math><mo>(</mo><msub><mi>n</mi><mn>1,</mn></msub><msub><mi>n</mi><mn>2</mn></msub><mo>)</mo></math> 軌道與一組區間。</b>
+中篇的警告在此同樣適用 —— LOH 對 ASCAT 與 PURPLE 的主要擬合並非不利，
+<b>不可</b>宣稱「在它們失效之處仍然可用」。</p>
+</div>
 
 <h3 id="八-實作分期">八、實作分期</h3>
 
@@ -1175,7 +1427,7 @@ GHIR 的定義見 <code>src/haplotag/HaplotagStrategy.h</code> 的
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="sr4.html"><small>← 上一模組</small>中篇：單倍型失衡的閉式與三個觀測通道</a><span></span></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>TINC（腫瘤污染正常樣本）</dt><dd>Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv3"><a href="#中篇留下的四個缺口">中篇留下的四個缺口</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#一-完整的估計式">一、完整的估計式</a></li><li class="lv4"><a href="#為何不能沿用上篇的分數形式">為何不能沿用上篇的分數形式</a></li><li class="lv3"><a href="#二-生成模型-從參數到計數">二、生成模型：從參數到計數</a></li><li class="lv4"><a href="#第三層-分子組成">第三層：分子組成</a></li><li class="lv4"><a href="#第四層-三個通道各自的分布">第四層：三個通道各自的分布</a></li><li class="lv4"><a href="#第五層-四格表">第五層：四格表</a></li><li class="lv3"><a href="#三-分段與定向是兩件不同的工作">三、分段與定向是兩件不同的工作</a></li><li class="lv3"><a href="#四-nuisance-參數-c-與兩種錯誤">四、nuisance 參數：c、μ 與兩種錯誤</a></li><li class="lv3"><a href="#五-解決與未解決的不可辨識性">五、解決與未解決的不可辨識性</a></li><li class="lv4"><a href="#解決-無等位失衡時純度不可辨識">解決：無等位失衡時純度不可辨識</a></li><li class="lv4"><a href="#未解決-全基因體加倍">未解決：全基因體加倍</a></li><li class="lv4"><a href="#輸出格式-加倍未定時保留兩個模式">輸出格式：加倍未定時保留兩個模式</a></li><li class="lv3"><a href="#六-失效模式">六、失效模式</a></li><li class="lv3"><a href="#七-與現行迴歸的對照">七、與現行迴歸的對照</a></li><li class="lv3"><a href="#八-實作分期">八、實作分期</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#真值缺口">真值缺口</a></li><li class="lv3"><a href="#三條分開的評比軌道">三條分開的評比軌道</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv3"><a href="#尚未解決的問題">尚未解決的問題</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv3"><a href="#中篇留下的四個缺口">中篇留下的四個缺口</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#一-完整的估計式">一、完整的估計式</a></li><li class="lv4"><a href="#為何不能沿用上篇的分數形式">為何不能沿用上篇的分數形式</a></li><li class="lv3"><a href="#二-生成模型-從參數到計數">二、生成模型：從參數到計數</a></li><li class="lv4"><a href="#第三層-分子組成">第三層：分子組成</a></li><li class="lv4"><a href="#第四層-三個通道各自的分布">第四層：三個通道各自的分布</a></li><li class="lv4"><a href="#第五層-四格表">第五層：四格表</a></li><li class="lv3"><a href="#三-分段與定向是兩件不同的工作">三、分段與定向是兩件不同的工作</a></li><li class="lv3"><a href="#四-nuisance-參數-c-與兩種錯誤">四、nuisance 參數：c、μ 與兩種錯誤</a></li><li class="lv3"><a href="#五-解決與未解決的不可辨識性">五、解決與未解決的不可辨識性</a></li><li class="lv4"><a href="#解決-無等位失衡時純度不可辨識">解決：無等位失衡時純度不可辨識</a></li><li class="lv4"><a href="#未解決-全基因體加倍">未解決：全基因體加倍</a></li><li class="lv4"><a href="#輸出格式-加倍未定時保留兩個模式">輸出格式：加倍未定時保留兩個模式</a></li><li class="lv3"><a href="#六-失效模式">六、失效模式</a></li><li class="lv3"><a href="#七-與現行方法的對照">七、與現行方法的對照</a></li><li class="lv4"><a href="#與現行迴歸-同一條資料路線之內">與現行迴歸：同一條資料路線之內</a></li><li class="lv4"><a href="#與-ascat-purple-真正的對照基準">與 ASCAT／PURPLE：真正的對照基準</a></li><li class="lv4"><a href="#三項可宣稱的新意-與三項不是新意的事">三項可宣稱的新意，與三項不是新意的事</a></li><li class="lv3"><a href="#八-實作分期">八、實作分期</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#真值缺口">真值缺口</a></li><li class="lv3"><a href="#三條分開的評比軌道">三條分開的評比軌道</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv3"><a href="#尚未解決的問題">尚未解決的問題</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">

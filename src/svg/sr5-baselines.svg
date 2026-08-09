@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580">
+  <title>四個方法各自使用哪些觀測統計量</title>
+  <desc>把 ASCAT、PURPLE、現行迴歸與本頁規格放在同一張表上，
+        每一列是一個可以從資料算出來的統計量，每一欄是一個方法，
+        格子填色代表該方法有用這個量，虛線代表沒有用，橘框代表有條件地用。
+        看下來會發現重疊的部分比想像中多：總深度比、逐位點折疊的等位比例、
+        結構變異斷點，這三個量 ASCAT 或 PURPLE 至少有一個已經在用。
+        真正只有本頁規格在用的是兩列：相位後不折疊的單倍型深度比，
+        以及分母只涵蓋一條單倍型的體細胞佔比。
+        現行迴歸所用的 GHIR 也自成一列，它量在體細胞位點上，
+        但分母涵蓋兩條單倍型而且經過折疊，所以跟上面兩個新增的量都不同。
+        PURPLE 的體細胞 VAF 那一格是橘框，因為它只在推得拷貝數落於
+        一點八到二點二之間時才啟用。
+        讀法是：要說明新意在哪裡，指的應該是那兩列，而不是整張表。</desc>
+
+  <text class="ttl zh" x="20" y="36">四個方法用到哪些觀測統計量</text>
+  <text class="anno zh" x="20" y="66">填色＝使用，虛線＝不使用，橘框＝有條件使用。</text>
+
+  <!-- 高亮欄：本頁規格。region 是 10% 底色，必須畫在所有方框之前 -->
+  <rect class="region" x="835" y="128" width="165" height="372"/>
+
+  <text class="lbl bold zh mid" x="422" y="112">ASCAT</text>
+  <text class="lbl bold zh mid" x="587" y="112">PURPLE</text>
+  <text class="lbl bold zh mid" x="752" y="112">現行迴歸</text>
+  <text class="lbl bold zh mid accent" x="917" y="112">本頁規格</text>
+  <line class="axis" x1="20" y1="128" x2="980" y2="128"/>
+
+  <!-- ── 第一列：總深度比 ─────────────────────────────────────────── -->
+  <text class="tick zh" x="24" y="170">總深度比：視窗全體</text>
+  <rect class="box accent" x="352" y="146" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="517" y="146" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="682" y="146" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="847" y="146" width="140" height="28" rx="6"/>
+
+  <!-- ── 第二列：逐位點折疊的等位比例 ─────────────────────────────── -->
+  <text class="tick zh" x="24" y="222">BAF（germline 位點，逐位點折疊）</text>
+  <rect class="box accent" x="352" y="198" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="517" y="198" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="682" y="198" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="847" y="198" width="140" height="28" rx="6"/>
+
+  <!-- ── 第三列：相位後不折疊 ★新增 ──────────────────────────────── -->
+  <text class="tick zh bold accent" x="24" y="274">單倍型深度比（germline 位點，不折疊）</text>
+  <rect class="box ghost"  x="352" y="250" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="517" y="250" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="682" y="250" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="847" y="250" width="140" height="28" rx="6"/>
+
+  <!-- ── 第四列：somatic VAF ─────────────────────────────────────── -->
+  <text class="tick zh" x="24" y="326">somatic VAF：分母涵蓋兩條單倍型</text>
+  <rect class="box ghost" x="352" y="302" width="140" height="28" rx="6"/>
+  <rect class="box warn"  x="517" y="302" width="140" height="28" rx="6"/>
+  <text class="tick warn mid" x="587" y="322">限 CN 1.8–2.2</text>
+  <rect class="box ghost" x="682" y="302" width="140" height="28" rx="6"/>
+  <rect class="box ghost" x="847" y="302" width="140" height="28" rx="6"/>
+
+  <!-- ── 第五列：GHIR ────────────────────────────────────────────── -->
+  <text class="tick zh" x="24" y="378">GHIR：somatic 位點，分母兩條且折疊</text>
+  <rect class="box ghost"  x="352" y="354" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="517" y="354" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="682" y="354" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="847" y="354" width="140" height="28" rx="6"/>
+
+  <!-- ── 第六列：單倍型內佔比 ★新增 ──────────────────────────────── -->
+  <text class="tick zh bold accent" x="24" y="430">單倍型內佔比 s：分母只有一條</text>
+  <rect class="box ghost"  x="352" y="406" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="517" y="406" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="682" y="406" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="847" y="406" width="140" height="28" rx="6"/>
+
+  <!-- ── 第七列：結構變異斷點 ─────────────────────────────────────── -->
+  <text class="tick zh" x="24" y="482">結構變異斷點（供分段）</text>
+  <rect class="box ghost"  x="352" y="458" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="517" y="458" width="140" height="28" rx="6"/>
+  <rect class="box ghost"  x="682" y="458" width="140" height="28" rx="6"/>
+  <rect class="box accent" x="847" y="458" width="140" height="28" rx="6"/>
+
+  <!-- 高亮欄的邊框畫在最上層，10% 底色在螢幕上還是偏淡 -->
+  <rect class="box ghost" x="835" y="128" width="165" height="372"/>
+
+  <rect class="box accent" x="20" y="512" width="960" height="52" rx="8"/>
+  <text class="anno zh" x="40" y="546">第 3 與第 6 列是本規格唯一新增的兩個量 —— 其餘五列 ASCAT 或 PURPLE 已在用。</text>
+</svg>

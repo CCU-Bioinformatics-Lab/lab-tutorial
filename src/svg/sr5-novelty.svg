@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540">
+  <title>三項可宣稱的新意及其邊界，與三項早已存在的技術</title>
+  <desc>左欄是本頁規格真正新增的三件事，每一件都附上它的邊界。
+        第一件是相位由分子本身給出，所以折疊之前的聚合單位從單一個位點放大到整個相位區塊；
+        它的邊界是區塊之間的單倍型標號仍然任意，跨區塊連結沒有解決。
+        第二件是兩類位點落在同一條分子上，四格表因而存在，
+        體細胞佔比的分母只涵蓋一條單倍型；它的邊界是這只消去另一條的拷貝數，
+        仍然依賴帶有變異那一條的拷貝數、帶原細胞比例與多重度。
+        第三件是三個通道進同一個似然，因而可以回報多個模式而不是一個區間；
+        它的邊界是這以模型正確為前提，模型錯的時候區間會過窄。
+        右欄是三件早已存在的技術，列出來是為了避免把它們算成新意：
+        純度與倍體的聯合網格擬合在 ASCAT 就有，
+        體細胞變異當純度錨是 PURPLE 的做法，
+        而用相位輔助等位失衡估計，Battenberg 以參考面板 imputation 早已做到。
+        讀法是：三件新增的事情裡，只有第二件是長讀獨有的，
+        因為體細胞變異不在任何參考面板裡，面板 imputation 相位不出四格表。</desc>
+
+  <text class="ttl zh" x="20" y="36">哪些是新的，哪些不是</text>
+  <text class="anno zh" x="20" y="66">左為本規格新增者，每項附其邊界；右為既有技術與其出處。</text>
+
+  <text class="lbl bold zh accent" x="20" y="112">新增（各附邊界）</text>
+  <text class="lbl bold zh" x="510" y="112">既有技術（出處）</text>
+
+  <!-- ── 左：三項新增 ─────────────────────────────────────────────── -->
+  <rect class="box accent" x="20" y="128" width="460" height="104" rx="8"/>
+  <text class="lbl bold zh" x="44" y="162">① 相位由分子本身給出</text>
+  <text class="tick zh" x="44" y="190">折疊前的聚合單位：一個位點 → 一個 phase block</text>
+  <text class="tick warn zh" x="44" y="216">邊界：區塊之間的 H1／H2 標號仍然任意</text>
+
+  <rect class="box accent" x="20" y="244" width="460" height="104" rx="8"/>
+  <text class="lbl bold zh" x="44" y="278">② 兩類位點在同一條分子上</text>
+  <text class="tick zh" x="44" y="306">四格表因而存在：s 的分母只有一條單倍型</text>
+  <text class="tick warn zh" x="44" y="332">邊界：只消去 n₂，仍依賴 n₁、c 與 μ</text>
+
+  <rect class="box accent" x="20" y="360" width="460" height="104" rx="8"/>
+  <text class="lbl bold zh" x="44" y="394">③ 三個通道進同一個似然</text>
+  <text class="tick zh" x="44" y="422">可回報多個模式，而非一個區間</text>
+  <text class="tick warn zh" x="44" y="448">邊界：以模型正確為前提，模型錯時區間過窄</text>
+
+  <!-- ── 右：三項既有 ─────────────────────────────────────────────── -->
+  <rect class="box sunken" x="510" y="128" width="470" height="104" rx="8"/>
+  <text class="lbl zh" x="534" y="168">純度與倍體的聯合網格擬合</text>
+  <text class="tick zh" x="534" y="200">ASCAT 已有；PURPLE 用同一組代數</text>
+
+  <rect class="box sunken" x="510" y="244" width="470" height="104" rx="8"/>
+  <text class="lbl zh" x="534" y="284">somatic 變異作為純度錨</text>
+  <text class="tick zh" x="534" y="316">PURPLE 的低純度懲罰與二倍體退路</text>
+
+  <rect class="box sunken" x="510" y="360" width="470" height="104" rx="8"/>
+  <text class="lbl zh" x="534" y="400">相位輔助的等位失衡估計</text>
+  <text class="tick zh" x="534" y="432">Battenberg：參考面板 imputation</text>
+
+  <rect class="box accent" x="20" y="476" width="960" height="52" rx="8"/>
+  <text class="anno zh" x="40" y="510">只有 ② 是長讀獨有的：somatic 變異不在任何參考面板裡，面板相位推不出四格表。</text>
+</svg>

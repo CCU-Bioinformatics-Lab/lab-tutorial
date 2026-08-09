@@ -2,10 +2,11 @@
 {
   "objectives": [
     "說明一條 tumor read 為什麼被標成 HP1、HP2、HP1-1、HP2-1 或 HP3",
-    "畫出 LongPhase-S 的四個階段，並說明為什麼 purity 估計必須排在過濾之前",
+    "畫出 LongPhase-S 的四個階段，並說明為什麼比例估計必須排在過濾之前",
     "寫出 GHIR 的算式，並說明造成失衡的兩個來源",
+    "說明這個迴歸估出來的量為什麼是 tumor DNA fraction，而不是 cellular purity",
     "說出四個 somatic variant filter 各自在偵測什麼樣的假陽性",
-    "在 BAM 裡找到 somatic haplotype 的標籤，並知道 purity 被寫到哪裡"
+    "在 BAM 裡找到 somatic haplotype 的標籤，並知道估計值被寫到哪裡"
   ]
 }
 -->
@@ -19,8 +20,14 @@
 
 <p class="prose">[[LongPhase-S]] 的做法是<b>多做一層</b>：除了兩條 germline haplotype，
 再把「帶著 somatic 變異的那些 read」單獨拉成它們的後代分支。
-這一層做出來之後有三個連帶好處 —— 可以直接估 [[tumour purity|purity]]、
+這一層做出來之後有三個連帶好處 —— 可以直接估<b>腫瘤來源 DNA 佔了多少</b>、
 可以用來重新判斷變異真假、也可以看出哪些 read 屬於同一個癌細胞群。</p>
+
+<p class="prose">第一項要先把量講清楚，因為工具的參數名稱與輸出欄位都叫 <code>purity</code>，
+但它估的是 [[tumour DNA fraction|腫瘤 DNA 比例]]（分母是<b>分子</b>），
+不是 [[tumour purity|cellular purity]]（分母是<b>細胞</b>）。
+M3 與 M8 的<a href="m08.html#guard-2">重要區分 #2</a> 已建立這兩個量在非二倍體之下並不相等；
+本章說明 LongPhase-S 落在哪一邊，以及為什麼它不可能落在另一邊。</p>
 </section>
 
 
@@ -53,15 +60,16 @@
 <h3>四個階段</h3>
 
 {{svg:m12-pipeline | [wide] 四個階段從左到右。紅色回饋線是整個設計的關鍵順序：
-<b>purity 必須先估出來，才能決定過濾要多嚴格</b>。}}
+<b>比例必須先估出來，才能決定過濾要多嚴格</b>。
+階段②的輸出標成 <tspan class="mono">f</tspan>（DNA 比例）而非 <tspan class="mono">p</tspan>，理由見下一節末的重要區分。}}
 
 <div class="table-wrap">
 <table>
 <thead><tr><th>階段</th><th>做什麼</th><th>產出</th></tr></thead>
 <tbody>
 <tr><td>①</td><td>初步 somatic haplotagging（上一節那張圖）</td><td>每條 read 一個暫時標籤</td></tr>
-<tr><td>②</td><td>算全基因體的 [[GHIR]] 分布、過濾低信心位點、迴歸估 purity</td><td>一個 purity 數值</td></tr>
-<tr><td>③</td><td>依 purity 調整門檻，跑四個過濾器重新校準候選變異</td><td>高信心的 somatic VCF</td></tr>
+<tr><td>②</td><td>算全基因體的 [[GHIR]] 分布、過濾低信心位點、迴歸估腫瘤 DNA 比例</td><td>一個比例數值 {{m: f}}</td></tr>
+<tr><td>③</td><td>依該比例調整門檻，跑四個過濾器重新校準候選變異</td><td>高信心的 somatic VCF</td></tr>
 <tr><td>④</td><td>用校準後的變異重新 haplotag，並處理 <code>HP3</code></td><td>最終 HP 標籤</td></tr>
 </tbody>
 </table>
@@ -72,12 +80,14 @@ normal 的 germline 變異由 [[Clair3]] 或 DeepVariant 提供，並先 [[phasi
 LongPhase-S 是接在它們後面的一層。</p>
 
 <div class="guardrail guardrail--info">
-<p class="guardrail__hd">為何 purity 估計先於過濾</p>
-<p class="prose">回到 M8 的合成示例：purity 0.2（此處與 tumor DNA fraction 相等）、50× coverage，一個 clonal somatic 變異
+<p class="guardrail__hd">為何比例估計先於過濾</p>
+<p class="prose">回到 M8 的合成示例：腫瘤 DNA 比例 0.2、50× coverage，一個 clonal somatic 變異
 只有<b>約 5 條 read</b> 支持。</p>
-<p class="prose">若套用適合 purity 1.0 的嚴格門檻，真變異可能被當成雜訊而漏掉，[[recall]] 下降。
-若一律放寬，高 purity 樣本的偽陽性則可能增加。</p>
-<p class="prose">因此門檻不是一組固定數字：流程先估 purity，再依 purity 級距選用對應的那組參數。</p>
+<p class="prose">若套用適合純腫瘤的嚴格門檻，真變異可能被當成雜訊而漏掉，[[recall]] 下降。
+若一律放寬，高比例樣本的偽陽性則可能增加。</p>
+<p class="prose">因此門檻不是一組固定數字：流程先估比例，再依比例級距選用對應的那組參數。
+這一步只需要「支持 read 大概會有幾條」，而那正是 DNA 比例決定的量 ——
+<b>過濾這件事本來就不需要細胞比例</b>。</p>
 </div>
 
 <h3>GHIR：兩條 germline haplotype 的 read 有多偏</h3>
@@ -92,16 +102,16 @@ GHIR = \frac{\max(\text{HP1 read 數}, \text{HP2 read 數})}{\text{HP1 read 數}
 分母只算被分到 HP1 或 HP2 的 read —— 這是關鍵，因為帶 somatic allele 的 read 會被改標成
 <code>HP1-1</code>／<code>HP2-1</code>，就<b>不再算進</b>原本那條的計數。</p>
 
-{{svg:m12-ghir | [wide] 三格由左到右是同一個位點在 purity 由低到高時的樣子。
+{{svg:m12-ghir | [wide] 三格由左到右是同一個位點在腫瘤佔比由低到高時的樣子。
 腫瘤細胞越多，被拉去 HP2-1 的 read 就越多，HP2 剩下的越少，比值就越接近 1。
 下半部提醒第二個來源：腫瘤自己的拷貝數變化與 LOH 也會造成失衡，所以需要先用 normal 當基準過濾。}}
 
 <p class="prose">失衡有<b>兩個</b>來源，這點很容易只記住一個：</p>
 
 <ol class="prose">
-<li><b>somatic 變異把 read 拉走</b>。purity 越高，被拉走的比例越大 —— 這是我們想量的訊號。</li>
+<li><b>somatic 變異把 read 拉走</b>。腫瘤佔的比例越高，被拉走的越多 —— 這是我們想量的訊號。</li>
 <li><b>腫瘤本身的拷貝數變化、LOH 與 aneuploidy</b>。某條 haplotype 被放大或整條刪掉，
-一樣會讓比值接近 1 —— 這是雜訊，而且它跟 purity 沒有關係。</li>
+一樣會讓比值接近 1 —— 這是雜訊，而且它跟腫瘤佔多少沒有關係。</li>
 </ol>
 
 <p class="prose">第 2 項的處理方式是拿<b>配對的 normal 樣本當基準</b>：normal 裡就已經失衡的位點，
@@ -127,32 +137,87 @@ GHIR = \frac{\max(\text{HP1 read 數}, \text{HP2 read 數})}{\text{HP1 read 數}
 </div>
 
 <p class="prose">最後一項值得多看一眼。固定一個「至少幾條 read」的數字看起來最簡單，
-但那個數字在 purity 0.2 與 purity 1.0 的樣本上不可能同時適用。
+但那個數字在比例 0.2 與比例 1.0 的樣本上不可能同時適用。
 實際觀察到高信心與低信心變異的 read 數呈<b>雙峰分布</b>，
 於是做法改成：<b>先把直方圖平滑化、找出兩個主峰、取中間的谷點當門檻</b>。
 門檻因此會隨著樣本自己移動。</p>
 
 <h3>從分布到一個數字：迴歸模型</h3>
 
-<p class="prose">濾乾淨之後，全基因體的 GHIR 分布就可以用來估 purity 了。
-做法刻意簡單：<b>整個分布只取兩個數字</b> —— 中位數與四分位距 —— 再用二次多項式迴歸對上 purity。</p>
+<p class="prose">濾乾淨之後，全基因體的 GHIR 分布就可以拿來估比例了。
+做法刻意簡單：<b>整個分布只取兩個數字</b> —— 中位數與四分位距 —— 再用二次多項式迴歸對上目標值。</p>
 
-{{svg:m12-purity-regression | [wide] 五個 purity 已知的合成樣本各有一個 GHIR 分布；
-purity 越高整個分布越往右。每個分布只取<b>中位數</b>（偏到哪）與<b>四分位距</b>（多分散）兩個特徵，
-送進二次多項式迴歸得到 purity。最下方是訓練方式與外推的界線。}}
+{{svg:m12-purity-regression | [wide] 五個比例已知的合成樣本各有一個 GHIR 分布；
+比例越高整個分布越往右。每個分布只取<b>中位數</b>（偏到哪）與<b>四分位距</b>（多分散）兩個特徵，
+送進二次多項式迴歸得到一個估計值。
+<b>最上方標出訓練標籤的來源</b>：五個樣本是把純腫瘤與正常的 BAM 依 read 數混出來的，
+所以已知的那個數字是<b>分子</b>的比例。最下方是訓練方式與外推的界線。}}
 
 <p class="prose">為什麼只用兩個特徵就夠？因為要學的是一條單調的關係，不是分類問題；
 特徵少也讓模型不容易在八個資料集上過擬合。
 代價是這條曲線只在<b>訓練資料涵蓋的範圍內</b>可信 ——
 這也是後面「判讀練習」要處理的問題。</p>
 
+<h3>這個迴歸估的是哪一個量</h3>
+
+<p class="prose">上圖那五個「已知比例」的樣本，是把純腫瘤細胞株的 BAM 與正常樣本的 BAM
+<b>依 read 數混合</b>出來的。所以標籤 0.2 的意思是「這堆 read 裡有兩成來自腫瘤細胞株」——
+它控制的是<b>分子</b>的比例，也就是 [[tumour DNA fraction]]，一般記作 {{m: f}}。</p>
+
+<p class="prose">迴歸學到的是「GHIR 的中位數與四分位距 → 這個標籤」。
+既然標籤是 {{m: f}}，學到的曲線輸出的當然也是 {{m: f}}。
+要把它轉成 [[tumour purity|cellular purity]] {{m: p}}，需要腫瘤的 [[ploidy|倍體]] {{m: κ}}：</p>
+
+{{eq}}
+f = \frac{p · κ}{p · κ + 2 · (1 − p)}, \qquad p = \frac{2f}{κ(1 − f) + 2f}
+{{note}}
+{{m: κ = 2}} 時兩者相等。這也是為什麼在二倍體的討論裡混用兩個詞不會出事，
+而在腫瘤上會。
+{{/eq}}
+
+<p class="prose"><b>而 LongPhase-S 的模型裡沒有 {{m: κ}}。</b>
+它不做拷貝數分段、不估等位特異拷貝數、也沒有任何一個參數代表倍體 ——
+整個模型就是兩個特徵與一條多項式。缺了 {{m: κ}}，上面那條換算式跑不動，
+所以它<b>在原理上就不可能輸出 {{m: p}}</b>。這不是實作偷懶，是模型形式決定的。</p>
+
+<p class="prose">具體差多少？以研究實際用到的細胞株為例，腫瘤細胞株多半不是二倍體：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>來源細胞株的 {{m: κ}}</th><th>2.0（二倍體）</th><th>3.2</th><th>4.0</th></tr></thead>
+<tbody>
+<tr><td>混合標籤 {{m: f = 0.20}} 對應的 {{m: p}}</td><td>0.200</td><td><b>0.135</b></td><td><b>0.111</b></td></tr>
+<tr><td>混合標籤 {{m: f = 0.60}} 對應的 {{m: p}}</td><td>0.600</td><td><b>0.484</b></td><td><b>0.429</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">低比例那一端差得最兇：標籤寫 0.2，實際的細胞比例可能只有 0.11。
+如果把輸出當成細胞比例拿去跟病理判讀的腫瘤細胞百分比對照，
+會得到一個看起來像是「工具高估了」的結論 —— 而那其實是<b>兩邊在講不同的量</b>。</p>
+
+{{guard:21 | 輸出檔寫的 purity 是 DNA 比例，不是細胞比例}}
+<p class="prose">參數 <code>--tumor-purity</code>、子指令 <code>estimate_purity</code>、
+輸出檔 <code>&lt;prefix&gt;_purity.out</code> 裡的 <code>Tumor purity:</code> —— 這些名稱一律要照原樣打，
+但它們指的量是 [[tumour DNA fraction]] {{m: f}}。</p>
+<p class="prose"><b>可容許之處</b>：{{m: f}} 正是流程下游需要的量。
+決定過濾門檻要多鬆、判斷一個 clonal 變異大概該有幾條支持 read，
+靠的都是「腫瘤來源的分子佔多少」。<b>在 LongPhase-S 自己的流程裡，這個量是對的那一個。</b>
+評比也站得住腳：合成樣本的真值就是 {{m: f}}，兩邊尺度一致。</p>
+<p class="prose"><b>限制</b>：不可把它當成 cellular purity 回報，也不可拿它跟
+流式細胞術、FISH 或病理判讀的腫瘤細胞比例直接比較 —— 那些量的分母是細胞。
+要換算需要 {{m: κ}}，而這個模型不產生 {{m: κ}}。
+同理，把它跟 ASCAT／PURPLE 的輸出並排時，<b>要換算的是對方</b>（它們輸出 {{m: (p, κ)}}），
+不是把這個數字改個名字。</p>
+{{/guard}}
+
 <h3>四個 somatic variant filter</h3>
 
-<p class="prose">purity 估好之後進入第三階段。四個過濾器各看一種證據，<b>任何一個沒過就丟掉</b>：</p>
+<p class="prose">比例估好之後進入第三階段。四個過濾器各看一種證據，<b>任何一個沒過就丟掉</b>：</p>
 
 {{svg:m12-recalib-filters | [wide] 四個過濾器與各自的判準。四個都在問同一個問題的不同面向：
 <b>支持這個候選的 read，來源夠不夠一致</b>。最下方是門檻的來源 —— 不是公式算出來的，
-是在每個 purity 級距上分別搜出來的。}}
+是在每個比例級距上分別搜出來的。}}
 
 <div class="table-wrap">
 <table>
@@ -167,9 +232,9 @@ purity 越高整個分布越往右。每個分布只取<b>中位數</b>（偏到
 </div>
 
 <p class="prose">門檻怎麼來的？<b>不是公式算出來的，是搜出來的。</b>
-每個 purity 級距各做一次獨立的參數最佳化：先在合理範圍內隨機取樣做全域搜尋，
+每個比例級距各做一次獨立的參數最佳化：先在合理範圍內隨機取樣做全域搜尋，
 再對表現最好的區域做網格細搜。所以「purity 感知」的具體意思是
-<b>「查表拿出這個 purity 對應的那組門檻」</b>，而不是把 purity 代進某個公式。</p>
+<b>「查表拿出這個比例對應的那組門檻」</b>，而不是把它代進某個公式。</p>
 
 <h3>HP3 怎麼補上來源</h3>
 
@@ -189,7 +254,7 @@ purity 越高整個分布越往右。每個分布只取<b>中位數</b>（偏到
 <h3>實際指令</h3>
 
 {{cli}}
-# 僅估計 purity
+# 僅估計腫瘤 DNA 比例（子指令名稱是 estimate_purity）
 longphase-s estimate_purity \
   -s phased_normal_snp.vcf \
   -b normal.bam \
@@ -199,7 +264,7 @@ longphase-s estimate_purity \
   -t 8 \
   -o output_prefix
 
-# somatic haplotagging（依版本可自動估計或指定 purity）
+# somatic haplotagging（依版本可自動估計或用 --tumor-purity 指定）
 longphase-s somatic_haplotag \
   -s phased_germline_snp.vcf \
   -b normal.bam \
@@ -218,7 +283,7 @@ longphase-s somatic_haplotag \
 <thead><tr><th>東西</th><th>位置</th></tr></thead>
 <tbody>
 <tr><td>somatic haplotype 標籤</td><td>BAM 的 <code>HP:Z:1-1</code> / <code>2-1</code> / <code>3</code>（<b>字串</b>型別）</td></tr>
-<tr><td>tumor purity</td><td><code>&lt;prefix&gt;_purity.out</code> <b>文字檔</b></td></tr>
+<tr><td>腫瘤 DNA 比例（欄位名為 <code>Tumor purity</code>）</td><td><code>&lt;prefix&gt;_purity.out</code> <b>文字檔</b></td></tr>
 <tr><td>過濾後的 somatic VCF</td><td><code>&lt;prefix&gt;_sc.vcf</code>（需加 <code>--output-somatic-vcf</code>）</td></tr>
 <tr><td>haplotagging 效能</td><td><code>&lt;prefix&gt;_somatic_haplotag.metrics</code>（需給 <code>--truth-vcf</code>）</td></tr>
 </tbody>
@@ -228,12 +293,12 @@ longphase-s somatic_haplotag \
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">三項常見注意事項</p>
 <ul class="prose">
-<li><b>purity 不會印到 stdout。</b>請讀取 <code>_purity.out</code>，尋找
-<code>Tumor purity: 0.169599</code> 這一行。</li>
+<li><b>估計值不會印到 stdout。</b>請讀取 <code>_purity.out</code>，尋找
+<code>Tumor purity: 0.169599</code> 這一行 —— 欄位名寫的是 purity，讀到的是 {{m: f}}。</li>
 <li><b>是 <code>--tumor-bam-file</code>，不是 <code>--tumor-bam</code>。</b>
 同理是 <code>--tumor-snv-file</code>。</li>
 <li><b><code>--tumor-purity</code> 的合法範圍是 0.1–1.0</b>（不是 0–1）。
-給了這個參數就會關閉自動估計。</li>
+給了這個參數就會關閉自動估計 —— 而你要給的是 DNA 比例，不是病理報告上的腫瘤細胞百分比。</li>
 </ul>
 </div>
 
@@ -248,20 +313,20 @@ longphase-s somatic_haplotag \
 
 {{fig:a-s41-igv-loh}}
 
-<h3>purity 估計的結果</h3>
+<h3>比例估計的結果</h3>
 
 {{fig:a-s27-purity}}
 
 <h3>結果摘要</h3>
 
-<p class="prose">研究在<b>八個資料集、六個癌症細胞株</b>上評估，並用合成混合樣本製造已知的 purity 梯度。
-把 recall 與 precision 分開看，才看得出這個方法實際上做了什麼：</p>
+<p class="prose">研究在<b>八個資料集、六個癌症細胞株</b>上評估，並用合成混合樣本製造已知的
+腫瘤 DNA 比例梯度。把 recall 與 precision 分開看，才看得出這個方法實際上做了什麼：</p>
 
 <div class="table-wrap">
 <table>
 <thead><tr><th>面向</th><th>報告的結果</th></tr></thead>
 <tbody>
-<tr><td>purity 估計</td><td>在低 purity 區段明顯優於 ASCAT（ASCAT 在多個資料集把 0.2 預測成 1.0）；leave-k-out 交叉驗證平均 {{m: R^2}} 約 0.96</td></tr>
+<tr><td>DNA 比例估計</td><td>在低比例區段明顯優於 ASCAT（ASCAT 在多個資料集把 0.2 預測成 1.0）；leave-k-out 交叉驗證平均 {{m: R^2}} 約 0.96。<b>比較是在 {{m: f}} 的尺度上做的</b>：ASCAT 輸出 {{m: (p, κ)}}，先經換算式才進入這張表</td></tr>
 <tr><td>接在 ClairS 之後（SNV）</td><td><b>recall 平均 +4.5%</b>（最多 +14.4%），precision 平均 −1.3%，淨效果 F1 平均 +1.9%（8 個資料集中 6 個變好）</td></tr>
 <tr><td>接在 ClairS 之後（indel）</td><td><b>recall 平均 +14.7%</b>，precision 平均 −11.9%，F1 平均 +7.1%（8 個中 7 個變好）</td></tr>
 <tr><td>接在 DeepSomatic 之後</td><td>方向相反：主要是 <b>precision</b> 上升（SNV 平均 +3.1%），recall 略降，F1 只有小幅變化（+1.2% / +0.5%）</td></tr>
@@ -285,10 +350,13 @@ longphase-s somatic_haplotag \
 
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">這些數字的成立條件</p>
-<p class="prose">全部來自<b>細胞株與合成混合樣本</b>。合成樣本提供了已知的 purity（這是真實檢體給不了的），
+<p class="prose">全部來自<b>細胞株與合成混合樣本</b>。合成樣本提供了已知的<b>DNA 比例</b>（這是真實檢體給不了的），
 代價是它不會有真實腫瘤的纖維組織混雜、空間異質性與更複雜的次族群結構。</p>
+<p class="prose">這裡要補一句原始素材沒明說的假設：<b>「混出比例 0.2 的樣本」預設來源腫瘤是 100% 純的</b>。
+細胞株確實接近如此，所以真值可信 —— 但那個真值是 {{m: f}}，
+換算成細胞比例還需要細胞株自己的倍體。</p>
 <p class="prose">研究本身也把這點列為限制，並指出 subclonal 的 CNV、LOH 與 aneuploidy
-可能造成部分模仿 purity 效果的等位失衡。</p>
+可能造成部分模仿比例效果的等位失衡。</p>
 </div>
 </section>
 
@@ -300,10 +368,27 @@ longphase-s somatic_haplotag \
 <p class="prose">執行 <code>estimate_purity</code> 後得到 0.95，但外部資料估計這個檢體只有大約 40% 的腫瘤細胞。<br><br>
 可能出了什麼問題？</p>
 {{reveal}}
-<p class="prose">依可能性排序：</p>
+<p class="prose"><b>第 0 步：先確認兩邊在講同一個量。</b>
+「40% 的腫瘤細胞」是細胞比例 {{m: p}}；<code>estimate_purity</code> 給的是 DNA 比例 {{m: f}}。
+兩者本來就不該相等。<b>但這一項算不完這筆帳，值得算一次看看</b>：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>假設腫瘤倍體 {{m: κ}}</th><th>2.0</th><th>3.0</th><th>4.0</th><th>要湊到 0.95 得多少</th></tr></thead>
+<tbody>
+<tr><td>{{m: p = 0.40}} 所對應的 {{m: f}}</td><td>0.400</td><td>0.500</td><td>0.571</td><td><b>{{m: κ ≈ 57}}</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">四倍體只能把 0.40 拉到 0.57，要拉到 0.95 需要生物學上不存在的倍體。
+所以<b>單位不一致解釋得了其中一部分，解釋不了全部</b> —— 剩下的落差另有成因。
+這一步的價值在於：先扣掉它，才知道真正要追的落差有多大（是 0.55 還是 0.38）。</p>
+
+<p class="prose">扣掉之後，依可能性排序：</p>
 <ol class="prose">
 <li><b>大範圍的 [[LOH]] 或 [[copy number|CNV]]</b>。GHIR 量的是 haplotype 失衡，
-而 LOH 與 aneuploidy 造成的失衡跟 purity 無關 —— 若沒被 LCVF 濾掉，就會被誤讀成高 purity。
+而 LOH 與 aneuploidy 造成的失衡跟腫瘤佔多少無關 —— 若沒被 LCVF 濾掉，就會被誤讀成高比例。
 值得注意的是：<b>研究實際觀察到的結果沒有出現這個問題</b>，
 即使資料集中有帶染色體規模 LOH 的細胞株（例如 HCC1395），估計仍未受影響；
 論文推測原因是這個估計本身是 phase-aware 的，而以等位比例或拷貝數為基礎的方法更容易被這類事件帶偏。
@@ -315,8 +400,9 @@ longphase-s somatic_haplotag \
 如果你的樣本在某個維度上不像那批訓練資料（不同癌別、不同 [[basecalling|basecaller]]、不同 coverage），
 預測可能不可靠。</li>
 </ol>
-<p class="prose">建議的排查順序是：先以 IGV 檢視多個區域的 phasing 品質，
-再查看 <code>_purity.out</code> 的 filter 統計，確認 LCVF 濾掉的位點比例。
+<p class="prose">建議的排查順序是：先把外部的細胞比例換算成 {{m: f}}（第 0 步），
+再以 IGV 檢視多個區域的 phasing 品質，
+最後查看 <code>_purity.out</code> 的 filter 統計，確認 LCVF 濾掉的位點比例。
 若濾除比例異常低，第 1 項的可能性較高。</p>
 {{/ask}}
 </section>
@@ -333,7 +419,7 @@ longphase-s phase \
   -s normal_snp.vcf -b normal.bam -r reference.fasta \
   -t 8 -o phased_normal --ont
 
-# 主流程：估純度 + 過濾 + somatic haplotagging
+# 主流程：估 DNA 比例 + 過濾 + somatic haplotagging
 longphase-s somatic_haplotag \
   -s phased_normal.vcf \
   -b normal.bam \
@@ -349,7 +435,7 @@ longphase-s somatic_haplotag \
 <h3>逐項檢視輸出</h3>
 
 {{cli}}
-# purity 估計（不會印到 stdout，請讀取輸出檔案）
+# 腫瘤 DNA 比例（不會印到 stdout，請讀取輸出檔案）
 grep -A2 'Estimation result' tagged_purity.out
 
 # 每條 read 被分到哪個 somatic haplotype
@@ -365,9 +451,9 @@ awk '!/^#/ {print $7}' tagged_sc.vcf | sort | uniq -c
 <table>
 <thead><tr><th>細節</th><th>正確做法</th></tr></thead>
 <tbody>
-<tr><td>找不到純度結果</td><td>它<b>不印到 stdout</b>，在 <code>&lt;prefix&gt;_purity.out</code> 裡</td></tr>
+<tr><td>找不到比例結果</td><td>它<b>不印到 stdout</b>，在 <code>&lt;prefix&gt;_purity.out</code> 裡</td></tr>
 <tr><td>參數名稱</td><td>是 <code>--tumor-bam-file</code> 與 <code>--tumor-snv-file</code>，不是 <code>--tumor-bam</code></td></tr>
-<tr><td>手動指定純度</td><td><code>--tumor-purity</code> 的合法範圍是 <b>0.1–1.0</b>（不是 0–1）；給了就關閉自動估計</td></tr>
+<tr><td>手動指定比例</td><td><code>--tumor-purity</code> 的合法範圍是 <b>0.1–1.0</b>（不是 0–1）；給了就關閉自動估計</td></tr>
 </tbody>
 </table>
 </div>

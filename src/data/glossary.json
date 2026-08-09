@@ -527,7 +527,7 @@
   "zh_gloss": "腫瘤純度",
   "zh": "樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。",
   "en": "The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.",
-  "long_zh": "樣本中腫瘤<b>細胞</b>所佔的比例。<br><br>注意它跟 <b>tumor DNA fraction</b>（腫瘤來源 DNA 的比例）不是同一件事。在實驗室用 BAM 依覆蓋度混合出來的合成樣本裡，兩者恰好相等；但真實腫瘤若是 aneuploid 或發生過 whole-genome duplication，一個腫瘤細胞貢獻的 DNA 比正常細胞多，兩個數字就會分開。",
+  "long_zh": "樣本中腫瘤<b>細胞</b>所佔的比例。<br><br>注意它跟 <b>tumor DNA fraction</b>（腫瘤來源 DNA 的比例）不是同一件事：一個腫瘤細胞若含有比正常細胞多的 DNA（aneuploidy 或 whole-genome duplication），它在分子層貢獻的份量就大於它在細胞層佔的份量，兩個數字因此分開。換算式為 {{m: f = pκ/(pκ + 2(1 − p))}}，只有倍體 {{m: κ = 2}} 時兩者相等。<br><br>常見的誤解是「用 BAM 依覆蓋度混出來的合成樣本裡兩者恰好相等」。<b>不成立</b>：混合控制的是 read 數，也就是 {{m: f}}；來源腫瘤細胞株若非二倍體，同一份樣本的細胞比例低於標示值。以標示 0.2、來源 {{m: κ = 3.2}} 為例，{{m: p}} 只有 0.135。",
   "aka": [
    "purity"
   ],
@@ -547,7 +547,8 @@
   "see": [
    "tumour purity",
    "ploidy"
-  ]
+  ],
+  "long_zh": "樣本 DNA 中源自腫瘤的比例，分母是<b>分子</b>而非細胞。<br><br>凡是依 read 數混合而得的合成樣本，其已知的比例就是這個量；凡是以「支持 read 大概會有幾條」為用途的下游步驟（過濾門檻、偵測極限），需要的也是這個量。<br><br><b>LongPhase-S 的 <code>estimate_purity</code> 輸出的是這個量</b>，儘管子指令、參數 <code>--tumor-purity</code> 與輸出欄位 <code>Tumor purity:</code> 都寫 purity。理由是它的迴歸標籤是混合比例，且模型中沒有倍體參數，因此無從換算成細胞比例。"
  },
  "cancer cell fraction": {
   "zh_gloss": "癌細胞比例",
@@ -718,16 +719,17 @@
   ]
  },
  "LongPhase-S": {
-  "zh": "配對 tumor–normal 版本。做 tumor purity 估計、purity 感知的 somatic variant 過濾，以及 somatic haplotagging。",
-  "en": "The matched tumour–normal version: purity estimation, purity-aware somatic filtering, and somatic haplotagging.",
+  "zh": "配對 tumor–normal 版本。做腫瘤 DNA 比例估計（輸出欄位名為 purity）、比例感知的 somatic variant 過濾，以及 somatic haplotagging。",
+  "en": "The matched tumour–normal version: tumour DNA fraction estimation (the output field is named purity), fraction-aware somatic filtering, and somatic haplotagging.",
   "see": [
    "LongPhase",
    "somatic haplotagging",
-   "GHIR"
+   "GHIR",
+   "tumour DNA fraction"
   ]
  },
  "LongPhase-TO": {
-  "zh": "tumor-only 版本。做染色體等級的 LOH 偵測、triplet graph 再校正、somatic phasing 與 purity 估計。",
+  "zh": "tumor-only 版本。做染色體等級的 LOH 偵測、triplet graph 再校正、somatic phasing 與腫瘤 DNA 比例估計。",
   "en": "The tumour-only version: chromosome-scale LOH detection, triplet-graph recalibration, somatic phasing and purity estimation.",
   "see": [
    "LongPhase",
@@ -739,8 +741,8 @@
   "zh_gloss": "生殖系單倍型失衡比",
   "zh": "Germline Haplotype Imbalance Ratio：在<b>候選 somatic 位點</b>上，取標為 HP1 與 HP2 的 read 數中較大者除以兩者之和，值域為 0.5 至 1。須注意兩件事：分母<b>只含這兩個 germline 計數</b>，HP1-1／HP2-1／HP3 皆不在內；且這些標籤是<b>整條 read</b> 的判定（該 read 任一處帶 somatic 等位即離開 germline 計數），並非該位點的等位計數。它不是直接的 purity 讀數：拷貝數變異、LOH、read 跨距內的突變密度、標記錯誤與抽樣不足都會使它偏移。",
   "en": "Germline Haplotype Imbalance Ratio: at a candidate somatic locus, the larger of the HP1 and HP2 tagged read counts divided by their sum, ranging from 0.5 to 1. Two caveats: the denominator contains only those two germline counts, excluding HP1-1/HP2-1/HP3; and those tags are whole-read decisions (a read carrying a somatic allele anywhere leaves the germline counts), not per-locus allele counts. It is not a direct purity readout — copy number, LOH, mutation density within the read span, tagging error and sparse sampling all shift it.",
-  "long_zh": "GHIR 的解讀依賴幾個前提：<br>· germline VCF 的 phasing 與 HP1／HP2 分群大致正確；<br>· normal 樣本能代表 germline 基準，且 TINC 不高；<br>· 納入的 germline 位點沒有被 LOH 或 CNV 顯著影響；<br>· read 數足夠，mapping 與抽樣不造成明顯 allele bias；<br>· purity 迴歸模型的校準資料與目前樣本的來源、basecaller、coverage 等分布相近。<br><br>在這些前提下，腫瘤來源 read 被分到 somatic 分支後，GHIR 偏離 0.5 的程度可與 tumor DNA fraction 或模型定義的 purity 建立關聯；若前提不成立，同樣的偏移也可能來自結構變異、phasing 錯誤或技術偏差，不能單獨當成 purity 證據。",
-  "long_en": "Interpreting GHIR assumes that germline phasing and HP1/HP2 assignment are reliable, the matched normal represents the germline baseline with limited TINC, selected germline sites are not strongly affected by LOH or CNV, read depth and mapping do not create substantial allele bias, and the regression calibration applies to the sample's source, basecaller and coverage distribution. Under those assumptions, reads diverted to a somatic branch can make the deviation from 0.5 correlate with tumour DNA fraction or model-defined purity. Without them, the same shift may reflect structural variation, phasing error or technical bias and is not purity evidence by itself.",
+  "long_zh": "GHIR 的解讀依賴幾個前提：<br>· germline VCF 的 phasing 與 HP1／HP2 分群大致正確；<br>· normal 樣本能代表 germline 基準，且 TINC 不高；<br>· 納入的 germline 位點沒有被 LOH 或 CNV 顯著影響；<br>· read 數足夠，mapping 與抽樣不造成明顯 allele bias；<br>· 迴歸模型的校準資料與目前樣本的來源、basecaller、coverage 等分布相近。<br><br>在這些前提下，腫瘤來源 read 被分到 somatic 分支後，GHIR 偏離 0.5 的程度可與 tumor DNA fraction 建立關聯（現行迴歸的標籤就是這個量）；若前提不成立，同樣的偏移也可能來自結構變異、phasing 錯誤或技術偏差，不能單獨當成比例證據。此外，單一位點的 GHIR 無雜訊值 {{m: 1/(2 − p)}} 的自變數是 cellular purity，與迴歸的標籤 {{m: f}} 不是同一個量。",
+  "long_en": "Interpreting GHIR assumes that germline phasing and HP1/HP2 assignment are reliable, the matched normal represents the germline baseline with limited TINC, selected germline sites are not strongly affected by LOH or CNV, read depth and mapping do not create substantial allele bias, and the regression calibration applies to the sample's source, basecaller and coverage distribution. Under those assumptions, reads diverted to a somatic branch can make the deviation from 0.5 correlate with tumour DNA fraction, which is what the current regression is trained against. Note that the noise-free value at a single locus, 1/(2 - p), is driven by cellular purity, not by the DNA fraction used as the training label. Without them, the same shift may reflect structural variation, phasing error or technical bias and is not purity evidence by itself.",
   "see": [
    "LongPhase-S",
    "tumour purity"
