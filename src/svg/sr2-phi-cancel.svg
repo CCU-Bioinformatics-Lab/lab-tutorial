@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600">
+  <title>同一批分子上的兩個變異量不到 φ，因為偏移是它們共有的</title>
+  <desc>左右兩欄的差別只有一件事：兩個變異是不是落在同一批分子上。
+        左欄是同一個單位裡的兩個變異。定序拿到的那一池分子，
+        它的真實變異比例本來就會偏離期望值一點點，而 φ 想量的正是這個偏離。
+        關鍵在於這兩個變異讀的是同一池分子，
+        所以那個偏離對兩者是完全一樣的，兩個觀測到的頻率一起往同一個方向移。
+        把兩者相減時，共有的偏移就消掉了，剩下的只有各自抽到哪幾條 read 的隨機性，
+        以及讀錯字母的機率。
+        右欄是相距夠遠的兩個變異。它們讀的是兩池互相獨立的分子，
+        兩池各自偏離，方向不一定相同，所以相減之後偏移還留著，量得到。
+        最下方是結論表：同一批分子量得到的只有 read 抽樣與 base error 這一層，
+        該處拷貝數估錯、以及真實細胞比例偏離群心這兩層都被消掉了，
+        而後兩層恰好是 φ 的主要來源。
+        所以同一批分子給出的是一個下界，不是 φ 本身。
+        讀法是：同一批分子這個優點，正好也是它量不到 φ 的原因。</desc>
+
+  <text class="ttl zh" x="20" y="36">同一批分子的優點，正好是它量不到 φ 的原因</text>
+
+  <!-- 左：同一批分子 -->
+  <rect class="box warn" x="18" y="58" width="470" height="290" rx="8"/>
+  <text class="lbl bold zh warn" x="34" y="88">同一個單位裡的兩個變異</text>
+  <text class="tick zh" x="34" y="112">S1 與 S2 讀的是同一池分子</text>
+
+  <rect class="box sunken" x="34" y="126" width="438" height="72" rx="6"/>
+  <text class="tick zh" x="48" y="150">這池分子的真實比例</text>
+  <text class="tick mono" x="240" y="150">p ≠ θ</text>
+  <text class="tick zh" x="48" y="176">偏離期望值一點點 —— 這就是 φ 想量的東西</text>
+
+  <line class="axis" x1="60" y1="252" x2="440" y2="252"/>
+  <text class="tick zh" x="60" y="276">θ</text>
+  <line class="guide" x1="140" y1="222" x2="140" y2="258"/>
+  <text class="tick mono mid" x="140" y="216">θ</text>
+
+  <circle class="mark somatic" cx="250" cy="252" r="9"/>
+  <text class="tick mono" x="238" y="234">S1</text>
+  <circle class="mark somatic" cx="262" cy="252" r="9"/>
+  <text class="tick mono" x="272" y="234">S2</text>
+  <path class="conn bad" d="M150,296 L248,296" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh bad" x="262" y="300">兩個一起往同一邊移</text>
+
+  <text class="anno bold zh" x="34" y="334">相減 → 共有的偏移<tspan class="bad">消去</tspan></text>
+
+  <!-- 右：相距夠遠 -->
+  <rect class="box ok" x="512" y="58" width="470" height="290" rx="8"/>
+  <text class="lbl bold zh ok" x="528" y="88">相距夠遠的兩個變異</text>
+  <text class="tick zh" x="528" y="112">S1 與 S2 讀的是兩池獨立的分子</text>
+
+  <rect class="box sunken" x="528" y="126" width="438" height="72" rx="6"/>
+  <text class="tick zh" x="542" y="150">兩池各自偏離</text>
+  <text class="tick mono" x="700" y="150">p₁ ≠ p₂</text>
+  <text class="tick zh" x="542" y="176">方向不一定相同</text>
+
+  <line class="axis" x1="554" y1="252" x2="934" y2="252"/>
+  <text class="tick zh" x="554" y="276">θ</text>
+  <line class="guide" x1="634" y1="222" x2="634" y2="258"/>
+  <text class="tick mono mid" x="634" y="216">θ</text>
+
+  <circle class="mark somatic" cx="720" cy="252" r="9"/>
+  <text class="tick mono" x="708" y="234">S1</text>
+  <circle class="mark germline" cx="580" cy="252" r="9"/>
+  <text class="tick mono" x="568" y="234">S2</text>
+  <path class="conn" d="M644,296 L718,296" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M624,296 L582,296" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh ok" x="736" y="300">各走各的</text>
+
+  <text class="anno bold zh" x="528" y="334">相減 → 偏移<tspan class="ok">還在</tspan>，量得到</text>
+
+  <!-- 結論 -->
+  <rect class="box sunken" x="18" y="368" width="964" height="176" rx="8"/>
+  <text class="lbl bold zh" x="34" y="398">同一批分子量得到哪幾層</text>
+
+  <text class="tick bold zh" x="52" y="432">read 抽樣、base error</text>
+  <text class="tick zh" x="380" y="432">各自獨立</text>
+  <text class="tick bold zh ok" x="620" y="432">量得到</text>
+
+  <text class="tick bold zh" x="52" y="466">該處 CN／μ 估錯</text>
+  <text class="tick zh" x="380" y="466">兩者共有</text>
+  <text class="tick bold zh bad" x="620" y="466">消掉了</text>
+
+  <text class="tick bold zh" x="52" y="500">真實 CCF 偏離群心</text>
+  <text class="tick zh" x="380" y="500">兩者共有</text>
+  <text class="tick bold zh bad" x="620" y="500">消掉了</text>
+
+  <text class="anno bold zh accent" x="52" y="532">後兩層恰好是 φ 的主要來源 → 量到的是<tspan class="bold">下界</tspan>，不是 φ</text>
+
+  <text class="tick zh" x="18" y="576">讀法：「它們的真實頻率完全相等」這個優點，正好也是偏移會互相消掉的原因。</text>
+</svg>

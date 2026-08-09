@@ -151,6 +151,6 @@
 
   <rect class="box ghost accent" x="20" y="606" width="960" height="98" rx="8"/>
   <text class="lbl bold zh" x="40" y="638">系統發生重建要的是「有幾群、群間什麼關係」，不是逐一指派變異。</text>
-  <text class="anno zh" x="40" y="666">所以最稀疏的一對只有 28 條約束仍然足夠 —— 28 條遠不足以指派 1,000 個變異，</text>
+  <text class="anno zh" x="40" y="666">所以最稀疏的一對只有 28 個單位仍然足夠 —— 28 個遠不足以指派 1,000 個變異，</text>
   <text class="anno zh" x="40" y="692">但對「這兩個成分是不是同一個」這個是非判定則已然充足。</text>
 </svg>

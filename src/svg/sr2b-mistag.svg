@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 610">
+  <title>逐位點錯誤與整條分子誤標的形狀不同，而且位點越多，誤標越是主角</title>
+  <desc>左邊是逐位點的定序錯誤。它一次只改一個字母，
+        每個位點各自獨立，所以要一次改對三個位點才會生出一個完全不同的狀態，
+        機率是單點錯誤率的三次方，小到可以忽略。
+        右邊是整條分子的家族誤標。一條本來屬於另一個單倍型家族的分子被標錯，
+        整條就這樣跳到這個單位裡，它的三個位點是一起過來的，
+        所以機率只有一個誤標率，跟位點數完全無關。
+        中間下方是兩者的比較表。以單點錯誤率千分之五為例，
+        差一個位點時兩者相當；差兩個位點時誤標大約高一百倍；
+        差三個位點時高兩萬倍以上。
+        所以位點越多，能造出假狀態的幾乎只剩誤標這一條路。
+        最下方是後果：如果模型只寫了逐位點錯誤，
+        那麼在全參考的背景上冒出來的三位點全變異狀態，
+        在模型眼中會是「錯誤不可能造出來的」，於是只剩一個解釋 —— 一個新的 clone。
+        而它真正的來源是隔壁那個家族。
+        讀法是：一個參數描述不了兩種形狀不同的錯誤，寫漏的那一種會直接變成假的 subclone。</desc>
+
+  <text class="ttl zh" x="20" y="36">兩種錯誤的形狀不同：一種改一個字母，一種搬走一整條分子</text>
+
+  <!-- 左：逐位點 -->
+  <rect class="box" x="18" y="58" width="472" height="216" rx="8"/>
+  <text class="lbl bold zh" x="34" y="88">逐位點定序錯誤</text>
+  <text class="tick zh" x="34" y="112">每個位點獨立，一次改一個字母</text>
+
+  <rect class="read hp1" x="34" y="130" width="330" height="24" rx="12"/>
+  <text class="tick mono" x="46" y="147">0</text>
+  <text class="tick mono" x="190" y="147">0</text>
+  <text class="tick mono" x="334" y="147">0</text>
+
+  <path class="conn" d="M198,158 L198,176" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh bad" x="212" y="174">只有中間這個位點被讀錯</text>
+
+  <rect class="read hp1" x="34" y="182" width="330" height="24" rx="12"/>
+  <text class="tick mono" x="46" y="199">0</text>
+  <text class="tick mono bad bold" x="190" y="199">1</text>
+  <text class="tick mono" x="334" y="199">0</text>
+
+  <text class="anno zh" x="34" y="234">要生出一個差三個位點的狀態，</text>
+  <text class="anno bold zh" x="34" y="262">得<tspan class="bad">同時</tspan>錯三次：ε³</text>
+
+  <!-- 右：誤標 -->
+  <rect class="box warn" x="510" y="58" width="472" height="216" rx="8"/>
+  <text class="lbl bold zh warn" x="526" y="88">整條分子的家族誤標</text>
+  <text class="tick zh" x="526" y="112">三個位點<tspan class="bold">一起</tspan>過來</text>
+
+  <text class="tick zh" x="526" y="140">另一個單倍型家族</text>
+  <rect class="read hp2" x="526" y="150" width="330" height="24" rx="12"/>
+  <text class="tick mono" x="538" y="167">1</text>
+  <text class="tick mono" x="682" y="167">1</text>
+  <text class="tick mono" x="826" y="167">1</text>
+
+  <path class="conn bad" d="M690,178 L690,196" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh bad" x="704" y="194">整條被標到這個單位</text>
+
+  <rect class="read hp2" x="526" y="202" width="330" height="24" rx="12"/>
+  <text class="tick mono bad bold" x="538" y="219">1</text>
+  <text class="tick mono bad bold" x="682" y="219">1</text>
+  <text class="tick mono bad bold" x="826" y="219">1</text>
+
+  <text class="anno zh" x="526" y="252">機率只有一個誤標率 η，</text>
+  <text class="anno bold zh warn" x="748" y="252">與位點數無關</text>
+
+  <!-- 比較 -->
+  <rect class="box sunken" x="18" y="300" width="964" height="146" rx="8"/>
+  <text class="lbl bold zh" x="34" y="330">差幾個位點，誰才是主角（以 ε ＝ 0.005、η ＝ 0.01、來源比例 0.3 為例）</text>
+
+  <text class="tick bold zh" x="52" y="366">差 1 個位點</text>
+  <text class="tick mono" x="230" y="366">逐位點 5×10⁻³</text>
+  <text class="tick mono" x="440" y="366">誤標 3×10⁻³</text>
+  <text class="tick zh" x="640" y="366">兩者相當</text>
+
+  <text class="tick bold zh" x="52" y="396">差 2 個位點</text>
+  <text class="tick mono" x="230" y="396">逐位點 2.5×10⁻⁵</text>
+  <text class="tick mono" x="440" y="396">誤標 3×10⁻³</text>
+  <text class="tick zh warn" x="640" y="396">誤標高約 100 倍</text>
+
+  <text class="tick bold zh" x="52" y="426">差 3 個位點</text>
+  <text class="tick mono" x="230" y="426">逐位點 1.3×10⁻⁷</text>
+  <text class="tick mono" x="440" y="426">誤標 3×10⁻³</text>
+  <text class="tick bold zh bad" x="640" y="426">誤標高約 20,000 倍</text>
+
+  <!-- 後果 -->
+  <rect class="box bad" x="18" y="462" width="964" height="110" rx="8"/>
+  <text class="lbl bold zh bad" x="34" y="492">只寫逐位點錯誤會發生什麼</text>
+  <text class="anno zh" x="34" y="522">在全 0 的背景上冒出 111：模型認為錯誤造不出來（10⁻⁷），</text>
+  <text class="anno zh" x="34" y="552">於是只剩一個解釋 —— 一個新的 clone。而它真正的來源是隔壁那個家族。</text>
+
+  <text class="tick zh" x="18" y="596">讀法：一個參數描述不了兩種形狀不同的錯誤；寫漏的那一種會直接變成假的 subclone。</text>
+</svg>

@@ -1,67 +1,75 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600">
-  <title>實作流程：從 read 到約束，再到全基因體的群與樹</title>
-  <desc>八個步驟由上而下，右欄註明每一步的狀態是沿用、修正還是新增。
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640">
+  <title>實作流程：從 read 到全基因體的群與樹，以及每一步是沿用還是改寫</title>
+  <desc>八個步驟由上而下，右欄註明每一步的狀態是沿用、改寫還是新增。
         第一步前處理，用現有的變異判定與單倍型標記，沿用。
-        第二步切分析單位，鍵值要含 phase set，沿用。
-        第三步抽狀態表，並且額外算出每一個位點對各自的跨越深度，這一步要修正。
-        第四步把每個區域分類成三種約束：不可同群、必定同群、有向的祖先關係，
-        這是把現行輸出重新解讀，沿用。
-        第五步是新增的兩道品質閘門：逐對檢定力不足的約束丟掉，
-        以及修正排序偏誤，因為那個偏誤會系統性地把分岔判成串接。
-        第六步給每條約束一個信心值，來源是潛在節點數與候選集合大小，這是新增的。
-        第七步把九成五區域的頻率與百分之五區域的約束一起餵進混合模型，這是新增的核心。
-        第八步輸出全基因體的群與樹，並且逐條標明哪些關係由資料決定、哪些靠偏好補。
-        最下方標注：第五步是整條流程的關鍵，因為錯的約束會強迫模型拆出不存在的群，
-        比沒有約束更糟。
-        讀法是：八步裡有四步沿用現行實作，真正要新增的是閘門、信心值與最後的接合。</desc>
+        第二步切分析單位，一個單位是一個區域乘一個單倍型家族，鍵值要含 phase set，沿用。
+        第三步抽狀態表，除了完整的狀態之外還要留下每一條 read 的覆蓋遮罩與計數，
+        這一步要改寫：現行流程把部分覆蓋的 read 併進判定，
+        新的做法是把遮罩本身存下來，因為似然要用它。
+        第四步是現行的最小成本候選列舉，沿用，它負責產生候選的局部拓撲與必要的潛在節點。
+        第五步是改寫的重點：把原本用 read-AF 差值總和排序的分數，
+        換成這個單位那張狀態表的似然，並且不再只留一個候選。
+        第六步是新增的觀測通道，包含逐位點錯誤與整條分子的家族誤標，兩者形狀不同要分開估。
+        第七步把九成五單變異區域的頻率因子與百分之五多變異單位的狀態表因子相乘，
+        接到同一組全域參數上，這是整條路線的核心。
+        第八步輸出全基因體的群與樹，並且逐條標明支持度、
+        沒看到的狀態各自的比例上界，以及跨 phase set 沒解決的對應關係。
+        右下角標注一個由此消失的東西：原本的約束信心值不再需要，
+        因為權重本來就是為了修補重複計數才存在的。
+        最下方標注：分岔與不可同群這些分類仍然照樣產生，但它們是這條流程的輸出，
+        不是再餵回去的證據。
+        讀法是：八步裡有三步沿用，兩步改寫，兩步新增，
+        而改寫的那兩步都是把「先挑一個」換成「全部留著，讓似然決定」。</desc>
 
-  <text class="ttl zh" x="20" y="36">實作流程：把已經算出來的關係接到全基因體那一層</text>
+  <text class="ttl zh" x="20" y="36">實作流程：把局部的狀態表接到全基因體那一層</text>
 
-  <rect class="box" x="24" y="64" width="596" height="50" rx="8"/>
-  <text class="lbl zh" x="44" y="95">① 前處理：變異判定 ＋ 單倍型標記</text>
-  <text class="anno bold zh ok" x="656" y="95">沿用</text>
+  <rect class="box" x="24" y="64" width="596" height="48" rx="8"/>
+  <text class="lbl zh" x="44" y="94">① 前處理：變異判定 ＋ 單倍型標記</text>
+  <text class="anno bold zh ok" x="656" y="94">沿用</text>
 
-  <rect class="box" x="24" y="124" width="596" height="50" rx="8"/>
-  <text class="lbl zh" x="44" y="155">② 切單位：染色體＋phase set＋視窗＋家族</text>
-  <text class="anno bold zh ok" x="656" y="155">沿用</text>
+  <rect class="box" x="24" y="122" width="596" height="48" rx="8"/>
+  <text class="lbl zh" x="44" y="152">② 切單位：染色體＋phase set＋視窗＋家族</text>
+  <text class="anno bold zh ok" x="656" y="152">沿用</text>
 
-  <rect class="box warn" x="24" y="184" width="596" height="50" rx="8"/>
-  <text class="lbl zh" x="44" y="215">③ 抽狀態表 ＋ 算每一對的跨越深度</text>
-  <text class="anno bold zh warn" x="656" y="208">修正</text>
-  <text class="tick zh" x="656" y="230">逐對計數是後面兩道閘門的前提</text>
+  <rect class="box warn" x="24" y="180" width="596" height="56" rx="8"/>
+  <text class="lbl zh" x="44" y="212">③ 抽狀態表，並保留每條 read 的<tspan class="bold">覆蓋遮罩</tspan></text>
+  <text class="anno bold zh warn" x="656" y="204">改寫</text>
+  <text class="tick zh" x="656" y="228">遮罩不再被併掉，似然要用</text>
 
-  <rect class="box" x="24" y="244" width="596" height="50" rx="8"/>
-  <text class="lbl zh" x="44" y="275">④ 分類成三種約束：不可同群／必定同群／祖先</text>
-  <text class="anno bold zh ok" x="656" y="268">沿用</text>
-  <text class="tick zh" x="656" y="290">就是現行的串接／分岔判定</text>
+  <rect class="box" x="24" y="246" width="596" height="56" rx="8"/>
+  <text class="lbl zh" x="44" y="278">④ 列舉最小成本候選與潛在節點</text>
+  <text class="anno bold zh ok" x="656" y="270">沿用</text>
+  <text class="tick zh" x="656" y="294">現行的超立方體解法照用</text>
 
-  <rect class="box bad" x="24" y="304" width="596" height="50" rx="8"/>
-  <text class="lbl bold zh" x="44" y="335">⑤ 兩道品質閘門：檢定力 ＋ 排序偏誤</text>
-  <text class="anno bold zh bad" x="656" y="328">新增</text>
-  <text class="tick zh bad" x="656" y="350">最關鍵的一步</text>
+  <rect class="box accent" x="24" y="312" width="596" height="56" rx="8"/>
+  <text class="lbl bold zh accent" x="44" y="344">⑤ 候選分數：read-AF 差值 → <tspan class="bold">狀態表似然</tspan></text>
+  <text class="anno bold zh accent" x="656" y="336">改寫</text>
+  <text class="tick zh" x="656" y="360">而且不再只留一個候選</text>
 
-  <rect class="box bad" x="24" y="364" width="596" height="50" rx="8"/>
-  <text class="lbl zh" x="44" y="395">⑥ 給每條約束一個信心值</text>
-  <text class="anno bold zh bad" x="656" y="388">新增</text>
-  <text class="tick zh" x="656" y="410">來源：潛在節點數、候選集合大小</text>
+  <rect class="box bad" x="24" y="378" width="596" height="56" rx="8"/>
+  <text class="lbl zh" x="44" y="410">⑥ 觀測通道：逐位點錯誤 ＋ 家族誤標</text>
+  <text class="anno bold zh bad" x="656" y="402">新增</text>
+  <text class="tick zh" x="656" y="426">兩者形狀不同，要分開估</text>
 
-  <rect class="box accent" x="24" y="424" width="596" height="50" rx="8"/>
-  <text class="lbl bold zh" x="44" y="455">⑦ 頻率 ＋ 約束 一起餵進混合模型</text>
-  <text class="anno bold zh accent" x="656" y="448">新增</text>
-  <text class="tick zh" x="656" y="470">這是整條路線的核心</text>
+  <rect class="box accent" x="24" y="444" width="596" height="56" rx="8"/>
+  <text class="lbl bold zh accent" x="44" y="476">⑦ 兩類因子<tspan class="bold">相乘</tspan>，接到同一組全域參數</text>
+  <text class="anno bold zh accent" x="656" y="468">新增</text>
+  <text class="tick zh" x="656" y="492">這是整條路線的核心</text>
 
-  <rect class="box accent" x="24" y="484" width="596" height="50" rx="8"/>
-  <text class="lbl zh" x="44" y="515">⑧ 輸出：全基因體的群 ＋ 樹 ＋ 逐條支持度</text>
-  <text class="anno bold zh accent" x="656" y="515">新增</text>
+  <rect class="box accent" x="24" y="510" width="596" height="56" rx="8"/>
+  <text class="lbl zh" x="44" y="542">⑧ 輸出：群 ＋ 樹 ＋ 支持度 ＋ 未解對應</text>
+  <text class="anno bold zh accent" x="656" y="534">新增</text>
+  <text class="tick zh" x="656" y="558">含「沒看到的狀態」比例上界</text>
 
-  <path class="conn" d="M322,114 L322,122" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M322,174 L322,182" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M322,234 L322,242" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M322,294 L322,302" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M322,354 L322,362" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M322,414 L322,422" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M322,474 L322,482" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,112 L322,120" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,170 L322,178" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,236 L322,244" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,302 L322,310" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,368 L322,376" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,434 L322,442" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M322,500 L322,508" marker-end="url(#arrow-sm)"/>
 
-  <text class="anno zh bad" x="24" y="568">第 ⑤ 步是關鍵：錯的約束會強迫模型拆出<tspan class="bold">不存在的群</tspan> —— 比沒有約束更糟。</text>
-  <text class="tick zh" x="24" y="590">八步裡有四步沿用現行實作；真正新增的是閘門、信心值，與最後那一次接合。</text>
+  <rect class="box ghost" x="656" y="600" width="326" height="0" rx="8"/>
+  <text class="anno bold zh ok" x="24" y="600">由此消失的一步：約束的信心值。權重本來就是為了修補重複計數才存在的。</text>
+  <text class="tick zh" x="24" y="626">分岔／不可同群這些分類照樣產生 —— 但它們是這條流程的<tspan class="bold">輸出</tspan>，不是再餵回去的證據。</text>
 </svg>

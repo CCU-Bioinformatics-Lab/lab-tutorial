@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
+  <title>同一批 read 不能算兩次：由相加的合成目標改為相乘的兩個因子</title>
+  <desc>上半是原本的寫法。全基因體一萬五千五百個變異全部進入頻率項，
+        其中落在多變異區域的一千四百七十五個變異，
+        它們的 read 又被拿去算成關係約束，再加進第二項。
+        中間用兩條指向同一疊 read 的箭頭標出問題：同一批分子被計了兩次，
+        所以那個和不是一個真正的 likelihood，只能叫合成目標，
+        而且必須另外校準一個權重來稀釋重複的部分。
+        下半是改過的寫法。把觀測依區域切成兩類互不重疊的集合：
+        只有一個變異的區域走 beta-binomial，兩個以上變異的單位走聯合的狀態表模型。
+        兩類的 read 沒有交集，所以兩個因子相乘就是一個真正的 likelihood，
+        不需要權重，也沒有東西被算第二次。
+        右下角標注一句關鍵的話：多變異單位的邊際 VAF 已經包含在它的聯合表裡，
+        所以不可以再把它加回頻率項。
+        讀法是：權重原本是用來修補重複計數的補丁，把觀測切乾淨之後那個補丁就不需要了。</desc>
+
+  <text class="ttl zh" x="20" y="36">同一批 read 被算了兩次 —— 這是相加那個寫法的病灶</text>
+
+  <!-- 上半：舊 -->
+  <rect class="box bad" x="18" y="58" width="964" height="184" rx="8"/>
+  <text class="lbl bold zh bad" x="34" y="88">原本：兩項相加</text>
+
+  <rect class="box" x="36" y="104" width="300" height="60" rx="8"/>
+  <text class="lbl zh" x="50" y="130">頻率項</text>
+  <text class="tick zh" x="50" y="152">全部 15,500 個變異</text>
+
+  <text class="lbl bold mid" x="366" y="140">＋</text>
+
+  <rect class="box" x="396" y="104" width="300" height="60" rx="8"/>
+  <text class="lbl zh" x="410" y="130">關係項</text>
+  <text class="tick zh" x="410" y="152">來自 1,475 個變異的 read</text>
+
+  <rect class="box ghost" x="756" y="98" width="210" height="72" rx="8"/>
+  <text class="tick zh" x="770" y="124">必須另外校準一個權重</text>
+  <text class="tick zh" x="770" y="148">來稀釋重複的部分</text>
+
+  <!-- 同一疊 read -->
+  <rect class="read hp1" x="330" y="188" width="150" height="14" rx="7"/>
+  <rect class="read hp1" x="340" y="206" width="150" height="14" rx="7"/>
+  <rect class="read hp1" x="326" y="224" width="150" height="14" rx="7"/>
+  <text class="tick bold zh bad" x="500" y="216">同一批分子</text>
+
+  <path class="conn bad" d="M186,166 L360,184" marker-end="url(#arrow-sm)"/>
+  <path class="conn bad" d="M546,166 L440,184" marker-end="url(#arrow-sm)"/>
+
+  <text class="anno bold zh bad" x="18" y="270">後果：那個和不是 likelihood，只能叫合成目標，而且權重是為了修補重複計數才存在的。</text>
+
+  <!-- 下半：新 -->
+  <rect class="box ok" x="18" y="296" width="964" height="152" rx="8"/>
+  <text class="lbl bold zh ok" x="34" y="326">改成：兩個因子相乘，觀測先切成互不重疊的兩類</text>
+
+  <rect class="box" x="36" y="342" width="380" height="76" rx="8"/>
+  <text class="lbl zh" x="50" y="368">只有一個變異的區域（95%）</text>
+  <text class="tick zh" x="50" y="392">beta-binomial，一個位點兩格</text>
+  <text class="tick mono" x="50" y="412">14,025 個變異</text>
+
+  <text class="lbl bold mid" x="446" y="386">×</text>
+
+  <rect class="box accent" x="476" y="342" width="380" height="76" rx="8"/>
+  <text class="lbl zh accent" x="490" y="368">兩個以上變異的單位（5%）</text>
+  <text class="tick zh" x="490" y="392">聯合狀態表，一個單位 2ᵏ 格</text>
+  <text class="tick mono" x="490" y="412">1,475 個變異</text>
+
+  <rect class="box ok" x="880" y="342" width="88" height="76" rx="8"/>
+  <text class="tick bold zh ok mid" x="924" y="374">沒有</text>
+  <text class="tick bold zh ok mid" x="924" y="398">交集</text>
+
+  <text class="anno bold zh accent" x="18" y="480">多變異單位的邊際 VAF <tspan class="bold">已經含在它的聯合表裡</tspan> —— 不可以再加回頻率項。</text>
+  <text class="tick zh" x="18" y="508">權重原本是修補重複計數的補丁；觀測切乾淨之後，那個補丁就不需要了。</text>
+</svg>

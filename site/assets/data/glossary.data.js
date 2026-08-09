@@ -609,7 +609,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "haplotagging",
   "modules": [
-   "m06"
+   "m06",
+   "sr2b"
   ]
  },
  "somatic haplotype": {
@@ -1228,7 +1229,8 @@ window.TW_GLOSSARY = {
   "slug": "clone-tree",
   "modules": [
    "sr1",
-   "sr2"
+   "sr2",
+   "sr2b"
   ]
  },
  "parsimony": {
@@ -1316,7 +1318,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "pigeonhole",
   "modules": [
-   "sr2"
+   "sr2",
+   "sr2b"
   ]
  },
  "B-allele frequency": {
