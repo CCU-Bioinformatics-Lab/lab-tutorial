@@ -207,12 +207,22 @@ window.TW_MODULES = [
  },
  {
   "id": "sr4",
+  "num": "中",
+  "title_zh": "中篇：單倍型失衡的閉式與三個觀測通道",
+  "title_en": "Part 2 — the closed form and three channels",
+  "short": "失衡的閉式與通道",
+  "q": "同一個失衡數字，可能是腫瘤變多了，也可能是拷貝數不平均 —— 怎麼分？",
+  "sub": "由原始碼寫出單倍型失衡的閉式，說明它與等位比例式同形；指出 somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位點分別量測；並給出一個對另一條單倍型免疫的純度訊號。",
+  "group": "研究指引"
+ },
+ {
+  "id": "sr5",
   "num": "下",
-  "title_zh": "下篇：以單倍型失衡聯合估計純度、倍體與腫瘤 DNA 比例",
-  "title_en": "Part 2 — a joint model from haplotype imbalance",
-  "short": "單倍型失衡的聯合模型",
-  "q": "somatic haplotagging 已經算出來的數字，能不能一次給出純度、倍體與拷貝數？",
-  "sub": "單倍型失衡有閉式，其形式與等位比例的式子相同。加上「單倍型內 somatic 佔比」這個對另一條單倍型免疫的純度錨，即可把迴歸換成聯合估計，並使倍體與 DNA 比例成為導出量。",
+  "title_zh": "下篇：聯合估計式的規格，以及它還不能宣稱什麼",
+  "title_en": "Part 3 — specification of the joint estimator",
+  "short": "聯合估計式的規格",
+  "q": "三個通道要怎麼合成一條式子，才不會被資料的組成牽著走？",
+  "sub": "把三個通道寫成單一個似然而非懲罰與似然的混合，逐層攤開由參數到計數的生成模型，處理 c 與 μ 這兩個 nuisance，並界定它解決與未解決的不可辨識性、失效模式與實作分期。",
   "group": "研究指引"
  }
 ];

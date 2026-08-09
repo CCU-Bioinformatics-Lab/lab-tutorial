@@ -583,7 +583,7 @@ window.TW_GLOSSARY = {
    "m11",
    "sr1",
    "sr2b",
-   "sr4"
+   "sr5"
   ]
  },
  "switch error": {
@@ -797,7 +797,7 @@ window.TW_GLOSSARY = {
   "modules": [
    "m07",
    "m12",
-   "sr4"
+   "sr5"
   ]
  },
  "tumour purity": {
