@@ -83,7 +83,7 @@
         中間的箭頭把兩者匯進同一個混合模型：
         頻率決定成分的位置，約束決定成分的個數、寬度、比例與先後。
         輸出是全基因體的群與樹，並且要標明哪些關係是由資料決定的、哪些是靠偏好補的。
-        最下方是這一頁的出發點：本實驗室現行的實作其實已經在算右邊那一欄了，
+        最下方為本頁的出發點：本實驗室現行的實作已在計算右欄的內容，
         它每個區域都判過串接或分岔，只是那些判定停在區域層級，沒有送到全基因體這一層。
         讀法是：缺的不是資料，是把已經算出來的關係接上去。</desc>
 
@@ -718,7 +718,7 @@ pigeonhole 至此容許分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code>。<
 </ul>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" class="dia-svg" role="img" aria-labelledby="rg-composition-count__title" aria-describedby="rg-composition-count__desc">
-  <title id="rg-composition-count__title">組成機率其實就是在數分子：分子是那一堆有幾條，分母是全部有幾條</title>
+  <title id="rg-composition-count__title">組成機率即為分子的計數：分子為該組的條數，分母為全部的條數</title>
   <desc id="rg-composition-count__desc">左半把一個分析單位裡的分子按組成分成四堆。
         第一堆是兩個位點都是參考型，裡面有六條來自正常細胞的分子。
         第二堆是只帶第一個變異，有四條，來自一個腫瘤 clone。
@@ -871,7 +871,7 @@ pigeonhole 至此容許分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code>。<
 
   <text class="anno zh" x="800" y="360">同一個 VAF＝0.30</text>
   <text class="anno zh bad" x="800" y="388">可以落在 0.38 到 1.80</text>
-  <text class="tick zh" x="800" y="414">（見 M14 的換算鏈）</text>
+  <text class="tick zh" x="800" y="414">（見上篇的換算鏈）</text>
 </svg><figcaption>相除之後僅餘兩個 clone 的細胞比例與家族拷貝數之比。
 右欄為傳統路線的對照：VAF 換算細胞比例需三個估計值，同一個 VAF＝0.30 可落於 0.38 至 1.80 之間。</figcaption></figure>
 
@@ -1134,7 +1134,7 @@ pigeonhole 至此容許分支：<code>c_B + c_C = 0.80 ≤ c_A = 1.00</code>。<
         第一對與第二對各有十七條與二十條，分別判出分岔與串接；
         第三對只有三條，而且三條都是參考型，什麼也判不出來。
         最下方是這張圖的結論：這個單位的演化樹靠的是十七與二十這兩個數字，不是一百九十四；
-        而第三對其實沒有資料，卻仍然被演算法決定了關係。
+        而第三對實質上缺乏資料，仍被演算法判定了關係。
         讀法是：有效樣本數是「每一個位點對各自的跨越深度」，不是這個單位的總 read 數。</desc>
 
   <text class="ttl zh" x="20" y="36">真實資料的覆蓋結構</text>

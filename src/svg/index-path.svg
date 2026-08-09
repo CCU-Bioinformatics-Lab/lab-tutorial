@@ -1,13 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300">
-  <title>整份教材的學習路徑</title>
-  <desc>六個階段由左至右：基礎模組建立資料模型，工具模組介紹實際檔案，
-        核心模組處理腫瘤資料的分析限制，工具實作介紹三項程式，
-        研究前沿說明 subclone 重建從頻率統計走到單倍型的過程，
-        最後以綜合評量完成整合式判讀。
-        下方標出兩個轉折點：從第四個模組開始需要能操作終端機，
-        本教材不預設先備癌症生物學知識。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 320">
+  <title>整份教材的學習路徑：五段課程模組，之後接研究指引</title>
+  <desc>由左至右共六格，前五格為課程模組，第六格為課程之外的研究指引。
+        基礎模組建立資料模型，工具模組介紹實際檔案，
+        核心模組處理腫瘤資料的分析限制，實驗室工具介紹三項程式，
+        課程以綜合評量的整合式判讀作結。
+        第六格以虛線框與虛線箭頭表示，代表它不屬於課程：
+        研究指引為上下兩篇，主題為 subclone 系統發生重建，
+        內容為研究方向的說明而非教材，建議在完成綜合評量之後閱讀。
+        下方標出兩個轉折點：自第四個模組開始需要能操作終端機，
+        以及本教材不預設先備癌症生物學知識。</desc>
 
-  <!-- 六個階段 -->
+  <!-- ── 五段課程 ────────────────────────────────────────────────── -->
   <g>
     <rect class="box accent" x="20" y="52" width="145" height="92" rx="8"/>
     <text class="anno mid bold zh" x="92" y="82">基礎</text>
@@ -25,38 +28,46 @@
     <text class="tick mid zh" x="418" y="130">腫瘤資料的複雜度</text>
 
     <rect class="box" x="509" y="52" width="145" height="92" rx="8"/>
-    <text class="anno mid bold zh" x="581" y="82">工具實作</text>
+    <text class="anno mid bold zh" x="581" y="82">實驗室工具</text>
     <text class="tick mid" x="581" y="106">M11 – M13</text>
     <text class="tick mid zh" x="581" y="130">三項分析工具</text>
 
-    <rect class="box" x="672" y="52" width="145" height="92" rx="8"/>
-    <text class="anno mid bold zh" x="744" y="82">研究前沿</text>
-    <text class="tick mid" x="744" y="106">M14</text>
-    <text class="tick mid zh" x="744" y="130">從頻率到單倍型</text>
-
-    <rect class="box ok" x="835" y="52" width="145" height="92" rx="8"/>
-    <text class="anno mid bold zh" x="907" y="82">綜合評量</text>
-    <text class="tick mid" x="907" y="106">Capstone</text>
-    <text class="tick mid zh" x="907" y="130">完成整合式判讀</text>
+    <rect class="box ok" x="672" y="52" width="145" height="92" rx="8"/>
+    <text class="anno mid bold zh" x="744" y="82">綜合評量</text>
+    <text class="tick mid" x="744" y="106">Capstone</text>
+    <text class="tick mid zh" x="744" y="130">完成整合式判讀</text>
   </g>
 
-  <!-- 箭頭 -->
+  <!-- ── 課程之後：研究指引（虛線框 ＝ 不屬於課程）───────────────── -->
+  <rect class="box ghost" x="835" y="52" width="145" height="92" rx="8"/>
+  <text class="anno mid bold zh" x="907" y="82">研究指引</text>
+  <text class="tick mid zh" x="907" y="106">上篇 · 下篇</text>
+  <text class="tick mid zh" x="907" y="130">subclone 重建</text>
+
+  <!-- 箭頭：課程內為實線，跨到研究指引為虛線 -->
   <path class="flow" d="M167,98 L179,98" marker-end="url(#arrow-sm)"/>
   <path class="flow" d="M330,98 L342,98" marker-end="url(#arrow-sm)"/>
   <path class="flow" d="M493,98 L505,98" marker-end="url(#arrow-sm)"/>
   <path class="flow" d="M656,98 L668,98" marker-end="url(#arrow-sm)"/>
-  <path class="flow" d="M819,98 L831,98" marker-end="url(#arrow-sm)"/>
+  <path class="flow" d="M819,98 L831,98" marker-end="url(#arrow-sm)" style="stroke-dasharray:5 4"/>
 
-  <!-- 上方：起點標示 -->
+  <!-- 上方：起點與課程終點 -->
   <path class="conn somatic" d="M92,44 L92,26" marker-start="url(#arrow-sm)" style="stroke-width:3"/>
   <text class="anno mid zh bold somatic" x="92" y="20">從這裡開始</text>
+
+  <text class="tick mid zh ok" x="744" y="40">課程到此結束</text>
+  <text class="tick mid zh" x="907" y="40">課程之外 · 選讀</text>
 
   <!-- 下方：兩個轉折 -->
   <line class="guide" x1="183" y1="152" x2="183" y2="188"/>
   <text class="tick zh" x="193" y="176">M4 起需要基本終端機操作</text>
 
+  <line class="guide" x1="907" y1="152" x2="907" y2="188"/>
+  <text class="tick zh end" x="897" y="176">不計入課程時數</text>
+
   <line class="axis" x1="20" y1="212" x2="980" y2="212"/>
 
   <text class="anno zh" x="20" y="244">本教材不預設先備癌症生物學知識；必要概念會在對應模組引入。</text>
   <text class="tick zh" x="20" y="272">M0–M3 以閱讀與互動為主，M4 起再進入終端機實作。</text>
+  <text class="tick zh" x="20" y="296">研究指引是研究方向的說明，不是課程；建議完成 Capstone 之後再讀。</text>
 </svg>
