@@ -476,6 +476,27 @@ for (const f of html) {
   }
 }
 
+/* ── 13.9 圖說標籤必須成對 ───────────────────────────────────────────────
+   實際踩過：{{svg:… | 圖說}} 的圖說裡放了 {{m: …}}，而當時的 macro 用
+   ([^}]*) 抓圖說，於是在式子的第一個 } 就截斷。後半段變成裸文字，
+   再被 {{m: …}} 的掃描器一路吃到 macro 的收尾 }}，
+   把 </figcaption></figure> 整個吞進 MathML。
+
+   為什麼非得寫成檢查項：頁面「看起來還是好的」—— HTML parser 會自行收尾，
+   所以不會有錯誤、不會有警告，只是圖說從中間消失、後面的版面全部位移。
+   m11 與 sr1 就是這樣出貨的，而且沒有人發現。
+   標籤數量對不上是這個 bug 最便宜的指紋，不管成因是什麼都抓得到。         */
+
+for (const f of html) {
+  const s = fs.readFileSync(f, 'utf8');
+  const open = (s.match(/<figcaption>/g) || []).length;
+  const close = (s.match(/<\/figcaption>/g) || []).length;
+  if (open !== close) {
+    fail(rel(f), `<figcaption> ${open} 個、</figcaption> ${close} 個 —— 圖說標籤不成對` +
+                 `（常見成因：圖說裡的 {{m: …}} 把 macro 截斷，圖說後半被吞進 MathML）`);
+  }
+}
+
 /* ── 14. 大小預算 ────────────────────────────────────────────────────── */
 
 let total = 0;

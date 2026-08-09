@@ -5,10 +5,12 @@
         把腫瘤與正常配對資料的分子標上單倍型；
         在每個體細胞變異位點上算出五個計數；
         用四道濾波把低信心的變異去掉；
-        以及相位區塊本身，它直接就是分段的單位，不需要另外切。
+        以及相位區塊，它提供每個區段之內兩條單倍型的定向。
         深色的四步是要新增的：
+        以深度與生殖系等位計數獨立分段並納入結構變異斷點，因為拷貝數斷點不一定落在相位區塊的邊界上；
         在生殖系異型合子位點上算單倍型深度比，這是目前完全沒有用到的通道；
-        算出單倍型內的體細胞佔比，它的兩個計數都已經在輸出裡，只差沒有相除；
+        彙總每個位點的四格表，算出單倍型內的體細胞佔比 ——
+        現有的五個計數是每條分子一個標籤，不是每個位點的等位計數，所以不能直接相除；
         依每段的拷貝數把這些位點分層，再一起最佳化細胞比例與各段的拷貝數；
         最後輸出四個量以及各自的區間。
         右邊標出被取代的部分：現行流程在算完五個計數之後，
@@ -34,18 +36,18 @@
   <line class="flow" x1="360" y1="238" x2="360" y2="254" marker-end="url(#arrow)"/>
 
   <rect class="box plain" x="150" y="258" width="420" height="34" rx="6"/>
-  <text class="tick zh mid" x="360" y="280">④ 以 phase block 為分段單位</text>
+  <text class="tick zh mid" x="360" y="280">④ phase block：提供區段內的 H1／H2 定向</text>
   <line class="flow" x1="360" y1="292" x2="360" y2="308" marker-end="url(#arrow)"/>
 
   <!-- ══ 須新增 ══ -->
   <text class="anno bold zh" x="20" y="330">須新增</text>
 
   <rect class="box accent" x="150" y="312" width="420" height="34" rx="6"/>
-  <text class="tick bold zh mid" x="360" y="334">⑤ germline 位點的單倍型深度比（目前未使用）</text>
+  <text class="tick bold zh mid" x="360" y="334">⑤ 以深度與等位獨立分段（納入 SV 斷點）</text>
   <line class="flow" x1="360" y1="346" x2="360" y2="362" marker-end="url(#arrow)"/>
 
   <rect class="box accent" x="150" y="366" width="420" height="34" rx="6"/>
-  <text class="tick bold zh mid" x="360" y="388">⑥ 單倍型內 somatic 佔比（兩個計數已在，未相除）</text>
+  <text class="tick bold zh mid" x="360" y="388">⑥ 位點層級四格表 → 單倍型內 somatic 佔比</text>
   <line class="flow" x1="360" y1="400" x2="360" y2="416" marker-end="url(#arrow)"/>
 
   <rect class="box accent" x="150" y="420" width="420" height="34" rx="6"/>
@@ -68,7 +70,7 @@
   <text class="anno bold zh mid" x="800" y="360">新增工作的性質</text>
   <text class="tick zh" x="644" y="392">⑤ 需重新掃一次 germline VCF，</text>
   <text class="tick zh" x="644" y="414">　 但標記結果已在 BAM 上</text>
-  <text class="tick zh" x="644" y="444">⑥ 只是兩個既有計數相除</text>
+  <text class="tick zh" x="644" y="444">⑥ 須新增位點層級的彙總</text>
   <text class="tick zh" x="644" y="474">⑦ 為本路線的主要新增工作，</text>
   <text class="tick zh" x="644" y="496">　 其收斂性尚待模擬檢驗</text>
 </svg>

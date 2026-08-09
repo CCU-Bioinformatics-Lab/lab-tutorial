@@ -107,6 +107,31 @@ class Stash {
   }
 }
 
+/* {{svg:name | 圖說}} 的掃描器。圖說可以含巢狀的 {{m: …}}，所以收尾的 }}
+   要自己數深度找，不能交給 regex —— 理由見呼叫端的註解。
+   fn(name, caption) 回傳要替換進去的 HTML。 */
+function replaceSvgMacro(s, fn) {
+  const OPEN = '{{svg:';
+  for (let i = s.indexOf(OPEN); i >= 0; i = s.indexOf(OPEN, i)) {
+    const m = /^\{\{svg:([\w-]+)\s*(\|)?/.exec(s.slice(i));
+    if (!m) { i += OPEN.length; continue; }
+    let j = i + m[0].length, depth = 0, end = -1;
+    while (j < s.length) {
+      if (s[j] === '{') depth++;
+      else if (s[j] === '}') {
+        if (depth > 0) depth--;
+        else if (s[j + 1] === '}') { end = j; break; }
+      }
+      j++;
+    }
+    if (end < 0) { i += OPEN.length; continue; }  /* 沒收尾 → 交給「未知 macro」那一關報錯 */
+    const out = fn(m[1], m[2] ? s.slice(i + m[0].length, end) : '');
+    s = s.slice(0, i) + out + s.slice(end + 2);
+    i += out.length;
+  }
+  return s;
+}
+
 /* {{m: 式子}} → MathML。
    ★ 這裡不能用 regex ★ 式子本身就含大括號（\frac{a}{b}、\hat{φ}），
    所以 /\{\{m:(.*?)\}\}/ 會停在 "…{b}" 的那個 }} 上，把式子剪斷。
@@ -252,8 +277,16 @@ function expand(raw, ctx) {
     return read(f);
   });
 
-  /* 2) {{svg:name | caption}} */
-  s = s.replace(/\{\{svg:([\w-]+)\s*(?:\|([^}]*))?\}\}/g, (m0, name, cap) => {
+  /* 2) {{svg:name | caption}}
+     ★ 這裡不能用 /\{\{svg:([\w-]+)\s*(?:\|([^}]*))?\}\}/ ★
+     圖說裡會出現 {{m: …}}（圖說本來就常要提到式子裡的符號），而 [^}]* 會停在
+     \frac{a}{b} 或 {{m: s}} 的第一個 }，把圖說攔腰截斷。後果特別隱蔽：
+     被截掉的後半段變成散在文件裡的裸文字，接著第 7.2 步的 {{m: …}} 掃描器
+     從殘缺的 {{m: 一路吃到整個 macro 的收尾 }}，把 </figcaption></figure>
+     一併吞進 MathML —— 頁面照樣渲染（HTML parser 很寬容），只是圖說消失、
+     版面錯位，而且沒有任何錯誤訊息。m11、sr1 出貨時就是這樣壞掉的。
+     所以改成跟 expandInlineMath 一樣自己數大括號深度。 */
+  s = replaceSvgMacro(s, (name, cap) => {
     const r = inlineSvg(name, ctx.id);
     if (!r) return '';
     r.symbols.forEach((x) => ctx.symbols.add(x));

@@ -10,6 +10,8 @@
         正常細胞在裡面只有一份，另一條單倍型整條不在式子裡。
         所以在兩個等位各一份、變異是所有腫瘤細胞都帶有、且只佔一份拷貝的情形下，
         這個比值直接等於細胞比例，不需要乘以二，也不需要知道另一條有幾份。
+        要注意消去的只有另一條那一份：這個比值仍然依賴變異所在那一條的拷貝數，
+        也依賴帶原細胞比例與多重度。
         下方點明：消失的那個二，和消失的另一條單倍型，是同一件事的兩個後果。
         讀法是：換分母，就換掉了適用範圍。</desc>
 
@@ -59,10 +61,10 @@
   <text class="anno bold mono mid" x="746" y="304">s = 0.50 ＝ p</text>
 
   <text class="tick zh" x="536" y="342">正常細胞在分母裡只有<tspan class="bold">一份</tspan>，</text>
-  <text class="tick zh" x="536" y="366">故不需要那個 2；且式中不含 <tspan class="mono">n₂</tspan>。</text>
+  <text class="tick zh" x="536" y="366">故不需要那個 2；式中不含 <tspan class="mono">n₂</tspan>，但仍含 <tspan class="mono">n₁</tspan>。</text>
 
   <!-- ══ 結論 ══ -->
   <rect class="box accent" x="20" y="400" width="960" height="66" rx="8"/>
   <text class="anno zh" x="40" y="428">消失的那個 <tspan class="mono">2</tspan>，與消失的 <tspan class="mono">n₂</tspan>，是<tspan class="bold">同一件事的兩個後果</tspan> —— 兩者都來自「另一條單倍型不在分母裡」。</text>
-  <text class="anno zh" x="40" y="456">前者只是省掉一個係數，後者<tspan class="bold">移除了適用範圍的限制</tspan>，見下一張圖。</text>
+  <text class="anno zh" x="40" y="456">前者只是省掉一個係數，後者<tspan class="bold">移除了「該區段須為二倍體」這一項限制</tspan>，見下一張圖。</text>
 </svg>

@@ -364,7 +364,7 @@ ASCAT 刻意不做相位，因此其等位軌道對稱於 0.5，PURPLE 的 AMBER
 正常細胞每個貢獻 2 份。深度式與等位比例式<b>共用這個分母</b>，
 差別僅在分子 —— 深度式取全部，等位比例式只取其中一個等位，
 而正常細胞在該等位上恰好貢獻一半。
-<math><mi>γ</mi><mo>&lt;</mo><mo>/</mo><mi>figcaption</mi><mo>&gt;</mo><mo>&lt;</mo><mo>/</mo><mi>figure</mi><mo>&gt;</mo><mi>與</mi><mrow><mi>m</mi><mo>:</mo><mi>ψ</mi></mrow><mi>只</mi><mi>出</mi><mi>現</mi><mi>在</mi><mi>深</mi><mi>度</mi><mi>式</mi><mi>，</mi><mi>故</mi><mi>等</mi><mi>位</mi><mi>比</mi><mi>例</mi><mi>不</mi><mi>受</mi><mi>平</mi><mi>台</mi><mi>常</mi><mi>數</mi><mi>與</mi><mi>正</mi><mi>規</mi><mi>化</mi><mi>的</mi><mi>影</mi><mi>響</mi><mi>。</mi></math>
+<math><mi>γ</mi></math> 與 <math><mi>ψ</mi></math> 只出現在深度式，故等位比例不受平台常數與正規化的影響。</figcaption></figure>
 
 <p class="prose"><math><mi>γ</mi></math> 為平台常數，其操作定義為「純樣本中單一拷貝缺失所造成的深度比下降量」。
 SNP 陣列取 0.55，<b>定序資料一律取 1</b>。它以 <math><msup><mn>2</mn><mrow><mi>r</mi><mo>/</mo><mi>γ</mi></mrow></msup></math> 的形式進入反解，
@@ -477,7 +477,9 @@ SNP 陣列取 0.55，<b>定序資料一律取 1</b>。它以 <math><msup><mn>2</
   <text class="anno zh" x="40" y="462">等位比例式的分子為 <tspan class="mono">ρ·n_B + (1−ρ)</tspan>。<tspan class="bold">承載純度的是後一項，而它屬於正常細胞。</tspan></text>
   <text class="anno zh" x="40" y="484">ρ → 1 時該項趨於零，式子退化為 <tspan class="mono">n_B ÷ (n_A + n_B)</tspan> 的純比值 —— <tspan class="bold">樣本越純，錨越弱</tspan>。</text>
 </svg><figcaption>同一個 1+0 區段，左右僅純度不同。
-左側 <math><mi>ρ</mi><mo>=</mo><mn>0.40</mn><mo>&lt;</mo><mo>/</mo><mi>figcaption</mi><mo>&gt;</mo><mo>&lt;</mo><mo>/</mo><mi>figure</mi><mo>&gt;</mo><mi>：</mi><mi>正</mi><mi>常</mi><mi>細</mi><mi>胞</mi><mi>的</mi><mi>分</mi><mi>子</mi><mi>把</mi><mi>等</mi><mi>位</mi><mi>比</mi><mi>例</mi><mi>由</mi><mn>0</mn><mi>拉</mi><mi>高</mi><mi>到</mi><mn>0.375</mn><mi>，</mi><mi>該</mi><mi>位</mi><mi>移</mi><mi>量</mi><mi>即</mi><mi>承</mi><mi>載</mi><mi>純</mi><mi>度</mi><mi>資</mi><mi>訊</mi><mi>。</mi><mi>右</mi><mi>側</mi><mrow><mi>m</mi><mo>:</mo><mi>ρ</mi><mo>=</mo><mn>1.00</mn></mrow><mi>：</mi><mi>正</mi><mi>常</mi><mi>細</mi><mi>胞</mi><mi>為</mi><mi>零</mi><mi>，</mi><mi>等</mi><mi>位</mi><mi>比</mi><mi>例</mi><mi>落</mi><mi>回</mi><mn>0</mn><mi>，</mi><mi>而</mi><mn>0</mn><mi>同</mi><mi>時</mi><mi>相</mi><mi>容</mi><mi>於</mi><mn>1</mn><mo>+</mo><mn>0</mn><mi>、</mi><mn>2</mn><mo>+</mo><mn>0</mn><mi>、</mi><mn>3</mn><mo>+</mo><mn>0</mn><mi>—</mi><mi>—</mi><mo>&lt;</mo><mi>b</mi><mo>&gt;</mo><mi>位</mi><mi>移</mi><mi>量</mi><mi>消</mi><mi>失</mi><mi>，</mi><mi>純</mi><mi>度</mi><mi>資</mi><mi>訊</mi><mi>隨</mi><mi>之</mi><mi>消</mi><mi>失</mi><mo>&lt;</mo><mo>/</mo><mi>b</mi><mo>&gt;</mo><mi>。</mi></math>
+左側 <math><mi>ρ</mi><mo>=</mo><mn>0.40</mn></math>：正常細胞的分子把等位比例由 0 拉高到 0.375，
+該位移量即承載純度資訊。右側 <math><mi>ρ</mi><mo>=</mo><mn>1.00</mn></math>：正常細胞為零，等位比例落回 0，
+而 0 同時相容於 1+0、2+0、3+0 —— <b>位移量消失，純度資訊隨之消失</b>。</figcaption></figure>
 
 <aside class="guardrail" id="guard-16"><p class="guardrail__hd">重要區分 #16：BAF 的 0.5 錨點來自正常細胞</p><p class="prose">等位比例之所以能反推純度，依賴的是<b>正常細胞</b>在該位點的已知值 0.5。
 腫瘤細胞本身只提供 <math><msub><mi>n</mi><mi>B</mi></msub><mo>/</mo><mo>(</mo><msub><mi>n</mi><mi>A</mi></msub><mo>+</mo><msub><mi>n</mi><mi>B</mi></msub><mo>)</mo></math> 這個比值，其中不含 <math><mi>ρ</mi></math>。</p>
@@ -716,7 +718,11 @@ PURPLE 因此同時輸出 <code>minPurity</code>／<code>maxPurity</code>／<cod
   <!-- ══ 結論 ══ -->
   <rect class="box accent" x="20" y="412" width="960" height="46" rx="8"/>
   <text class="anno zh" x="40" y="441">兩排的深度比與等位比例<tspan class="bold">完全相同</tspan>；唯一的差別是上排有零拷貝的等位而下排沒有 —— <tspan class="bold">辨識依據只有這一項</tspan>。</text>
-</svg><figcaption><math><mi>m</mi><mo>&lt;</mo><mo>/</mo><mi>figcaption</mi><mo>&gt;</mo><mo>&lt;</mo><mo>/</mo><mi>figure</mi><mo>&gt;</mo><mi>何</mi><mi>以</mi><mi>被</mi><mi>零</mi><mi>拷</mi><mi>貝</mi><mi>的</mi><mi>區</mi><mi>段</mi><mi>定</mi><mi>住</mi><mi>。</mi><mi>上</mi><mi>排</mi><mi>為</mi><mi>原</mi><mi>解</mi><mi>，</mi><mi>其</mi><mi>中</mi><mi>一</mi><mi>段</mi><mi>的</mi><mi>等</mi><mi>位</mi><mi>特</mi><mi>異</mi><mi>拷</mi><mi>貝</mi><mi>數</mi><mi>為</mi><mo>&lt;</mo><mi>tspan</mi><mi>class</mi><mo>=</mo><mi>"</mi><mi>mono</mi><mi>"</mi><mo>&gt;</mo><mn>1</mn><mo>+</mo><mn>0</mn><mo>&lt;</mo><mo>/</mo><mi>tspan</mi><mo>&gt;</mo><mi>；</mi><mi>下</mi><mi>排</mi><mi>為</mi><mi>各</mi><mi>等</mi><mi>位</mi><mi>各</mi><mi>加</mi><mi>一</mi><mi>份</mi><mi>之</mi><mi>後</mi><mi>的</mi><mi>解</mi><mi>，</mi><mi>同</mi><mi>一</mi><mi>段</mi><mi>變</mi><mi>為</mi><mo>&lt;</mo><mi>tspan</mi><mi>class</mi><mo>=</mo><mi>"</mi><mi>mono</mi><mi>"</mi><mo>&gt;</mo><mn>2</mn><mo>+</mo><mn>1</mn><mo>&lt;</mo><mo>/</mo><mi>tspan</mi><mo>&gt;</mo><mi>。</mi><mi>兩</mi><mi>者</mi><mi>的</mi><mi>深</mi><mi>度</mi><mi>比</mi><mi>與</mi><mi>等</mi><mi>位</mi><mi>比</mi><mi>例</mi><mi>相</mi><mi>同</mi><mi>，</mi><mi>但</mi><mi>下</mi><mi>排</mi><mo>&lt;</mo><mi>b</mi><mo>&gt;</mo><mi>整</mi><mi>個</mi><mi>基</mi><mi>因</mi><mi>體</mi><mi>不</mi><mi>存</mi><mi>在</mi><mi>任</mi><mi>何</mi><mi>零</mi><mi>拷</mi><mi>貝</mi><mi>的</mi><mi>等</mi><mi>位</mi><mo>&lt;</mo><mo>/</mo><mi>b</mi><mo>&gt;</mo><mi>。</mi><mi>故</mi><mi>「</mi><mi>觀</mi><mi>測</mi><mi>到</mi><mi>homozygous</mi><mi>deletion</mi><mi>」</mi><mi>即</mi><mi>為</mi><mi>排</mi><mi>除</mi><mi>下</mi><mi>排</mi><mi>的</mi><mi>依</mi><mi>據</mi><mi>—</mi><mi>—</mi><mi>ASCAT</mi><mi>的</mi><mo>&lt;</mo><mi>code</mi><mo>&gt;</mo><mi>percentzero</mi><mo>&lt;</mo><mo>/</mo><mi>code</mi><mo>&gt;</mo><mi>門</mi><mi>檻</mi><mi>所</mi><mi>檢</mi><mi>驗</mi><mi>者</mi><mi>即</mi><mi>為</mi><mi>此</mi><mi>。</mi></math>
+</svg><figcaption><math><mi>m</mi></math> 何以被零拷貝的區段定住。上排為原解，其中一段的等位特異拷貝數為
+<tspan class="mono">1+0</tspan>；下排為各等位各加一份之後的解，同一段變為 <tspan class="mono">2+1</tspan>。
+兩者的深度比與等位比例相同，但下排<b>整個基因體不存在任何零拷貝的等位</b>。
+故「觀測到 homozygous deletion」即為排除下排的依據 ——
+ASCAT 的 <code>percentzero</code> 門檻所檢驗者即為此。</figcaption></figure>
 
 <h3 id="六-ascat-以硬性可行域選解">六、ASCAT：以硬性可行域選解</h3>
 
@@ -838,7 +844,11 @@ ASCAT 取 7×7 鄰域內的嚴格極小為候選，再以四道硬性條件篩�
   <!-- 結論 -->
   <rect class="box accent" x="20" y="480" width="960" height="34" rx="8"/>
   <text class="anno zh" x="40" y="504">曲線上各點的距離值相近，故此步驟的性質為<tspan class="bold">切割可行域</tspan>；剩一點即輸出，剩零點即回傳失敗而非勉強的解。</text>
-</svg><figcaption><math><mo>(</mo><mi>ρ</mi><mo>,</mo><msub><mi>ψ</mi><mi>t</mi></msub><mo>)</mo><mo>&lt;</mo><mo>/</mo><mi>figcaption</mi><mo>&gt;</mo><mo>&lt;</mo><mo>/</mo><mi>figure</mi><mo>&gt;</mo><mi>網</mi><mi>格</mi><mi>上</mi><mi>的</mi><mi>距</mi><mi>離</mi><mi>曲</mi><mi>面</mi><mi>示</mi><mi>意</mi><mi>。</mi><mo>&lt;</mo><mi>b</mi><mo>&gt;</mo><mi>局</mi><mi>部</mi><mi>極</mi><mi>小</mi><mi>並</mi><mi>非</mi><mi>散</mi><mi>布</mi><mi>，</mi><mi>而</mi><mi>是</mi><mi>沿</mi><mi>一</mi><mi>條</mi><mi>曲</mi><mi>線</mi><mi>排</mi><mi>列</mi><mo>&lt;</mo><mo>/</mo><mi>b</mi><mo>&gt;</mo><mi>—</mi><mi>—</mi><mi>該</mi><mi>曲</mi><mi>線</mi><mi>即</mi><mi>前</mi><mi>一</mi><mi>節</mi><mi>的</mi><mi>格</mi><mi>點</mi><mi>族</mi><mi>。</mi><mi>四</mi><mi>道</mi><mi>硬</mi><mi>性</mi><mi>條</mi><mi>件</mi><mi>各</mi><mi>自</mi><mi>切</mi><mi>掉</mi><mi>曲</mi><mi>面</mi><mi>的</mi><mi>一</mi><mi>片</mi><mi>：</mi><mi>倍</mi><mi>體</mi><mi>界</mi><mi>限</mi><mi>切</mi><mi>掉</mi><mi>兩</mi><mi>端</mi><mi>，</mi><mi>純</mi><mi>度</mi><mi>下</mi><mi>限</mi><mi>切</mi><mi>掉</mi><mi>左</mi><mi>側</mi><mi>，</mi><mi>零</mi><mi>拷</mi><mi>貝</mi><mi>門</mi><mi>檻</mi><mi>切</mi><mi>掉</mi><mi>「</mi><mi>各</mi><mi>等</mi><mi>位</mi><mi>各</mi><mi>加</mi><mi>一</mi><mi>份</mi><mi>」</mi><mi>的</mi><mi>那</mi><mi>一</mi><mi>段</mi><mi>，</mi><mi>擬</mi><mi>合</mi><mi>優</mi><mi>度</mi><mi>切</mi><mi>掉</mi><mi>整</mi><mi>體</mi><mi>不</mi><mi>合</mi><mi>的</mi><mi>區</mi><mi>域</mi><mi>。</mi><mi>選</mi><mi>解</mi><mi>因</mi><mi>此</mi><mi>是</mi><mo>&lt;</mo><mi>b</mi><mo>&gt;</mo><mi>切</mi><mi>割</mi><mo>&lt;</mo><mo>/</mo><mi>b</mi><mo>&gt;</mo><mi>而</mi><mi>非</mi><mi>最</mi><mi>佳</mi><mi>化</mi><mi>—</mi><mi>—</mi><mi>剩</mi><mi>下</mi><mi>一</mi><mi>點</mi><mi>即</mi><mi>輸</mi><mi>出</mi><mi>，</mi><mi>剩</mi><mi>下</mi><mi>零</mi><mi>點</mi><mi>即</mi><mi>回</mi><mi>報</mi><mi>失</mi><mi>敗</mi><mi>。</mi></math>
+</svg><figcaption><math><mo>(</mo><mi>ρ</mi><mo>,</mo><msub><mi>ψ</mi><mi>t</mi></msub><mo>)</mo></math> 網格上的距離曲面示意。
+<b>局部極小並非散布，而是沿一條曲線排列</b> —— 該曲線即前一節的格點族。
+四道硬性條件各自切掉曲面的一片：倍體界限切掉兩端，純度下限切掉左側，
+零拷貝門檻切掉「各等位各加一份」的那一段，擬合優度切掉整體不合的區域。
+選解因此是<b>切割</b>而非最佳化 —— 剩下一點即輸出，剩下零點即回報失敗。</figcaption></figure>
 
 <h3 id="七-purple-同一組代數-連續的先驗">七、PURPLE：同一組代數，連續的先驗</h3>
 
@@ -1025,7 +1035,9 @@ ASCAT 取 7×7 鄰域內的嚴格極小為候選，再以四道硬性條件篩�
   <rect class="box accent" x="20" y="428" width="960" height="34" rx="8"/>
   <text class="anno zh" x="40" y="452">關鍵量為 <tspan class="mono">p·ν ÷ 2σ</tspan> —— 相鄰整數拷貝數在深度上的間距，折合成幾個標準差。此值隨純度下降而縮小。</text>
 </svg><figcaption>偏離懲罰對整數距離的反應，兩條曲線分別為
-<math><mi>p</mi><mo>=</mo><mn>0.90</mn><mo>&lt;</mo><mo>/</mo><mi>figcaption</mi><mo>&gt;</mo><mo>&lt;</mo><mo>/</mo><mi>figure</mi><mo>&gt;</mo><mi>與</mi><mrow><mi>m</mi><mo>:</mo><mi>p</mi><mo>=</mo><mn>0.20</mn></mrow><mi>。</mi><mo>&lt;</mo><mi>b</mi><mo>&gt;</mo><mi>橫</mi><mi>軸</mi><mi>上</mi><mi>同</mi><mi>一</mi><mi>個</mi><mn>0.25</mn><mo>&lt;</mo><mo>/</mo><mi>b</mi><mo>&gt;</mo><mi>在</mi><mi>高</mi><mi>純</mi><mi>度</mi><mi>時</mi><mi>落</mi><mi>在</mi><mi>曲</mi><mi>線</mi><mi>的</mi><mi>平</mi><mi>坦</mi><mi>頂</mi><mi>端</mi><mi>（</mi><mi>近</mi><mi>乎</mi><mi>確</mi><mi>定</mi><mi>為</mi><mi>結</mi><mi>構</mi><mi>）</mi><mi>，</mi><mi>在</mi><mi>低</mi><mi>純</mi><mi>度</mi><mi>時</mi><mi>仍</mi><mi>位</mi><mi>於</mi><mi>上</mi><mi>升</mi><mi>段</mi><mi>（</mi><mi>尚</mi><mi>在</mi><mi>雜</mi><mi>訊</mi><mi>範</mi><mi>圍</mi><mi>）</mi><mi>。</mi><mi>右</mi><mi>側</mi><mi>為</mi><mi>ASCAT</mi><mi>的</mi><mi>對</mi><mi>照</mi><mi>：</mi><mi>一</mi><mi>條</mi><mi>與</mi><mi>純</mi><mi>度</mi><mi>無</mi><mi>關</mi><mi>的</mi><mi>平</mi><mi>方</mi><mi>曲</mi><mi>線</mi><mi>。</mi></math>
+<math><mi>p</mi><mo>=</mo><mn>0.90</mn></math> 與 <math><mi>p</mi><mo>=</mo><mn>0.20</mn></math>。<b>橫軸上同一個 0.25</b> 在高純度時落在曲線的平坦頂端
+（近乎確定為結構），在低純度時仍位於上升段（尚在雜訊範圍）。
+右側為 ASCAT 的對照：一條與純度無關的平方曲線。</figcaption></figure>
 
 <h4 id="somatic-變異提供的兩種約束">somatic 變異提供的兩種約束</h4>
 
@@ -1238,7 +1250,12 @@ subclonal 的拷貝數變異因此表現為真正非整數的 <math><mover accen
 <ol class="prose">
 <li><b>somatic 變異的 VAF。</b>變異的拷貝數須為不超過主要等位的正整數，
 且 clonal 變異在 1+1 區段的 VAF 恆為 <math><mi>p</mi><mo>/</mo><mn>2</mn></math>。
-此為<b>唯一位於同一份資料之內、且能破解加倍簡併的錨</b>。</li>
+此為同一份資料之內<b>最強</b>的錨。惟其對加倍簡併的作用是<b>有條件的</b>：
+起作用的並非 VAF 的數值本身（該值在加倍變換下不變），
+而是「變異拷貝數須為不超過主要等位的<b>正整數</b>」這條約束 ——
+它使「把拷貝數對半」在需要半整數 multiplicity 時不可行。
+因此它只在<b>存在加倍之後才發生的變異</b>、或對變異發生時序另有假設時才定得下模式。
+下篇第七節以代數證明此點。</li>
 <li><b>零拷貝的證據。</b>定住 <math><mi>m</mi></math>，但對 <math><mi>k</mi></math> 無作用。</li>
 <li><b>簡約性偏好與群體先驗。</b>PURPLE 的事件懲罰、ASCAT 的倍體界限皆屬此類。
 其性質為偏好而非證據，樣本落在偏好之外時即失效。</li>
@@ -1449,7 +1466,8 @@ subclone 重建中「兩群細胞比例相等時增加定序深度無助於分�
 <h3 id="與下篇的銜接">與下篇的銜接</h3>
 
 <p class="prose">本頁的結論可歸為三句：深度與等位比例決定的是一個格點族而非一組解；
-族內選點必須依賴錨或偏好；而同一份資料之內唯一能破解加倍簡併的錨是 somatic 變異的 VAF。</p>
+族內選點必須依賴錨或偏好；而同一份資料之內最強的錨是 somatic 變異的 VAF，
+且其對加倍簡併的作用取決於整數 multiplicity 的約束，並非無條件成立。</p>
 
 <p class="prose">該錨的限制已在第七節指出：<math><mi>VAF</mi><mo>=</mo><mi>p</mi><mo>/</mo><mn>2</mn></math> 的分母含兩條單倍型的拷貝數，
 故僅在二倍體區段成立，PURPLE 因而只能在推得拷貝數落於 1.8 至 2.2 的區域使用它。</p>
