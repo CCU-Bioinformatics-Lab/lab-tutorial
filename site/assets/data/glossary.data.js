@@ -836,7 +836,7 @@ window.TW_GLOSSARY = {
  },
  "cancer cell fraction": {
   "zh_gloss": "癌細胞比例",
-  "zh": "帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b>",
+  "zh": "帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（<math><mo>≈</mo><mn>1</mn></math>）與 subclonal（<math><mo>&lt;</mo><mn>1</mn></math>）突變。<b>不等於 VAF。</b>",
   "en": "The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.",
   "aka": [
    "CCF"
@@ -1268,8 +1268,8 @@ window.TW_GLOSSARY = {
  },
  "epimutation": {
   "zh_gloss": "表觀突變",
-  "zh": "細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 10⁻⁵ 到 10⁻⁴，而 DNA 突變約每鹼基 10⁻⁹ 到 10⁻¹⁰，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 10⁻³ 的），應當成量級而非定值。",
-  "en": "A stochastic flip of methylation state during cell division. Commonly cited at 10⁻⁵–10⁻⁴ per CpG per division versus 10⁻⁹–10⁻¹⁰ per base for DNA mutation — roughly five orders of magnitude faster like-for-like — which makes it a higher-resolution lineage clock. Treat it as an order of magnitude, not a constant: estimates vary by site and assay, up to ~10⁻³.",
+  "zh": "細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></math> 到 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup></math>，而 DNA 突變約每鹼基 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>9</mn></mrow></msup></math> 到 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>10</mn></mrow></msup></math>，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup></math> 的），應當成量級而非定值。",
+  "en": "A stochastic flip of methylation state during cell division. Commonly cited at <math><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></math>–<math><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup></math> per CpG per division versus <math><msup><mn>10</mn><mrow><mo>−</mo><mn>9</mn></mrow></msup></math>–<math><msup><mn>10</mn><mrow><mo>−</mo><mn>10</mn></mrow></msup></math> per base for DNA mutation — roughly five orders of magnitude faster like-for-like — which makes it a higher-resolution lineage clock. Treat it as an order of magnitude, not a constant: estimates vary by site and assay, up to ~<math><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup></math>.",
   "see": [
    "5mC",
    "CpG",

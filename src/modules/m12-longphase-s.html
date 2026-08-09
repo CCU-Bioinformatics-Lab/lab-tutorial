@@ -261,11 +261,11 @@ longphase-s somatic_haplotag \
 <table>
 <thead><tr><th>面向</th><th>報告的結果</th></tr></thead>
 <tbody>
-<tr><td>purity 估計</td><td>在低 purity 區段明顯優於 ASCAT（ASCAT 在多個資料集把 0.2 預測成 1.0）；leave-k-out 交叉驗證平均 R² 約 0.96</td></tr>
+<tr><td>purity 估計</td><td>在低 purity 區段明顯優於 ASCAT（ASCAT 在多個資料集把 0.2 預測成 1.0）；leave-k-out 交叉驗證平均 {{m: R^2}} 約 0.96</td></tr>
 <tr><td>接在 ClairS 之後（SNV）</td><td><b>recall 平均 +4.5%</b>（最多 +14.4%），precision 平均 −1.3%，淨效果 F1 平均 +1.9%（8 個資料集中 6 個變好）</td></tr>
 <tr><td>接在 ClairS 之後（indel）</td><td><b>recall 平均 +14.7%</b>，precision 平均 −11.9%，F1 平均 +7.1%（8 個中 7 個變好）</td></tr>
 <tr><td>接在 DeepSomatic 之後</td><td>方向相反：主要是 <b>precision</b> 上升（SNV 平均 +3.1%），recall 略降，F1 只有小幅變化（+1.2% / +0.5%）</td></tr>
-<tr><td>somatic haplotagging</td><td><code>HP1-1</code>／<code>HP2-1</code> 的 read 層級 F1 在 8 個資料集中有 6 個 ≥0.98；<code>HP3</code> 明顯較低</td></tr>
+<tr><td>somatic haplotagging</td><td><code>HP1-1</code>／<code>HP2-1</code> 的 read 層級 F1 在 8 個資料集中有 6 個 {{m: ≥ 0.98}}；<code>HP3</code> 明顯較低</td></tr>
 </tbody>
 </table>
 </div>

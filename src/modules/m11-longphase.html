@@ -60,7 +60,7 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
 <p class="prose">邊不是「有」或「沒有」，而是<b>四個加權計數</b>。跨過兩個位置的每一條 read，
 依它在兩邊看到的 allele 落進 rr、ra、ar、aa 之一：</p>
 
-{{svg:m11-phase-graph | [wide] 四個計數併成 para（＝rr+aa，平行的證據）與 cross（＝ra+ar，交叉的證據），再算 ESR ＝ 兩者的小除以大。para 大就平行連接、cross 大就交叉連接；ESR 大到超過 <code>edgeThreshold</code>（預設 0.7）就代表兩種組合幾乎一樣多，這條邊會被<b>整個丟掉</b>。反過來，ESR ≤ 0.1 的乾淨邊，它那一票的權重會從 1 拉到 20。}}
+{{svg:m11-phase-graph | [wide] 四個計數併成 para（{{m: = rr + aa}}，平行的證據）與 cross（{{m: = ra + ar}}，交叉的證據），再算 ESR ＝ 兩者的小除以大。para 大就平行連接、cross 大就交叉連接；ESR 大到超過 <code>edgeThreshold</code>（預設 0.7）就代表兩種組合幾乎一樣多，這條邊會被<b>整個丟掉</b>。反過來，{{m: ESR ≤ 0.1}} 的乾淨邊，它那一票的權重會從 1 拉到 20。}}
 
 <p class="prose">兩個細節值得記住，因為它們解釋了很多「為什麼這裡沒接起來」：</p>
 
@@ -77,7 +77,7 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
 一次決定一個變異：前面最多 <code>--connectAdjacent</code>（預設 35）個變異各投一票，
 票的權重就是上面那個 20 / 1 / 0.1，兩邊加總大的一邊贏。</p>
 
-{{svg:m11-voting | [wide] ① 加權投票決定當前變異接到哪一條 haplotype。② 兩邊得票<b>剛好相等</b>時程式無法決定方向，就在這裡開一個新的 phase block —— 這是 <code>PS</code> 換號最直接的原因。③ 一個特例保護：如果很多票其實都靠同一條長 read 撐著（每條邊只有一條 read，para＋cross ≤ 1），那條 read 一旦有系統性錯誤就會一路投錯票；程式偵測到超過三票是這種情況時，會改成只採信乾淨（ESR &lt; 0.2）且非 indel 的票重算。}}
+{{svg:m11-voting | [wide] ① 加權投票決定當前變異接到哪一條 haplotype。② 兩邊得票<b>剛好相等</b>時程式無法決定方向，就在這裡開一個新的 phase block —— 這是 <code>PS</code> 換號最直接的原因。③ 一個特例保護：如果很多票其實都靠同一條長 read 撐著（每條邊只有一條 read，{{m: para + cross ≤ 1}}），那條 read 一旦有系統性錯誤就會一路投錯票；程式偵測到超過三票是這種情況時，會改成只採信乾淨（ESR &lt; 0.2）且非 indel 的票重算。}}
 
 <p class="prose">這是一個典型的 heuristic：快、在長讀上通常夠準，但代價是它對兩件事敏感 ——
 <b>證據剛好平手</b>，以及<b>單一 read 主導</b>。③ 那個特例保護就是為了後者而存在的。

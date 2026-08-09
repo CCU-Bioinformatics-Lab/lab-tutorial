@@ -173,7 +173,7 @@ score = (\text{成功移除的 FP} − λ × \text{誤刪的 TP}) ÷ \text{FP �
 <h3>本例交叉驗證以樣本為分割單位</h3>
 
 <p class="prose">LongPhase-S 用 <b>leave-k-out</b> 交叉驗證評估 purity 模型，
-每次留下 1 或 2 個 <b>cell line</b> 當測試集。結果 MAE 約 4%、R² 約 0.95。</p>
+每次留下 1 或 2 個 <b>cell line</b> 當測試集。結果 MAE 約 4%、{{m: R^2}} 約 0.95。</p>
 
 <p class="prose">這種做法叫 [[cross-validation]]。此處保留 cell line 作測試，有助於評估<b>跨樣本的泛化能力</b>。
 若同一 cell line 的高度相關位點同時出現在訓練與測試中，可能造成 [[data leakage]] 或效能高估。</p>

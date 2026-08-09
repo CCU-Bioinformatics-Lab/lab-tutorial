@@ -1934,7 +1934,7 @@ bcftools view -g het sample.vcf | grep -vc '^#'</code></pre>
 <thead><tr><th scope="col">量</th><th scope="col">意思</th><th scope="col">本教材示例值</th></tr></thead>
 <tbody>
 <tr><td><span class="term" data-term="coverage" tabindex="0" role="button" aria-expanded="false" aria-describedby="m03__gd-coverage-5">coverage<span class="term__pop" id="m03__gd-coverage-5" role="tooltip"><b class="term__hd">coverage <i>覆蓋度／深度</i></b><span class="term__def" data-lang="zh">某個位置被多少條 read 覆蓋。50× 表示平均每個位置約有 50 條 read 覆蓋，不代表它們均支持同一 allele。</span><span class="term__def" data-lang="en" lang="en">How many reads span a position. 50x means on average 50 reads per position.</span><a class="term__more" href="glossary.html#coverage">完整條目 →</a></span></span></td><td>某個位置被多少條 read 覆蓋</td><td>tumor 50×，normal 25×</td></tr>
-<tr><td><span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="m03__gd-vaf-6">VAF<span class="term__pop" id="m03__gd-vaf-6" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en" lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span></td><td>支持 alt allele 的 read 比例</td><td>germline het 在簡化二倍體模型中 ≈ 0.5；somatic 依 purity、copy number 與 clonality 而異</td></tr>
+<tr><td><span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="m03__gd-vaf-6">VAF<span class="term__pop" id="m03__gd-vaf-6" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en" lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span></td><td>支持 alt allele 的 read 比例</td><td>germline het 在簡化二倍體模型中 <math><mo>≈</mo><mn>0.5</mn></math>；somatic 依 purity、copy number 與 clonality 而異</td></tr>
 <tr><td><span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="m03__gd-tumour-purity-7">purity<span class="term__pop" id="m03__gd-tumour-purity-7" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en" lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span></td><td>樣本中腫瘤細胞的比例</td><td>合成資料用 0.2 / 0.4 / 0.6 / 0.8 / 1.0</td></tr>
 </tbody>
 </table>
@@ -2725,7 +2725,7 @@ minimap2 -ax map-ont -y reference.fasta methylcall.raw.fastq</code></pre>
 同時，這列中的 <code>0|1</code> 與 <code>PS=105</code> 各自告訴你什麼？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>先回 BAM。</b>用 VCF 的 <code>CHROM</code> 與 <code>POS</code> 查詢該區間，再查看每條 read 的序列、MAPQ、CIGAR 與可用 tags；需要時再對照 reference FASTA。FASTQ 是尚未放回座標的原始 read，不能直接回答哪條 read 覆蓋 <code>chr7:105</code>。</p>
 <p class="prose"><code>0|1</code> 表示 REF 與 ALT 的順序已被定相表示；<code>PS=105</code> 表示這個位點屬於編號為 105 的 phase set。它們都不等於支持 read 數量，也不會取代對 BAM 的檢查；HP1／HP2 也不因此自動帶有父系／母系意義。</p></div></details>
 
-<div class="reveal__q"><p class="prose">另一條 BAM record 的 CIGAR 是 <code>60S40M</code>。這條 read 總長多少？它消耗了多少參考序列？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>read 長 100 bp，參考涵蓋 40 bp。</b><code>S</code> 仍保留在 read，所以 <code>60+40=100</code>；但 <code>S</code> 不消耗參考，只有 <code>40M</code> 消耗 40 個參考位置。</p>
+<div class="reveal__q"><p class="prose">另一條 BAM record 的 CIGAR 是 <code>60S40M</code>。這條 read 總長多少？它消耗了多少參考序列？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>read 長 100 bp，參考涵蓋 40 bp。</b><code>S</code> 仍保留在 read，所以 <math><mn>60</mn><mo>+</mo><mn>40</mn><mo>=</mo><mn>100</mn></math>；但 <code>S</code> 不消耗參考，只有 <code>40M</code> 消耗 40 個參考位置。</p>
 <p class="prose">如果許多 read 在相近座標出現相同方向的 <code>S</code>，可把該處列為結構變異斷點候選；仍需結合其他證據，不能由單一 CIGAR 直接下結論。</p></div></details>
 </section>
 
@@ -5355,7 +5355,7 @@ technologies with DeepSomatic</i>，Nature Biotechnology，2025。程式碼在
 <h3 id="m08__先把名詞跟-在數什麼-對起來">先把名詞跟「在數什麼」對起來</h3>
 
 <p class="prose">這些名詞看起來很多，但它們其實只做一件事：<b>在不同層級上數東西</b>。
-<span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-tumour-purity-0">purity<span class="term__pop" id="m08__gd-tumour-purity-0" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en" lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span> 與 <span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-cancer-cell-fraction-1">CCF<span class="term__pop" id="m08__gd-cancer-cell-fraction-1" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en" lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span> 數的是<b>細胞</b>；
+<span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-tumour-purity-0">purity<span class="term__pop" id="m08__gd-tumour-purity-0" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en" lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span> 與 <span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-cancer-cell-fraction-1">CCF<span class="term__pop" id="m08__gd-cancer-cell-fraction-1" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（<math><mo>≈</mo><mn>1</mn></math>）與 subclonal（<math><mo>&lt;</mo><mn>1</mn></math>）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en" lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span> 數的是<b>細胞</b>；
 <span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-copy-number-2">copy number<span class="term__pop" id="m08__gd-copy-number-2" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en" lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span> 與 <span class="term" data-term="mutation multiplicity" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-mutation-multiplicity-3">multiplicity<span class="term__pop" id="m08__gd-mutation-multiplicity-3" role="tooltip"><b class="term__hd">mutation multiplicity</b><span class="term__def" data-lang="zh">在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</span><span class="term__def" data-lang="en" lang="en">How many mutant-allele copies are present in a cell carrying the mutation; a necessary term when converting VAF to cancer cell fraction.</span><a class="term__more" href="glossary.html#mutation-multiplicity">完整條目 →</a></span></span> 數的是<b>一個細胞裡有幾份 DNA</b>；
 <span class="term" data-term="VAF" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-vaf-4">VAF<span class="term__pop" id="m08__gd-vaf-4" role="tooltip"><b class="term__hd">VAF <i>變異等位基因頻率</i></b><span class="term__def" data-lang="zh">在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</span><span class="term__def" data-lang="en" lang="en">Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.</span><a class="term__more" href="glossary.html#vaf">完整條目 →</a></span></span> 數的是<b>read</b>。搞混它們，通常就是搞混了分母。</p>
 
@@ -5550,8 +5550,8 @@ technologies with DeepSomatic</i>，Nature Biotechnology，2025。程式碼在
 <p class="prose">這張圖裡有兩件事值得停下來看。</p>
 
 <p class="prose">第一，<b>方向是不對稱的</b>。給定上面兩層，VAF 只有一個答案 ——
-腫瘤佔 0.6、其中一半帶突變、每個細胞 2 份裡帶 1 份，算出來就是 0.6 × 0.5 ÷ 2 = 0.15。
-但拿著 VAF = 0.15 往上反推，會有很多組合都成立。整章的難處都在這個不對稱上。</p>
+腫瘤佔 0.6、其中一半帶突變、每個細胞 2 份裡帶 1 份，算出來就是 <math><mn>0.6</mn><mo>×</mo><mn>0.5</mn><mo>÷</mo><mn>2</mn><mo>=</mo><mn>0.15</mn></math>。
+但拿著 <math><mi>VAF</mi><mo>=</mo><mn>0.15</mn></math> 往上反推，會有很多組合都成立。整章的難處都在這個不對稱上。</p>
 
 <p class="prose">第二，<b>read 不是細胞</b>。一條 read 是一個 DNA 分子，同一個細胞會貢獻很多條 read，
 而且哪一條 read 來自哪個細胞在 bulk 資料裡查不到。所以「數 read」永遠只是「數細胞」的間接代理。</p>
@@ -5735,7 +5735,7 @@ technologies with DeepSomatic</i>，Nature Biotechnology，2025。程式碼在
 <tr><td><code>purity</code></td><td><span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-tumour-purity-7">腫瘤細胞比例<span class="term__pop" id="m08__gd-tumour-purity-7" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en" lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span></td><td>通常需估計</td></tr>
 <tr><td><code>totalCN</code></td><td>該位置的 <span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-copy-number-8">總拷貝數<span class="term__pop" id="m08__gd-copy-number-8" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en" lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span>（整體平均值即 <span class="term" data-term="ploidy" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-ploidy-9">ploidy<span class="term__pop" id="m08__gd-ploidy-9" role="tooltip"><b class="term__hd">ploidy <i>倍性</i></b><span class="term__def" data-lang="zh">細胞內染色體套數。多數正常常染色體為 2（diploid）；腫瘤可呈現 3、4 或其他非整倍體狀態。</span><span class="term__def" data-lang="en" lang="en">The number of chromosome sets in a cell. Most normal autosomal regions are diploid (2); tumours may be triploid, tetraploid or otherwise non-diploid.</span><a class="term__more" href="glossary.html#ploidy">完整條目 →</a></span></span>）</td><td>通常需估計</td></tr>
 <tr><td><code>multiplicity</code></td><td><span class="term" data-term="mutation multiplicity" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-mutation-multiplicity-10">突變佔了幾份拷貝<span class="term__pop" id="m08__gd-mutation-multiplicity-10" role="tooltip"><b class="term__hd">mutation multiplicity</b><span class="term__def" data-lang="zh">在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</span><span class="term__def" data-lang="en" lang="en">How many mutant-allele copies are present in a cell carrying the mutation; a necessary term when converting VAF to cancer cell fraction.</span><a class="term__more" href="glossary.html#mutation-multiplicity">完整條目 →</a></span></span></td><td>通常需推論</td></tr>
-<tr><td><code>CCF</code></td><td><span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-cancer-cell-fraction-11">帶有此突變的腫瘤細胞比例<span class="term__pop" id="m08__gd-cancer-cell-fraction-11" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en" lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span></td><td>通常是分析所要估計的目標</td></tr>
+<tr><td><code>CCF</code></td><td><span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="m08__gd-cancer-cell-fraction-11">帶有此突變的腫瘤細胞比例<span class="term__pop" id="m08__gd-cancer-cell-fraction-11" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（<math><mo>≈</mo><mn>1</mn></math>）與 subclonal（<math><mo>&lt;</mo><mn>1</mn></math>）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en" lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span></td><td>通常是分析所要估計的目標</td></tr>
 <tr><td><code>VAF</code></td><td>支持 alt 的 read 比例</td><td>可由 reads 估計</td></tr>
 </tbody>
 </table>
@@ -6070,7 +6070,7 @@ technologies with DeepSomatic</i>，Nature Biotechnology，2025。程式碼在
 具體適用範圍與資料平台應依研究設計說明。</p>
 
 <p class="prose">該研究報告 LongPhase-S 在<b>低 purity</b> 合成樣本上的估計誤差多數低於 10%，
-交叉驗證 MAE 約 4%、R² 約 0.95；解讀時應同時確認誤差定義、資料集與切分方式。</p>
+交叉驗證 MAE 約 4%、<math><msup><mi>R</mi><mn>2</mn></msup></math> 約 0.95；解讀時應同時確認誤差定義、資料集與切分方式。</p>
 
 <p class="prose">這項比較僅涵蓋合成樣本，且<b>假設來源 tumor BAM 接近純腫瘤</b>。
 細胞株仍可能包含少量正常或異質細胞，因此此假設限定了 purity 結果的適用範圍。</p>
@@ -6151,7 +6151,7 @@ bcftools view -H -g het sample.vcf | awk '{print $1, int($2/1000000)}' | \
 </section>
 
     
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>VAF（變異等位基因頻率）</dt><dd>在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>mutation multiplicity</dt><dd>在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</dd><dt>ploidy（倍性）</dt><dd>細胞內染色體套數。多數正常常染色體為 2（diploid）；腫瘤可呈現 3、4 或其他非整倍體狀態。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>VAF（變異等位基因頻率）</dt><dd>在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（<math><mo>≈</mo><mn>1</mn></math>）與 subclonal（<math><mo>&lt;</mo><mn>1</mn></math>）突變。<b>不等於 VAF。</b></dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>mutation multiplicity</dt><dd>在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</dd><dt>ploidy（倍性）</dt><dd>細胞內染色體套數。多數正常常染色體為 2（diploid）；腫瘤可呈現 3、4 或其他非整倍體狀態。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
   </article>
 <hr>
 <article class="module" id="m09">
@@ -7331,7 +7331,7 @@ benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
 <h3 id="m10__本例交叉驗證以樣本為分割單位">本例交叉驗證以樣本為分割單位</h3>
 
 <p class="prose">LongPhase-S 用 <b>leave-k-out</b> 交叉驗證評估 purity 模型，
-每次留下 1 或 2 個 <b>cell line</b> 當測試集。結果 MAE 約 4%、R² 約 0.95。</p>
+每次留下 1 或 2 個 <b>cell line</b> 當測試集。結果 MAE 約 4%、<math><msup><mi>R</mi><mn>2</mn></msup></math> 約 0.95。</p>
 
 <p class="prose">這種做法叫 <span class="term" data-term="cross-validation" tabindex="0" role="button" aria-expanded="false" aria-describedby="m10__gd-cross-validation-8">cross-validation<span class="term__pop" id="m10__gd-cross-validation-8" role="tooltip"><b class="term__hd">cross-validation <i>交叉驗證</i></b><span class="term__def" data-lang="zh">輪流保留資料子集作為驗證折，用來估計模型的泛化能力與選擇設定；這些折是 validation，不是最終 test。最終測試集應在模型與設定確定後才使用，並另行保留。</span><span class="term__def" data-lang="en" lang="en">Repeatedly holding out validation folds to estimate generalisation and choose model settings. The folds are validation data, not the final test; an untouched final test set is used only after the model is fixed.</span><a class="term__more" href="glossary.html#cross-validation">完整條目 →</a></span></span>。此處保留 cell line 作測試，有助於評估<b>跨樣本的泛化能力</b>。
 若同一 cell line 的高度相關位點同時出現在訓練與測試中，可能造成 <span class="term" data-term="data leakage" tabindex="0" role="button" aria-expanded="false" aria-describedby="m10__gd-data-leakage-9">data leakage<span class="term__pop" id="m10__gd-data-leakage-9" role="tooltip"><b class="term__hd">data leakage <i>資料洩漏</i></b><span class="term__def" data-lang="zh">訓練或模型選擇階段取得了評估資料的資訊，讓效能被高估。實驗室的做法是<b>按染色體切分</b>，確保同一個位點不會同時出現在訓練、驗證與最終測試中。</span><span class="term__def" data-lang="en" lang="en">Evaluation information entering training or model selection and inflating performance. The lab splits by chromosome so a locus cannot appear in training, validation and final test partitions at once.</span><a class="term__more" href="glossary.html#data-leakage">完整條目 →</a></span></span> 或效能高估。</p>
@@ -7684,7 +7684,7 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
 
   <line class="axis" x1="16" y1="668" x2="984" y2="668"/>
   <text class="anno zh" x="16" y="698">SNP 與甲基化之間的邊門檻另外收緊到 0.3 —— 甲基化訊號比較吵，要求更乾淨才採信。</text>
-</svg><figcaption>四個計數併成 para（＝rr+aa，平行的證據）與 cross（＝ra+ar，交叉的證據），再算 ESR ＝ 兩者的小除以大。para 大就平行連接、cross 大就交叉連接；ESR 大到超過 <code>edgeThreshold</code>（預設 0.7）就代表兩種組合幾乎一樣多，這條邊會被<b>整個丟掉</b>。反過來，ESR ≤ 0.1 的乾淨邊，它那一票的權重會從 1 拉到 20。</figcaption></figure>
+</svg><figcaption>四個計數併成 para（<math><mo>=</mo><mi>rr</mi><mo>+</mo><mi>aa</mi><mo>&lt;</mo><mo>/</mo><mi>figcaption</mi><mo>&gt;</mo><mo>&lt;</mo><mo>/</mo><mi>figure</mi><mo>&gt;</mo><mi>，</mi><mi>平</mi><mi>行</mi><mi>的</mi><mi>證</mi><mi>據</mi><mi>）</mi><mi>與</mi><mi>cross</mi><mi>（</mi><mrow><mi>m</mi><mo>:</mo><mo>=</mo><mi>ra</mi><mo>+</mo><mi>ar</mi></mrow><mi>，</mi><mi>交</mi><mi>叉</mi><mi>的</mi><mi>證</mi><mi>據</mi><mi>）</mi><mi>，</mi><mi>再</mi><mi>算</mi><mi>ESR</mi><mi>＝</mi><mi>兩</mi><mi>者</mi><mi>的</mi><mi>小</mi><mi>除</mi><mi>以</mi><mi>大</mi><mi>。</mi><mi>para</mi><mi>大</mi><mi>就</mi><mi>平</mi><mi>行</mi><mi>連</mi><mi>接</mi><mi>、</mi><mi>cross</mi><mi>大</mi><mi>就</mi><mi>交</mi><mi>叉</mi><mi>連</mi><mi>接</mi><mi>；</mi><mi>ESR</mi><mi>大</mi><mi>到</mi><mi>超</mi><mi>過</mi><mo>&lt;</mo><mi>code</mi><mo>&gt;</mo><mi>edgeThreshold</mi><mo>&lt;</mo><mo>/</mo><mi>code</mi><mo>&gt;</mo><mi>（</mi><mi>預</mi><mi>設</mi><mn>0.7</mn><mi>）</mi><mi>就</mi><mi>代</mi><mi>表</mi><mi>兩</mi><mi>種</mi><mi>組</mi><mi>合</mi><mi>幾</mi><mi>乎</mi><mi>一</mi><mi>樣</mi><mi>多</mi><mi>，</mi><mi>這</mi><mi>條</mi><mi>邊</mi><mi>會</mi><mi>被</mi><mo>&lt;</mo><mi>b</mi><mo>&gt;</mo><mi>整</mi><mi>個</mi><mi>丟</mi><mi>掉</mi><mo>&lt;</mo><mo>/</mo><mi>b</mi><mo>&gt;</mo><mi>。</mi><mi>反</mi><mi>過</mi><mi>來</mi><mi>，</mi><mrow><mi>m</mi><mo>:</mo><mi>ESR</mi><mo>≤</mo><mn>0.1</mn></mrow><mi>的</mi><mi>乾</mi><mi>淨</mi><mi>邊</mi><mi>，</mi><mi>它</mi><mi>那</mi><mi>一</mi><mi>票</mi><mi>的</mi><mi>權</mi><mi>重</mi><mi>會</mi><mi>從</mi><mn>1</mn><mi>拉</mi><mi>到</mi><mn>20</mn><mi>。</mi></math>
 
 <p class="prose">兩個細節值得記住，因為它們解釋了很多「為什麼這裡沒接起來」：</p>
 
@@ -7798,7 +7798,7 @@ LongPhase 本身不做 variant calling —— 它需要別人先給它 het 位�
   <text class="anno zh bold" x="16" y="648">這一整套都是 heuristic：沿著座標往前掃、用加權投票決定，沒有回頭修正也不求全域最佳解。</text>
   <text class="anno zh" x="16" y="676">好處是快、而且在長讀上通常夠準；代價是它對「證據剛好平手」與「單一 read 主導」很敏感 ——</text>
   <text class="anno zh" x="16" y="704">所以程式才需要 ③ 這種特例保護，以及下一張圖的兩道信心門檻。</text>
-</svg><figcaption>① 加權投票決定當前變異接到哪一條 haplotype。② 兩邊得票<b>剛好相等</b>時程式無法決定方向，就在這裡開一個新的 phase block —— 這是 <code>PS</code> 換號最直接的原因。③ 一個特例保護：如果很多票其實都靠同一條長 read 撐著（每條邊只有一條 read，para＋cross ≤ 1），那條 read 一旦有系統性錯誤就會一路投錯票；程式偵測到超過三票是這種情況時，會改成只採信乾淨（ESR &lt; 0.2）且非 indel 的票重算。</figcaption></figure>
+</svg><figcaption>① 加權投票決定當前變異接到哪一條 haplotype。② 兩邊得票<b>剛好相等</b>時程式無法決定方向，就在這裡開一個新的 phase block —— 這是 <code>PS</code> 換號最直接的原因。③ 一個特例保護：如果很多票其實都靠同一條長 read 撐著（每條邊只有一條 read，<math><mi>para</mi><mo>+</mo><mi>cross</mi><mo>≤</mo><mn>1</mn><mo>&lt;</mo><mo>/</mo><mi>figcaption</mi><mo>&gt;</mo><mo>&lt;</mo><mo>/</mo><mi>figure</mi><mo>&gt;</mo><mi>）</mi><mi>，</mi><mi>那</mi><mi>條</mi><mi>read</mi><mi>一</mi><mi>旦</mi><mi>有</mi><mi>系</mi><mi>統</mi><mi>性</mi><mi>錯</mi><mi>誤</mi><mi>就</mi><mi>會</mi><mi>一</mi><mi>路</mi><mi>投</mi><mi>錯</mi><mi>票</mi><mi>；</mi><mi>程</mi><mi>式</mi><mi>偵</mi><mi>測</mi><mi>到</mi><mi>超</mi><mi>過</mi><mi>三</mi><mi>票</mi><mi>是</mi><mi>這</mi><mi>種</mi><mi>情</mi><mi>況</mi><mi>時</mi><mi>，</mi><mi>會</mi><mi>改</mi><mi>成</mi><mi>只</mi><mi>採</mi><mi>信</mi><mi>乾</mi><mi>淨</mi><mi>（</mi><mi>ESR</mi><mi>&amp;</mi><mi>lt</mi><mo>;</mo><mn>0.2</mn><mi>）</mi><mi>且</mi><mi>非</mi><mi>indel</mi><mi>的</mi><mi>票</mi><mi>重</mi><mi>算</mi><mi>。</mi></math>
 
 <p class="prose">這是一個典型的 heuristic：快、在長讀上通常夠準，但代價是它對兩件事敏感 ——
 <b>證據剛好平手</b>，以及<b>單一 read 主導</b>。③ 那個特例保護就是為了後者而存在的。
@@ -9104,11 +9104,11 @@ longphase-s somatic_haplotag \
 <table>
 <thead><tr><th scope="col">面向</th><th scope="col">報告的結果</th></tr></thead>
 <tbody>
-<tr><td>purity 估計</td><td>在低 purity 區段明顯優於 ASCAT（ASCAT 在多個資料集把 0.2 預測成 1.0）；leave-k-out 交叉驗證平均 R² 約 0.96</td></tr>
+<tr><td>purity 估計</td><td>在低 purity 區段明顯優於 ASCAT（ASCAT 在多個資料集把 0.2 預測成 1.0）；leave-k-out 交叉驗證平均 <math><msup><mi>R</mi><mn>2</mn></msup></math> 約 0.96</td></tr>
 <tr><td>接在 ClairS 之後（SNV）</td><td><b>recall 平均 +4.5%</b>（最多 +14.4%），precision 平均 −1.3%，淨效果 F1 平均 +1.9%（8 個資料集中 6 個變好）</td></tr>
 <tr><td>接在 ClairS 之後（indel）</td><td><b>recall 平均 +14.7%</b>，precision 平均 −11.9%，F1 平均 +7.1%（8 個中 7 個變好）</td></tr>
 <tr><td>接在 DeepSomatic 之後</td><td>方向相反：主要是 <b>precision</b> 上升（SNV 平均 +3.1%），recall 略降，F1 只有小幅變化（+1.2% / +0.5%）</td></tr>
-<tr><td>somatic haplotagging</td><td><code>HP1-1</code>／<code>HP2-1</code> 的 read 層級 F1 在 8 個資料集中有 6 個 ≥0.98；<code>HP3</code> 明顯較低</td></tr>
+<tr><td>somatic haplotagging</td><td><code>HP1-1</code>／<code>HP2-1</code> 的 read 層級 F1 在 8 個資料集中有 6 個 <math><mo>≥</mo><mn>0.98</mn></math>；<code>HP3</code> 明顯較低</td></tr>
 </tbody>
 </table>
 </div>
@@ -10236,7 +10236,7 @@ bcftools query -f '[%GT\t%GT2]\n' phased_prefix.vcf | \
 <li><b>VAF 與簡化模型相容。</b>觀測 VAF = 11/50 = 0.22。
 在 tumor DNA fraction = 0.6、diploid、無拷貝數變化、單拷貝且 clonal 的合成假設下，
 理論預期為 <math><mn>0.6</mn><mo>×</mo><mn>1</mn><mo>÷</mo><mn>2</mn><mo>=</mo><mn>0.30</mn></math>。0.22 略低於此值，可能與
-<span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="capstone__gd-cancer-cell-fraction-4">CCF<span class="term__pop" id="capstone__gd-cancer-cell-fraction-4" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en" lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span> 約 0.73 的次要 clone 或取樣波動相容；這不是對 CCF 的直接量測。</li>
+<span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="capstone__gd-cancer-cell-fraction-4">CCF<span class="term__pop" id="capstone__gd-cancer-cell-fraction-4" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（<math><mo>≈</mo><mn>1</mn></math>）與 subclonal（<math><mo>&lt;</mo><mn>1</mn></math>）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en" lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span> 約 0.73 的次要 clone 或取樣波動相容；這不是對 CCF 的直接量測。</li>
 <li><b>normal 樣本未觀測到 ALT。</b>25× 深度、0 條 ALT。若此位點是典型 het germline，
 在相同覆蓋與取樣假設下原本可預期約一半 read 支持 ALT；觀測到 0 條會降低此解釋的可能性，
 但不能僅憑此結果完全排除 germline。</li>
@@ -10345,9 +10345,9 @@ bcftools query -f '[%GT\t%GT2]\n' phased_prefix.vcf | \
 <div class="reveal__q"><p class="prose">算出 <span class="term" data-term="precision" tabindex="0" role="button" aria-expanded="false" aria-describedby="capstone__gd-precision-7">precision<span class="term__pop" id="capstone__gd-precision-7" role="tooltip"><b class="term__hd">precision <i>精確率</i></b><span class="term__def" data-lang="zh">所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</span><span class="term__def" data-lang="en" lang="en">Of the calls you made, the fraction that are correct: TP / (TP + FP).</span><a class="term__more" href="glossary.html#precision">完整條目 →</a></span></span>、<span class="term" data-term="recall" tabindex="0" role="button" aria-expanded="false" aria-describedby="capstone__gd-recall-8">recall<span class="term__pop" id="capstone__gd-recall-8" role="tooltip"><b class="term__hd">recall <i>召回率</i></b><span class="term__def" data-lang="zh">在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</span><span class="term__def" data-lang="en" lang="en">Within a stated evaluation scope, the fraction of true positives that were found: TP / (TP + FN). With a fixed caller candidate set, post-filtering can preserve or lower recall but cannot recover variants the caller never emitted; report the candidate-set scope explicitly.</span><a class="term__more" href="glossary.html#recall">完整條目 →</a></span></span>、<span class="term" data-term="F1" tabindex="0" role="button" aria-expanded="false" aria-describedby="capstone__gd-f1-9">F1<span class="term__pop" id="capstone__gd-f1-9" role="tooltip"><b class="term__hd">F1</b><span class="term__def" data-lang="zh">precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。</span><span class="term__def" data-lang="en" lang="en">The harmonic mean of precision and recall. A precision gain has little effect when false negatives dominate the evaluation.</span><a class="term__more" href="glossary.html#f1">完整條目 →</a></span></span>。然後回答：
 如果你加一個後處理過濾器，把 FP 從 88 降到 44，F1 會變成多少？這個改善值得嗎？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>目前：</b></p>
 <ul class="prose">
-<li>precision = 412 / (412+88) = <b>0.824</b></li>
-<li>recall = 412 / (412+335) = <b>0.551</b></li>
-<li>F1 = 2 × 0.824 × 0.551 / (0.824+0.551) = <b>0.661</b></li>
+<li><math><mi>precision</mi><mo>=</mo><mn>412</mn><mo>/</mo><mo>(</mo><mn>412</mn><mo>+</mo><mn>88</mn><mo>)</mo><mo>=</mo><mn>0.824</mn></math></li>
+<li><math><mi>recall</mi><mo>=</mo><mn>412</mn><mo>/</mo><mo>(</mo><mn>412</mn><mo>+</mo><mn>335</mn><mo>)</mo><mo>=</mo><mn>0.551</mn></math></li>
+<li><math><mi>F</mi><mn>1</mn><mo>=</mo><mn>2</mn><mo>×</mo><mn>0.824</mn><mo>×</mo><mn>0.551</mn><mo>/</mo><mo>(</mo><mn>0.824</mn><mo>+</mo><mn>0.551</mn><mo>)</mo><mo>=</mo><mn>0.661</mn></math></li>
 </ul>
 <p class="prose"><b>把 FP 減半之後（假設未誤刪 TP，屬於理想化情境）：</b></p>
 <ul class="prose">
@@ -10755,7 +10755,7 @@ read 證據支持一個分支式、多步驟的候選拓撲，其結構與 clone
 </section>
 
     
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>F1</dt><dd>precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>PON（正常樣本面板／族群資料庫（依流程而異））</dt><dd>PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>precision（精確率）</dt><dd>所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</dd><dt>recall（召回率）</dt><dd>在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</dd><dt>triplet graph</dt><dd>LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>F1</dt><dd>precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>PON（正常樣本面板／族群資料庫（依流程而異））</dt><dd>PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（<math><mo>≈</mo><mn>1</mn></math>）與 subclonal（<math><mo>&lt;</mo><mn>1</mn></math>）突變。<b>不等於 VAF。</b></dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>precision（精確率）</dt><dd>所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。</dd><dt>recall（召回率）</dt><dd>在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</dd><dt>triplet graph</dt><dd>LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
   </article>
 <hr>
 <article class="module" id="sr1">
@@ -11109,9 +11109,7 @@ bulk read 在這兩個位置上即為一個 0／1 向量；
 <b>①</b> 最右側的峰對應全部腫瘤細胞皆帶有的變異，其位置由 <span class="term" data-term="tumour purity" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr1__gd-tumour-purity-6">純度<span class="term__pop" id="sr1__gd-tumour-purity-6" role="tooltip"><b class="term__hd">tumour purity <i>腫瘤純度</i></b><span class="term__def" data-lang="zh">樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</span><span class="term__def" data-lang="en" lang="en">The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.</span><a class="term__more" href="glossary.html#tumour-purity">完整條目 →</a></span></span>決定（拷貝數正常、變異僅位於其中一份拷貝上時，<b>恰為</b> purity ÷ 2）。
 <b>②</b> 左側的肩對應僅一部分腫瘤細胞帶有的變異 —— 每一個肩對應一群 <span class="term" data-term="subclone" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr1__gd-subclone-7">subclone<span class="term__pop" id="sr1__gd-subclone-7" role="tooltip"><b class="term__hd">subclone <i>次克隆</i></b><span class="term__def" data-lang="zh">clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。</span><span class="term__def" data-lang="en" lang="en">A subset of a clone that acquired further mutations and expanded. Treatment-resistant populations are often subclones.</span><a class="term__more" href="glossary.html#subclone">完整條目 →</a></span></span>。
 <b>③</b> 中性演化的檢定所用者為中段（VAF 0.12–0.24），且其量測對象並非此直方圖 ——
-須先將變異數<b>累積</b>後對 1/f 作圖，該線方為直線。
-最左側三根標記叉號的長條為假陽性區：深度不足時定序錯誤亦落於該處，不可用於擬合。
-區分 ① 與 ② 即為分群；③ 所問者為是否存在天擇。</figcaption></figure>
+須先將變異數<b>累積</b>後對 <math><mn>1</mn><mo>/</mo><mi>f</mi><mo>&lt;</mo><mo>/</mo><mi>figcaption</mi><mo>&gt;</mo><mo>&lt;</mo><mo>/</mo><mi>figure</mi><mo>&gt;</mo><mi>作</mi><mi>圖</mi><mi>，</mi><mi>該</mi><mi>線</mi><mi>方</mi><mi>為</mi><mi>直</mi><mi>線</mi><mi>。</mi><mi>最</mi><mi>左</mi><mi>側</mi><mi>三</mi><mi>根</mi><mi>標</mi><mi>記</mi><mi>叉</mi><mi>號</mi><mi>的</mi><mi>長</mi><mi>條</mi><mi>為</mi><mi>假</mi><mi>陽</mi><mi>性</mi><mi>區</mi><mi>：</mi><mi>深</mi><mi>度</mi><mi>不</mi><mi>足</mi><mi>時</mi><mi>定</mi><mi>序</mi><mi>錯</mi><mi>誤</mi><mi>亦</mi><mi>落</mi><mi>於</mi><mi>該</mi><mi>處</mi><mi>，</mi><mi>不</mi><mi>可</mi><mi>用</mi><mi>於</mi><mi>擬</mi><mi>合</mi><mi>。</mi><mi>區</mi><mi>分</mi><mi>①</mi><mi>與</mi><mi>②</mi><mi>即</mi><mi>為</mi><mi>分</mi><mi>群</mi><mi>；</mi><mi>③</mi><mi>所</mi><mi>問</mi><mi>者</mi><mi>為</mi><mi>是</mi><mi>否</mi><mi>存</mi><mi>在</mi><mi>天</mi><mi>擇</mi><mi>。</mi></math>
 
 <p class="prose">2014 至 2015 年間出現三項影響最大的做法，其思路均為<b>對此圖分群</b>：
 <b>SciClone</b>（2014）以 beta 混合模型（以數個鐘形分布擬合一張直方圖）擬合 VAF，
@@ -11122,13 +11120,13 @@ bulk read 在這兩個位置上即為一個 0／1 向量；
 
 <p class="prose">2016 年出現另一種取徑：不進行分群，而直接分析分布的形狀。
 其機制為：腫瘤指數成長時，發生越早的變異出現於越多細胞中，而此類變異本身數量越少。
-將「出現於至少比例 f 以上的變異」計數，該累積數量在中性演化下正比於 1/f，
-故<b>累積曲線對 1/f 作圖為一條直線</b>。
+將「出現於至少比例 f 以上的變異」計數，該累積數量在中性演化下正比於 <math><mn>1</mn><mo>/</mo><mi>f</mi></math>，
+故<b>累積曲線對 <math><mn>1</mn><mo>/</mo><mi>f</mi></math> 作圖為一條直線</b>。
 在 14 種癌別、904 個腫瘤中，有 323 個符合此直線關係。</p>
 
 <p class="prose">以下兩點須予區分。
 其一，<b>直線為累積曲線的性質，而非直方圖的性質</b> ——
-直方圖本身的形狀為 1/f²（累積曲線的微分），直接量測直方圖的斜率將得到錯誤的指數。
+直方圖本身的形狀為 <math><mn>1</mn><mo>/</mo><msup><mi>f</mi><mn>2</mn></msup></math>（累積曲線的微分），直接量測直方圖的斜率將得到錯誤的指數。
 其二，原始研究刻意僅在 <b>VAF 0.12 至 0.24</b> 一段擬合：
 更低頻的一端混有假陽性，更高頻的一端已進入 clonal 峰。</p>
 
@@ -11138,7 +11136,7 @@ driver 變異的頻率本即偏向 0 與 1 兩端，不易在中間頻率被觀�
 
 <h3 id="sr1__由-vaf-至-ccf-換算所需的分母">由 VAF 至 CCF：換算所需的分母</h3>
 
-<p class="prose">前述分群的對象並非 VAF，而是 <span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr1__gd-cancer-cell-fraction-10">CCF<span class="term__pop" id="sr1__gd-cancer-cell-fraction-10" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en" lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span>。
+<p class="prose">前述分群的對象並非 VAF，而是 <span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr1__gd-cancer-cell-fraction-10">CCF<span class="term__pop" id="sr1__gd-cancer-cell-fraction-10" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（<math><mo>≈</mo><mn>1</mn></math>）與 subclonal（<math><mo>&lt;</mo><mn>1</mn></math>）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en" lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span>。
 理由已見於 M8：VAF 為「帶變異的 read 所佔比例」，CCF 為「帶變異的癌細胞所佔比例」，
 兩者相差一段換算。</p>
 
@@ -11305,10 +11303,7 @@ driver 變異的頻率本即偏向 0 與 1 兩端，不易在中間頻率被觀�
   <text class="anno zh bold" x="20" y="442">差別在最下面那排：左邊「帶 C」完全包在「帶 B」裡，右邊兩者互不重疊。</text>
   <text class="anno zh" x="20" y="470">而這件事 CCF 沒有記錄。要選出一棵樹，方法必須自己補上一個偏好 —— 通常是取步數最少的。</text>
 </svg><figcaption>同一組 CCF 值 1.0 / 0.6 / 0.3，兩棵樹皆通過該算術檢查。
-<b>左</b>：線性 —— 0.3 一群為 0.6 一群的後代（0.3 ≤ 0.6 ✓）。
-<b>右</b>：分支 —— 0.6 與 0.3 為兄弟，各自衍生自 1.0（0.6 ＋ 0.3 ＝ 0.9 ≤ 1.0 ✓）。
-兩棵樹的生物學意義完全不同：左為單一路徑上的連續演化，右為兩支平行的分支。
-但兩者對應<b>同一組數字</b>，故僅憑 CCF 無法擇一。</figcaption></figure>
+<b>左</b>：線性 —— 0.3 一群為 0.6 一群的後代（<math><mn>0.3</mn><mo>≤</mo><mn>0.6</mn><mo>&lt;</mo><mo>/</mo><mi>figcaption</mi><mo>&gt;</mo><mo>&lt;</mo><mo>/</mo><mi>figure</mi><mo>&gt;</mo><mi>✓</mi><mi>）</mi><mi>。</mi><mo>&lt;</mo><mi>b</mi><mo>&gt;</mo><mi>右</mi><mo>&lt;</mo><mo>/</mo><mi>b</mi><mo>&gt;</mo><mi>：</mi><mi>分</mi><mi>支</mi><mi>—</mi><mi>—</mi><mn>0.6</mn><mi>與</mi><mn>0.3</mn><mi>為</mi><mi>兄</mi><mi>弟</mi><mi>，</mi><mi>各</mi><mi>自</mi><mi>衍</mi><mi>生</mi><mi>自</mi><mn>1.0</mn><mi>（</mi><mrow><mi>m</mi><mo>:</mo><mn>0.6</mn><mo>+</mo><mn>0.3</mn><mo>=</mo><mn>0.9</mn><mo>≤</mo><mn>1.0</mn></mrow><mi>✓</mi><mi>）</mi><mi>。</mi><mi>兩</mi><mi>棵</mi><mi>樹</mi><mi>的</mi><mi>生</mi><mi>物</mi><mi>學</mi><mi>意</mi><mi>義</mi><mi>完</mi><mi>全</mi><mi>不</mi><mi>同</mi><mi>：</mi><mi>左</mi><mi>為</mi><mi>單</mi><mi>一</mi><mi>路</mi><mi>徑</mi><mi>上</mi><mi>的</mi><mi>連</mi><mi>續</mi><mi>演</mi><mi>化</mi><mi>，</mi><mi>右</mi><mi>為</mi><mi>兩</mi><mi>支</mi><mi>平</mi><mi>行</mi><mi>的</mi><mi>分</mi><mi>支</mi><mi>。</mi><mi>但</mi><mi>兩</mi><mi>者</mi><mi>對</mi><mi>應</mi><mo>&lt;</mo><mi>b</mi><mo>&gt;</mo><mi>同</mi><mi>一</mi><mi>組</mi><mi>數</mi><mi>字</mi><mo>&lt;</mo><mo>/</mo><mi>b</mi><mo>&gt;</mo><mi>，</mi><mi>故</mi><mi>僅</mi><mi>憑</mi><mi>CCF</mi><mi>無</mi><mi>法</mi><mi>擇</mi><mi>一</mi><mi>。</mi></math>
 
 <p class="prose">在此情形下，方法必須引入額外的偏好。最常用者為 <span class="term" data-term="parsimony" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr1__gd-parsimony-13">簡約<span class="term__pop" id="sr1__gd-parsimony-13" role="tooltip"><b class="term__hd">parsimony <i>簡約法</i></b><span class="term__def" data-lang="zh">在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</span><span class="term__def" data-lang="en" lang="en">Choosing, among all solutions compatible with the data, the one requiring the fewest steps or lowest cost. It is a preference rather than evidence: when several solutions tie, parsimony picks one, but the data has not ruled the others out.</span><a class="term__more" href="glossary.html#parsimony">完整條目 →</a></span></span>：
 於所有相容的樹中選取步數最少者。此為合理的偏好，但它是<b>偏好，而非證據</b>。
@@ -11350,7 +11345,7 @@ S1 出現於 50% 的細胞、S2 出現於 30% 的細胞。
 
 <p class="prose">更精確地說，邊際並非全無作用，它給出一個<b>區間</b>：
 同時帶有兩者的比例至多不超過 0.30（不可能多於帶有 S2 者），
-至少不低於 0.50 ＋ 0.30 − 1 ＝ 0（兩者可完全不重疊）。
+至少不低於 <math><mn>0.50</mn><mo>+</mo><mn>0.30</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>0</mn></math>（兩者可完全不重疊）。
 故邊際將答案限定於 0 至 0.30 之間，<b>而此區間無法再行收窄</b>。
 樹的形狀在此區間的兩端則完全不同。</p>
 
@@ -11533,13 +11528,13 @@ CCF 換算是在<b>估計邊際</b>，簡約性則是在<b>推定聯合</b>。
 
 <p class="prose">既然序列上的頻率不足，更換標記是否有所改善？<span class="term" data-term="5mC" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr1__gd-5mc-17">甲基化<span class="term__pop" id="sr1__gd-5mc-17" role="tooltip"><b class="term__hd">5mC <i>5-甲基胞嘧啶</i></b><span class="term__def" data-lang="zh">胞嘧啶第 5 個碳上的甲基化修飾。這是常見的 DNA 甲基化形式，主要見於 CpG；可影響轉錄調控，效應依基因組位置與細胞類型而異。</span><span class="term__def" data-lang="en" lang="en">5-methylcytosine, the commonest DNA methylation mark, usually at CpG sites. Affects expression without changing sequence.</span><a class="term__more" href="glossary.html#5mc">完整條目 →</a></span></span>為自然的候選。</p>
 
-<p class="prose">其吸引力在於速率。<span class="term" data-term="epimutation" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr1__gd-epimutation-18">epimutation<span class="term__pop" id="sr1__gd-epimutation-18" role="tooltip"><b class="term__hd">epimutation <i>表觀突變</i></b><span class="term__def" data-lang="zh">細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 10⁻⁵ 到 10⁻⁴，而 DNA 突變約每鹼基 10⁻⁹ 到 10⁻¹⁰，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 10⁻³ 的），應當成量級而非定值。</span><span class="term__def" data-lang="en" lang="en">A stochastic flip of methylation state during cell division. Commonly cited at 10⁻⁵–10⁻⁴ per CpG per division versus 10⁻⁹–10⁻¹⁰ per base for DNA mutation — roughly five orders of magnitude faster like-for-like — which makes it a higher-resolution lineage clock. Treat it as an order of magnitude, not a constant: estimates vary by site and assay, up to ~10⁻³.</span><a class="term__more" href="glossary.html#epimutation">完整條目 →</a></span></span>（甲基化狀態的隨機翻轉）的發生速率，
-文獻常引的量級為每個 <span class="term" data-term="CpG" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr1__gd-cpg-19">CpG<span class="term__pop" id="sr1__gd-cpg-19" role="tooltip"><b class="term__hd">CpG</b><span class="term__def" data-lang="zh">序列上一個 C 後接一個 G（p 代表兩者之間的磷酸鍵）。哺乳類多數 5mC 位於 CpG，特定細胞或情況亦可見非 CpG 甲基化。</span><span class="term__def" data-lang="en" lang="en">A cytosine followed by a guanine. Most mammalian 5mC occurs at CpG sites, although non-CpG methylation is also observed in particular cells and contexts.</span><a class="term__more" href="glossary.html#cpg">完整條目 →</a></span></span>、每次細胞分裂 10⁻⁵ 至 10⁻⁴；DNA 突變則為每個鹼基 10⁻⁹ 至 10⁻¹⁰。
+<p class="prose">其吸引力在於速率。<span class="term" data-term="epimutation" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr1__gd-epimutation-18">epimutation<span class="term__pop" id="sr1__gd-epimutation-18" role="tooltip"><b class="term__hd">epimutation <i>表觀突變</i></b><span class="term__def" data-lang="zh">細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></math> 到 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup></math>，而 DNA 突變約每鹼基 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>9</mn></mrow></msup></math> 到 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>10</mn></mrow></msup></math>，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup></math> 的），應當成量級而非定值。</span><span class="term__def" data-lang="en" lang="en">A stochastic flip of methylation state during cell division. Commonly cited at <math><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></math>–<math><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup></math> per CpG per division versus <math><msup><mn>10</mn><mrow><mo>−</mo><mn>9</mn></mrow></msup></math>–<math><msup><mn>10</mn><mrow><mo>−</mo><mn>10</mn></mrow></msup></math> per base for DNA mutation — roughly five orders of magnitude faster like-for-like — which makes it a higher-resolution lineage clock. Treat it as an order of magnitude, not a constant: estimates vary by site and assay, up to ~<math><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup></math>.</span><a class="term__more" href="glossary.html#epimutation">完整條目 →</a></span></span>（甲基化狀態的隨機翻轉）的發生速率，
+文獻常引的量級為每個 <span class="term" data-term="CpG" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr1__gd-cpg-19">CpG<span class="term__pop" id="sr1__gd-cpg-19" role="tooltip"><b class="term__hd">CpG</b><span class="term__def" data-lang="zh">序列上一個 C 後接一個 G（p 代表兩者之間的磷酸鍵）。哺乳類多數 5mC 位於 CpG，特定細胞或情況亦可見非 CpG 甲基化。</span><span class="term__def" data-lang="en" lang="en">A cytosine followed by a guanine. Most mammalian 5mC occurs at CpG sites, although non-CpG methylation is also observed in particular cells and contexts.</span><a class="term__more" href="glossary.html#cpg">完整條目 →</a></span></span>、每次細胞分裂 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></math> 至 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup></math>；DNA 突變則為每個鹼基 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>9</mn></mrow></msup></math> 至 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>10</mn></mrow></msup></math>。
 同量級相比，<b>快約五個數量級</b>。此即表示甲基化為解析度高得多的時鐘 ——
 兩群細胞分離僅數十代時，序列上尚無任何差異，甲基化上已可觀測。</p>
 
 <p class="prose">該速率應視為量級而非定值：它隨位點與量測方式差異甚大，
-專供作時鐘之用的位點另有估至 10⁻³ 量級者。
+專供作時鐘之用的位點另有估至 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup></math> 量級者。
 故「甲基化快得多」一項穩固，「快幾個數量級」則不宜作為定值引用。</p>
 
 <p class="prose">此取徑已達規模化。2015 年一項研究取 19 位低度膠質瘤病人的原發與復發檢體，
@@ -11701,7 +11696,7 @@ CCF 換算是在<b>估計邊際</b>，簡約性則是在<b>推定聯合</b>。
 再以組成的熵變化量衡量兩個時間點之間譜系結構的改變。</p>
 
 <p class="prose">其技術要求值得留意，因為該形式為<b>此類做法所共有</b>，各工具所選的數值不同而已。
-methclone 要求單一條 read 跨越 <b>4 個相鄰的 CpG</b>（對應 2⁴ ＝ 16 種可能組合），
+methclone 要求單一條 read 跨越 <b>4 個相鄰的 CpG</b>（對應 <math><msup><mn>2</mn><mn>4</mn></msup><mo>=</mo><mn>16</mn></math> 種可能組合），
 且該位置須有 <b>60× 以上的深度</b>，組成比例方能估得準確。
 亦即：同一條分子上須有足夠多的 CpG，且此類分子須有足夠的數量 ——
 4 為 methclone 的選擇，並非自然常數。</p>
@@ -12129,7 +12124,7 @@ M8 已將此列為方法的適用範圍限制 ——
 
 <p class="prose">比較兩條路線之前，須先確認比較的層級：前述既有做法<b>皆非在單一位點上做推論</b>。
 SciClone、PyClone 與 PhyloWGS 均將數千個變異的 VAF 匯總為一張直方圖，
-再自<b>該圖的形狀</b>導出結論；1/f 中性檢定所量測者亦為同一張圖的尾端。
+再自<b>該圖的形狀</b>導出結論；<math><mn>1</mn><mo>/</mo><mi>f</mi></math> 中性檢定所量測者亦為同一張圖的尾端。
 故應比較的是<b>頻譜這一層</b>，而非單一位點的量測準確度。</p>
 
 <p class="prose">長讀一側亦有一張頻率譜，做法完全相同 —— 同樣將整批數值匯總為直方圖，橫軸同樣為頻率。
@@ -12457,7 +12452,7 @@ SciClone、PyClone 與 PhyloWGS 均將數千個變異的 VAF 匯總為一張直�
 
 <p class="prose"><b>左側</b>：六個 SNV 各給出一個 VAF。A、B、C 皆為 0.35，D、E、F 皆為 0.20，
 匯為兩根高度 3 的長條。其讀法為「有兩群，各佔 0.35 與 0.20」——
-但此二數字<b>同時相容於兩棵樹</b>（0.20 ≤ 0.35 ✓；0.35 ＋ 0.20 ≤ 1 ✓），故無從區分。
+但此二數字<b>同時相容於兩棵樹</b>（<math><mn>0.20</mn><mo>≤</mo><mn>0.35</mn></math> ✓；<math><mn>0.35</mn><mo>+</mo><mn>0.20</mn><mo>≤</mo><mn>1</mn></math> ✓），故無從區分。
 此與前述 1.0／0.6／0.3 一組為同一件事。</p>
 
 <p class="prose"><b>右側</b>：三條單倍型各給出一個頻率，各根長條高度皆為 1。隨之出現兩項差異：</p>
@@ -12580,7 +12575,7 @@ HP1-1 ⊂ HP1，且 HP1-1 與 HP1-2 為兄弟。前述六個 SNV 的例子之所
 <b>其額外資訊存在於標籤，而非頻率值；且標籤具有區域性。</b>
 亦即，它不會改善「全基因體共有幾群、各佔多少」此一問題的答案，
 它所回答的是「在此區域內，這幾個變異的先後次序」。
-而其回答的品質直接取決於突變負荷：負荷越高，k ≥ 2 的區域越多，該偏序的可用範圍越大。</p>
+而其回答的品質直接取決於突變負荷：負荷越高，<math><mi>k</mi><mo>≥</mo><mn>2</mn></math> 的區域越多，該偏序的可用範圍越大。</p>
 
 <p class="prose">一項技術細節須先釐清，否則兩張圖不對等：左側該類圖通常為<b>全基因體</b>尺度
 （數千個位點全部納入），此處所繪為<b>單一區域</b>。若要製作全基因體版本，
@@ -12694,11 +12689,11 @@ HP1-1 ⊂ HP1，且 HP1-1 與 HP1-2 為兄弟。前述六個 SNV 的例子之所
 </tr>
 <tr>
 <td>頻率譜的形狀可量測，但亦易被過度解讀</td>
-<td>14 種癌別、904 個腫瘤中有 323 個符合 1/f 中性演化的直線（2016）。後續分析指出 driver 頻率偏向 0 與 1 兩端，難以在中間頻率被觀察到，因此中性比例可能被高估（2018、2019）</td>
+<td>14 種癌別、904 個腫瘤中有 323 個符合 <math><mn>1</mn><mo>/</mo><mi>f</mi></math> 中性演化的直線（2016）。後續分析指出 driver 頻率偏向 0 與 1 兩端，難以在中間頻率被觀察到，因此中性比例可能被高估（2018、2019）</td>
 </tr>
 <tr>
 <td>甲基化為解析度更高的時鐘</td>
-<td>epimutation 速率約 10⁻⁵–10⁻⁴／CpG／次分裂（文獻多寫為上界），DNA 突變約 10⁻⁹–10⁻¹⁰／bp／次分裂，同量級相比約差五個數量級。專供作時鐘之用的位點另有估至 10⁻³ 者，故此為量級而非定值</td>
+<td>epimutation 速率約 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></math>–<math><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup></math>／CpG／次分裂（文獻多寫為上界），DNA 突變約 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>9</mn></mrow></msup></math>–<math><msup><mn>10</mn><mrow><mo>−</mo><mn>10</mn></mrow></msup></math>／bp／次分裂，同量級相比約差五個數量級。專供作時鐘之用的位點另有估至 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup></math> 者，故此為量級而非定值</td>
 </tr>
 <tr>
 <td>甲基化所攜帶的譜系訊號與突變高度吻合</td>
@@ -12710,7 +12705,7 @@ HP1-1 ⊂ HP1，且 HP1-1 與 HP1-2 為兄弟。前述六個 SNV 的例子之所
 </tr>
 <tr>
 <td>分子層級的聯合觀測有明確的技術門檻</td>
-<td>epiallele 組成分析要求 read 跨越 4 個<b>相鄰</b> CpG（2⁴＝16 種組合），且該位置深度須達 60× 以上（2014）。全基因體平均每 100 bp 一個 CpG，故 100 bp 短讀僅在 CpG 密集區達到此門檻</td>
+<td>epiallele 組成分析要求 read 跨越 4 個<b>相鄰</b> CpG（<math><msup><mn>2</mn><mn>4</mn></msup><mo>=</mo><mn>16</mn></math> 種組合），且該位置深度須達 60× 以上（2014）。全基因體平均每 100 bp 一個 CpG，故 100 bp 短讀僅在 CpG 密集區達到此門檻</td>
 </tr>
 </tbody>
 </table>
@@ -12729,7 +12724,7 @@ M10 曾討論同一困難的另一版本：以合成純度的樣本評估 varian
 
 <div class="reveal__q"><p class="prose">一份腫瘤樣本換算後得到三群 somatic 變異，CCF 分別為 <code>1.00</code>、<code>0.55</code>、<code>0.40</code>。
 請問：CCF 0.40 一群為 CCF 0.55 一群的<b>後代</b>，抑或其<b>兄弟</b>？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>無從區分，且並非資料量不足所致。</b></p>
-<p class="prose">兩種解皆通過該算術檢查：作為後代時 0.40 ≤ 0.55 ✓；作為兄弟時 0.55 ＋ 0.40 ＝ 0.95 ≤ 1.00 ✓。
+<p class="prose">兩種解皆通過該算術檢查：作為後代時 <math><mn>0.40</mn><mo>≤</mo><mn>0.55</mn></math> ✓；作為兄弟時 <math><mn>0.55</mn><mo>+</mo><mn>0.40</mn><mo>=</mo><mn>0.95</mn><mo>≤</mo><mn>1.00</mn></math> ✓。
 若程式僅輸出一棵樹，該樹係由其偏好（通常為簡約性）所選，而非由資料所選。</p>
 <p class="prose">真正的區分所需者並非更多變異或更深的定序，
 而是<b>另一類資訊</b>：同時帶有這兩群變異的細胞佔多少。
@@ -12755,7 +12750,7 @@ M10 曾討論同一困難的另一版本：以合成純度的樣本評估 varian
 
 <p class="prose">銜接之前須先確立這些判定的可信度。
 在真實輸出中，一個含 194 條 read 的單位，其三個位點對的跨越深度分別為 20、17 與 <b>3</b>，
-其中 <code>n = 3</code> 的位點對仍產出了一條約束。
+其中 <math><mi>n</mi><mo>=</mo><mn>3</mn></math> 的位點對仍產出了一條約束。
 <b>錯誤的約束較缺少約束更為不利</b>：它將迫使模型分出一個不存在的群，且不留任何跡象。</p>
 
 <h3 id="sr1__原始文獻與程式碼">原始文獻與程式碼</h3>
@@ -12789,7 +12784,7 @@ evolution at clinical scale</i>，Nature 645:764–773，2025。程式碼在
 </section>
 
     
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>5mC（5-甲基胞嘧啶）</dt><dd>胞嘧啶第 5 個碳上的甲基化修飾。這是常見的 DNA 甲基化形式，主要見於 CpG；可影響轉錄調控，效應依基因組位置與細胞類型而異。</dd><dt>CpG</dt><dd>序列上一個 C 後接一個 G（p 代表兩者之間的磷酸鍵）。哺乳類多數 5mC 位於 CpG，特定細胞或情況亦可見非 CpG 甲基化。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>VAF（變異等位基因頻率）</dt><dd>在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（≈1）與 subclonal（<1）突變。<b>不等於 VAF。</b></dd><dt>clone（克隆）</dt><dd>源自共同祖先細胞，並共享一組可辨識 somatic mutations 的細胞群。</dd><dt>clone tree（克隆演化樹）</dt><dd>描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>epiallele（表觀等位型）</dt><dd>同一條分子上一組相鄰 CpG 的甲基化組合，例如四個 CpG 的 1101。逐位點的 β 值看不到它 —— 要算 epiallele 的組成，一條 read 至少得跨過 4 個 CpG。</dd><dt>epimutation（表觀突變）</dt><dd>細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 10⁻⁵ 到 10⁻⁴，而 DNA 突變約每鹼基 10⁻⁹ 到 10⁻¹⁰，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 10⁻³ 的），應當成量級而非定值。</dd><dt>haplotype（單倍型）</dt><dd>同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</dd><dt>joint distribution（聯合分布）</dt><dd>多個變數一起看的分布，也就是「哪些組合各出現多少」。演化樹的形狀取決於聯合分布，而不是邊際分布；長讀的價值在於一條分子上的組合是直接觀測到的。</dd><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>long read（長讀）</dt><dd>單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</dd><dt>marginal distribution（邊際分布）</dt><dd>只描述單一變數的分布。VAF 與甲基化 β 值都是邊際統計：它們各自只講一個位點有多少比例帶有標記，不講兩個位點在同一個分子或同一個細胞上的搭配情形。</dd><dt>mutation frequency spectrum（突變頻率譜）</dt><dd>把一份樣本裡所有 somatic 變異的 VAF 畫成直方圖後得到的分布。分布上的峰與肩對應不同大小的細胞群，最低頻端的尾巴斜率則被用來判斷有沒有天擇。</dd><dt>mutation multiplicity</dt><dd>在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</dd><dt>parsimony（簡約法）</dt><dd>在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>read-AF（read 層級的 ALT 比例）</dt><dd>在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd><dt>somatic variant（體細胞變異）</dt><dd>在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</dd><dt>subclone（次克隆）</dt><dd>clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>5mC（5-甲基胞嘧啶）</dt><dd>胞嘧啶第 5 個碳上的甲基化修飾。這是常見的 DNA 甲基化形式，主要見於 CpG；可影響轉錄調控，效應依基因組位置與細胞類型而異。</dd><dt>CpG</dt><dd>序列上一個 C 後接一個 G（p 代表兩者之間的磷酸鍵）。哺乳類多數 5mC 位於 CpG，特定細胞或情況亦可見非 CpG 甲基化。</dd><dt>HP tag</dt><dd>BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>VAF（變異等位基因頻率）</dt><dd>在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（<math><mo>≈</mo><mn>1</mn></math>）與 subclonal（<math><mo>&lt;</mo><mn>1</mn></math>）突變。<b>不等於 VAF。</b></dd><dt>clone（克隆）</dt><dd>源自共同祖先細胞，並共享一組可辨識 somatic mutations 的細胞群。</dd><dt>clone tree（克隆演化樹）</dt><dd>描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>epiallele（表觀等位型）</dt><dd>同一條分子上一組相鄰 CpG 的甲基化組合，例如四個 CpG 的 1101。逐位點的 β 值看不到它 —— 要算 epiallele 的組成，一條 read 至少得跨過 4 個 CpG。</dd><dt>epimutation（表觀突變）</dt><dd>細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></math> 到 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup></math>，而 DNA 突變約每鹼基 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>9</mn></mrow></msup></math> 到 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>10</mn></mrow></msup></math>，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 <math><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup></math> 的），應當成量級而非定值。</dd><dt>haplotype（單倍型）</dt><dd>同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。</dd><dt>joint distribution（聯合分布）</dt><dd>多個變數一起看的分布，也就是「哪些組合各出現多少」。演化樹的形狀取決於聯合分布，而不是邊際分布；長讀的價值在於一條分子上的組合是直接觀測到的。</dd><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>long read（長讀）</dt><dd>單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</dd><dt>marginal distribution（邊際分布）</dt><dd>只描述單一變數的分布。VAF 與甲基化 β 值都是邊際統計：它們各自只講一個位點有多少比例帶有標記，不講兩個位點在同一個分子或同一個細胞上的搭配情形。</dd><dt>mutation frequency spectrum（突變頻率譜）</dt><dd>把一份樣本裡所有 somatic 變異的 VAF 畫成直方圖後得到的分布。分布上的峰與肩對應不同大小的細胞群，最低頻端的尾巴斜率則被用來判斷有沒有天擇。</dd><dt>mutation multiplicity</dt><dd>在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。</dd><dt>parsimony（簡約法）</dt><dd>在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>read-AF（read 層級的 ALT 比例）</dt><dd>在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd><dt>somatic variant（體細胞變異）</dt><dd>在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。</dd><dt>subclone（次克隆）</dt><dd>clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
   </article>
 <hr>
 <article class="module" id="sr2">
@@ -13863,8 +13858,8 @@ pigeonhole 至此容許分支：<math><msub><mi>c</mi><mi>B</mi></msub><mo>+</mo
 <thead><tr><th scope="col">現行輸出</th><th scope="col">對應的約束</th><th scope="col">在全基因體尺度所決定的量</th></tr></thead>
 <tbody>
 <tr><td>分岔（無分子同時帶有兩者）</td><td><b>不可同群</b>（硬）</td><td>強制拆峰，為用途一唯一的原料。<b>惟 trans 會偽造此一格，見第十節</b></td></tr>
-<tr><td>串接，且比值 ≈ 1</td><td><b>必定同群</b>（硬）</td><td>合併分散於不同區域的同一群。<b>權重應為最低，理由見下</b></td></tr>
-<tr><td>串接，且比值 &lt; 1</td><td><b>有向</b>：A 群為 B 群的祖先</td><td>群間先後次序，取代第一節第四步的簡約性偏好</td></tr>
+<tr><td>串接，且比值 <math><mo>≈</mo><mn>1</mn></math></td><td><b>必定同群</b>（硬）</td><td>合併分散於不同區域的同一群。<b>權重應為最低，理由見下</b></td></tr>
+<tr><td>串接，且比值 <math><mo>&lt;</mo><mn>1</mn></math></td><td><b>有向</b>：A 群為 B 群的祖先</td><td>群間先後次序，取代第一節第四步的簡約性偏好</td></tr>
 <tr><td>不相容（四格皆非空）</td><td>不產生約束</td><td>反向用於估計單倍型標記的錯誤率</td></tr>
 </tbody>
 </table>
@@ -13873,16 +13868,16 @@ pigeonhole 至此容許分支：<math><msub><mi>c</mi><mi>B</mi></msub><mo>+</mo
 <h4 id="sr2__必定同群-與用途一的張力">「必定同群」與用途一的張力</h4>
 
 <p class="prose">上表第二列不宜直接採用。串接表示後者衍生自前者的譜系，
-故兩群為<b>巢狀</b>關係；比值 ≈ 1 僅表示後者已接近取代前者。
+故兩群為<b>巢狀</b>關係；比值 <math><mo>≈</mo><mn>1</mn></math> 僅表示後者已接近取代前者。
 然而「接近取代」<b>不等同於同一群</b>：兩者為<b>兩個真實存在的 clone</b>，
 僅在頻率軸上不可分辨。而「頻率相等不等同於同群」正是第三節的論點。
 將其強制合併，等同於在用途一所欲分離之處主動合併，方向相反。</p>
 
 <ul class="prose">
-<li><b>「≈ 1」須定為明確的容差，且該容差應由檢定力決定，而非任意設定的常數。</b>
+<li><b>「<math><mo>≈</mo><mn>1</mn></math>」須定為明確的容差，且該容差應由檢定力決定，而非任意設定的常數。</b>
 在跨越深度 <math><mi>n</mi></math> 之下，比值本身即帶有抽樣誤差；
-唯有當「比值 &lt; 1」在該 <math><mi>n</mi></math> 下本即可分辨、而觀測仍落於 1 附近時，
-「≈ 1」才承載資訊。<math><mi>n</mi></math> 較小時任何比值皆近似於 1，
+唯有當「比值 <math><mo>&lt;</mo><mn>1</mn></math>」在該 <math><mi>n</mi></math> 下本即可分辨、而觀測仍落於 1 附近時，
+「<math><mo>≈</mo><mn>1</mn></math>」才承載資訊。<math><mi>n</mi></math> 較小時任何比值皆近似於 1，
 此為解析度不足，不構成證據。</li>
 <li><b>其權重應為三種約束中最低者。</b>不可同群與有向關係皆<b>增加</b>可辨識性；
 必定同群為唯一<b>降低</b>可辨識性者。錯誤的不可同群將產生不存在的群；
@@ -14489,7 +14484,7 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th scope="col">項目</th><th scope="col">寬視窗（現行約 39 kb）</th><th scope="col">窄視窗（≤ read 跨距）</th></tr></thead>
+<thead><tr><th scope="col">項目</th><th scope="col">寬視窗（現行約 39 kb）</th><th scope="col">窄視窗（<math><mo>≤</mo><mtext>read 跨距</mtext></math>）</th></tr></thead>
 <tbody>
 <tr><td>可跨越的位點對</td><td>多</td><td>少</td></tr>
 <tr><td>各對的跨越深度</td><td>低（多數 read 無法覆蓋兩端）</td><td>高（多數 read 覆蓋全部位點）</td></tr>

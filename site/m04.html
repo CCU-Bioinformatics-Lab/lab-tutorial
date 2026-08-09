@@ -609,7 +609,7 @@ minimap2 -ax map-ont -y reference.fasta methylcall.raw.fastq</code></pre>
 同時，這列中的 <code>0|1</code> 與 <code>PS=105</code> 各自告訴你什麼？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>先回 BAM。</b>用 VCF 的 <code>CHROM</code> 與 <code>POS</code> 查詢該區間，再查看每條 read 的序列、MAPQ、CIGAR 與可用 tags；需要時再對照 reference FASTA。FASTQ 是尚未放回座標的原始 read，不能直接回答哪條 read 覆蓋 <code>chr7:105</code>。</p>
 <p class="prose"><code>0|1</code> 表示 REF 與 ALT 的順序已被定相表示；<code>PS=105</code> 表示這個位點屬於編號為 105 的 phase set。它們都不等於支持 read 數量，也不會取代對 BAM 的檢查；HP1／HP2 也不因此自動帶有父系／母系意義。</p></div></details>
 
-<div class="reveal__q"><p class="prose">另一條 BAM record 的 CIGAR 是 <code>60S40M</code>。這條 read 總長多少？它消耗了多少參考序列？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>read 長 100 bp，參考涵蓋 40 bp。</b><code>S</code> 仍保留在 read，所以 <code>60+40=100</code>；但 <code>S</code> 不消耗參考，只有 <code>40M</code> 消耗 40 個參考位置。</p>
+<div class="reveal__q"><p class="prose">另一條 BAM record 的 CIGAR 是 <code>60S40M</code>。這條 read 總長多少？它消耗了多少參考序列？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>read 長 100 bp，參考涵蓋 40 bp。</b><code>S</code> 仍保留在 read，所以 <math><mn>60</mn><mo>+</mo><mn>40</mn><mo>=</mo><mn>100</mn></math>；但 <code>S</code> 不消耗參考，只有 <code>40M</code> 消耗 40 個參考位置。</p>
 <p class="prose">如果許多 read 在相近座標出現相同方向的 <code>S</code>，可把該處列為結構變異斷點候選；仍需結合其他證據，不能由單一 CIGAR 直接下結論。</p></div></details>
 </section>
 

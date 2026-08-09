@@ -247,7 +247,7 @@ minimap2 -ax map-ont -y reference.fasta methylcall.raw.fastq
 {{ask}}
 <p class="prose">另一條 BAM record 的 CIGAR 是 <code>60S40M</code>。這條 read 總長多少？它消耗了多少參考序列？</p>
 {{reveal}}
-<p class="prose"><b>read 長 100 bp，參考涵蓋 40 bp。</b><code>S</code> 仍保留在 read，所以 <code>60+40=100</code>；但 <code>S</code> 不消耗參考，只有 <code>40M</code> 消耗 40 個參考位置。</p>
+<p class="prose"><b>read 長 100 bp，參考涵蓋 40 bp。</b><code>S</code> 仍保留在 read，所以 {{m: 60 + 40 = 100}}；但 <code>S</code> 不消耗參考，只有 <code>40M</code> 消耗 40 個參考位置。</p>
 <p class="prose">如果許多 read 在相近座標出現相同方向的 <code>S</code>，可把該處列為結構變異斷點候選；仍需結合其他證據，不能由單一 CIGAR 直接下結論。</p>
 {{/ask}}
 </section>

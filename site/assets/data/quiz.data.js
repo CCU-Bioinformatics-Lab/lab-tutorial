@@ -115,7 +115,7 @@ window.TW_QUIZ = {
      "id": "b",
      "html": "0.25，因為帶有變異的 DNA 拷貝數佔總拷貝數的四分之一",
      "correct": true,
-     "why": "正確。在題目指定的簡化條件下，總 DNA 拷貝數為 100×2=200，帶有變異的拷貝數為 50×1=50，因此 VAF=50/200=0.25。"
+     "why": "正確。在題目指定的簡化條件下，總 DNA 拷貝數為 <math><mn>100</mn><mo>×</mo><mn>2</mn><mo>=</mo><mn>200</mn></math>，帶有變異的拷貝數為 <math><mn>50</mn><mo>×</mo><mn>1</mn><mo>=</mo><mn>50</mn></math>，因此 <math><mi>VAF</mi><mo>=</mo><mn>50</mn><mo>/</mo><mn>200</mn><mo>=</mo><mn>0.25</mn></math>。"
     },
     {
      "id": "c",
@@ -131,7 +131,7 @@ window.TW_QUIZ = {
     }
    ],
    "hint_zh": "先計算總 DNA 拷貝數，再計算帶有變異的拷貝數。",
-   "explain_html": "在此簡化模型中，總 DNA 拷貝數為 100×2=200，帶有變異的拷貝數為 50×1=50，因此 VAF=50/200=0.25。除以 2 的換算僅適用於題目指定的兩份拷貝、單一變異拷貝及無偏差條件，並非通用公式。"
+   "explain_html": "在此簡化模型中，總 DNA 拷貝數為 <math><mn>100</mn><mo>×</mo><mn>2</mn><mo>=</mo><mn>200</mn></math>，帶有變異的拷貝數為 <math><mn>50</mn><mo>×</mo><mn>1</mn><mo>=</mo><mn>50</mn></math>，因此 <math><mi>VAF</mi><mo>=</mo><mn>50</mn><mo>/</mo><mn>200</mn><mo>=</mo><mn>0.25</mn></math>。除以 2 的換算僅適用於題目指定的兩份拷貝、單一變異拷貝及無偏差條件，並非通用公式。"
   },
   {
    "id": "m01.q2",
@@ -316,7 +316,7 @@ window.TW_QUIZ = {
      "id": "c",
      "html": "約 5 條",
      "correct": true,
-     "why": "正確。VAF = 0.2 × 1 ÷ 2 = 0.10，50 × 0.10 = 5 條。此算式說明低 purity 會減少支持 read 數，增加偵測難度。"
+     "why": "正確。<math><mi>VAF</mi><mo>=</mo><mn>0.2</mn><mo>×</mo><mn>1</mn><mo>÷</mo><mn>2</mn><mo>=</mo><mn>0.10</mn></math>，<math><mn>50</mn><mo>×</mo><mn>0.10</mn><mo>=</mo><mn>5</mn></math> 條。此算式說明低 purity 會減少支持 read 數，增加偵測難度。"
     },
     {
      "id": "d",
@@ -761,7 +761,7 @@ window.TW_QUIZ = {
      "id": "b",
      "html": "0.67",
      "correct": true,
-     "why": "正確。0.5×4 ÷ (0.5×4 + 0.5×2) = 2/3。這就是 cellular purity 與 DNA fraction 分家的地方。"
+     "why": "正確。<math><mn>0.5</mn><mo>×</mo><mn>4</mn><mo>÷</mo><mo>(</mo><mn>0.5</mn><mo>×</mo><mn>4</mn><mo>+</mo><mn>0.5</mn><mo>×</mo><mn>2</mn><mo>)</mo><mo>=</mo><mn>2</mn><mo>/</mo><mn>3</mn></math>。這就是 cellular purity 與 DNA fraction 分家的地方。"
     },
     {
      "id": "c",
@@ -1149,7 +1149,7 @@ window.TW_QUIZ = {
      "id": "a",
      "html": "資料支持線性樹，因為 0.30 小於 0.60",
      "correct": false,
-     "why": "「0.30 ≤ 0.60」只說明線性樹<b>沒有被排除</b>，不等於它被選中。分支樹同樣沒有被排除：0.60 ＋ 0.30 ＝ 0.90 ≤ 1.00 也成立。通過檢查與被證明是兩件事。"
+     "why": "「<math><mn>0.30</mn><mo>≤</mo><mn>0.60</mn></math>」只說明線性樹<b>沒有被排除</b>，不等於它被選中。分支樹同樣沒有被排除：<math><mn>0.60</mn><mo>+</mo><mn>0.30</mn><mo>=</mo><mn>0.90</mn><mo>≤</mo><mn>1.00</mn></math> 也成立。通過檢查與被證明是兩件事。"
     },
     {
      "id": "b",
