@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
+  <title>三個觀測通道的量測位置與各自的分母</title>
+  <desc>中間畫一段染色體，上面標出兩類位置：
+        生殖系異型合子位點很密，體細胞變異位點很稀疏。
+        左邊的通道量在生殖系位點上。
+        那裡沒有體細胞等位，所以沒有分子被搬走，
+        兩條單倍型的深度比只承載拷貝數，不含體細胞的項。
+        右邊的通道量在體細胞位點上，而且分母只算單倍型一自己的分子，
+        另一條單倍型完全不進來。
+        中間偏下是現行的單倍型失衡比：它量在體細胞位點上，
+        但分母涵蓋兩條單倍型，所以兩種成因都混在裡面。
+        最下面還有一個通道，是整個視窗的總深度比，它承載的是兩條單倍型的拷貝數之和。
+        讀法是：三個通道分別在不同的位置量，才把混在一起的參數拆開；
+        現行流程只用了中間那一個。</desc>
+
+  <text class="ttl zh" x="20" y="36">三個通道量在不同的位置上</text>
+  <text class="anno zh" x="20" y="66">中央為一段染色體上兩類位點的分布。通道的差別在於<b>量在哪裡</b>，以及<b>分母涵蓋什麼</b>。</text>
+
+  <!-- ══ 染色體與兩類位點 ══ -->
+  <rect class="box plain" x="120" y="104" width="760" height="34" rx="8"/>
+  <text class="tick zh" x="20" y="126">染色體</text>
+
+  <!-- germline het 位點（密） -->
+  <circle class="mark germline" cx="150" cy="121" r="6"/>
+  <circle class="mark germline" cx="196" cy="121" r="6"/>
+  <circle class="mark germline" cx="242" cy="121" r="6"/>
+  <circle class="mark germline" cx="288" cy="121" r="6"/>
+  <circle class="mark germline" cx="334" cy="121" r="6"/>
+  <circle class="mark germline" cx="380" cy="121" r="6"/>
+  <circle class="mark germline" cx="426" cy="121" r="6"/>
+  <circle class="mark germline" cx="472" cy="121" r="6"/>
+  <circle class="mark germline" cx="518" cy="121" r="6"/>
+  <circle class="mark germline" cx="564" cy="121" r="6"/>
+  <circle class="mark germline" cx="610" cy="121" r="6"/>
+  <circle class="mark germline" cx="656" cy="121" r="6"/>
+  <circle class="mark germline" cx="702" cy="121" r="6"/>
+  <circle class="mark germline" cx="748" cy="121" r="6"/>
+  <circle class="mark germline" cx="794" cy="121" r="6"/>
+  <circle class="mark germline" cx="840" cy="121" r="6"/>
+
+  <!-- somatic 位點（稀） -->
+  <circle class="mark somatic" cx="311" cy="121" r="8"/>
+  <circle class="mark somatic" cx="633" cy="121" r="8"/>
+
+  <text class="tick germline zh" x="120" y="164">germline heterozygous 位點（密）</text>
+  <text class="tick somatic zh end" x="880" y="164">somatic 位點（稀）</text>
+
+  <!-- ══ 通道一 ══ -->
+  <line class="conn germline" x1="242" y1="138" x2="180" y2="196" marker-end="url(#arrow)"/>
+  <rect class="box ghost ok" x="20" y="200" width="300" height="150" rx="8"/>
+  <text class="anno bold zh mid" x="170" y="230">通道一：單倍型深度比</text>
+  <text class="tick zh mid" x="170" y="254">量在 germline 位點</text>
+  <text class="tick mono mid" x="170" y="286">(p·n₁ + 1−p)</text>
+  <text class="tick mono mid" x="170" y="308">─────────────</text>
+  <text class="tick mono mid" x="170" y="330">(p·n₂ + 1−p)</text>
+  <text class="tick ok zh mid" x="170" y="372">無 somatic 掏空 —— 只承載拷貝數</text>
+
+  <!-- ══ 通道三 ══ -->
+  <line class="conn somatic" x1="633" y1="138" x2="830" y2="196" marker-end="url(#arrow)"/>
+  <rect class="box ghost ok" x="680" y="200" width="300" height="150" rx="8"/>
+  <text class="anno bold zh mid" x="830" y="230">通道三：單倍型內 somatic 佔比</text>
+  <text class="tick zh mid" x="830" y="254">量在 somatic 位點</text>
+  <text class="tick mono mid" x="830" y="286">p · c · μ</text>
+  <text class="tick mono mid" x="830" y="308">─────────────</text>
+  <text class="tick mono mid" x="830" y="330">(p·n₁ + 1−p)</text>
+  <text class="tick ok zh mid" x="830" y="372">分母只含<tspan class="bold">一條</tspan>單倍型 —— 不含 n₂</text>
+
+  <!-- ══ 現行的 GHIR ══ -->
+  <line class="conn somatic" x1="311" y1="138" x2="470" y2="196" marker-end="url(#arrow)"/>
+  <rect class="box ghost bad" x="340" y="200" width="320" height="150" rx="8"/>
+  <text class="anno bold zh mid" x="500" y="230">現行：GHIR</text>
+  <text class="tick zh mid" x="500" y="254">量在 somatic 位點</text>
+  <text class="tick mono mid" x="500" y="286">max(H1, H2)</text>
+  <text class="tick mono mid" x="500" y="308">─────────────</text>
+  <text class="tick mono mid" x="500" y="330">H1 + H2</text>
+  <text class="tick bad zh mid" x="500" y="372">分母涵蓋<tspan class="bold">兩條</tspan>單倍型 —— 兩種成因混在一起</text>
+
+  <!-- ══ 通道二 ══ -->
+  <rect class="box ghost ok" x="20" y="396" width="960" height="52" rx="8"/>
+  <text class="anno bold zh" x="44" y="428">通道二：視窗的總深度比 —— 承載 <tspan class="mono">n₁ + n₂</tspan>，即該段的總拷貝數；作用與上篇的深度軌道相同。</text>
+
+  <rect class="box accent" x="20" y="460" width="960" height="46" rx="8"/>
+  <text class="anno zh" x="40" y="490">現行流程只用了中間那一個通道。<tspan class="bold">三個通道分別量在不同位置</tspan>，混在一起的參數才分得開。</text>
+</svg>

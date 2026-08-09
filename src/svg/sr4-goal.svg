@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+  <title>現行流程與本頁所建立的流程：輸出的量不同</title>
+  <desc>三排流程並列。
+        最上排是現行的做法：把每個 somatic 位點的單倍型失衡收成一個分布，
+        取中位數與四分位距兩個數字，再用一條擬合出來的曲線換成腫瘤 DNA 比例。
+        輸出只有一個純量，細胞比例與倍體都不在裡面。
+        中排是本頁要建立的做法：三個觀測通道分別量在生殖系異型合子位點、
+        整個視窗、以及體細胞變異位點上，
+        一起估出細胞比例與每一段兩個等位各有幾份，
+        倍體是各段拷貝數的加權平均，DNA 比例再由細胞比例與倍體換算出來。
+        輸出因此有四個量，而且每一個都有物理意義。
+        最下排是上篇的兩個對照方法：它們輸出細胞比例與倍體，
+        要進到同一個尺度上比較時，還得先經過那條換算式。
+        讀法是：三排的差別不在準確度，在於輸出了什麼。</desc>
+
+  <text class="ttl zh" x="20" y="36">三種流程的輸出</text>
+  <text class="anno zh" x="20" y="66">同一份腫瘤與正常配對資料，三種處理方式。差別不在準確度，而在輸出的量。</text>
+
+  <!-- ══ 現行 ══ -->
+  <rect class="box ghost" x="20" y="88" width="960" height="104" rx="8"/>
+  <text class="anno bold zh" x="40" y="118">現行</text>
+
+  <rect class="box plain" x="150" y="126" width="150" height="46" rx="6"/>
+  <text class="tick zh mid" x="225" y="146">GHIR 分布</text>
+  <text class="tick zh mid" x="225" y="166">每個 somatic 位點一個值</text>
+  <line class="flow" x1="300" y1="149" x2="336" y2="149" marker-end="url(#arrow)"/>
+
+  <rect class="box plain" x="340" y="126" width="140" height="46" rx="6"/>
+  <text class="tick zh mid" x="410" y="154">中位數與四分位距</text>
+  <line class="flow" x1="480" y1="149" x2="516" y2="149" marker-end="url(#arrow)"/>
+
+  <rect class="box warn" x="520" y="126" width="140" height="46" rx="6"/>
+  <text class="tick zh mid" x="590" y="154">擬合而得的曲線</text>
+  <line class="flow" x1="660" y1="149" x2="696" y2="149" marker-end="url(#arrow)"/>
+
+  <rect class="box ok" x="700" y="126" width="260" height="46" rx="6"/>
+  <text class="tick bold zh mid" x="830" y="146">輸出：DNA 比例 f</text>
+  <text class="tick bad zh mid" x="830" y="166">純度與倍體不在輸出之中</text>
+
+  <!-- ══ 本頁 ══ -->
+  <rect class="box ghost ok" x="20" y="202" width="960" height="150" rx="8"/>
+  <text class="anno bold zh" x="40" y="232">本頁</text>
+
+  <rect class="box plain" x="150" y="216" width="150" height="34" rx="6"/>
+  <text class="tick zh mid" x="225" y="238">germline 位點的深度比</text>
+  <rect class="box plain" x="150" y="256" width="150" height="34" rx="6"/>
+  <text class="tick zh mid" x="225" y="278">視窗的總深度比</text>
+  <rect class="box accent" x="150" y="296" width="150" height="34" rx="6"/>
+  <text class="tick bold zh mid" x="225" y="318">somatic 位點的錨</text>
+
+  <line class="flow" x1="300" y1="233" x2="376" y2="265" marker-end="url(#arrow)"/>
+  <line class="flow" x1="300" y1="273" x2="376" y2="273" marker-end="url(#arrow)"/>
+  <line class="flow" x1="300" y1="313" x2="376" y2="281" marker-end="url(#arrow)"/>
+
+  <rect class="box plain" x="380" y="250" width="180" height="46" rx="6"/>
+  <text class="tick zh mid" x="470" y="278">聯合估計</text>
+  <line class="flow" x1="560" y1="273" x2="596" y2="273" marker-end="url(#arrow)"/>
+
+  <rect class="box ok" x="600" y="216" width="360" height="114" rx="6"/>
+  <text class="tick bold zh mid" x="780" y="242">輸出：純度 p、每段的等位特異拷貝數</text>
+  <text class="tick zh mid" x="780" y="268">倍體 κ 為各段拷貝數的加權平均</text>
+  <text class="tick zh mid" x="780" y="294">DNA 比例 f 由 p 與 κ 換算</text>
+  <text class="tick ok zh mid" x="780" y="320">四個量，皆有物理意義</text>
+
+  <!-- ══ 上篇的對照 ══ -->
+  <rect class="box ghost" x="20" y="362" width="960" height="60" rx="8"/>
+  <text class="anno bold zh" x="40" y="398">上篇</text>
+
+  <rect class="box plain" x="150" y="374" width="330" height="36" rx="6"/>
+  <text class="tick zh mid" x="315" y="398">深度與等位比例 → 純度 p 與倍體 κ</text>
+  <line class="flow" x1="480" y1="392" x2="516" y2="392" marker-end="url(#arrow)"/>
+  <rect class="box warn" x="520" y="374" width="170" height="36" rx="6"/>
+  <text class="tick zh mid" x="605" y="398">換算式</text>
+  <line class="flow" x1="690" y1="392" x2="726" y2="392" marker-end="url(#arrow)"/>
+  <rect class="box ok" x="730" y="374" width="230" height="36" rx="6"/>
+  <text class="tick zh mid" x="845" y="398">方可與上排比較</text>
+
+  <rect class="box accent" x="20" y="432" width="960" height="34" rx="8"/>
+  <text class="anno zh" x="40" y="456">三排皆可給出 <tspan class="mono">f</tspan>。差別在於中排的 <tspan class="mono">f</tspan> 是<tspan class="bold">導出量</tspan>，其誤差可追溯至 <tspan class="mono">p</tspan> 與 <tspan class="mono">κ</tspan> 兩者。</text>
+</svg>

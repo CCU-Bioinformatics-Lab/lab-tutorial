@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 490">
+  <title>兩種選解策略：切割可行域與重新加權曲面</title>
+  <desc>兩欄對照同一件工作 —— 從一族給出相同觀測的候選解中選出一個。
+        左欄的做法是切割：先把全部候選列出來，再用四道是非條件逐一淘汰，
+        倍體要落在界內、純度不得低於零點二、零拷貝的區段要佔到一定比例、擬合優度要達標。
+        剩下一個就輸出，剩下零個就回報失敗。
+        這個做法的性質是透明而脆弱：它不會給出勉強的答案，但它經常什麼都不給。
+        右欄的做法是重新加權：不淘汰任何候選，
+        而是給每個候選加上兩種連續的代價，一種偏好簡約的拷貝數，
+        一種依純度調整對整數偏離的容忍度，然後取總分最低者。
+        右欄另外多一條左欄沒有的東西：一個來自另一種資料的約束，
+        也就是 somatic 變異的 VAF。
+        那條約束不沿著這一族解的方向變化，所以它能真正把族切開。
+        讀法是：兩者的觀測模型完全相同，分歧全部落在選解的依據上。</desc>
+
+  <text class="ttl zh" x="20" y="36">兩種選解策略</text>
+  <text class="anno zh" x="20" y="66">兩者的觀測模型相同，皆為前述的深度式與等位比例式；分歧全部落在如何自格點族中選出一點。</text>
+
+  <!-- ══ 左：切割可行域 ══ -->
+  <rect class="box ghost" x="20" y="88" width="468" height="356" rx="8"/>
+  <text class="lbl bold zh mid" x="254" y="120">切割可行域</text>
+
+  <rect class="box plain" x="52" y="140" width="404" height="40" rx="6"/>
+  <text class="tick zh mid" x="254" y="166">列出全部局部極小</text>
+  <line class="flow" x1="254" y1="180" x2="254" y2="200" marker-end="url(#arrow)"/>
+
+  <rect class="box bad" x="52" y="204" width="404" height="34" rx="6"/>
+  <text class="tick zh mid" x="254" y="226">倍體須落於界內</text>
+  <rect class="box bad" x="52" y="244" width="404" height="34" rx="6"/>
+  <text class="tick zh mid" x="254" y="266">純度不得低於 0.20</text>
+  <rect class="box bad" x="52" y="284" width="404" height="34" rx="6"/>
+  <text class="tick zh mid" x="254" y="306">零拷貝區段須佔 2% 以上</text>
+  <rect class="box bad" x="52" y="324" width="404" height="34" rx="6"/>
+  <text class="tick zh mid" x="254" y="346">擬合優度須達 80</text>
+
+  <line class="flow" x1="254" y1="358" x2="254" y2="378" marker-end="url(#arrow)"/>
+  <rect class="box ok" x="52" y="382" width="404" height="44" rx="6"/>
+  <text class="tick zh mid" x="254" y="402">剩一點即輸出</text>
+  <text class="tick bad zh mid" x="254" y="420">剩零點即回傳失敗</text>
+
+  <!-- ══ 右：重新加權 ══ -->
+  <rect class="box ghost ok" x="512" y="88" width="468" height="356" rx="8"/>
+  <text class="lbl bold zh mid" x="746" y="120">重新加權曲面</text>
+
+  <rect class="box plain" x="544" y="140" width="404" height="40" rx="6"/>
+  <text class="tick zh mid" x="746" y="166">保留全部候選，逐一評分</text>
+  <line class="flow" x1="746" y1="180" x2="746" y2="200" marker-end="url(#arrow)"/>
+
+  <rect class="box warn" x="544" y="204" width="404" height="34" rx="6"/>
+  <text class="tick zh mid" x="746" y="226">事件懲罰：偏好簡約的拷貝數</text>
+  <rect class="box warn" x="544" y="244" width="404" height="34" rx="6"/>
+  <text class="tick zh mid" x="746" y="266">偏離懲罰：容忍度隨純度調整</text>
+
+  <rect class="box accent" x="544" y="284" width="404" height="74" rx="6"/>
+  <text class="tick bold zh mid" x="746" y="308">somatic 變異的 VAF</text>
+  <text class="tick zh mid" x="746" y="330">來自另一種資料，不沿格點族的方向變化</text>
+  <text class="tick ok zh mid" x="746" y="350">故可真正切開該族</text>
+
+  <line class="flow" x1="746" y1="358" x2="746" y2="378" marker-end="url(#arrow)"/>
+  <rect class="box ok" x="544" y="382" width="404" height="44" rx="6"/>
+  <text class="tick zh mid" x="746" y="402">取總分最低者</text>
+  <text class="tick zh mid" x="746" y="420">並回報族內其餘候選的範圍</text>
+
+  <!-- 結論 -->
+  <rect class="box accent" x="20" y="452" width="960" height="34" rx="8"/>
+  <text class="anno zh" x="40" y="476">左側透明而脆弱：不給勉強的答案，但經常什麼都不給。右側較穩健，惟其常數係由特定隊列調校而得。</text>
+</svg>

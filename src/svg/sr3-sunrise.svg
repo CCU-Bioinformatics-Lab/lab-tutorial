@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
+  <title>純度與倍體網格上的距離曲面：局部極小沿格點族排成一條曲線，選解靠切割而非最佳化</title>
+  <desc>橫軸是純度，縱軸是腫瘤倍體，每一點代表一組候選參數。
+        點的大小代表反解出來的拷貝數離整數有多遠，小的表示擬合得好。
+        擬合得好的點不是散布在整個平面上，而是沿著一條由左下往右上的曲線排列，
+        那條曲線就是前一節的格點族：族上每一點對同一份資料給出相同的觀測。
+        四道硬性條件各自切掉平面的一片：
+        倍體下限與上限切掉曲線的兩端，純度下限切掉左側一段，
+        零拷貝比例的門檻切掉曲線上那些解讀成各等位各加一份的點，
+        擬合優度門檻則切掉整體不合的區域。
+        剩下的那一點就是輸出，一點都不剩就回報失敗。
+        讀法是：這個步驟的性質是切割可行域，不是在一個有唯一谷底的曲面上找最低點。</desc>
+
+  <text class="ttl zh" x="20" y="36">距離曲面上的局部極小排成一條線</text>
+  <text class="anno zh" x="20" y="66">橫軸為純度、縱軸為腫瘤倍體。圓點為候選解，圓越小表示反解所得的拷貝數越接近整數。</text>
+
+  <!-- 座標軸 -->
+  <line class="axis" x1="130" y1="420" x2="820" y2="420"/>
+  <line class="axis" x1="130" y1="420" x2="130" y2="110"/>
+  <text class="anno zh mid" x="475" y="470">純度 ρ</text>
+  <text class="tick mid" x="130" y="444">0.0</text>
+  <text class="tick mid" x="268" y="444">0.2</text>
+  <text class="tick mid" x="406" y="444">0.4</text>
+  <text class="tick mid" x="544" y="444">0.6</text>
+  <text class="tick mid" x="682" y="444">0.8</text>
+  <text class="tick mid" x="820" y="444">1.0</text>
+  <text class="tick end" x="120" y="426">1.0</text>
+  <text class="tick end" x="120" y="349">2.0</text>
+  <text class="tick end" x="120" y="272">3.0</text>
+  <text class="tick end" x="120" y="195">4.0</text>
+  <text class="tick end" x="120" y="118">5.0</text>
+  <text class="anno zh" x="20" y="100">腫瘤倍體 ψ_t</text>
+
+  <!-- 不可行區：純度下限 -->
+  <rect class="region bad" x="130" y="110" width="138" height="310"/>
+  <text class="tick bad zh mid" x="199" y="404">純度下限 0.2</text>
+
+  <!-- 不可行區：倍體上限 -->
+  <rect class="region bad" x="268" y="110" width="552" height="33"/>
+  <text class="tick bad zh end" x="812" y="132">倍體上限</text>
+
+  <!-- 格點族曲線 -->
+  <path class="guide" d="M 172 397 Q 320 330 470 250 T 780 150"/>
+
+  <!-- 候選解：沿曲線 -->
+  <circle class="pt gl" cx="172" cy="397" r="12"/>
+  <circle class="pt gl" cx="268" cy="349" r="9"/>
+  <circle class="pt tp" cx="406" cy="272" r="7"/>
+  <circle class="pt gl" cx="544" cy="212" r="9"/>
+  <circle class="pt gl" cx="682" cy="170" r="10"/>
+  <circle class="pt gl" cx="780" cy="150" r="12"/>
+
+  <!-- 離曲線的雜點 -->
+  <circle class="pt fp" cx="330" cy="180" r="22"/>
+  <circle class="pt fp" cx="600" cy="380" r="24"/>
+  <circle class="pt fp" cx="720" cy="290" r="20"/>
+  <circle class="pt fp" cx="450" cy="380" r="21"/>
+
+  <!-- 標註 -->
+  <line class="conn" x1="406" y1="272" x2="470" y2="330" marker-end="url(#arrow)"/>
+  <text class="anno ok zh" x="474" y="352">唯一通過四道條件者</text>
+
+  <text class="tick zh" x="184" y="376">ρ 過低</text>
+  <text class="tick zh" x="278" y="332">零拷貝比例不足</text>
+  <text class="tick zh" x="556" y="196">零拷貝比例不足</text>
+  <text class="tick zh" x="694" y="154">倍體過高</text>
+
+  <text class="tick zh" x="800" y="212">格點族</text>
+  <line class="conn" x1="798" y1="206" x2="740" y2="178"/>
+
+  <text class="tick zh mid" x="330" y="150">擬合優度不足</text>
+
+  <!-- 結論 -->
+  <rect class="box accent" x="20" y="480" width="960" height="34" rx="8"/>
+  <text class="anno zh" x="40" y="504">曲線上各點的距離值相近，故此步驟的性質為<tspan class="bold">切割可行域</tspan>；剩一點即輸出，剩零點即回傳失敗而非勉強的解。</text>
+</svg>

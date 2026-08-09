@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <title>等位比例的錨來自正常細胞：純度趨近一時錨消失</title>
+  <desc>同一個區段，兩個等位在腫瘤細胞中是一份與零份，左右兩欄只有純度不同。
+        左欄純度零點四：這個位置的分子有一部分來自正常細胞，
+        而正常細胞在這裡兩個等位各一份，所以被丟掉的那個等位仍然收得到分子。
+        等位比例因此不是零而是零點三七五，
+        那個離開零的位移量完全由正常細胞造成，反解回去就得到純度。
+        右欄純度等於一：沒有正常細胞，被丟掉的等位一個分子也收不到，
+        等位比例落回零。
+        而零同時相容於一加零、二加零、三加零這些狀態，
+        因為它們的比值都是零 —— 位移量消失，純度資訊也跟著消失。
+        讀法是：等位比例之所以能反推純度，靠的是正常細胞在這裡的已知值零點五；
+        樣本越純，這個錨越弱，方向和一般預期相反。</desc>
+
+  <text class="ttl zh" x="20" y="36">錨的來源與其消失的條件</text>
+  <text class="anno zh" x="20" y="66">同一個區段，腫瘤細胞的等位特異拷貝數皆為 <tspan class="mono">1 + 0</tspan>；左右兩欄僅純度不同。</text>
+
+  <!-- ══ 左：ρ = 0.40 ══ -->
+  <rect class="box ghost ok" x="20" y="88" width="468" height="336" rx="8"/>
+  <text class="lbl bold zh mid" x="254" y="120">純度 0.40</text>
+
+  <text class="tick zh" x="44" y="152">此位置的分子來源</text>
+  <rect class="bar somatic" x="44" y="164" width="152" height="30"/>
+  <rect class="bar germline" x="196" y="164" width="228" height="30"/>
+  <text class="tick zh mid" x="120" y="216">腫瘤 0.4×1</text>
+  <text class="tick zh mid" x="310" y="216">正常 0.6×2</text>
+
+  <text class="tick zh" x="44" y="252">其中屬於<tspan class="bold">被丟掉的那個等位</tspan>者</text>
+  <rect class="box ghost" x="44" y="264" width="152" height="30" rx="4"/>
+  <rect class="bar germline" x="196" y="264" width="114" height="30"/>
+  <text class="tick zh mid" x="120" y="316">0 份</text>
+  <text class="tick zh mid" x="253" y="316">0.6 份</text>
+
+  <line class="axis ok" x1="44" y1="374" x2="424" y2="374"/>
+  <text class="tick mid" x="44" y="396">0</text>
+  <text class="tick mid" x="424" y="396">0.5</text>
+  <circle class="mark hp1" cx="329" cy="374" r="9"/>
+  <text class="anno bold ok mid" x="329" y="356">0.375</text>
+  <line class="conn ok" x1="48" y1="374" x2="316" y2="374" style="stroke-dasharray:5 4"/>
+  <text class="anno ok zh" x="44" y="418">位移量承載純度：<tspan class="mono">ρ = (1−2b) ÷ (1−b) = 0.40</tspan></text>
+
+  <!-- ══ 右：ρ = 1.00 ══ -->
+  <rect class="box ghost bad" x="512" y="88" width="468" height="336" rx="8"/>
+  <text class="lbl bold zh mid" x="746" y="120">純度 1.00</text>
+
+  <text class="tick zh" x="536" y="152">此位置的分子來源</text>
+  <rect class="bar somatic" x="536" y="164" width="380" height="30"/>
+  <text class="tick zh mid" x="726" y="216">腫瘤 1.0×1，無正常細胞</text>
+
+  <text class="tick zh" x="536" y="252">其中屬於<tspan class="bold">被丟掉的那個等位</tspan>者</text>
+  <rect class="box ghost bad" x="536" y="264" width="380" height="30" rx="4"/>
+  <text class="tick zh mid" x="726" y="316">0 份</text>
+
+  <line class="axis bad" x1="536" y1="374" x2="916" y2="374"/>
+  <text class="tick mid" x="536" y="396">0</text>
+  <text class="tick mid" x="916" y="396">0.5</text>
+  <circle class="mark artifact" cx="536" cy="374" r="9"/>
+  <text class="anno bold bad mid" x="560" y="356">0</text>
+  <text class="anno bad zh" x="536" y="418">位移量為零，<tspan class="bold">純度資訊隨之消失</tspan></text>
+
+  <!-- ══ 結論 ══ -->
+  <rect class="box accent" x="20" y="436" width="960" height="56" rx="8"/>
+  <text class="anno zh" x="40" y="462">等位比例式的分子為 <tspan class="mono">ρ·n_B + (1−ρ)</tspan>。<tspan class="bold">承載純度的是後一項，而它屬於正常細胞。</tspan></text>
+  <text class="anno zh" x="40" y="484">ρ → 1 時該項趨於零，式子退化為 <tspan class="mono">n_B ÷ (n_A + n_B)</tspan> 的純比值 —— <tspan class="bold">樣本越純，錨越弱</tspan>。</text>
+</svg>

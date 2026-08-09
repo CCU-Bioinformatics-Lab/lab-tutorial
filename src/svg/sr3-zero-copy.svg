@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+  <title>零拷貝的區段何以定住整體平移量</title>
+  <desc>上下兩排是同一份資料的兩種解讀，四個區段的等位特異拷貝數畫成方塊的堆疊。
+        上排是原解，第三段的較小等位是零份，也就是那個等位完全缺失。
+        下排是每個等位各加一份之後的解，同一段的較小等位變成一份。
+        兩排的深度比與等位比例完全相同，所以這兩條軌道分不出上下。
+        差別只有一處：上排的基因體上存在完全缺失的等位，下排一個都沒有。
+        因此只要在真實資料上觀測到任何一個完全缺失的區段，下排就被排除，
+        平移量也就被定住了。
+        這正是那道零拷貝比例門檻所檢驗的東西。
+        讀法是：定住平移量的不是統計上的擬合優度，是一個具體的生物學觀測。</desc>
+
+  <text class="ttl zh" x="20" y="36">零拷貝的區段何以定住平移量</text>
+  <text class="anno zh" x="20" y="66">同一份資料的兩種解讀。每個區段畫成兩個等位的方塊堆疊，方塊數即該等位的拷貝數。</text>
+
+  <!-- ══ 上排：原解 ══ -->
+  <rect class="box ghost" x="20" y="88" width="960" height="150" rx="8"/>
+  <text class="lbl bold zh" x="40" y="120">原解</text>
+  <text class="tick mono" x="40" y="146">ρ = 0.40</text>
+  <text class="tick mono" x="40" y="170">ψ_t = 2.00</text>
+
+  <g>
+    <rect class="chr hp1" x="300" y="192" width="34" height="18" rx="4"/>
+    <rect class="chr hp2" x="344" y="192" width="34" height="18" rx="4"/>
+    <text class="tick mono mid" x="339" y="230">1 + 1</text>
+
+    <rect class="chr hp1" x="460" y="192" width="34" height="18" rx="4"/>
+    <rect class="chr hp1" x="460" y="168" width="34" height="18" rx="4"/>
+    <text class="tick mono mid" x="499" y="230">2 + 0</text>
+
+    <rect class="chr hp1" x="620" y="192" width="34" height="18" rx="4"/>
+    <text class="tick mono mid" x="659" y="230">1 + 0</text>
+
+    <rect class="chr hp1" x="780" y="192" width="34" height="18" rx="4"/>
+    <rect class="chr hp1" x="780" y="168" width="34" height="18" rx="4"/>
+    <rect class="chr hp2" x="824" y="192" width="34" height="18" rx="4"/>
+    <text class="tick mono mid" x="819" y="230">2 + 1</text>
+  </g>
+
+  <rect class="box ghost bad" x="452" y="160" width="90" height="52" rx="6"/>
+  <rect class="box ghost bad" x="612" y="160" width="90" height="52" rx="6"/>
+  <text class="anno bad zh end" x="960" y="200">兩處有完全缺失的等位</text>
+
+  <!-- ══ 下排：各等位各加一份 ══ -->
+  <rect class="box ghost" x="20" y="250" width="960" height="150" rx="8"/>
+  <text class="lbl bold zh" x="40" y="282">各等位各加一份</text>
+  <text class="tick mono" x="40" y="308">ρ = 0.67</text>
+  <text class="tick mono" x="40" y="332">ψ_t = 4.00</text>
+
+  <g>
+    <rect class="chr hp1" x="300" y="354" width="34" height="18" rx="4"/>
+    <rect class="chr hp1" x="300" y="330" width="34" height="18" rx="4"/>
+    <rect class="chr hp2" x="344" y="354" width="34" height="18" rx="4"/>
+    <rect class="chr hp2" x="344" y="330" width="34" height="18" rx="4"/>
+    <text class="tick mono mid" x="339" y="392">2 + 2</text>
+
+    <rect class="chr hp1" x="460" y="354" width="34" height="18" rx="4"/>
+    <rect class="chr hp1" x="460" y="330" width="34" height="18" rx="4"/>
+    <rect class="chr hp1" x="460" y="306" width="34" height="18" rx="4"/>
+    <rect class="chr hp2" x="504" y="354" width="34" height="18" rx="4"/>
+    <text class="tick mono mid" x="499" y="392">3 + 1</text>
+
+    <rect class="chr hp1" x="620" y="354" width="34" height="18" rx="4"/>
+    <rect class="chr hp1" x="620" y="330" width="34" height="18" rx="4"/>
+    <rect class="chr hp2" x="664" y="354" width="34" height="18" rx="4"/>
+    <text class="tick mono mid" x="659" y="392">2 + 1</text>
+
+    <rect class="chr hp1" x="780" y="354" width="34" height="18" rx="4"/>
+    <rect class="chr hp1" x="780" y="330" width="34" height="18" rx="4"/>
+    <rect class="chr hp1" x="780" y="306" width="34" height="18" rx="4"/>
+    <rect class="chr hp2" x="824" y="354" width="34" height="18" rx="4"/>
+    <rect class="chr hp2" x="824" y="330" width="34" height="18" rx="4"/>
+    <text class="tick mono mid" x="819" y="392">3 + 2</text>
+  </g>
+
+  <text class="anno ok zh end" x="960" y="362">全無完全缺失的等位</text>
+
+  <!-- ══ 結論 ══ -->
+  <rect class="box accent" x="20" y="412" width="960" height="46" rx="8"/>
+  <text class="anno zh" x="40" y="441">兩排的深度比與等位比例<tspan class="bold">完全相同</tspan>；唯一的差別是上排有零拷貝的等位而下排沒有 —— <tspan class="bold">辨識依據只有這一項</tspan>。</text>
+</svg>

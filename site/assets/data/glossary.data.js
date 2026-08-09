@@ -342,7 +342,8 @@ window.TW_GLOSSARY = {
    "m03",
    "m08",
    "m12",
-   "sr1"
+   "sr1",
+   "sr3"
   ]
  },
  "homopolymer": {
@@ -581,7 +582,8 @@ window.TW_GLOSSARY = {
    "m06",
    "m11",
    "sr1",
-   "sr2b"
+   "sr2b",
+   "sr4"
   ]
  },
  "switch error": {
@@ -793,7 +795,8 @@ window.TW_GLOSSARY = {
   "slug": "tinc",
   "modules": [
    "m07",
-   "m12"
+   "m12",
+   "sr4"
   ]
  },
  "tumour purity": {
@@ -815,7 +818,8 @@ window.TW_GLOSSARY = {
    "m03",
    "m08",
    "m12",
-   "sr1"
+   "sr1",
+   "sr3"
   ]
  },
  "tumour DNA fraction": {
@@ -832,7 +836,8 @@ window.TW_GLOSSARY = {
   "slug": "tumour-dna-fraction",
   "modules": [
    "m03",
-   "m13"
+   "m13",
+   "sr3"
   ]
  },
  "cancer cell fraction": {
@@ -851,7 +856,8 @@ window.TW_GLOSSARY = {
   "modules": [
    "capstone",
    "m08",
-   "sr1"
+   "sr1",
+   "sr3"
   ]
  },
  "ploidy": {
@@ -865,7 +871,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "ploidy",
   "modules": [
-   "m08"
+   "m08",
+   "sr3"
   ]
  },
  "aneuploidy": {
@@ -938,7 +945,8 @@ window.TW_GLOSSARY = {
    "m11",
    "m12",
    "m13",
-   "sr1"
+   "sr1",
+   "sr3"
   ]
  },
  "BFB": {
@@ -1131,7 +1139,8 @@ window.TW_GLOSSARY = {
   "slug": "ghir",
   "modules": [
    "m12",
-   "m13"
+   "m13",
+   "sr4"
   ]
  },
  "triplet graph": {
@@ -1308,6 +1317,104 @@ window.TW_GLOSSARY = {
   "slug": "pigeonhole",
   "modules": [
    "sr2"
+  ]
+ },
+ "B-allele frequency": {
+  "zh_gloss": "B 等位頻率",
+  "zh": "在 germline heterozygous 位點上，兩個等位其中一個所佔的 read 比例。腫瘤樣本中混入的正常細胞在此值上恆為 0.5，該常數即為反推純度所依據的錨。ASCAT 與 PURPLE 皆刻意不做相位，故其標號在各位點之間獨立。",
+  "en": "The fraction of reads carrying one of the two alleles at a germline heterozygous site. Contaminating normal cells contribute exactly 0.5, and that constant is the anchor from which purity is recovered. ASCAT and PURPLE deliberately do not phase, so the A/B label is independent per site.",
+  "aka": [
+   "BAF"
+  ],
+  "see": [
+   "logR",
+   "allele-specific copy number",
+   "tumour purity",
+   "LOH"
+  ],
+  "slug": "b-allele-frequency",
+  "modules": [
+   "sr3"
+  ]
+ },
+ "logR": {
+  "zh_gloss": "深度比對數",
+  "zh": "同一位點上腫瘤與正常樣本的 read 深度比取以 2 為底的對數。ASCAT 再以全基因體比值的平均重新置中，因此 0 並不代表兩份拷貝 —— 倍體須由擬合結果另行推算。單獨的 logR 只能決定拷貝數輪廓至一個仿射變換。",
+  "en": "The base-2 logarithm of the tumour-to-normal read-depth ratio at a locus, re-centred on the genome-wide mean ratio. Zero therefore does not mean two copies; ploidy has to be recomputed from the fitted profile. logR alone determines the copy-number profile only up to an affine map.",
+  "aka": [
+   "log R ratio",
+   "LRR"
+  ],
+  "see": [
+   "B-allele frequency",
+   "copy number",
+   "ploidy"
+  ],
+  "slug": "logr",
+  "modules": [
+   "sr3"
+  ]
+ },
+ "allele-specific copy number": {
+  "zh_gloss": "等位特異拷貝數",
+  "zh": "把一個區段的總拷貝數拆成兩個親源等位各自的份數，通常記為 major 與 minor。總拷貝數相同而兩個等位不同的狀態（例如 2+0 與 1+1）在深度上完全一致，只有 B-allele frequency 分得開 —— copy-neutral LOH 即為此類。",
+  "en": "The total copy number of a segment split into the counts contributed by each parental allele, usually reported as major and minor. States with equal total but different split (2+0 versus 1+1) are identical in depth and separable only by B-allele frequency; copy-neutral LOH is exactly such a case.",
+  "see": [
+   "copy number",
+   "B-allele frequency",
+   "LOH",
+   "haplotype imbalance"
+  ],
+  "slug": "allele-specific-copy-number",
+  "modules": [
+   "sr3"
+  ]
+ },
+ "whole-genome doubling": {
+  "zh_gloss": "全基因體加倍",
+  "zh": "腫瘤演化過程中整套基因體複製一次的事件，使各處拷貝數同時加倍。其重要後果是可辨識性：若加倍後所有等位特異拷貝數皆為偶數，則該解與未加倍的解對深度與等位比例給出完全相同的觀測；純度為 1 時兩者逐點相同。",
+  "en": "An event doubling the entire tumour genome, multiplying every copy number by two. Its consequence is identifiability: if all allele-specific copy numbers are even afterwards, the doubled solution reproduces the observed depth and allele ratios exactly, and at purity one the two models are pointwise identical.",
+  "aka": [
+   "WGD"
+  ],
+  "see": [
+   "ploidy",
+   "aneuploidy",
+   "identifiability",
+   "allele-specific copy number"
+  ],
+  "slug": "whole-genome-doubling",
+  "modules": [
+   "sr3"
+  ]
+ },
+ "haplotype imbalance": {
+  "zh_gloss": "單倍型失衡",
+  "zh": "指派至兩條親源單倍型的 read 數不相等。其成因有二：該處兩條單倍型的拷貝數不同，或其中一條的分子被改標至 somatic 子單倍型。兩者在數值上形式相同，僅憑一個失衡值無法區分。",
+  "en": "Unequal read counts assigned to the two parental haplotypes. Two mechanisms produce it: unequal allele-specific copy number, or molecules of one haplotype being relabelled to a somatic sub-haplotype. The two are indistinguishable from a single imbalance value.",
+  "see": [
+   "GHIR",
+   "somatic haplotype",
+   "allele-specific copy number",
+   "B-allele frequency"
+  ],
+  "slug": "haplotype-imbalance",
+  "modules": [
+   "sr4"
+  ]
+ },
+ "identifiability": {
+  "zh_gloss": "可辨識性",
+  "zh": "資料在原則上能否區分兩組不同的參數值。若兩組參數對任何可能的觀測給出相同的機率，則兩者不可辨識，增加深度、變異數目或更換工具皆無作用 —— 須改變的是可行域，例如加入外部約束或錨。此性質與精度不同：精度指可區分之後量得準不準。",
+  "en": "Whether the data can in principle distinguish two parameter values. If both assign the same probability to every possible observation they are unidentifiable, and more depth, more variants or a different tool cannot help; only changing the feasible set — an external constraint or anchor — can. This differs from precision, which concerns accuracy once two states are already distinguishable.",
+  "see": [
+   "whole-genome doubling",
+   "tumour purity",
+   "ploidy"
+  ],
+  "slug": "identifiability",
+  "modules": [
+   "sr3"
   ]
  }
 };

@@ -1,0 +1,619 @@
+<!--tw
+{
+  "objectives": [
+    "寫出 GHIR 的期望值閉式，並說明它與上篇的等位比例式為同一個形式",
+    "說明 max() 的折疊效應如何同時作用於 GHIR 分布的中位數與四分位距",
+    "寫出單倍型內 somatic 佔比的估計式，並說明它為何不含另一條單倍型的拷貝數",
+    "界定該錨所解決與未解決的兩種不可辨識性，並說明全基因體加倍為何仍需外部依據",
+    "說明合成混合樣本何以不能直接作為 cellular purity 的真值，並提出可行的驗證設計"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<h3>上篇留下的限制</h3>
+
+<p class="prose">上篇的結論為：深度與等位比例所決定的是一個格點族，
+族內選點須依賴錨或偏好，而同一份資料之內最強的錨是 somatic 變異的 VAF。
+該錨的限制亦已指出 —— 其關係式 {{m: VAF = p/2}} 的分母含<b>兩條</b>單倍型的拷貝數，
+故僅在二倍體區段成立。PURPLE 因此將此估計限於推得拷貝數落於 1.8 至 2.2、
+且較小等位不低於 0.5 的區域。</p>
+
+<p class="prose">腫瘤基因體上符合該條件的區域往往不是多數，
+而不符合的區域（LOH、單一等位擴增、非整倍體）恰是腫瘤最具資訊的部分。
+<b>錨最有力之處，正是它被排除之處。</b></p>
+
+<h3>單倍型標記改變了分母</h3>
+
+<p class="prose">當 read 已帶有單倍型標記時，同一個 somatic 訊號可以在<b>單一條單倍型之內</b>計數：
+分子為該單倍型上帶有 somatic 等位的分子數，分母為該單倍型的全部分子數。
+另一條單倍型完全不進入這個比值，前述的限制隨之消失。</p>
+
+<p class="prose">本頁的內容即為此一觀察的展開：先由原始碼寫出 LongPhase-S 現行統計量的閉式，
+說明它與上篇的等位比例式為同一個形式；再據以建立聯合估計式，
+使 cellular purity 與 ploidy 成為輸出，而 tumour DNA fraction 由兩者導出。</p>
+
+{{svg:sr4-goal | [wide] 上排為現行流程：GHIR 分布經中位數與四分位距兩個特徵，
+以迴歸給出 tumour DNA fraction 一個純量；純度與倍體不在輸出之中。
+下排為本頁所建立者：三個觀測通道分別量在 germline 位點、視窗全體與 somatic 位點上，
+聯合估計純度與每段的等位特異拷貝數，<b>倍體與 DNA 比例由兩者導出</b>。
+右側對照上篇：ASCAT 與 PURPLE 輸出純度與倍體之後，須以換算式才進入同一個尺度。}}
+
+<h3>所需的量多半已在輸出裡</h3>
+
+<p class="prose">現行實作在每個 somatic 位點上，已將覆蓋該位點的 read 依標籤分入
+<code>H1</code>、<code>H2</code>、<code>H1-1</code>、<code>H2-1</code>、<code>H3</code> 五個計數
+（<code>SomaticVarCaller.cpp</code> 的 <code>ReadHpCount</code>），
+並已算出三個比值：<code>germlineHaplotypeImbalanceRatio</code>（即 [[GHIR]]）、
+<code>allelicImbalanceRatio</code> 與 <code>somaticHaplotypeImbalanceRatio</code>。</p>
+
+<p class="prose">下文所需的觀測量，除了一項之外皆為上述計數的算術組合。
+<b>缺的不是資料，是模型。</b></p>
+
+<p class="prose">本頁討論範圍限於單一樣本的 cellular purity、ploidy 與等位特異拷貝數；
+subclonality 僅作為混淆項出現，其重建屬另一主題。</p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>一、GHIR 的定義，以原始碼為準</h3>
+
+{{eq}}
+GHIR(i) = \frac{\max(RC^{H1}(i), RC^{H2}(i))}{RC^{H1}(i) + RC^{H2}(i)}
+{{note}}
+{{m: i}} 為一個候選 somatic 位點；{{m: RC^{H1}}} 與 {{m: RC^{H2}}} 為該位點上標為
+<code>H1</code> 與 <code>H2</code> 的 read 數。實作見 <code>HaplotagStrategy.h</code> 的
+<code>calculateHaplotypeImbalanceRatio</code>。
+{{/eq}}
+
+<p class="prose">三件必須先講清楚的事。</p>
+
+<p class="prose"><b>其一，分母只有 <code>H1</code> 與 <code>H2</code> 兩個計數。</b>
+<code>H1-1</code>、<code>H2-1</code>、<code>H3</code> 與未標記者<b>皆不在分母之內</b>。
+這一點決定了後續整個閉式的形狀，且與「涵蓋該位點的總 read 數」一語不同；
+以式子與原始碼為準。</p>
+
+<p class="prose"><b>其二，帶有 somatic 等位的 read 不會落入 <code>H1</code> 或 <code>H2</code>。</b>
+標記程序先判定該 read 是否帶有 somatic 等位（<code>tumorMaxHPcount != 0</code>），
+帶有者才進入 <code>H1-1</code>／<code>H2-1</code>／<code>H3</code> 的分支；
+兩個 germline 計數<b>僅收未帶 somatic 等位的 read</b>。</p>
+
+<p class="prose"><b>其三，<code>max()</code> 使值域為 {{m: [0.5, 1]}}。</b>
+這是一個<b>折疊</b>統計量，與上篇所述 AMBER 取兩個等位較大者的做法同型。
+邊界情形另有規定：兩個計數皆為零時回傳 0，僅其一為零時回傳 1，
+前者被後續濾波當作哨兵值排除。</p>
+
+{{svg:sr4-ghir-buckets | [wide] 一個 somatic 位點上的 read 依標籤分入五個計數。
+<b>虛線框標出 GHIR 的分母</b>：只有 <code>H1</code> 與 <code>H2</code>。
+右側標出關鍵的一步 —— 帶有 somatic 等位的分子<b>離開</b> <code>H1</code> 進入 <code>H1-1</code>，
+因此 <code>H1</code> 被掏空，而 <code>H2</code> 不變。}}
+
+<h3>二、GHIR 的期望值閉式</h3>
+
+<h4>三個計數的分子數</h4>
+
+<p class="prose">設 somatic 變異位於 germline 單倍型 1。令 {{m: p}} 為 cellular purity、
+{{m: n_1}} 與 {{m: n_2}} 為該處腫瘤細胞的等位特異拷貝數、
+{{m: c}} 為帶有此變異的腫瘤細胞比例、{{m: μ}} 為 multiplicity。
+正常細胞在兩條單倍型上各一份。各計數所對應的分子數為：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>計數</th><th>分子數</th><th>來源</th></tr></thead>
+<tbody>
+<tr><td><code>H1-1</code></td><td>{{m: p · c · μ}}</td><td>帶有 somatic 等位的腫瘤分子</td></tr>
+<tr><td><code>H1</code></td><td>{{m: p · (n_1 − c · μ) + (1 − p)}}</td><td>單倍型 1 上<b>未</b>帶 somatic 等位者，含全部正常細胞的一份</td></tr>
+<tr><td><code>H2</code></td><td>{{m: p · n_2 + (1 − p)}}</td><td>單倍型 2 的全部分子</td></tr>
+</tbody>
+</table>
+</div>
+
+{{eq}}
+E[GHIR] = \frac{\max(p(n_1 − cμ) + (1 − p), \quad p·n_2 + (1 − p))}{p(n_1 + n_2 − cμ) + 2(1 − p)}
+{{/eq}}
+
+<p class="prose"><b>此式與上篇的等位比例式為同一個形式。</b>
+將上篇的 {{m: n_B}} 代換為 {{m: n_1 − cμ}}、總拷貝數代換為 {{m: n_1 + n_2 − cμ}}，
+兩式逐項對應。差別僅在兩處：分子外多一層 {{m: \max}}（折疊），
+以及腫瘤側的拷貝數被 somatic 的 {{m: cμ}} 扣掉一塊。</p>
+
+{{svg:sr4-ghir-is-baf | [wide] 兩式逐項對齊。左為上篇的等位比例式，右為 GHIR 的期望值。
+分母的兩項完全對應；分子的差別只有 <b>somatic 所扣掉的 <tspan class="mono">cμ</tspan></b> 與外層的 <tspan class="mono">max</tspan>。
+<b>形式相同的後果是：上篇整套機制可直接接上來</b> ——
+反解式、格點族、以及以整數距離為目標函數的擬合方式皆然。}}
+
+<h4>二倍體、clonal、multiplicity 為 1 的特例</h4>
+
+<p class="prose">代入 {{m: n_1 = n_2 = 1}}、{{m: c = 1}}、{{m: μ = 1}}：
+<code>H1</code> 為 {{m: 1 − p}}，<code>H2</code> 為 {{m: 1}}，故</p>
+
+{{eq}}
+E[GHIR] = \frac{1}{2 − p}, \qquad p = 2 − \frac{1}{GHIR}
+{{note}}
+{{m: p = 0}} 時為 0.5，{{m: p = 1}} 時為 1.0，區間內單調遞增。
+{{/eq}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>{{m: p}}</th><th>0.0</th><th>0.2</th><th>0.5</th><th>0.9</th><th>1.0</th></tr></thead>
+<tbody>
+<tr><td>{{m: E[GHIR]}}</td><td>0.500</td><td>0.556</td><td>0.667</td><td>0.909</td><td>1.000</td></tr>
+</tbody>
+</table>
+</div>
+
+{{svg:sr4-ghir-mechanism | [wide] 三格純度階梯，同一個 somatic 位點。
+純度上升時，單倍型 1 的分子<b>由 <code>H1</code> 遷移至 <code>H1-1</code></b>，
+<code>H1</code> 因而被掏空，而 <code>H2</code> 全程不變。
+GHIR 取兩者較大者除以兩者之和，故隨純度單調上升 —— 三格的值分別為 0.556、0.667、0.909。
+<b>此即現行迴歸所擬合的那條曲線，而它有閉式。</b>}}
+
+<p class="prose">此結果對照現行做法值得留意：現行流程量測 GHIR 分布的中位數與四分位距，
+再以二階多項式迴歸估計 tumour DNA fraction。
+上式顯示該關係在二倍體 clonal 的情形下<b>為一條已知的一元函數</b>，
+迴歸所擬合的是一個本已有閉式的物理量。</p>
+
+<h4>兩種歸因是同一條式子的兩項</h4>
+
+<p class="prose">GHIR 的偏移可歸因於 somatic read 的過度呈現，
+亦可歸因於拷貝數變異、LOH 與非整倍體所造成的等位失衡。
+上式顯示<b>兩者是同一個分子裡的兩項</b>：
+{{m: cμ}} 一項為 somatic 所造成的掏空，{{m: n_1 ≠ n_2}} 一項為拷貝數所造成的失衡。
+二倍體時只剩前者；有拷貝數變異時兩者相加。</p>
+
+<p class="prose"><b>而單一個 GHIR 值無法分開兩者。</b>
+{{m: p = 0.50}} 時，二倍體 clonal 的位點給出 {{m: GHIR = 0.667}}；
+而一個該處無 somatic 變異、但等位特異拷貝數為 {{m: 1 + 3}} 的位點，
+其 GHIR 同樣為 {{m: 0.667}}。這正是 [[haplotype imbalance|單倍型失衡]]
+一詞所涵蓋的兩種成因。</p>
+
+{{svg:sr4-two-terms | [wide] 兩欄的 GHIR <b>刻意設為完全相同的 0.667</b>，純度同為 0.50。
+左欄的偏移全部來自 somatic 掏空（拷貝數為 <tspan class="mono">1+1</tspan>），
+右欄全部來自拷貝數失衡（<tspan class="mono">1+3</tspan>，該處無 somatic 變異）。
+<b>只看一個 GHIR 值分不出兩者</b> —— 要分開，須在不同位點分別量測這兩項。}}
+
+<h3>三、折疊效應</h3>
+
+<p class="prose">{{m: \max}} 使 GHIR 恆不小於 0.5，因此即使真實情形<b>完全平衡</b>
+（{{m: n_1 = n_2}} 且無 somatic 變異），有限深度下的樣本 GHIR 期望值仍高於 0.5。
+其偏移量隨跨越深度下降而增大：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>覆蓋該位點的 germline read 數</th><th>10</th><th>20</th><th>40</th><th>60</th><th>100</th></tr></thead>
+<tbody>
+<tr><td>平衡位點的 {{m: E[GHIR]}}</td><td>0.623</td><td>0.588</td><td>0.563</td><td>0.551</td><td>0.540</td></tr>
+<tr><td>與真值 0.5 的偏移</td><td>0.123</td><td>0.088</td><td>0.063</td><td>0.051</td><td>0.040</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">此表的數值可與訊號本身相比：{{m: p = 0.20}} 的二倍體位點，
+其真實 GHIR 為 0.556，訊號量為 0.056。<b>而深度 20 時的折疊偏移為 0.088，大於該訊號。</b>
+在低純度區間，折疊所造成的位移可以超過純度所造成的位移。</p>
+
+{{svg:sr4-folding | [wide] 上排為折疊前：平衡位點的兩個計數對稱分布於 0.5 兩側。
+下排為取 <tspan class="mono">max</tspan> 之後：整個左半被翻折到右半，分布的重心因而落在 0.5 之上。
+右側兩條曲線顯示偏移量隨深度的變化 —— <b>深度越低，偏移越大</b>。
+虛線標出 <tspan class="mono">p = 0.20</tspan> 的真實 GHIR，可與偏移量直接比較。}}
+
+{{guard:17 | GHIR 的 max() 是折疊統計量}}
+<p class="prose">取兩個計數的較大者，使 GHIR 的值域為 {{m: [0.5, 1]}}。
+其後果是<b>真實平衡的位點在有限深度下不會給出 0.5</b>，而是給出一個偏高的值，
+且該偏移隨深度下降而增大。</p>
+<p class="prose"><b>可容許之處</b>：折疊使「哪一條單倍型較多」這件無關的資訊被消去，
+因此不需要跨位點的相位一致性 —— 這正是上篇所述 ASCAT 隨機化 A／B 標號的同一個理由。</p>
+<p class="prose"><b>限制</b>：分布的中位數與四分位距<b>兩者皆同時受純度與深度影響</b>，
+故不是兩個獨立的訊號。以此二者為特徵的迴歸，其所學到的一部分是資料集的深度分布；
+更換深度設定即須重新訓練。上篇所述 PURPLE 對同一問題設有明確處置：
+以二項分布算出平衡區段的期望值，並在觀測值低於 0.535 時比較
+「視為平衡」與「視為觀測值」兩種解釋，取偏離較小者。
+<b>GHIR 目前沒有對應的處置。</b></p>
+{{/guard}}
+
+<h3>四、三個觀測通道</h3>
+
+<p class="prose">要把 {{m: p}}、{{m: n_1}}、{{m: n_2}}、{{m: c}} 與 {{m: μ}} 分開，
+須在<b>不同位點</b>分別量測，而非壓在單一個統計量上。
+已標記的 read 提供三個通道：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>通道</th><th>量測位置</th><th>期望值</th><th>含哪些參數</th></tr></thead>
+<tbody>
+<tr><td>單倍型深度比 {{m: D_1/D_2}}</td><td><b>germline heterozygous</b> 位點</td>
+<td>{{m: \frac{p·n_1 + (1 − p)}{p·n_2 + (1 − p)}}}</td><td>{{m: p, n_1, n_2}}</td></tr>
+<tr><td>總深度比 {{m: R_s}}</td><td>視窗全體</td>
+<td>{{m: \frac{p(n_1 + n_2) + 2(1 − p)}{ψ}}}</td><td>{{m: p, n_1 + n_2, ψ}}</td></tr>
+<tr><td>單倍型內 somatic 佔比 {{m: s}}</td><td><b>somatic</b> 位點</td>
+<td>{{m: \frac{p · c · μ}{p · n_1 + (1 − p)}}}</td><td>{{m: p, c, μ, n_1}}</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">此處的關鍵區分在於<b>量測位置</b>。GHIR 量在 somatic 位點上，
+故其分子同時混入 {{m: cμ}} 與 {{m: n_1 − n_2}}；
+而第一個通道量在 germline heterozygous 位點上，該處無 somatic 掏空，
+所以<b>只承載拷貝數</b>。兩者分開量測，前一節所述的兩項即分離。</p>
+
+<p class="prose">現行流程並未使用第一個通道 —— 它把等位失衡與 somatic 掏空
+壓在同一個 GHIR 上，再以分布的兩個矩概括之。</p>
+
+{{svg:sr4-three-channels | [wide] 三個通道的量測位置與各自的分母。
+中央為一條染色體上兩類位點的分布：germline heterozygous 位點遠多於 somatic 位點。
+<b>左側通道量在前者上，故不含 somatic 項；右側通道量在後者上，且分母限於單一條單倍型。</b>
+現行的 GHIR 落在中間 —— 它量在 somatic 位點上，但分母涵蓋兩條單倍型。}}
+
+<h3>五、單倍型內的 somatic 佔比</h3>
+
+{{eq}}
+s(i) = \frac{RC^{H1-1}(i)}{RC^{H1-1}(i) + RC^{H1}(i)} = \frac{p · c · μ}{p · n_1 + (1 − p)}
+{{note}}
+分母為單倍型 1 的<b>全部</b>分子數：帶 somatic 等位者與未帶者之和。
+此量目前未被計算，但其兩個計數皆已在輸出之中。
+{{/eq}}
+
+<h4>{{m: n_1 = μ = 1}} 且 {{m: c = 1}} 時 {{m: s = p}}</h4>
+
+<p class="prose">代入即得 {{m: s = p·1/(p + 1 − p) = p}}。
+與上篇 PURPLE 所用的 {{m: VAF = p/2}} 相比，此處<b>沒有那個 2</b>。
+成因在分母：{{m: VAF}} 的分母涵蓋兩條單倍型，故正常細胞貢獻 2 份；
+{{m: s}} 的分母只涵蓋一條，正常細胞只貢獻 1 份。</p>
+
+<h4>式中不含 {{m: n_2}}</h4>
+
+<p class="prose">這是此路線的主要論據。另一條單倍型的拷貝數<b>完全不進入這個比值</b>，
+因此 LOH、單一等位擴增與非整倍體皆不影響它。以 {{m: p = 0.50}}、{{m: n_1 = 1}} 為例：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>該區段的狀態</th><th>{{m: 2 × VAF}}（PURPLE 的錨）</th><th>{{m: s}}（本路線）</th></tr></thead>
+<tbody>
+<tr><td>{{m: 1 + 1}}（二倍體）</td><td>0.500</td><td>0.500</td></tr>
+<tr><td>{{m: 1 + 0}}（LOH）</td><td><b>0.667</b></td><td>0.500</td></tr>
+<tr><td>{{m: 1 + 3}}（單一等位擴增）</td><td><b>0.333</b></td><td>0.500</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">PURPLE 之所以將 somatic 擬合限於推得拷貝數 1.8 至 2.2 的區域，理由即在第二、三列：
+在該範圍之外，{{m: 2 × VAF}} 的偏誤達三成。<b>{{m: s}} 不需要這道限制。</b></p>
+
+<p class="prose">此亦為 LongPhase-S 原始文獻中一項假說的機制。
+該文推測其估計在 LOH 與非整倍體之下仍穩健，係源於 phase-aware 的估計方式，
+但未給出機制。上式即為該機制：<b>分母限於單一條單倍型，另一條的拷貝數因而消去。</b></p>
+
+{{svg:sr4-purity-anchor | [wide] 兩個比值的分母範圍。
+左為 <tspan class="mono">2 × VAF</tspan>：分母涵蓋<b>兩條</b>單倍型，故正常細胞貢獻 2 份，
+且另一條單倍型的拷貝數在其中。
+右為 {{m: s}}：分母只涵蓋<b>一條</b>，正常細胞貢獻 1 份，另一條完全不在式內。
+<b>那個消失的 2，與那個消失的 <tspan class="mono">n₂</tspan>，是同一件事的兩個後果。</b>}}
+
+{{svg:sr4-anchor-vs-vaf | [wide] 純度固定為 0.50，改變另一條單倍型的拷貝數。
+三格的 <tspan class="mono">n₂</tspan> 分別為 1、0、3。
+<b>下排的 {{m: s}} 三格完全相同</b>；上排的 <tspan class="mono">2 × VAF</tspan> 由 0.500 變為 0.667 與 0.333。
+右側標出 PURPLE 的因應方式：把後兩格排除在錨的適用範圍之外。}}
+
+<h4>梳齒：{{m: s}} 在各 {{m: (n_1, μ)}} 之下取離散值</h4>
+
+<p class="prose">{{m: s = p}} 僅在 {{m: n_1 = μ = 1}} 且 {{m: c = 1}} 時成立。
+一般情形下，由於 {{m: μ}} 為不超過 {{m: n_1}} 的正整數，
+{{m: s}} 的可能值構成一組離散的位置 —— 以 {{m: p = 0.50}} 為例：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>{{m: (n_1, μ)}}</th><th>{{m: (1, 1)}}</th><th>{{m: (2, 1)}}</th><th>{{m: (2, 2)}}</th><th>{{m: (3, 1)}}</th><th>{{m: (3, 2)}}</th><th>{{m: (3, 3)}}</th></tr></thead>
+<tbody>
+<tr><td>{{m: s}}（{{m: c = 1}}）</td><td>0.500</td><td>0.333</td><td>0.667</td><td>0.250</td><td>0.500</td><td>0.750</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">{{m: c < 1}} 時 {{m: s}} 由該齒向下移動，故每一齒實為一個上界。
+表中 {{m: (1, 1)}} 與 {{m: (3, 2)}} 給出相同的值，說明<b>盲目地在 {{m: s}} 的分布上找峰並不可行</b>。</p>
+
+<p class="prose">可行的做法是<b>先分層</b>：{{m: n_1}} 由第一、二通道就地取得，
+故各位點可依其所在區段的 {{m: n_1}} 分組，組內的齒位是已知的有限集合。
+在 {{m: n_1 = 1}} 的組內 {{m: μ}} 只能為 1，故 {{m: s = p · c ≤ p}}，
+<b>該組 {{m: s}} 的上包絡即為 {{m: p}}</b>，其依據是 truncal 變異（{{m: c = 1}}）必然存在。</p>
+
+{{svg:sr4-comb | [wide] {{m: s}} 的可能值在 <tspan class="mono">n₁</tspan> 相同時構成一組齒。
+上排未分層：三個 <tspan class="mono">n₁</tspan> 的齒混在同一條軸上，且有兩齒重合（0.500）。
+下排依 <tspan class="mono">n₁</tspan> 分層之後，各層的齒位為已知的有限集合。
+<tspan class="mono">n₁ = 1</tspan> 一層只有一齒，其上包絡即為純度。
+灰色的下拖尾為 <tspan class="mono">c &lt; 1</tspan> 的 subclonal 變異。}}
+
+<h3>六、聯合估計式</h3>
+
+<p class="prose">分段直接取 [[phase block]]。
+LongPhase-S 的原始文獻報告 germline 區塊 N50 的中位數約 1.19 Mb
+（範圍 257.6 kb 至 4.39 Mb），與 ASCAT 及 PURPLE 分段的尺度相當，
+故不需另做分割 —— 且此一選擇有其必要性，見第八節。</p>
+
+<p class="prose">參數為：全樣本單一的 {{m: p}}，以及每段兩個整數 {{m: (n_1, n_2)_s}}。
+倍體與 DNA 比例<b>不是自由參數，而是導出量</b>：</p>
+
+{{eq}}
+κ = \frac{\sum_{s} ℓ_s · (n_{1,s} + n_{2,s})}{\sum_{s} ℓ_s}, \qquad f = \frac{p · κ}{p · κ + 2(1 − p)}
+{{note}}
+{{m: ℓ_s}} 為該段的長度或所含 heterozygous 位點數。
+{{m: f}} 由上篇的換算式導出，故其誤差可追溯至 {{m: p}} 與 {{m: κ}} 兩者。
+{{/eq}}
+
+<p class="prose">目標函數沿用上篇 PURPLE 的兩項，再加上第三項：</p>
+
+{{eq}}
+score(p, n) = (\sum_{s} w_s · E_s) × (\sum_{s} w_s · D_s) − \sum_{i} \log P(RC^{H1-1}_i \mid p, n_{1}, c, μ)
+{{/eq}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>項</th><th>資料來源</th><th>作用</th></tr></thead>
+<tbody>
+<tr><td>{{m: E_s}}</td><td>各段的等位特異拷貝數</td><td>事件懲罰，即上篇的連續簡約先驗</td></tr>
+<tr><td>{{m: D_s}}</td><td>通道一與通道二</td><td>偏離懲罰，容忍度隨 {{m: p}} 調整</td></tr>
+<tr><td>第三項</td><td>通道三</td><td><b>錨</b>：對每個 somatic 位點取二項似然 {{m: Binomial(RC^{H1-1} + RC^{H1}, s)}}</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">第三項與 PURPLE 的 somatic 懲罰在性質上不同，此點須明確區分。
+PURPLE 的懲罰為<b>單邊</b>：僅當變異拷貝數超出主要等位所能容納的上界時扣分，
+未超出者一律不扣。第三項為<b>雙邊</b>的似然：{{m: s}} 偏高或偏低皆改變分數，
+因此它直接約束 {{m: p}}，而非僅排除不合理的候選。</p>
+
+{{svg:sr4-flow | [wide] 完整流程。淺色的四步為現行實作已具備者：
+單倍型標記、五個計數、低信心變異濾除，以及分段所依據的 phase block。
+深色的四步為新增者：由 germline heterozygous 位點取單倍型深度比、
+依 <tspan class="mono">n₁</tspan> 分層、聯合最佳化，以及輸出四個量與其區間。
+<b>現行的「兩個矩加迴歸」被整段取代。</b>}}
+
+<h3>七、此錨解決與未解決的不可辨識性</h3>
+
+<h4>解決：無等位失衡時純度不可辨識</h4>
+
+<p class="prose">上篇第八節列出的第一項不可辨識為「全基因體皆為 1+1 時 {{m: ρ}} 不可辨識」。
+此時兩條軌道皆為常數：深度比處處相同、等位比例處處為 0.5，對純度零資訊。
+ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍體區段的 VAF 峰。</p>
+
+<p class="prose">而在此情形下 {{m: n_1 = 1}} 處處成立，故 {{m: s = p · c}}，
+其上包絡直接給出 {{m: p}}。<b>此項不可辨識因而被解除。</b>
+其代價僅為需要存在 truncal 的 somatic 變異 —— 而 subclone 重建的整個前提即為此。</p>
+
+<h4>未解決：全基因體加倍</h4>
+
+<p class="prose">此處須明確劃線。將上篇的格點變換施於本頁的錨：
+{{m: (k, m) = (2, 0)}} 時 {{m: n_1 → 2n_1}}，
+而一個發生於加倍<b>之前</b>的變異，其 {{m: μ}} 亦隨之加倍。代入 {{m: s}}：</p>
+
+{{eq}}
+s′ = \frac{ρ′ · c · 2μ}{ρ′ · 2n_1 + (1 − ρ′)}
+{{note}}
+以 {{m: ρ = 0.40}}、{{m: n_1 = μ = 1}} 為例：原式 {{m: s = 0.400}}；
+加倍後 {{m: ρ′ = 0.25}}、{{m: n_1′ = 2}}、{{m: μ′ = 2}}，代入仍得 {{m: s′ = 0.400}}。
+{{/eq}}
+
+<p class="prose"><b>錨在加倍變換下不變，因此它不能單獨破解加倍簡併。</b>
+上篇的結論在此仍然成立：加倍與否須由簡約先驗、奇數拷貝數的存在，
+或樣本外的量測決定。</p>
+
+<p class="prose">此一劃線並非本路線的缺陷，而是其適用範圍的準確界定。
+可宣稱的是「純度的估計不再需要該區段為二倍體，
+且無等位失衡的樣本亦可估計」，<b>不可宣稱</b>「解決了純度與倍體的簡併」。</p>
+
+{{svg:sr4-what-it-fixes | [wide] 三種不可辨識的處置對照。
+左欄「全基因體無等位失衡」：兩條軌道皆為常數，但 <tspan class="mono">n₁ = 1</tspan> 處處成立，故錨仍給出純度 —— <b>解除</b>。
+中欄「錨的區域限制」：{{m: s}} 的分母不含另一條單倍型，故 LOH 與擴增區段皆可用 —— <b>解除</b>。
+右欄「全基因體加倍」：拷貝數與 multiplicity 一同加倍時 {{m: s}} 不變 —— <b>仍未解除</b>，
+須另以簡約先驗或樣本外量測處理。}}
+
+{{svg:sr4-loh-strength | [wide] LOH 區段（<tspan class="mono">n₂ = 0</tspan>）上，<code>H2</code> 只剩正常細胞的一份，
+故單倍型深度比 <tspan class="mono">D₁/D₂</tspan> 為 <tspan class="mono">(p·n₁ + 1 − p) ÷ (1 − p)</tspan>，
+隨純度急遽上升，是全基因體上訊號最強的一類區段。
+<b>而錨在此處同樣成立</b>。兩者相合的後果是：對 ASCAT 與 PURPLE 而言最不利的區域，
+在此路線上反而是資訊最密的區域。}}
+
+<h3>八、失效模式</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>失效</th><th>機制</th><th>處置</th></tr></thead>
+<tbody>
+<tr><td><code>H3</code> 與無 germline 錨的位點</td>
+<td>無法歸屬單倍型的 somatic read 進不了 {{m: s}} 的分子。原始文獻報告 <code>H3</code> 的 F1 為 0.746、recall 僅 0.596</td>
+<td>單倍型繼承程序可救回一部分；救不回者<b>應排除該位點，不得計為零</b></td></tr>
+<tr><td>低 DNA 比例時的 recall 下降</td>
+<td>somatic 標籤的 recall 在比例 0.2 時降至約 0.6，使 {{m: s}} 的分子被系統性低估，{{m: p}} 隨之低估</td>
+<td>須以 recall 曲線校正，或將偵測機率納入似然</td></tr>
+<tr><td>subclonality</td>
+<td>{{m: n_1 = μ = 1}} 時 {{m: s = p · c}}，單一個位點分不開 {{m: p}} 與 {{m: c}}</td>
+<td>取該層 {{m: s}} 的上包絡；並回報 {{m: s}} 的多峰結構，因其本身即為 subclone 的訊號</td></tr>
+<tr><td>multiplicity</td>
+<td>{{m: μ > 1}} 使 {{m: s}} 落在梳子的另一齒</td>
+<td>分層後 {{m: μ}} 的候選為有限整數集，可列舉</td></tr>
+<tr><td><b>跨 phase block</b></td>
+<td><code>H1</code>／<code>H2</code> 的標號<b>逐 block 獨立決定</b>（見 M13 的重要區分 #13），
+故 {{m: (n_1, n_2)}} 的配對<b>只在單一 block 之內有定義</b></td>
+<td>{{m: κ}} 不受影響，因其僅用 {{m: n_1 + n_2}}；但「沿染色體的等位特異拷貝數軌道」需跨 block 連結，此為本路線的硬上限</td></tr>
+<tr><td>[[TINC]]</td>
+<td>正常樣本內含腫瘤時，正常側的深度正規化與濾波門檻皆偏移</td>
+<td>現行的正常樣本 VAF 門檻處理其一；對本模型的影響須另行評估</td></tr>
+<tr><td>mappability</td>
+<td>低可對應區域使兩個 germline 計數同時偏低</td>
+<td>沿用現行的四道低信心變異濾波，其中的 germline 標記比例即為可對應性的代理</td></tr>
+</tbody>
+</table>
+</div>
+
+{{svg:sr4-hp3-gap | [wide] 哪些 somatic 位點無法貢獻 {{m: s}}。
+上排為可用者：該位點附近有 germline heterozygous 位點，且 read 同時覆蓋兩者。
+下排為三類不可用者：附近無 germline 錨、read 過短無法同時覆蓋、
+以及位於 phase block 邊界。三者皆使 read 落入 <code>H3</code>。
+<b>這些位點不得計入分母而以零充數</b> —— 那會使純度被系統性低估。}}
+
+<h3>九、與現行迴歸的對照</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>項目</th><th>現行：兩個矩加多項式迴歸</th><th>本路線：聯合估計</th></tr></thead>
+<tbody>
+<tr><td>輸出</td><td>{{m: f}} 一個純量</td><td>{{m: p}}、{{m: κ}}、每段 {{m: (n_1, n_2)}}，{{m: f}} 為導出量</td></tr>
+<tr><td>係數來源</td><td>由合成混合樣本擬合而得</td><td>不需訓練；式中的量皆有物理意義</td></tr>
+<tr><td>跨平台</td><td>ONT 訓練、PacBio 直接轉移（原始文獻已驗證可行）</td><td>不涉及平台特定係數</td></tr>
+<tr><td>深度依賴</td><td>折疊偏移進入兩個特徵，故隱含於係數之中</td><td>折疊可顯式建模為二項分布</td></tr>
+<tr><td>不確定性</td><td>無</td><td>可回報各參數的區間，形式同上篇 PURPLE 的候選範圍</td></tr>
+<tr><td>拷貝數變異與 LOH</td><td>視為干擾，以「經驗上穩健」處理</td><td>顯式建模，成為輸出的一部分</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose"><b>此處須誠實界定論據的位置。</b>
+現行迴歸在 {{m: f}} 上的實測成績已相當好（見下節），
+本路線在該項上<b>不見得更好</b>，且多出的參數會帶來額外的估計誤差。
+其論據在於<b>多輸出三個量</b>、<b>不需訓練</b>與<b>失效模式可診斷</b>，
+而非把誤差由 0.03 壓到 0.02。</p>
+</section>
+
+
+<section data-part="evidence">
+<h2>真實資料與證據</h2>
+
+<h3>原料的現況</h3>
+
+<p class="prose">下列數值皆出自 LongPhase-S 的原始文獻與其原始碼，
+在本頁的脈絡下構成可用原料的清單。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>觀測</th><th>數值</th><th>在本頁的意義</th></tr></thead>
+<tbody>
+<tr><td>現行估計的準確度</td><td>MAE 0.03、{{m: R^2}} 約 0.98</td><td>本路線在 {{m: f}} 上須達到的基準</td></tr>
+<tr><td>資料集</td><td>8 個 ONT、6 個 PacBio；腫瘤 50×、正常 25×</td><td>通道一與通道三的可用深度</td></tr>
+<tr><td>germline 區塊 N50</td><td>中位數約 1.19 Mb（257.6 kb 至 4.39 Mb）</td><td>分段尺度；與 ASCAT／PURPLE 相當</td></tr>
+<tr><td>somatic 標籤的準確度</td><td>8 個資料集中有 6 個的 F1 不低於 0.98</td><td>{{m: s}} 分子的可靠度</td></tr>
+<tr><td><code>H3</code> 的表現</td><td>F1 0.746、recall 0.596</td><td>第八節第一列的量化依據</td></tr>
+<tr><td>read 層級評比的涵蓋率</td><td>全部 read 的 3.5% 至 25%</td><td>評比僅涵蓋跨越可信 somatic 位點者，非全基因體</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>真值缺口</h3>
+
+<p class="prose">合成混合樣本依 read 比例混合，其所控制的量是<b>分子比例</b> {{m: f}}。
+本路線的主要輸出為 {{m: p}} 與 {{m: κ}}，而這兩者<b>在此資料上沒有乾淨的真值</b>。</p>
+
+<p class="prose">由 {{m: f}} 反推 {{m: p}} 需要來源細胞株的倍體。以標示為 0.2 的混合樣本為例：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>來源細胞株的 {{m: κ}}</th><th>2.0</th><th>3.2</th><th>4.0</th></tr></thead>
+<tbody>
+<tr><td>{{m: f = 0.20}} 所對應的 {{m: p}}</td><td>0.200</td><td><b>0.135</b></td><td><b>0.111</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">細胞株的倍體可由既有的核型與拷貝數輪廓取得，但其本身帶有不確定性，
+且多數細胞株並非整倍體。因此驗證設計須改為三項並行：</p>
+
+<ul class="prose">
+<li><b>一致性</b>：與 ASCAT、PURPLE 在同一批樣本上的 {{m: (p, κ)}} 比對。
+此為相對比較，不需真值，但其上限是對照方法本身的可靠度。</li>
+<li><b>自洽性</b>：由估得的 {{m: (p, κ)}} 換算回 {{m: f}}，與已知的混合比例比對。
+此項可直接執行，且與現行的評比指標相容。</li>
+<li><b>重現性</b>：同一細胞株在不同 basecaller、不同機構之間的 {{m: (p, κ)}} 一致程度。
+<b>此項不需金標準</b>，而金標準正是此處最欠缺的條件。</li>
+</ul>
+
+{{guard:18 | 合成混合的已知比例是 DNA 比例，不是細胞比例}}
+<p class="prose">以 read 抽樣後合併所合成的樣本，其已知的比例是<b>分子</b>的比例 {{m: f}}。
+M8 已建立 {{m: f}} 與 cellular purity {{m: p}} 在非二倍體之下並不相等（重要區分 #2）；
+此處是該項在<b>實驗設計</b>上的後果。</p>
+<p class="prose"><b>可容許之處</b>：以此資料評比一個<b>輸出 {{m: f}}</b> 的方法完全恰當，
+真值精確且無須換算。現行的評比即屬此類。</p>
+<p class="prose"><b>限制</b>：以同一批資料評比一個<b>輸出 {{m: p}}</b> 的方法時，
+須先將標示值換算為 {{m: p}}，而該換算需要來源細胞株的倍體。
+若逕以標示的 0.2 當作 {{m: p}} 的真值，則所有估計器<b>看起來都會低估</b>，
+因為真實的 {{m: p}} 在非整倍體細胞株上低於 0.2。
+此一偏誤作用於全部受測方法，不會在方法之間的排名上顯現，
+故不會被任何內部檢查發現。</p>
+{{/guard}}
+</section>
+
+
+<section data-part="predict">
+<h2>預測與結果檢視</h2>
+
+{{ask}}
+<p class="prose">一份合成混合樣本標示為「purity 0.2」，
+其來源細胞株的倍體為 3.2。某方法在此樣本上估得 cellular purity 為 0.14。
+請問：此結果的誤差為多少？</p>
+{{reveal}}
+<p class="prose"><b>約 0.005，而非 0.06。</b></p>
+
+<p class="prose">該樣本以 read 比例合成，故標示的 0.2 是分子比例 {{m: f}}。
+對應的 cellular purity 為</p>
+
+{{eq}}
+p = \frac{2f}{κ(1 − f) + 2f} = \frac{2 × 0.20}{3.2 × 0.80 + 0.40} = 0.135
+{{/eq}}
+
+<p class="prose">故 0.14 的估計值誤差約為 0.005。
+若逕以標示的 0.2 為真值，同一個結果會被記為低估 0.06 —— 相差一個數量級。</p>
+
+<p class="prose">此一混淆的方向須留意：它使<b>全部</b>輸出 cellular purity 的方法
+看起來一致地低估，且偏誤量隨細胞株的倍體而異。
+因為它作用於所有受測方法，方法之間的<b>排名不受影響</b>，
+故任何以排名為依據的內部檢查都不會發現它。</p>
+
+<p class="prose">可行的做法有二：其一，在此類資料上只評比 {{m: f}}，
+並將 {{m: p}} 與 {{m: κ}} 列為未經真值驗證的輸出；
+其二，另行取得來源細胞株的倍體，並在報告中載明該倍體的來源與不確定性。
+<b>兩者皆可接受，但必須擇一言明</b>，而不是把標示值直接當作 {{m: p}}。</p>
+{{/ask}}
+
+<h3>尚未解決的問題</h3>
+
+<ul class="prose">
+<li><b>整條路線尚未經實測。</b>上述各項皆有代數上的依據，但均未在真實資料上檢驗。
+最小的驗證為第二節的閉式：取二倍體且拷貝數正常的區段，
+比對 {{m: 1/(2 − p)}} 與實測的 GHIR 分布，確認閉式與資料相符，
+再據以檢查現行迴歸的殘差是否確為折疊與拷貝數兩項所致。</li>
+<li><b>分層與估計互為前提。</b>{{m: s}} 的分層需要可靠的每段 {{m: (n_1, n_2)}}，
+而後者正是要一併估計的量。此為典型的交替最佳化問題，
+其收斂性與初始值的敏感度<b>未知</b>，須以模擬檢驗。</li>
+<li><b>低 DNA 比例時的偏誤未量化。</b>somatic 標籤的 recall 在該區間下降，
+而該區間恰為本主題最關切者。recall 曲線須先量測，否則錨在低純度時系統性低估。</li>
+<li><b>跨 block 的等位特異拷貝數軌道。</b>單倍型標號逐 block 獨立，
+故沿染色體連續的拷貝數輪廓需要另一層連結。
+{{m: κ}} 與 {{m: p}} 不受此限，但「這一段是 2+0 還是 0+2」在跨 block 之後無定義。</li>
+<li><b>{{m: p}} 與 {{m: κ}} 沒有乾淨的真值。</b>前一節所述的三項驗證皆為間接。
+此為本主題最缺乏的條件，且不因方法改良而改善。</li>
+<li><b>與 subclone 重建共用 {{m: c}}。</b>本頁的 {{m: c}} 與該主題的細胞比例為同一個量，
+兩處的估計理應一致。目前兩者各自獨立，未曾互相檢驗 ——
+而互相檢驗本身即為一項不需金標準的驗證。</li>
+</ul>
+
+<h3>原始文獻與程式碼</h3>
+
+<p class="prose">本頁的閉式與各項計數的定義，均以 LongPhase-S 的原始碼為準：
+GHIR 的定義見 <code>src/haplotag/HaplotagStrategy.h</code> 的
+<code>calculateHaplotypeImbalanceRatio</code>；
+五個計數與其填入條件見 <code>src/somatic_haplotag/SomaticVarCaller.cpp</code>；
+低信心變異濾波與現行的迴歸流程見
+<code>src/somatic_haplotag/TumorPurityEstimator.cpp</code>。
+程式碼在 <a href="https://github.com/CCU-Bioinformatics-Lab/longphase-s"><code>github.com/CCU-Bioinformatics-Lab/longphase-s</code></a>，
+方法與實測數值見其預印本
+（<a href="https://www.biorxiv.org/content/10.1101/2025.11.20.689492v1">bioRxiv, 2025，doi 10.1101/2025.11.20.689492</a>）。</p>
+
+<p class="prose">前身工具見 Lin J-H et al., <i>LongPhase: an ultra-fast chromosome-scale phasing
+algorithm for small and large variants</i>, <i>Bioinformatics</i> 2022;38:1816–1822
+（<a href="https://doi.org/10.1093/bioinformatics/btac058">doi 10.1093/bioinformatics/btac058</a>）。</p>
+
+<p class="prose">第六節的目標函數沿用 PURPLE 的兩項懲罰，第七節的格點變換沿用上篇的推導；
+兩者的出處、常數與程式碼位置均列於上篇的同名節次，此處不重複。</p>
+</section>

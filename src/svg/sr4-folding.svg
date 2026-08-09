@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
+  <title>折疊效應：真實平衡的位點在有限深度下仍給出高於 0.5 的值</title>
+  <desc>左邊上下兩張直方圖。
+        上面是折疊之前：一個真實平衡的位點，兩個生殖系計數的比例對稱地散布在零點五的兩側，
+        重心就落在零點五。
+        下面是取較大值之後：整個左半被翻折到右半疊上去，
+        分布的重心因而被推到零點五的右邊，即使真實值就是零點五。
+        右邊是偏移量對深度的曲線：深度十時偏移零點一二三，
+        深度二十時零點零八八，深度六十時零點零五一，深度一百時零點零四。
+        深度越低，偏移越大。
+        圖上另外畫一條虛線，標出細胞比例零點二的位點其真實值零點五五六，
+        也就是訊號本身只有零點零五六。
+        在深度二十的時候，折疊造成的偏移比這個訊號還大。
+        讀法是：這個統計量的中位數與四分位距同時被純度和深度影響，
+        所以它們不是兩個獨立的訊號。</desc>
+
+  <text class="ttl zh" x="20" y="36">折疊之後，平衡的位點也不落在 0.5</text>
+  <text class="anno zh" x="20" y="66">左為機制，右為偏移量隨深度的變化。左側兩張圖的橫軸刻度相同。</text>
+
+  <!-- ══ 左上：折疊前 ══ -->
+  <rect class="box ghost" x="20" y="88" width="520" height="180" rx="8"/>
+  <text class="anno bold zh" x="44" y="118">折疊前：兩個計數的比例</text>
+
+  <line class="axis" x1="70" y1="236" x2="500" y2="236"/>
+  <text class="tick mid" x="70" y="258">0.0</text>
+  <text class="tick mid" x="285" y="258">0.5</text>
+  <text class="tick mid" x="500" y="258">1.0</text>
+
+  <rect class="bar germline" x="160" y="224" width="22" height="12"/>
+  <rect class="bar germline" x="186" y="206" width="22" height="30"/>
+  <rect class="bar germline" x="212" y="182" width="22" height="54"/>
+  <rect class="bar germline" x="238" y="160" width="22" height="76"/>
+  <rect class="bar germline" x="264" y="150" width="22" height="86"/>
+  <rect class="bar germline" x="290" y="160" width="22" height="76"/>
+  <rect class="bar germline" x="316" y="182" width="22" height="54"/>
+  <rect class="bar germline" x="342" y="206" width="22" height="30"/>
+  <rect class="bar germline" x="368" y="224" width="22" height="12"/>
+
+  <line class="guide" x1="285" y1="140" x2="285" y2="236"/>
+  <text class="tick ok zh mid" x="285" y="134">重心在 0.5</text>
+
+  <!-- ══ 左下：折疊後 ══ -->
+  <rect class="box ghost bad" x="20" y="278" width="520" height="180" rx="8"/>
+  <text class="anno bold zh" x="44" y="308">取 <tspan class="mono">max</tspan> 之後</text>
+
+  <line class="axis bad" x1="70" y1="426" x2="500" y2="426"/>
+  <text class="tick mid" x="70" y="448">0.0</text>
+  <text class="tick mid" x="285" y="448">0.5</text>
+  <text class="tick mid" x="500" y="448">1.0</text>
+
+  <rect class="bar warn" x="290" y="330" width="22" height="96"/>
+  <rect class="bar warn" x="316" y="342" width="22" height="84"/>
+  <rect class="bar warn" x="342" y="372" width="22" height="54"/>
+  <rect class="bar warn" x="368" y="402" width="22" height="24"/>
+
+  <line class="guide" x1="285" y1="330" x2="285" y2="426"/>
+  <line class="guide somatic" x1="330" y1="330" x2="330" y2="426"/>
+  <text class="tick bad zh" x="340" y="324">重心右移</text>
+
+  <path class="conn bad" d="M 240 300 Q 285 284 330 300" marker-end="url(#arrow)"/>
+  <text class="tick bad zh mid" x="180" y="348">左半被翻折過去</text>
+
+  <!-- ══ 右：偏移對深度 ══ -->
+  <rect class="box ghost" x="560" y="88" width="420" height="370" rx="8"/>
+  <text class="anno bold zh mid" x="770" y="118">偏移量隨深度變化</text>
+
+  <line class="axis" x1="620" y1="380" x2="940" y2="380"/>
+  <line class="axis" x1="620" y1="380" x2="620" y2="150"/>
+  <text class="tick mid" x="620" y="402">10</text>
+  <text class="tick mid" x="700" y="402">20</text>
+  <text class="tick mid" x="780" y="402">40</text>
+  <text class="tick mid" x="860" y="402">60</text>
+  <text class="tick mid" x="940" y="402">100</text>
+  <text class="tick zh mid" x="780" y="426">覆蓋該位點的 germline read 數</text>
+  <text class="tick end" x="612" y="386">0.50</text>
+  <text class="tick end" x="612" y="310">0.55</text>
+  <text class="tick end" x="612" y="234">0.60</text>
+  <text class="tick end" x="612" y="158">0.65</text>
+
+  <path class="conn bad" d="M 620 193 L 700 246 L 780 284 L 860 302 L 940 319"/>
+  <circle class="mark artifact" cx="620" cy="193" r="7"/>
+  <circle class="mark artifact" cx="700" cy="246" r="7"/>
+  <circle class="mark artifact" cx="780" cy="284" r="7"/>
+  <circle class="mark artifact" cx="860" cy="302" r="7"/>
+  <circle class="mark artifact" cx="940" cy="319" r="7"/>
+  <text class="tick bad zh" x="632" y="180">平衡位點的實際期望值</text>
+
+  <line class="guide somatic" x1="620" y1="295" x2="940" y2="295"/>
+  <text class="tick somatic zh" x="632" y="288">p = 0.20 的真實 GHIR ＝ 0.556</text>
+
+  <text class="tick zh" x="632" y="350">深度 20 時，折疊偏移 0.088</text>
+  <text class="tick zh" x="632" y="374">已大於該訊號的 0.056</text>
+
+  <!-- 結論 -->
+  <rect class="box accent" x="20" y="472" width="960" height="34" rx="8"/>
+  <text class="anno zh" x="40" y="496">中位數與四分位距<tspan class="bold">兩者皆同時受純度與深度影響</tspan>，故不是兩個獨立的訊號；更換深度設定即須重新訓練。</text>
+</svg>

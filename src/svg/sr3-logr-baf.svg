@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
+  <title>深度比與等位比例兩條軌道：總拷貝數相同而等位拆分不同的區段，只有等位比例分得開</title>
+  <desc>沿一條染色體的三個區段，上下兩條軌道。
+        第一段的兩個等位各一份，第二段是一份被丟掉之後另一份被複製，
+        第三段是其中一份多了一份。
+        上面那條是深度比：第一段與第二段的總拷貝數都是二，
+        所以兩段的深度比完全一樣，畫出來是同一個高度，看不出任何差別；
+        第三段的總拷貝數是三，深度才抬高。
+        下面那條是等位比例：第一段兩個等位一樣多，落在零點五；
+        第二段只剩一種等位，落在一附近；第三段落在中間。
+        於是第一段與第二段在下面這條軌道上分得很開。
+        讀法是：深度只承載總拷貝數，等位怎麼拆分完全落在另一條軌道上，
+        這就是只看覆蓋度會漏掉拷貝數不變的異型合子性喪失的代數成因。</desc>
+
+  <text class="ttl zh" x="20" y="36">兩條軌道各自承載什麼</text>
+  <text class="anno zh" x="20" y="66">同一條染色體的三個區段，腫瘤細胞的等位特異拷貝數如最下方所示。純度固定，僅拷貝狀態不同。</text>
+
+  <!-- ══ 深度比軌道 ══ -->
+  <rect class="box ghost" x="20" y="88" width="960" height="150" rx="8"/>
+  <text class="lbl bold zh" x="40" y="122">深度比軌道</text>
+  <text class="tick zh" x="40" y="148">承載總拷貝數</text>
+
+  <line class="axis" x1="330" y1="216" x2="960" y2="216"/>
+  <line class="guide" x1="330" y1="176" x2="960" y2="176"/>
+  <text class="tick end" x="322" y="182">1.0</text>
+  <text class="tick end" x="322" y="222">0.5</text>
+
+  <rect class="bar germline" x="350" y="176" width="180" height="40"/>
+  <rect class="bar germline" x="560" y="176" width="180" height="40"/>
+  <rect class="bar germline" x="770" y="156" width="180" height="60"/>
+  <text class="tick mono mid" x="440" y="170">1.00</text>
+  <text class="tick mono mid" x="650" y="170">1.00</text>
+  <text class="tick mono mid" x="860" y="150">1.50</text>
+
+  <rect class="box ghost bad" x="344" y="150" width="402" height="72" rx="6"/>
+  <text class="anno bad zh mid" x="545" y="240">兩段完全相同</text>
+
+  <!-- ══ 等位比例軌道 ══ -->
+  <rect class="box ghost ok" x="20" y="250" width="960" height="150" rx="8"/>
+  <text class="lbl bold zh" x="40" y="284">等位比例軌道</text>
+  <text class="tick zh" x="40" y="310">承載等位的拆分方式</text>
+
+  <line class="axis ok" x1="330" y1="378" x2="960" y2="378"/>
+  <line class="guide" x1="330" y1="338" x2="960" y2="338"/>
+  <text class="tick end" x="322" y="344">1.0</text>
+  <text class="tick end" x="322" y="384">0.5</text>
+
+  <rect class="bar hp1" x="350" y="374" width="180" height="4"/>
+  <rect class="bar hp1" x="560" y="338" width="180" height="40"/>
+  <rect class="bar hp1" x="770" y="358" width="180" height="20"/>
+  <text class="tick mono mid" x="440" y="368">0.50</text>
+  <text class="tick mono mid" x="650" y="332">0.94</text>
+  <text class="tick mono mid" x="860" y="352">0.72</text>
+
+  <rect class="box ghost ok" x="344" y="326" width="402" height="56" rx="6"/>
+  <text class="anno ok zh mid" x="545" y="400">同兩段，在此分開</text>
+
+  <!-- ══ 區段標示 ══ -->
+  <text class="anno bold zh mid" x="440" y="434">1 + 1</text>
+  <text class="anno bold zh mid" x="650" y="434">2 + 0</text>
+  <text class="anno bold zh mid" x="860" y="434">2 + 1</text>
+  <text class="tick zh mid" x="440" y="458">正常</text>
+  <text class="tick zh mid" x="650" y="458">拷貝數不變的 LOH</text>
+  <text class="tick zh mid" x="860" y="458">單一等位增加</text>
+
+  <rect class="box accent" x="20" y="472" width="960" height="36" rx="8"/>
+  <text class="anno zh" x="40" y="497">深度式的分子只有 <tspan class="mono">n_A + n_B</tspan>，故 <tspan class="mono">2+0</tspan> 與 <tspan class="mono">1+1</tspan> 對它是同一個輸入；等位比例式的分子只取其中一個等位。</text>
+</svg>

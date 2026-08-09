@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480">
+  <title>兩個比值的分母範圍：涵蓋兩條單倍型與只涵蓋一條</title>
+  <desc>同一個體細胞變異位點，兩種計數方式，差別在分母框住多少東西。
+        左邊是變異等位頻率乘以二，也就是上篇那個錨。
+        它的分母把兩條單倍型都框進去，所以正常細胞在裡面貢獻兩份，
+        而且另一條單倍型的拷貝數也在裡面。
+        要抵消那兩份，才需要乘以二；而另一條單倍型的拷貝數一旦不是一份，
+        乘以二就不對了。
+        右邊是本頁的比值。分母只框住單倍型一自己，
+        正常細胞在裡面只有一份，另一條單倍型整條不在式子裡。
+        所以在兩個等位各一份、變異是所有腫瘤細胞都帶有、且只佔一份拷貝的情形下，
+        這個比值直接等於細胞比例，不需要乘以二，也不需要知道另一條有幾份。
+        下方點明：消失的那個二，和消失的另一條單倍型，是同一件事的兩個後果。
+        讀法是：換分母，就換掉了適用範圍。</desc>
+
+  <text class="ttl zh" x="20" y="36">兩個比值的分母範圍</text>
+  <text class="anno zh" x="20" y="66">同一個 somatic 位點。純度 <tspan class="mono">0.50</tspan>，拷貝數 <tspan class="mono">1 + 1</tspan>，變異為 clonal 且 multiplicity 為 1。</text>
+
+  <!-- ══ 左：2 × VAF ══ -->
+  <rect class="box ghost" x="20" y="88" width="468" height="300" rx="8"/>
+  <text class="lbl bold zh mid" x="254" y="118">2 × VAF：分母涵蓋兩條單倍型</text>
+
+  <text class="tick zh" x="44" y="152">單倍型 1</text>
+  <rect class="bar somatic" x="150" y="134" width="100" height="24"/>
+  <rect class="bar hp1" x="250" y="134" width="100" height="24"/>
+  <text class="tick mono" x="358" y="152">5 + 5</text>
+
+  <text class="tick zh" x="44" y="196">單倍型 2</text>
+  <rect class="bar hp2" x="150" y="178" width="200" height="24"/>
+  <text class="tick mono" x="358" y="196">10</text>
+
+  <rect class="box ghost bad" x="142" y="126" width="216" height="84" rx="6"/>
+  <text class="anno bad zh mid" x="254" y="238">分母 ＝ 20</text>
+
+  <text class="tick mono mid" x="254" y="272">VAF = 5 ÷ 20 = 0.25</text>
+  <text class="anno bold mono mid" x="254" y="304">2 × VAF = 0.50</text>
+
+  <text class="tick zh" x="44" y="342">正常細胞在分母裡貢獻<tspan class="bold">兩份</tspan>，</text>
+  <text class="tick zh" x="44" y="366">故須乘以 2 才抵消；且 <tspan class="mono">n₂</tspan> 也在分母裡。</text>
+
+  <!-- ══ 右：s ══ -->
+  <rect class="box ghost ok" x="512" y="88" width="468" height="300" rx="8"/>
+  <text class="lbl bold zh mid" x="746" y="118">s：分母只涵蓋一條單倍型</text>
+
+  <text class="tick zh" x="536" y="152">單倍型 1</text>
+  <rect class="bar somatic" x="642" y="134" width="100" height="24"/>
+  <rect class="bar hp1" x="742" y="134" width="100" height="24"/>
+  <text class="tick mono" x="850" y="152">5 + 5</text>
+
+  <text class="tick zh" x="536" y="196">單倍型 2</text>
+  <rect class="bar hp2" x="642" y="178" width="200" height="24"/>
+  <text class="tick mono" x="850" y="196">10</text>
+
+  <rect class="box ghost ok" x="634" y="126" width="216" height="40" rx="6"/>
+  <text class="anno ok zh mid" x="746" y="238">分母 ＝ 10</text>
+  <text class="tick zh mid" x="746" y="214">單倍型 2 不在框內</text>
+
+  <text class="tick mono mid" x="746" y="272">s = 5 ÷ 10</text>
+  <text class="anno bold mono mid" x="746" y="304">s = 0.50 ＝ p</text>
+
+  <text class="tick zh" x="536" y="342">正常細胞在分母裡只有<tspan class="bold">一份</tspan>，</text>
+  <text class="tick zh" x="536" y="366">故不需要那個 2；且式中不含 <tspan class="mono">n₂</tspan>。</text>
+
+  <!-- ══ 結論 ══ -->
+  <rect class="box accent" x="20" y="400" width="960" height="66" rx="8"/>
+  <text class="anno zh" x="40" y="428">消失的那個 <tspan class="mono">2</tspan>，與消失的 <tspan class="mono">n₂</tspan>，是<tspan class="bold">同一件事的兩個後果</tspan> —— 兩者都來自「另一條單倍型不在分母裡」。</text>
+  <text class="anno zh" x="40" y="456">前者只是省掉一個係數，後者<tspan class="bold">移除了適用範圍的限制</tspan>，見下一張圖。</text>
+</svg>

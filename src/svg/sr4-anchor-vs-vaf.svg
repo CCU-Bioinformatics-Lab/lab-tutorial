@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 490">
+  <title>改變另一條單倍型的拷貝數：VAF 的錨隨之偏移，單倍型內的比值不動</title>
+  <desc>三格的細胞比例都固定在零點五，變異所在的那條單倍型也都是一份，
+        唯一改變的是另一條單倍型有幾份：分別是一份、零份、三份。
+        上排是變異等位頻率乘以二。
+        一份時是零點五，正確；
+        零份也就是異型合子性喪失時變成零點六六七，高估三成；
+        三份也就是單一等位擴增時變成零點三三三，低估三成。
+        下排是單倍型內的體細胞佔比。三格都是零點五，一格都沒有變。
+        原因寫在下排每一格的分母上：那個分母裡從頭到尾沒有另一條單倍型。
+        最右邊標出上篇所述的因應方式：
+        既然這個錨只在兩個等位各一份時準，那就只在推得拷貝數接近二的區域使用它。
+        而下排不需要這道限制。
+        讀法是：三格的真值都是零點五，上排三個數字都不一樣，下排三個都一樣。</desc>
+
+  <text class="ttl zh" x="20" y="36">改變另一條單倍型的拷貝數</text>
+  <text class="anno zh" x="20" y="66">三格的純度皆為 <tspan class="mono">0.50</tspan>，<tspan class="mono">n₁</tspan> 皆為 1，變異皆為 clonal 且 multiplicity 為 1。僅 <tspan class="mono">n₂</tspan> 不同。</text>
+
+  <!-- 欄標 -->
+  <text class="lbl bold mono mid" x="240" y="118">1 + 1</text>
+  <text class="tick zh mid" x="240" y="142">二倍體</text>
+  <text class="lbl bold mono mid" x="500" y="118">1 + 0</text>
+  <text class="tick zh mid" x="500" y="142">LOH</text>
+  <text class="lbl bold mono mid" x="760" y="118">1 + 3</text>
+  <text class="tick zh mid" x="760" y="142">單一等位擴增</text>
+
+  <!-- ══ 上排：2 × VAF ══ -->
+  <rect class="box ghost bad" x="20" y="158" width="960" height="140" rx="8"/>
+  <text class="anno bold zh" x="40" y="186">2 × VAF</text>
+  <text class="tick zh" x="40" y="212">分母含 n₂</text>
+
+  <text class="tick mono mid" x="240" y="240">5 ÷ 20</text>
+  <text class="anno bold ok mono mid" x="240" y="272">0.500</text>
+  <text class="tick mono mid" x="500" y="240">5 ÷ 15</text>
+  <text class="anno bold bad mono mid" x="500" y="272">0.667</text>
+  <text class="tick mono mid" x="760" y="240">5 ÷ 30</text>
+  <text class="anno bold bad mono mid" x="760" y="272">0.333</text>
+
+  <rect class="box ghost bad" x="420" y="222" width="160" height="60" rx="6"/>
+  <rect class="box ghost bad" x="680" y="222" width="160" height="60" rx="6"/>
+  <text class="tick bad zh mid" x="500" y="296">高估三成</text>
+  <text class="tick bad zh mid" x="760" y="296">低估三成</text>
+
+  <!-- ══ 下排：s ══ -->
+  <rect class="box ghost ok" x="20" y="310" width="960" height="140" rx="8"/>
+  <text class="anno bold zh" x="40" y="338">s</text>
+  <text class="tick zh" x="40" y="364">分母不含 n₂</text>
+
+  <text class="tick mono mid" x="240" y="392">5 ÷ 10</text>
+  <text class="anno bold ok mono mid" x="240" y="424">0.500</text>
+  <text class="tick mono mid" x="500" y="392">5 ÷ 10</text>
+  <text class="anno bold ok mono mid" x="500" y="424">0.500</text>
+  <text class="tick mono mid" x="760" y="392">5 ÷ 10</text>
+  <text class="anno bold ok mono mid" x="760" y="424">0.500</text>
+
+  <text class="tick ok zh mid" x="500" y="448">三格的分子與分母皆未改變</text>
+
+  <!-- 因應 -->
+  <rect class="box accent" x="20" y="462" width="960" height="26" rx="8"/>
+  <text class="tick zh" x="40" y="480">上篇所述的因應方式：把中、右兩格<tspan class="bold">排除在錨的適用範圍之外</tspan>，只在推得拷貝數 1.8 至 2.2 的區域使用。下排不需要這道限制。</text>
+</svg>

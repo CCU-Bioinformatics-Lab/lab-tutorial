@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <title>哪些 somatic 位點無法貢獻單倍型內的佔比</title>
+  <desc>上排是可用的情形：體細胞變異位點附近有生殖系異型合子位點，
+        而且同一條分子同時覆蓋兩者，
+        所以這條分子能被追溯到哪一條單倍型，可以進到體細胞子單倍型那一堆。
+        下排是三種不可用的情形。
+        第一種是附近沒有生殖系異型合子位點，分子上只有體細胞等位，無從歸屬。
+        第二種是分子太短，只蓋到體細胞變異而蓋不到旁邊的生殖系位點。
+        第三種是兩個位點落在不同的相位區塊，區塊之間的標號各自獨立，
+        所以就算兩個都蓋到，也不能把它們接起來。
+        三種都使該分子被標成無法歸屬。
+        最下面是一句必須遵守的規則：
+        這些位點應該整個排除，不可以把它們當成零計進分母裡，
+        因為那會讓分子偏小，細胞比例被系統性低估。
+        讀法是：可用的位點少，是這條路線的成本；把不可用的當成零，是錯誤。</desc>
+
+  <text class="ttl zh" x="20" y="36">哪些 somatic 位點無法貢獻 s</text>
+  <text class="anno zh" x="20" y="66">上排為可用者，下排為三種不可用者。實心圓為 somatic 位點，空心圓為 germline heterozygous 位點。</text>
+
+  <!-- ══ 可用 ══ -->
+  <rect class="box ghost ok" x="20" y="88" width="960" height="120" rx="8"/>
+  <text class="anno bold zh" x="44" y="118">可用</text>
+
+  <line class="guide" x1="260" y1="130" x2="900" y2="130"/>
+  <circle class="mark germline" cx="380" cy="130" r="8"/>
+  <circle class="mark somatic" cx="560" cy="130" r="9"/>
+  <circle class="mark germline" cx="740" cy="130" r="8"/>
+
+  <rect class="read hp1" x="330" y="152" width="440" height="14" rx="7"/>
+  <rect class="read hp1" x="360" y="176" width="440" height="14" rx="7"/>
+  <text class="tick ok zh" x="44" y="164">read 同時覆蓋</text>
+  <text class="tick ok zh" x="44" y="188">兩類位點</text>
+  <text class="tick ok zh end" x="960" y="196">可追溯至單倍型 → 進入 H1-1</text>
+
+  <!-- ══ 不可用 ══ -->
+  <rect class="box ghost bad" x="20" y="220" width="960" height="222" rx="8"/>
+  <text class="anno bold zh" x="44" y="250">不可用</text>
+
+  <!-- ① 附近無 germline 錨 -->
+  <text class="tick zh" x="44" y="288">① 附近無錨</text>
+  <line class="guide" x1="260" y1="282" x2="900" y2="282"/>
+  <circle class="mark somatic" cx="560" cy="282" r="9"/>
+  <rect class="read hp0" x="400" y="296" width="320" height="14" rx="7"/>
+  <text class="tick bad zh end" x="960" y="308">分子上只有 somatic 等位</text>
+
+  <!-- ② read 過短 -->
+  <text class="tick zh" x="44" y="344">② read 過短</text>
+  <line class="guide" x1="260" y1="338" x2="900" y2="338"/>
+  <circle class="mark germline" cx="330" cy="338" r="8"/>
+  <circle class="mark somatic" cx="560" cy="338" r="9"/>
+  <circle class="mark germline" cx="800" cy="338" r="8"/>
+  <rect class="read hp0" x="500" y="352" width="120" height="14" rx="7"/>
+  <text class="tick bad zh end" x="960" y="364">蓋不到旁邊的 germline 位點</text>
+
+  <!-- ③ 跨 phase block -->
+  <text class="tick zh" x="44" y="400">③ 跨 phase block</text>
+  <line class="guide" x1="260" y1="394" x2="560" y2="394"/>
+  <line class="guide" x1="580" y1="394" x2="900" y2="394"/>
+  <circle class="mark germline" cx="400" cy="394" r="8"/>
+  <circle class="mark somatic" cx="700" cy="394" r="9"/>
+  <rect class="read hp0" x="350" y="408" width="420" height="14" rx="7"/>
+  <text class="tick bad mid" x="570" y="386">▮</text>
+  <text class="tick bad zh end" x="960" y="420">兩區塊的標號各自獨立，不可接續</text>
+
+  <!-- ══ 規則 ══ -->
+  <rect class="box accent" x="20" y="454" width="960" height="34" rx="8"/>
+  <text class="anno zh" x="40" y="478">三者皆使該分子被標為無法歸屬。<tspan class="bold">此類位點須整個排除，不可計為零</tspan> —— 計為零會使分子偏小，純度被系統性低估。</text>
+</svg>

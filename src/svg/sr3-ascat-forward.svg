@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540">
+  <title>前向式的分子與分母：兩條軌道共用同一個分母，差別只在分子取哪一部分</title>
+  <desc>把兩條前向式拆成看得見的分子與分母。
+        中間畫的是這個位置讀到的全部 DNA：腫瘤細胞每個貢獻兩個等位加起來的份數，
+        正常細胞每個貢獻兩份。兩者相加就是分母，兩條式子共用它。
+        左邊是深度式：分子取全部，也就是整個分母本身，再除以全樣本的平均倍體並取對數，
+        平台常數只出現在這裡。
+        右邊是等位比例式：分子只取其中一個等位，
+        腫瘤的部分是純度乘上該等位的拷貝數，正常細胞的部分恰好是一份，也就是它兩份中的一半。
+        正常細胞貢獻的那個一，就是等位比例之所以能反推純度的來源。
+        讀法是：兩條軌道不是兩批獨立資料，它們是同一個分母的兩種取分子方式。</desc>
+
+  <text class="ttl zh" x="20" y="36">前向式的分子與分母</text>
+  <text class="anno zh" x="20" y="66">中間為此位置讀到的 DNA 總量，兩條式子共用它作為分母；差別在於分子取其中的哪一部分。</text>
+
+  <!-- ══ 中央：分母 ══ -->
+  <rect class="box accent" x="300" y="96" width="400" height="132" rx="8"/>
+  <text class="lbl bold zh mid" x="500" y="124">共用的分母</text>
+
+  <rect class="bar somatic" x="322" y="142" width="216" height="34"/>
+  <rect class="bar germline" x="538" y="142" width="140" height="34"/>
+  <text class="tick zh mid" x="430" y="196">腫瘤細胞</text>
+  <text class="tick zh mid" x="608" y="196">正常細胞</text>
+  <text class="tick mono mid" x="430" y="218">ρ · (n_A + n_B)</text>
+  <text class="tick mono mid" x="608" y="218">2 · (1 − ρ)</text>
+
+  <line class="conn" x1="380" y1="228" x2="260" y2="250" marker-end="url(#arrow)"/>
+  <line class="conn ok" x1="620" y1="228" x2="740" y2="250" marker-end="url(#arrow)"/>
+
+  <!-- ══ 左：深度式 ══ -->
+  <rect class="box ghost" x="20" y="256" width="450" height="212" rx="8"/>
+  <text class="lbl bold zh" x="44" y="288">深度式：分子取全部</text>
+
+  <text class="tick zh" x="44" y="318">分子涵蓋範圍</text>
+  <rect class="bar somatic" x="44" y="328" width="216" height="18"/>
+  <rect class="bar germline" x="260" y="328" width="140" height="18"/>
+  <text class="tick zh mid" x="222" y="366">全部</text>
+
+  <text class="tick mono" x="44" y="398">r = γ · log₂ [ 分母 ÷ ψ ]</text>
+  <text class="tick zh" x="44" y="424">分子即為整個分母，故此式只承載<tspan class="bold">總拷貝數</tspan>。</text>
+  <text class="tick zh" x="44" y="450">γ 與 ψ <tspan class="bold">只出現在這裡</tspan>，設錯將使拷貝數整體縮放。</text>
+
+  <!-- ══ 右：等位比例式 ══ -->
+  <rect class="box ghost ok" x="530" y="256" width="450" height="212" rx="8"/>
+  <text class="lbl bold zh" x="554" y="288">等位比例式：分子只取一個等位</text>
+
+  <text class="tick zh" x="554" y="318">分子涵蓋範圍</text>
+  <rect class="bar somatic" x="554" y="328" width="108" height="18"/>
+  <rect class="box ghost" x="662" y="328" width="108" height="18" rx="3"/>
+  <rect class="bar germline" x="770" y="328" width="70" height="18"/>
+  <rect class="box ghost" x="840" y="328" width="70" height="18" rx="3"/>
+  <text class="tick zh mid" x="732" y="366">兩段各取一半</text>
+
+  <text class="tick mono" x="554" y="398">b = (ρ·n_B + (1−ρ)) ÷ 同一個分母</text>
+  <text class="tick zh" x="554" y="424">正常細胞的兩份中<tspan class="bold">恰有一份</tspan>屬於這個等位，</text>
+  <text class="tick zh" x="554" y="450">故分子帶著已知的 <tspan class="mono">(1−ρ)</tspan> —— <tspan class="bold">錨即在此</tspan>。</text>
+
+  <rect class="box accent" x="20" y="482" width="960" height="44" rx="8"/>
+  <text class="anno zh" x="40" y="510">兩條軌道並非兩批獨立的觀測，而是<tspan class="bold">同一個分母的兩種取分子方式</tspan>；此亦為兩者必須一併擬合的原因。</text>
+</svg>

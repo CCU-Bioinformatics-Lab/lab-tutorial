@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+  <title>真值落在純度下限之外時：純度與倍體被一併推高</title>
+  <desc>橫軸是純度，縱軸是腫瘤倍體。斜線上的一串點是那一族給出相同觀測的候選解，
+        沿著這條線走，純度與倍體是一起增加的。
+        真值那一點落在左下角，位在純度下限之外，也就是搜尋不會回傳的區域。
+        搜尋只能挑線上位於可行區內的下一點，
+        而那一點的純度與倍體同時高於真值 —— 兩個參數的偏誤方向相同。
+        右邊把這種偏誤和量測雜訊放在一起比。
+        量測雜訊是連續的、每次重複都會換方向、兩個參數各自獨立；
+        格點跳躍是離散的、重複做還是跳到同一點、兩個參數同向。
+        所以看到一個估計器在低純度樣本上系統性地把純度和倍體一起報高，
+        該懷疑的是可辨識性而不是雜訊。
+        讀法是：偏誤的形狀本身就是診斷依據。</desc>
+
+  <text class="ttl zh" x="20" y="36">真值落在可行域之外時的行為</text>
+  <text class="anno zh" x="20" y="66">橫軸為純度、縱軸為腫瘤倍體。斜線上的點為格點族，沿線移動時兩個參數同向變化。</text>
+
+  <!-- ══ 左：格點與下限 ══ -->
+  <rect class="box ghost" x="20" y="88" width="560" height="336" rx="8"/>
+
+  <line class="axis" x1="90" y1="360" x2="540" y2="360"/>
+  <line class="axis" x1="90" y1="360" x2="90" y2="130"/>
+  <text class="tick mid" x="90" y="382">0.0</text>
+  <text class="tick mid" x="180" y="382">0.2</text>
+  <text class="tick mid" x="270" y="382">0.4</text>
+  <text class="tick mid" x="360" y="382">0.6</text>
+  <text class="tick mid" x="450" y="382">0.8</text>
+  <text class="tick mid" x="540" y="382">1.0</text>
+  <text class="tick zh mid" x="315" y="406">純度</text>
+  <text class="tick end" x="82" y="366">1</text>
+  <text class="tick end" x="82" y="303">2</text>
+  <text class="tick end" x="82" y="246">3</text>
+  <text class="tick end" x="82" y="189">4</text>
+  <text class="tick zh" x="34" y="120">倍體</text>
+
+  <!-- 不可行區 -->
+  <rect class="region bad" x="90" y="130" width="90" height="230"/>
+  <text class="tick bad zh mid" x="135" y="348">下限之外</text>
+
+  <!-- 格點族 -->
+  <line class="guide" x1="112" y1="330" x2="500" y2="160"/>
+  <circle class="mark artifact" cx="122" cy="326" r="10"/>
+  <circle class="mark somatic" cx="235" cy="276" r="9"/>
+  <circle class="mark ref" cx="350" cy="226" r="8"/>
+  <circle class="mark ref" cx="465" cy="176" r="8"/>
+
+  <text class="tick bad zh mid" x="122" y="306">真值</text>
+  <text class="tick zh mid" x="245" y="252">回傳值</text>
+  <line class="conn bad" x1="132" y1="322" x2="224" y2="281" marker-end="url(#arrow)"/>
+
+  <text class="tick zh" x="366" y="212">族內其餘候選</text>
+
+  <text class="anno bad zh mid" x="315" y="150">純度與倍體同時被推高</text>
+
+  <!-- ══ 右：與雜訊的區別 ══ -->
+  <rect class="box ghost ok" x="604" y="88" width="376" height="336" rx="8"/>
+  <text class="lbl bold zh mid" x="792" y="120">與量測雜訊的區別</text>
+
+  <text class="tick bold zh" x="628" y="158">量測雜訊</text>
+  <text class="tick zh" x="628" y="184">· 連續，幅度隨深度縮小</text>
+  <text class="tick zh" x="628" y="210">· 重複實驗時方向會改變</text>
+  <text class="tick zh" x="628" y="236">· 兩個參數各自獨立</text>
+
+  <line class="guide" x1="628" y1="258" x2="956" y2="258"/>
+
+  <text class="tick bold bad zh" x="628" y="290">格點跳躍</text>
+  <text class="tick zh" x="628" y="316">· 離散，幅度與深度無關</text>
+  <text class="tick zh" x="628" y="342">· 重複實驗時跳到同一點</text>
+  <text class="tick zh" x="628" y="368">· 兩個參數<tspan class="bold">同向</tspan>偏移</text>
+  <text class="tick zh" x="628" y="398">· 加深定序不改善</text>
+
+  <!-- 結論 -->
+  <rect class="box accent" x="20" y="432" width="960" height="34" rx="8"/>
+  <text class="anno zh" x="40" y="456">偏誤的<tspan class="bold">形狀</tspan>即為診斷依據：低純度樣本上純度與倍體被系統性地一併報高，所指向的是可辨識性而非雜訊。</text>
+</svg>

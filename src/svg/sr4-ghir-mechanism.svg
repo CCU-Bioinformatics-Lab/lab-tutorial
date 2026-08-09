@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <title>純度上升時 H1 被搬空而 H2 不變，故 GHIR 單調上升</title>
+  <desc>三格是同一個體細胞變異位點在三種細胞比例之下的樣子，
+        每格都是二十份分子，變異是所有腫瘤細胞都帶有、而且每個帶原細胞只佔一份拷貝。
+        左格細胞比例零點二：二十份分子裡有兩份來自腫瘤細胞的單倍型一，
+        這兩份都帶著體細胞等位，所以被搬到體細胞那一堆；
+        留在單倍型一的剩八份，單倍型二仍是十份。
+        中格細胞比例零點五：搬走五份，單倍型一剩五份，單倍型二仍是十份。
+        右格細胞比例零點九：搬走九份，單倍型一只剩一份，單倍型二仍是十份。
+        單倍型二從頭到尾沒有變過，因為變異不在它上面。
+        取兩者較大的除以兩者之和，三格分別是零點五五六、零點六六七、零點九零九，
+        正好等於一除以二減細胞比例。
+        讀法是：現行流程用迴歸去擬合的那條曲線，其實有閉式，而且閉式就寫在圖上。</desc>
+
+  <text class="ttl zh" x="20" y="36">純度上升時發生了什麼</text>
+  <text class="anno zh" x="20" y="66">同一個 somatic 位點，三種純度。每格 20 份分子；變異為 clonal，multiplicity 為 1，拷貝數為 <tspan class="mono">1 + 1</tspan>。</text>
+
+  <!-- ══ p = 0.2 ══ -->
+  <rect class="box ghost" x="20" y="88" width="306" height="300" rx="8"/>
+  <text class="lbl bold zh mid" x="173" y="118">純度 0.20</text>
+
+  <text class="tick zh" x="44" y="150">H1（單倍型 1，未帶變異）</text>
+  <rect class="bar hp1" x="44" y="160" width="128" height="26"/>
+  <text class="tick mono" x="180" y="180">8</text>
+
+  <text class="tick zh" x="44" y="216">H2（單倍型 2）</text>
+  <rect class="bar hp2" x="44" y="226" width="160" height="26"/>
+  <text class="tick mono" x="212" y="246">10</text>
+
+  <text class="tick somatic zh" x="44" y="282">H1-1（已搬離 H1）</text>
+  <rect class="bar somatic" x="44" y="292" width="32" height="26"/>
+  <text class="tick mono" x="84" y="312">2</text>
+
+  <text class="anno bold mono mid" x="173" y="356">GHIR = 10 ÷ 18</text>
+  <text class="anno bold ok mono mid" x="173" y="380">= 0.556</text>
+
+  <!-- ══ p = 0.5 ══ -->
+  <rect class="box ghost" x="346" y="88" width="306" height="300" rx="8"/>
+  <text class="lbl bold zh mid" x="499" y="118">純度 0.50</text>
+
+  <text class="tick zh" x="370" y="150">H1（單倍型 1，未帶變異）</text>
+  <rect class="bar hp1" x="370" y="160" width="80" height="26"/>
+  <text class="tick mono" x="458" y="180">5</text>
+
+  <text class="tick zh" x="370" y="216">H2（單倍型 2）</text>
+  <rect class="bar hp2" x="370" y="226" width="160" height="26"/>
+  <text class="tick mono" x="538" y="246">10</text>
+
+  <text class="tick somatic zh" x="370" y="282">H1-1（已搬離 H1）</text>
+  <rect class="bar somatic" x="370" y="292" width="80" height="26"/>
+  <text class="tick mono" x="458" y="312">5</text>
+
+  <text class="anno bold mono mid" x="499" y="356">GHIR = 10 ÷ 15</text>
+  <text class="anno bold ok mono mid" x="499" y="380">= 0.667</text>
+
+  <!-- ══ p = 0.9 ══ -->
+  <rect class="box ghost" x="672" y="88" width="306" height="300" rx="8"/>
+  <text class="lbl bold zh mid" x="825" y="118">純度 0.90</text>
+
+  <text class="tick zh" x="696" y="150">H1（單倍型 1，未帶變異）</text>
+  <rect class="bar hp1" x="696" y="160" width="16" height="26"/>
+  <text class="tick mono" x="720" y="180">1</text>
+
+  <text class="tick zh" x="696" y="216">H2（單倍型 2）</text>
+  <rect class="bar hp2" x="696" y="226" width="160" height="26"/>
+  <text class="tick mono" x="864" y="246">10</text>
+
+  <text class="tick somatic zh" x="696" y="282">H1-1（已搬離 H1）</text>
+  <rect class="bar somatic" x="696" y="292" width="144" height="26"/>
+  <text class="tick mono" x="848" y="312">9</text>
+
+  <text class="anno bold mono mid" x="825" y="356">GHIR = 10 ÷ 11</text>
+  <text class="anno bold ok mono mid" x="825" y="380">= 0.909</text>
+
+  <!-- ══ 結論 ══ -->
+  <rect class="box accent" x="20" y="400" width="960" height="86" rx="8"/>
+  <text class="anno zh" x="40" y="428"><tspan class="mono">H2</tspan> 三格<tspan class="bold">完全沒有變</tspan>（變異不在其上）；被純度改變的只有 <tspan class="mono">H1</tspan>，它的分子持續被搬往 <tspan class="mono">H1-1</tspan>。</text>
+  <text class="anno mono" x="40" y="456">H1 = 1 − p　　H2 = 1　　GHIR = 1 ÷ (2 − p)　　p = 2 − 1 ÷ GHIR</text>
+  <text class="anno zh" x="40" y="480">現行流程以迴歸擬合的正是這條曲線，而<tspan class="bold">它有閉式</tspan>。</text>
+</svg>

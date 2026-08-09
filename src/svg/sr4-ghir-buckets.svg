@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
+  <title>一個 somatic 位點上的五個計數，以及 GHIR 的分母只含其中兩個</title>
+  <desc>一個體細胞變異位點，覆蓋它的分子依標籤分成五堆。
+        兩堆是生殖系的：來自單倍型一而沒有帶體細胞等位的，以及來自單倍型二的。
+        兩堆是體細胞子單倍型的：帶著體細胞等位而且能追溯到單倍型一或單倍型二的。
+        最後一堆是無法歸屬單倍型的。
+        虛線框圈出單倍型失衡比的分母，裡面只有前兩堆，
+        體細胞的那兩堆與無法歸屬的那一堆都不在分母裡。
+        右邊標出關鍵的一步：一個分子只要帶著體細胞等位，
+        判定程序就會先把它送進體細胞的分支，所以它不會留在生殖系那一堆裡。
+        單倍型一的分子因此被搬走一部分，單倍型二則原封不動。
+        讀法是：這個統計量的偏移，來自其中一堆被搬空，而不是來自兩堆本身的大小。</desc>
+
+  <text class="ttl zh" x="20" y="36">一個 somatic 位點上的五個計數</text>
+  <text class="anno zh" x="20" y="66">覆蓋此位點的分子依標籤分堆。<tspan class="bold">虛線框即為 GHIR 的分母</tspan>。</text>
+
+  <!-- ══ 五堆 ══ -->
+  <text class="lbl bold zh mid" x="150" y="116">H1</text>
+  <text class="tick zh mid" x="150" y="140">單倍型 1，未帶 somatic</text>
+  <text class="lbl bold zh mid" x="360" y="116">H2</text>
+  <text class="tick zh mid" x="360" y="140">單倍型 2</text>
+  <text class="lbl bold zh mid" x="580" y="116">H1-1</text>
+  <text class="tick zh mid" x="580" y="140">單倍型 1，帶 somatic</text>
+  <text class="lbl bold zh mid" x="770" y="116">H2-1</text>
+  <text class="tick zh mid" x="770" y="140">單倍型 2，帶 somatic</text>
+  <text class="lbl bold zh mid" x="920" y="116">H3</text>
+  <text class="tick zh mid" x="920" y="140">無法歸屬</text>
+
+  <!-- H1：四條 -->
+  <rect class="read hp1" x="80" y="160" width="140" height="14" rx="7"/>
+  <rect class="read hp1" x="80" y="184" width="140" height="14" rx="7"/>
+  <rect class="read hp1" x="80" y="208" width="140" height="14" rx="7"/>
+  <rect class="read hp1" x="80" y="232" width="140" height="14" rx="7"/>
+
+  <!-- H2：六條 -->
+  <rect class="read hp2" x="290" y="160" width="140" height="14" rx="7"/>
+  <rect class="read hp2" x="290" y="184" width="140" height="14" rx="7"/>
+  <rect class="read hp2" x="290" y="208" width="140" height="14" rx="7"/>
+  <rect class="read hp2" x="290" y="232" width="140" height="14" rx="7"/>
+  <rect class="read hp2" x="290" y="256" width="140" height="14" rx="7"/>
+  <rect class="read hp2" x="290" y="280" width="140" height="14" rx="7"/>
+
+  <!-- H1-1：三條，帶 somatic 標記 -->
+  <rect class="read hp1" x="510" y="160" width="140" height="14" rx="7"/>
+  <circle class="mark somatic" cx="580" cy="152" r="6"/>
+  <rect class="read hp1" x="510" y="184" width="140" height="14" rx="7"/>
+  <circle class="mark somatic" cx="580" cy="176" r="6"/>
+  <rect class="read hp1" x="510" y="208" width="140" height="14" rx="7"/>
+  <circle class="mark somatic" cx="580" cy="200" r="6"/>
+
+  <!-- H2-1：零條 -->
+  <rect class="box ghost" x="700" y="158" width="140" height="66" rx="6"/>
+  <text class="tick zh mid" x="770" y="196">0 條</text>
+
+  <!-- H3：兩條 -->
+  <rect class="read hp0" x="860" y="160" width="120" height="14" rx="7"/>
+  <circle class="mark somatic" cx="920" cy="152" r="6"/>
+  <rect class="read hp0" x="860" y="184" width="120" height="14" rx="7"/>
+  <circle class="mark somatic" cx="920" cy="176" r="6"/>
+
+  <!-- ══ 分母框 ══ -->
+  <rect class="box ghost bad" x="60" y="316" width="390" height="76" rx="8"/>
+  <text class="anno bold bad zh mid" x="255" y="344">GHIR 的分母</text>
+  <text class="tick mono mid" x="255" y="372">H1 + H2 = 4 + 6 = 10</text>
+
+  <rect class="box ghost" x="490" y="316" width="490" height="76" rx="8"/>
+  <text class="anno zh mid" x="735" y="344">不在分母之內</text>
+  <text class="tick mono mid" x="735" y="372">H1-1 = 3　　H2-1 = 0　　H3 = 2</text>
+
+  <text class="anno mono mid" x="255" y="418">GHIR = max(4, 6) ÷ 10 = 0.60</text>
+
+  <!-- ══ 關鍵一步 ══ -->
+  <rect class="box accent" x="20" y="436" width="960" height="72" rx="8"/>
+  <text class="anno zh" x="40" y="464">判定程序<tspan class="bold">先看該分子是否帶有 somatic 等位</tspan>：帶有者一律進入右側三堆，不會留在 <tspan class="mono">H1</tspan> 或 <tspan class="mono">H2</tspan>。</text>
+  <text class="anno zh" x="40" y="492">因此純度上升時 <tspan class="mono">H1</tspan> 被<tspan class="bold">搬空</tspan>而 <tspan class="mono">H2</tspan> 不變 —— 這就是 GHIR 隨純度上升的機制，下一張圖展開。</text>
+</svg>

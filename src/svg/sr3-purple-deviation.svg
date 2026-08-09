@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+  <title>偏離懲罰對純度的依賴：同一個整數偏離在高低純度下的意義不同</title>
+  <desc>橫軸是反解出來的拷貝數離最近整數有多遠，從零到零點五；縱軸是該偏離所付的代價。
+        左邊畫兩條曲線。純度零點九那一條上升得很快，
+        因為高純度時相鄰兩個整數拷貝數在深度上隔得很開，
+        零點二五的偏離已經是好幾個標準差，幾乎確定不是雜訊，代價接近上限。
+        純度零點二那一條上升得慢，同樣零點二五的偏離仍在雜訊範圍內，代價不高。
+        兩條曲線在橫軸零點二五處被同一條垂直線切過，兩個交點的高度差就是這件事的全部內容。
+        右邊是不含純度的對照：一條固定的平方曲線，
+        在任何純度下對同一個偏離都給出同一個代價。
+        讀法是：把偏離換算成幾個標準差之後再罰，
+        與直接罰偏離本身，這兩種做法在低純度樣本上會得到不同的解。</desc>
+
+  <text class="ttl zh" x="20" y="36">偏離懲罰是否隨純度調整</text>
+  <text class="anno zh" x="20" y="66">橫軸為反解所得的拷貝數與最近整數的距離，縱軸為代價。兩側的橫軸刻度相同。</text>
+
+  <!-- ══ 左：隨純度調整 ══ -->
+  <rect class="box ghost ok" x="20" y="88" width="468" height="326" rx="8"/>
+  <text class="lbl bold zh mid" x="254" y="118">換算成標準差之後再罰</text>
+
+  <line class="axis ok" x1="80" y1="340" x2="440" y2="340"/>
+  <line class="axis ok" x1="80" y1="340" x2="80" y2="150"/>
+  <text class="tick mid" x="80" y="362">0</text>
+  <text class="tick mid" x="260" y="362">0.25</text>
+  <text class="tick mid" x="440" y="362">0.50</text>
+  <text class="tick end" x="72" y="346">0</text>
+  <text class="tick end" x="72" y="156">1</text>
+
+  <path class="conn ok" d="M 80 340 Q 140 200 200 166 T 440 152"/>
+  <path class="conn warn" d="M 80 340 Q 200 320 300 280 T 440 214" style="stroke-dasharray:6 5"/>
+
+  <line class="guide" x1="260" y1="150" x2="260" y2="340"/>
+  <circle class="mark somatic" cx="260" cy="160" r="8"/>
+  <circle class="mark artifact" cx="260" cy="296" r="8"/>
+
+  <text class="tick ok zh" x="290" y="146">純度 0.90</text>
+  <text class="tick warn zh" x="300" y="322">純度 0.20</text>
+  <text class="tick zh mid" x="260" y="392">同一個 0.25</text>
+  <text class="tick zh" x="96" y="196">高純度：幾乎確定為結構</text>
+  <text class="tick zh" x="96" y="264">低純度：仍在雜訊範圍</text>
+
+  <!-- ══ 右：不隨純度調整 ══ -->
+  <rect class="box ghost" x="512" y="88" width="468" height="326" rx="8"/>
+  <text class="lbl bold zh mid" x="746" y="118">直接罰偏離本身</text>
+
+  <line class="axis" x1="572" y1="340" x2="932" y2="340"/>
+  <line class="axis" x1="572" y1="340" x2="572" y2="150"/>
+  <text class="tick mid" x="572" y="362">0</text>
+  <text class="tick mid" x="752" y="362">0.25</text>
+  <text class="tick mid" x="932" y="362">0.50</text>
+  <text class="tick end" x="564" y="346">0</text>
+  <text class="tick end" x="564" y="156">1</text>
+
+  <path class="conn" d="M 572 340 Q 752 340 932 150"/>
+  <line class="guide" x1="752" y1="150" x2="752" y2="340"/>
+  <circle class="mark ref" cx="752" cy="316" r="8"/>
+
+  <text class="tick zh mid" x="752" y="392">同一個 0.25</text>
+  <text class="tick zh" x="588" y="196">曲線與純度無關 ——</text>
+  <text class="tick zh" x="588" y="222">純度 0.20 與 0.90 得到同一個代價</text>
+  <text class="tick zh" x="588" y="292">故低純度樣本上的 subclonal 訊號</text>
+  <text class="tick zh" x="588" y="318">與雜訊被同等看待</text>
+
+  <!-- 結論 -->
+  <rect class="box accent" x="20" y="428" width="960" height="34" rx="8"/>
+  <text class="anno zh" x="40" y="452">關鍵量為 <tspan class="mono">p·ν ÷ 2σ</tspan> —— 相鄰整數拷貝數在深度上的間距，折合成幾個標準差。此值隨純度下降而縮小。</text>
+</svg>

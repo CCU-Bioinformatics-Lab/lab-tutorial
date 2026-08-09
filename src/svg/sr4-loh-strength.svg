@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+  <title>LOH 區段上單倍型深度比隨純度急遽上升，而錨在該處同樣成立</title>
+  <desc>左邊比較兩種區段上的單倍型深度比隨細胞比例的變化。
+        兩個等位各一份的區段，這個比值恆為一，一條水平線，對細胞比例毫無資訊。
+        異型合子性喪失的區段，也就是另一條單倍型被刪掉的地方，
+        那一條只剩正常細胞貢獻的一份，所以比值等於腫瘤那一份加正常那一份，
+        再除以正常那一份，也就是一除以一減細胞比例，隨細胞比例急遽上升：
+        零點二時是一點二五，零點六時是二點五，零點八時是五。
+        右邊指出兩件事疊在一起的後果。
+        對上篇的兩個方法而言，異型合子性喪失與非整倍體是干擾：
+        它們的變異頻率錨在那裡失準，所以要把那些區域排除掉。
+        對本頁的路線而言，同樣的區域反而同時有最強的深度訊號，
+        而且錨在那裡照樣成立，因為錨的分母裡沒有另一條單倍型。
+        讀法是：對照方法最不利的區域，在這條路線上是資訊最密的區域。</desc>
+
+  <text class="ttl zh" x="20" y="36">LOH 區段：訊號最強而錨仍成立</text>
+  <text class="anno zh" x="20" y="66">左為單倍型深度比隨純度的變化，右為此一性質與錨相合的後果。</text>
+
+  <!-- ══ 左：曲線 ══ -->
+  <rect class="box ghost" x="20" y="88" width="540" height="330" rx="8"/>
+
+  <line class="axis" x1="90" y1="360" x2="520" y2="360"/>
+  <line class="axis" x1="90" y1="360" x2="90" y2="130"/>
+  <text class="tick mid" x="90" y="382">0.0</text>
+  <text class="tick mid" x="176" y="382">0.2</text>
+  <text class="tick mid" x="262" y="382">0.4</text>
+  <text class="tick mid" x="348" y="382">0.6</text>
+  <text class="tick mid" x="434" y="382">0.8</text>
+  <text class="tick mid" x="520" y="382">1.0</text>
+  <text class="tick zh mid" x="305" y="406">純度 p</text>
+  <text class="tick end" x="82" y="366">1</text>
+  <text class="tick end" x="82" y="314">2</text>
+  <text class="tick end" x="82" y="262">3</text>
+  <text class="tick end" x="82" y="210">5</text>
+  <text class="tick end" x="82" y="158">10</text>
+  <text class="tick zh" x="30" y="120">D₁ / D₂</text>
+
+  <!-- 1+1：水平線 -->
+  <line class="conn hp2" x1="90" y1="360" x2="520" y2="360"/>
+  <text class="tick hp2 zh" x="106" y="332">1 + 1：恆為 1，對純度無資訊</text>
+
+  <!-- 1+0：上升 -->
+  <path class="conn ok" d="M 90 360 L 176 347 L 262 327 L 348 296 L 434 210 L 490 130"/>
+  <circle class="mark somatic" cx="176" cy="347" r="7"/>
+  <circle class="mark somatic" cx="348" cy="296" r="7"/>
+  <circle class="mark somatic" cx="434" cy="210" r="7"/>
+  <text class="tick mono" x="188" y="352">1.25</text>
+  <text class="tick mono" x="360" y="290">2.5</text>
+  <text class="tick mono" x="446" y="206">5.0</text>
+  <text class="tick ok bold zh" x="120" y="166">1 + 0（LOH）</text>
+  <text class="tick ok zh" x="120" y="190">D₁/D₂ = (p·n₁ + 1−p) ÷ (1−p)</text>
+
+  <!-- ══ 右：後果 ══ -->
+  <rect class="box ghost bad" x="584" y="88" width="396" height="150" rx="8"/>
+  <text class="anno bold zh" x="608" y="118">對上篇的兩個方法</text>
+  <text class="tick zh" x="608" y="148">LOH 與非整倍體使 VAF 的錨失準，</text>
+  <text class="tick zh" x="608" y="172">故須把該類區域<tspan class="bold">排除</tspan>在錨之外。</text>
+  <text class="tick bad zh" x="608" y="204">最有資訊的區域，被排除在最有用的</text>
+  <text class="tick bad zh" x="608" y="228">那一步之外。</text>
+
+  <rect class="box ghost ok" x="584" y="250" width="396" height="168" rx="8"/>
+  <text class="anno bold zh" x="608" y="280">對本頁的路線</text>
+  <text class="tick zh" x="608" y="310">同一批區域<tspan class="bold">同時</tspan>具備兩件事：</text>
+  <text class="tick ok zh" x="608" y="340">① 單倍型深度比的訊號最強</text>
+  <text class="tick ok zh" x="608" y="364">② 錨照樣成立（分母不含 n₂）</text>
+  <text class="tick zh" x="608" y="396">故其為資訊最密的區域，</text>
+  <text class="tick zh" x="608" y="412">而非須排除的區域。</text>
+
+  <!-- 結論 -->
+  <rect class="box accent" x="20" y="432" width="960" height="34" rx="8"/>
+  <text class="anno zh" x="40" y="456">此即原始文獻中「穩健性源自 phase-aware 估計」一項假說的機制：<tspan class="bold">分母限於一條單倍型，另一條的拷貝數消去</tspan>。</text>
+</svg>

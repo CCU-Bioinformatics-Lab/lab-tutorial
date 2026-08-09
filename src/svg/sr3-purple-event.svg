@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480">
+  <title>連續的簡約先驗與硬性的倍體界限：兩種限制高倍體解的方式</title>
+  <desc>左邊是連續的事件懲罰。橫軸是一個區段的較大等位有幾份，縱軸是該區段要付的代價。
+        兩條 V 形折線分別以一加一與二加二為底：
+        前者代表從正常狀態出發，一份一份改變所需的事件數；
+        後者代表先做一次全基因體加倍再從二加二出發，
+        它的底部比前者高一格，那一格就是加倍事件本身的代價。
+        實際採用的是兩條折線的下包絡，也就是同一個狀態的兩種來歷之中比較省的那一種。
+        兩條 V 交會的地方，就是解釋成加倍反而比較省的分界。
+        右邊是硬性的倍體界限：界內完全不計代價，界外一律不可行，
+        中間沒有過渡。
+        讀法是：兩者都在偏好簡約的解，差別在於一個是連續的、可以被證據推翻的代價，
+        另一個是不可協商的邊界。</desc>
+
+  <text class="ttl zh" x="20" y="36">連續的代價與硬性的界限</text>
+  <text class="anno zh" x="20" y="66">兩種限制高倍體解的方式。橫軸皆為拷貝數，縱軸為該解所付的代價。</text>
+
+  <!-- ══ 左：事件懲罰 ══ -->
+  <rect class="box ghost ok" x="20" y="88" width="468" height="330" rx="8"/>
+  <text class="lbl bold zh mid" x="254" y="118">連續的事件懲罰</text>
+
+  <line class="axis ok" x1="70" y1="340" x2="450" y2="340"/>
+  <line class="axis ok" x1="70" y1="340" x2="70" y2="150"/>
+  <text class="tick mid" x="70" y="362">0</text>
+  <text class="tick mid" x="146" y="362">1</text>
+  <text class="tick mid" x="222" y="362">2</text>
+  <text class="tick mid" x="298" y="362">3</text>
+  <text class="tick mid" x="374" y="362">4</text>
+  <text class="tick mid" x="450" y="362">5</text>
+  <text class="tick zh mid" x="260" y="384">較大等位的拷貝數</text>
+  <text class="tick end" x="62" y="346">1.0</text>
+  <text class="tick end" x="62" y="270">1.4</text>
+  <text class="tick end" x="62" y="194">1.8</text>
+
+  <!-- V1：由 1+1 出發 -->
+  <path class="conn ok" d="M 70 264 L 146 340 L 222 264 L 298 188 L 374 150 L 450 150"/>
+  <text class="tick ok zh" x="82" y="242">由 1+1 出發</text>
+
+  <!-- V2：先加倍再由 2+2 出發（底部高一格） -->
+  <path class="conn warn" d="M 70 150 L 146 188 L 222 226 L 298 264 L 374 302 L 450 340" style="stroke-dasharray:6 5"/>
+  <text class="tick warn zh end" x="444" y="322">先加倍再出發</text>
+
+  <!-- 下包絡標記 -->
+  <circle class="mark somatic" cx="298" cy="264" r="8"/>
+  <text class="tick zh mid" x="298" y="410">兩條交會處</text>
+  <line class="conn" x1="298" y1="272" x2="298" y2="392"/>
+
+  <text class="tick zh" x="82" y="164">底部高一格</text>
+  <text class="tick zh" x="82" y="188">＝加倍本身的代價</text>
+
+  <!-- ══ 右：硬性界限 ══ -->
+  <rect class="box ghost bad" x="512" y="88" width="468" height="330" rx="8"/>
+  <text class="lbl bold zh mid" x="746" y="118">硬性的倍體界限</text>
+
+  <line class="axis bad" x1="562" y1="340" x2="942" y2="340"/>
+  <line class="axis bad" x1="562" y1="340" x2="562" y2="150"/>
+  <text class="tick mid" x="562" y="362">0</text>
+  <text class="tick mid" x="638" y="362">1</text>
+  <text class="tick mid" x="714" y="362">2</text>
+  <text class="tick mid" x="790" y="362">3</text>
+  <text class="tick mid" x="866" y="362">4</text>
+  <text class="tick mid" x="942" y="362">5</text>
+  <text class="tick zh mid" x="752" y="384">腫瘤倍體</text>
+
+  <rect class="region bad" x="562" y="150" width="76" height="190"/>
+  <rect class="region bad" x="904" y="150" width="38" height="190"/>
+  <path class="conn bad" d="M 638 150 L 638 340 L 904 340 L 904 150"/>
+
+  <text class="tick zh mid" x="771" y="316">界內：代價一律為零</text>
+  <text class="tick bad zh mid" x="600" y="252">不可行</text>
+  <text class="tick bad zh mid" x="923" y="252">不可行</text>
+  <text class="tick zh mid" x="752" y="410">沒有過渡地帶</text>
+
+  <!-- 結論 -->
+  <rect class="box accent" x="20" y="432" width="960" height="34" rx="8"/>
+  <text class="anno zh" x="40" y="456">兩者皆偏好簡約的解。差別在於左側的代價<tspan class="bold">可被足夠強的證據推翻</tspan>，右側的界限不可協商。</text>
+</svg>

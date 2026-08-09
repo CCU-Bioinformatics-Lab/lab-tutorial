@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+  <title>此錨解除兩種不可辨識，但未解除全基因體加倍</title>
+  <desc>三欄，各是一種原本無法由深度與等位比例分辨的情形，以及本頁的錨對它做得到什麼。
+        左欄是整個基因體都沒有等位失衡的樣本。
+        這時深度比處處相同、等位比例處處是零點五，對細胞比例完全沒有資訊，
+        上篇的兩個方法一個拒絕輸出、一個改用二倍體區段的變異頻率。
+        但這種樣本每一段的單倍型都是一份，所以錨處處成立，直接讀出細胞比例。這一項解除。
+        中欄是錨本身的區域限制。
+        上篇那個錨的分母含另一條單倍型，所以只能用在拷貝數接近二的區域；
+        本頁的錨分母只有一條單倍型，異型合子性喪失與擴增區段都能用。這一項也解除。
+        右欄是全基因體加倍。
+        把拷貝數全部乘二，發生在加倍之前的變異其多重度也跟著乘二，
+        代進去之後錨的值一模一樣。所以這一項沒有解除，
+        仍然要靠簡約偏好、奇數拷貝數的存在，或樣本外的量測。
+        讀法是：把做得到與做不到分開講，是這條路線能不能被採信的前提。</desc>
+
+  <text class="ttl zh" x="20" y="36">解除兩項，未解除一項</text>
+  <text class="anno zh" x="20" y="66">三種上篇所列的不可辨識，以及本頁的錨對各項的作用。</text>
+
+  <!-- ══ 左 ══ -->
+  <rect class="box ghost ok" x="20" y="88" width="306" height="300" rx="8"/>
+  <text class="lbl bold zh mid" x="173" y="120">全基因體無等位失衡</text>
+
+  <text class="tick zh" x="44" y="156">深度比處處相同，</text>
+  <text class="tick zh" x="44" y="180">等位比例處處為 0.5。</text>
+  <text class="tick bad zh" x="44" y="212">上篇：一者拒絕輸出，</text>
+  <text class="tick bad zh" x="44" y="236">一者改用二倍體區段的 VAF。</text>
+
+  <line class="guide" x1="44" y1="258" x2="302" y2="258"/>
+
+  <text class="tick zh" x="44" y="290">此時 <tspan class="mono">n₁ = 1</tspan> 處處成立，</text>
+  <text class="tick mono" x="44" y="316">故 s = p · c</text>
+  <text class="tick zh" x="44" y="342">上包絡直接給出純度。</text>
+
+  <rect class="box ok" x="44" y="356" width="258" height="24" rx="6"/>
+  <text class="tick bold ok zh mid" x="173" y="374">解除</text>
+
+  <!-- ══ 中 ══ -->
+  <rect class="box ghost ok" x="346" y="88" width="306" height="300" rx="8"/>
+  <text class="lbl bold zh mid" x="499" y="120">錨的區域限制</text>
+
+  <text class="tick zh" x="370" y="156">上篇的錨分母含 <tspan class="mono">n₂</tspan>，</text>
+  <text class="tick zh" x="370" y="180">故只能用於拷貝數近 2 的區域。</text>
+  <text class="tick bad zh" x="370" y="212">而 LOH 與擴增區段</text>
+  <text class="tick bad zh" x="370" y="236">正是腫瘤最具資訊的部分。</text>
+
+  <line class="guide" x1="370" y1="258" x2="628" y2="258"/>
+
+  <text class="tick zh" x="370" y="290">本頁的錨分母只含一條，</text>
+  <text class="tick mono" x="370" y="316">s = p·cμ ÷ (p·n₁ + 1−p)</text>
+  <text class="tick zh" x="370" y="342">式中不含 <tspan class="mono">n₂</tspan>，故全基因體可用。</text>
+
+  <rect class="box ok" x="370" y="356" width="258" height="24" rx="6"/>
+  <text class="tick bold ok zh mid" x="499" y="374">解除</text>
+
+  <!-- ══ 右 ══ -->
+  <rect class="box ghost bad" x="672" y="88" width="306" height="300" rx="8"/>
+  <text class="lbl bold zh mid" x="825" y="120">全基因體加倍</text>
+
+  <text class="tick zh" x="696" y="156">拷貝數全部乘二時，</text>
+  <text class="tick zh" x="696" y="180">加倍前發生的變異其 <tspan class="mono">μ</tspan> 亦乘二。</text>
+  <text class="tick zh" x="696" y="212">代入後 —— </text>
+  <text class="tick mono" x="696" y="238">ρ = 0.40 → s = 0.400</text>
+  <text class="tick mono" x="696" y="262">ρ′ = 0.25 → s′ = 0.400</text>
+
+  <line class="guide" x1="696" y1="284" x2="954" y2="284"/>
+
+  <text class="tick bad zh" x="696" y="316">錨在此變換下<tspan class="bold">不變</tspan>，</text>
+  <text class="tick zh" x="696" y="342">仍須靠簡約偏好或樣本外量測。</text>
+
+  <rect class="box bad" x="696" y="356" width="258" height="24" rx="6"/>
+  <text class="tick bold bad zh mid" x="825" y="374">未解除</text>
+
+  <!-- 結論 -->
+  <rect class="box accent" x="20" y="402" width="960" height="56" rx="8"/>
+  <text class="anno zh" x="40" y="430">可宣稱：<tspan class="bold">純度的估計不再要求區段為二倍體，且無等位失衡的樣本亦可估計</tspan>。</text>
+  <text class="anno zh" x="40" y="452">不可宣稱：解決了純度與倍體的簡併。<tspan class="bold">把做得到與做不到分開講，是此路線能否被採信的前提。</tspan></text>
+</svg>

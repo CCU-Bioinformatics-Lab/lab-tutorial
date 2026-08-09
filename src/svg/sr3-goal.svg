@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <title>同一份檢體的三種計數：細胞比例、每細胞份數與分子比例</title>
+  <desc>一份檢體，三層各自計數，分母不同。
+        第一層是細胞：十個細胞裡五個是腫瘤細胞，所以細胞比例是零點五。
+        第二層是每個細胞在這個位置有幾份 DNA：正常細胞兩份，腫瘤細胞四份，
+        所以腫瘤的倍體是四。
+        第三層是定序池裡的分子：腫瘤細胞貢獻五乘四等於二十份，
+        正常細胞貢獻五乘二等於十份，於是腫瘤分子佔三十份中的二十份，也就是零點六七。
+        三個數字描述的是同一份檢體，差別只在計數的對象。
+        最下方給出換算式，並指出倍體等於二時第一層與第三層才會相等。
+        讀法是：把細胞比例當成分子比例使用，在非二倍體的腫瘤上會有十六點七個百分點的落差。</desc>
+
+  <text class="ttl zh" x="20" y="36">同一份檢體的三種計數</text>
+  <text class="anno zh" x="20" y="66">十個細胞，其中五個為腫瘤細胞；此處每個腫瘤細胞有四份 DNA，每個正常細胞兩份。</text>
+
+  <!-- ══ ① 細胞層 ══ -->
+  <rect class="box ghost" x="20" y="88" width="960" height="98" rx="8"/>
+  <text class="anno bold zh" x="40" y="122">① 細胞層</text>
+  <text class="tick zh" x="40" y="150">分母：全部細胞</text>
+
+  <circle class="cell normal" cx="256" cy="137" r="19"/>
+  <circle class="cell normal" cx="308" cy="137" r="19"/>
+  <circle class="cell normal" cx="360" cy="137" r="19"/>
+  <circle class="cell normal" cx="412" cy="137" r="19"/>
+  <circle class="cell normal" cx="464" cy="137" r="19"/>
+  <circle class="cell tumor" cx="536" cy="137" r="19"/>
+  <circle class="cell tumor" cx="588" cy="137" r="19"/>
+  <circle class="cell tumor" cx="640" cy="137" r="19"/>
+  <circle class="cell tumor" cx="692" cy="137" r="19"/>
+  <circle class="cell tumor" cx="744" cy="137" r="19"/>
+  <text class="tick zh mid" x="360" y="110">正常細胞 5</text>
+  <text class="tick zh mid" x="640" y="110">腫瘤細胞 5</text>
+
+  <text class="lbl bold mono end" x="960" y="130">p = 0.50</text>
+  <text class="tick mono end" x="960" y="156">5 ÷ 10</text>
+
+  <!-- ══ ② 每細胞的份數 ══ -->
+  <rect class="box ghost" x="20" y="196" width="960" height="118" rx="8"/>
+  <text class="anno bold zh" x="40" y="230">② 每細胞的份數</text>
+  <text class="tick zh" x="40" y="258">此處的拷貝數</text>
+
+  <text class="tick zh mid" x="330" y="230">正常細胞</text>
+  <rect class="chr hp1" x="312" y="244" width="14" height="52" rx="6"/>
+  <rect class="chr hp2" x="336" y="244" width="14" height="52" rx="6"/>
+  <text class="tick mono mid" x="330" y="308">2 份</text>
+
+  <text class="tick zh mid" x="620" y="230">腫瘤細胞</text>
+  <rect class="chr hp1" x="578" y="244" width="14" height="52" rx="6"/>
+  <rect class="chr hp1" x="602" y="244" width="14" height="52" rx="6"/>
+  <rect class="chr hp2" x="626" y="244" width="14" height="52" rx="6"/>
+  <rect class="chr hp2" x="650" y="244" width="14" height="52" rx="6"/>
+  <text class="tick mono mid" x="620" y="308">4 份</text>
+
+  <text class="lbl bold mono end" x="960" y="248">κ = 4</text>
+  <text class="tick zh end" x="960" y="274">正常細胞恆為 2</text>
+
+  <!-- ══ ③ 分子層 ══ -->
+  <rect class="box ghost" x="20" y="324" width="960" height="98" rx="8"/>
+  <text class="anno bold zh" x="40" y="358">③ 分子層</text>
+  <text class="tick zh" x="40" y="386">分母：全部分子</text>
+
+  <rect class="bar somatic" x="256" y="352" width="320" height="38"/>
+  <rect class="bar germline" x="576" y="352" width="160" height="38"/>
+  <text class="tick zh mid" x="416" y="344">腫瘤 5×4 = 20 份</text>
+  <text class="tick zh mid" x="656" y="344">正常 5×2 = 10 份</text>
+  <text class="tick mono mid" x="416" y="410">0.667</text>
+  <text class="tick mono mid" x="656" y="410">0.333</text>
+
+  <text class="lbl bold mono end" x="960" y="368">f = 0.667</text>
+  <text class="tick mono end" x="960" y="394">20 ÷ 30</text>
+
+  <!-- ══ 換算 ══ -->
+  <rect class="box accent" x="20" y="432" width="960" height="56" rx="8"/>
+  <text class="anno zh" x="40" y="460">換算式為 <tspan class="mono">f = pκ ÷ (pκ + 2(1−p))</tspan>，分母兩項即為上圖第三層的兩段長條。</text>
+  <text class="anno zh" x="40" y="482"><tspan class="bold">κ = 2 時 f = p</tspan> —— 二倍體之下三個數字重合，故此一分家在一般敘述中不易被察覺。</text>
+</svg>

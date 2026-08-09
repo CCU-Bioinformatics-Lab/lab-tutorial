@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640">
+  <title>同一組觀測的三種解讀：格點族上的三個點給出恆等的深度比與等位比例</title>
+  <desc>三欄並排，每一欄是同一份資料的一種解讀。
+        上半是觀測值：四個區段的深度比與等位比例。
+        三欄的這八個數字完全相同，一位數都沒有差別，因為它們本來就是同一份資料。
+        下半是參數：純度、腫瘤倍體，以及每個區段兩個等位各有幾份。
+        左欄是原解，純度零點四、倍體二。
+        中欄把每個等位的拷貝數乘以二，這是全基因體加倍的解讀，純度變成零點二五、倍體變成四。
+        右欄把每個等位各加一份，純度變成零點六七、倍體也是四。
+        三組參數代入前向式之後，算出來的深度比與等位比例逐格相同。
+        最下面一列是辨識依據：右欄原本零拷貝的那個等位被抬升成一份，
+        所以只要在基因體上觀測到任何一個完全缺失的等位，右欄就被排除。
+        中欄沒有對應的辨識依據，因為它的拷貝數全部是偶數，
+        它和左欄互為加倍關係，任何一條軌道都看不出兩者的差別。
+        讀法是：深度與等位比例決定的不是一組參數，是一整族參數。</desc>
+
+  <text class="ttl zh" x="20" y="36">同一組觀測的三種解讀</text>
+  <text class="anno zh" x="20" y="66">四個區段。上半為觀測值，三欄逐格相同；下半為各自的參數。純度記為 <tspan class="mono">ρ</tspan>，腫瘤倍體記為 <tspan class="mono">ψ_t</tspan>。</text>
+
+  <!-- ══ 觀測（三欄刻意各自完整列出）══ -->
+  <text class="lbl bold zh" x="20" y="116">觀測值</text>
+
+  <rect class="box ghost" x="20" y="130" width="306" height="126" rx="8"/>
+  <rect class="box ghost" x="346" y="130" width="306" height="126" rx="8"/>
+  <rect class="box ghost" x="672" y="130" width="306" height="126" rx="8"/>
+
+  <text class="tick zh mid" x="173" y="156">深度比</text>
+  <text class="tick mono mid" x="173" y="182">1.00　1.00　0.80　1.20</text>
+  <text class="tick zh mid" x="173" y="214">等位比例</text>
+  <text class="tick mono mid" x="173" y="240">0.50　0.70　0.63　0.58</text>
+
+  <text class="tick zh mid" x="499" y="156">深度比</text>
+  <text class="tick mono mid" x="499" y="182">1.00　1.00　0.80　1.20</text>
+  <text class="tick zh mid" x="499" y="214">等位比例</text>
+  <text class="tick mono mid" x="499" y="240">0.50　0.70　0.63　0.58</text>
+
+  <text class="tick zh mid" x="825" y="156">深度比</text>
+  <text class="tick mono mid" x="825" y="182">1.00　1.00　0.80　1.20</text>
+  <text class="tick zh mid" x="825" y="214">等位比例</text>
+  <text class="tick mono mid" x="825" y="240">0.50　0.70　0.63　0.58</text>
+
+  <text class="anno bold ok zh mid" x="499" y="282">三欄的八個數字逐格相同</text>
+
+  <!-- ══ 參數 ══ -->
+  <text class="lbl bold zh" x="20" y="322">參數</text>
+
+  <rect class="box accent" x="20" y="336" width="306" height="216" rx="8"/>
+  <text class="lbl bold zh mid" x="173" y="366">原解</text>
+  <text class="tick mono mid" x="173" y="392">(k, m) = (1, 0)</text>
+  <text class="anno bold mono mid" x="173" y="424">ρ = 0.40　ψ_t = 2.00</text>
+  <text class="tick zh mid" x="173" y="456">各區段的等位拷貝數</text>
+  <text class="tick mono mid" x="173" y="482">1+1　2+0　1+0　2+1</text>
+  <text class="tick bad zh mid" x="173" y="514">有零拷貝的等位</text>
+
+  <rect class="box accent" x="346" y="336" width="306" height="216" rx="8"/>
+  <text class="lbl bold zh mid" x="499" y="366">全基因體加倍</text>
+  <text class="tick mono mid" x="499" y="392">(k, m) = (2, 0)</text>
+  <text class="anno bold mono mid" x="499" y="424">ρ = 0.25　ψ_t = 4.00</text>
+  <text class="tick zh mid" x="499" y="456">各區段的等位拷貝數</text>
+  <text class="tick mono mid" x="499" y="482">2+2　4+0　2+0　4+2</text>
+  <text class="tick bad zh mid" x="499" y="514">有零拷貝的等位</text>
+
+  <rect class="box accent" x="672" y="336" width="306" height="216" rx="8"/>
+  <text class="lbl bold zh mid" x="825" y="366">各等位各加一份</text>
+  <text class="tick mono mid" x="825" y="392">(k, m) = (1, +1)</text>
+  <text class="anno bold mono mid" x="825" y="424">ρ = 0.67　ψ_t = 4.00</text>
+  <text class="tick zh mid" x="825" y="456">各區段的等位拷貝數</text>
+  <text class="tick mono mid" x="825" y="482">2+2　3+1　2+1　3+2</text>
+  <text class="tick ok zh mid" x="825" y="514">全無零拷貝的等位</text>
+
+  <!-- ══ 辨識依據 ══ -->
+  <text class="anno zh" x="20" y="588">辨識依據</text>
+  <rect class="box ghost bad" x="346" y="562" width="306" height="66" rx="8"/>
+  <rect class="box ghost ok" x="672" y="562" width="306" height="66" rx="8"/>
+  <text class="anno bad zh mid" x="499" y="590">無辨識依據</text>
+  <text class="tick bad zh mid" x="499" y="614">拷貝數全為偶數，與左欄互為加倍</text>
+  <text class="anno ok zh mid" x="825" y="590">可排除</text>
+  <text class="tick ok zh mid" x="825" y="614">只要觀測到任一零拷貝的等位</text>
+</svg>

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480">
+  <title>somatic 變異的 VAF 峰作為純度錨，以及此錨的適用範圍</title>
+  <desc>左邊是一批 somatic 變異的 VAF 直方圖。
+        在兩個等位各一份的區段上，一個所有腫瘤細胞都帶有、且只佔一份拷貝的變異，
+        它的期望 VAF 恰好是純度的一半。
+        所以直方圖上最高的那根峰落在零點二五時，純度就是零點五。
+        這個錨與拷貝數輪廓無關，它來自另一種資料，
+        因此可以切斷純度與倍體之間的那一族解。
+        右邊說明它的界線。這條關係式的分母含有兩條單倍型的拷貝數，
+        所以只有在該區段確實是兩個等位各一份時才成立。
+        右邊畫了另外兩種區段：一個等位被刪掉的，以及一個等位多了兩份的。
+        同樣的純度零點五，在這兩種區段上讀到的 VAF 分別是零點三三與零點二，
+        乘以二之後得到零點六七與零點四，都不是零點五。
+        所以這個錨必須先確認區段是二倍體才能用，
+        而腫瘤基因體上的二倍體區段往往不是多數。
+        讀法是：這個錨很有力，但它的分母把它綁在二倍體區段上。</desc>
+
+  <text class="ttl zh" x="20" y="36">somatic 變異的 VAF 峰與其適用範圍</text>
+  <text class="anno zh" x="20" y="66">左為錨的用法，右為其成立條件。兩側的純度皆為 <tspan class="mono">0.50</tspan>，變異皆為 clonal 且 multiplicity 為 1。</text>
+
+  <!-- ══ 左：峰即純度的一半 ══ -->
+  <rect class="box ghost ok" x="20" y="88" width="468" height="336" rx="8"/>
+  <text class="lbl bold zh mid" x="254" y="118">在 1+1 區段上</text>
+
+  <line class="axis ok" x1="70" y1="300" x2="450" y2="300"/>
+  <text class="tick mid" x="70" y="322">0</text>
+  <text class="tick mid" x="222" y="322">0.25</text>
+  <text class="tick mid" x="374" y="322">0.50</text>
+  <text class="tick zh mid" x="260" y="346">somatic 變異的 VAF</text>
+
+  <rect class="bar somatic" x="150" y="270" width="18" height="30"/>
+  <rect class="bar somatic" x="172" y="230" width="18" height="70"/>
+  <rect class="bar somatic" x="194" y="180" width="18" height="120"/>
+  <rect class="bar somatic" x="216" y="156" width="18" height="144"/>
+  <rect class="bar somatic" x="238" y="184" width="18" height="116"/>
+  <rect class="bar somatic" x="260" y="234" width="18" height="66"/>
+  <rect class="bar somatic" x="282" y="272" width="18" height="28"/>
+
+  <line class="guide somatic" x1="225" y1="150" x2="225" y2="300"/>
+  <text class="anno bold ok mid" x="225" y="144">峰 0.25</text>
+
+  <text class="tick mono mid" x="254" y="378">VAF = p ÷ 2</text>
+  <text class="anno bold zh mid" x="254" y="406">純度 = 2 × 0.25 = 0.50</text>
+
+  <!-- ══ 右：其他拷貝狀態 ══ -->
+  <rect class="box ghost bad" x="512" y="88" width="468" height="336" rx="8"/>
+  <text class="lbl bold zh mid" x="746" y="118">同一個純度，其他拷貝狀態</text>
+
+  <line class="axis bad" x1="562" y1="300" x2="942" y2="300"/>
+  <text class="tick mid" x="562" y="322">0</text>
+  <text class="tick mid" x="714" y="322">0.25</text>
+  <text class="tick mid" x="866" y="322">0.50</text>
+  <text class="tick zh mid" x="752" y="346">somatic 變異的 VAF</text>
+
+  <rect class="bar artifact" x="654" y="210" width="20" height="90"/>
+  <text class="tick mono mid" x="664" y="200">0.20</text>
+  <text class="tick mid" x="664" y="176">2+1</text>
+
+  <rect class="bar warn" x="762" y="180" width="20" height="120"/>
+  <text class="tick mono mid" x="772" y="170">0.33</text>
+  <text class="tick mid" x="772" y="146">1+0</text>
+
+  <line class="guide" x1="714" y1="130" x2="714" y2="300"/>
+
+  <text class="tick zh" x="536" y="378">乘以二之後得到 <tspan class="mono">0.40</tspan> 與 <tspan class="mono">0.67</tspan>，</text>
+  <text class="anno bold bad zh" x="536" y="406">兩者皆非真值 0.50</text>
+
+  <!-- 結論 -->
+  <rect class="box accent" x="20" y="436" width="960" height="34" rx="8"/>
+  <text class="anno zh" x="40" y="460">關係式的<tspan class="bold">分母含兩條單倍型的拷貝數</tspan>，故此錨僅在二倍體區段成立 —— 而該類區段在腫瘤基因體上往往不是多數。</text>
+</svg>

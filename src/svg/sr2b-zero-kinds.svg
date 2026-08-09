@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>一格是空的，有三種完全不同的原因</title>
+  <desc>三欄並列，三欄的觀測完全一樣：那一格的計數是零。但成因不同，處理方式也不同。
+        第一欄是抽樣零。那個狀態真的存在，只是跨越這幾個位點的分子太少，沒抽到。
+        判準是機率：沒抽到的機率等於一減去它的比例，再取跨越深度次方。
+        跨越深度三、比例三成時，這個機率大約是三分之一，
+        所以「沒看到」幾乎沒有排除任何東西。跨越深度五十九時才降到百分之五。
+        處理方式是讓似然自己算，不需要任何門檻。
+        第二欄是結構零。沒有任何 clone 帶有那個基因型，所以它的真實比例就是零。
+        這是我們真正想推論的結論，不是輸入。
+        第三欄是錯誤地板。那個基因型確實不存在，但定序錯誤與家族誤標仍然會產生看起來像它的 read。
+        所以觀測到的比例永遠不會真的是零，而是壓在一個地板上。
+        中間橫跨一條警告：Dirichlet 的參數不允許是零，
+        所以結構零必須經過錯誤通道抬到地板之上，模型才寫得下去。
+        最下方是三者的處理方式對照。
+        讀法是：把這三種零混為一談，就會把錯誤產生的少數幾條 read 讀成一個新的 clone。</desc>
+
+  <text class="ttl zh" x="20" y="36">同樣是「這一格沒有 read」，成因有三種</text>
+
+  <!-- 抽樣零 -->
+  <rect class="box" x="18" y="58" width="308" height="230" rx="8"/>
+  <text class="lbl bold zh" x="34" y="88">① 抽樣零</text>
+  <text class="tick zh" x="34" y="112">狀態存在，只是沒抽到</text>
+
+  <rect class="box sunken" x="34" y="126" width="276" height="76" rx="6"/>
+  <text class="tick mono mid" x="172" y="154">P(看不到) = (1 − q)ⁿ</text>
+  <text class="tick zh mid" x="172" y="182">n ＝ 3、q ＝ 0.30 → 0.34</text>
+
+  <text class="anno zh bad" x="34" y="228">三分之一的機率誤判成「不存在」</text>
+  <text class="tick zh" x="34" y="254">n ＝ 59 才降到 0.05</text>
+  <text class="tick bold zh ok" x="34" y="278">處理：讓似然自己算</text>
+
+  <!-- 結構零 -->
+  <rect class="box" x="346" y="58" width="308" height="230" rx="8"/>
+  <text class="lbl bold zh" x="362" y="88">② 結構零</text>
+  <text class="tick zh" x="362" y="112">沒有任何 clone 帶這個基因型</text>
+
+  <rect class="box sunken" x="362" y="126" width="276" height="76" rx="6"/>
+  <text class="tick mono mid" x="500" y="154">q = 0</text>
+  <text class="tick zh mid" x="500" y="182">這是要推論出來的<tspan class="bold">結論</tspan></text>
+
+  <text class="anno zh" x="362" y="228">不是輸入，也不是門檻判出來的</text>
+  <text class="tick zh" x="362" y="254">硬性排除等於把結論當成前提</text>
+  <text class="tick bold zh ok" x="362" y="278">處理：讓資料把 q 壓下去</text>
+
+  <!-- 錯誤地板 -->
+  <rect class="box warn" x="674" y="58" width="308" height="230" rx="8"/>
+  <text class="lbl bold zh warn" x="690" y="88">③ 錯誤地板</text>
+  <text class="tick zh" x="690" y="112">基因型不存在，但錯誤會造出它</text>
+
+  <rect class="box sunken" x="690" y="126" width="276" height="76" rx="6"/>
+  <text class="tick mono mid" x="828" y="154">q<tspan class="muted">觀測</tspan> = (1−ε)·q + ε·r</text>
+  <text class="tick zh mid" x="828" y="182">觀測比例有一個下界</text>
+
+  <text class="anno zh warn" x="690" y="228">逐位點錯誤 ＋ 家族誤標都在這裡</text>
+  <text class="tick zh" x="690" y="254">地板高度決定得出來的解析度下限</text>
+  <text class="tick bold zh ok" x="690" y="278">處理：寫進觀測通道</text>
+
+  <!-- Dirichlet 警告 -->
+  <rect class="box bad" x="18" y="312" width="964" height="86" rx="8"/>
+  <text class="lbl bold zh bad" x="34" y="342">為什麼 ② 與 ③ 一定要分開寫：Dirichlet 的參數不可以是零</text>
+  <text class="anno zh" x="34" y="374">結構零給出 q ＝ 0，但 Dirichlet 分量必須為正。所以結構零一定要先經過 ③ 的通道抬到地板之上，式子才寫得下去 —— 這不是技術細節，它就是「零不代表不可能」的數學形式。</text>
+
+  <!-- 對照 -->
+  <rect class="box sunken" x="18" y="418" width="964" height="94" rx="8"/>
+  <text class="lbl bold zh" x="34" y="446">三者的觀測一模一樣，都是「這一格計數為 0」</text>
+  <text class="anno zh" x="34" y="478">分得開它們的不是那個 0，是跨越深度、其他單位的證據，以及就地估到的錯誤率。</text>
+  <text class="anno bold zh bad" x="34" y="504">混為一談的後果：錯誤造出來的少數幾條 read，會被讀成一個新的 clone。</text>
+
+  <text class="tick zh" x="18" y="540">讀法：門檻只能把三種零一起丟掉；似然可以分別給它們不同的重量。</text>
+</svg>

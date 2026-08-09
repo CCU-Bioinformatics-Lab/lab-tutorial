@@ -21,6 +21,9 @@
      \{ \}                   字面上的大括號（{ } 本身是分組用）
      \log \max \min \exp     直立字體的函數名
      \mid \sim \to \cdot     ∣ ∼ → ·（也可以直接打 Unicode）
+     \quad \qquad            水平間距。一行放兩條式子時用，例如
+                             「\hat{n}_A = … , \qquad \hat{n}_B = …」；
+                             純空白在 MathML 裡不佔寬度，硬打空格沒有作用
 
    其餘字元照下面的規則自動分類：
      數字（含 , . %）→ <mn>   運算子 → <mo>   其他 → <mi>
@@ -43,6 +46,10 @@ const CMD_SYMBOL = {
   infty: '∞', propto: '∝', Rightarrow: '⇒',
 };
 const CMD_FUNC = new Set(['log', 'max', 'min', 'exp', 'ln', 'det', 'arg']);
+
+/* \cmd → 固定寬度的空白。<mspace> 是 void element，verify.mjs 的
+   MathML 配對檢查已經把它列為不需要收尾標籤。 */
+const CMD_SPACE = { quad: '1em', qquad: '2em' };
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -121,6 +128,7 @@ function parse(tokens, display) {
       if (name === 'sum')  return { big: '∑' };
       if (name === 'prod') return { big: '∏' };
       if (CMD_FUNC.has(name)) return `<mi>${esc(name)}</mi>`;
+      if (CMD_SPACE[name])    return `<mspace width="${CMD_SPACE[name]}"/>`;
       if (CMD_SYMBOL[name])   return `<mo>${esc(CMD_SYMBOL[name])}</mo>`;
       throw new Error(`math：不認得的命令 \\${name}`);
     }
