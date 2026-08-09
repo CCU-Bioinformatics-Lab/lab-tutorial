@@ -326,6 +326,7 @@
   },
   {
     "id": "sr6",
+    "draft": true,
     "num": "整合",
     "src": "sr6-lift-cn.html",
     "group": "研究指引",

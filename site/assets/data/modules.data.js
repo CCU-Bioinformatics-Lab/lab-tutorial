@@ -224,15 +224,5 @@ window.TW_MODULES = [
   "q": "三個通道要怎麼合成一條式子，才不會被資料的組成牽著走？",
   "sub": "把三個通道寫成單一個似然而非懲罰與似然的混合，逐層攤開由參數到計數的生成模型，處理 c 與 μ 這兩個 nuisance，並界定它解決與未解決的不可辨識性、失效模式與實作分期。",
   "group": "研究指引"
- },
- {
-  "id": "sr6",
-  "num": "整合",
-  "title_zh": "整合篇：LiFT-CN 的生成模型與實作規格",
-  "title_en": "Integration — the LiFT-CN generative model and implementation specification",
-  "short": "LiFT-CN 的實作規格",
-  "q": "同一批長讀資料，如何同時推回癌細胞比例、染色體份數與腫瘤內的細胞族群？",
-  "sub": "以原始長讀分子的 germline–somatic 聯合 marks 建立 marked-fragment likelihood，將 clone tree、實體 copy lineage、allele-specific CN、mutation timing、cellular purity、tumour DNA fraction、ploidy 與 WGD modes 納入同一個 posterior，並定義可辨識條件、推論演算法、輸入輸出、ablation 與驗證標準。",
-  "group": "研究指引"
  }
 ];

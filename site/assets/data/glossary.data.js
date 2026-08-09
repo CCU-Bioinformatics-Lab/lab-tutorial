@@ -821,8 +821,7 @@ window.TW_GLOSSARY = {
    "m12",
    "sr1",
    "sr3",
-   "sr4",
-   "sr6"
+   "sr4"
   ]
  },
  "tumour DNA fraction": {
@@ -843,8 +842,7 @@ window.TW_GLOSSARY = {
    "m12",
    "m13",
    "sr3",
-   "sr4",
-   "sr6"
+   "sr4"
   ]
  },
  "cancer cell fraction": {
@@ -880,8 +878,7 @@ window.TW_GLOSSARY = {
   "modules": [
    "m08",
    "m12",
-   "sr3",
-   "sr6"
+   "sr3"
   ]
  },
  "aneuploidy": {
@@ -1397,8 +1394,7 @@ window.TW_GLOSSARY = {
   ],
   "slug": "whole-genome-doubling",
   "modules": [
-   "sr3",
-   "sr6"
+   "sr3"
   ]
  },
  "haplotype imbalance": {

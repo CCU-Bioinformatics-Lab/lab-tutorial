@@ -22,6 +22,14 @@ python3 tools/check_svg_layout.py # SVG 文字重疊／超出畫布
 
 push 到 `main` 之後 CI 會自動發布，不需要手動推 `gh-pages`。
 
+**不想發布的模組**：在 `modules.json` 那一筆加 `"draft": true`。頁面照建（本機
+`file://` 讀得到，CI 的 `site/`↔`src/` 比對也才不會失敗），但不出現在首頁、學習
+路徑時數、`print-all`、上下篇 pager 與 glossary 的任何連結上；CI 在上傳 Pages
+artifact 之前由 `tools/strip_drafts.mjs` 把檔案刪掉。拿掉這個欄位就會發布出去。
+
+這是**未列出**，不是**私密** —— repo 是公開的，`src/` 與 `site/` 裡的原始檔照樣
+讀得到。真的不能公開的東西就不要 commit 進這個 repo。
+
 ---
 
 ## 1. 教材必須自成一體（最重要的一條）

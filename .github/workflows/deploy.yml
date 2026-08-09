@@ -70,6 +70,15 @@ jobs:
       - name: 4／SVG 文字重疊／超出畫布
         run: python3 tools/check_svg_layout.py
 
+      # modules.json 標了 "draft": true 的頁面不發布到 Pages。
+      # 一定要放在上面的「site/ 必須跟 src/ 同步」之後 —— 那一步比對的是完整的
+      # site/，先刪就會判定不同步。刪掉之後 site/ 只剩要發布的內容，才上傳。
+      #
+      # 這是「未列出」而不是「私密」：repo 是公開的，src/ 與 site/ 裡的
+      # 原始檔照樣讀得到。要真的不公開就不能 commit 進來。
+      - name: 從 Pages artifact 移除 draft 頁面
+        run: node tools/strip_drafts.mjs
+
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site
