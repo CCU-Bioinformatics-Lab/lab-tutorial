@@ -88,9 +88,67 @@
 <h3 id="一-完整的估計式">一、完整的估計式</h3>
 
 <p class="prose">中篇的三個用途各動一個參數：用途一約束 <math><mi>z</mi></math>、用途二把 <math><mi>φ</mi></math> 由待估改為代入、
-用途三對 <math><mi>c</mi></math> 加一條等式。把三者疊加於中篇第一節那個混合式，即得此路線的完整形式：</p>
+用途三對 <math><mi>c</mi></math> 加一條等式。把三者疊加於中篇第一節那個混合式，即得此路線的完整形式。
+先把兩個容易被省略的定義寫清楚：第一，峰的位置必須使用每個變異自己的拷貝數與
+multiplicity；第二，Beta-binomial 的第三個參數不是含糊的「峰寬」，而是可換算為
+Beta 分布 concentration 的 overdispersion。</p>
 
-<div class="eq"><math display="block"><mi>ℒ</mi><mo>(</mo><mi>K</mi><mo>,</mo><mi>c</mi><mo>,</mo><mi>π</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><mi>log</mi><mo>[</mo><msub><mi>π</mi><msub><mi>z</mi><mi>m</mi></msub></msub><mo>·</mo><mi>BetaBin</mi><mo>(</mo><msub><mi>a</mi><mi>m</mi></msub><mo>;</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><mi>ρ</mi><mo>·</mo><msub><mi>c</mi><msub><mi>z</mi><mi>m</mi></msub></msub><mo>/</mo><mn>2,</mn><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mo>)</mo><mo>]</mo><mo>+</mo><munder><mo>∑</mo><mi>r</mi></munder><msub><mi>ω</mi><mi>r</mi></msub><mo>·</mo><mi>log</mi><mi>P</mi><mo>(</mo><msub><mi>R</mi><mi>r</mi></msub><mo>∣</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo></math></div>
+<div class="eq"><math display="block"><msub><mi>θ</mi><mi>mk</mi></msub><mo>=</mo><mi>E</mi><mo>[</mo><msub><mi>VAF</mi><mi>m</mi></msub><mo>∣</mo><msub><mi>z</mi><mi>m</mi></msub><mo>=</mo><mi>k</mi><mo>]</mo><mo>=</mo><mfrac><mrow><mi>ρ</mi><mo>·</mo><msub><mi>c</mi><mi>k</mi></msub><mo>·</mo><msub><mi>μ</mi><mi>m</mi></msub></mrow><mrow><mi>ρ</mi><mo>·</mo><msub><mi>CN</mi><mi>m</mi></msub><mo>+</mo><mn>2</mn><mo>(</mo><mn>1</mn><mo>−</mo><mi>ρ</mi><mo>)</mo></mrow></mfrac></math></div>
+
+<p class="prose">其中 <math><mi>ρ</mi></math> 是樣本純度、<math><msub><mi>c</mi><mi>k</mi></msub></math> 是第 <math><mi>k</mi></math> 群的 CCF、
+<math><msub><mi>CN</mi><mi>m</mi></msub></math> 是變異所在腫瘤區段的總拷貝數、<math><msub><mi>μ</mi><mi>m</mi></msub></math> 是帶原細胞中該變異的
+multiplicity。若該區段二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub><mo>=</mo><mn>1</mn></math>，才化簡為
+<math><msub><mi>θ</mi><mi>mk</mi></msub><mo>=</mo><mi>ρ</mi><msub><mi>c</mi><mi>k</mi></msub><mo>/</mo><mn>2</mn></math>；這個化簡只適用於 copy-number-normal、單拷貝變異，
+不能放回有 CN 或 LOH 的變異。</p>
+
+<div class="eq"><math display="block"><msub><mi>a</mi><mi>m</mi></msub><mo>∣</mo><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>z</mi><mi>m</mi></msub><mo>=</mo><mi>k</mi><mo>)</mo><mo>∼</mo><mi>BetaBinomial</mi><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>;</mo><msub><mi>α</mi><mi>mk</mi></msub><mo>,</mo><msub><mi>β</mi><mi>mk</mi></msub><mo>)</mo><mo>,</mo><mspace width="2em"/><msub><mi>α</mi><mi>mk</mi></msub><mo>=</mo><msub><mi>θ</mi><mi>mk</mi></msub><msub><mi>κ</mi><mi>m</mi></msub><mo>,</mo><mspace width="1em"/><msub><mi>β</mi><mi>mk</mi></msub><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><msub><mi>θ</mi><mi>mk</mi></msub><mo>)</mo><msub><mi>κ</mi><mi>m</mi></msub></math></div>
+
+<div class="eq"><math display="block"><msub><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mi>m</mi></msub><mo>=</mo><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>CN</mi><mi>m</mi></msub><mo>)</mo><mo>,</mo><mspace width="2em"/><msub><mi>κ</mi><mi>m</mi></msub><mo>=</mo><mfrac><mrow><mn>1</mn><mo>−</mo><msub><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mi>m</mi></msub></mrow><msub><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mi>m</mi></msub></mfrac><mo>,</mo><mspace width="2em"/><mi>Var</mi><mo>(</mo><msub><mi>a</mi><mi>m</mi></msub><mo>∣</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>z</mi><mi>m</mi></msub><mo>=</mo><mi>k</mi><mo>)</mo><mo>=</mo><msub><mi>d</mi><mi>m</mi></msub><msub><mi>θ</mi><mi>mk</mi></msub><mo>(</mo><mn>1</mn><mo>−</mo><msub><mi>θ</mi><mi>mk</mi></msub><mo>)</mo><mo>[</mo><mn>1</mn><mo>+</mo><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>−</mo><mn>1</mn><mo>)</mo><msub><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mi>m</mi></msub><mo>]</mo></math></div>
+
+<p class="prose">這裡以 <math><mi>φ</mi><mo>=</mo><mn>1</mn><mo>/</mo><mo>(</mo><mi>κ</mi><mo>+</mo><mn>1</mn><mo>)</mo></math> 定義 overdispersion，故
+<math><mi>φ</mi><mo>=</mo><mn>0</mn></math> 是 binomial 極限，<math><mi>φ</mi></math> 越大代表同一深度下的額外抽樣變異越大。
+<math><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mo>(</mo><mi>d</mi><mo>,</mo><mi>CN</mi><mo>)</mo></math> 不是一個全域常數：應在「read depth 分層 × 腫瘤 CN 分層」內，
+以已知共享真實頻率的同單倍型變異估計，再以平滑或 shrinkage 借力處理稀疏 strata。
+沒有足夠校準資料的 <math><mo>(</mo><mi>d</mi><mo>,</mo><mi>CN</mi><mo>)</mo></math> 格不得悄悄套用一個寬峰；應標為未知並做敏感度分析。</p>
+
+<div class="eq"><math display="block"><msub><mi>ℓ</mi><mi>comp</mi></msub><mo>(</mo><mi>K</mi><mo>,</mo><mi>c</mi><mo>,</mo><mi>π</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><mi>log</mi><mo>[</mo><msub><mi>π</mi><msub><mi>z</mi><mi>m</mi></msub></msub><mo>·</mo><mi>BBpmf</mi><mo>(</mo><msub><mi>a</mi><mi>m</mi></msub><mo>∣</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>α</mi><mrow><mi>m</mi><mo>,</mo><msub><mi>z</mi><mi>m</mi></msub></mrow></msub><mo>,</mo><msub><mi>β</mi><mrow><mi>m</mi><mo>,</mo><msub><mi>z</mi><mi>m</mi></msub></mrow></msub><mo>)</mo><mo>]</mo><mo>+</mo><munder><mo>∑</mo><mi>r</mi></munder><msub><mi>ω</mi><mi>r</mi></msub><mo>·</mo><mi>log</mi><mi>P</mi><mo>(</mo><msub><mi>R</mi><mi>r</mi></msub><mo>∣</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo></math></div>
+
+<p class="prose">符號 <math><msub><mi>ℓ</mi><mi>comp</mi></msub></math> 刻意標成<b>合成（composite）目標</b>：
+<math><msub><mi>a</mi><mi>m</mi></msub></math> 與 <math><msub><mi>R</mi><mi>r</mi></msub></math> 往往由同一批 read 計算，兩項不是獨立資料集，
+因此不能直接把這個和當成已證明的完整 joint likelihood。只有改為逐 read 建模、
+再由同一個生成模型同時推出 VAF 與關係時，才可稱為完整 likelihood；目前規格應稱為
+經校準的 composite/pseudo-likelihood，並以有效樣本數或留出單位校準 <math><msub><mi>ω</mi><mi>r</mi></msub></math>。</p>
+
+<p class="prose">此處寫的是<b>可實作的統計規格</b>，不是已完成或已驗證的 estimator 程式。
+以下各項定義的目的，是讓後續實作能逐項測試；在合成資料與真實重複資料通過末節所列驗證之前，
+不得把 <math><mi>Score</mi></math> 的最大值當成已證實的生物學結論。</p>
+
+<p class="prose">若 <math><msub><mi>I</mi><mi>r</mi></msub><mo>(</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo><mo>=</mo><mn>1</mn></math> 表示候選解滿足第 <math><mi>r</mi></math> 條觀測關係，
+<math><msub><mi>q</mi><mi>r</mi></msub><mo>=</mo><mi>P</mi><mo>(</mo><msub><mi>R</mi><mi>r</mi></msub><mo>∣</mo><msub><mi>I</mi><mi>r</mi></msub><mo>=</mo><mn>1</mn><mo>)</mo></math>、<math><msub><mi>ε</mi><mi>r</mi></msub><mo>=</mo><mi>P</mi><mo>(</mo><msub><mi>R</mi><mi>r</mi></msub><mo>∣</mo><msub><mi>I</mi><mi>r</mi></msub><mo>=</mo><mn>0</mn><mo>)</mo></math> 且
+<math><msub><mi>q</mi><mi>r</mi></msub><mo>&gt;</mo><msub><mi>ε</mi><mi>r</mi></msub></math>，則軟關係模型明確為：</p>
+
+<div class="eq"><math display="block"><mi>log</mi><mi>P</mi><mo>(</mo><msub><mi>R</mi><mi>r</mi></msub><mo>∣</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo><mo>=</mo><msub><mi>I</mi><mi>r</mi></msub><mo>(</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo><mi>log</mi><msub><mi>q</mi><mi>r</mi></msub><mo>+</mo><mo>[</mo><mn>1</mn><mo>−</mo><msub><mi>I</mi><mi>r</mi></msub><mo>(</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo><mo>]</mo><mi>log</mi><msub><mi>ε</mi><mi>r</mi></msub></math></div>
+
+<p class="prose">所以 <math><msub><mi>ω</mi><mi>r</mi></msub></math> 不是把關係變成硬條件，而是把這條觀測的對數證據乘上可靠度：
+違反相對於滿足少掉 <math><msub><mi>ω</mi><mi>r</mi></msub><mi>log</mi><mo>(</mo><msub><mi>q</mi><mi>r</mi></msub><mo>/</mo><msub><mi>ε</mi><mi>r</mi></msub><mo>)</mo></math>。可將 <math><msub><mi>ω</mi><mi>r</mi></msub></math> 設為
+<math><mn>0</mn><mo>≤</mo><msub><mi>ω</mi><mi>r</mi></msub><mo>≤</mo><mn>1</mn></math> 的可信度（此時是 tempered pseudo-likelihood），或在
+<math><msub><mi>ω</mi><mi>r</mi></msub></math> 為獨立重複觀測數時用整數權重；兩者都應在報告中區分。只有在
+<math><msub><mi>ε</mi><mi>r</mi></msub><mo>=</mo><mn>0</mn></math> 且 <math><msub><mi>ω</mi><mi>r</mi></msub><mo>&gt;</mo><mn>0</mn></math> 時才是數學上的硬約束；本提案不採此設定，
+而是讓高信心關係近似硬、低信心關係可被其他證據推翻。</p>
+
+<div class="eq"><math display="block"><mi>Score</mi><mo>(</mo><mi>K</mi><mo>,</mo><mi>Θ</mi><mo>)</mo><mo>=</mo><msub><mi>ℓ</mi><mi>comp</mi></msub><mo>(</mo><mi>K</mi><mo>,</mo><mi>Θ</mi><mo>)</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>p</mi><mi>K</mi></msub><mi>log</mi><msub><mi>M</mi><mi>eff</mi></msub><mo>+</mo><mi>log</mi><mi>p</mi><mo>(</mo><mi>K</mi><mo>)</mo><mo>,</mo><mspace width="2em"/><mover accent="true"><mi>K</mi><mo>^</mo></mover><mo>=</mo><mi>arg</mi><msub><mi>max</mi><mi>K</mi></msub><mi>Score</mi><mo>(</mo><mi>K</mi><mo>,</mo><msub><mover accent="true"><mi>Θ</mi><mo>^</mo></mover><mi>K</mi></msub><mo>)</mo></math></div>
+
+<p class="prose"><math><mi>Θ</mi><mo>=</mo><mo>(</mo><mi>c</mi><mo>,</mo><mi>π</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo></math>；<math><mi>ρ</mi></math> 若已有外部純度估計則固定，否則須列為
+一個全域 nuisance scalar 與 <math><mi>Θ</mi></math> 一併 profile。巢狀比值只能定出 <math><mi>c</mi></math> 的相對尺度，
+不能憑空決定最後的絕對尺度。<math><msub><mi>p</mi><mi>K</mi></msub></math> 是在第 <math><mi>K</mi></math> 群下的自由參數數目，
+<math><msub><mi>M</mi><mi>eff</mi></msub></math> 是扣除同一 read／同一突變叢相關性後的有效觀測數，
+<math><mi>p</mi><mo>(</mo><mi>K</mi><mo>)</mo></math> 是對群數的先驗（若不用先驗，可設為常數）。這個 BIC/先驗項不可省略：
+關係限制只會砍掉不相容的候選解，並不會自己決定要不要多開一群；沒有此項，增加
+<math><mi>K</mi></math> 可能只是在吸收錯誤關係或過度擬合。此處 <math><mi>BBpmf</mi></math> 是上一組
+<math><mo>(</mo><mi>α</mi><mo>,</mo><mi>β</mi><mo>)</mo></math> 定義所對應的 beta-binomial PMF；<math><msub><mover accent="true"><mi>Θ</mi><mo>^</mo></mover><mi>K</mi></msub></math> 則是固定
+<math><mi>K</mi></math> 後使 <math><msub><mi>ℓ</mi><mi>comp</mi></msub></math> 最大的解。上式是預先指定的選模規則；
+若使用 composite likelihood，<math><msub><mi>p</mi><mi>K</mi></msub></math> 與 <math><msub><mi>M</mi><mi>eff</mi></msub></math> 必須以模擬或重抽樣校準，
+不可直接照搬普通 likelihood 的 BIC 並宣稱具有同一套理論保證。</p>
 
 <div class="table-wrap">
 <table>
@@ -98,11 +156,11 @@
 <tbody>
 <tr>
 <td>第一項</td><td>95% 的區域（頻率）</td>
-<td>即中篇第一節第二步，惟有兩處相異：<math><mi>z</mi></math> 不再被邊際化（<math><msub><mo>∑</mo><mi>k</mi></msub></math> 已移除），改為受約束的對象；<math><mover accent="true"><mi>φ</mi><mo>^</mo></mover></math> 不再是自由參數，由用途二量測後代入</td>
+<td>即中篇第一節第二步，惟有兩處相異：<math><mi>z</mi></math> 不再被邊際化（<math><msub><mo>∑</mo><mi>k</mi></msub></math> 已移除），改為受約束的對象；<math><msub><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mi>m</mi></msub><mo>=</mo><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>CN</mi><mi>m</mi></msub><mo>)</mo></math> 不再是自由參數，由用途二分層量測後代入</td>
 </tr>
 <tr>
 <td>第二項</td><td>5% 的區域（關係）</td>
-<td><math><msub><mi>R</mi><mi>r</mi></msub></math> 為第 <math><mi>r</mi></math> 條約束，<math><msub><mi>ω</mi><mi>r</mi></msub></math> 為其信心權重</td>
+<td><math><msub><mi>R</mi><mi>r</mi></msub></math> 為第 <math><mi>r</mi></math> 條觀測關係；<math><msub><mi>ω</mi><mi>r</mi></msub></math> 是經校準的可靠度／重複觀測權重，不是硬編碼開關</td>
 </tr>
 </tbody>
 </table>
@@ -122,9 +180,9 @@
 </table>
 </div>
 
-<p class="prose">此處採<b>加權</b>而非硬性條件。第八、九節的閘門雖可排除多數假約束，但無法完全排除；
-將殘餘的不確定性納入 <math><msub><mi>ω</mi><mi>r</mi></msub></math>，單一條錯誤約束僅被稀釋，
-而不致如硬性條件般直接迫使模型產生不存在的群。</p>
+<p class="prose">此處採<b>軟關係模型</b>而非硬性條件。第三、四節的閘門雖可排除多數假約束，但無法完全排除；
+將殘餘的不確定性納入 <math><mo>(</mo><msub><mi>q</mi><mi>r</mi></msub><mo>,</mo><msub><mi>ε</mi><mi>r</mi></msub><mo>,</mo><msub><mi>ω</mi><mi>r</mi></msub><mo>)</mo></math>，單一條錯誤觀測只增加有限的違反代價，
+而不會像 <math><msub><mi>ε</mi><mi>r</mi></msub><mo>=</mo><mn>0</mn></math> 的硬性條件般直接迫使模型產生不存在的群。</p>
 
 <p class="prose">推論方法為帶約束的 EM，或直接對 <math><mo>(</mo><mi>T</mi><mo>,</mo><mi>c</mi><mo>,</mo><mi>z</mi><mo>)</mo></math> 取樣。
 <b>輸出須載明每一組群配對由幾條約束支持</b>；
@@ -433,9 +491,9 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 </table>
 </div>
 
-<p class="prose">處理方式已內建於估計式：由於約束是<b>加權項</b>而非硬性條件，
+<p class="prose">處理方式已內建於估計式：由於約束是<b>加權的軟證據項</b>而非硬性條件，
 求解器不會因矛盾而無解，它取總和最大的那組 <math><mo>(</mo><mi>z</mi><mo>,</mo><mi>T</mi><mo>)</mo></math>，
-少數錯誤的約束被多數蓋過。此即本節開頭堅持採 <math><msub><mi>ω</mi><mi>r</mi></msub></math> 而非硬性條件的理由。</p>
+少數錯誤的約束被多數蓋過。此即本節開頭堅持採 <math><mo>(</mo><msub><mi>q</mi><mi>r</mi></msub><mo>,</mo><msub><mi>ε</mi><mi>r</mi></msub><mo>,</mo><msub><mi>ω</mi><mi>r</mi></msub><mo>)</mo></math> 而非硬性條件的理由。</p>
 
 <p class="prose">而<b>矛盾率本身是一個診斷量</b>：它估計的是整條約束產線的錯誤率，
 邏輯與第二節以「不相容單位」估計單倍型標記錯誤率相同，僅是提升至全域這一層。
@@ -613,9 +671,9 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 <table>
 <thead><tr><th scope="col">現行輸出</th><th scope="col">對應的約束</th><th scope="col">在全基因體尺度所決定的量</th></tr></thead>
 <tbody>
-<tr><td>分岔（無分子同時帶有兩者）</td><td><b>不可同群</b>（硬）</td><td>強制拆峰，為用途一唯一的原料。<b>惟 trans 會偽造此一格，見第五節</b></td></tr>
-<tr><td>串接，且比值 <math><mo>≈</mo><mn>1</mn></math></td><td><b>必定同群</b>（硬）</td><td>合併分散於不同區域的同一群。<b>權重應為最低，理由見下</b></td></tr>
-<tr><td>串接，且比值 <math><mo>&lt;</mo><mn>1</mn></math></td><td><b>有向</b>：A 群為 B 群的祖先</td><td>群間先後次序，取代中篇第一節第四步的簡約性偏好</td></tr>
+<tr><td>分岔（無分子同時帶有兩者）</td><td><b>不可同群</b>（軟；高信心時近似硬）</td><td>強制拆峰，為用途一唯一的原料。<b>惟 trans 會偽造此一格，見第五節</b></td></tr>
+<tr><td>串接，且比值 <math><mo>≈</mo><mn>1</mn></math></td><td><b>必定同群</b>（軟；高信心時近似硬）</td><td>合併分散於不同區域的同一群。<b>權重應為最低，理由見下</b></td></tr>
+<tr><td>串接，且比值 <math><mo>&lt;</mo><mn>1</mn></math></td><td><b>有向</b>（軟）：A 群為 B 群的祖先</td><td>群間先後次序，取代中篇第一節第四步的簡約性偏好</td></tr>
 <tr><td>不相容（四格皆非空）</td><td>不產生約束</td><td>反向用於估計單倍型標記的錯誤率</td></tr>
 </tbody>
 </table>
@@ -714,8 +772,8 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 <p class="prose">設該譜系中有三成的分子帶有某一狀態，則三條 read 全數未取樣到的機率為
 <math><msup><mn>0.7</mn><mn>3</mn></msup><mo>≈</mo><mn>0.34</mn></math>。<b>約三分之一的機率會將「存在」誤判為「不存在」</b>，
 而「未觀測到」正是判定分岔的依據。
-換言之，該條約束有約三分之一的機率為假，並將以硬性 <math><msub><mi>z</mi><mi>i</mi></msub><mo>≠</mo><msub><mi>z</mi><mi>j</mi></msub></math> 的形式
-進入第一節的估計式。</p>
+換言之，該條觀測關係有約三分之一的機率為假；它應降低 <math><msub><mi>q</mi><mi>r</mi></msub></math>、提高
+<math><msub><mi>ε</mi><mi>r</mi></msub></math> 或降低 <math><msub><mi>ω</mi><mi>r</mi></msub></math>，而不是以硬性 <math><msub><mi>z</mi><mi>i</mi></msub><mo>≠</mo><msub><mi>z</mi><mi>j</mi></msub></math> 進入估計式。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="rg-pairwise-gate__title" aria-describedby="rg-pairwise-gate__desc">
   <title id="rg-pairwise-gate__title">兩種「沒看到」：真的沒有那種細胞，與沒有 read 跨得到</title>
@@ -774,7 +832,7 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
   <text class="tick zh" x="48" y="470">預期效果：目前被歸進「單層無分支」的單位，會有一部分正確地移到「未解析」。</text>
 </svg><figcaption>「此狀態未出現」有兩種成因：該類細胞確實不存在，
 或無 read 跨越該對位點。現行做法將兩者等同處理 ——
-在約束的脈絡下，第二種成因將直接產生一條假的硬約束。</figcaption></figure>
+在約束的脈絡下，第二種成因將直接產生一條假的高權重關係；軟模型應讓它保留非零的違反機率。</figcaption></figure>
 
 <pre><code>for each pair (i, j) in the unit:
     n_ij  = 同時覆蓋 i 與 j 的 read 數
@@ -1092,8 +1150,9 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 <code>00</code>、<code>10</code>、<code>01</code>，而 <code>11</code> 一格為空 ——
 <b>此形態與兩群互不包含的 subclone 完全相同</b>。
 
-在約束的脈絡下此點尤為關鍵：它將產出一條<b>假的「不可同群」</b>，
-而該約束為硬性條件，將直接迫使混合模型分出一個不存在的群。
+在約束的脈絡下此點尤為關鍵：它可能產出一條<b>假的「不可同群」</b>；
+若把它錯誤地設成 <math><msub><mi>ε</mi><mi>r</mi></msub><mo>=</mo><mn>0</mn></math> 的硬性條件，才會直接迫使混合模型分出一個不存在的群。
+本提案的 <math><msub><mi>ε</mi><mi>r</mi></msub><mo>&gt;</mo><mn>0</mn></math> 軟模型允許頻率項與其他關係把它推翻。
 
 現行流程已先依單倍型家族分組，此設計正確；
 且相位使 cis／trans 在<b>整個 phase block</b> 內為已知
@@ -1103,7 +1162,8 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 <h3 id="六-約束的信心值-_r">六、約束的信心值 ω_r</h3>
 
 <p class="prose">通過兩道閘門之後，約束的強度仍有差異。
-第一節的 <math><msub><mi>ω</mi><mi>r</mi></msub></math> 不需另行設計，可直接取用求解器既有的兩個量：</p>
+第一節的 <math><msub><mi>ω</mi><mi>r</mi></msub></math> 不能只把求解器輸出的分數當作權重；下列兩個量可作為輸入，
+仍須以重複資料或留出單位校準成 <math><mo>(</mo><msub><mi>q</mi><mi>r</mi></msub><mo>,</mo><msub><mi>ε</mi><mi>r</mi></msub><mo>,</mo><msub><mi>ω</mi><mi>r</mi></msub><mo>)</mo></math>：</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530" class="dia-svg" role="img" aria-labelledby="rg-steiner-latent__title" aria-describedby="rg-steiner-latent__desc">
   <title id="rg-steiner-latent__title">樹成本等於潛在節點數，所以最小成本就是「補最少的看不到狀態」</title>
@@ -1177,6 +1237,11 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 </tbody>
 </table>
 </div>
+
+<p class="prose">實作上可令 <math><msub><mi>ω</mi><mi>r</mi></msub></math> 隨有效跨越深度增加、隨 <math><mo>|</mo><mi>H</mi><mo>|</mo></math> 與候選集合大小增加而降低，
+再用已知重現性資料把它映射到 <math><msub><mi>q</mi><mi>r</mi></msub></math> 與 <math><msub><mi>ε</mi><mi>r</mi></msub></math>。若候選解對某一關係意見不一，
+最安全的做法是令 <math><msub><mi>ω</mi><mi>r</mi></msub><mo>=</mo><mn>0</mn></math>（UNDETERMINED），而不是把多數票轉成硬條件；
+這保留了「漏掉約束」通常比「加入假約束」便宜的保守原則。</p>
 
 <p class="prose">此亦為 <span class="term" data-term="latent node" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-latent-node-3">latent node<span class="term__pop" id="gd-latent-node-3" role="tooltip"><b class="term__hd">latent node <i>潛在節點</i></b><span class="term__def" data-lang="zh">建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</span><span class="term__def" data-lang="en" lang="en">An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.</span><a class="term__more" href="glossary.html#latent-node">完整條目 →</a></span></span> 一項警告的具體應用：
 潛在節點<b>並非</b>一群尚未被觀測到的細胞，故不得作為證據，但可作為扣分依據。</p>
@@ -1479,7 +1544,7 @@ report: 收得幾條約束、排除幾條、排除的是哪些</code></pre>
 確認僅用 VAF 的分群必然給出 <math><mi>K</mi><mo>=</mo><mn>2</mn></math> 與線性樹，
 再量測需要多少條約束、閘門需多嚴格，方能正確分離而不誤拆。</li>
 <li><b>用途二需要同一條單倍型上存在多個變異</b>，而該條件對應的正是最稀缺的區域。
-低突變負荷時 <math><mover accent="true"><mi>φ</mi><mo>^</mo></mover></math> 可能無法估計，此時用途二失效，僅餘用途一與用途三。</li>
+低突變負荷時 <math><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mo>(</mo><mi>d</mi><mo>,</mo><mi>CN</mi><mo>)</mo></math> 可能無法估計，此時用途二失效，僅餘用途一與用途三。</li>
 <li><b>約束的來源具有偏性。</b>它們僅來自變異密集的區域，
 而變異密集有時並非偶然：<b>kataegis</b> 為一種局部超突變，
 單次事件於數十 kb 內產生一連串變異。
@@ -1522,7 +1587,7 @@ MOBSTER，Caravagna G et al., <i>Nat Genet</i> 2020;52:898–907
 參數名稱與欄位一律以<b>原始碼</b>為準。</p>
 </section>
 
-    <nav class="pager" aria-label="模組導覽"><a class="prev" href="sr2.html"><small>← 上一模組</small>中篇：VAF 路線缺什麼，多變異區域能補上哪三格</a><span></span></nav>
+    <nav class="pager" aria-label="模組導覽"><a class="prev" href="sr2.html"><small>← 上一模組</small>中篇：VAF 路線缺什麼，多變異區域能補上哪三格</a><a class="next" href="sr3.html"><small>下一模組 →</small>上篇：純度、倍體與拷貝數為何只能一起估計</a></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>read-AF（read 層級的 ALT 比例）</dt><dd>在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd></dl></section>
   </main>
   <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#一-完整的估計式">一、完整的估計式</a></li><li class="lv4"><a href="#數百個單位的局部拓撲形狀不同-這是預期-不是矛盾">數百個單位的局部拓撲形狀不同 —— 這是預期，不是矛盾</a></li><li class="lv4"><a href="#合起來為什麼更準-解析度更高">合起來為什麼更準、解析度更高</a></li><li class="lv3"><a href="#二-約束的來源-現行實作的分類輸出">二、約束的來源：現行實作的分類輸出</a></li><li class="lv4"><a href="#必定同群-與用途一的張力">「必定同群」與用途一的張力</a></li><li class="lv3"><a href="#三-閘門一-單位的有效樣本數">三、閘門一：單位的有效樣本數</a></li><li class="lv3"><a href="#四-閘門二-候選排序偏誤對-不可同群-的系統性損耗">四、閘門二：候選排序偏誤對「不可同群」的系統性損耗</a></li><li class="lv3"><a href="#五-兩類會產生假約束的誤讀">五、兩類會產生假約束的誤讀</a></li><li class="lv3"><a href="#六-約束的信心值-_r">六、約束的信心值 ω_r</a></li><li class="lv3"><a href="#七-約束預算">七、約束預算</a></li><li class="lv4"><a href="#兩個-5-的分母不同">兩個 5% 的分母不同</a></li><li class="lv4"><a href="#推導">推導</a></li><li class="lv3"><a href="#八-視窗寬度-約束產量與品質的取捨">八、視窗寬度：約束產量與品質的取捨</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#現行實作的量測結果-約束的可用庫存">現行實作的量測結果：約束的可用庫存</a></li><li class="lv3"><a href="#三項須注意的事項">三項須注意的事項</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv3"><a href="#尚未解決的問題">尚未解決的問題</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
