@@ -124,5 +124,5 @@
 
   <line class="axis" x1="20" y1="452" x2="980" y2="452"/>
   <text class="anno zh bold" x="20" y="482">同一條分子上的四個 CpG 一起看，才分得出「一群細胞在起伏」與「兩群細胞」。</text>
-  <text class="anno zh" x="20" y="510">但「兩群」也可能是同一群細胞的兩條 haplotype，一條甲基化一條不甲基化 —— 要看它跟 HP 標籤對不對得上。</text>
+  <text class="anno zh" x="20" y="510">惟「兩群」亦可能為同一群細胞的兩條 haplotype，一條甲基化、一條不甲基化 —— 須與 HP 標籤比對方能區分。</text>
 </svg>

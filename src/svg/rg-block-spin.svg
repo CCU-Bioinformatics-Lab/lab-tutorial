@@ -22,7 +22,7 @@
   <text class="tick mid" x="920" y="137">拷貝 ②</text>
 
   <!-- 中排：軟體輸出 -->
-  <text class="lbl bold zh" x="20" y="204">軟體給你</text>
+  <text class="lbl bold zh" x="20" y="204">軟體輸出</text>
   <text class="anno zh" x="130" y="204">每個 block 各自標號，標號獨立決定</text>
 
   <rect class="box ghost" x="126" y="216" width="360" height="96" rx="8"/>
@@ -43,7 +43,7 @@
 
   <path class="conn bad" d="M486,264 L530,264" marker-end="url(#arrow-sm)"/>
   <path class="conn bad" d="M486,280 L530,280" marker-end="url(#arrow-sm)"/>
-  <text class="tick zh bad mid" x="508" y="336">標號在這裡翻面</text>
+  <text class="tick zh bad mid" x="508" y="336">標號於此處反轉</text>
 
   <!-- 下排：後果 -->
   <rect class="box ok" x="24" y="368" width="460" height="150" rx="8"/>

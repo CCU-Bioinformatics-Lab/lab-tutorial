@@ -11,7 +11,7 @@
         而第三對其實沒有資料，卻仍然被演算法決定了關係。
         讀法是：有效樣本數是「每一個位點對各自的跨越深度」，不是這個單位的總 read 數。</desc>
 
-  <text class="ttl zh" x="20" y="36">真實資料長什麼樣</text>
+  <text class="ttl zh" x="20" y="36">真實資料的覆蓋結構</text>
   <text class="tick mono" x="20" y="62">HCC1395_HKU · chr12:981,725–1,021,146 · HP1 · k=3 · 194 reads · 視窗 39.4 kb</text>
 
   <!-- 覆蓋統計 -->

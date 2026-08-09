@@ -109,6 +109,6 @@
 
   <!-- ══ 兩個根本差別 ══ -->
   <rect class="box accent" x="24" y="634" width="952" height="60" rx="8"/>
-  <text class="anno zh" x="48" y="662">① 左邊每根長條數的是<tspan class="bold">變異</tspan>，右邊數的是<tspan class="bold">細胞群</tspan>。所以 0.45 那一根左邊根本畫不出來 —— 沒有變異就沒有 VAF。</text>
+  <text class="anno zh" x="48" y="662">① 左側每根長條計數的是<tspan class="bold">變異</tspan>，右側計數的是<tspan class="bold">細胞群</tspan>。0.45 一根在左側無法繪出 —— 無變異即無 VAF。</text>
   <text class="anno zh" x="48" y="686">② 左邊的頻率是邊際，右邊的頻率<tspan class="bold">帶著隸屬關係</tspan>，所以「兄弟還是祖孫」不必再猜。</text>
 </svg>

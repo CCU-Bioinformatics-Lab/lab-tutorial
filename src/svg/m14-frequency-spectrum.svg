@@ -77,5 +77,5 @@
   <line class="axis" x1="20" y1="448" x2="980" y2="448"/>
   <text class="anno zh" x="20" y="478">① 所有腫瘤細胞都帶有。CN＝2、multiplicity＝1 時峰的位置<tspan class="bold">恰好</tspan>是純度 ÷ 2，可反推純度。</text>
   <text class="anno zh" x="20" y="508">② 只有一部分腫瘤細胞帶有。每一個鼓起對應一群 subclone —— 這是「分群」要抓的東西。</text>
-  <text class="anno zh bold" x="20" y="538">③ 別直接量這張圖的斜率：直方圖是 1/f²，要先把變異數累積起來，那條線才對 1/f 呈直線。</text>
+  <text class="anno zh bold" x="20" y="538">③ 不可直接量測此圖的斜率：直方圖為 1/f²，須先將變異數累積，該線方對 1/f 呈直線。</text>
 </svg>

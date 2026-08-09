@@ -34,7 +34,7 @@
   <line class="axis" x1="110" y1="236" x2="380" y2="236"/>
   <text class="tick zh" x="396" y="196">一根峰</text>
 
-  <text class="tick zh mid bad" x="258" y="258">這一根其實是<tspan class="bold">兩群</tspan>，而且兩群佔的比例一樣</text>
+  <text class="tick zh mid bad" x="258" y="258">此峰實為<tspan class="bold">兩群</tspan>，且兩群的比例相等</text>
   <text class="tick zh mid" x="258" y="278">在一維軸上它們是同一個點 —— 再深的定序也分不開</text>
 
   <!-- 解法 -->

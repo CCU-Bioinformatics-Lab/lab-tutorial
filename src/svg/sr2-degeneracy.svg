@@ -1,32 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 660">
-  <title>一個具體例子：兩群細胞比例相同時只用 VAF 會少數一群並把樹判成線性，一條不可同群就改回分支</title>
-  <desc>純度百分之六十、二倍體、每個帶原細胞只有一份變異拷貝。
-        左欄是真相：三群細胞，A 佔全部腫瘤細胞，B 與 C 各佔百分之四十，
-        而 B 與 C 是兩個分開的分支，都直接長在 A 底下。
-        中欄是只看 VAF 直方圖會得到的結果：
-        A 的期望 VAF 是零點三零，B 與 C 的期望 VAF 都是零點一二，
-        因為兩群的細胞比例相同，所以它們在頻率軸上疊成同一根峰。
-        混合模型配出兩群，樹是 A 到 B 一條線。
-        這不是擬合失敗，兩群就是這組資料的最大似然解，
-        因為把一個成分拆成兩個位置相同的成分，似然完全不變，
-        而模型選擇準則會罰多出來的參數。
-        右欄是加上一條約束之後：B 裡的變異 i 與 C 裡的變異 j 落在同一個分析單位裡，
-        觀測到沒有任何分子同時帶著兩者，於是 i 與 j 不可能屬於同一群。
-        兩群的解在零點一二那根峰上只有一個成分，必然把 i 與 j 指到同一群，
-        所以那個解變成不可行，最好的可行解是三群，
-        其中兩個成分落在同一個位置。
-        這時父節點的比例零點四加零點四等於零點八，不超過 A 的一點零，
-        所以分支的樹才被允許。
-        最下方標注：改變的是樹的形狀與群的個數，不是某個數字的小數點；
-        而且這一條約束只釘住 i 與 j 兩個變異，
-        那根峰裡其餘的變異歸屬仍然分不出來。</desc>
+  <title>數值例：兩群細胞比例相等時僅用 VAF 將少計一群並將樹誤判為線性，單一條不可同群使其回復為分支</title>
+  <desc>純度百分之六十、二倍體、每個帶原細胞僅有一份變異拷貝。
+        左欄為真實情形：三群細胞，A 佔全部腫瘤細胞，B 與 C 各佔百分之四十，
+        且 B 與 C 為兩個分離的分支，皆直接衍生自 A。
+        中欄為僅觀察 VAF 直方圖所得的結果：
+        A 的期望 VAF 為零點三零，B 與 C 的期望 VAF 皆為零點一二；
+        因兩群的細胞比例相等，兩者在頻率軸上重疊於同一峰。
+        混合模型擬合出兩群，樹為 A 至 B 的線性形式。
+        此非擬合失敗，兩群即為該組資料的最大似然解，
+        因為將一個成分拆為兩個位置相同的成分後似然完全不變，
+        而模型選擇準則對額外參數施以懲罰。
+        右欄為加入一條約束之後：B 中的變異 i 與 C 中的變異 j 落於同一個分析單位，
+        且觀測到無任何分子同時帶有兩者，故 i 與 j 不可能屬於同一群。
+        兩群的解在零點一二一峰上僅有一個成分，必然將 i 與 j 指派至同一群，
+        該解因而不可行；最優的可行解為三群，
+        其中兩個成分位於同一位置。
+        此時父節點的比例零點四加零點四等於零點八，未超過 A 的一點零，
+        分支形式的樹方獲容許。
+        最下方標注：所改變者為樹的拓撲與群的個數，而非參數的數值；
+        且該條約束僅確定 i 與 j 兩個變異，
+        該峰內其餘變異的歸屬仍不可辨識。</desc>
 
-  <text class="ttl zh" x="20" y="38">ρ ＝ 0.60、二倍體、μ ＝ 1：一條約束把線性樹改回分支樹</text>
-  <text class="anno zh" x="20" y="66">三欄的直方圖是同一組資料。差別只在有沒有那一條「不可同群」。</text>
+  <text class="ttl zh" x="20" y="38">ρ ＝ 0.60、二倍體、μ ＝ 1：單一條約束使線性樹回復為分支樹</text>
+  <text class="anno zh" x="20" y="66">三欄的直方圖為同一組資料，差異僅在於是否加入該條「不可同群」。</text>
   <line class="axis" x1="20" y1="86" x2="980" y2="86"/>
 
   <!-- ══════════ 左欄：真相 ══════════ -->
-  <text class="lbl bold zh" x="20" y="120">真相</text>
+  <text class="lbl bold zh" x="20" y="120">真實情形</text>
   <rect class="box plain" x="20" y="136" width="292" height="238" rx="6"/>
 
   <circle class="mark germline" cx="166" cy="176" r="16"/>
@@ -41,11 +41,11 @@
   <text class="tick mono mid" x="166" y="290">CCF   A 1.00</text>
   <text class="tick mono mid hp1" x="106" y="314">B 0.40</text>
   <text class="tick mono mid hp2" x="226" y="314">C 0.40</text>
-  <text class="tick bold zh mid" x="166" y="348">B 與 C 是兩個分開的分支，</text>
-  <text class="tick bold zh mid" x="166" y="366">但細胞比例剛好一樣</text>
+  <text class="tick bold zh mid" x="166" y="348">B 與 C 為兩個分離的分支，</text>
+  <text class="tick bold zh mid" x="166" y="366">惟細胞比例相等</text>
 
   <!-- ══════════ 中欄：只用 VAF ══════════ -->
-  <text class="lbl bold zh bad" x="354" y="120">只用 VAF 直方圖</text>
+  <text class="lbl bold zh bad" x="354" y="120">僅用 VAF 直方圖</text>
   <rect class="box bad" x="354" y="136" width="292" height="238" rx="6"/>
 
   <rect class="bar" x="376" y="270" width="16" height="22"/>
@@ -66,14 +66,14 @@
   <text class="tick mono mid" x="538" y="312">0.30</text>
   <text class="tick mid" x="620" y="312">VAF</text>
 
-  <text class="tick bold zh bad mid" x="430" y="166">B 與 C 疊在這裡</text>
+  <text class="tick bold zh bad mid" x="430" y="166">B 與 C 重疊於此</text>
 
   <circle class="mark germline" cx="470" cy="342" r="13"/>
   <text class="tick mid" x="470" y="347">A</text>
   <path class="conn" d="M483,342 L513,342" marker-end="url(#arrow-sm)"/>
   <circle class="mark hp1" cx="526" cy="342" r="13"/>
   <text class="tick mid" x="526" y="347">B</text>
-  <text class="tick bold zh bad" x="372" y="347">估出 K ＝ 2</text>
+  <text class="tick bold zh bad" x="372" y="347">估得 K ＝ 2</text>
   <text class="tick zh bad" x="548" y="347">線性樹</text>
 
   <!-- ══════════ 右欄：加一條約束 ══════════ -->
@@ -104,7 +104,7 @@
   <text class="tick mid" x="780" y="169">C</text>
   <path class="conn ok" d="M748,175 L764,196" marker-end="url(#arrow-sm)"/>
   <path class="conn ok" d="M780,175 L764,196" marker-end="url(#arrow-sm)"/>
-  <text class="tick bold zh ok" x="800" y="169">同一根峰，兩個成分</text>
+  <text class="tick bold zh ok" x="800" y="169">同一峰，兩個成分</text>
 
   <circle class="mark germline" cx="800" cy="336" r="13"/>
   <text class="tick mid" x="800" y="341">A</text>
@@ -120,21 +120,21 @@
   <!-- ══════════ 下半：為什麼 ══════════ -->
   <line class="axis" x1="20" y1="398" x2="980" y2="398"/>
 
-  <text class="lbl bold zh" x="20" y="432">為什麼「只用 VAF」必然估出 K ＝ 2</text>
+  <text class="lbl bold zh" x="20" y="432">「僅用 VAF」必然估得 K ＝ 2 的原因</text>
   <rect class="box sunken" x="20" y="448" width="480" height="118" rx="6"/>
   <text class="tick mono" x="36" y="478">π_B·BetaBin(a; d, θ, φ) + π_C·BetaBin(a; d, θ, φ)</text>
   <text class="tick mono" x="36" y="504">      = (π_B + π_C)·BetaBin(a; d, θ, φ)</text>
-  <text class="anno zh" x="36" y="534">兩群與一群對<tspan class="bold">任何一筆</tspan>可能的資料給出相同的機率。</text>
-  <text class="anno zh" x="36" y="556">不是接近，是相等 —— 所以 (π_B, π_C) 本身不可辨識。</text>
+  <text class="anno zh" x="36" y="534">兩群與一群對<tspan class="bold">任何一組</tspan>可能的觀測給出相同機率。</text>
+  <text class="anno zh" x="36" y="556">並非近似而是恆等，故 (π_B, π_C) 本身不可辨識。</text>
 
-  <text class="lbl bold zh" x="520" y="432">那一條約束做了什麼</text>
+  <text class="lbl bold zh" x="520" y="432">該條約束的作用</text>
   <rect class="box sunken" x="520" y="448" width="460" height="118" rx="6"/>
   <text class="tick mono" x="536" y="478">i ∈ B, j ∈ C, 同一單位, 無分子同時帶 → z_i ≠ z_j</text>
-  <text class="anno zh" x="536" y="508">K ＝ 2 時那根峰只有一個成分 → 必然 z_i ＝ z_j</text>
-  <text class="anno zh" x="536" y="530">→ 該解<tspan class="bold">不可行</tspan>。最好的可行解是 K ＝ 3。</text>
-  <text class="anno zh" x="536" y="552">pigeonhole 這時才准分支：0.40 ＋ 0.40 ≤ 1.00 ✓</text>
+  <text class="anno zh" x="536" y="508">K ＝ 2 時該峰僅一個成分 → 必然 z_i ＝ z_j</text>
+  <text class="anno zh" x="536" y="530">→ 該解<tspan class="bold">不可行</tspan>；最優可行解為 K ＝ 3。</text>
+  <text class="anno zh" x="536" y="552">pigeonhole 至此容許分支：0.40 ＋ 0.40 ≤ 1.00 ✓</text>
 
   <rect class="box ghost accent" x="20" y="582" width="960" height="62" rx="6"/>
-  <text class="lbl bold zh" x="38" y="612">改變的是樹的形狀與群的個數，不是某個數字的小數點。</text>
-  <text class="anno zh" x="38" y="636">但這一條只釘住 i 與 j 兩個變異 —— 那根峰裡其餘幾百個的歸屬，仍然分不出來，也不需要分。</text>
+  <text class="lbl bold zh" x="38" y="612">所改變者為樹的拓撲與群的個數，而非參數的數值。</text>
+  <text class="anno zh" x="38" y="636">該條約束僅確定 i 與 j 兩個變異；該峰內其餘數百個的歸屬仍不可辨識，而重建亦不需要。</text>
 </svg>

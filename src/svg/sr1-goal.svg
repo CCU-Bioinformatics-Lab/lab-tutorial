@@ -41,9 +41,9 @@
   <text class="tick zh mid" x="172" y="212">好幾群細胞，各帶不同的變異組合</text>
   <text class="tick zh mid" x="172" y="236">而且群之間有先後關係</text>
 
-  <!-- ② 定序給你的 -->
+  <!-- ② 定序所得 -->
   <rect class="box ghost" x="350" y="62" width="296" height="186" rx="8"/>
-  <text class="lbl bold zh mid" x="498" y="92">② 定序給你的</text>
+  <text class="lbl bold zh mid" x="498" y="92">② 定序所得</text>
 
   <rect class="read hp0" x="372" y="110" width="120" height="12" rx="6"/>
   <rect class="read hp0" x="504" y="110" width="120" height="12" rx="6"/>

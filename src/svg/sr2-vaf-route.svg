@@ -1,23 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700">
-  <title>只用 VAF 頻率譜重建 subclone 的四個步驟，以及三個弱點各落在哪一個參數上</title>
-  <desc>由左而右四個步驟，這是不使用任何長讀關係、只靠一維頻率譜的標準做法。
-        第一步是換算：一個位點的 read 分成帶變異與不帶變異兩堆，比值是 VAF，
-        再除以純度的一半換算成癌細胞比例。這一步需要三個外部估計值，
-        分別是全樣本一個的純度、每個區段一個的拷貝數、每個變異一個的 multiplicity。
-        第二步是把一萬五千個換算後的數值疊成一維直方圖，配上混合模型，
-        每一群有位置、高度與寬度三個參數，而每個變異屬於哪一群是看不到的潛在變數，
-        在這個式子裡被加總積掉了。
-        第三步是決定總共有幾群，用的是模型選擇準則而不是參數估計。
-        第四步是從各群的細胞比例建樹，規則是父節點的比例不能小於子節點的比例總和，
-        但這條規則通常無法把候選縮到只剩一棵，剩下的要靠簡約性之類的偏好挑。
-        圖的下方列出三個弱點，各自用箭頭指回它所在的步驟：
-        群數不可辨識，落在潛在變數與群數上；
-        寬度參數與群數互相吃，落在寬度上；
-        細胞比例要靠三個外部估計值換算，落在位置上。
-        讀法是：這三個弱點就是後面三個用途各自要補的格子，一項對一個。</desc>
+  <title>僅以 VAF 頻率譜重建 subclone 的四個步驟，及三項限制各自所在的參數</title>
+  <desc>由左至右共四個步驟，為不使用任何長讀關係、僅以一維頻率譜重建的標準做法。
+        第一步為換算：單一位點的 read 分為帶變異與不帶變異兩組，其比值為 VAF，
+        再除以純度的一半換算為癌細胞比例。此步驟需要三個外部估計值，
+        分別為全樣本單一值的純度、每區段一個值的拷貝數，以及每個變異一個值的 multiplicity。
+        第二步為將一萬五千個換算後的數值匯為一維直方圖並擬合混合模型，
+        每一群具有位置、高度與寬度三個參數；每個變異的群歸屬為未觀測的潛在變數，
+        在該式中被邊際化。
+        第三步為決定群數，所依據者為模型選擇準則而非參數估計。
+        第四步為由各群的細胞比例建樹，其條件為父節點的比例不得小於子節點的比例總和；
+        此條件通常無法將候選收斂至唯一一棵，其餘由簡約性等偏好決定。
+        圖的下方列出三項限制，各以箭頭指回其所在的步驟：
+        群數不可辨識，位於潛在變數與群數；
+        寬度參數與群數不可區辨，位於寬度；
+        細胞比例依賴三個外部估計值，位於位置。
+        此三項限制與後續三個用途一一對應。</desc>
 
-  <text class="ttl zh" x="20" y="38">只用 VAF：從 read 到樹的四步</text>
-  <text class="anno zh" x="20" y="66">這是要被改善的對象。三個弱點在最下方，各對應後面一個用途。</text>
+  <text class="ttl zh" x="20" y="38">僅用 VAF：自 read 至樹的四個步驟</text>
+  <text class="anno zh" x="20" y="66">此為改善的對照基準。三項限制列於下方，各對應一個用途。</text>
 
   <!-- ─────────── 步驟橫幅 ─────────── -->
   <line class="axis" x1="20" y1="86" x2="980" y2="86"/>
@@ -45,7 +45,7 @@
 
   <!-- 外部估計值 -->
   <rect class="box sunken" x="20" y="322" width="200" height="96" rx="6"/>
-  <text class="tick bold zh" x="34" y="344">要三個外部估計值</text>
+  <text class="tick bold zh" x="34" y="344">須三個外部估計值</text>
   <text class="tick mono" x="34" y="366">ρ    純度 · 全樣本一個</text>
   <text class="tick mono" x="34" y="386">CN   拷貝數 · 每區段一個</text>
   <text class="tick mono" x="34" y="406">μ    multiplicity · 每變異</text>
@@ -53,8 +53,8 @@
   <path class="conn" d="M228,240 L262,240" marker-end="url(#arrow)"/>
 
   <!-- ② 混合模型 -->
-  <text class="lbl bold zh" x="272" y="118">② 配混合模型</text>
-  <text class="tick zh" x="272" y="142">15,500 個 c 疊成一維直方圖</text>
+  <text class="lbl bold zh" x="272" y="118">② 擬合混合模型</text>
+  <text class="tick zh" x="272" y="142">15,500 個 c 匯為一維直方圖</text>
 
   <rect class="box plain" x="272" y="158" width="228" height="150" rx="6"/>
   <rect class="bar" x="292" y="262" width="17" height="24"/>
@@ -73,28 +73,28 @@
   <text class="tick mono" x="272" y="336">a_m | z_m=k ~ BetaBin(d_m, θ_k, φ)</text>
   <text class="tick mono" x="272" y="360">θ_k 位置 · π_k 高度 · φ 寬度</text>
   <rect class="box ghost bad" x="268" y="372" width="236" height="46" rx="6"/>
-  <text class="tick bold zh bad" x="280" y="392">z_m 在這一步被「積掉」了</text>
-  <text class="tick zh" x="280" y="410">—— 5% 要接的正是它</text>
+  <text class="tick bold zh bad" x="280" y="392">z_m 於此處被邊際化</text>
+  <text class="tick zh" x="280" y="410">5% 的作用點即為此變數</text>
 
   <path class="conn" d="M508,240 L542,240" marker-end="url(#arrow)"/>
 
   <!-- ③ 決定 K -->
   <text class="lbl bold zh" x="552" y="118">③ 決定 K</text>
-  <text class="tick zh" x="552" y="142">總共幾群？</text>
+  <text class="tick zh" x="552" y="142">群數為何</text>
 
   <rect class="box plain" x="548" y="158" width="184" height="150" rx="6"/>
   <text class="tick zh" x="562" y="184">BIC</text>
   <text class="tick zh" x="562" y="206">Dirichlet process</text>
   <text class="tick zh" x="562" y="228">MOBSTER 的冪次尾</text>
   <rect class="box ghost bad" x="558" y="242" width="164" height="52" rx="6"/>
-  <text class="tick bold zh bad" x="570" y="264">這是模型選擇，</text>
-  <text class="tick bold zh bad" x="570" y="284">不是參數估計</text>
+  <text class="tick bold zh bad" x="570" y="264">此為模型選擇，</text>
+  <text class="tick bold zh bad" x="570" y="284">非參數估計</text>
 
   <path class="conn" d="M736,240 L770,240" marker-end="url(#arrow)"/>
 
   <!-- ④ 建樹 -->
   <text class="lbl bold zh" x="780" y="118">④ 建樹</text>
-  <text class="tick zh" x="780" y="142">從 {c_k} 排出先後</text>
+  <text class="tick zh" x="780" y="142">由 {c_k} 定先後</text>
 
   <rect class="box plain" x="780" y="158" width="200" height="150" rx="6"/>
   <circle class="mark germline" cx="880" cy="190" r="13"/>
@@ -108,36 +108,36 @@
   <text class="tick mono mid" x="880" y="284">c_A ≥ c_B + c_C</text>
 
   <rect class="box ghost bad" x="776" y="322" width="204" height="96" rx="6"/>
-  <text class="tick bold zh bad" x="790" y="346">pigeonhole 通常縮不到</text>
-  <text class="tick bold zh bad" x="790" y="368">只剩一棵樹</text>
-  <text class="tick zh" x="790" y="392">剩下的靠簡約性之類的</text>
-  <text class="tick zh" x="790" y="410">偏好挑 —— 那不是資料</text>
+  <text class="tick bold zh bad" x="790" y="346">pigeonhole 通常無法</text>
+  <text class="tick bold zh bad" x="790" y="368">收斂至唯一一棵</text>
+  <text class="tick zh" x="790" y="392">其餘由簡約性等偏好</text>
+  <text class="tick zh" x="790" y="410">決定，非由資料決定</text>
 
   <!-- ─────────── 三個弱點 ─────────── -->
   <line class="axis" x1="20" y1="448" x2="980" y2="448"/>
-  <text class="lbl bold zh" x="20" y="482">這條路線的三個弱點 —— 5% 的三個用途正好一項對一個</text>
+  <text class="lbl bold zh" x="20" y="482">此路線的三項限制 —— 與 5% 的三個用途一一對應</text>
 
   <rect class="box bad" x="20" y="500" width="308" height="176" rx="6"/>
-  <text class="lbl bold zh bad" x="38" y="530">弱點一：K 不可辨識</text>
-  <text class="anno zh" x="38" y="558">兩群的 c 相同時，似然對</text>
-  <text class="anno zh" x="38" y="582">「一群還是兩群」完全不變。</text>
-  <text class="anno zh" x="38" y="606">加深定序也進不到這個方向。</text>
+  <text class="lbl bold zh bad" x="38" y="530">限制一：K 不可辨識</text>
+  <text class="anno zh" x="38" y="558">兩群的 c 相等時，似然對</text>
+  <text class="anno zh" x="38" y="582">「一群或兩群」完全不變。</text>
+  <text class="anno zh" x="38" y="606">增加深度不作用於此方向。</text>
   <text class="tick bold mono" x="38" y="638">參數：z → K</text>
-  <text class="tick bold zh ok" x="38" y="662">→ 用途一補</text>
+  <text class="tick bold zh ok" x="38" y="662">→ 由用途一補足</text>
 
   <rect class="box bad" x="346" y="500" width="308" height="176" rx="6"/>
-  <text class="lbl bold zh bad" x="364" y="530">弱點二：φ 與 K 互相吃</text>
-  <text class="anno zh" x="364" y="558">一個寬峰，和兩個靠近的</text>
-  <text class="anno zh" x="364" y="582">窄峰，配出幾乎一樣的圖。</text>
-  <text class="anno zh" x="364" y="606">選哪一個取決於懲罰項。</text>
+  <text class="lbl bold zh bad" x="364" y="530">限制二：φ 與 K 不可區辨</text>
+  <text class="anno zh" x="364" y="558">單一寬峰與兩個鄰近的</text>
+  <text class="anno zh" x="364" y="582">窄峰擬合出近乎相同的圖。</text>
+  <text class="anno zh" x="364" y="606">其結果取決於懲罰項。</text>
   <text class="tick bold mono" x="364" y="638">參數：φ</text>
-  <text class="tick bold zh ok" x="364" y="662">→ 用途二補</text>
+  <text class="tick bold zh ok" x="364" y="662">→ 由用途二補足</text>
 
   <rect class="box bad" x="672" y="500" width="308" height="176" rx="6"/>
-  <text class="lbl bold zh bad" x="690" y="530">弱點三：c 要靠換算</text>
-  <text class="anno zh" x="690" y="558">ρ 錯了整排一起平移；</text>
-  <text class="anno zh" x="690" y="582">CN 或 μ 錯了是逐個變異</text>
-  <text class="anno zh" x="690" y="606">跑位，會把群染髒。</text>
+  <text class="lbl bold zh bad" x="690" y="530">限制三：c 依賴換算</text>
+  <text class="anno zh" x="690" y="558">ρ 偏誤使整體平移；</text>
+  <text class="anno zh" x="690" y="582">CN 或 μ 偏誤為逐變異</text>
+  <text class="anno zh" x="690" y="606">位移，將汙染群的組成。</text>
   <text class="tick bold mono" x="690" y="638">參數：c</text>
-  <text class="tick bold zh ok" x="690" y="662">→ 用途三補</text>
+  <text class="tick bold zh ok" x="690" y="662">→ 由用途三補足</text>
 </svg>
