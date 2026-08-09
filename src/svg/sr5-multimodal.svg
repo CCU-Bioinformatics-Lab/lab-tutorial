@@ -9,11 +9,12 @@
         而兩個答案的倍體差了一倍。
         右欄是本頁要求的輸出：兩個模式各自附上機率，
         並列出三類可以用來定案的證據，以及它們在這個樣本上的狀態 ——
-        有沒有奇數的等位拷貝數、有沒有加倍之後才發生的變異、有沒有樣本外的量測。
+        有沒有加倍之後才發生的變異、有沒有樣本外的量測，以及有沒有奇數的等位拷貝數 ——
+        最後這一項只能擋住「再對半」，擋不住「再加倍」，所以它靠的是簡約偏好而不是資料。
         讀法是：把雙峰壓成一個數字，丟掉的不是精度，是「這裡還沒有定論」這件事。</desc>
 
   <text class="ttl zh" x="20" y="36">加倍未定時的輸出格式</text>
-  <text class="anno zh" x="20" y="66">同一份資料。兩個模式對深度與等位比例給出<b>相同</b>的期望值，體細胞錨亦不能分辨。</text>
+  <text class="anno zh" x="20" y="66">同一份資料。兩個模式對深度與等位比例給出<tspan class="bold">相同</tspan>的期望值，體細胞錨亦不能分辨。</text>
 
   <rect class="box ghost" x="20" y="88" width="306" height="290" rx="8"/>
   <text class="lbl bold zh mid" x="173" y="118">後驗的實況</text>
@@ -46,11 +47,11 @@
   <text class="tick mono mid" x="826" y="210">p 0.25　κ 4.0</text>
   <text class="tick mid" x="826" y="230">機率 0.4</text>
   <text class="tick bold zh" x="694" y="262">可用以定案的證據</text>
-  <text class="tick zh" x="694" y="286">· 奇數的等位拷貝數</text>
-  <text class="tick zh" x="694" y="310">· 加倍之後才發生的變異</text>
-  <text class="tick zh" x="694" y="334">· 樣本外的量測</text>
+  <text class="tick zh" x="694" y="286">· 加倍後才發生的變異</text>
+  <text class="tick zh" x="694" y="310">· 樣本外的量測</text>
+  <text class="tick zh" x="694" y="334">· 奇數拷貝數（僅擋對半）</text>
   <text class="tick ok zh" x="694" y="362">本樣本：三者皆無</text>
 
   <rect class="box accent" x="20" y="394" width="960" height="42" rx="8"/>
-  <text class="anno zh" x="40" y="422">壓成一個數字所丟掉的不是精度，是<b>「這裡還沒有定論」這件事</b> —— 而兩個模式的倍體相差一倍。</text>
+  <text class="anno zh" x="40" y="422">壓成一個數字所丟掉的不是精度，是<tspan class="bold">「這裡還沒有定論」這件事</tspan> —— 而兩個模式的倍體相差一倍。</text>
 </svg>

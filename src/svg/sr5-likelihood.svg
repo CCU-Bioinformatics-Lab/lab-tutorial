@@ -29,7 +29,7 @@
   <rect class="bar somatic" x="104" y="262" width="230" height="24"/>
   <text class="tick mono" x="344" y="280">似然主導</text>
 
-  <text class="tick bad zh" x="44" y="322">兩塊的相對高度<b>隨資料組成而變</b>，</text>
+  <text class="tick bad zh" x="44" y="322">兩塊的相對高度<tspan class="bold">隨資料組成而變</tspan>，</text>
   <text class="tick bad zh" x="44" y="346">而兩者之間沒有任何係數校準。</text>
   <text class="anno bold bad zh" x="44" y="382">同一個方法 ＝ 兩個方法</text>
 
@@ -50,12 +50,12 @@
   <rect class="bar somatic" x="736" y="262" width="140" height="24"/>
   <rect class="bar germline" x="876" y="262" width="60" height="24"/>
 
-  <text class="tick ok zh" x="536" y="322">各項的份量由其<b>樣本數與分布</b>自動決定，</text>
+  <text class="tick ok zh" x="536" y="322">各項的份量由其<tspan class="bold">樣本數與分布</tspan>自動決定，</text>
   <text class="tick ok zh" x="536" y="346">不需人為係數；簡約偏好搬到最後一項的先驗。</text>
   <text class="anno bold ok zh" x="536" y="382">尺度一致，可相加也可比較</text>
 
   <!-- ══ 最實際的差別 ══ -->
   <rect class="box accent" x="20" y="420" width="960" height="66" rx="8"/>
-  <text class="anno zh" x="40" y="448">最實際的差別在<b>不確定性</b>：右式的最大值附近有曲率，故給得出區間、給得出多峰。</text>
-  <text class="anno zh" x="40" y="474">左式的懲罰<b>不是機率</b>，其最小值附近的形狀不對應任何區間 —— 只能回報一個點。</text>
+  <text class="anno zh" x="40" y="448">最實際的差別在<tspan class="bold">不確定性</tspan>：右式的最大值附近有曲率，故給得出區間、給得出多峰。</text>
+  <text class="anno zh" x="40" y="474">左式的懲罰<tspan class="bold">不是機率</tspan>，其最小值附近的形狀不對應任何區間 —— 只能回報一個點。</text>
 </svg>

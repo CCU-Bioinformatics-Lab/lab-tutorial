@@ -15,7 +15,7 @@
         讀法是：N50 尺度相近不代表斷點對應，這兩件事不能互相代替。</desc>
 
   <text class="ttl zh" x="20" y="36">分段與定向是兩件不同的工作</text>
-  <text class="anno zh" x="20" y="66">同一段染色體。上排為拷貝數的真實邊界，中排為相位區塊的邊界，<b>兩者不對齊</b>。</text>
+  <text class="anno zh" x="20" y="66">同一段染色體。上排為拷貝數的真實邊界，中排為相位區塊的邊界，<tspan class="bold">兩者不對齊</tspan>。</text>
 
   <!-- ══ 拷貝數真實邊界 ══ -->
   <text class="anno bold zh" x="20" y="118">拷貝數狀態</text>
@@ -68,5 +68,5 @@
   <text class="tick zh mid" x="550" y="415">相位區塊只在每個區段<tspan class="bold">之內</tspan>指出哪一條是 H1</text>
 
   <rect class="box accent" x="20" y="458" width="960" height="48" rx="8"/>
-  <text class="anno zh" x="40" y="486">兩者回答不同的問題：<b>分段決定邊界在哪，定向決定邊界之內兩條怎麼配對</b>。N50 尺度相近不蘊含斷點對應。</text>
+  <text class="anno zh" x="40" y="486">兩者回答不同的問題：<tspan class="bold">分段決定邊界在哪，定向決定邊界之內兩條怎麼配對</tspan>。N50 尺度相近不蘊含斷點對應。</text>
 </svg>

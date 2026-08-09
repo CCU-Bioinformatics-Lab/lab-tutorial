@@ -6,12 +6,12 @@
         那一條只剩正常細胞貢獻的一份，所以比值等於腫瘤那一份加正常那一份，
         再除以正常那一份，也就是一除以一減細胞比例，隨細胞比例急遽上升：
         零點二時是一點二五，零點六時是二點五，零點八時是五。
-        右邊指出兩件事疊在一起的後果。
-        對上篇的兩個方法而言，異型合子性喪失與非整倍體是干擾：
-        它們的變異頻率錨在那裡失準，所以要把那些區域排除掉。
-        對本頁的路線而言，同樣的區域反而同時有最強的深度訊號，
-        而且錨在那裡照樣成立，因為錨的分母裡沒有另一條單倍型。
-        讀法是：對照方法最不利的區域，在這條路線上是資訊最密的區域。</desc>
+        右邊指出這件事的範圍。
+        受限的是 PURPLE 在高度二倍體樣本上啟用的那條變異頻率退路：
+        它的分母含兩條單倍型，所以只能用在拷貝數接近二的區域。
+        而異型合子性喪失對兩個方法的主要擬合並不是障礙 ——
+        上篇第四節已經示範，拷貝數不變的異型合子性喪失給出的是最乾淨的純度讀數之一。
+        讀法是：本頁的錨取代的是那條退路的區域限制，不是取代整個方法。</desc>
 
   <text class="ttl zh" x="20" y="36">LOH 區段：訊號最強而錨仍成立</text>
   <text class="anno zh" x="20" y="66">左為單倍型深度比隨純度的變化，右為此一性質與錨相合的後果。</text>
@@ -52,21 +52,21 @@
 
   <!-- ══ 右：後果 ══ -->
   <rect class="box ghost bad" x="584" y="88" width="396" height="150" rx="8"/>
-  <text class="anno bold zh" x="608" y="118">對上篇的兩個方法</text>
-  <text class="tick zh" x="608" y="148">LOH 與非整倍體使 VAF 的錨失準，</text>
-  <text class="tick zh" x="608" y="172">故須把該類區域<tspan class="bold">排除</tspan>在錨之外。</text>
-  <text class="tick bad zh" x="608" y="204">最有資訊的區域，被排除在最有用的</text>
-  <text class="tick bad zh" x="608" y="228">那一步之外。</text>
+  <text class="anno bold zh" x="608" y="118">受限的只有一條路徑</text>
+  <text class="tick zh" x="608" y="148">PURPLE 的 somatic VAF 退路分母含</text>
+  <text class="tick zh" x="608" y="172">兩條單倍型，故限於 CN 1.8–2.2。</text>
+  <text class="tick ok zh" x="608" y="204">兩者的<tspan class="bold">主要</tspan>擬合（深度＋等位比例）</text>
+  <text class="tick ok zh" x="608" y="228">在 LOH 上反而資訊量高。</text>
 
   <rect class="box ghost ok" x="584" y="250" width="396" height="168" rx="8"/>
   <text class="anno bold zh" x="608" y="280">對本頁的路線</text>
   <text class="tick zh" x="608" y="310">同一批區域<tspan class="bold">同時</tspan>具備兩件事：</text>
   <text class="tick ok zh" x="608" y="340">① 單倍型深度比的訊號最強</text>
   <text class="tick ok zh" x="608" y="364">② 錨照樣成立（分母不含 n₂）</text>
-  <text class="tick zh" x="608" y="396">故其為資訊最密的區域，</text>
-  <text class="tick zh" x="608" y="412">而非須排除的區域。</text>
+  <text class="tick zh" x="608" y="396">故其為此路線資訊最密之處，</text>
+  <text class="tick zh" x="608" y="412">亦不需排除在錨之外。</text>
 
   <!-- 結論 -->
   <rect class="box accent" x="20" y="432" width="960" height="34" rx="8"/>
-  <text class="anno zh" x="40" y="456">此即原始文獻中「穩健性源自 phase-aware 估計」一項假說的機制：<tspan class="bold">分母限於一條單倍型，另一條的拷貝數消去</tspan>。</text>
+  <text class="anno zh" x="40" y="456">可宣稱的是<tspan class="bold">取代該退路的區域限制</tspan>，不是「在對照方法失效之處仍可用」—— 它們在此並未失效。</text>
 </svg>

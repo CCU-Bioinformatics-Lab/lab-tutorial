@@ -150,7 +150,7 @@ somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位
   <rect class="bar somatic" x="104" y="262" width="230" height="24"/>
   <text class="tick mono" x="344" y="280">似然主導</text>
 
-  <text class="tick bad zh" x="44" y="322">兩塊的相對高度<b>隨資料組成而變</b>，</text>
+  <text class="tick bad zh" x="44" y="322">兩塊的相對高度<tspan class="bold">隨資料組成而變</tspan>，</text>
   <text class="tick bad zh" x="44" y="346">而兩者之間沒有任何係數校準。</text>
   <text class="anno bold bad zh" x="44" y="382">同一個方法 ＝ 兩個方法</text>
 
@@ -171,14 +171,14 @@ somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位
   <rect class="bar somatic" x="736" y="262" width="140" height="24"/>
   <rect class="bar germline" x="876" y="262" width="60" height="24"/>
 
-  <text class="tick ok zh" x="536" y="322">各項的份量由其<b>樣本數與分布</b>自動決定，</text>
+  <text class="tick ok zh" x="536" y="322">各項的份量由其<tspan class="bold">樣本數與分布</tspan>自動決定，</text>
   <text class="tick ok zh" x="536" y="346">不需人為係數；簡約偏好搬到最後一項的先驗。</text>
   <text class="anno bold ok zh" x="536" y="382">尺度一致，可相加也可比較</text>
 
   <!-- ══ 最實際的差別 ══ -->
   <rect class="box accent" x="20" y="420" width="960" height="66" rx="8"/>
-  <text class="anno zh" x="40" y="448">最實際的差別在<b>不確定性</b>：右式的最大值附近有曲率，故給得出區間、給得出多峰。</text>
-  <text class="anno zh" x="40" y="474">左式的懲罰<b>不是機率</b>，其最小值附近的形狀不對應任何區間 —— 只能回報一個點。</text>
+  <text class="anno zh" x="40" y="448">最實際的差別在<tspan class="bold">不確定性</tspan>：右式的最大值附近有曲率，故給得出區間、給得出多峰。</text>
+  <text class="anno zh" x="40" y="474">左式的懲罰<tspan class="bold">不是機率</tspan>，其最小值附近的形狀不對應任何區間 —— 只能回報一個點。</text>
 </svg><figcaption>左為上篇的分數：兩個平均相乘，再加一個與其無關尺度的項；
 三塊的高度<b>刻意畫成隨資料組成變動</b>。右為本頁的形式：四項皆為對數機率，
 相加即可，且每一項的份量由其樣本數與分布自動決定。
@@ -213,7 +213,7 @@ somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位
         讀法是：要判斷一個估計值可不可信，就看它依賴的是哪幾層。</desc>
 
   <text class="ttl zh" x="20" y="36">生成模型：一個純度 → 每段拷貝數 → 分子組成 → 三個通道 → 計數</text>
-  <text class="anno zh" x="20" y="66">五層由上而下，每一層只做一件事。<b>干擾參數全部集中在第四層</b>，前三層沒有。</text>
+  <text class="anno zh" x="20" y="66">五層由上而下，每一層只做一件事。<tspan class="bold">干擾參數全部集中在第四層</tspan>，前三層沒有。</text>
 
   <!-- ══ ① 全域參數 ══ -->
   <rect class="box accent" x="20" y="88" width="700" height="66" rx="8"/>
@@ -241,7 +241,7 @@ somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位
   <rect class="box ok" x="20" y="282" width="700" height="112" rx="8"/>
   <text class="lbl bold zh ok" x="40" y="312">③ 分子組成</text>
   <text class="tick zh" x="40" y="336">由上兩層決定</text>
-  <text class="tick ok zh" x="40" y="360">此層<b>無自由參數</b></text>
+  <text class="tick ok zh" x="40" y="360">此層<tspan class="bold">無自由參數</tspan></text>
 
   <rect class="bar somatic" x="290" y="300" width="120" height="26"/>
   <rect class="bar germline" x="410" y="300" width="90" height="26"/>
@@ -260,7 +260,7 @@ somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位
   <!-- ══ ④ 三個通道 ══ -->
   <rect class="box warn" x="20" y="428" width="700" height="180" rx="8"/>
   <text class="lbl bold zh warn" x="40" y="458">④ 三個觀測通道</text>
-  <text class="tick bad zh" x="40" y="482">干擾參數<b>全部在此進入</b></text>
+  <text class="tick bad zh" x="40" y="482">干擾參數<tspan class="bold">全部在此進入</tspan></text>
 
   <rect class="box plain" x="40" y="496" width="205" height="96" rx="6"/>
   <text class="tick bold zh mid" x="142" y="518">總深度比</text>
@@ -315,7 +315,7 @@ somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位
   <text class="tick bad zh" x="758" y="596">④ 的參數需另行校準。</text>
 
   <rect class="box accent" x="20" y="724" width="960" height="42" rx="8"/>
-  <text class="anno zh" x="40" y="752">現行流程只用第④層最左邊那一格的一部分，再把 GHIR 分布壓成兩個矩 —— <b>②③ 兩層整個沒有被寫出來</b>。</text>
+  <text class="anno zh" x="40" y="752">現行流程只用第④層最左邊那一格的一部分，再把 GHIR 分布壓成兩個矩 —— <tspan class="bold">②③ 兩層整個沒有被寫出來</tspan>。</text>
 </svg><figcaption>五層。第一層是全樣本唯一的純度；
 第二層是每個拷貝數區段的兩個整數，它們決定第三層的分子組成 ——
 腫瘤細胞按其拷貝數貢獻，正常細胞每條單倍型各一份。
@@ -402,7 +402,7 @@ DNA 比例再由它與第一層算出。<b>倍體與 DNA 比例都不是自由�
         讀法是：N50 尺度相近不代表斷點對應，這兩件事不能互相代替。</desc>
 
   <text class="ttl zh" x="20" y="36">分段與定向是兩件不同的工作</text>
-  <text class="anno zh" x="20" y="66">同一段染色體。上排為拷貝數的真實邊界，中排為相位區塊的邊界，<b>兩者不對齊</b>。</text>
+  <text class="anno zh" x="20" y="66">同一段染色體。上排為拷貝數的真實邊界，中排為相位區塊的邊界，<tspan class="bold">兩者不對齊</tspan>。</text>
 
   <!-- ══ 拷貝數真實邊界 ══ -->
   <text class="anno bold zh" x="20" y="118">拷貝數狀態</text>
@@ -455,7 +455,7 @@ DNA 比例再由它與第一層算出。<b>倍體與 DNA 比例都不是自由�
   <text class="tick zh mid" x="550" y="415">相位區塊只在每個區段<tspan class="bold">之內</tspan>指出哪一條是 H1</text>
 
   <rect class="box accent" x="20" y="458" width="960" height="48" rx="8"/>
-  <text class="anno zh" x="40" y="486">兩者回答不同的問題：<b>分段決定邊界在哪，定向決定邊界之內兩條怎麼配對</b>。N50 尺度相近不蘊含斷點對應。</text>
+  <text class="anno zh" x="40" y="486">兩者回答不同的問題：<tspan class="bold">分段決定邊界在哪，定向決定邊界之內兩條怎麼配對</tspan>。N50 尺度相近不蘊含斷點對應。</text>
 </svg><figcaption>上排為拷貝數的真實邊界，下排為相位區塊的邊界，兩者<b>刻意畫成不對齊</b>。
 中間標出兩種錯配：一個拷貝數斷點落在 block 之內（該 block 橫跨兩個狀態，
 其 <tspan class="mono">(n₁, n₂)</tspan> 不是一組整數），
@@ -542,7 +542,7 @@ DNA 比例再由它與第一層算出。<b>倍體與 DNA 比例都不是自由�
   <text class="tick ok zh" x="742" y="188">設先驗：有峰，也有寬度</text>
 
   <rect class="box accent" x="20" y="420" width="960" height="42" rx="8"/>
-  <text class="anno zh" x="40" y="448">先驗<b>沒有創造資料裡沒有的資訊</b> —— 樣本若無 clonal 變異，後驗會退回接近先驗，<b>而這由寬度看得出來</b>。</text>
+  <text class="anno zh" x="40" y="448">先驗<tspan class="bold">沒有創造資料裡沒有的資訊</tspan> —— 樣本若無 clonal 變異，後驗會退回接近先驗，<tspan class="bold">而這由寬度看得出來</tspan>。</text>
 </svg><figcaption>兩個 nuisance 參數的處置方式不同。
 <tspan class="mono">μ</tspan> 是離散且有界的（不超過該單倍型的拷貝數），故<b>逐一列舉</b>；
 <tspan class="mono">c</tspan> 是連續的，故給先驗後積分。
@@ -565,8 +565,21 @@ DNA 比例再由它與第一層算出。<b>倍體與 DNA 比例都不是自由�
 ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍體區段的 VAF 峰。</p>
 
 <p class="prose">而此情形下 <math><msub><mi>n</mi><mn>1</mn></msub><mo>=</mo><mn>1</mn></math> 處處成立，somatic 通道仍然作用，
-故 <math><mi>p</mi></math> 的後驗不會退化為平坦。<b>此項不可辨識因而被解除</b>，
-其代價為需要存在 truncal 的 somatic 變異。</p>
+故 <math><mi>p</mi></math> 的後驗不會退化為平坦。<b>此項不可辨識因而被解除 —— 但只是條件性的。</b></p>
+
+<p class="prose">須同時成立的條件有四項，缺一則模型僅為<b>部分可辨識</b>，
+後驗退回第四節所述的「由 <math><msub><mi>max</mi><mi>i</mi></msub><mo>(</mo><msub><mi>s</mi><mi>i</mi></msub><mo>)</mo></math> 起始的下界」：</p>
+
+<ul class="prose">
+<li>至少存在一個真正 truncal（<math><mi>c</mi><mo>=</mo><mn>1</mn></math>）的 somatic 變異；</li>
+<li>該變異落在 <math><msub><mi>n</mi><mn>1</mn></msub><mo>=</mo><mn>1</mn></math> 的分層之內；</li>
+<li>它被 caller 偵測到，且單倍型標記正確；</li>
+<li>其觀測值未被抽樣雜訊推高（取極大值本身即為向上偏誤的估計量）。</li>
+</ul>
+
+<p class="prose">四者皆非自動成立，且第三項在低純度時系統性變差（第六節第二列）。
+<b>因此輸出必須是後驗而非點估計</b> —— 條件不成立時，後驗的寬度會顯示出來，
+點估計不會。</p>
 
 <h4 id="未解決-全基因體加倍">未解決：全基因體加倍</h4>
 
@@ -577,8 +590,17 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
 加倍後 <math><mi>ρ</mi><mi>′</mi><mo>=</mo><mn>0.25</mn></math>、<math><msub><mi>n</mi><mn>1</mn></msub><mi>′</mi><mo>=</mo><mn>2</mn></math>、<math><mi>μ</mi><mi>′</mi><mo>=</mo><mn>2</mn></math>，代入仍得 <math><mi>s</mi><mi>′</mi><mo>=</mo><mn>0.400</mn></math>。</p></div>
 
 <p class="prose"><b>錨在加倍變換下不變，故不能單獨破解加倍簡併。</b>
-可用以定下模式的證據有三類：任一區段出現奇數的等位特異拷貝數、
-加倍之後才發生的變異（其 <math><mi>μ</mi></math> 不隨拷貝數加倍）、以及樣本外的量測。</p>
+可用以定下模式的證據有三類，但三者的作用方式<b>不同</b>：</p>
+
+<ul class="prose">
+<li><b>奇數的等位特異拷貝數 —— 只擋一個方向。</b>它使該解無法<b>再對半</b>，
+但<b>任何解皆可再加倍</b>：含奇數拷貝數的解，其加倍版本全為偶數，
+且對深度與等位比例給出逐格相同的觀測。
+故奇數只是把該解定為此族中<b>最小</b>的一個；真正排除加倍解的是<b>簡約先驗</b>，不是資料。</li>
+<li><b>加倍之後才發生的變異 —— 這一項才是資料證據。</b>其 <math><mi>μ</mi></math> 不隨拷貝數加倍，
+故兩個模式對它預測不同的 <math><mi>s</mi></math>。惟須另行判定該變異的發生時序。</li>
+<li><b>樣本外的量測</b>：流式細胞術的 DNA 指數、核型或 FISH。</li>
+</ul>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" class="dia-svg" role="img" aria-labelledby="sr4-what-it-fixes__title" aria-describedby="sr4-what-it-fixes__desc">
   <title id="sr4-what-it-fixes__title">此錨解除兩種不可辨識，但未解除全基因體加倍</title>
@@ -586,14 +608,16 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
         左欄是整個基因體都沒有等位失衡的樣本。
         這時深度比處處相同、等位比例處處是零點五，對細胞比例完全沒有資訊，
         上篇的兩個方法一個拒絕輸出、一個改用二倍體區段的變異頻率。
-        但這種樣本每一段的單倍型都是一份，所以錨處處成立，直接讀出細胞比例。這一項解除。
+        但這種樣本每一段的單倍型都是一份，所以錨處處成立。
+        這一項因而解除，不過是有條件的：
+        得先有一個真正主幹的變異落在這一層、被偵測到、標記正確，而且沒有被雜訊推高。
         中欄是錨本身的區域限制。
         上篇那個錨的分母含另一條單倍型，所以只能用在拷貝數接近二的區域；
         本頁的錨分母只有一條單倍型，異型合子性喪失與擴增區段都能用。這一項也解除。
         右欄是全基因體加倍。
         把拷貝數全部乘二，發生在加倍之前的變異其多重度也跟著乘二，
         代進去之後錨的值一模一樣。所以這一項沒有解除，
-        仍然要靠簡約偏好、奇數拷貝數的存在，或樣本外的量測。
+        仍然要靠簡約偏好或樣本外的量測；奇數拷貝數只能擋住「再對半」，擋不住「再加倍」。
         讀法是：把做得到與做不到分開講，是這條路線能不能被採信的前提。</desc>
 
   <text class="ttl zh" x="20" y="36">解除兩項，未解除一項</text>
@@ -612,10 +636,10 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
 
   <text class="tick zh" x="44" y="290">此時 <tspan class="mono">n₁ = 1</tspan> 處處成立，</text>
   <text class="tick mono" x="44" y="316">故 s = p · c</text>
-  <text class="tick zh" x="44" y="342">上包絡直接給出純度。</text>
+  <text class="tick zh" x="44" y="342">惟須有 truncal 變異，見下篇第五節。</text>
 
-  <rect class="box ok" x="44" y="356" width="258" height="24" rx="6"/>
-  <text class="tick bold ok zh mid" x="173" y="374">解除</text>
+  <rect class="box warn" x="44" y="356" width="258" height="24" rx="6"/>
+  <text class="tick bold zh mid" x="173" y="374">條件性解除</text>
 
   <!-- ══ 中 ══ -->
   <rect class="box ghost ok" x="346" y="88" width="306" height="300" rx="8"/>
@@ -655,7 +679,7 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
 
   <!-- 結論 -->
   <rect class="box accent" x="20" y="402" width="960" height="56" rx="8"/>
-  <text class="anno zh" x="40" y="430">可宣稱：<tspan class="bold">純度的估計不再要求區段為二倍體，且無等位失衡的樣本亦可估計</tspan>。</text>
+  <text class="anno zh" x="40" y="430">可宣稱：<tspan class="bold">純度的估計不再要求區段為二倍體</tspan>；無等位失衡的樣本<tspan class="bold">在條件成立時</tspan>亦可估計。</text>
   <text class="anno zh" x="40" y="452">不可宣稱：解決了純度與倍體的簡併。<tspan class="bold">把做得到與做不到分開講，是此路線能否被採信的前提。</tspan></text>
 </svg><figcaption>三種不可辨識的處置對照。
 左欄「全基因體無等位失衡」：兩條軌道皆為常數，但 <tspan class="mono">n₁ = 1</tspan> 處處成立，故錨仍給出純度 —— <b>解除</b>。
@@ -680,11 +704,12 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
         而兩個答案的倍體差了一倍。
         右欄是本頁要求的輸出：兩個模式各自附上機率，
         並列出三類可以用來定案的證據，以及它們在這個樣本上的狀態 ——
-        有沒有奇數的等位拷貝數、有沒有加倍之後才發生的變異、有沒有樣本外的量測。
+        有沒有加倍之後才發生的變異、有沒有樣本外的量測，以及有沒有奇數的等位拷貝數 ——
+        最後這一項只能擋住「再對半」，擋不住「再加倍」，所以它靠的是簡約偏好而不是資料。
         讀法是：把雙峰壓成一個數字，丟掉的不是精度，是「這裡還沒有定論」這件事。</desc>
 
   <text class="ttl zh" x="20" y="36">加倍未定時的輸出格式</text>
-  <text class="anno zh" x="20" y="66">同一份資料。兩個模式對深度與等位比例給出<b>相同</b>的期望值，體細胞錨亦不能分辨。</text>
+  <text class="anno zh" x="20" y="66">同一份資料。兩個模式對深度與等位比例給出<tspan class="bold">相同</tspan>的期望值，體細胞錨亦不能分辨。</text>
 
   <rect class="box ghost" x="20" y="88" width="306" height="290" rx="8"/>
   <text class="lbl bold zh mid" x="173" y="118">後驗的實況</text>
@@ -717,13 +742,13 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
   <text class="tick mono mid" x="826" y="210">p 0.25　κ 4.0</text>
   <text class="tick mid" x="826" y="230">機率 0.4</text>
   <text class="tick bold zh" x="694" y="262">可用以定案的證據</text>
-  <text class="tick zh" x="694" y="286">· 奇數的等位拷貝數</text>
-  <text class="tick zh" x="694" y="310">· 加倍之後才發生的變異</text>
-  <text class="tick zh" x="694" y="334">· 樣本外的量測</text>
+  <text class="tick zh" x="694" y="286">· 加倍後才發生的變異</text>
+  <text class="tick zh" x="694" y="310">· 樣本外的量測</text>
+  <text class="tick zh" x="694" y="334">· 奇數拷貝數（僅擋對半）</text>
   <text class="tick ok zh" x="694" y="362">本樣本：三者皆無</text>
 
   <rect class="box accent" x="20" y="394" width="960" height="42" rx="8"/>
-  <text class="anno zh" x="40" y="422">壓成一個數字所丟掉的不是精度，是<b>「這裡還沒有定論」這件事</b> —— 而兩個模式的倍體相差一倍。</text>
+  <text class="anno zh" x="40" y="422">壓成一個數字所丟掉的不是精度，是<tspan class="bold">「這裡還沒有定論」這件事</tspan> —— 而兩個模式的倍體相差一倍。</text>
 </svg><figcaption>同一份資料的後驗。左為雙峰的實況：
 兩個模式的 <tspan class="mono">(p, κ)</tspan> 分別為 <tspan class="mono">(0.40, 2.0)</tspan> 與 <tspan class="mono">(0.25, 4.0)</tspan>，
 兩者對深度與等位比例給出<b>相同</b>的期望值。
@@ -842,7 +867,7 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
 <thead><tr><th scope="col">項目</th><th scope="col">現行：兩個矩加多項式迴歸</th><th scope="col">本頁的規格</th></tr></thead>
 <tbody>
 <tr><td>輸出</td><td><math><mi>f</mi></math> 一個純量</td><td><math><mi>p</mi></math>、<math><mi>κ</mi></math>、每段 <math><mo>(</mo><msub><mi>n</mi><mn>1,</mn></msub><msub><mi>n</mi><mn>2</mn></msub><mo>)</mo></math>，<math><mi>f</mi></math> 為導出量</td></tr>
-<tr><td>係數來源</td><td>由合成混合樣本擬合而得</td><td>不需訓練；式中的量皆有物理意義</td></tr>
+<tr><td>係數來源</td><td>由合成混合樣本擬合而得</td><td>不需<b>純度迴歸</b>的監督式訓練；式中的量皆有物理意義。惟偵測機率、標記錯誤率與平台校準參數<b>仍須估計</b></td></tr>
 <tr><td>跨平台</td><td>ONT 訓練、PacBio 直接轉移（原始文獻已驗證可行）</td>
 <td>不含平台特定的<b>迴歸係數</b>；惟錯誤率、標記正確率與偵測機率仍須逐平台校準
 —— <b>「不需訓練係數」不等於「平台無關」</b></td></tr>
@@ -1054,7 +1079,7 @@ M8 已建立 <math><mi>f</mi></math> 與 cellular purity <math><mi>p</mi></math>
   <text class="anno bold zh" x="696" y="330">但它決定能否使用</text>
 
   <rect class="box accent" x="20" y="356" width="960" height="66" rx="8"/>
-  <text class="anno zh" x="40" y="384">混在同一張表裡報告，會讓最弱的一條<b>借用到最強的一條的可信度</b> —— 讀者以為 <tspan class="mono">p</tspan> 也有 MAE 0.03 那種等級的驗證。</text>
+  <text class="anno zh" x="40" y="384">混在同一張表裡報告，會讓最弱的一條<tspan class="bold">借用到最強的一條的可信度</tspan> —— 讀者以為 <tspan class="mono">p</tspan> 也有 MAE 0.03 那種等級的驗證。</text>
   <text class="anno zh" x="40" y="410">而此主題最欠缺的正是金標準，故第三條軌道的份量比一般情形更重。</text>
 </svg><figcaption>三條軌道各有不同的真值來源與可宣稱的強度。
 左：<tspan class="mono">f</tspan> 有精確真值（混合比例即為之），可與現行迴歸直接比較，

@@ -8455,7 +8455,7 @@ variants</i>，Bioinformatics，2022。程式碼在
 <thead><tr><th scope="col">階段</th><th scope="col">做什麼</th><th scope="col">產出</th></tr></thead>
 <tbody>
 <tr><td>①</td><td>初步 somatic haplotagging（上一節那張圖）</td><td>每條 read 一個暫時標籤</td></tr>
-<tr><td>②</td><td>算全基因體的 <span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-ghir-4">GHIR<span class="term__pop" id="m12__gd-ghir-4" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</span><span class="term__def" data-lang="en" lang="en">Germline Haplotype Imbalance Ratio: the normalized balance of reads assigned to HP1 and HP2 at a germline site. Under the tutorial's illustrative definition, an ideal unbiased sample is near 0.5. It is not a direct purity measurement; somatic branches, LOH/CNV, TINC, phasing errors, mapping bias and sparse sampling can all shift it. LongPhase-S estimates purity from its distribution only after filtering and model calibration.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span> 分布、過濾低信心位點、迴歸估 purity</td><td>一個 purity 數值</td></tr>
+<tr><td>②</td><td>算全基因體的 <span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-ghir-4">GHIR<span class="term__pop" id="m12__gd-ghir-4" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在<b>候選 somatic 位點</b>上，取標為 HP1 與 HP2 的 read 數中較大者除以兩者之和，值域為 0.5 至 1。須注意兩件事：分母<b>只含這兩個 germline 計數</b>，HP1-1／HP2-1／HP3 皆不在內；且這些標籤是<b>整條 read</b> 的判定（該 read 任一處帶 somatic 等位即離開 germline 計數），並非該位點的等位計數。它不是直接的 purity 讀數：拷貝數變異、LOH、read 跨距內的突變密度、標記錯誤與抽樣不足都會使它偏移。</span><span class="term__def" data-lang="en" lang="en">Germline Haplotype Imbalance Ratio: at a candidate somatic locus, the larger of the HP1 and HP2 tagged read counts divided by their sum, ranging from 0.5 to 1. Two caveats: the denominator contains only those two germline counts, excluding HP1-1/HP2-1/HP3; and those tags are whole-read decisions (a read carrying a somatic allele anywhere leaves the germline counts), not per-locus allele counts. It is not a direct purity readout — copy number, LOH, mutation density within the read span, tagging error and sparse sampling all shift it.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span> 分布、過濾低信心位點、迴歸估 purity</td><td>一個 purity 數值</td></tr>
 <tr><td>③</td><td>依 purity 調整門檻，跑四個過濾器重新校準候選變異</td><td>高信心的 somatic VCF</td></tr>
 <tr><td>④</td><td>用校準後的變異重新 haplotag，並處理 <code>HP3</code></td><td>最終 HP 標籤</td></tr>
 </tbody>
@@ -8477,7 +8477,7 @@ LongPhase-S 是接在它們後面的一層。</p>
 
 <h3 id="m12__ghir-兩條-germline-haplotype-的-read-有多偏">GHIR：兩條 germline haplotype 的 read 有多偏</h3>
 
-<p class="prose"><span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-ghir-9">GHIR<span class="term__pop" id="m12__gd-ghir-9" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</span><span class="term__def" data-lang="en" lang="en">Germline Haplotype Imbalance Ratio: the normalized balance of reads assigned to HP1 and HP2 at a germline site. Under the tutorial's illustrative definition, an ideal unbiased sample is near 0.5. It is not a direct purity measurement; somatic branches, LOH/CNV, TINC, phasing errors, mapping bias and sparse sampling can all shift it. LongPhase-S estimates purity from its distribution only after filtering and model calibration.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span>（Germline Haplotype Imbalance Ratio）在<b>每一個候選 somatic 位點上各算一次</b>：</p>
+<p class="prose"><span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="m12__gd-ghir-9">GHIR<span class="term__pop" id="m12__gd-ghir-9" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在<b>候選 somatic 位點</b>上，取標為 HP1 與 HP2 的 read 數中較大者除以兩者之和，值域為 0.5 至 1。須注意兩件事：分母<b>只含這兩個 germline 計數</b>，HP1-1／HP2-1／HP3 皆不在內；且這些標籤是<b>整條 read</b> 的判定（該 read 任一處帶 somatic 等位即離開 germline 計數），並非該位點的等位計數。它不是直接的 purity 讀數：拷貝數變異、LOH、read 跨距內的突變密度、標記錯誤與抽樣不足都會使它偏移。</span><span class="term__def" data-lang="en" lang="en">Germline Haplotype Imbalance Ratio: at a candidate somatic locus, the larger of the HP1 and HP2 tagged read counts divided by their sum, ranging from 0.5 to 1. Two caveats: the denominator contains only those two germline counts, excluding HP1-1/HP2-1/HP3; and those tags are whole-read decisions (a read carrying a somatic allele anywhere leaves the germline counts), not per-locus allele counts. It is not a direct purity readout — copy number, LOH, mutation density within the read span, tagging error and sparse sampling all shift it.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span>（Germline Haplotype Imbalance Ratio）在<b>每一個候選 somatic 位點上各算一次</b>：</p>
 
 <div class="eq"><math display="block"><mi>GHIR</mi><mo>=</mo><mfrac><mrow><mi>max</mi><mo>(</mo><mtext>HP1 read 數</mtext><mo>,</mo><mtext>HP2 read 數</mtext><mo>)</mo></mrow><mrow><mtext>HP1 read 數</mtext><mo>+</mo><mtext>HP2 read 數</mtext></mrow></mfrac></math></div>
 
@@ -9228,7 +9228,7 @@ awk '!/^#/ {print $7}' tagged_sc.vcf | sort | uniq -c</code></pre>
 </section>
 
     
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>Clair3</dt><dd>以深度學習做 germline variant calling 的工具，長 read 上常用。</dd><dt>ClairS</dt><dd>配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</dd><dt>GHIR（生殖系單倍型失衡比）</dt><dd>Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>LongPhase-S</dt><dd>配對 tumor–normal 版本。做 tumor purity 估計、purity 感知的 somatic variant 過濾，以及 somatic haplotagging。</dd><dt>TINC（腫瘤污染正常樣本）</dt><dd>Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。</dd><dt>VAF（變異等位基因頻率）</dt><dd>在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</dd><dt>basecalling（鹼基判讀）</dt><dd>把定序儀的原始訊號（ONT 是電流）轉成 A/C/G/T 字母的步驟。不同 basecaller 版本會產生不同的錯誤特性 —— 所以「同一個細胞株、不同 basecaller」是兩份不同的資料集。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>phasing（定相）</dt><dd>為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。</dd><dt>recall（召回率）</dt><dd>在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</dd><dt>somatic haplotagging</dt><dd>把帶有 somatic 突變的 read 指派到它們源自的 germline haplotype。這是 LongPhase-S 的核心產出。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>Clair3</dt><dd>以深度學習做 germline variant calling 的工具，長 read 上常用。</dd><dt>ClairS</dt><dd>配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</dd><dt>GHIR（生殖系單倍型失衡比）</dt><dd>Germline Haplotype Imbalance Ratio：在<b>候選 somatic 位點</b>上，取標為 HP1 與 HP2 的 read 數中較大者除以兩者之和，值域為 0.5 至 1。須注意兩件事：分母<b>只含這兩個 germline 計數</b>，HP1-1／HP2-1／HP3 皆不在內；且這些標籤是<b>整條 read</b> 的判定（該 read 任一處帶 somatic 等位即離開 germline 計數），並非該位點的等位計數。它不是直接的 purity 讀數：拷貝數變異、LOH、read 跨距內的突變密度、標記錯誤與抽樣不足都會使它偏移。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>LongPhase-S</dt><dd>配對 tumor–normal 版本。做 tumor purity 估計、purity 感知的 somatic variant 過濾，以及 somatic haplotagging。</dd><dt>TINC（腫瘤污染正常樣本）</dt><dd>Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。</dd><dt>VAF（變異等位基因頻率）</dt><dd>在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。</dd><dt>basecalling（鹼基判讀）</dt><dd>把定序儀的原始訊號（ONT 是電流）轉成 A/C/G/T 字母的步驟。不同 basecaller 版本會產生不同的錯誤特性 —— 所以「同一個細胞株、不同 basecaller」是兩份不同的資料集。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>phasing（定相）</dt><dd>為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。</dd><dt>recall（召回率）</dt><dd>在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。</dd><dt>somatic haplotagging</dt><dd>把帶有 somatic 突變的 read 指派到它們源自的 germline haplotype。這是 LongPhase-S 的核心產出。</dd><dt>tumour purity（腫瘤純度）</dt><dd>樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。</dd></dl></section>
   </article>
 <hr>
 <article class="module" id="m13">
@@ -9803,7 +9803,7 @@ LongPhase-TO 做的是<b>再校正</b>（<span class="term" data-term="recalibra
 <h3 id="m13__第四件事-這個樣本有多少比例是腫瘤">第四件事：這個樣本有多少比例是腫瘤</h3>
 
 <p class="prose">檢體不會是純的癌細胞，裡面一定混著正常細胞。混得多寡直接影響每個變異的訊號強度，
-所以這個比例要估出來。M12 用的是 <span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="m13__gd-ghir-10">GHIR<span class="term__pop" id="m13__gd-ghir-10" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</span><span class="term__def" data-lang="en" lang="en">Germline Haplotype Imbalance Ratio: the normalized balance of reads assigned to HP1 and HP2 at a germline site. Under the tutorial's illustrative definition, an ideal unbiased sample is near 0.5. It is not a direct purity measurement; somatic branches, LOH/CNV, TINC, phasing errors, mapping bias and sparse sampling can all shift it. LongPhase-S estimates purity from its distribution only after filtering and model calibration.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span>；這裡的比值算法一樣，差別只在<b>數的是帶 reference allele 的 read</b>。</p>
+所以這個比例要估出來。M12 用的是 <span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="m13__gd-ghir-10">GHIR<span class="term__pop" id="m13__gd-ghir-10" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在<b>候選 somatic 位點</b>上，取標為 HP1 與 HP2 的 read 數中較大者除以兩者之和，值域為 0.5 至 1。須注意兩件事：分母<b>只含這兩個 germline 計數</b>，HP1-1／HP2-1／HP3 皆不在內；且這些標籤是<b>整條 read</b> 的判定（該 read 任一處帶 somatic 等位即離開 germline 計數），並非該位點的等位計數。它不是直接的 purity 讀數：拷貝數變異、LOH、read 跨距內的突變密度、標記錯誤與抽樣不足都會使它偏移。</span><span class="term__def" data-lang="en" lang="en">Germline Haplotype Imbalance Ratio: at a candidate somatic locus, the larger of the HP1 and HP2 tagged read counts divided by their sum, ranging from 0.5 to 1. Two caveats: the denominator contains only those two germline counts, excluding HP1-1/HP2-1/HP3; and those tags are whole-read decisions (a read carrying a somatic allele anywhere leaves the germline counts), not per-locus allele counts. It is not a direct purity readout — copy number, LOH, mutation density within the read span, tagging error and sparse sampling all shift it.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span>；這裡的比值算法一樣，差別只在<b>數的是帶 reference allele 的 read</b>。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" class="dia-svg" role="img" aria-labelledby="m13__m13-imbalance-fraction__title" aria-describedby="m13__m13-imbalance-fraction__desc">
   <title id="m13__m13-imbalance-fraction__title">從兩條 haplotype 的失衡程度，估計樣本裡有多少比例來自腫瘤</title>
@@ -10102,7 +10102,7 @@ bcftools query -f '[%GT\t%GT2]\n' phased_prefix.vcf | \
 </section>
 
     
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>BFB（斷裂—融合—橋循環）</dt><dd>Breakage-fusion-bridge：染色體反覆斷裂與融合造成的劇烈重排，在 coverage 上呈現特殊的階梯形狀。</dd><dt>ClairS</dt><dd>配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</dd><dt>GHIR（生殖系單倍型失衡比）</dt><dd>Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>LongPhase-TO</dt><dd>tumor-only 版本。做染色體等級的 LOH 偵測、triplet graph 再校正、somatic phasing 與 purity 估計。</dd><dt>PON（正常樣本面板／族群資料庫（依流程而異））</dt><dd>PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</dd><dt>aneuploidy（非整倍體）</dt><dd>染色體數目異常。腫瘤裡非常普遍，也可能使 cellular purity 與 DNA fraction 不一致。</dd><dt>heterozygous（異型合子）</dt><dd>在一般二倍體位點上，兩份 allele 不同（例如一份 A、一份 G）。此類位點可作為區分 haplotype 的資訊錨點；複雜拷貝數情況需另行解讀。</dd><dt>long read（長讀）</dt><dd>單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</dd><dt>recalibration（再校正）</dt><dd>以額外證據重新評估 caller 已輸出的 candidates。若僅處理既有候選，可移除 false positives，但不能恢復 caller 未輸出的變異。</dd><dt>soft clipping</dt><dd>read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</dd><dt>triplet graph</dt><dd>LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</dd><dt>tumour DNA fraction（腫瘤 DNA 比例）</dt><dd>樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>BFB（斷裂—融合—橋循環）</dt><dd>Breakage-fusion-bridge：染色體反覆斷裂與融合造成的劇烈重排，在 coverage 上呈現特殊的階梯形狀。</dd><dt>ClairS</dt><dd>配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</dd><dt>GHIR（生殖系單倍型失衡比）</dt><dd>Germline Haplotype Imbalance Ratio：在<b>候選 somatic 位點</b>上，取標為 HP1 與 HP2 的 read 數中較大者除以兩者之和，值域為 0.5 至 1。須注意兩件事：分母<b>只含這兩個 germline 計數</b>，HP1-1／HP2-1／HP3 皆不在內；且這些標籤是<b>整條 read</b> 的判定（該 read 任一處帶 somatic 等位即離開 germline 計數），並非該位點的等位計數。它不是直接的 purity 讀數：拷貝數變異、LOH、read 跨距內的突變密度、標記錯誤與抽樣不足都會使它偏移。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>LongPhase-TO</dt><dd>tumor-only 版本。做染色體等級的 LOH 偵測、triplet graph 再校正、somatic phasing 與 purity 估計。</dd><dt>PON（正常樣本面板／族群資料庫（依流程而異））</dt><dd>PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。</dd><dt>aneuploidy（非整倍體）</dt><dd>染色體數目異常。腫瘤裡非常普遍，也可能使 cellular purity 與 DNA fraction 不一致。</dd><dt>heterozygous（異型合子）</dt><dd>在一般二倍體位點上，兩份 allele 不同（例如一份 A、一份 G）。此類位點可作為區分 haplotype 的資訊錨點；複雜拷貝數情況需另行解讀。</dd><dt>long read（長讀）</dt><dd>單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。</dd><dt>recalibration（再校正）</dt><dd>以額外證據重新評估 caller 已輸出的 candidates。若僅處理既有候選，可移除 false positives，但不能恢復 caller 未輸出的變異。</dd><dt>soft clipping</dt><dd>read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。</dd><dt>triplet graph</dt><dd>LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</dd><dt>tumour DNA fraction（腫瘤 DNA 比例）</dt><dd>樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。</dd></dl></section>
   </article>
 <hr>
 <article class="module" id="capstone">
@@ -16668,7 +16668,7 @@ ASCAT 原始文獻在 79 例的驗證中有 10 例（12.7%）落於此點，該�
 <aside class="guardrail" id="sr3__guard-15"><p class="guardrail__hd">重要區分 #15：純度與倍體只能成對辨識</p><p class="prose">深度與等位比例所決定的<b>不是一組 <math><mo>(</mo><mi>ρ</mi><mo>,</mo><msub><mi>ψ</mi><mi>t</mi></msub><mo>)</mo></math>，而是一個格點族</b>。
 族中各點由 <math><mi>n</mi><mi>′</mi><mo>=</mo><mi>kn</mi><mo>+</mo><mi>m</mi></math> 相連，彼此給出相同的觀測。</p>
 <p class="prose"><b>可容許之處</b>：多數格點可由資料本身排除 —— 拷貝數不得為負、
-任一區段出現奇數的等位特異拷貝數即可排除 <math><mi>k</mi><mo>=</mo><mn>2</mn></math>、
+任一區段出現奇數的等位特異拷貝數即可排除<b>再對半</b>（<math><mi>k</mi><mo>=</mo><mn>1</mn><mo>/</mo><mn>2</mn></math>）、
 觀測到零拷貝的區段即可定住 <math><mi>m</mi></math>。</p>
 <p class="prose"><b>限制</b>：所有等位特異拷貝數皆為偶數時，<math><mi>k</mi><mo>=</mo><mn>2</mn></math> <b>無法由這兩條軌道排除</b>。
 因此「純度 0.8 而倍體 2.0」與「純度 0.67 而倍體 4.0」是同一份資料的兩種讀法，
@@ -17275,7 +17275,8 @@ subclonal 的拷貝數變異因此表現為真正非整數的 <math><mover accen
 <tr><td>相對拷貝數輪廓（各區段的高低關係）</td><td>可</td><td>—</td></tr>
 <tr><td>各區段是否存在等位失衡</td><td>可</td><td>—</td></tr>
 <tr><td><math><mi>m</mi></math>（整體平移量）</td><td>條件成立時可</td><td>基因體上存在零拷貝的區段</td></tr>
-<tr><td><math><mi>k</mi><mo>=</mo><mn>2</mn></math>（是否加倍）</td><td>條件成立時可</td><td>存在奇數的等位特異拷貝數</td></tr>
+<tr><td><math><mi>k</mi><mo>=</mo><mn>1</mn><mo>/</mo><mn>2</mn></math>（可否再對半）</td><td>可</td><td>存在奇數的等位特異拷貝數</td></tr>
+<tr><td><math><mi>k</mi><mo>=</mo><mn>2</mn></math>（是否加倍）</td><td><b>不可</b></td><td>任何解皆可再加倍；須靠簡約先驗或樣本外量測</td></tr>
 <tr><td><math><mi>ρ</mi></math>（全基因體皆為 1+1 時）</td><td><b>不可</b></td><td>需要樣本外的量測或另一種資料</td></tr>
 <tr><td><math><mi>k</mi><mo>=</mo><mn>2</mn></math>（全部拷貝數皆為偶數時）</td><td><b>不可</b></td><td>同上</td></tr>
 </tbody>
@@ -17679,7 +17680,7 @@ cellular purity 與 ploidy 的估計式，使 tumour DNA fraction 成為導出�
 <p class="prose">現行實作在每個 somatic 位點上，已將覆蓋該位點的 read 依標籤分入
 <code>H1</code>、<code>H2</code>、<code>H1-1</code>、<code>H2-1</code>、<code>H3</code> 五個計數
 （<code>SomaticVarCaller.cpp</code> 的 <code>ReadHpCount</code>），
-並已算出三個比值：<code>germlineHaplotypeImbalanceRatio</code>（即 <span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr4__gd-ghir-0">GHIR<span class="term__pop" id="sr4__gd-ghir-0" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</span><span class="term__def" data-lang="en" lang="en">Germline Haplotype Imbalance Ratio: the normalized balance of reads assigned to HP1 and HP2 at a germline site. Under the tutorial's illustrative definition, an ideal unbiased sample is near 0.5. It is not a direct purity measurement; somatic branches, LOH/CNV, TINC, phasing errors, mapping bias and sparse sampling can all shift it. LongPhase-S estimates purity from its distribution only after filtering and model calibration.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span>）、
+並已算出三個比值：<code>germlineHaplotypeImbalanceRatio</code>（即 <span class="term" data-term="GHIR" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr4__gd-ghir-0">GHIR<span class="term__pop" id="sr4__gd-ghir-0" role="tooltip"><b class="term__hd">GHIR <i>生殖系單倍型失衡比</i></b><span class="term__def" data-lang="zh">Germline Haplotype Imbalance Ratio：在<b>候選 somatic 位點</b>上，取標為 HP1 與 HP2 的 read 數中較大者除以兩者之和，值域為 0.5 至 1。須注意兩件事：分母<b>只含這兩個 germline 計數</b>，HP1-1／HP2-1／HP3 皆不在內；且這些標籤是<b>整條 read</b> 的判定（該 read 任一處帶 somatic 等位即離開 germline 計數），並非該位點的等位計數。它不是直接的 purity 讀數：拷貝數變異、LOH、read 跨距內的突變密度、標記錯誤與抽樣不足都會使它偏移。</span><span class="term__def" data-lang="en" lang="en">Germline Haplotype Imbalance Ratio: at a candidate somatic locus, the larger of the HP1 and HP2 tagged read counts divided by their sum, ranging from 0.5 to 1. Two caveats: the denominator contains only those two germline counts, excluding HP1-1/HP2-1/HP3; and those tags are whole-read decisions (a read carrying a somatic allele anywhere leaves the germline counts), not per-locus allele counts. It is not a direct purity readout — copy number, LOH, mutation density within the read span, tagging error and sparse sampling all shift it.</span><a class="term__more" href="glossary.html#ghir">完整條目 →</a></span></span>）、
 <code>allelicImbalanceRatio</code> 與 <code>somaticHaplotypeImbalanceRatio</code>。</p>
 
 <p class="prose">但這五個計數是<b>read 層級</b>的標籤（見第一節的說明框），
@@ -17818,9 +17819,14 @@ subclonality 僅作為混淆項出現，其重建屬另一主題。</p>
 右側標出關鍵的一步 —— 帶有 somatic 等位的分子<b>離開</b> <code>H1</code> 進入 <code>H1-1</code>，
 因此 <code>H1</code> 被掏空，而 <code>H2</code> 不變。</figcaption></figure>
 
-<h3 id="sr4__二-ghir-的無雜訊值">二、GHIR 的無雜訊值</h3>
+<h3 id="sr4__二-理想化焦點統計量的無雜訊值">二、理想化焦點統計量的無雜訊值</h3>
 
 <h4 id="sr4__三個計數的分子數">三個計數的分子數</h4>
+
+<p class="prose"><b>本節先處理一個理想化的量</b>：假設該 read 跨距之內
+<b>只有焦點這一個</b> somatic 變異。此假設使「這條 read 帶不帶 somatic 等位」
+等同於「它在焦點位點帶不帶 ALT」，五個計數因而可以直接寫成焦點位點的函數。
+下一小節說明放掉此假設之後會變成什麼。</p>
 
 <p class="prose">設 somatic 變異位於 germline 單倍型 1。令 <math><mi>p</mi></math> 為 cellular purity、
 <math><msub><mi>n</mi><mn>1</mn></msub></math> 與 <math><msub><mi>n</mi><mn>2</mn></msub></math> 為該處腫瘤細胞的等位特異拷貝數、
@@ -17846,11 +17852,11 @@ subclonality 僅作為混淆項出現，其重建屬另一主題。</p>
 以及腫瘤側的拷貝數被 somatic 的 <math><mi>c</mi><mi>μ</mi></math> 扣掉一塊。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" class="dia-svg" role="img" aria-labelledby="sr4__sr4-ghir-is-baf__title" aria-describedby="sr4__sr4-ghir-is-baf__desc">
-  <title id="sr4__sr4-ghir-is-baf__title">GHIR 的期望值與等位比例式逐項對應</title>
+  <title id="sr4__sr4-ghir-is-baf__title">理想化焦點統計量的無雜訊值與等位比例式逐項對應</title>
   <desc id="sr4__sr4-ghir-is-baf__desc">兩條式子上下對齊，逐項比對。
         上面是上篇的等位比例式：分子是純度乘上某一個等位的拷貝數，
         再加上正常細胞貢獻的那一份；分母是這個位置讀到的全部 DNA。
-        下面是單倍型失衡比的期望值：分子的第一項一樣是純度乘上單倍型一的拷貝數，
+        下面是理想化焦點統計量的無雜訊值，也就是假設這條 read 的跨距內只有焦點這一個體細胞變異時的值：分子的第一項一樣是純度乘上單倍型一的拷貝數，
         但要先扣掉被體細胞等位佔走的那一塊，也就是帶原細胞比例乘以多重度；
         加上正常細胞那一份；分母同樣是全部 DNA，同樣扣掉那一塊。
         差別只有兩處：被扣掉的那一塊，以及最外面多了一層取較大值。
@@ -17885,7 +17891,8 @@ subclonality 僅作為混淆項出現，其重建屬另一主題。</p>
 
   <!-- ══ 下：GHIR ══ -->
   <rect class="box ghost ok" x="20" y="240" width="960" height="106" rx="8"/>
-  <text class="anno bold zh" x="40" y="270">GHIR</text>
+  <text class="anno bold zh" x="40" y="264">理想化焦點</text>
+  <text class="tick zh" x="40" y="286">統計量</text>
 
   <rect class="box accent" x="90" y="284" width="120" height="44" rx="6"/>
   <text class="tick bold mono mid" x="150" y="312">max( · )</text>
@@ -18019,10 +18026,46 @@ subclonality 僅作為混淆項出現，其重建屬另一主題。</p>
 GHIR 取兩者較大者除以兩者之和，故隨純度單調上升 —— 三格的值分別為 0.556、0.667、0.909。
 <b>此即現行迴歸所擬合的那條曲線，而它有閉式。</b></figcaption></figure>
 
-<p class="prose">此結果對照現行做法值得留意：現行流程量測 GHIR 分布的中位數與四分位距，
-再以二階多項式迴歸估計 tumour DNA fraction。
-上式顯示該關係在二倍體 clonal 的情形下<b>為一條已知的一元函數</b>，
-迴歸所擬合的是一個本已有閉式的物理量。</p>
+<h4 id="sr4__放掉理想化假設之後-實際的-ghir-還依賴突變負荷">放掉理想化假設之後：實際的 GHIR 還依賴突變負荷</h4>
+
+<p class="prose">第一節已指出 <code>hpResult</code> 是<b>整條 read</b> 的標籤。
+因此一條 read 只要在跨距內<b>任何一處</b>帶有 somatic 等位，就會離開 germline 計數 ——
+與它在焦點位點是不是 ALT 無關。上式因而<b>不是實際 GHIR 的閉式</b>。</p>
+
+<p class="prose">令 <math><mi>λ</mi></math> 為一條 read 的跨距內<b>其他</b>可偵測 somatic 變異的期望數。
+二倍體、clonal、焦點變異位於單倍型 1 時：單倍型 1 的腫瘤分子全部帶有焦點變異，
+故 <code>H1</code> 只剩正常細胞；而單倍型 2 的腫瘤分子<b>亦被其他變異掏空</b>：</p>
+
+<div class="eq"><math display="block"><mi>H</mi><mn>1</mn><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo>)</mo><mo>,</mo><mspace width="2em"/><mi>H</mi><mn>2</mn><mo>=</mo><mi>p</mi><mo>·</mo><msub><mi>n</mi><mn>2</mn></msub><mo>·</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup><mo>+</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo>)</mo></math><p class="eq__note"><math><mi>λ</mi><mo>=</mo><mn>0</mn></math> 時退回上式。<b><math><mi>λ</mi></math> 越大，<code>H2</code> 越小，GHIR 越接近 0.5</b> ——
+方向與純度下降相同。</p></div>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">突變負荷（read 跨距 20 kb）</th><th scope="col">0</th><th scope="col">5／Mb</th><th scope="col">20／Mb</th><th scope="col">50／Mb</th></tr></thead>
+<tbody>
+<tr><td><math><mi>λ</mi></math></td><td>0</td><td>0.10</td><td>0.40</td><td>1.00</td></tr>
+<tr><td><math><mi>p</mi><mo>=</mo><mn>0.50</mn></math> 時的 GHIR</td><td>0.667</td><td>0.656</td><td>0.626</td><td><b>0.578</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">末欄與理想化的 0.667 相差 0.089，<b>大於低純度區間的整段訊號</b>
+（<math><mi>p</mi></math> 由 0 到 0.2 時 GHIR 只由 0.500 走到 0.556）。</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">此依賴的方向，對現行迴歸有直接後果</p>
+<p class="prose">固定純度之下，GHIR 隨突變負荷<b>下降</b>；而下降的方向與純度降低所造成的方向相同。
+現行流程以中位數與四分位距為特徵、跨細胞株擬合迴歸，
+<b>而各細胞株的突變負荷差異甚大</b>。</p>
+<p class="prose">後果是該迴歸的係數<b>有一部分在描述突變負荷，而非純度</b>。
+此點可直接檢驗：把資料集依突變負荷分層後重擬合，
+若係數隨負荷系統性移動，即為此效應。<b>此檢驗不需要新資料。</b></p>
+</div>
+
+<p class="prose">因此本節的結論須分兩句陳述：
+理想化的焦點統計量在二倍體 clonal 之下<b>為一條已知的一元函數</b>；
+而<b>現行的 GHIR 不是該函數</b>，它另外依賴 read 跨距、突變負荷、偵測率與 clonality。
+第五節所建立的焦點四格表即為取回前者的方式。</p>
 
 <h4 id="sr4__兩種歸因是同一條式子的兩項">兩種歸因是同一條式子的兩項</h4>
 
@@ -18292,7 +18335,7 @@ GHIR 取兩者較大者除以兩者之和，故隨純度單調上升 —— 三�
         現行流程只用了中間那一個。</desc>
 
   <text class="ttl zh" x="20" y="36">三個通道量在不同的位置上</text>
-  <text class="anno zh" x="20" y="66">中央為一段染色體上兩類位點的分布。通道的差別在於<b>量在哪裡</b>，以及<b>分母涵蓋什麼</b>。</text>
+  <text class="anno zh" x="20" y="66">中央為一段染色體上兩類位點的分布。通道的差別在於<tspan class="bold">量在哪裡</tspan>，以及<tspan class="bold">分母涵蓋什麼</tspan>。</text>
 
   <!-- ══ 染色體與兩類位點 ══ -->
   <rect class="box plain" x="120" y="104" width="760" height="34" rx="8"/>
@@ -18568,6 +18611,94 @@ copy-neutral LOH、該條的擴增、變異發生於擴增之前或之後（決�
 <b>下排的 <math><mi>s</mi></math> 三格完全相同</b>；上排的 <tspan class="mono">2 × VAF</tspan> 由 0.500 變為 0.667 與 0.333。
 右側標出 PURPLE 的因應方式：把後兩格排除在錨的適用範圍之外。</figcaption></figure>
 
+<h4 id="sr4__loh-區段-錨與深度訊號同時最強">LOH 區段：錨與深度訊號同時最強</h4>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" class="dia-svg" role="img" aria-labelledby="sr4__sr4-loh-strength__title" aria-describedby="sr4__sr4-loh-strength__desc">
+  <title id="sr4__sr4-loh-strength__title">LOH 區段上單倍型深度比隨純度急遽上升，而錨在該處同樣成立</title>
+  <desc id="sr4__sr4-loh-strength__desc">左邊比較兩種區段上的單倍型深度比隨細胞比例的變化。
+        兩個等位各一份的區段，這個比值恆為一，一條水平線，對細胞比例毫無資訊。
+        異型合子性喪失的區段，也就是另一條單倍型被刪掉的地方，
+        那一條只剩正常細胞貢獻的一份，所以比值等於腫瘤那一份加正常那一份，
+        再除以正常那一份，也就是一除以一減細胞比例，隨細胞比例急遽上升：
+        零點二時是一點二五，零點六時是二點五，零點八時是五。
+        右邊指出這件事的範圍。
+        受限的是 PURPLE 在高度二倍體樣本上啟用的那條變異頻率退路：
+        它的分母含兩條單倍型，所以只能用在拷貝數接近二的區域。
+        而異型合子性喪失對兩個方法的主要擬合並不是障礙 ——
+        上篇第四節已經示範，拷貝數不變的異型合子性喪失給出的是最乾淨的純度讀數之一。
+        讀法是：本頁的錨取代的是那條退路的區域限制，不是取代整個方法。</desc>
+
+  <text class="ttl zh" x="20" y="36">LOH 區段：訊號最強而錨仍成立</text>
+  <text class="anno zh" x="20" y="66">左為單倍型深度比隨純度的變化，右為此一性質與錨相合的後果。</text>
+
+  <!-- ══ 左：曲線 ══ -->
+  <rect class="box ghost" x="20" y="88" width="540" height="330" rx="8"/>
+
+  <line class="axis" x1="90" y1="360" x2="520" y2="360"/>
+  <line class="axis" x1="90" y1="360" x2="90" y2="130"/>
+  <text class="tick mid" x="90" y="382">0.0</text>
+  <text class="tick mid" x="176" y="382">0.2</text>
+  <text class="tick mid" x="262" y="382">0.4</text>
+  <text class="tick mid" x="348" y="382">0.6</text>
+  <text class="tick mid" x="434" y="382">0.8</text>
+  <text class="tick mid" x="520" y="382">1.0</text>
+  <text class="tick zh mid" x="305" y="406">純度 p</text>
+  <text class="tick end" x="82" y="366">1</text>
+  <text class="tick end" x="82" y="314">2</text>
+  <text class="tick end" x="82" y="262">3</text>
+  <text class="tick end" x="82" y="210">5</text>
+  <text class="tick end" x="82" y="158">10</text>
+  <text class="tick zh" x="30" y="120">D₁ / D₂</text>
+
+  <!-- 1+1：水平線 -->
+  <line class="conn hp2" x1="90" y1="360" x2="520" y2="360"/>
+  <text class="tick hp2 zh" x="106" y="332">1 + 1：恆為 1，對純度無資訊</text>
+
+  <!-- 1+0：上升 -->
+  <path class="conn ok" d="M 90 360 L 176 347 L 262 327 L 348 296 L 434 210 L 490 130"/>
+  <circle class="mark somatic" cx="176" cy="347" r="7"/>
+  <circle class="mark somatic" cx="348" cy="296" r="7"/>
+  <circle class="mark somatic" cx="434" cy="210" r="7"/>
+  <text class="tick mono" x="188" y="352">1.25</text>
+  <text class="tick mono" x="360" y="290">2.5</text>
+  <text class="tick mono" x="446" y="206">5.0</text>
+  <text class="tick ok bold zh" x="120" y="166">1 + 0（LOH）</text>
+  <text class="tick ok zh" x="120" y="190">D₁/D₂ = (p·n₁ + 1−p) ÷ (1−p)</text>
+
+  <!-- ══ 右：後果 ══ -->
+  <rect class="box ghost bad" x="584" y="88" width="396" height="150" rx="8"/>
+  <text class="anno bold zh" x="608" y="118">受限的只有一條路徑</text>
+  <text class="tick zh" x="608" y="148">PURPLE 的 somatic VAF 退路分母含</text>
+  <text class="tick zh" x="608" y="172">兩條單倍型，故限於 CN 1.8–2.2。</text>
+  <text class="tick ok zh" x="608" y="204">兩者的<tspan class="bold">主要</tspan>擬合（深度＋等位比例）</text>
+  <text class="tick ok zh" x="608" y="228">在 LOH 上反而資訊量高。</text>
+
+  <rect class="box ghost ok" x="584" y="250" width="396" height="168" rx="8"/>
+  <text class="anno bold zh" x="608" y="280">對本頁的路線</text>
+  <text class="tick zh" x="608" y="310">同一批區域<tspan class="bold">同時</tspan>具備兩件事：</text>
+  <text class="tick ok zh" x="608" y="340">① 單倍型深度比的訊號最強</text>
+  <text class="tick ok zh" x="608" y="364">② 錨照樣成立（分母不含 n₂）</text>
+  <text class="tick zh" x="608" y="396">故其為此路線資訊最密之處，</text>
+  <text class="tick zh" x="608" y="412">亦不需排除在錨之外。</text>
+
+  <!-- 結論 -->
+  <rect class="box accent" x="20" y="432" width="960" height="34" rx="8"/>
+  <text class="anno zh" x="40" y="456">可宣稱的是<tspan class="bold">取代該退路的區域限制</tspan>，不是「在對照方法失效之處仍可用」—— 它們在此並未失效。</text>
+</svg><figcaption>LOH 區段（<tspan class="mono">n₂ = 0</tspan>）上，<code>H2</code> 只剩正常細胞的一份，
+故單倍型深度比 <tspan class="mono">D₁/D₂</tspan> 為 <tspan class="mono">(p·n₁ + 1 − p) ÷ (1 − p)</tspan>，
+隨純度急遽上升。<b>而錨在此處同樣成立</b>，因其分母不含 <tspan class="mono">n₂</tspan>。</figcaption></figure>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">LOH 對上篇的兩個方法並非不利 —— 受限的只有 PURPLE 的一條退路</p>
+<p class="prose">上篇第四節已示範：copy-neutral LOH 給出 <math><mi>b</mi><mo>=</mo><mo>(</mo><mn>1</mn><mo>+</mo><mi>ρ</mi><mo>)</mo><mo>/</mo><mn>2</mn></math>，
+即 <math><mi>ρ</mi><mo>=</mo><mn>2</mn><mi>b</mi><mo>−</mo><mn>1</mn></math>，<b>是等位比例路線上最乾淨的純度讀數之一</b>。
+故 LOH 對 ASCAT 與 PURPLE 的<b>主要</b>擬合（深度加等位比例）不但不是障礙，資訊量反而高。</p>
+<p class="prose">受拷貝數 1.8 至 2.2 限制的，只有 PURPLE 在高度二倍體樣本上啟用的
+<b>somatic VAF 退路</b>。本頁的錨與該退路對應，
+故可宣稱的是「<b>取代該退路的區域限制</b>」，
+<b>不可</b>宣稱「在 ASCAT 與 PURPLE 失效之處仍然可用」—— 它們在 LOH 上並未失效。</p>
+</div>
+
 <h4 id="sr4__梳齒-s-在各-n1-之下取離散值">梳齒：<math><mi>s</mi></math> 在各 <math><mo>(</mo><msub><mi>n</mi><mn>1,</mn></msub><mi>μ</mi><mo>)</mo></math> 之下取離散值</h4>
 
 <p class="prose"><math><mi>s</mi><mo>=</mo><mi>p</mi></math> 僅在 <math><msub><mi>n</mi><mn>1</mn></msub><mo>=</mo><mi>μ</mi><mo>=</mo><mn>1</mn></math> 且 <math><mi>c</mi><mo>=</mo><mn>1</mn></math> 時成立。
@@ -18764,7 +18895,7 @@ algorithm for small and large variants</i>, <i>Bioinformatics</i> 2022;38:1816�
 </section>
 
     
-    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>GHIR（生殖系單倍型失衡比）</dt><dd>Germline Haplotype Imbalance Ratio：在已分到 HP1／HP2 的 germline 位點上，量化兩個 haplotype 分支的 read 比例；在本教材的示意定義中，理想且無偏差時接近 0.5。它不是直接的 purity 讀數：somatic mutation branch、LOH/CNV、TINC、錯誤 phasing、mapping bias 與抽樣不足都可能造成偏移。LongPhase-S 需在過濾與模型假設下，利用其分布估計 purity。</dd><dt>haplotype imbalance（單倍型失衡）</dt><dd>指派至兩條親源單倍型的 read 數不相等。其成因有二：該處兩條單倍型的拷貝數不同，或其中一條的分子被改標至 somatic 子單倍型。兩者在數值上形式相同，僅憑一個失衡值無法區分。</dd></dl></section>
+    <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>GHIR（生殖系單倍型失衡比）</dt><dd>Germline Haplotype Imbalance Ratio：在<b>候選 somatic 位點</b>上，取標為 HP1 與 HP2 的 read 數中較大者除以兩者之和，值域為 0.5 至 1。須注意兩件事：分母<b>只含這兩個 germline 計數</b>，HP1-1／HP2-1／HP3 皆不在內；且這些標籤是<b>整條 read</b> 的判定（該 read 任一處帶 somatic 等位即離開 germline 計數），並非該位點的等位計數。它不是直接的 purity 讀數：拷貝數變異、LOH、read 跨距內的突變密度、標記錯誤與抽樣不足都會使它偏移。</dd><dt>haplotype imbalance（單倍型失衡）</dt><dd>指派至兩條親源單倍型的 read 數不相等。其成因有二：該處兩條單倍型的拷貝數不同，或其中一條的分子被改標至 somatic 子單倍型。兩者在數值上形式相同，僅憑一個失衡值無法區分。</dd></dl></section>
   </article>
 <hr>
 <article class="module" id="sr5">
@@ -18865,7 +18996,7 @@ somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位
   <rect class="bar somatic" x="104" y="262" width="230" height="24"/>
   <text class="tick mono" x="344" y="280">似然主導</text>
 
-  <text class="tick bad zh" x="44" y="322">兩塊的相對高度<b>隨資料組成而變</b>，</text>
+  <text class="tick bad zh" x="44" y="322">兩塊的相對高度<tspan class="bold">隨資料組成而變</tspan>，</text>
   <text class="tick bad zh" x="44" y="346">而兩者之間沒有任何係數校準。</text>
   <text class="anno bold bad zh" x="44" y="382">同一個方法 ＝ 兩個方法</text>
 
@@ -18886,14 +19017,14 @@ somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位
   <rect class="bar somatic" x="736" y="262" width="140" height="24"/>
   <rect class="bar germline" x="876" y="262" width="60" height="24"/>
 
-  <text class="tick ok zh" x="536" y="322">各項的份量由其<b>樣本數與分布</b>自動決定，</text>
+  <text class="tick ok zh" x="536" y="322">各項的份量由其<tspan class="bold">樣本數與分布</tspan>自動決定，</text>
   <text class="tick ok zh" x="536" y="346">不需人為係數；簡約偏好搬到最後一項的先驗。</text>
   <text class="anno bold ok zh" x="536" y="382">尺度一致，可相加也可比較</text>
 
   <!-- ══ 最實際的差別 ══ -->
   <rect class="box accent" x="20" y="420" width="960" height="66" rx="8"/>
-  <text class="anno zh" x="40" y="448">最實際的差別在<b>不確定性</b>：右式的最大值附近有曲率，故給得出區間、給得出多峰。</text>
-  <text class="anno zh" x="40" y="474">左式的懲罰<b>不是機率</b>，其最小值附近的形狀不對應任何區間 —— 只能回報一個點。</text>
+  <text class="anno zh" x="40" y="448">最實際的差別在<tspan class="bold">不確定性</tspan>：右式的最大值附近有曲率，故給得出區間、給得出多峰。</text>
+  <text class="anno zh" x="40" y="474">左式的懲罰<tspan class="bold">不是機率</tspan>，其最小值附近的形狀不對應任何區間 —— 只能回報一個點。</text>
 </svg><figcaption>左為上篇的分數：兩個平均相乘，再加一個與其無關尺度的項；
 三塊的高度<b>刻意畫成隨資料組成變動</b>。右為本頁的形式：四項皆為對數機率，
 相加即可，且每一項的份量由其樣本數與分布自動決定。
@@ -18928,7 +19059,7 @@ somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位
         讀法是：要判斷一個估計值可不可信，就看它依賴的是哪幾層。</desc>
 
   <text class="ttl zh" x="20" y="36">生成模型：一個純度 → 每段拷貝數 → 分子組成 → 三個通道 → 計數</text>
-  <text class="anno zh" x="20" y="66">五層由上而下，每一層只做一件事。<b>干擾參數全部集中在第四層</b>，前三層沒有。</text>
+  <text class="anno zh" x="20" y="66">五層由上而下，每一層只做一件事。<tspan class="bold">干擾參數全部集中在第四層</tspan>，前三層沒有。</text>
 
   <!-- ══ ① 全域參數 ══ -->
   <rect class="box accent" x="20" y="88" width="700" height="66" rx="8"/>
@@ -18956,7 +19087,7 @@ somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位
   <rect class="box ok" x="20" y="282" width="700" height="112" rx="8"/>
   <text class="lbl bold zh ok" x="40" y="312">③ 分子組成</text>
   <text class="tick zh" x="40" y="336">由上兩層決定</text>
-  <text class="tick ok zh" x="40" y="360">此層<b>無自由參數</b></text>
+  <text class="tick ok zh" x="40" y="360">此層<tspan class="bold">無自由參數</tspan></text>
 
   <rect class="bar somatic" x="290" y="300" width="120" height="26"/>
   <rect class="bar germline" x="410" y="300" width="90" height="26"/>
@@ -18975,7 +19106,7 @@ somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位
   <!-- ══ ④ 三個通道 ══ -->
   <rect class="box warn" x="20" y="428" width="700" height="180" rx="8"/>
   <text class="lbl bold zh warn" x="40" y="458">④ 三個觀測通道</text>
-  <text class="tick bad zh" x="40" y="482">干擾參數<b>全部在此進入</b></text>
+  <text class="tick bad zh" x="40" y="482">干擾參數<tspan class="bold">全部在此進入</tspan></text>
 
   <rect class="box plain" x="40" y="496" width="205" height="96" rx="6"/>
   <text class="tick bold zh mid" x="142" y="518">總深度比</text>
@@ -19030,7 +19161,7 @@ somatic 掏空與拷貝數失衡是同一個分子裡的兩項，須在不同位
   <text class="tick bad zh" x="758" y="596">④ 的參數需另行校準。</text>
 
   <rect class="box accent" x="20" y="724" width="960" height="42" rx="8"/>
-  <text class="anno zh" x="40" y="752">現行流程只用第④層最左邊那一格的一部分，再把 GHIR 分布壓成兩個矩 —— <b>②③ 兩層整個沒有被寫出來</b>。</text>
+  <text class="anno zh" x="40" y="752">現行流程只用第④層最左邊那一格的一部分，再把 GHIR 分布壓成兩個矩 —— <tspan class="bold">②③ 兩層整個沒有被寫出來</tspan>。</text>
 </svg><figcaption>五層。第一層是全樣本唯一的純度；
 第二層是每個拷貝數區段的兩個整數，它們決定第三層的分子組成 ——
 腫瘤細胞按其拷貝數貢獻，正常細胞每條單倍型各一份。
@@ -19117,7 +19248,7 @@ DNA 比例再由它與第一層算出。<b>倍體與 DNA 比例都不是自由�
         讀法是：N50 尺度相近不代表斷點對應，這兩件事不能互相代替。</desc>
 
   <text class="ttl zh" x="20" y="36">分段與定向是兩件不同的工作</text>
-  <text class="anno zh" x="20" y="66">同一段染色體。上排為拷貝數的真實邊界，中排為相位區塊的邊界，<b>兩者不對齊</b>。</text>
+  <text class="anno zh" x="20" y="66">同一段染色體。上排為拷貝數的真實邊界，中排為相位區塊的邊界，<tspan class="bold">兩者不對齊</tspan>。</text>
 
   <!-- ══ 拷貝數真實邊界 ══ -->
   <text class="anno bold zh" x="20" y="118">拷貝數狀態</text>
@@ -19170,7 +19301,7 @@ DNA 比例再由它與第一層算出。<b>倍體與 DNA 比例都不是自由�
   <text class="tick zh mid" x="550" y="415">相位區塊只在每個區段<tspan class="bold">之內</tspan>指出哪一條是 H1</text>
 
   <rect class="box accent" x="20" y="458" width="960" height="48" rx="8"/>
-  <text class="anno zh" x="40" y="486">兩者回答不同的問題：<b>分段決定邊界在哪，定向決定邊界之內兩條怎麼配對</b>。N50 尺度相近不蘊含斷點對應。</text>
+  <text class="anno zh" x="40" y="486">兩者回答不同的問題：<tspan class="bold">分段決定邊界在哪，定向決定邊界之內兩條怎麼配對</tspan>。N50 尺度相近不蘊含斷點對應。</text>
 </svg><figcaption>上排為拷貝數的真實邊界，下排為相位區塊的邊界，兩者<b>刻意畫成不對齊</b>。
 中間標出兩種錯配：一個拷貝數斷點落在 block 之內（該 block 橫跨兩個狀態，
 其 <tspan class="mono">(n₁, n₂)</tspan> 不是一組整數），
@@ -19257,7 +19388,7 @@ DNA 比例再由它與第一層算出。<b>倍體與 DNA 比例都不是自由�
   <text class="tick ok zh" x="742" y="188">設先驗：有峰，也有寬度</text>
 
   <rect class="box accent" x="20" y="420" width="960" height="42" rx="8"/>
-  <text class="anno zh" x="40" y="448">先驗<b>沒有創造資料裡沒有的資訊</b> —— 樣本若無 clonal 變異，後驗會退回接近先驗，<b>而這由寬度看得出來</b>。</text>
+  <text class="anno zh" x="40" y="448">先驗<tspan class="bold">沒有創造資料裡沒有的資訊</tspan> —— 樣本若無 clonal 變異，後驗會退回接近先驗，<tspan class="bold">而這由寬度看得出來</tspan>。</text>
 </svg><figcaption>兩個 nuisance 參數的處置方式不同。
 <tspan class="mono">μ</tspan> 是離散且有界的（不超過該單倍型的拷貝數），故<b>逐一列舉</b>；
 <tspan class="mono">c</tspan> 是連續的，故給先驗後積分。
@@ -19280,8 +19411,21 @@ DNA 比例再由它與第一層算出。<b>倍體與 DNA 比例都不是自由�
 ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍體區段的 VAF 峰。</p>
 
 <p class="prose">而此情形下 <math><msub><mi>n</mi><mn>1</mn></msub><mo>=</mo><mn>1</mn></math> 處處成立，somatic 通道仍然作用，
-故 <math><mi>p</mi></math> 的後驗不會退化為平坦。<b>此項不可辨識因而被解除</b>，
-其代價為需要存在 truncal 的 somatic 變異。</p>
+故 <math><mi>p</mi></math> 的後驗不會退化為平坦。<b>此項不可辨識因而被解除 —— 但只是條件性的。</b></p>
+
+<p class="prose">須同時成立的條件有四項，缺一則模型僅為<b>部分可辨識</b>，
+後驗退回第四節所述的「由 <math><msub><mi>max</mi><mi>i</mi></msub><mo>(</mo><msub><mi>s</mi><mi>i</mi></msub><mo>)</mo></math> 起始的下界」：</p>
+
+<ul class="prose">
+<li>至少存在一個真正 truncal（<math><mi>c</mi><mo>=</mo><mn>1</mn></math>）的 somatic 變異；</li>
+<li>該變異落在 <math><msub><mi>n</mi><mn>1</mn></msub><mo>=</mo><mn>1</mn></math> 的分層之內；</li>
+<li>它被 caller 偵測到，且單倍型標記正確；</li>
+<li>其觀測值未被抽樣雜訊推高（取極大值本身即為向上偏誤的估計量）。</li>
+</ul>
+
+<p class="prose">四者皆非自動成立，且第三項在低純度時系統性變差（第六節第二列）。
+<b>因此輸出必須是後驗而非點估計</b> —— 條件不成立時，後驗的寬度會顯示出來，
+點估計不會。</p>
 
 <h4 id="sr5__未解決-全基因體加倍">未解決：全基因體加倍</h4>
 
@@ -19292,8 +19436,17 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
 加倍後 <math><mi>ρ</mi><mi>′</mi><mo>=</mo><mn>0.25</mn></math>、<math><msub><mi>n</mi><mn>1</mn></msub><mi>′</mi><mo>=</mo><mn>2</mn></math>、<math><mi>μ</mi><mi>′</mi><mo>=</mo><mn>2</mn></math>，代入仍得 <math><mi>s</mi><mi>′</mi><mo>=</mo><mn>0.400</mn></math>。</p></div>
 
 <p class="prose"><b>錨在加倍變換下不變，故不能單獨破解加倍簡併。</b>
-可用以定下模式的證據有三類：任一區段出現奇數的等位特異拷貝數、
-加倍之後才發生的變異（其 <math><mi>μ</mi></math> 不隨拷貝數加倍）、以及樣本外的量測。</p>
+可用以定下模式的證據有三類，但三者的作用方式<b>不同</b>：</p>
+
+<ul class="prose">
+<li><b>奇數的等位特異拷貝數 —— 只擋一個方向。</b>它使該解無法<b>再對半</b>，
+但<b>任何解皆可再加倍</b>：含奇數拷貝數的解，其加倍版本全為偶數，
+且對深度與等位比例給出逐格相同的觀測。
+故奇數只是把該解定為此族中<b>最小</b>的一個；真正排除加倍解的是<b>簡約先驗</b>，不是資料。</li>
+<li><b>加倍之後才發生的變異 —— 這一項才是資料證據。</b>其 <math><mi>μ</mi></math> 不隨拷貝數加倍，
+故兩個模式對它預測不同的 <math><mi>s</mi></math>。惟須另行判定該變異的發生時序。</li>
+<li><b>樣本外的量測</b>：流式細胞術的 DNA 指數、核型或 FISH。</li>
+</ul>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" class="dia-svg" role="img" aria-labelledby="sr5__sr4-what-it-fixes__title" aria-describedby="sr5__sr4-what-it-fixes__desc">
   <title id="sr5__sr4-what-it-fixes__title">此錨解除兩種不可辨識，但未解除全基因體加倍</title>
@@ -19301,14 +19454,16 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
         左欄是整個基因體都沒有等位失衡的樣本。
         這時深度比處處相同、等位比例處處是零點五，對細胞比例完全沒有資訊，
         上篇的兩個方法一個拒絕輸出、一個改用二倍體區段的變異頻率。
-        但這種樣本每一段的單倍型都是一份，所以錨處處成立，直接讀出細胞比例。這一項解除。
+        但這種樣本每一段的單倍型都是一份，所以錨處處成立。
+        這一項因而解除，不過是有條件的：
+        得先有一個真正主幹的變異落在這一層、被偵測到、標記正確，而且沒有被雜訊推高。
         中欄是錨本身的區域限制。
         上篇那個錨的分母含另一條單倍型，所以只能用在拷貝數接近二的區域；
         本頁的錨分母只有一條單倍型，異型合子性喪失與擴增區段都能用。這一項也解除。
         右欄是全基因體加倍。
         把拷貝數全部乘二，發生在加倍之前的變異其多重度也跟著乘二，
         代進去之後錨的值一模一樣。所以這一項沒有解除，
-        仍然要靠簡約偏好、奇數拷貝數的存在，或樣本外的量測。
+        仍然要靠簡約偏好或樣本外的量測；奇數拷貝數只能擋住「再對半」，擋不住「再加倍」。
         讀法是：把做得到與做不到分開講，是這條路線能不能被採信的前提。</desc>
 
   <text class="ttl zh" x="20" y="36">解除兩項，未解除一項</text>
@@ -19327,10 +19482,10 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
 
   <text class="tick zh" x="44" y="290">此時 <tspan class="mono">n₁ = 1</tspan> 處處成立，</text>
   <text class="tick mono" x="44" y="316">故 s = p · c</text>
-  <text class="tick zh" x="44" y="342">上包絡直接給出純度。</text>
+  <text class="tick zh" x="44" y="342">惟須有 truncal 變異，見下篇第五節。</text>
 
-  <rect class="box ok" x="44" y="356" width="258" height="24" rx="6"/>
-  <text class="tick bold ok zh mid" x="173" y="374">解除</text>
+  <rect class="box warn" x="44" y="356" width="258" height="24" rx="6"/>
+  <text class="tick bold zh mid" x="173" y="374">條件性解除</text>
 
   <!-- ══ 中 ══ -->
   <rect class="box ghost ok" x="346" y="88" width="306" height="300" rx="8"/>
@@ -19370,7 +19525,7 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
 
   <!-- 結論 -->
   <rect class="box accent" x="20" y="402" width="960" height="56" rx="8"/>
-  <text class="anno zh" x="40" y="430">可宣稱：<tspan class="bold">純度的估計不再要求區段為二倍體，且無等位失衡的樣本亦可估計</tspan>。</text>
+  <text class="anno zh" x="40" y="430">可宣稱：<tspan class="bold">純度的估計不再要求區段為二倍體</tspan>；無等位失衡的樣本<tspan class="bold">在條件成立時</tspan>亦可估計。</text>
   <text class="anno zh" x="40" y="452">不可宣稱：解決了純度與倍體的簡併。<tspan class="bold">把做得到與做不到分開講，是此路線能否被採信的前提。</tspan></text>
 </svg><figcaption>三種不可辨識的處置對照。
 左欄「全基因體無等位失衡」：兩條軌道皆為常數，但 <tspan class="mono">n₁ = 1</tspan> 處處成立，故錨仍給出純度 —— <b>解除</b>。
@@ -19395,11 +19550,12 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
         而兩個答案的倍體差了一倍。
         右欄是本頁要求的輸出：兩個模式各自附上機率，
         並列出三類可以用來定案的證據，以及它們在這個樣本上的狀態 ——
-        有沒有奇數的等位拷貝數、有沒有加倍之後才發生的變異、有沒有樣本外的量測。
+        有沒有加倍之後才發生的變異、有沒有樣本外的量測，以及有沒有奇數的等位拷貝數 ——
+        最後這一項只能擋住「再對半」，擋不住「再加倍」，所以它靠的是簡約偏好而不是資料。
         讀法是：把雙峰壓成一個數字，丟掉的不是精度，是「這裡還沒有定論」這件事。</desc>
 
   <text class="ttl zh" x="20" y="36">加倍未定時的輸出格式</text>
-  <text class="anno zh" x="20" y="66">同一份資料。兩個模式對深度與等位比例給出<b>相同</b>的期望值，體細胞錨亦不能分辨。</text>
+  <text class="anno zh" x="20" y="66">同一份資料。兩個模式對深度與等位比例給出<tspan class="bold">相同</tspan>的期望值，體細胞錨亦不能分辨。</text>
 
   <rect class="box ghost" x="20" y="88" width="306" height="290" rx="8"/>
   <text class="lbl bold zh mid" x="173" y="118">後驗的實況</text>
@@ -19432,13 +19588,13 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
   <text class="tick mono mid" x="826" y="210">p 0.25　κ 4.0</text>
   <text class="tick mid" x="826" y="230">機率 0.4</text>
   <text class="tick bold zh" x="694" y="262">可用以定案的證據</text>
-  <text class="tick zh" x="694" y="286">· 奇數的等位拷貝數</text>
-  <text class="tick zh" x="694" y="310">· 加倍之後才發生的變異</text>
-  <text class="tick zh" x="694" y="334">· 樣本外的量測</text>
+  <text class="tick zh" x="694" y="286">· 加倍後才發生的變異</text>
+  <text class="tick zh" x="694" y="310">· 樣本外的量測</text>
+  <text class="tick zh" x="694" y="334">· 奇數拷貝數（僅擋對半）</text>
   <text class="tick ok zh" x="694" y="362">本樣本：三者皆無</text>
 
   <rect class="box accent" x="20" y="394" width="960" height="42" rx="8"/>
-  <text class="anno zh" x="40" y="422">壓成一個數字所丟掉的不是精度，是<b>「這裡還沒有定論」這件事</b> —— 而兩個模式的倍體相差一倍。</text>
+  <text class="anno zh" x="40" y="422">壓成一個數字所丟掉的不是精度，是<tspan class="bold">「這裡還沒有定論」這件事</tspan> —— 而兩個模式的倍體相差一倍。</text>
 </svg><figcaption>同一份資料的後驗。左為雙峰的實況：
 兩個模式的 <tspan class="mono">(p, κ)</tspan> 分別為 <tspan class="mono">(0.40, 2.0)</tspan> 與 <tspan class="mono">(0.25, 4.0)</tspan>，
 兩者對深度與等位比例給出<b>相同</b>的期望值。
@@ -19557,7 +19713,7 @@ ASCAT 將此類樣本標記為非異常並拒絕輸出，PURPLE 則轉用二倍�
 <thead><tr><th scope="col">項目</th><th scope="col">現行：兩個矩加多項式迴歸</th><th scope="col">本頁的規格</th></tr></thead>
 <tbody>
 <tr><td>輸出</td><td><math><mi>f</mi></math> 一個純量</td><td><math><mi>p</mi></math>、<math><mi>κ</mi></math>、每段 <math><mo>(</mo><msub><mi>n</mi><mn>1,</mn></msub><msub><mi>n</mi><mn>2</mn></msub><mo>)</mo></math>，<math><mi>f</mi></math> 為導出量</td></tr>
-<tr><td>係數來源</td><td>由合成混合樣本擬合而得</td><td>不需訓練；式中的量皆有物理意義</td></tr>
+<tr><td>係數來源</td><td>由合成混合樣本擬合而得</td><td>不需<b>純度迴歸</b>的監督式訓練；式中的量皆有物理意義。惟偵測機率、標記錯誤率與平台校準參數<b>仍須估計</b></td></tr>
 <tr><td>跨平台</td><td>ONT 訓練、PacBio 直接轉移（原始文獻已驗證可行）</td>
 <td>不含平台特定的<b>迴歸係數</b>；惟錯誤率、標記正確率與偵測機率仍須逐平台校準
 —— <b>「不需訓練係數」不等於「平台無關」</b></td></tr>
@@ -19769,7 +19925,7 @@ M8 已建立 <math><mi>f</mi></math> 與 cellular purity <math><mi>p</mi></math>
   <text class="anno bold zh" x="696" y="330">但它決定能否使用</text>
 
   <rect class="box accent" x="20" y="356" width="960" height="66" rx="8"/>
-  <text class="anno zh" x="40" y="384">混在同一張表裡報告，會讓最弱的一條<b>借用到最強的一條的可信度</b> —— 讀者以為 <tspan class="mono">p</tspan> 也有 MAE 0.03 那種等級的驗證。</text>
+  <text class="anno zh" x="40" y="384">混在同一張表裡報告，會讓最弱的一條<tspan class="bold">借用到最強的一條的可信度</tspan> —— 讀者以為 <tspan class="mono">p</tspan> 也有 MAE 0.03 那種等級的驗證。</text>
   <text class="anno zh" x="40" y="410">而此主題最欠缺的正是金標準，故第三條軌道的份量比一般情形更重。</text>
 </svg><figcaption>三條軌道各有不同的真值來源與可宣稱的強度。
 左：<tspan class="mono">f</tspan> 有精確真值（混合比例即為之），可與現行迴歸直接比較，

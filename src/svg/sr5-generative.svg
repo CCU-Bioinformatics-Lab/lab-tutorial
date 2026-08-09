@@ -21,7 +21,7 @@
         讀法是：要判斷一個估計值可不可信，就看它依賴的是哪幾層。</desc>
 
   <text class="ttl zh" x="20" y="36">生成模型：一個純度 → 每段拷貝數 → 分子組成 → 三個通道 → 計數</text>
-  <text class="anno zh" x="20" y="66">五層由上而下，每一層只做一件事。<b>干擾參數全部集中在第四層</b>，前三層沒有。</text>
+  <text class="anno zh" x="20" y="66">五層由上而下，每一層只做一件事。<tspan class="bold">干擾參數全部集中在第四層</tspan>，前三層沒有。</text>
 
   <!-- ══ ① 全域參數 ══ -->
   <rect class="box accent" x="20" y="88" width="700" height="66" rx="8"/>
@@ -49,7 +49,7 @@
   <rect class="box ok" x="20" y="282" width="700" height="112" rx="8"/>
   <text class="lbl bold zh ok" x="40" y="312">③ 分子組成</text>
   <text class="tick zh" x="40" y="336">由上兩層決定</text>
-  <text class="tick ok zh" x="40" y="360">此層<b>無自由參數</b></text>
+  <text class="tick ok zh" x="40" y="360">此層<tspan class="bold">無自由參數</tspan></text>
 
   <rect class="bar somatic" x="290" y="300" width="120" height="26"/>
   <rect class="bar germline" x="410" y="300" width="90" height="26"/>
@@ -68,7 +68,7 @@
   <!-- ══ ④ 三個通道 ══ -->
   <rect class="box warn" x="20" y="428" width="700" height="180" rx="8"/>
   <text class="lbl bold zh warn" x="40" y="458">④ 三個觀測通道</text>
-  <text class="tick bad zh" x="40" y="482">干擾參數<b>全部在此進入</b></text>
+  <text class="tick bad zh" x="40" y="482">干擾參數<tspan class="bold">全部在此進入</tspan></text>
 
   <rect class="box plain" x="40" y="496" width="205" height="96" rx="6"/>
   <text class="tick bold zh mid" x="142" y="518">總深度比</text>
@@ -123,5 +123,5 @@
   <text class="tick bad zh" x="758" y="596">④ 的參數需另行校準。</text>
 
   <rect class="box accent" x="20" y="724" width="960" height="42" rx="8"/>
-  <text class="anno zh" x="40" y="752">現行流程只用第④層最左邊那一格的一部分，再把 GHIR 分布壓成兩個矩 —— <b>②③ 兩層整個沒有被寫出來</b>。</text>
+  <text class="anno zh" x="40" y="752">現行流程只用第④層最左邊那一格的一部分，再把 GHIR 分布壓成兩個矩 —— <tspan class="bold">②③ 兩層整個沒有被寫出來</tspan>。</text>
 </svg>

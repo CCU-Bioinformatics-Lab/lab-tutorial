@@ -127,9 +127,14 @@ GHIR(i) = \frac{\max(RC^{H1}(i), RC^{H2}(i))}{RC^{H1}(i) + RC^{H2}(i)}
 右側標出關鍵的一步 —— 帶有 somatic 等位的分子<b>離開</b> <code>H1</code> 進入 <code>H1-1</code>，
 因此 <code>H1</code> 被掏空，而 <code>H2</code> 不變。}}
 
-<h3>二、GHIR 的無雜訊值</h3>
+<h3>二、理想化焦點統計量的無雜訊值</h3>
 
 <h4>三個計數的分子數</h4>
+
+<p class="prose"><b>本節先處理一個理想化的量</b>：假設該 read 跨距之內
+<b>只有焦點這一個</b> somatic 變異。此假設使「這條 read 帶不帶 somatic 等位」
+等同於「它在焦點位點帶不帶 ALT」，五個計數因而可以直接寫成焦點位點的函數。
+下一小節說明放掉此假設之後會變成什麼。</p>
 
 <p class="prose">設 somatic 變異位於 germline 單倍型 1。令 {{m: p}} 為 cellular purity、
 {{m: n_1}} 與 {{m: n_2}} 為該處腫瘤細胞的等位特異拷貝數、
@@ -187,10 +192,50 @@ GHIR^{∞} = \frac{1}{2 − p}, \qquad p = 2 − \frac{1}{GHIR^{∞}}
 GHIR 取兩者較大者除以兩者之和，故隨純度單調上升 —— 三格的值分別為 0.556、0.667、0.909。
 <b>此即現行迴歸所擬合的那條曲線，而它有閉式。</b>}}
 
-<p class="prose">此結果對照現行做法值得留意：現行流程量測 GHIR 分布的中位數與四分位距，
-再以二階多項式迴歸估計 tumour DNA fraction。
-上式顯示該關係在二倍體 clonal 的情形下<b>為一條已知的一元函數</b>，
-迴歸所擬合的是一個本已有閉式的物理量。</p>
+<h4>放掉理想化假設之後：實際的 GHIR 還依賴突變負荷</h4>
+
+<p class="prose">第一節已指出 <code>hpResult</code> 是<b>整條 read</b> 的標籤。
+因此一條 read 只要在跨距內<b>任何一處</b>帶有 somatic 等位，就會離開 germline 計數 ——
+與它在焦點位點是不是 ALT 無關。上式因而<b>不是實際 GHIR 的閉式</b>。</p>
+
+<p class="prose">令 {{m: λ}} 為一條 read 的跨距內<b>其他</b>可偵測 somatic 變異的期望數。
+二倍體、clonal、焦點變異位於單倍型 1 時：單倍型 1 的腫瘤分子全部帶有焦點變異，
+故 <code>H1</code> 只剩正常細胞；而單倍型 2 的腫瘤分子<b>亦被其他變異掏空</b>：</p>
+
+{{eq}}
+H1 = (1 − p), \qquad H2 = p·n_2·e^{−λ} + (1 − p)
+{{note}}
+{{m: λ = 0}} 時退回上式。<b>{{m: λ}} 越大，<code>H2</code> 越小，GHIR 越接近 0.5</b> ——
+方向與純度下降相同。
+{{/eq}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>突變負荷（read 跨距 20 kb）</th><th>0</th><th>5／Mb</th><th>20／Mb</th><th>50／Mb</th></tr></thead>
+<tbody>
+<tr><td>{{m: λ}}</td><td>0</td><td>0.10</td><td>0.40</td><td>1.00</td></tr>
+<tr><td>{{m: p = 0.50}} 時的 GHIR</td><td>0.667</td><td>0.656</td><td>0.626</td><td><b>0.578</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">末欄與理想化的 0.667 相差 0.089，<b>大於低純度區間的整段訊號</b>
+（{{m: p}} 由 0 到 0.2 時 GHIR 只由 0.500 走到 0.556）。</p>
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">此依賴的方向，對現行迴歸有直接後果</p>
+<p class="prose">固定純度之下，GHIR 隨突變負荷<b>下降</b>；而下降的方向與純度降低所造成的方向相同。
+現行流程以中位數與四分位距為特徵、跨細胞株擬合迴歸，
+<b>而各細胞株的突變負荷差異甚大</b>。</p>
+<p class="prose">後果是該迴歸的係數<b>有一部分在描述突變負荷，而非純度</b>。
+此點可直接檢驗：把資料集依突變負荷分層後重擬合，
+若係數隨負荷系統性移動，即為此效應。<b>此檢驗不需要新資料。</b></p>
+</div>
+
+<p class="prose">因此本節的結論須分兩句陳述：
+理想化的焦點統計量在二倍體 clonal 之下<b>為一條已知的一元函數</b>；
+而<b>現行的 GHIR 不是該函數</b>，它另外依賴 read 跨距、突變負荷、偵測率與 clonality。
+第五節所建立的焦點四格表即為取回前者的方式。</p>
 
 <h4>兩種歸因是同一條式子的兩項</h4>
 
@@ -369,6 +414,23 @@ copy-neutral LOH、該條的擴增、變異發生於擴增之前或之後（決�
 三格的 <tspan class="mono">n₂</tspan> 分別為 1、0、3。
 <b>下排的 {{m: s}} 三格完全相同</b>；上排的 <tspan class="mono">2 × VAF</tspan> 由 0.500 變為 0.667 與 0.333。
 右側標出 PURPLE 的因應方式：把後兩格排除在錨的適用範圍之外。}}
+
+<h4>LOH 區段：錨與深度訊號同時最強</h4>
+
+{{svg:sr4-loh-strength | [wide] LOH 區段（<tspan class="mono">n₂ = 0</tspan>）上，<code>H2</code> 只剩正常細胞的一份，
+故單倍型深度比 <tspan class="mono">D₁/D₂</tspan> 為 <tspan class="mono">(p·n₁ + 1 − p) ÷ (1 − p)</tspan>，
+隨純度急遽上升。<b>而錨在此處同樣成立</b>，因其分母不含 <tspan class="mono">n₂</tspan>。}}
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">LOH 對上篇的兩個方法並非不利 —— 受限的只有 PURPLE 的一條退路</p>
+<p class="prose">上篇第四節已示範：copy-neutral LOH 給出 {{m: b = (1 + ρ)/2}}，
+即 {{m: ρ = 2b − 1}}，<b>是等位比例路線上最乾淨的純度讀數之一</b>。
+故 LOH 對 ASCAT 與 PURPLE 的<b>主要</b>擬合（深度加等位比例）不但不是障礙，資訊量反而高。</p>
+<p class="prose">受拷貝數 1.8 至 2.2 限制的，只有 PURPLE 在高度二倍體樣本上啟用的
+<b>somatic VAF 退路</b>。本頁的錨與該退路對應，
+故可宣稱的是「<b>取代該退路的區域限制</b>」，
+<b>不可</b>宣稱「在 ASCAT 與 PURPLE 失效之處仍然可用」—— 它們在 LOH 上並未失效。</p>
+</div>
 
 <h4>梳齒：{{m: s}} 在各 {{m: (n_1, μ)}} 之下取離散值</h4>
 

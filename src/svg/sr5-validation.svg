@@ -51,6 +51,6 @@
   <text class="anno bold zh" x="696" y="330">但它決定能否使用</text>
 
   <rect class="box accent" x="20" y="356" width="960" height="66" rx="8"/>
-  <text class="anno zh" x="40" y="384">混在同一張表裡報告，會讓最弱的一條<b>借用到最強的一條的可信度</b> —— 讀者以為 <tspan class="mono">p</tspan> 也有 MAE 0.03 那種等級的驗證。</text>
+  <text class="anno zh" x="40" y="384">混在同一張表裡報告，會讓最弱的一條<tspan class="bold">借用到最強的一條的可信度</tspan> —— 讀者以為 <tspan class="mono">p</tspan> 也有 MAE 0.03 那種等級的驗證。</text>
   <text class="anno zh" x="40" y="410">而此主題最欠缺的正是金標準，故第三條軌道的份量比一般情形更重。</text>
 </svg>

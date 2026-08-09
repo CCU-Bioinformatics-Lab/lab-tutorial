@@ -631,7 +631,7 @@ ASCAT 原始文獻在 79 例的驗證中有 10 例（12.7%）落於此點，該�
 <aside class="guardrail" id="guard-15"><p class="guardrail__hd">重要區分 #15：純度與倍體只能成對辨識</p><p class="prose">深度與等位比例所決定的<b>不是一組 <math><mo>(</mo><mi>ρ</mi><mo>,</mo><msub><mi>ψ</mi><mi>t</mi></msub><mo>)</mo></math>，而是一個格點族</b>。
 族中各點由 <math><mi>n</mi><mi>′</mi><mo>=</mo><mi>kn</mi><mo>+</mo><mi>m</mi></math> 相連，彼此給出相同的觀測。</p>
 <p class="prose"><b>可容許之處</b>：多數格點可由資料本身排除 —— 拷貝數不得為負、
-任一區段出現奇數的等位特異拷貝數即可排除 <math><mi>k</mi><mo>=</mo><mn>2</mn></math>、
+任一區段出現奇數的等位特異拷貝數即可排除<b>再對半</b>（<math><mi>k</mi><mo>=</mo><mn>1</mn><mo>/</mo><mn>2</mn></math>）、
 觀測到零拷貝的區段即可定住 <math><mi>m</mi></math>。</p>
 <p class="prose"><b>限制</b>：所有等位特異拷貝數皆為偶數時，<math><mi>k</mi><mo>=</mo><mn>2</mn></math> <b>無法由這兩條軌道排除</b>。
 因此「純度 0.8 而倍體 2.0」與「純度 0.67 而倍體 4.0」是同一份資料的兩種讀法，
@@ -1238,7 +1238,8 @@ subclonal 的拷貝數變異因此表現為真正非整數的 <math><mover accen
 <tr><td>相對拷貝數輪廓（各區段的高低關係）</td><td>可</td><td>—</td></tr>
 <tr><td>各區段是否存在等位失衡</td><td>可</td><td>—</td></tr>
 <tr><td><math><mi>m</mi></math>（整體平移量）</td><td>條件成立時可</td><td>基因體上存在零拷貝的區段</td></tr>
-<tr><td><math><mi>k</mi><mo>=</mo><mn>2</mn></math>（是否加倍）</td><td>條件成立時可</td><td>存在奇數的等位特異拷貝數</td></tr>
+<tr><td><math><mi>k</mi><mo>=</mo><mn>1</mn><mo>/</mo><mn>2</mn></math>（可否再對半）</td><td>可</td><td>存在奇數的等位特異拷貝數</td></tr>
+<tr><td><math><mi>k</mi><mo>=</mo><mn>2</mn></math>（是否加倍）</td><td><b>不可</b></td><td>任何解皆可再加倍；須靠簡約先驗或樣本外量測</td></tr>
 <tr><td><math><mi>ρ</mi></math>（全基因體皆為 1+1 時）</td><td><b>不可</b></td><td>需要樣本外的量測或另一種資料</td></tr>
 <tr><td><math><mi>k</mi><mo>=</mo><mn>2</mn></math>（全部拷貝數皆為偶數時）</td><td><b>不可</b></td><td>同上</td></tr>
 </tbody>

@@ -54,5 +54,5 @@
   <text class="tick ok zh" x="742" y="188">設先驗：有峰，也有寬度</text>
 
   <rect class="box accent" x="20" y="420" width="960" height="42" rx="8"/>
-  <text class="anno zh" x="40" y="448">先驗<b>沒有創造資料裡沒有的資訊</b> —— 樣本若無 clonal 變異，後驗會退回接近先驗，<b>而這由寬度看得出來</b>。</text>
+  <text class="anno zh" x="40" y="448">先驗<tspan class="bold">沒有創造資料裡沒有的資訊</tspan> —— 樣本若無 clonal 變異，後驗會退回接近先驗，<tspan class="bold">而這由寬度看得出來</tspan>。</text>
 </svg>

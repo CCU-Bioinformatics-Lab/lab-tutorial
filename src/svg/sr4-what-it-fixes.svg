@@ -4,14 +4,16 @@
         左欄是整個基因體都沒有等位失衡的樣本。
         這時深度比處處相同、等位比例處處是零點五，對細胞比例完全沒有資訊，
         上篇的兩個方法一個拒絕輸出、一個改用二倍體區段的變異頻率。
-        但這種樣本每一段的單倍型都是一份，所以錨處處成立，直接讀出細胞比例。這一項解除。
+        但這種樣本每一段的單倍型都是一份，所以錨處處成立。
+        這一項因而解除，不過是有條件的：
+        得先有一個真正主幹的變異落在這一層、被偵測到、標記正確，而且沒有被雜訊推高。
         中欄是錨本身的區域限制。
         上篇那個錨的分母含另一條單倍型，所以只能用在拷貝數接近二的區域；
         本頁的錨分母只有一條單倍型，異型合子性喪失與擴增區段都能用。這一項也解除。
         右欄是全基因體加倍。
         把拷貝數全部乘二，發生在加倍之前的變異其多重度也跟著乘二，
         代進去之後錨的值一模一樣。所以這一項沒有解除，
-        仍然要靠簡約偏好、奇數拷貝數的存在，或樣本外的量測。
+        仍然要靠簡約偏好或樣本外的量測；奇數拷貝數只能擋住「再對半」，擋不住「再加倍」。
         讀法是：把做得到與做不到分開講，是這條路線能不能被採信的前提。</desc>
 
   <text class="ttl zh" x="20" y="36">解除兩項，未解除一項</text>
@@ -30,10 +32,10 @@
 
   <text class="tick zh" x="44" y="290">此時 <tspan class="mono">n₁ = 1</tspan> 處處成立，</text>
   <text class="tick mono" x="44" y="316">故 s = p · c</text>
-  <text class="tick zh" x="44" y="342">上包絡直接給出純度。</text>
+  <text class="tick zh" x="44" y="342">惟須有 truncal 變異，見下篇第五節。</text>
 
-  <rect class="box ok" x="44" y="356" width="258" height="24" rx="6"/>
-  <text class="tick bold ok zh mid" x="173" y="374">解除</text>
+  <rect class="box warn" x="44" y="356" width="258" height="24" rx="6"/>
+  <text class="tick bold zh mid" x="173" y="374">條件性解除</text>
 
   <!-- ══ 中 ══ -->
   <rect class="box ghost ok" x="346" y="88" width="306" height="300" rx="8"/>
@@ -73,6 +75,6 @@
 
   <!-- 結論 -->
   <rect class="box accent" x="20" y="402" width="960" height="56" rx="8"/>
-  <text class="anno zh" x="40" y="430">可宣稱：<tspan class="bold">純度的估計不再要求區段為二倍體，且無等位失衡的樣本亦可估計</tspan>。</text>
+  <text class="anno zh" x="40" y="430">可宣稱：<tspan class="bold">純度的估計不再要求區段為二倍體</tspan>；無等位失衡的樣本<tspan class="bold">在條件成立時</tspan>亦可估計。</text>
   <text class="anno zh" x="40" y="452">不可宣稱：解決了純度與倍體的簡併。<tspan class="bold">把做得到與做不到分開講，是此路線能否被採信的前提。</tspan></text>
 </svg>

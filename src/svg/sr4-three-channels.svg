@@ -14,7 +14,7 @@
         現行流程只用了中間那一個。</desc>
 
   <text class="ttl zh" x="20" y="36">三個通道量在不同的位置上</text>
-  <text class="anno zh" x="20" y="66">中央為一段染色體上兩類位點的分布。通道的差別在於<b>量在哪裡</b>，以及<b>分母涵蓋什麼</b>。</text>
+  <text class="anno zh" x="20" y="66">中央為一段染色體上兩類位點的分布。通道的差別在於<tspan class="bold">量在哪裡</tspan>，以及<tspan class="bold">分母涵蓋什麼</tspan>。</text>
 
   <!-- ══ 染色體與兩類位點 ══ -->
   <rect class="box plain" x="120" y="104" width="760" height="34" rx="8"/>

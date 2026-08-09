@@ -204,6 +204,31 @@ function inlineSvg(name, where) {
                ` —— 顏色只能走 class → diagram.css → token`);
   }
 
+  /* ★ HTML 破框標籤檢查 ★
+     inline SVG 是走 HTML parser 的「foreign content」模式，而 HTML 規格對
+     b / i / em / strong / code / span / p / br / sub / sup … 這一票標籤有一條
+     特例：在 foreign content 裡遇到它們，parser 會「往上彈出元素直到離開
+     foreign content」—— 也就是把 <svg> 整個關掉，後面全部當 HTML 解析。
+     結果就是圖從破框那一行開始整個消失，而且 **沒有任何錯誤訊息**。
+     （<title> 與 <desc> 是 HTML integration point，裡面寫 HTML 標籤是合法的，
+       所以先把這兩塊挖掉再檢查。）
+     要在 <text> 裡做粗體，用 <tspan class="bold">。 */
+  const BREAKOUT = ['b','big','blockquote','body','br','center','code','dd','div',
+    'dl','dt','em','embed','h1','h2','h3','h4','h5','h6','head','hr','i','img',
+    'li','listing','menu','meta','nobr','ol','p','pre','ruby','s','small','span',
+    'strong','strike','sub','sup','table','tt','u','ul','var'];
+  const outsideProse = noComments
+    .replace(/<title\b[\s\S]*?<\/title>/gi, '')
+    .replace(/<desc\b[\s\S]*?<\/desc>/gi, '');
+  const bad = [...new Set(
+    [...outsideProse.matchAll(new RegExp(`<(${BREAKOUT.join('|')})\\b[^>]*>`, 'gi'))]
+      .map((m) => `<${m[1].toLowerCase()}>`))];
+  if (bad.length) {
+    err(where, `src/svg/${name}.svg 在 <title>／<desc> 之外用了 HTML 標籤 ` +
+               `${bad.slice(0, 4).join(', ')} —— HTML parser 會在這裡把 <svg> ` +
+               `整個關掉，圖從該行起消失且不報錯。粗體請改用 <tspan class="bold">`);
+  }
+
   /* 這張圖引用到哪些共用符號 */
   const symbols = new Set();
   for (const m of noComments.matchAll(/(?:xlink:)?href\s*=\s*"#(sym-[\w-]+)"/g)) symbols.add(m[1]);

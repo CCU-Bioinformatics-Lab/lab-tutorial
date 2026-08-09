@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
-  <title>GHIR 的期望值與等位比例式逐項對應</title>
+  <title>理想化焦點統計量的無雜訊值與等位比例式逐項對應</title>
   <desc>兩條式子上下對齊，逐項比對。
         上面是上篇的等位比例式：分子是純度乘上某一個等位的拷貝數，
         再加上正常細胞貢獻的那一份；分母是這個位置讀到的全部 DNA。
-        下面是單倍型失衡比的期望值：分子的第一項一樣是純度乘上單倍型一的拷貝數，
+        下面是理想化焦點統計量的無雜訊值，也就是假設這條 read 的跨距內只有焦點這一個體細胞變異時的值：分子的第一項一樣是純度乘上單倍型一的拷貝數，
         但要先扣掉被體細胞等位佔走的那一塊，也就是帶原細胞比例乘以多重度；
         加上正常細胞那一份；分母同樣是全部 DNA，同樣扣掉那一塊。
         差別只有兩處：被扣掉的那一塊，以及最外面多了一層取較大值。
@@ -38,7 +38,8 @@
 
   <!-- ══ 下：GHIR ══ -->
   <rect class="box ghost ok" x="20" y="240" width="960" height="106" rx="8"/>
-  <text class="anno bold zh" x="40" y="270">GHIR</text>
+  <text class="anno bold zh" x="40" y="264">理想化焦點</text>
+  <text class="tick zh" x="40" y="286">統計量</text>
 
   <rect class="box accent" x="90" y="284" width="120" height="44" rx="6"/>
   <text class="tick bold mono mid" x="150" y="312">max( · )</text>
