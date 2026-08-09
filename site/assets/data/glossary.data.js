@@ -581,7 +581,7 @@ window.TW_GLOSSARY = {
    "m06",
    "m11",
    "sr1",
-   "sr2"
+   "sr2b"
   ]
  },
  "switch error": {
@@ -622,7 +622,8 @@ window.TW_GLOSSARY = {
   "modules": [
    "m04",
    "sr1",
-   "sr2"
+   "sr2",
+   "sr2b"
   ]
  },
  "somatic haplotagging": {
@@ -1248,7 +1249,7 @@ window.TW_GLOSSARY = {
   "slug": "latent-node",
   "modules": [
    "sr1",
-   "sr2"
+   "sr2b"
   ]
  },
  "epiallele": {
@@ -1292,7 +1293,7 @@ window.TW_GLOSSARY = {
   "slug": "read-af",
   "modules": [
    "sr1",
-   "sr2"
+   "sr2b"
   ]
  },
  "pigeonhole": {

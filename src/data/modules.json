@@ -243,17 +243,33 @@
   },
   {
     "id": "sr2",
-    "num": "下",
-    "src": "sr2-implementation.html",
+    "num": "中",
+    "src": "sr2-uses.html",
     "group": "研究指引",
-    "short": "多變異區域的約束",
+    "short": "5% 能補的三格",
     "kicker": "研究指引 · Subclone 系統發生重建",
-    "title_zh": "下篇：用多變異區域的關係改善全基因體重建",
-    "title_en": "Part 2 — constraints from multi-mutation regions",
+    "title_zh": "中篇：VAF 路線缺什麼，多變異區域能補上哪三格",
+    "title_en": "Part 2 — what the 5% can supply",
     "q": "只有 5% 的區域有兩個以上變異，它們還能幫上什麼忙？",
-    "sub": "那 5% 給的不是更多資料點，是資料點之間的關係。把現行實作已經算出來的串接／分岔收成三種約束，過兩道品質閘門，再餵進全基因體的混合模型 —— 而錯的約束比沒有約束更糟。",
+    "sub": "先寫出僅以 VAF 頻率譜重建的完整流程作為對照基準，指出它三項限制各落在哪一個參數上；再說明多變異區域的觀測與 95% 共用哪一個變數，以及它能補上的三格分別是什麼。",
     "prereq": [
       "sr1"
+    ],
+    "topic": "主題一 · Subclone 系統發生重建"
+  },
+  {
+    "id": "sr2b",
+    "num": "下",
+    "src": "sr2b-estimator.html",
+    "group": "研究指引",
+    "short": "估計式與落地",
+    "kicker": "研究指引 · Subclone 系統發生重建",
+    "title_zh": "下篇：完整的估計式，以及它能不能建起來",
+    "title_en": "Part 3 — the joint estimator and its feasibility",
+    "q": "把三個用途合成一條式子之後，需要的約束真的拿得到嗎？",
+    "sub": "把三個用途合成一條聯合估計式，說明數百個形狀相異的局部拓撲如何合併；再回頭處理約束的來源、兩道品質閘門、兩類會產生假約束的誤讀，以及約束的實際產量。",
+    "prereq": [
+      "sr2"
     ],
     "topic": "主題一 · Subclone 系統發生重建"
   }
