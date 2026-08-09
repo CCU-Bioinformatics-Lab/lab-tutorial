@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 780">
+  <title>生成模型：從一個純度到三個通道的觀測計數</title>
+  <desc>五層由上而下，每一層只做一件事。
+        第一層是全樣本唯一的細胞比例，整份檢體只有這一個數。
+        第二層是每一個拷貝數區段的兩個整數，也就是兩條單倍型各有幾份，
+        它們是自由參數，但只能取整數。
+        第三層把前兩層換算成這個區段的分子組成：
+        每個腫瘤細胞按它的拷貝數貢獻，每個正常細胞在兩條單倍型上各貢獻一份，
+        所以兩條單倍型的分子數分別是細胞比例乘以拷貝數再加上一減細胞比例。
+        這一層沒有自由參數，它完全由上面兩層決定。
+        第四層是三個觀測通道，各自從第三層抽樣：
+        總深度比量整個視窗，用負二項；
+        單倍型深度比量生殖系異型合子位點，用貝他二項；
+        單倍型內體細胞佔比量體細胞位點，也用貝他二項。
+        所有的干擾參數都在這一層進入，包括帶原細胞比例、多重度、標記錯誤率與偵測機率，
+        前三層完全沒有這些東西。
+        第五層是實際數到的計數，也就是似然真正對上的資料。
+        右側是導出量：倍體是第二層各段拷貝數以可呼叫長度加權的平均，
+        腫瘤 DNA 比例再由倍體與第一層的細胞比例算出。
+        兩者都不是自由參數，所以它們的誤差可以一路追回到第一層與第二層。
+        讀法是：要判斷一個估計值可不可信，就看它依賴的是哪幾層。</desc>
+
+  <text class="ttl zh" x="20" y="36">生成模型：一個純度 → 每段拷貝數 → 分子組成 → 三個通道 → 計數</text>
+  <text class="anno zh" x="20" y="66">五層由上而下，每一層只做一件事。<b>干擾參數全部集中在第四層</b>，前三層沒有。</text>
+
+  <!-- ══ ① 全域參數 ══ -->
+  <rect class="box accent" x="20" y="88" width="700" height="66" rx="8"/>
+  <text class="lbl bold zh accent" x="40" y="118">① 全域參數</text>
+  <text class="tick zh" x="40" y="142">全樣本唯一，不隨區段變動</text>
+  <rect class="box plain" x="330" y="102" width="180" height="38" rx="6"/>
+  <text class="anno bold mono mid" x="420" y="127">p</text>
+  <text class="tick zh" x="530" y="127">cellular purity</text>
+
+  <line class="flow" x1="370" y1="154" x2="370" y2="176" marker-end="url(#arrow)"/>
+
+  <!-- ══ ② 每段參數 ══ -->
+  <rect class="box accent" x="20" y="180" width="700" height="76" rx="8"/>
+  <text class="lbl bold zh accent" x="40" y="210">② 每段參數</text>
+  <text class="tick zh" x="40" y="234">自由參數，惟須為整數</text>
+  <rect class="box plain" x="290" y="194" width="130" height="44" rx="6"/>
+  <text class="anno bold mono mid" x="355" y="222">n₁</text>
+  <rect class="box plain" x="430" y="194" width="130" height="44" rx="6"/>
+  <text class="anno bold mono mid" x="495" y="222">n₂</text>
+  <text class="tick zh" x="578" y="222">每個拷貝數區段一組</text>
+
+  <line class="flow" x1="370" y1="256" x2="370" y2="278" marker-end="url(#arrow)"/>
+
+  <!-- ══ ③ 分子組成 ══ -->
+  <rect class="box ok" x="20" y="282" width="700" height="112" rx="8"/>
+  <text class="lbl bold zh ok" x="40" y="312">③ 分子組成</text>
+  <text class="tick zh" x="40" y="336">由上兩層決定</text>
+  <text class="tick ok zh" x="40" y="360">此層<b>無自由參數</b></text>
+
+  <rect class="bar somatic" x="290" y="300" width="120" height="26"/>
+  <rect class="bar germline" x="410" y="300" width="90" height="26"/>
+  <text class="tick mono" x="512" y="320">M₁ = p·n₁ + (1−p)</text>
+
+  <rect class="bar somatic" x="290" y="342" width="180" height="26"/>
+  <rect class="bar germline" x="470" y="342" width="90" height="26"/>
+  <text class="tick mono" x="572" y="362">M₂ = p·n₂ + (1−p)</text>
+
+  <text class="tick zh" x="290" y="388">深色為腫瘤細胞的貢獻，淺色為正常細胞的一份</text>
+
+  <line class="flow" x1="200" y1="394" x2="150" y2="424" marker-end="url(#arrow)"/>
+  <line class="flow" x1="370" y1="394" x2="370" y2="424" marker-end="url(#arrow)"/>
+  <line class="flow" x1="540" y1="394" x2="590" y2="424" marker-end="url(#arrow)"/>
+
+  <!-- ══ ④ 三個通道 ══ -->
+  <rect class="box warn" x="20" y="428" width="700" height="180" rx="8"/>
+  <text class="lbl bold zh warn" x="40" y="458">④ 三個觀測通道</text>
+  <text class="tick bad zh" x="40" y="482">干擾參數<b>全部在此進入</b></text>
+
+  <rect class="box plain" x="40" y="496" width="205" height="96" rx="6"/>
+  <text class="tick bold zh mid" x="142" y="518">總深度比</text>
+  <text class="tick zh mid" x="142" y="540">量：整個視窗</text>
+  <text class="tick mono mid" x="142" y="562">負二項</text>
+  <text class="tick zh mid" x="142" y="584">離散度、GC 偏差</text>
+
+  <rect class="box plain" x="257" y="496" width="205" height="96" rx="6"/>
+  <text class="tick bold zh mid" x="359" y="518">單倍型深度比</text>
+  <text class="tick zh mid" x="359" y="540">量：germline het 位點</text>
+  <text class="tick mono mid" x="359" y="562">beta-binomial</text>
+  <text class="tick zh mid" x="359" y="584">參考偏差、標記錯誤</text>
+
+  <rect class="box accent" x="474" y="496" width="226" height="96" rx="6"/>
+  <text class="tick bold zh mid" x="587" y="518">單倍型內 somatic 佔比</text>
+  <text class="tick zh mid" x="587" y="540">量：somatic 位點</text>
+  <text class="tick mono mid" x="587" y="562">beta-binomial</text>
+  <text class="tick bad zh mid" x="587" y="584">c、μ、標記錯誤、偵測機率</text>
+
+  <line class="flow" x1="370" y1="608" x2="370" y2="630" marker-end="url(#arrow)"/>
+
+  <!-- ══ ⑤ 觀測計數 ══ -->
+  <rect class="box ghost" x="20" y="634" width="700" height="76" rx="8"/>
+  <text class="lbl bold zh" x="40" y="664">⑤ 觀測計數</text>
+  <text class="tick zh" x="40" y="688">似然真正對上的資料</text>
+  <rect class="box plain" x="290" y="648" width="410" height="48" rx="6"/>
+  <text class="tick mono mid" x="495" y="670">視窗深度　　列和　　四格表</text>
+  <text class="tick zh mid" x="495" y="690">後兩者目前尚未彙總</text>
+
+  <!-- ══ 導出量 ══ -->
+  <rect class="box ok" x="740" y="180" width="240" height="214" rx="8"/>
+  <text class="lbl bold zh ok mid" x="860" y="212">導出量</text>
+  <text class="tick zh mid" x="860" y="238">不是自由參數</text>
+
+  <line class="conn ok" x1="720" y1="218" x2="740" y2="250" marker-end="url(#arrow)"/>
+  <rect class="box plain" x="762" y="262" width="196" height="52" rx="6"/>
+  <text class="tick bold mono mid" x="860" y="284">κ</text>
+  <text class="tick zh mid" x="860" y="304">②各段以長度加權平均</text>
+
+  <line class="flow" x1="860" y1="314" x2="860" y2="332" marker-end="url(#arrow)"/>
+  <rect class="box plain" x="762" y="336" width="196" height="46" rx="6"/>
+  <text class="tick bold mono mid" x="860" y="358">f</text>
+  <text class="tick zh mid" x="860" y="376">由 κ 與 ① 算出</text>
+
+  <!-- ══ 結論 ══ -->
+  <rect class="box accent" x="740" y="428" width="240" height="180" rx="8"/>
+  <text class="anno bold zh mid" x="860" y="458">為何要分層</text>
+  <text class="tick zh" x="758" y="486">一個估計值可不可信，</text>
+  <text class="tick zh" x="758" y="510">取決於它依賴到第幾層。</text>
+  <text class="tick ok zh" x="758" y="542">① ② ③ 只有整數與比例，</text>
+  <text class="tick ok zh" x="758" y="566">錯了看得出來。</text>
+  <text class="tick bad zh" x="758" y="596">④ 的參數需另行校準。</text>
+
+  <rect class="box accent" x="20" y="724" width="960" height="42" rx="8"/>
+  <text class="anno zh" x="40" y="752">現行流程只用第④層最左邊那一格的一部分，再把 GHIR 分布壓成兩個矩 —— <b>②③ 兩層整個沒有被寫出來</b>。</text>
+</svg>

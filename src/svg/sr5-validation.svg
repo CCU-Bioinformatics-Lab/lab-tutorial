@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440">
+  <title>三條分開的評比軌道，各自的真值強度不同</title>
+  <desc>三欄，各是一條評比軌道。
+        左欄是腫瘤 DNA 比例。它的真值就是混合時所用的比例，精確而且不需換算，
+        所以這一條可以跟現行的迴歸直接比較，
+        也是唯一一條能夠宣稱優於現行方法的軌道。
+        中欄是細胞比例與倍體。合成樣本沒有這兩個量的乾淨真值，
+        要取得就得另外做流式細胞術、DNA 指數、核型或螢光原位雜交，
+        而這些本身也帶不確定性。
+        所以這一條只能宣稱與其他方法一致，不能宣稱準確。
+        另一個可行的檢驗是自洽性：把估出來的細胞比例與倍體換算回腫瘤 DNA 比例，
+        再跟已知的混合比例對照。
+        右欄是校準度，包括區間的涵蓋率、失敗率，以及加倍模式判定的正確率。
+        這一條完全不需要外部真值，但它也完全不在平均絕對誤差與決定係數的涵蓋範圍內。
+        而它才是「這個數字可不可以拿去用」的依據。
+        讀法是：三條軌道不能混在同一張表裡報告，因為它們可宣稱的強度不同。</desc>
+
+  <text class="ttl zh" x="20" y="36">三條軌道要分開報告</text>
+  <text class="anno zh" x="20" y="66">三個量的真值強度不同，混在同一張表裡會讓最弱的一條借用到最強的一條的可信度。</text>
+
+  <rect class="box ghost ok" x="20" y="88" width="306" height="252" rx="8"/>
+  <text class="lbl bold zh mid" x="173" y="120">腫瘤 DNA 比例 f</text>
+  <rect class="box ok" x="44" y="140" width="258" height="34" rx="6"/>
+  <text class="tick zh mid" x="173" y="162">真值：混合比例，精確</text>
+  <text class="tick zh" x="44" y="200">不需換算，直接可比。</text>
+  <text class="tick zh" x="44" y="224">與現行迴歸同一個量。</text>
+  <text class="tick ok zh" x="44" y="262">可宣稱：</text>
+  <text class="anno bold ok zh" x="44" y="292">優於現行方法</text>
+  <text class="tick ok zh" x="44" y="318">唯一能這樣宣稱的一條</text>
+
+  <rect class="box ghost warn" x="346" y="88" width="306" height="252" rx="8"/>
+  <text class="lbl bold zh mid" x="499" y="120">細胞比例 p 與倍體 κ</text>
+  <rect class="box warn" x="370" y="140" width="258" height="34" rx="6"/>
+  <text class="tick zh mid" x="499" y="162">無乾淨真值</text>
+  <text class="tick zh" x="370" y="200">須另做流式細胞術、DNA 指數、</text>
+  <text class="tick zh" x="370" y="224">核型或 FISH，且皆帶不確定性。</text>
+  <text class="tick zh" x="370" y="252">或檢驗自洽性：由估得的兩者</text>
+  <text class="tick zh" x="370" y="276">換算回 f，與混合比例對照。</text>
+  <text class="tick warn zh" x="370" y="306">可宣稱：</text>
+  <text class="anno bold warn zh" x="370" y="330">一致，但非準確</text>
+
+  <rect class="box ghost accent" x="672" y="88" width="308" height="252" rx="8"/>
+  <text class="lbl bold zh mid" x="826" y="120">校準度</text>
+  <rect class="box accent" x="696" y="140" width="260" height="34" rx="6"/>
+  <text class="tick zh mid" x="826" y="162">不需外部真值</text>
+  <text class="tick zh" x="696" y="200">· 區間涵蓋率</text>
+  <text class="tick zh" x="696" y="224">· 失敗率</text>
+  <text class="tick zh" x="696" y="248">· 加倍模式的正確率</text>
+  <text class="tick zh" x="696" y="272">· 跨 basecaller 的重現性</text>
+  <text class="tick bad zh" x="696" y="306">MAE 與 R² <tspan class="bold">不涵蓋這一條</tspan></text>
+  <text class="anno bold zh" x="696" y="330">但它決定能否使用</text>
+
+  <rect class="box accent" x="20" y="356" width="960" height="66" rx="8"/>
+  <text class="anno zh" x="40" y="384">混在同一張表裡報告，會讓最弱的一條<b>借用到最強的一條的可信度</b> —— 讀者以為 <tspan class="mono">p</tspan> 也有 MAE 0.03 那種等級的驗證。</text>
+  <text class="anno zh" x="40" y="410">而此主題最欠缺的正是金標準，故第三條軌道的份量比一般情形更重。</text>
+</svg>

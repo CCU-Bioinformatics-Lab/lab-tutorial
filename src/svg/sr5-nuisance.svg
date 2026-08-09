@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+  <title>兩個干擾參數的處置方式不同，以及三種做法給出的輸出</title>
+  <desc>左邊說明兩個干擾參數為什麼要分開處理。
+        多重度是離散而且有上界的，它不能超過該單倍型的拷貝數，
+        所以可能的取值是一個有限的集合，直接逐一列舉即可。
+        帶原細胞比例是連續的，落在零到一之間，所以給它一個先驗再積分掉。
+        右邊比較三種做法在同一批觀測上的輸出。
+        把帶原細胞比例固定成一，得到一個過低的點估計，因為次群變異被當成主幹變異。
+        讓它完全自由，似然從觀測值的最大值開始一路向上都是平的，
+        任何更大的純度都能靠調小帶原細胞比例來擬合，所以只給得出一個下界。
+        給先驗之後，後驗有一個峰也有寬度。
+        三者的差別不只在中心位置，更在於它能不能給出區間。
+        讀法是：先驗沒有創造資料裡沒有的資訊，它只是把常識寫成可檢驗的形式，
+        而且後驗的寬度會誠實反映資料到底支持多少。</desc>
+
+  <text class="ttl zh" x="20" y="36">兩個干擾參數，兩種處置</text>
+  <text class="anno zh" x="20" y="66">左為處置方式，右為三種做法在同一批觀測上的輸出。</text>
+
+  <rect class="box ghost" x="20" y="88" width="380" height="316" rx="8"/>
+
+  <text class="anno bold zh" x="44" y="124">μ：離散且有界</text>
+  <text class="tick zh" x="44" y="150">不超過該單倍型的拷貝數</text>
+  <circle class="mark somatic" cx="60" cy="180" r="9"/>
+  <circle class="mark somatic" cx="106" cy="180" r="9"/>
+  <circle class="mark somatic" cx="152" cy="180" r="9"/>
+  <text class="tick mono" x="180" y="186">n₁ = 3 → μ ∈ {1,2,3}</text>
+  <text class="tick ok zh" x="44" y="214">→ <tspan class="bold">逐一列舉</tspan>，和為有限項</text>
+
+  <line class="guide" x1="44" y1="240" x2="376" y2="240"/>
+
+  <text class="anno bold zh" x="44" y="276">c：連續</text>
+  <text class="tick zh" x="44" y="302">落於 0 與 1 之間</text>
+  <path class="conn somatic" d="M 60 356 Q 130 300 200 344 T 340 320"/>
+  <line class="axis" x1="60" y1="356" x2="356" y2="356"/>
+  <text class="tick ok zh" x="44" y="386">→ <tspan class="bold">給先驗後積分</tspan></text>
+
+  <rect class="box ghost" x="420" y="88" width="560" height="316" rx="8"/>
+  <text class="lbl bold zh mid" x="700" y="118">三種做法的輸出</text>
+
+  <line class="axis" x1="460" y1="360" x2="950" y2="360"/>
+  <text class="tick mid" x="460" y="382">0</text>
+  <text class="tick mid" x="580" y="382">max(s)</text>
+  <text class="tick mid" x="950" y="382">1</text>
+  <text class="tick zh mid" x="705" y="404">純度 p</text>
+
+  <path class="conn bad" d="M 500 340 L 520 180 L 540 340"/>
+  <text class="tick bad zh" x="466" y="168">固定 c = 1</text>
+  <text class="tick bad zh" x="466" y="146">點估計，且過低</text>
+
+  <path class="conn warn" d="M 580 250 L 950 250" style="stroke-dasharray:6 5"/>
+  <text class="tick warn zh" x="700" y="240">c 全自由：平坦，只給下界</text>
+
+  <path class="conn ok" d="M 560 356 Q 640 300 700 200 Q 760 300 860 352"/>
+  <text class="tick ok zh" x="742" y="188">設先驗：有峰，也有寬度</text>
+
+  <rect class="box accent" x="20" y="420" width="960" height="42" rx="8"/>
+  <text class="anno zh" x="40" y="448">先驗<b>沒有創造資料裡沒有的資訊</b> —— 樣本若無 clonal 變異，後驗會退回接近先驗，<b>而這由寬度看得出來</b>。</text>
+</svg>

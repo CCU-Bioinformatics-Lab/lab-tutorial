@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
+  <title>拷貝數邊界與相位區塊邊界不對齊，故分段與定向是兩件工作</title>
+  <desc>上排是拷貝數的真實邊界，這一段染色體分成三個狀態。
+        中排是相位區塊的邊界，兩排的邊界刻意畫成不對齊。
+        圖上標出兩種錯配。
+        第一種是一個拷貝數斷點落在某個相位區塊的中間，
+        於是那個區塊橫跨兩個不同的拷貝數狀態，
+        它的兩個等位拷貝數就不是一組整數，三個通道會同時被扭曲。
+        第二種是同一個拷貝數狀態橫跨好幾個相位區塊，
+        而區塊之間的單倍型標號各自獨立決定，
+        所以不能把它們直接串成一條連續的軌道。
+        下排是正確的做法：先用深度與生殖系等位計數獨立分段，並納入結構變異的斷點，
+        得到的邊界與上排一致；相位區塊只在每個區段之內提供哪一條是哪一條的定向。
+        兩者回答的是不同的問題，一個決定邊界在哪，一個決定邊界之內兩條怎麼配對。
+        讀法是：N50 尺度相近不代表斷點對應，這兩件事不能互相代替。</desc>
+
+  <text class="ttl zh" x="20" y="36">分段與定向是兩件不同的工作</text>
+  <text class="anno zh" x="20" y="66">同一段染色體。上排為拷貝數的真實邊界，中排為相位區塊的邊界，<b>兩者不對齊</b>。</text>
+
+  <!-- ══ 拷貝數真實邊界 ══ -->
+  <text class="anno bold zh" x="20" y="118">拷貝數狀態</text>
+  <rect class="bar hp1" x="180" y="98" width="230" height="34"/>
+  <rect class="bar hp2" x="410" y="98" width="270" height="34"/>
+  <rect class="bar somatic" x="680" y="98" width="240" height="34"/>
+  <text class="tick mono mid" x="295" y="122">1 + 1</text>
+  <text class="tick mono mid" x="545" y="122">2 + 0</text>
+  <text class="tick mono mid" x="800" y="122">2 + 1</text>
+
+  <line class="guide" x1="410" y1="92" x2="410" y2="230" style="stroke-dasharray:4 4"/>
+  <line class="guide" x1="680" y1="92" x2="680" y2="230" style="stroke-dasharray:4 4"/>
+
+  <!-- ══ 相位區塊邊界 ══ -->
+  <text class="anno bold zh" x="20" y="188">相位區塊</text>
+  <rect class="box plain" x="180" y="168" width="160" height="34" rx="6"/>
+  <rect class="box plain" x="346" y="168" width="200" height="34" rx="6"/>
+  <rect class="box plain" x="552" y="168" width="130" height="34" rx="6"/>
+  <rect class="box plain" x="688" y="168" width="110" height="34" rx="6"/>
+  <rect class="box plain" x="804" y="168" width="116" height="34" rx="6"/>
+  <text class="tick mid" x="260" y="192">B1</text>
+  <text class="tick mid" x="446" y="192">B2</text>
+  <text class="tick mid" x="617" y="192">B3</text>
+  <text class="tick mid" x="743" y="192">B4</text>
+  <text class="tick mid" x="862" y="192">B5</text>
+
+  <!-- ══ 兩種錯配 ══ -->
+  <rect class="box ghost bad" x="340" y="160" width="212" height="50" rx="6"/>
+  <text class="anno bad zh mid" x="446" y="240">錯配一：B2 橫跨兩個狀態</text>
+  <text class="tick bad zh mid" x="446" y="264">其 (n₁, n₂) 不是一組整數</text>
+
+  <rect class="box ghost bad" x="684" y="160" width="240" height="50" rx="6"/>
+  <text class="anno bad zh mid" x="804" y="240">錯配二：一個狀態橫跨 B4 B5</text>
+  <text class="tick bad zh mid" x="804" y="264">兩區塊的標號各自獨立</text>
+
+  <!-- ══ 正解 ══ -->
+  <rect class="box ghost ok" x="20" y="292" width="960" height="150" rx="8"/>
+  <text class="lbl bold zh" x="44" y="324">正解：兩件工作分開做</text>
+
+  <text class="anno bold zh" x="44" y="366">① 分段</text>
+  <rect class="bar ok" x="180" y="346" width="230" height="28"/>
+  <rect class="bar ok" x="410" y="346" width="270" height="28"/>
+  <rect class="bar ok" x="680" y="346" width="240" height="28"/>
+  <text class="tick zh mid" x="550" y="366">依深度、germline 等位與結構變異斷點 —— 邊界與上排一致</text>
+
+  <text class="anno bold zh" x="44" y="416">② 定向</text>
+  <rect class="box plain" x="180" y="398" width="230" height="24" rx="4"/>
+  <rect class="box plain" x="410" y="398" width="270" height="24" rx="4"/>
+  <rect class="box plain" x="680" y="398" width="240" height="24" rx="4"/>
+  <text class="tick zh mid" x="550" y="415">相位區塊只在每個區段<tspan class="bold">之內</tspan>指出哪一條是 H1</text>
+
+  <rect class="box accent" x="20" y="458" width="960" height="48" rx="8"/>
+  <text class="anno zh" x="40" y="486">兩者回答不同的問題：<b>分段決定邊界在哪，定向決定邊界之內兩條怎麼配對</b>。N50 尺度相近不蘊含斷點對應。</text>
+</svg>

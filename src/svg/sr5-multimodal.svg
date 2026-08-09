@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+  <title>加倍未定時的後驗是雙峰，壓成一個數字會丟掉什麼</title>
+  <desc>三欄。
+        左欄是後驗的實況：兩個峰，一個在細胞比例零點四、倍體二，另一個在零點二五、倍體四。
+        兩者對深度與等位比例給出完全相同的期望值，所以資料無法分辨它們，
+        而且第五節已證明體細胞那個錨在加倍變換下也不變，所以它也分不出來。
+        中欄是常見的做法：取最高的那個峰，回報一組數字。
+        另一個峰連同它的機率一起消失，讀報告的人看不出這裡本來有兩個答案，
+        而兩個答案的倍體差了一倍。
+        右欄是本頁要求的輸出：兩個模式各自附上機率，
+        並列出三類可以用來定案的證據，以及它們在這個樣本上的狀態 ——
+        有沒有奇數的等位拷貝數、有沒有加倍之後才發生的變異、有沒有樣本外的量測。
+        讀法是：把雙峰壓成一個數字，丟掉的不是精度，是「這裡還沒有定論」這件事。</desc>
+
+  <text class="ttl zh" x="20" y="36">加倍未定時的輸出格式</text>
+  <text class="anno zh" x="20" y="66">同一份資料。兩個模式對深度與等位比例給出<b>相同</b>的期望值，體細胞錨亦不能分辨。</text>
+
+  <rect class="box ghost" x="20" y="88" width="306" height="290" rx="8"/>
+  <text class="lbl bold zh mid" x="173" y="118">後驗的實況</text>
+  <line class="axis" x1="50" y1="300" x2="296" y2="300"/>
+  <text class="tick mid" x="110" y="322">0.25</text>
+  <text class="tick mid" x="230" y="322">0.40</text>
+  <text class="tick zh mid" x="173" y="346">純度 p</text>
+  <path class="conn ok" d="M 60 296 Q 90 200 110 190 Q 135 200 165 280 Q 200 200 230 172 Q 260 200 288 294"/>
+  <text class="tick mono mid" x="110" y="178">κ = 4.0</text>
+  <text class="tick mono mid" x="230" y="160">κ = 2.0</text>
+  <text class="anno bold zh mid" x="173" y="368">兩個峰</text>
+
+  <rect class="box ghost bad" x="346" y="88" width="306" height="290" rx="8"/>
+  <text class="lbl bold zh mid" x="499" y="118">取最高峰回報一個數</text>
+  <line class="axis bad" x1="376" y1="300" x2="622" y2="300"/>
+  <text class="tick mid" x="556" y="322">0.40</text>
+  <text class="tick zh mid" x="499" y="346">純度 p</text>
+  <path class="conn bad" d="M 526 300 L 556 172 L 586 300"/>
+  <text class="tick mono mid" x="556" y="160">κ = 2.0</text>
+  <text class="tick bad zh mid" x="460" y="212">另一個峰</text>
+  <text class="tick bad zh mid" x="460" y="236">連同機率一起消失</text>
+  <text class="anno bold bad zh mid" x="499" y="368">倍體差一倍，看不出來</text>
+
+  <rect class="box ghost ok" x="672" y="88" width="308" height="290" rx="8"/>
+  <text class="lbl bold zh mid" x="826" y="118">本頁要求的輸出</text>
+  <rect class="box plain" x="694" y="136" width="264" height="46" rx="6"/>
+  <text class="tick mono mid" x="826" y="156">p 0.40　κ 2.0</text>
+  <text class="tick mid" x="826" y="176">機率 0.6</text>
+  <rect class="box plain" x="694" y="190" width="264" height="46" rx="6"/>
+  <text class="tick mono mid" x="826" y="210">p 0.25　κ 4.0</text>
+  <text class="tick mid" x="826" y="230">機率 0.4</text>
+  <text class="tick bold zh" x="694" y="262">可用以定案的證據</text>
+  <text class="tick zh" x="694" y="286">· 奇數的等位拷貝數</text>
+  <text class="tick zh" x="694" y="310">· 加倍之後才發生的變異</text>
+  <text class="tick zh" x="694" y="334">· 樣本外的量測</text>
+  <text class="tick ok zh" x="694" y="362">本樣本：三者皆無</text>
+
+  <rect class="box accent" x="20" y="394" width="960" height="42" rx="8"/>
+  <text class="anno zh" x="40" y="422">壓成一個數字所丟掉的不是精度，是<b>「這裡還沒有定論」這件事</b> —— 而兩個模式的倍體相差一倍。</text>
+</svg>

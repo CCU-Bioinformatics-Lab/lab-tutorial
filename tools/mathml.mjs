@@ -21,6 +21,7 @@
      \{ \}                   字面上的大括號（{ } 本身是分組用）
      \log \max \min \exp     直立字體的函數名
      \mid \sim \to \cdot     ∣ ∼ → ·（也可以直接打 Unicode）
+     \int                    積分號（把 nuisance 參數積掉時會用到）
      \quad \qquad            水平間距。一行放兩條式子時用，例如
                              「\hat{n}_A = … , \qquad \hat{n}_B = …」；
                              純空白在 MathML 裡不佔寬度，硬打空格沒有作用
@@ -35,7 +36,7 @@
 
 const OPS = new Set([
   '=', '≠', '≥', '≤', '<', '>', '+', '−', '-', '±', '×', '÷', '·', '⋅',
-  '∈', '∉', '⊂', '⊆', '∼', '~', '≈', '∝', '→', '←', '⇒', '↔', '∣', '|',
+  '∈', '∉', '⊂', '⊆', '∼', '~', '≈', '∝', '→', '←', '⇒', '↔', '∣', '|', '∫',
   '(', ')', '[', ']', '{', '}', ',', ';', ':', '/', '…', '∑', '∏', '√', '∞', '!',
 ]);
 
@@ -43,7 +44,7 @@ const OPS = new Set([
 const CMD_SYMBOL = {
   mid: '∣', sim: '∼', to: '→', gets: '←', cdot: '·', times: '×', div: '÷',
   le: '≤', ge: '≥', ne: '≠', in: '∈', approx: '≈', pm: '±', ldots: '…',
-  infty: '∞', propto: '∝', Rightarrow: '⇒',
+  infty: '∞', propto: '∝', Rightarrow: '⇒', int: '∫',
 };
 const CMD_FUNC = new Set(['log', 'max', 'min', 'exp', 'ln', 'det', 'arg']);
 

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <title>懲罰乘積加似然 vs 四項相加的對數機率</title>
+  <desc>左邊是上篇那種分數的形狀：兩個加權平均相乘，再加上一個尺度無關的似然項。
+        三塊的高度隨資料組成而變 —— 突變多的腫瘤上，體細胞那一塊會把另外兩塊壓掉；
+        拷貝數變異多而突變少的腫瘤上則相反。
+        所以同一個方法用在兩種腫瘤上，實際上等於兩個不同的方法。
+        右邊是本頁的形式：四項都是對數機率，直接相加，
+        每一項的份量由它自己的樣本數與分布決定，不需要人為給係數。
+        簡約性偏好從分數裡搬到先驗那一項。
+        最下面標出最實際的差別：右邊的最大值附近有曲率，所以給得出區間；
+        左邊的懲罰不是機率，最小值附近的形狀不對應任何不確定性。
+        讀法是：能不能給出區間，取決於目標函數是不是一個機率。</desc>
+
+  <text class="ttl zh" x="20" y="36">目標函數的兩種寫法</text>
+  <text class="anno zh" x="20" y="66">左為沿用上篇的分數再加一項，右為改寫為單一似然。兩側的橫軸皆為資料組成。</text>
+
+  <!-- ══ 左 ══ -->
+  <rect class="box ghost bad" x="20" y="88" width="468" height="316" rx="8"/>
+  <text class="lbl bold zh mid" x="254" y="118">懲罰乘積 ＋ 似然</text>
+  <text class="tick mono mid" x="254" y="142">(Σ w·E) × (Σ w·D) + log L</text>
+
+  <text class="tick zh" x="44" y="180">突變少、拷貝數變異多</text>
+  <rect class="bar warn" x="44" y="190" width="240" height="24"/>
+  <rect class="bar somatic" x="284" y="190" width="50" height="24"/>
+  <text class="tick mono" x="344" y="208">懲罰主導</text>
+
+  <text class="tick zh" x="44" y="252">突變多、拷貝數變異少</text>
+  <rect class="bar warn" x="44" y="262" width="60" height="24"/>
+  <rect class="bar somatic" x="104" y="262" width="230" height="24"/>
+  <text class="tick mono" x="344" y="280">似然主導</text>
+
+  <text class="tick bad zh" x="44" y="322">兩塊的相對高度<b>隨資料組成而變</b>，</text>
+  <text class="tick bad zh" x="44" y="346">而兩者之間沒有任何係數校準。</text>
+  <text class="anno bold bad zh" x="44" y="382">同一個方法 ＝ 兩個方法</text>
+
+  <!-- ══ 右 ══ -->
+  <rect class="box ghost ok" x="512" y="88" width="468" height="316" rx="8"/>
+  <text class="lbl bold zh mid" x="746" y="118">四項對數機率相加</text>
+  <text class="tick mono mid" x="746" y="142">log L_depth + log L_germ + log L_som + log P</text>
+
+  <text class="tick zh" x="536" y="180">突變少、拷貝數變異多</text>
+  <rect class="bar ok" x="536" y="190" width="110" height="24"/>
+  <rect class="bar hp1" x="646" y="190" width="90" height="24"/>
+  <rect class="bar somatic" x="736" y="190" width="40" height="24"/>
+  <rect class="bar germline" x="776" y="190" width="60" height="24"/>
+
+  <text class="tick zh" x="536" y="252">突變多、拷貝數變異少</text>
+  <rect class="bar ok" x="536" y="262" width="110" height="24"/>
+  <rect class="bar hp1" x="646" y="262" width="90" height="24"/>
+  <rect class="bar somatic" x="736" y="262" width="140" height="24"/>
+  <rect class="bar germline" x="876" y="262" width="60" height="24"/>
+
+  <text class="tick ok zh" x="536" y="322">各項的份量由其<b>樣本數與分布</b>自動決定，</text>
+  <text class="tick ok zh" x="536" y="346">不需人為係數；簡約偏好搬到最後一項的先驗。</text>
+  <text class="anno bold ok zh" x="536" y="382">尺度一致，可相加也可比較</text>
+
+  <!-- ══ 最實際的差別 ══ -->
+  <rect class="box accent" x="20" y="420" width="960" height="66" rx="8"/>
+  <text class="anno zh" x="40" y="448">最實際的差別在<b>不確定性</b>：右式的最大值附近有曲率，故給得出區間、給得出多峰。</text>
+  <text class="anno zh" x="40" y="474">左式的懲罰<b>不是機率</b>，其最小值附近的形狀不對應任何區間 —— 只能回報一個點。</text>
+</svg>
