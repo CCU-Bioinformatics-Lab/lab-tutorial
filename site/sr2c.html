@@ -739,6 +739,29 @@ somatic calling 有既有的 truth set 與 precision／recall 曲線，
 </table>
 </div>
 
+<h4 id="圖上那三個階段-各在哪一節">圖上那三個階段，各在哪一節</h4>
+
+<p class="prose">上圖的 <b>階段 0 / G / L</b> 是本頁從頭到尾用的詞彙。
+它們與節次的對應如下 —— <b>階段 L 佔了四節</b>，因為本規格的內容幾乎全在那裡：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">階段</th><th scope="col">在哪一節</th><th scope="col">那幾節各回答什麼</th></tr></thead>
+<tbody>
+<tr><td><b>階段 0</b> · 前處理</td><td>第七節</td><td>單位是怎麼從 BAM 切出來的，以及必須釘住哪些參數</td></tr>
+<tr><td><b>階段 G</b> · 全域</td><td>第四節</td><td>它輸出什麼，以及它憑什麼能當作獨立的先驗</td></tr>
+<tr><td rowspan="4"><b>階段 L</b> · 局部</td><td>第二節</td><td>要估的是哪三個量</td></tr>
+<tr><td>第三節</td><td>由那三個量到一條 read 上的字母，中間有哪些層</td></tr>
+<tr><td>第五節</td><td>怎麼在候選之間選，以及輸出的每個旗標是什麼意思</td></tr>
+<tr><td>第八節</td><td>實際怎麼算、成本多少、算不完時怎麼辦</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">第六節（跨單位）與第九節（caller 特徵）在階段 L <b>之後</b>：
+前者說幾萬個單位的結果可以合併成什麼、不可以合併成什麼，
+後者是第二份交付物。第十、十一節是驗收與分期。</p>
+
 <h4 id="三個決定整份規格的選擇">三個決定整份規格的選擇</h4>
 
 <p class="prose">後面每一節都是這三個選擇的展開。先講清楚，是為了讓讀者在讀細節時知道每一段在服務哪一個。</p>
@@ -774,51 +797,135 @@ somatic calling 有既有的 truth set 與 precision／recall 曲線，
 局部系譜沒有金標準，而 somatic calling 有 truth set 與 precision／recall 曲線。
 所以整份規格的驗收重心落在第九節與第十節，而不是「局部系譜看起來合不合理」。</p>
 
-<h3 id="二-估計目標的形式定義">二、估計目標的形式定義</h3>
+<h3 id="二-階段-l-要估的三個量">二、階段 L · 要估的三個量</h3>
+
+<p class="prose">這一節只做一件事：把「重建一個單位的局部系譜」講成<b>可以寫進程式的東西</b> ——
+估的範圍到哪裡、要估的是哪幾個量、什麼時候算估完了。
+這裡還沒有似然、也還沒有先驗，那些是第三、四節的事；
+這一節先把<b>要求解的對象</b>釘死。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 564" class="dia-svg" role="img" aria-labelledby="sr2c-local-output__title" aria-describedby="sr2c-local-output__desc">
+  <title id="sr2c-local-output__title">一個單位的輸出：稀疏狀態表、唯一的相容樹，以及可以計數的旗標</title>
+  <desc id="sr2c-local-output__desc">三格由左到右。第一格是一個單位的稀疏狀態表：
+        全參考狀態 62 條、只帶第一個變異的 18 條、同時帶第一與第二個的 5 條、
+        同時帶第一與第三個的 7 條，而同時帶第二與第三個的是 0 條，
+        另外還有覆蓋遮罩不完整的分子另行計數。
+        這個單位的錯誤地板約為百分之一乘上分子總數，也就是不到一條，
+        所以 5 條遠高於地板，而 0 條還不足以排除那個狀態存在。
+        第二格是由這些狀態建出來的樹：全參考在最上，其下是只帶第一個變異的狀態，
+        再往下分成兩支，分別再加上第二個或第三個變異。
+        因為狀態集合通過四配子檢定，這棵樹是唯一的；
+        所以困難的地方不是搜尋樹，而是決定哪些狀態的比例高於地板。
+        第三格是這個單位輸出的那一列：狀態集合與各自比例、先後關係與後驗、
+        有效分子數與遮罩分布，以及四個旗標。
+        旗標是這條路線可以計數的產出，不是修辭。
+        最下方指出：四格全滿代表四配子檢定失敗，那不是一個新的 lineage，
+        而是這個單位的錯誤地板偏高，所以相容性檢定同時是品質訊號。</desc>
+
+  <text class="ttl zh" x="20" y="36">一個單位輸出什麼</text>
+
+  <!-- ① 狀態表 -->
+  <rect class="box" x="18" y="58" width="310" height="382" rx="8"/>
+  <text class="lbl bold zh" x="34" y="94">① 稀疏狀態表</text>
+  <text class="tick mono" x="34" y="136">000</text>
+  <text class="tick mono end" x="200" y="136">62</text>
+  <text class="tick mono" x="34" y="164">100</text>
+  <text class="tick mono end" x="200" y="164">18</text>
+  <text class="tick mono" x="34" y="192">110</text>
+  <text class="tick mono end" x="200" y="192">5</text>
+  <text class="tick mono" x="34" y="220">101</text>
+  <text class="tick mono end" x="200" y="220">7</text>
+  <text class="tick mono" x="34" y="248">011</text>
+  <text class="tick mono end" x="200" y="248">0</text>
+  <text class="tick zh" x="34" y="280">覆蓋遮罩不完整的另計</text>
+  <text class="tick zh" x="34" y="322">地板約為分子總數的百分之一</text>
+  <text class="tick zh ok" x="34" y="352">5 條遠高於地板</text>
+  <text class="tick zh warn" x="34" y="382">0 條還不足以排除</text>
+
+  <!-- ② 相容則樹唯一 -->
+  <rect class="box accent" x="345" y="58" width="310" height="382" rx="8"/>
+  <text class="lbl bold zh" x="361" y="94">② 相容則樹唯一</text>
+  <circle class="cell normal" cx="500" cy="150" r="20"/>
+  <circle class="cell tumor" cx="500" cy="228" r="20"/>
+  <circle class="cell clone1" cx="430" cy="316" r="20"/>
+  <circle class="cell clone2" cx="570" cy="316" r="20"/>
+  <line class="conn" x1="500" y1="170" x2="500" y2="206"/>
+  <line class="conn" x1="494" y1="247" x2="440" y2="298"/>
+  <line class="conn" x1="506" y1="247" x2="560" y2="298"/>
+  <text class="tick mono mid" x="500" y="155">000</text>
+  <text class="tick mono mid" x="500" y="233">100</text>
+  <text class="tick mono mid" x="430" y="321">110</text>
+  <text class="tick mono mid" x="570" y="321">101</text>
+  <text class="tick zh" x="361" y="382">難的是選狀態，不是搜尋樹</text>
+  <text class="tick zh" x="361" y="352">四配子檢定通過，樹就唯一</text>
+
+  <!-- ③ 輸出 -->
+  <rect class="box" x="672" y="58" width="310" height="382" rx="8"/>
+  <text class="lbl bold zh" x="688" y="94">③ 輸出這一列</text>
+  <text class="tick zh" x="688" y="136">狀態集合與各自比例</text>
+  <text class="tick zh" x="688" y="164">先後關係，附後驗</text>
+  <text class="tick zh" x="688" y="192">有效分子數與遮罩分布</text>
+  <text class="tick bold zh" x="688" y="226">旗標</text>
+  <text class="tick mono ok" x="688" y="254">REFINES_GLOBAL</text>
+  <text class="tick mono warn" x="688" y="282">FLOOR_LIMITED</text>
+  <text class="tick mono warn" x="688" y="310">ORDER_UNRESOLVED</text>
+  <text class="tick mono bad" x="688" y="338">INCOMPATIBLE</text>
+  <text class="tick zh" x="688" y="382">旗標是可以計數的產出</text>
+
+  <!-- 相容性 -->
+  <rect class="box bad" x="18" y="464" width="964" height="84" rx="8"/>
+  <text class="lbl bold zh bad" x="34" y="498">四格全滿 ＝ 四配子檢定失敗 ＝ 不相容</text>
+  <text class="anno zh" x="34" y="530">那不是一個新的 lineage，是這個單位的錯誤地板偏高 —— 相容性檢定同時是品質訊號。</text>
+</svg><figcaption>整節要交代的就是這張圖：
+左邊是一個單位收到的東西（稀疏狀態表），中間是要估出來的東西（哪幾種狀態、誰在誰之前），
+右邊是它最後輸出的那一列。中間那棵樹沒有經過搜尋 ——
+狀態集合一旦選定，包含關係就把樹決定了，這是下面第三個小節的重點。</figcaption></figure>
+
+<h4 id="估的範圍-一個單位">估的範圍：一個單位</h4>
 
 <p class="prose">沿用前一篇的<b>單位</b>：<math><mi>u</mi></math> 是一個「區域 × <span class="term" data-term="somatic haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-somatic-haplotype-4">單倍型家族<span class="term__pop" id="gd-somatic-haplotype-4" role="tooltip"><b class="term__hd">somatic haplotype</b><span class="term__def" data-lang="zh">在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</span><span class="term__def" data-lang="en" lang="en">A sub-level beneath the germline haplotype: HP1-1 and HP2-1 carry somatic mutations derived from HP1 and HP2; HP3 is unassignable.</span><a class="term__more" href="glossary.html#somatic-haplotype">完整條目 →</a></span></span>」，
-其位點集合為 <math><msub><mi>J</mi><mi>u</mi></msub></math>、<math><msub><mi>k</mi><mi>u</mi></msub><mo>=</mo><mo>|</mo><msub><mi>J</mi><mi>u</mi></msub><mo>|</mo></math>。
-一個單位裡的分子全部來自同一條染色體拷貝，另一條屬於另一個單位。</p>
+其位點集合為 <math><msub><mi>J</mi><mi>u</mi></msub></math>、位點數 <math><msub><mi>k</mi><mi>u</mi></msub><mo>=</mo><mo>|</mo><msub><mi>J</mi><mi>u</mi></msub><mo>|</mo></math>。</p>
 
-<p class="prose"><b>局部狀態</b>為 <math><mi>h</mi><mo>∈</mo><mo>{</mo><mn>0,1</mn><msup><mo>}</mo><msub><mi>k</mi><mi>u</mi></msub></msup></math>。
-<b>局部系譜</b> <math><msub><mi>L</mi><mi>u</mi></msub><mo>=</mo><mo>(</mo><msub><mi>X</mi><mi>u</mi></msub><mo>,</mo><msub><mi>E</mi><mi>u</mi></msub><mo>)</mo></math> 由兩件事構成：有正質量的狀態集合
-<math><msub><mi>X</mi><mi>u</mi></msub><mo>⊆</mo><mo>{</mo><mn>0,1</mn><msup><mo>}</mo><msub><mi>k</mi><mi>u</mi></msub></msup></math>，以及 <math><msub><mi>X</mi><mi>u</mi></msub></math> 上由集合包含關係決定的有根樹。
-根是全參考狀態 <math><msup><mn>0</mn><msub><mi>k</mi><mi>u</mi></msub></msup></math>。每個狀態 <math><mi>h</mi><mo>∈</mo><msub><mi>X</mi><mi>u</mi></msub></math> 另有
-<b>專屬分子比例</b> <math><msub><mi>ν</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub><mo>≥</mo><mn>0</mn></math>，且 <math><msub><mo>∑</mo><mi>h</mi></msub><msub><mi>ν</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub><mo>=</mo><mn>1</mn></math>。</p>
+<p class="prose">這樣切有一個具體的理由，不是為了方便：
+<b>一個單位裡的分子全部來自同一條染色體拷貝</b>，另一條屬於另一個單位。
+所以在單位內部，「兩個變異出現在同一條分子上」才真的等於
+「它們在同一條拷貝上先後發生」。
+若不先依家族切開，位於<b>兩條</b>拷貝上的一對變異（trans）永遠不會共存，
+其計數表會與「兩支互不包含的 subclone」長得<b>一模一樣</b> ——
+單位這個切法就是為了讓這兩件事落進不同的單位而不會相遇。</p>
 
-<p class="prose">要注意 <math><mi>ν</mi></math> 是<b>專屬</b>的，不是累積的：
-一條分子只由它所屬那個節點的狀態產生，不由祖先節點產生。
-祖先節點的 <math><mi>ν</mi></math> 因此是「還停留在該狀態的分子」的比例，可以很小。
-樹的形狀不對 <math><mi>ν</mi></math> 施加單調性，它只規定<b>哪些狀態可以同時存在</b>。</p>
+<h4 id="要估的三個量">要估的三個量</h4>
+
+<p class="prose">令<b>局部狀態</b>為 <math><mi>h</mi><mo>∈</mo><mo>{</mo><mn>0,1</mn><msup><mo>}</mo><msub><mi>k</mi><mi>u</mi></msub></msup></math>，
+即該單位那幾個位點上「帶或不帶變異」的樣式。
+一個單位的估計目標就是下面三個量，<b>沒有第四個</b>：</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th scope="col">估計目標的層級</th><th scope="col">內容</th><th scope="col">需要什麼</th><th scope="col">條件不足時的輸出</th></tr></thead>
+<thead><tr><th scope="col">要估的量</th><th scope="col">記號</th><th scope="col">白話</th></tr></thead>
 <tbody>
-<tr><td>分子層</td><td><math><msub><mi>X</mi><mi>u</mi></msub></math> 與 <math><msub><mi>ν</mi><mi>u</mi></msub></math></td><td>只需要該單位的 read 與就地估到的錯誤率</td><td><code>FLOOR_LIMITED</code></td></tr>
-<tr><td>系譜層</td><td><math><msub><mi>X</mi><mi>u</mi></msub></math> 上的先後關係</td><td>兩個單一狀態皆可見，且雙狀態的有無高於地板</td><td><code>ORDER_UNRESOLVED</code></td></tr>
-<tr><td>細胞層</td><td>各節點的 <span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cancer-cell-fraction-5">CCF<span class="term__pop" id="gd-cancer-cell-fraction-5" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（<math><mo>≈</mo><mn>1</mn></math>）與 subclonal（<math><mo>&lt;</mo><mn>1</mn></math>）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en" lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span></td><td>純度與該處 <span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-copy-number-6">拷貝數<span class="term__pop" id="gd-copy-number-6" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en" lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span>，由階段 G 提供</td><td>只報分子比例，標 <code>CELL_SCALE_UNAVAILABLE</code></td></tr>
-<tr><td>對應層</td><td>局部節點對應到哪一個全域群</td><td>節點內至少一個變異有可信的全域指派</td><td><code>UNLINKED_TO_GLOBAL</code></td></tr>
+<tr><td>狀態集合</td><td><math><msub><mi>X</mi><mi>u</mi></msub><mo>⊆</mo><mo>{</mo><mn>0,1</mn><msup><mo>}</mo><msub><mi>k</mi><mi>u</mi></msub></msup></math></td><td>這個單位裡<b>有哪幾種</b>分子</td></tr>
+<tr><td>專屬比例</td><td><math><msub><mi>ν</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub><mo>≥</mo><mn>0</mn></math>，總和為 1</td><td>每一種<b>各佔多少</b></td></tr>
+<tr><td>先後關係</td><td><math><msub><mi>X</mi><mi>u</mi></msub></math> 上的有根樹 <math><msub><mi>E</mi><mi>u</mi></msub></math></td><td>誰是誰的<b>祖先</b></td></tr>
 </tbody>
 </table>
 </div>
 
-<div class="guardrail">
-<p class="guardrail__hd">局部節點是一類分子狀態，不是一群細胞</p>
-<p class="prose">一個節點只表示「這些分子在 <math><msub><mi>J</mi><mi>u</mi></msub></math> 上帶有同一組突變」。
-兩群基因體其他地方不同、但在這個視窗內完全相同的細胞，會落進<b>同一個</b>節點。
-本實驗室的甲基化觀測正是這件事的實例：單一個「單倍型 ＋ 等位」狀態之下，
-仍可再分出數群甲基化模式。因此節點數的正確讀法恆為「<b>至少</b>此數」，
-而把節點數當成細胞群數會系統性低估。反向也不成立：
-同一群細胞在不同單位裡對應到不同的局部狀態，因為每個單位看的位點集合不同。</p>
-</div>
+<p class="prose">三者合起來記為 <math><msub><mi>L</mi><mi>u</mi></msub><mo>=</mo><mo>(</mo><msub><mi>X</mi><mi>u</mi></msub><mo>,</mo><msub><mi>E</mi><mi>u</mi></msub><mo>)</mo></math> 與 <math><msub><mi>ν</mi><mi>u</mi></msub></math>，
+樹根固定為全參考狀態 <math><msup><mn>0</mn><msub><mi>k</mi><mi>u</mi></msub></msup></math>。</p>
 
-<h4 id="四配子相容性-給定狀態集合-樹幾乎是決定的">四配子相容性：給定狀態集合，樹幾乎是決定的</h4>
+<p class="prose"><math><mi>ν</mi></math> 有一個容易寫錯的地方：它是<b>專屬</b>的，不是累積的。
+一條分子只由它<b>所屬那一個</b>節點的狀態產生，不由祖先節點產生；
+祖先節點的 <math><mi>ν</mi></math> 因此是「還停留在該狀態的分子」的比例，可以很小。
+換句話說，<b>樹的形狀不對 <math><mi>ν</mi></math> 施加任何單調性</b>，
+它只規定哪些狀態可以<b>同時存在</b>。</p>
 
-<p class="prose">兩個位點 <math><mi>j</mi><mo>,</mo><mi>j</mi><mi>'</mi></math> 稱為<b>相容</b>，若四種樣式
-<math><mn>00,01,10,11</mn></math> 中至多出現三種。若 <math><msub><mi>X</mi><mi>u</mi></msub></math> 中所有位點兩兩相容，
-則存在一棵樹使每個突變只發生一次（perfect phylogeny），
-而且<b>給定 <math><msub><mi>X</mi><mi>u</mi></msub></math>，那棵樹本質上是唯一的</b>。</p>
+<h4 id="先後關係幾乎不用估-四配子相容性">先後關係幾乎不用估：四配子相容性</h4>
+
+<p class="prose">上表第三列看起來是三個量裡最難的，其實不是。
+兩個位點稱為<b>相容</b>，若四種樣式 <math><mn>00,01,10,11</mn></math> 中至多出現三種。
+若 <math><msub><mi>X</mi><mi>u</mi></msub></math> 中所有位點兩兩相容，則存在一棵樹使每個突變只發生一次
+（perfect phylogeny），而且<b>給定 <math><msub><mi>X</mi><mi>u</mi></msub></math>，那棵樹本質上是唯一的</b>。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="rg-unit-classes__title" aria-describedby="rg-unit-classes__desc">
   <title id="rg-unit-classes__title">一個 k＝2 單位的聯合計數表只會落入三類：串接、分岔、不相容</title>
@@ -905,168 +1012,57 @@ somatic calling 有既有的 truth set 與 precision／recall 曲線，
   <text class="anno zh" x="24" y="450">右欄的出現率可以反過來估計單倍型分型的錯誤率 —— 模型因此自帶一個校正用的觀測量。</text>
   <text class="anno zh" x="24" y="482">分類要用似然比檢定，不是對原始計數設門檻：在偵測極限附近，兩種假設只差幾條 read。</text>
 </svg><figcaption>三欄的邊際計數刻意設為相同，用以顯示僅憑邊際無法區分三者。
-左欄為串接，中欄為分岔，右欄四格皆非空為不相容。
-在本規格下，前兩者是不同的局部系譜，第三者是四配子檢定失敗。</figcaption></figure>
+左欄為串接，中欄為分岔 —— 兩者是不同的局部系譜；
+右欄四格皆非空，代表四配子檢定失敗。</figcaption></figure>
 
-<p class="prose">這給出兩個實作上的結論。第一，<b>困難不在搜尋樹，在決定狀態集合</b> ——
-哪些狀態的比例真的高於地板。第二，四配子檢定失敗（四格皆非空）
-<b>不是</b>發現了一支新的 lineage，而是這個單位的錯誤地板偏高或家族誤標偏多，
-所以它同時是一個品質訊號。</p>
+<p class="prose">這給出兩個貫穿後面各節的結論：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 564" class="dia-svg" role="img" aria-labelledby="sr2c-local-output__title" aria-describedby="sr2c-local-output__desc">
-  <title id="sr2c-local-output__title">一個單位的輸出：稀疏狀態表、唯一的相容樹，以及可以計數的旗標</title>
-  <desc id="sr2c-local-output__desc">三格由左到右。第一格是一個單位的稀疏狀態表：
-        全參考狀態 62 條、只帶第一個變異的 18 條、同時帶第一與第二個的 5 條、
-        同時帶第一與第三個的 7 條，而同時帶第二與第三個的是 0 條，
-        另外還有覆蓋遮罩不完整的分子另行計數。
-        這個單位的錯誤地板約為百分之一乘上分子總數，也就是不到一條，
-        所以 5 條遠高於地板，而 0 條還不足以排除那個狀態存在。
-        第二格是由這些狀態建出來的樹：全參考在最上，其下是只帶第一個變異的狀態，
-        再往下分成兩支，分別再加上第二個或第三個變異。
-        因為狀態集合通過四配子檢定，這棵樹是唯一的；
-        所以困難的地方不是搜尋樹，而是決定哪些狀態的比例高於地板。
-        第三格是這個單位輸出的那一列：狀態集合與各自比例、先後關係與後驗、
-        有效分子數與遮罩分布，以及四個旗標。
-        旗標是這條路線可以計數的產出，不是修辭。
-        最下方指出：四格全滿代表四配子檢定失敗，那不是一個新的 lineage，
-        而是這個單位的錯誤地板偏高，所以相容性檢定同時是品質訊號。</desc>
+<ul class="prose">
+<li><b>困難不在搜尋樹，在決定 <math><msub><mi>X</mi><mi>u</mi></msub></math></b> ——
+哪些狀態的比例真的高於錯誤地板。第三節到第五節談的幾乎都是這一件事。</li>
+<li><b>四格全滿不是發現了一支新 lineage</b>，是四配子檢定失敗，
+代表這個單位的錯誤地板偏高或家族誤標偏多。相容性檢定因此同時是品質訊號。</li>
+</ul>
 
-  <text class="ttl zh" x="20" y="36">一個單位輸出什麼</text>
-
-  <!-- ① 狀態表 -->
-  <rect class="box" x="18" y="58" width="310" height="382" rx="8"/>
-  <text class="lbl bold zh" x="34" y="94">① 稀疏狀態表</text>
-  <text class="tick mono" x="34" y="136">000</text>
-  <text class="tick mono end" x="200" y="136">62</text>
-  <text class="tick mono" x="34" y="164">100</text>
-  <text class="tick mono end" x="200" y="164">18</text>
-  <text class="tick mono" x="34" y="192">110</text>
-  <text class="tick mono end" x="200" y="192">5</text>
-  <text class="tick mono" x="34" y="220">101</text>
-  <text class="tick mono end" x="200" y="220">7</text>
-  <text class="tick mono" x="34" y="248">011</text>
-  <text class="tick mono end" x="200" y="248">0</text>
-  <text class="tick zh" x="34" y="280">覆蓋遮罩不完整的另計</text>
-  <text class="tick zh" x="34" y="322">地板約為分子總數的百分之一</text>
-  <text class="tick zh ok" x="34" y="352">5 條遠高於地板</text>
-  <text class="tick zh warn" x="34" y="382">0 條還不足以排除</text>
-
-  <!-- ② 相容則樹唯一 -->
-  <rect class="box accent" x="345" y="58" width="310" height="382" rx="8"/>
-  <text class="lbl bold zh" x="361" y="94">② 相容則樹唯一</text>
-  <circle class="cell normal" cx="500" cy="150" r="20"/>
-  <circle class="cell tumor" cx="500" cy="228" r="20"/>
-  <circle class="cell clone1" cx="430" cy="316" r="20"/>
-  <circle class="cell clone2" cx="570" cy="316" r="20"/>
-  <line class="conn" x1="500" y1="170" x2="500" y2="206"/>
-  <line class="conn" x1="494" y1="247" x2="440" y2="298"/>
-  <line class="conn" x1="506" y1="247" x2="560" y2="298"/>
-  <text class="tick mono mid" x="500" y="155">000</text>
-  <text class="tick mono mid" x="500" y="233">100</text>
-  <text class="tick mono mid" x="430" y="321">110</text>
-  <text class="tick mono mid" x="570" y="321">101</text>
-  <text class="tick zh" x="361" y="382">難的是選狀態，不是搜尋樹</text>
-  <text class="tick zh" x="361" y="352">四配子檢定通過，樹就唯一</text>
-
-  <!-- ③ 輸出 -->
-  <rect class="box" x="672" y="58" width="310" height="382" rx="8"/>
-  <text class="lbl bold zh" x="688" y="94">③ 輸出這一列</text>
-  <text class="tick zh" x="688" y="136">狀態集合與各自比例</text>
-  <text class="tick zh" x="688" y="164">先後關係，附後驗</text>
-  <text class="tick zh" x="688" y="192">有效分子數與遮罩分布</text>
-  <text class="tick bold zh" x="688" y="226">旗標</text>
-  <text class="tick mono ok" x="688" y="254">REFINES_GLOBAL</text>
-  <text class="tick mono warn" x="688" y="282">FLOOR_LIMITED</text>
-  <text class="tick mono warn" x="688" y="310">ORDER_UNRESOLVED</text>
-  <text class="tick mono bad" x="688" y="338">INCOMPATIBLE</text>
-  <text class="tick zh" x="688" y="382">旗標是可以計數的產出</text>
-
-  <!-- 相容性 -->
-  <rect class="box bad" x="18" y="464" width="964" height="84" rx="8"/>
-  <text class="lbl bold zh bad" x="34" y="498">四格全滿 ＝ 四配子檢定失敗 ＝ 不相容</text>
-  <text class="anno zh" x="34" y="530">那不是一個新的 lineage，是這個單位的錯誤地板偏高 —— 相容性檢定同時是品質訊號。</text>
-</svg><figcaption>稀疏狀態表 → 相容則樹唯一 → 輸出這一列。
-中間那棵樹沒有經過搜尋：狀態集合一旦選定，包含關係就把樹決定了。
-右邊四個旗標是這條路線可以計數的產出。</figcaption></figure>
-
-<h4 id="一條邊可以帶多個突變-記帳節點因此消失">一條邊可以帶多個突變 —— 記帳節點因此消失</h4>
-
-<p class="prose">前一篇的候選列舉採「一步一個突變」的超立方體表示法，
-於是同一條全域邊上的多個突變會在局部被迫拆成數段，中間補進純粹<b>記帳</b>用的節點。
-本規格改為允許一條邊帶多個突變，這一類節點隨表示法一起消失。</p>
-
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530" class="dia-svg" role="img" aria-labelledby="rg-steiner-latent__title" aria-describedby="rg-steiner-latent__desc">
-  <title id="rg-steiner-latent__title">樹成本等於潛在節點數，所以最小成本就是「補最少的看不到狀態」</title>
-  <desc id="rg-steiner-latent__desc">左上是成本的算式。樹的成本等於邊數，邊數等於節點數減一，
-        而節點數等於固定節點數加上潛在節點數，
-        固定節點是參考型的根加上實際觀測到的狀態，潛在節點是為了把樹接起來而補進去的狀態。
-        所以最小成本等價於最少潛在節點。
-        右邊是一個例子：觀測到的只有全參考的根與兩個變異都帶的狀態，中間什麼都沒看到。
-        因為一步只能加一個突變，中間必須補一個狀態，補哪一個資料沒有意見，
-        於是得到兩個並列的最小成本候選，兩者成本都是二。
-        正確的做法是兩個都留著，而不是挑一個。
-        最下方指出潛在節點數本身就是一個值得統計的量：
-        它數的是「這棵樹需要、但沒有任何觀測支持」的狀態，
-        把全基因體的分布畫出來，就是這份重建有多少比例來自推論的直接量度。
-        讀法是：潛在節點不是一群還沒被觀察到的細胞，它是模型為了連通而記的帳。</desc>
-
-  <text class="ttl zh" x="20" y="36">最小成本 ＝ 補最少的「看不到的狀態」</text>
-
-  <rect class="box sunken" x="24" y="62" width="450" height="118" rx="8"/>
-  <text class="lbl mono mid" x="249" y="102">cost(T) = |E| = |V| − 1</text>
-  <text class="lbl mono mid" x="249" y="140">= C + |H| − 1</text>
-  <text class="tick zh mid" x="249" y="168">C ＝ 根 ＋ 觀測到的狀態　　H ＝ 補進去的潛在節點</text>
-
-  <text class="anno bold zh accent" x="24" y="216">C 固定時，最小成本就等價於最少潛在節點。</text>
-
-  <!-- 例子 -->
-  <text class="lbl bold zh" x="530" y="88">例：只觀測到 00 與 11</text>
-
-  <circle class="mark somatic" cx="620" cy="120" r="11"/>
-  <text class="tick mono mid" x="620" y="106">00</text>
-  <circle class="mark somatic" cx="620" cy="232" r="11"/>
-  <text class="tick mono mid" x="620" y="258">11</text>
-  <circle class="box ghost" cx="566" cy="176" r="11"/>
-  <circle class="box ghost" cx="674" cy="176" r="11"/>
-  <line class="conn" x1="612" y1="129" x2="574" y2="167"/>
-  <line class="conn" x1="628" y1="129" x2="666" y2="167"/>
-  <line class="conn" x1="574" y1="185" x2="612" y2="223"/>
-  <line class="conn" x1="666" y1="185" x2="628" y2="223"/>
-  <text class="tick zh" x="530" y="288">中間一定要經過一個狀態，但補哪一個資料沒有意見</text>
-
-  <rect class="box ok" x="760" y="92" width="100" height="88" rx="8"/>
-  <text class="tick mono mid" x="810" y="118">補 10</text>
-  <text class="tick mono mid" x="810" y="146">|H| = 1</text>
-  <text class="tick mono mid" x="810" y="170">cost 2</text>
-
-  <rect class="box ok" x="876" y="92" width="100" height="88" rx="8"/>
-  <text class="tick mono mid" x="926" y="118">補 01</text>
-  <text class="tick mono mid" x="926" y="146">|H| = 1</text>
-  <text class="tick mono mid" x="926" y="170">cost 2</text>
-
-  <text class="anno zh ok" x="760" y="214">兩個都留著</text>
-
-  <!-- |H| 當統計量 -->
-  <rect class="box accent" x="24" y="318" width="952" height="122" rx="8"/>
-  <text class="lbl bold zh accent" x="48" y="350">潛在節點數本身就是一個值得統計的量</text>
-  <text class="anno zh" x="48" y="382">它數的是「這棵樹需要、但沒有任何觀測支持」的狀態。</text>
-  <text class="anno zh" x="48" y="410">把全基因體的分布畫出來，就是這份重建有多少比例來自推論的直接量度 ——</text>
-  <text class="anno zh" x="48" y="434">而且求解器本來就算出來了，它就是成本。</text>
-
-  <text class="anno zh bad" x="24" y="476">但要記住它的意思：潛在節點<tspan class="bold">不是</tspan>一群還沒被觀察到的細胞。</text>
-  <text class="anno zh bad" x="24" y="504">它可能對應真的中間世代，也可能只是模型為了連通而記的帳。</text>
-</svg><figcaption>樹的成本等於固定節點數加潛在節點數減一，
-故最小成本等價於潛在節點數最少。潛在節點為該樹所需、但無任何觀測支持的狀態。</figcaption></figure>
-
-<p class="prose">但<b>真正因無限位點假設而必需的中間狀態仍然存在</b>，不可以一併宣稱消掉：
-觀測到 <math><mn>110</mn></math> 與 <math><mn>101</mn></math> 而 <math><mn>100</mn></math> 未觀測到時，
+<p class="prose">還有一點：<math><msub><mi>X</mi><mi>u</mi></msub></math> 可以含<b>沒有被任何分子觀測到</b>的狀態。
+觀測到 <math><mn>110</mn></math> 與 <math><mn>101</mn></math> 而 <math><mn>100</mn></math> 沒看到時，
 兩者若不共用一個帶第一個突變的祖先，第一個突變就得發生兩次。
-差別在於<b>身分變乾淨了</b>：這種節點只剩兩種可能 ——
-現存但沒抽到（<math><mi>ν</mi><mo>&gt;</mo><mn>0</mn></math>，抽樣零），或已被後代取代的歷史狀態（<math><mi>ν</mi><mo>=</mo><mn>0</mn></math>）——
-不再有前一篇表中那個「只因表示法而存在」的第三種。
-<span class="term" data-term="latent node" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-latent-node-7">latent node<span class="term__pop" id="gd-latent-node-7" role="tooltip"><b class="term__hd">latent node <i>潛在節點</i></b><span class="term__def" data-lang="zh">建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</span><span class="term__def" data-lang="en" lang="en">An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.</span><a class="term__more" href="glossary.html#latent-node">完整條目 →</a></span></span> 那條警告在這裡仍然適用，但它的適用範圍窄了一半。</p>
+這種狀態只有兩種身分 —— 現存但沒抽到（<math><mi>ν</mi><mo>&gt;</mo><mn>0</mn></math>），
+或已被後代取代的歷史狀態（<math><mi>ν</mi><mo>=</mo><mn>0</mn></math>）。
+<b>前一篇還有第三種</b>：純粹因為「一步一個突變」的表示法而被迫補進來的記帳節點；
+本規格允許一條邊帶多個突變，那一種就隨表示法一起消失了。
+<span class="term" data-term="latent node" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-latent-node-5">latent node<span class="term__pop" id="gd-latent-node-5" role="tooltip"><b class="term__hd">latent node <i>潛在節點</i></b><span class="term__def" data-lang="zh">建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</span><span class="term__def" data-lang="en" lang="en">An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.</span><a class="term__more" href="glossary.html#latent-node">完整條目 →</a></span></span> 那條警告仍然適用，但適用範圍窄了一半。</p>
 
-<h3 id="三-局部生成模型">三、局部生成模型</h3>
+<h4 id="什麼時候算-估完了">什麼時候算「估完了」</h4>
+
+<p class="prose">三個量不是同時可得的，而且往上還有兩層要靠外部資訊。
+每一層各有自己的成立條件；<b>不成立時輸出旗標，而不是猜一個值</b> ——
+這條規則是第五節輸出語義的來源。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">層級</th><th scope="col">估到什麼</th><th scope="col">需要什麼</th><th scope="col">條件不足時的輸出</th></tr></thead>
+<tbody>
+<tr><td>分子層</td><td><math><msub><mi>X</mi><mi>u</mi></msub></math> 與 <math><msub><mi>ν</mi><mi>u</mi></msub></math></td><td>只需要該單位的 read 與就地估到的錯誤率</td><td><code>FLOOR_LIMITED</code></td></tr>
+<tr><td>系譜層</td><td><math><msub><mi>X</mi><mi>u</mi></msub></math> 上的先後關係</td><td>兩個單一狀態皆可見，且雙狀態的有無高於地板</td><td><code>ORDER_UNRESOLVED</code></td></tr>
+<tr><td>細胞層</td><td>各節點的 <span class="term" data-term="cancer cell fraction" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cancer-cell-fraction-6">CCF<span class="term__pop" id="gd-cancer-cell-fraction-6" role="tooltip"><b class="term__hd">cancer cell fraction <i>癌細胞比例</i></b><span class="term__def" data-lang="zh">帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（<math><mo>≈</mo><mn>1</mn></math>）與 subclonal（<math><mo>&lt;</mo><mn>1</mn></math>）突變。<b>不等於 VAF。</b></span><span class="term__def" data-lang="en" lang="en">The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.</span><a class="term__more" href="glossary.html#cancer-cell-fraction">完整條目 →</a></span></span></td><td>純度與該處 <span class="term" data-term="copy number" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-copy-number-7">拷貝數<span class="term__pop" id="gd-copy-number-7" role="tooltip"><b class="term__hd">copy number <i>拷貝數</i></b><span class="term__def" data-lang="zh">某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</span><span class="term__def" data-lang="en" lang="en">How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.</span><a class="term__more" href="glossary.html#copy-number">完整條目 →</a></span></span>，由階段 G 提供</td><td>只報分子比例，標 <code>CELL_SCALE_UNAVAILABLE</code></td></tr>
+<tr><td>對應層</td><td>局部節點對應到哪一個全域群</td><td>節點內至少一個變異有可信的全域指派</td><td><code>UNLINKED_TO_GLOBAL</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="guardrail">
+<p class="guardrail__hd">局部節點是一類分子狀態，不是一群細胞</p>
+<p class="prose">上表的「細胞層」只是把比例換算到細胞尺度，<b>它不會把節點變成細胞群</b>。
+一個節點只表示「這些分子在 <math><msub><mi>J</mi><mi>u</mi></msub></math> 上帶有同一組突變」。
+兩群基因體其他地方不同、但在這個視窗內完全相同的細胞，會落進<b>同一個</b>節點。
+本實驗室的甲基化觀測正是這件事的實例：單一個「單倍型 ＋ 等位」狀態之下，
+仍可再分出數群甲基化模式。因此節點數的正確讀法恆為「<b>至少</b>此數」。
+反向也不成立：同一群細胞在不同單位裡對應到不同的局部狀態，
+因為每個單位看的位點集合不同。</p>
+</div>
+
+<h3 id="三-階段-l-局部生成模型">三、階段 L · 局部生成模型</h3>
 
 <p class="prose">由 <math><msub><mi>ν</mi><mi>u</mi></msub></math> 到一條 read 上看到的字母，中間三層與前一篇相同，
 此處只寫出必要的式子並標明差異。</p>
@@ -1595,7 +1591,7 @@ somatic calling 有既有的 truth set 與 precision／recall 曲線，
 <b>讓 <math><msub><mi>ν</mi><mi>u</mi></msub></math> 自由，正是「提高局部解析度」的技術內容</b>；
 它同時也是「不再限制全域參數」的原因。兩件事是同一個改動的兩面，不能只要一面。</p>
 
-<h3 id="四-全域訊號怎麼進來-而不把同一批-read-算兩次">四、全域訊號怎麼進來，而不把同一批 read 算兩次</h3>
+<h3 id="四-階段-g-它如何單向進入階段-l">四、階段 G · 它如何單向進入階段 L</h3>
 
 <p class="prose">局部比例自由之後，20 條分子撐不起一個穩定的估計。
 全域頻率譜在這裡仍然有用 —— 但只能<b>單向</b>進來。
@@ -1984,7 +1980,7 @@ somatic calling 有既有的 truth set 與 precision／recall 曲線，
 代價是這個後驗不是任何聯合模型的邊際分布，
 報告中必須如此稱呼，不得寫成「聯合估計」。</p>
 
-<h3 id="五-模型選擇與輸出語義">五、模型選擇與輸出語義</h3>
+<h3 id="五-階段-l-模型選擇與輸出語義">五、階段 L · 模型選擇與輸出語義</h3>
 
 <p class="prose">每個單位的推論目標是 <math><msub><mi>X</mi><mi>u</mi></msub></math> 的後驗。
 候選狀態集合由「觀測到的樣式 ∪ 相容性所需的中間狀態」產生，
@@ -2247,7 +2243,7 @@ somatic calling 有既有的 truth set 與 precision／recall 曲線，
 本規格的每一列都只能自最上層產生，而該層亦為三者中範圍最小者 ——
 這就是「不可拼接成一棵大樹」的物理來源，不是保守的選擇。</figcaption></figure>
 
-<h3 id="七-輸入與前處理契約">七、輸入與前處理契約</h3>
+<h3 id="七-階段-0-輸入與前處理契約">七、階段 0 · 輸入與前處理契約</h3>
 
 <p class="prose">前五節寫的是模型與它的輸出語義，那些都假設「單位已經切好了」。
 這一節處理那個假設：<b>單位是怎麼從 BAM 切出來的</b>。
@@ -2632,7 +2628,7 @@ Poisson 模型給的單一數字在這裡沒有用：真正該做的是逐樣本
 <b>其二，連鎖率是分層報告的第一個分層變數</b>，必須在跑之前先算、
 並用它決定這個樣本值不值得跑，而不是事後拿來解釋結果。</p>
 
-<h3 id="八-推論演算法與計算預算">八、推論演算法與計算預算</h3>
+<h3 id="八-階段-l-推論演算法與計算預算">八、階段 L · 推論演算法與計算預算</h3>
 
 <ol class="prose">
 <li><b>前處理。</b>依單位輸出稀疏狀態表，每列為
@@ -3407,7 +3403,7 @@ multiple sequencing technologies with DeepSomatic</i>，<i>Nat Biotechnol</i> 20
     <nav class="pager" aria-label="模組導覽"><span></span><span></span></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>Clair3</dt><dd>以深度學習做 germline variant calling 的工具，長 read 上常用。</dd><dt>ClairS</dt><dd>配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</dd><dt>DeepSomatic</dt><dd>Google 的 somatic variant caller，同樣有 tumor-only 版本。</dd><dt>DeepVariant</dt><dd>Google 開發的 germline variant caller，把 pileup 轉成影像再用 CNN 分類。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>LongPhase</dt><dd>實驗室開發的長 read phasing 工具，是後續所有工具的共同基礎。輸出 germline haplotype。</dd><dt>LongPhase-S</dt><dd>配對 tumor–normal 版本。做腫瘤 DNA 比例估計（輸出欄位名為 purity）、比例感知的 somatic variant 過濾，以及 somatic haplotagging。</dd><dt>allele-specific copy number（等位特異拷貝數）</dt><dd>把一個區段的總拷貝數拆成兩個親源等位各自的份數，通常記為 major 與 minor。總拷貝數相同而兩個等位不同的狀態（例如 2+0 與 1+1）在深度上完全一致，只有 B-allele frequency 分得開 —— copy-neutral LOH 即為此類。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（<math><mo>≈</mo><mn>1</mn></math>）與 subclonal（<math><mo>&lt;</mo><mn>1</mn></math>）突變。<b>不等於 VAF。</b></dd><dt>clone tree（克隆演化樹）</dt><dd>描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>data leakage（資料洩漏）</dt><dd>訓練或模型選擇階段取得了評估資料的資訊，讓效能被高估。實驗室的做法是<b>按染色體切分</b>，確保同一個位點不會同時出現在訓練、驗證與最終測試中。</dd><dt>distribution shift（分布偏移）</dt><dd>測試資料的組成與訓練資料存在顯著差異（例如正負樣本比例不同），使得模型表現不如預期。</dd><dt>haplotagging</dt><dd>根據已 phase 好的 variants，把每一條 read 指派到 HP1 或 HP2，並把結果寫回 BAM 的 <code>HP</code> tag。</dd><dt>high-confidence region</dt><dd>benchmark 建立者指定的高可信度區間，通常以 BED 檔表示；區間外不宜視為具有相同標註可靠度。</dd><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>mutation frequency spectrum（突變頻率譜）</dt><dd>把一份樣本裡所有 somatic 變異的 VAF 畫成直方圖後得到的分布。分布上的峰與肩對應不同大小的細胞群，最低頻端的尾巴斜率則被用來判斷有沒有天擇。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>pigeonhole（鴿籠原理）</dt><dd>由父代與子代的細胞比例限制樹形的算術規則：一個細胞至多屬於父節點底下的<b>一個</b>子節點，所以各子節點的細胞比例加起來不得超過父節點。名稱來自鴿籠原理 —— 東西放進籠子，總量不會憑空變多。在 subclone 重建的文獻中也稱為 sum rule 或 crossing rule。<b>它只能排除樹，不能挑出樹</b>：通過檢查的候選通常仍不只一棵，其餘要靠 parsimony 之類的偏好決定。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv3"><a href="#換掉的是目標-不是方法">換掉的是目標，不是方法</a></li><li class="lv3"><a href="#為什麼頻率譜不容易看到局部的結構">為什麼頻率譜不容易看到局部的結構</a></li><li class="lv4"><a href="#答案取決於兩群靠得多近-而且不是慢慢變多">答案取決於兩群靠得多近，而且不是慢慢變多</a></li><li class="lv4"><a href="#而一支只在一個視窗裡不同的-lineage-本來就帶不起那麼多變異">而一支只在一個視窗裡不同的 lineage，本來就帶不起那麼多變異</a></li><li class="lv4"><a href="#同一批-read-換一種看法">同一批 read，換一種看法</a></li><li class="lv4"><a href="#一個必要的但書">一個必要的但書</a></li><li class="lv3"><a href="#第二個交付物-給了第一個一個可以驗的終點">第二個交付物，給了第一個一個可以驗的終點</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#一-總覽-兩個階段-兩份交付物">一、總覽：兩個階段，兩份交付物</a></li><li class="lv4"><a href="#三個決定整份規格的選擇">三個決定整份規格的選擇</a></li><li class="lv3"><a href="#二-估計目標的形式定義">二、估計目標的形式定義</a></li><li class="lv4"><a href="#四配子相容性-給定狀態集合-樹幾乎是決定的">四配子相容性：給定狀態集合，樹幾乎是決定的</a></li><li class="lv4"><a href="#一條邊可以帶多個突變-記帳節點因此消失">一條邊可以帶多個突變 —— 記帳節點因此消失</a></li><li class="lv3"><a href="#三-局部生成模型">三、局部生成模型</a></li><li class="lv4"><a href="#覆蓋遮罩-沒覆蓋到的位點要邊際化">覆蓋遮罩：沒覆蓋到的位點要邊際化</a></li><li class="lv4"><a href="#兩個形狀不同的錯誤通道與地板">兩個形狀不同的錯誤通道與地板</a></li><li class="lv4"><a href="#只准-0-1-loh-區域會被系統性誤讀">只准 0 → 1：LOH 區域會被系統性誤讀</a></li><li class="lv4"><a href="#方向是-nuisance-但這裡的用途不同">方向是 nuisance，但這裡的用途不同</a></li><li class="lv4"><a href="#與前一篇的唯一結構差異">與前一篇的唯一結構差異</a></li><li class="lv3"><a href="#四-全域訊號怎麼進來-而不把同一批-read-算兩次">四、全域訊號怎麼進來，而不把同一批 read 算兩次</a></li><li class="lv4"><a href="#階段-g-只用-s1">階段 G：只用 S1</a></li><li class="lv4"><a href="#先驗-原子加上逃逸質量">先驗：原子加上逃逸質量</a></li><li class="lv4"><a href="#先後關係的先驗-鴿籠只能軟用">先後關係的先驗：鴿籠只能軟用</a></li><li class="lv3"><a href="#五-模型選擇與輸出語義">五、模型選擇與輸出語義</a></li><li class="lv3"><a href="#六-跨單位-可以合併什麼">六、跨單位：可以合併什麼</a></li><li class="lv3"><a href="#七-輸入與前處理契約">七、輸入與前處理契約</a></li><li class="lv4"><a href="#工具鏈與必須釘住的參數">工具鏈與必須釘住的參數</a></li><li class="lv4"><a href="#標籤詞彙只有五個值-而-hp3-是一個真的問題">標籤詞彙只有五個值，而 HP3 是一個真的問題</a></li><li class="lv4"><a href="#視窗不是固定寬度-是讀序連鎖的傳遞閉包">視窗不是固定寬度，是讀序連鎖的傳遞閉包</a></li><li class="lv4"><a href="#連鎖率才是真正的閘門-而它逐樣本差很大">連鎖率才是真正的閘門，而它逐樣本差很大</a></li><li class="lv4"><a href="#連鎖進來之後-多數單位只有兩個位點">連鎖進來之後，多數單位只有兩個位點</a></li><li class="lv3"><a href="#八-推論演算法與計算預算">八、推論演算法與計算預算</a></li><li class="lv4"><a href="#上限-棄權-以及棄權必須留在分母裡">上限、棄權，以及棄權必須留在分母裡</a></li><li class="lv4"><a href="#成本-既有實作已經量過">成本：既有實作已經量過</a></li><li class="lv3"><a href="#九-第二個交付物-給-somatic-caller-的特徵">九、第二個交付物：給 somatic caller 的特徵</a></li><li class="lv4"><a href="#錨點與候選必須分開">錨點與候選必須分開</a></li><li class="lv4"><a href="#三層特徵">三層特徵</a></li><li class="lv4"><a href="#三種整合方式">三種整合方式</a></li><li class="lv4"><a href="#訓練與評估的切分">訓練與評估的切分</a></li><li class="lv3"><a href="#十-驗收條件">十、驗收條件</a></li><li class="lv4"><a href="#核心-局部打散的負對照">核心：局部打散的負對照</a></li><li class="lv4"><a href="#其餘各層">其餘各層</a></li><li class="lv3"><a href="#十一-實作分期">十一、實作分期</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#庫存-原料已經在了">庫存：原料已經在了</a></li><li class="lv3"><a href="#分岔為什麼稀少-一個機械性的理由-不是生物學結論">分岔為什麼稀少：一個機械性的理由，不是生物學結論</a></li><li class="lv3"><a href="#既有方法佔據的邊界">既有方法佔據的邊界</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv3"><a href="#預期結果模式">預期結果模式</a></li><li class="lv3"><a href="#尚未解決的問題">尚未解決的問題</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv3"><a href="#換掉的是目標-不是方法">換掉的是目標，不是方法</a></li><li class="lv3"><a href="#為什麼頻率譜不容易看到局部的結構">為什麼頻率譜不容易看到局部的結構</a></li><li class="lv4"><a href="#答案取決於兩群靠得多近-而且不是慢慢變多">答案取決於兩群靠得多近，而且不是慢慢變多</a></li><li class="lv4"><a href="#而一支只在一個視窗裡不同的-lineage-本來就帶不起那麼多變異">而一支只在一個視窗裡不同的 lineage，本來就帶不起那麼多變異</a></li><li class="lv4"><a href="#同一批-read-換一種看法">同一批 read，換一種看法</a></li><li class="lv4"><a href="#一個必要的但書">一個必要的但書</a></li><li class="lv3"><a href="#第二個交付物-給了第一個一個可以驗的終點">第二個交付物，給了第一個一個可以驗的終點</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#一-總覽-兩個階段-兩份交付物">一、總覽：兩個階段，兩份交付物</a></li><li class="lv4"><a href="#圖上那三個階段-各在哪一節">圖上那三個階段，各在哪一節</a></li><li class="lv4"><a href="#三個決定整份規格的選擇">三個決定整份規格的選擇</a></li><li class="lv3"><a href="#二-階段-l-要估的三個量">二、階段 L · 要估的三個量</a></li><li class="lv4"><a href="#估的範圍-一個單位">估的範圍：一個單位</a></li><li class="lv4"><a href="#要估的三個量">要估的三個量</a></li><li class="lv4"><a href="#先後關係幾乎不用估-四配子相容性">先後關係幾乎不用估：四配子相容性</a></li><li class="lv4"><a href="#什麼時候算-估完了">什麼時候算「估完了」</a></li><li class="lv3"><a href="#三-階段-l-局部生成模型">三、階段 L · 局部生成模型</a></li><li class="lv4"><a href="#覆蓋遮罩-沒覆蓋到的位點要邊際化">覆蓋遮罩：沒覆蓋到的位點要邊際化</a></li><li class="lv4"><a href="#兩個形狀不同的錯誤通道與地板">兩個形狀不同的錯誤通道與地板</a></li><li class="lv4"><a href="#只准-0-1-loh-區域會被系統性誤讀">只准 0 → 1：LOH 區域會被系統性誤讀</a></li><li class="lv4"><a href="#方向是-nuisance-但這裡的用途不同">方向是 nuisance，但這裡的用途不同</a></li><li class="lv4"><a href="#與前一篇的唯一結構差異">與前一篇的唯一結構差異</a></li><li class="lv3"><a href="#四-階段-g-它如何單向進入階段-l">四、階段 G · 它如何單向進入階段 L</a></li><li class="lv4"><a href="#階段-g-只用-s1">階段 G：只用 S1</a></li><li class="lv4"><a href="#先驗-原子加上逃逸質量">先驗：原子加上逃逸質量</a></li><li class="lv4"><a href="#先後關係的先驗-鴿籠只能軟用">先後關係的先驗：鴿籠只能軟用</a></li><li class="lv3"><a href="#五-階段-l-模型選擇與輸出語義">五、階段 L · 模型選擇與輸出語義</a></li><li class="lv3"><a href="#六-跨單位-可以合併什麼">六、跨單位：可以合併什麼</a></li><li class="lv3"><a href="#七-階段-0-輸入與前處理契約">七、階段 0 · 輸入與前處理契約</a></li><li class="lv4"><a href="#工具鏈與必須釘住的參數">工具鏈與必須釘住的參數</a></li><li class="lv4"><a href="#標籤詞彙只有五個值-而-hp3-是一個真的問題">標籤詞彙只有五個值，而 HP3 是一個真的問題</a></li><li class="lv4"><a href="#視窗不是固定寬度-是讀序連鎖的傳遞閉包">視窗不是固定寬度，是讀序連鎖的傳遞閉包</a></li><li class="lv4"><a href="#連鎖率才是真正的閘門-而它逐樣本差很大">連鎖率才是真正的閘門，而它逐樣本差很大</a></li><li class="lv4"><a href="#連鎖進來之後-多數單位只有兩個位點">連鎖進來之後，多數單位只有兩個位點</a></li><li class="lv3"><a href="#八-階段-l-推論演算法與計算預算">八、階段 L · 推論演算法與計算預算</a></li><li class="lv4"><a href="#上限-棄權-以及棄權必須留在分母裡">上限、棄權，以及棄權必須留在分母裡</a></li><li class="lv4"><a href="#成本-既有實作已經量過">成本：既有實作已經量過</a></li><li class="lv3"><a href="#九-第二個交付物-給-somatic-caller-的特徵">九、第二個交付物：給 somatic caller 的特徵</a></li><li class="lv4"><a href="#錨點與候選必須分開">錨點與候選必須分開</a></li><li class="lv4"><a href="#三層特徵">三層特徵</a></li><li class="lv4"><a href="#三種整合方式">三種整合方式</a></li><li class="lv4"><a href="#訓練與評估的切分">訓練與評估的切分</a></li><li class="lv3"><a href="#十-驗收條件">十、驗收條件</a></li><li class="lv4"><a href="#核心-局部打散的負對照">核心：局部打散的負對照</a></li><li class="lv4"><a href="#其餘各層">其餘各層</a></li><li class="lv3"><a href="#十一-實作分期">十一、實作分期</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#庫存-原料已經在了">庫存：原料已經在了</a></li><li class="lv3"><a href="#分岔為什麼稀少-一個機械性的理由-不是生物學結論">分岔為什麼稀少：一個機械性的理由，不是生物學結論</a></li><li class="lv3"><a href="#既有方法佔據的邊界">既有方法佔據的邊界</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv3"><a href="#預期結果模式">預期結果模式</a></li><li class="lv3"><a href="#尚未解決的問題">尚未解決的問題</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">
