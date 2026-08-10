@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580">
+  <title>先後關係的先驗只能是軟的：階段 G 給的是重疊的後驗，不是一條排序</title>
+  <desc>左上格說明階段 G 交出來的東西。含節點 h 的那些變異被指派到群 A，
+        細胞比例的後驗中心是 0.42、區間 0.24 到 0.60；
+        含節點 h′ 的那些變異被指派到群 B，中心 0.35、區間 0.13 到 0.57。
+        兩個區間大幅重疊，重疊的那一段被標了出來。
+        所以「A 在 B 之前」不是一個事實，是一個機率，這裡是 0.68。
+        右上格把那個機率變成邊的先驗權重：由 h 指向 h′ 的邊得到 log 0.68，
+        反方向得到 log 0.32，兩者只差 0.75 nat，沒有任何一個方向被封死。
+        中間一列把 0.75 nat 跟這個單位自己的觀測放在一起比：
+        一次共現觀測，也就是預期 0.2 條而實際看到 5 條，值約 12 nat，
+        長條長了十六倍。所以局部觀測想翻轉先驗給的方向，輕而易舉。
+        最下方是硬用的後果：把 0.68 當成 1、0.32 當成 0，
+        就有三成的機率整個單位的先後從一開始就反了，
+        而局部後驗看起來一樣自信，輸出裡看不出來。
+        讀法是：先驗只調初始傾向，它封不死方向，也不該封。</desc>
+
+  <text class="ttl zh" x="20" y="36">先後關係的先驗，為什麼只能是軟的</text>
+
+  <!-- ① 階段 G 給的是重疊的後驗 -->
+  <rect class="box" x="18" y="58" width="470" height="252" rx="8"/>
+  <text class="lbl bold zh" x="34" y="96">① 階段 G 給的不是排序</text>
+
+  <text class="tick zh" x="34" y="132">群 A ＝ 含節點 h 的變異　群 B ＝ 含節點 h′ 的變異</text>
+
+  <rect class="region" x="172" y="150" width="169" height="88"/>
+  <rect class="box ghost" x="172" y="150" width="169" height="88" rx="4"/>
+
+  <line class="conn hp1" x1="172" y1="176" x2="356" y2="176" style="stroke-width:4"/>
+  <line class="conn hp1" x1="172" y1="168" x2="172" y2="184"/>
+  <line class="conn hp1" x1="356" y1="168" x2="356" y2="184"/>
+  <circle class="mark hp1" cx="264" cy="176" r="7"/>
+  <text class="tick bold zh hp1" x="34" y="181">群 A</text>
+  <text class="tick mono hp1" x="368" y="181">0.42</text>
+
+  <line class="conn hp2" x1="116" y1="222" x2="341" y2="222" style="stroke-width:4"/>
+  <line class="conn hp2" x1="116" y1="214" x2="116" y2="230"/>
+  <line class="conn hp2" x1="341" y1="214" x2="341" y2="230"/>
+  <circle class="mark hp2" cx="229" cy="222" r="7"/>
+  <text class="tick bold zh hp2" x="34" y="227">群 B</text>
+  <text class="tick mono hp2" x="368" y="227">0.35</text>
+
+  <line class="axis" x1="50" y1="258" x2="458" y2="258"/>
+  <text class="tick mono mid" x="50" y="278">0</text>
+  <text class="tick mono mid" x="254" y="278">0.4</text>
+  <text class="tick mono mid" x="458" y="278">0.8</text>
+  <text class="tick bold zh accent" x="34" y="300">重疊這麼多，所以那是機率，不是事實</text>
+
+  <!-- ② 機率就是邊的先驗權重 -->
+  <rect class="box accent" x="512" y="58" width="470" height="252" rx="8"/>
+  <text class="lbl bold zh" x="528" y="96">② 那個機率就是這條邊的權重</text>
+
+  <circle class="cell clone1" cx="620" cy="176" r="24"/>
+  <circle class="cell clone2" cx="820" cy="176" r="24"/>
+  <text class="tick mono mid" x="620" y="181">h</text>
+  <text class="tick mono mid" x="820" y="181">h′</text>
+
+  <path class="conn hp1" d="M644,158 C696,132 736,132 780,152"
+        marker-end="url(#arrow)" style="stroke-width:4"/>
+  <text class="tick mono mid hp1" x="720" y="128">log 0.68</text>
+
+  <path class="conn hp2" d="M796,196 C744,222 704,222 660,204"
+        marker-end="url(#arrow)"/>
+  <text class="tick mono mid hp2" x="720" y="242">log 0.32</text>
+
+  <text class="tick zh" x="528" y="278">兩個方向只差 0.75 nat ——</text>
+  <text class="tick bold zh" x="528" y="298">沒有任何一個方向被封死</text>
+
+  <!-- 0.75 nat 有多大 -->
+  <rect class="box sunken" x="18" y="330" width="964" height="122" rx="8"/>
+  <text class="lbl bold zh" x="34" y="366">0.75 nat 有多大？跟這個單位自己的觀測比一下</text>
+
+  <text class="tick zh" x="34" y="400">先驗給的方向傾向</text>
+  <rect class="bar hp1" x="400" y="388" width="30" height="16" rx="3"/>
+  <text class="tick mono" x="442" y="401">0.75 nat</text>
+
+  <text class="tick zh" x="34" y="434">一次共現觀測（預期 0.2 條、實際 5 條）</text>
+  <rect class="bar somatic" x="400" y="422" width="480" height="16" rx="3"/>
+  <text class="tick mono" x="892" y="435">≈ 12 nat</text>
+
+  <!-- 硬用的後果 -->
+  <rect class="box bad" x="18" y="472" width="964" height="94" rx="8"/>
+  <text class="lbl bold zh bad" x="34" y="508">硬用的後果：錯了不會留下痕跡</text>
+  <text class="anno zh" x="34" y="540">把 0.68 當成 1、0.32 當成 0，就有三成的機率整個單位的先後從一開始就反了，而局部後驗看起來一樣自信。</text>
+</svg>

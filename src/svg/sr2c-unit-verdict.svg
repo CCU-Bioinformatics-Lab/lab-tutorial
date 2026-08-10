@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <title>一個單位定得下來什麼、定不下來什麼，以及每一項各由哪個旗標承接</title>
+  <desc>左格是這個單位定得下來的三件事，全部由該單位自己的分子決定：
+        有哪幾種狀態，這裡是全參考、只帶第一個變異、以及兩個雙變異狀態共四種；
+        誰在誰之前，只帶第一個變異的那個狀態是另外兩個的祖先；
+        以及每一種各佔多少分子，依序是 0.66、0.19、0.05、0.07。
+        三件事都落在「一個視窗、一條染色體拷貝」之內。
+        右格是同一個單位定不下來的四件事，每一項後面掛著承接它的旗標：
+        某一支對應到哪一個全域群，掛 UNLINKED_TO_GLOBAL；
+        分子比例換算成細胞比例是多少，缺純度與拷貝數，掛 CELL_SCALE_UNAVAILABLE；
+        有沒有第四支被錯誤地板吃掉，掛 FLOOR_LIMITED；
+        某個沒被觀測到的狀態是真的不存在還是沒抽到，掛 ORDER_UNRESOLVED。
+        最下方是這張圖的重點：旗標不是免責聲明，是欄位。
+        右格每一項都有名字，所以「這條流程對多少比例的資料拒絕作答」查得出來；
+        被沉默補齊的東西在統計量上是隱形的。</desc>
+
+  <text class="ttl zh" x="20" y="36">一個單位交出去的那一列，說了什麼、沒說什麼</text>
+
+  <!-- 定得下來 -->
+  <rect class="box ok" x="18" y="58" width="470" height="326" rx="8"/>
+  <text class="lbl bold zh ok" x="34" y="96">定得下來 —— 用它自己的分子</text>
+
+  <circle class="cell normal" cx="118" cy="152" r="20"/>
+  <circle class="cell tumor" cx="118" cy="222" r="20"/>
+  <circle class="cell clone1" cx="72" cy="296" r="20"/>
+  <circle class="cell clone2" cx="164" cy="296" r="20"/>
+  <line class="conn" x1="118" y1="172" x2="118" y2="202"/>
+  <line class="conn" x1="112" y1="241" x2="82" y2="277"/>
+  <line class="conn" x1="124" y1="241" x2="154" y2="277"/>
+  <text class="tick mono mid" x="118" y="157">000</text>
+  <text class="tick mono mid" x="118" y="227">100</text>
+  <text class="tick mono mid" x="72" y="301">110</text>
+  <text class="tick mono mid" x="164" y="301">101</text>
+
+  <text class="tick zh" x="228" y="146">有哪幾種狀態</text>
+  <text class="tick mono" x="228" y="170">000 · 100 · 110 · 101</text>
+  <text class="tick zh" x="228" y="216">誰在誰之前</text>
+  <text class="tick mono" x="228" y="240">100 → 110 · 100 → 101</text>
+  <text class="tick zh" x="228" y="286">各佔多少分子</text>
+  <text class="tick mono" x="228" y="310">.66 · .19 · .05 · .07</text>
+
+  <text class="tick bold zh" x="34" y="356">三件事都在「一個視窗、一條拷貝」之內 ——</text>
+  <text class="tick bold zh" x="34" y="376">沒有用到任何單位以外的東西</text>
+
+  <!-- 定不下來 -->
+  <rect class="box warn" x="512" y="58" width="470" height="326" rx="8"/>
+  <text class="lbl bold zh warn" x="528" y="96">定不下來 —— 每一項各有一個名字</text>
+
+  <text class="tick zh" x="528" y="140">110 那一支對應哪一個全域群？</text>
+  <text class="tick mono warn" x="546" y="164">UNLINKED_TO_GLOBAL</text>
+
+  <text class="tick zh" x="528" y="204">0.05 換算成細胞比例是多少？</text>
+  <text class="tick mono warn" x="546" y="228">CELL_SCALE_UNAVAILABLE</text>
+
+  <text class="tick zh" x="528" y="268">有沒有第四支被錯誤地板吃掉？</text>
+  <text class="tick mono warn" x="546" y="292">FLOOR_LIMITED</text>
+
+  <text class="tick zh" x="528" y="332">沒看到 011，是不存在還是沒抽到？</text>
+  <text class="tick mono warn" x="546" y="356">ORDER_UNRESOLVED</text>
+
+  <!-- 結論 -->
+  <rect class="box accent" x="18" y="404" width="964" height="82" rx="8"/>
+  <text class="lbl bold zh accent" x="34" y="438">旗標不是免責聲明，是欄位</text>
+  <text class="anno zh" x="34" y="470">右格每一項都有名字，所以「對多少比例的資料拒絕作答」查得出來；被沉默補齊的東西在統計量上是隱形的。</text>
+</svg>

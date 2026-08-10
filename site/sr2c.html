@@ -1804,208 +1804,98 @@ somatic calling 有既有的 truth set 與 precision／recall 曲線，
 兩者都必須是<b>軟</b>的：階段 G 的群指派本身有不確定度，
 把它當成硬性排序會讓局部推論繼承全域的錯誤而且不留痕跡。</p></div>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 990" class="dia-svg" role="img" aria-labelledby="sr2-two-topologies__title" aria-describedby="sr2-two-topologies__desc">
-  <title id="sr2-two-topologies__title">三份證據如何把相容的候選樹砍到只剩一棵：頻率譜給一棵部分決定的樹，兩個單位各給一個局部拓撲</title>
-  <desc id="sr2-two-topologies__desc">本圖延續前一個數值例，純度零點六、二倍體，A、B、C 的細胞比例是一點零零、
-        零點四零、零點四零，另加第四群 D，細胞比例零點二零，是 B 的後代。
-        上排是三份證據各自說了什麼。
-        第一份是 VAF 頻率譜。換算後只得到三群：一點零零、零點四零、零點二零，
-        其中零點四零那一群可能是兩群被併起來的。
-        依 pigeonhole 檢查，這三群能排出的樹有兩棵，圖上並排畫出：
-        一棵是 A 到 X 再到 D 的線性樹，一棵是 A 同時接到 X 與 D 的分支樹，兩棵都合法。
-        取兩棵的共同部分，就是頻率譜真正確定的東西：A 是根，X 在 A 之下。
-        未定的有兩件：D 掛在 A 之下還是掛在 X 之下，以及 X 是一群還是兩群。
-        所以頻率譜給的是一棵部分決定的樹，不是一棵完整的樹。
-        第二份是單位甲。它含有兩個變異 i 與 j，觀測到沒有分子同時帶有兩者，
-        所以兩者分屬兩群 P 與 Q，而且兩群互不包含。
-        這同時做了兩件事：把群數由三修正為四，並指出 P 與 Q 誰都不是誰的祖先。
-        第三份是單位乙。它含有兩個變異 p 與 q，觀測到帶 q 的分子全部也帶 p，
-        所以 q 所在的群巢狀於 p 所在的群之內，另附零點五零的比值。
-        中排說明目標函數的兩項各自負責什麼、又各自不負責什麼。
-        左邊是 beta 二項混合這一項，圖上畫的是三根峰各自的成分曲線：
-        中心由細胞比例決定，寬度是用途二量出來的常數，高度是該群所佔的變異比例。
-        這一項回答的是某個變異的讀數比較像哪一根峰，
-        它對峰與峰之間誰在誰之下完全沒有意見。
-        右邊是約束這一項，它把甲寫成兩個變異不可同群，把乙寫成樹上的一條有向邊。
-        這一項回答的是哪些變異不能同群、以及誰在誰之下，
-        它對峰落在哪裡完全沒有意見。
-        兩項回答的問題不重疊，這正是合起來能補齊、而任一邊單獨補不齊的原因。
-        下排是候選樹的數量如何被砍下來。只用頻率譜時群數估成三，候選兩棵，
-        而且群數本身是錯的。加入甲之後群數修正為四；在四群的狀態空間裡
-        若沒有任何關係約束，候選會有七棵，甲的互不包含把它砍成三棵。
-        再加入乙的巢狀關係，候選只剩一棵，也就是最右邊那棵樹。
-        最後標注：樹的形狀是唯一的，但那兩群頻率相同，
-        所以它們的標號可以整組對調，編號本來就是任意的。</desc>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580" class="dia-svg" role="img" aria-labelledby="sr2c-order-prior__title" aria-describedby="sr2c-order-prior__desc">
+  <title id="sr2c-order-prior__title">先後關係的先驗只能是軟的：階段 G 給的是重疊的後驗，不是一條排序</title>
+  <desc id="sr2c-order-prior__desc">左上格說明階段 G 交出來的東西。含節點 h 的那些變異被指派到群 A，
+        細胞比例的後驗中心是 0.42、區間 0.24 到 0.60；
+        含節點 h′ 的那些變異被指派到群 B，中心 0.35、區間 0.13 到 0.57。
+        兩個區間大幅重疊，重疊的那一段被標了出來。
+        所以「A 在 B 之前」不是一個事實，是一個機率，這裡是 0.68。
+        右上格把那個機率變成邊的先驗權重：由 h 指向 h′ 的邊得到 log 0.68，
+        反方向得到 log 0.32，兩者只差 0.75 nat，沒有任何一個方向被封死。
+        中間一列把 0.75 nat 跟這個單位自己的觀測放在一起比：
+        一次共現觀測，也就是預期 0.2 條而實際看到 5 條，值約 12 nat，
+        長條長了十六倍。所以局部觀測想翻轉先驗給的方向，輕而易舉。
+        最下方是硬用的後果：把 0.68 當成 1、0.32 當成 0，
+        就有三成的機率整個單位的先後從一開始就反了，
+        而局部後驗看起來一樣自信，輸出裡看不出來。
+        讀法是：先驗只調初始傾向，它封不死方向，也不該封。</desc>
 
-  <text class="ttl zh" x="20" y="38">三份證據，各補上樹的一部分</text>
-  <text class="anno zh" x="20" y="66">延續前例：ρ ＝ 0.60、二倍體、μ ＝ 1；A ＝ 1.00、B ＝ C ＝ 0.40，另加 D ＝ 0.20（B 的後代）。</text>
-  <line class="axis" x1="20" y1="86" x2="980" y2="86"/>
+  <text class="ttl zh" x="20" y="36">先後關係的先驗，為什麼只能是軟的</text>
 
-  <!-- ═══════════ ① 頻率譜 → 部分決定的樹 ═══════════ -->
-  <text class="lbl bold zh bad" x="20" y="118">① 頻率譜給的：<tspan class="bold">部分</tspan>的樹</text>
-  <rect class="box bad" x="20" y="134" width="310" height="330" rx="8"/>
+  <!-- ① 階段 G 給的是重疊的後驗 -->
+  <rect class="box" x="18" y="58" width="470" height="252" rx="8"/>
+  <text class="lbl bold zh" x="34" y="96">① 階段 G 給的不是排序</text>
 
-  <text class="tick zh" x="36" y="164">換算後得到三群：</text>
-  <text class="tick mono" x="36" y="190">c ＝ 1.00 ／ 0.40 ／ 0.20</text>
-  <text class="tick zh bad" x="36" y="212">（0.40 那一群可能是兩群併起來的）</text>
+  <text class="tick zh" x="34" y="132">群 A ＝ 含節點 h 的變異　群 B ＝ 含節點 h′ 的變異</text>
 
-  <text class="tick zh" x="36" y="244">pigeonhole 檢查後，<tspan class="bold">兩棵都合法</tspan>：</text>
+  <rect class="region" x="172" y="150" width="169" height="88"/>
+  <rect class="box ghost" x="172" y="150" width="169" height="88" rx="4"/>
 
-  <circle class="mark germline" cx="95" cy="272" r="13"/><text class="tick mid" x="95" y="278">A</text>
-  <path class="conn" d="M95,285 L95,301" marker-end="url(#arrow-sm)"/>
-  <circle class="mark ref" cx="95" cy="312" r="13"/><text class="tick mid" x="95" y="318">X</text>
-  <path class="conn" d="M95,325 L95,341" marker-end="url(#arrow-sm)"/>
-  <circle class="mark artifact" cx="95" cy="352" r="13"/><text class="tick mid" x="95" y="358">D</text>
-  <text class="tick bold mid" x="95" y="380">線性</text>
+  <line class="conn hp1" x1="172" y1="176" x2="356" y2="176" style="stroke-width:4"/>
+  <line class="conn hp1" x1="172" y1="168" x2="172" y2="184"/>
+  <line class="conn hp1" x1="356" y1="168" x2="356" y2="184"/>
+  <circle class="mark hp1" cx="264" cy="176" r="7"/>
+  <text class="tick bold zh hp1" x="34" y="181">群 A</text>
+  <text class="tick mono hp1" x="368" y="181">0.42</text>
 
-  <line class="guide muted" x1="170" y1="260" x2="170" y2="368"/>
+  <line class="conn hp2" x1="116" y1="222" x2="341" y2="222" style="stroke-width:4"/>
+  <line class="conn hp2" x1="116" y1="214" x2="116" y2="230"/>
+  <line class="conn hp2" x1="341" y1="214" x2="341" y2="230"/>
+  <circle class="mark hp2" cx="229" cy="222" r="7"/>
+  <text class="tick bold zh hp2" x="34" y="227">群 B</text>
+  <text class="tick mono hp2" x="368" y="227">0.35</text>
 
-  <circle class="mark germline" cx="245" cy="272" r="13"/><text class="tick mid" x="245" y="278">A</text>
-  <path class="conn" d="M236,282 L222,302" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M254,282 L268,302" marker-end="url(#arrow-sm)"/>
-  <circle class="mark ref" cx="215" cy="314" r="13"/><text class="tick mid" x="215" y="320">X</text>
-  <circle class="mark artifact" cx="275" cy="314" r="13"/><text class="tick mid" x="275" y="320">D</text>
-  <text class="tick bold mid" x="245" y="380">分支</text>
+  <line class="axis" x1="50" y1="258" x2="458" y2="258"/>
+  <text class="tick mono mid" x="50" y="278">0</text>
+  <text class="tick mono mid" x="254" y="278">0.4</text>
+  <text class="tick mono mid" x="458" y="278">0.8</text>
+  <text class="tick bold zh accent" x="34" y="300">重疊這麼多，所以那是機率，不是事實</text>
 
-  <text class="tick bold zh ok" x="36" y="410">✓ 已定：A 是根、X 在 A 之下</text>
-  <text class="tick bold zh bad" x="36" y="432">✗ 未定：D 掛在 A 還是 X 之下</text>
-  <text class="tick bold zh bad" x="36" y="454">✗ 未定：X 是一群，還是兩群</text>
+  <!-- ② 機率就是邊的先驗權重 -->
+  <rect class="box accent" x="512" y="58" width="470" height="252" rx="8"/>
+  <text class="lbl bold zh" x="528" y="96">② 那個機率就是這條邊的權重</text>
 
-  <!-- ═══════════ ② 單位甲 ═══════════ -->
-  <text class="lbl bold zh ok" x="350" y="118">② 單位甲給的：<tspan class="bold">分岔</tspan></text>
-  <rect class="box ok" x="350" y="134" width="310" height="330" rx="8"/>
+  <circle class="cell clone1" cx="620" cy="176" r="24"/>
+  <circle class="cell clone2" cx="820" cy="176" r="24"/>
+  <text class="tick mono mid" x="620" y="181">h</text>
+  <text class="tick mono mid" x="820" y="181">h′</text>
 
-  <text class="tick zh" x="366" y="164">兩個變異 i、j 落在同一個單位</text>
-  <rect class="read hp1" x="366" y="178" width="112" height="13" rx="6"/>
-  <circle class="mark somatic" cx="390" cy="184" r="5"/>
-  <rect class="read hp2" x="366" y="198" width="112" height="13" rx="6"/>
-  <circle class="mark somatic" cx="454" cy="204" r="5"/>
-  <text class="tick" x="488" y="189">帶 i 不帶 j</text>
-  <text class="tick" x="488" y="209">帶 j 不帶 i</text>
-  <rect class="box ghost bad" x="362" y="220" width="286" height="30" rx="6"/>
-  <text class="tick bold zh mid bad" x="505" y="240">沒有任何分子同時帶有兩者</text>
+  <path class="conn hp1" d="M644,158 C696,132 736,132 780,152"
+        marker-end="url(#arrow)" style="stroke-width:4"/>
+  <text class="tick mono mid hp1" x="720" y="128">log 0.68</text>
 
-  <text class="tick zh" x="366" y="286">局部拓撲：</text>
-  <text class="tick mid bad" x="515" y="286">互不包含</text>
-  <circle class="mark hp1" cx="470" cy="316" r="15"/><text class="tick mid" x="470" y="322">P</text>
-  <circle class="mark hp2" cx="560" cy="316" r="15"/><text class="tick mid" x="560" y="322">Q</text>
-  <path class="conn bad" d="M488,316 L542,316"/>
-  <path class="conn bad" d="M505,306 L525,326"/>
+  <path class="conn hp2" d="M796,196 C744,222 704,222 660,204"
+        marker-end="url(#arrow)"/>
+  <text class="tick mono mid hp2" x="720" y="242">log 0.32</text>
 
-  <text class="tick bold zh ok" x="366" y="378">它同時做了兩件事：</text>
-  <text class="tick zh" x="366" y="410">① 把 0.40 那一群拆開 → 群數 3 修正為 <tspan class="bold">4</tspan></text>
-  <text class="tick zh" x="366" y="440">② 指出 P 與 Q <tspan class="bold">誰都不是誰的祖先</tspan></text>
+  <text class="tick zh" x="528" y="278">兩個方向只差 0.75 nat ——</text>
+  <text class="tick bold zh" x="528" y="298">沒有任何一個方向被封死</text>
 
-  <!-- ═══════════ ③ 單位乙 ═══════════ -->
-  <text class="lbl bold zh ok" x="680" y="118">③ 單位乙給的：<tspan class="bold">一條線</tspan></text>
-  <rect class="box ok" x="680" y="134" width="300" height="330" rx="8"/>
+  <!-- 0.75 nat 有多大 -->
+  <rect class="box sunken" x="18" y="330" width="964" height="122" rx="8"/>
+  <text class="lbl bold zh" x="34" y="366">0.75 nat 有多大？跟這個單位自己的觀測比一下</text>
 
-  <text class="tick zh" x="696" y="164">兩個變異 p、q 落在同一個單位</text>
-  <rect class="read hp1" x="696" y="178" width="112" height="13" rx="6"/>
-  <circle class="mark somatic" cx="720" cy="184" r="5"/>
-  <rect class="read hp1" x="696" y="198" width="112" height="13" rx="6"/>
-  <circle class="mark somatic" cx="720" cy="204" r="5"/>
-  <circle class="mark artifact" cx="784" cy="204" r="5"/>
-  <text class="tick" x="818" y="189">只帶 p</text>
-  <text class="tick" x="818" y="209">p、q 都帶</text>
-  <rect class="box ghost ok" x="692" y="220" width="276" height="30" rx="6"/>
-  <text class="tick bold zh mid ok" x="830" y="240">帶 q 的分子<tspan class="bold">全部</tspan>也帶 p</text>
+  <text class="tick zh" x="34" y="400">先驗給的方向傾向</text>
+  <rect class="bar hp1" x="400" y="388" width="30" height="16" rx="3"/>
+  <text class="tick mono" x="442" y="401">0.75 nat</text>
 
-  <text class="tick zh" x="696" y="286">局部拓撲：</text>
-  <circle class="mark hp1" cx="830" cy="292" r="15"/><text class="tick mid" x="830" y="298">P</text>
-  <path class="conn thick" d="M830,308 L830,332" marker-end="url(#arrow-sm)"/>
-  <circle class="mark artifact" cx="830" cy="346" r="15"/><text class="tick mid" x="830" y="352">D</text>
+  <text class="tick zh" x="34" y="434">一次共現觀測（預期 0.2 條、實際 5 條）</text>
+  <rect class="bar somatic" x="400" y="422" width="480" height="16" rx="3"/>
+  <text class="tick mono" x="892" y="435">≈ 12 nat</text>
 
-  <text class="tick bold zh ok" x="696" y="410">D <tspan class="bold">巢狀</tspan>在 0.40 的其中一群之內</text>
-  <text class="tick zh" x="696" y="440">另附比值 ϱ ＝ 0.50（不需純度）</text>
-
-  <!-- ═══════════ 目標函數的兩項 ═══════════ -->
-  <line class="axis" x1="20" y1="496" x2="980" y2="496"/>
-  <text class="lbl bold zh" x="20" y="530">目標函數的兩項，各自只回答一半的問題</text>
-
-  <rect class="box sunken" x="20" y="546" width="470" height="204" rx="8"/>
-  <text class="lbl bold zh" x="40" y="578">第一項｜beta-binomial 混合</text>
-
-  <line class="axis" x1="52" y1="656" x2="316" y2="656"/>
-  <path class="conn muted" d="M70,656 C80,618 90,618 100,656"/>
-  <path class="conn muted" d="M120,656 C136,584 154,584 170,656"/>
-  <path class="conn muted" d="M232,656 C244,602 256,602 268,656"/>
-  <text class="tick mono mid" x="85"  y="674">0.06</text>
-  <text class="tick mono mid" x="145" y="674">0.12</text>
-  <text class="tick mono mid" x="250" y="674">0.30</text>
-  <circle class="mark somatic" cx="152" cy="656" r="6"/>
-  <text class="tick mid somatic" x="176" y="696">某個變異 a／d ＝ 6／50</text>
-
-  <text class="tick" x="332" y="606">中心 ＝ ρ·c／2</text>
-  <text class="tick" x="332" y="630">寬度 ＝ 用途二量到的</text>
-  <text class="tick" x="332" y="654">高度 ＝ 該群的變異占比</text>
-
-  <text class="tick bold zh bad" x="40" y="716">它<tspan class="bold">只</tspan>回答：這個變異的讀數比較像哪一根峰。</text>
-  <text class="tick bold zh bad" x="40" y="738">峰之間誰在誰之下，它<tspan class="bold">沒有意見</tspan>。</text>
-
-  <rect class="box sunken" x="510" y="546" width="470" height="204" rx="8"/>
-  <text class="lbl bold zh" x="530" y="578">第二項｜約束</text>
-
-  <text class="tick zh" x="530" y="616">甲 → 不可同群</text>
-  <circle class="mark hp1" cx="566" cy="654" r="14"/><text class="tick mid" x="566" y="660">i</text>
-  <text class="lbl mid bad" x="606" y="661">≠</text>
-  <circle class="mark hp2" cx="646" cy="654" r="14"/><text class="tick mid" x="646" y="660">j</text>
-
-  <text class="tick zh" x="726" y="616">乙 → 一條有向邊</text>
-  <circle class="mark hp1" cx="790" cy="638" r="13"/><text class="tick mid" x="790" y="644">P</text>
-  <path class="conn thick" d="M790,652 L790,672" marker-end="url(#arrow-sm)"/>
-  <circle class="mark artifact" cx="790" cy="684" r="13"/><text class="tick mid" x="790" y="690">D</text>
-
-  <text class="tick bold zh bad" x="530" y="716">它<tspan class="bold">只</tspan>回答：哪些不能同群、誰在誰之下。</text>
-  <text class="tick bold zh bad" x="530" y="738">峰落在哪裡，它<tspan class="bold">沒有意見</tspan>。</text>
-
-  <rect class="box ghost accent" x="20" y="762" width="960" height="32" rx="6"/>
-  <text class="tick bold zh mid" x="500" y="783">兩項回答的問題<tspan class="bold">不重疊</tspan> —— 這正是合起來補得齊、任一邊單獨補不齊的原因。</text>
-
-  <!-- ═══════════ 候選樹被砍到只剩一棵 ═══════════ -->
-  <line class="axis" x1="20" y1="820" x2="980" y2="820"/>
-  <text class="lbl bold zh" x="20" y="854">合起來：相容的候選樹被砍到只剩一棵</text>
-
-  <rect class="box bad" x="20" y="870" width="190" height="96" rx="8"/>
-  <text class="tick bold zh mid bad" x="115" y="894">只用頻率譜</text>
-  <text class="lbl bold mid bad" x="115" y="926">2 棵</text>
-  <text class="tick zh mid" x="115" y="952">而且 K ＝ 3 是錯的</text>
-
-  <path class="conn thick" d="M216,918 L272,918" marker-end="url(#arrow)"/>
-  <text class="tick bold zh mid" x="244" y="894">＋甲</text>
-
-  <rect class="box warn" x="278" y="870" width="222" height="96" rx="8"/>
-  <text class="tick bold zh mid warn" x="389" y="894">K 修正為 4，P ⊥ Q</text>
-  <text class="lbl bold mid warn" x="389" y="926">3 棵</text>
-  <text class="tick zh mid" x="389" y="952">（不加約束會是 7 棵）</text>
-
-  <path class="conn thick" d="M506,918 L562,918" marker-end="url(#arrow)"/>
-  <text class="tick bold zh mid" x="534" y="894">＋乙</text>
-
-  <rect class="box ok" x="568" y="870" width="176" height="96" rx="8"/>
-  <text class="tick bold zh mid ok" x="656" y="894">再加巢狀關係</text>
-  <text class="lbl bold mid ok" x="656" y="926">1 棵</text>
-  <text class="tick zh mid" x="656" y="952">唯一解</text>
-
-  <rect class="box ok" x="762" y="870" width="218" height="96" rx="8"/>
-  <circle class="mark germline" cx="812" cy="890" r="12"/><text class="tick mid" x="812" y="895">A</text>
-  <path class="conn thick" d="M804,900 L786,912" marker-end="url(#arrow-sm)"/>
-  <path class="conn thick" d="M820,900 L838,912" marker-end="url(#arrow-sm)"/>
-  <circle class="mark hp1" cx="778" cy="921" r="12"/><text class="tick mid" x="778" y="926">P</text>
-  <circle class="mark hp2" cx="846" cy="921" r="12"/><text class="tick mid" x="846" y="926">Q</text>
-  <path class="conn thick" d="M778,933 L778,944" marker-end="url(#arrow-sm)"/>
-  <circle class="mark artifact" cx="778" cy="952" r="12"/><text class="tick mid" x="778" y="957">D</text>
-  <text class="tick zh" x="866" y="916">形狀唯一；</text>
-  <text class="tick zh" x="866" y="938">P、Q 標號</text>
-  <text class="tick zh" x="866" y="960">可整組對調</text>
-</svg><figcaption><b>本節只用得到第①格</b>，而它就是先驗只能軟用的理由：
-頻率譜給出的不是一棵樹，是一棵<b>部分決定</b>的樹 ——
-三群在鴿籠之下有兩棵樹同時通過，圖上標了哪幾格已定、哪幾格未定。
-本規格拿來當先驗的，只有兩棵樹<b>共有</b>的那幾格；
-未定的留給局部觀測，不可以先挑一棵印出來當成已知。
-第②③格與最下方「砍到只剩一棵」是<b>前一篇</b>的做法 ——
-把局部拓撲當成約束送回去修正全域的群數與樹。
-那正是本節刻意不做的事：本規格的箭頭只有一個方向，局部不回饋全域。</figcaption></figure>
+  <!-- 硬用的後果 -->
+  <rect class="box bad" x="18" y="472" width="964" height="94" rx="8"/>
+  <text class="lbl bold zh bad" x="34" y="508">硬用的後果：錯了不會留下痕跡</text>
+  <text class="anno zh" x="34" y="540">把 0.68 當成 1、0.32 當成 0，就有三成的機率整個單位的先後從一開始就反了，而局部後驗看起來一樣自信。</text>
+</svg><figcaption>「軟」在這裡是一個可以算出來的量，不是態度。
+階段 G 交出來的兩個群，細胞比例的後驗<b>大幅重疊</b>，
+所以「A 在 B 之前」是機率 0.68 而不是事實；
+<math><msub><mi>ω</mi><mi>anc</mi></msub></math> 把這 0.68 換成邊的權重，兩個方向只差 0.75 nat。
+中間那兩條長條說明這有多小：一次共現觀測（預期 0.2 條、實際 5 條）約 12 nat，
+是它的十六倍 —— <b>局部觀測要翻轉先驗給的方向，一次就夠</b>。
+反過來，若把 0.68 當成 1 硬用，三成的單位先後從一開始就反了，
+而且局部後驗看起來一樣自信，輸出裡完全看不出來。</figcaption></figure>
 
 <p class="prose">為什麼不做完整的聯合模型：那正是前一篇與整合篇的規格。
 本規格<b>刻意</b>切斷回饋（cut posterior），換三件事 ——
@@ -2040,169 +1930,75 @@ somatic calling 有既有的 truth set 與 precision／recall 曲線，
 </table>
 </div>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 730" class="dia-svg" role="img" aria-labelledby="sr2-constraint-scope__title" aria-describedby="sr2-constraint-scope__desc">
-  <title id="sr2-constraint-scope__title">一條約束確定了什麼、沒有確定什麼：K 與群間關係被定下來，個別變異的歸屬仍不可辨識</title>
-  <desc id="sr2-constraint-scope__desc">上排是同一根峰的前後對照，該峰位於 VAF 零點一二，其中含約一千個變異，
-        圖上以四十個小圓示意。
-        左格是加入約束之前：整根峰由單一個成分解釋，一千個變異全部被指派到同一群，
-        小圓全部是實心的同一種顏色 —— 表面上全部有解，實際上是把兩群併成了一群。
-        中格是加入的那一條約束：變異 i 與變異 j 落在同一個分析單位裡，
-        觀測到沒有任何分子同時帶有兩者，於是 i 與 j 不可能屬於同一群。
-        右格是加入之後：峰的位置沒有變，但必須由兩個成分解釋，
-        i 被釘在其中一群、j 被釘在另一群，圖上分別是藍色與橘色的實心圓；
-        其餘九百九十八個轉為空心圓，因為兩個成分位於同一個位置，
-        它們對這兩個成分的似然完全相同，歸屬無從分辨 —— 空心代表誠實標記為未定。
-        下排是這條約束的收支：左邊列出被確定的三件事 ——
-        群數由一變二、兩群確實相異、以及樹由線性改為分支；
-        右邊列出沒有被確定的兩件事 ——
-        其餘九百九十八個變異各屬哪一群，以及兩群各自的大小比例。
-        最下方是結論：系統發生重建要的是群數與群間關係，不是逐一指派變異，
-        所以最稀疏的一對只有二十八條約束仍然足夠 ——
-        二十八條遠不足以指派一千個變異，但對「這兩個成分是不是同一個」
-        這種是非判定則已然充足。</desc>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="sr2c-unit-verdict__title" aria-describedby="sr2c-unit-verdict__desc">
+  <title id="sr2c-unit-verdict__title">一個單位定得下來什麼、定不下來什麼，以及每一項各由哪個旗標承接</title>
+  <desc id="sr2c-unit-verdict__desc">左格是這個單位定得下來的三件事，全部由該單位自己的分子決定：
+        有哪幾種狀態，這裡是全參考、只帶第一個變異、以及兩個雙變異狀態共四種；
+        誰在誰之前，只帶第一個變異的那個狀態是另外兩個的祖先；
+        以及每一種各佔多少分子，依序是 0.66、0.19、0.05、0.07。
+        三件事都落在「一個視窗、一條染色體拷貝」之內。
+        右格是同一個單位定不下來的四件事，每一項後面掛著承接它的旗標：
+        某一支對應到哪一個全域群，掛 UNLINKED_TO_GLOBAL；
+        分子比例換算成細胞比例是多少，缺純度與拷貝數，掛 CELL_SCALE_UNAVAILABLE；
+        有沒有第四支被錯誤地板吃掉，掛 FLOOR_LIMITED；
+        某個沒被觀測到的狀態是真的不存在還是沒抽到，掛 ORDER_UNRESOLVED。
+        最下方是這張圖的重點：旗標不是免責聲明，是欄位。
+        右格每一項都有名字，所以「這條流程對多少比例的資料拒絕作答」查得出來；
+        被沉默補齊的東西在統計量上是隱形的。</desc>
 
-  <text class="ttl zh" x="20" y="38">一條約束確定了什麼、沒有確定什麼</text>
-  <text class="anno zh" x="20" y="66">同一根峰（VAF ＝ 0.12，約 1,000 個變異）加入一條「不可同群」的前後對照。</text>
-  <line class="axis" x1="20" y1="86" x2="980" y2="86"/>
+  <text class="ttl zh" x="20" y="36">一個單位交出去的那一列，說了什麼、沒說什麼</text>
 
-  <!-- ══════════ 左：加入之前 ══════════ -->
-  <text class="lbl bold zh" x="20" y="120">加入之前</text>
-  <rect class="box plain" x="20" y="136" width="290" height="212" rx="8"/>
+  <!-- 定得下來 -->
+  <rect class="box ok" x="18" y="58" width="470" height="326" rx="8"/>
+  <text class="lbl bold zh ok" x="34" y="96">定得下來 —— 用它自己的分子</text>
 
-  <text class="tick zh mid" x="165" y="164">單一成分解釋整根峰</text>
+  <circle class="cell normal" cx="118" cy="152" r="20"/>
+  <circle class="cell tumor" cx="118" cy="222" r="20"/>
+  <circle class="cell clone1" cx="72" cy="296" r="20"/>
+  <circle class="cell clone2" cx="164" cy="296" r="20"/>
+  <line class="conn" x1="118" y1="172" x2="118" y2="202"/>
+  <line class="conn" x1="112" y1="241" x2="82" y2="277"/>
+  <line class="conn" x1="124" y1="241" x2="154" y2="277"/>
+  <text class="tick mono mid" x="118" y="157">000</text>
+  <text class="tick mono mid" x="118" y="227">100</text>
+  <text class="tick mono mid" x="72" y="301">110</text>
+  <text class="tick mono mid" x="164" y="301">101</text>
 
-  <!-- 40 個示意變異：全部同一群 -->
-  <g>
-    <circle class="mark somatic" cx="52" cy="196" r="7"/>
-    <circle class="mark somatic" cx="80" cy="196" r="7"/>
-    <circle class="mark somatic" cx="108" cy="196" r="7"/>
-    <circle class="mark somatic" cx="136" cy="196" r="7"/>
-    <circle class="mark somatic" cx="164" cy="196" r="7"/>
-    <circle class="mark somatic" cx="192" cy="196" r="7"/>
-    <circle class="mark somatic" cx="220" cy="196" r="7"/>
-    <circle class="mark somatic" cx="248" cy="196" r="7"/>
-    <circle class="mark somatic" cx="276" cy="196" r="7"/>
-    <circle class="mark somatic" cx="52" cy="222" r="7"/>
-    <circle class="mark somatic" cx="80" cy="222" r="7"/>
-    <circle class="mark somatic" cx="108" cy="222" r="7"/>
-    <circle class="mark somatic" cx="136" cy="222" r="7"/>
-    <circle class="mark somatic" cx="164" cy="222" r="7"/>
-    <circle class="mark somatic" cx="192" cy="222" r="7"/>
-    <circle class="mark somatic" cx="220" cy="222" r="7"/>
-    <circle class="mark somatic" cx="248" cy="222" r="7"/>
-    <circle class="mark somatic" cx="276" cy="222" r="7"/>
-    <circle class="mark somatic" cx="52" cy="248" r="7"/>
-    <circle class="mark somatic" cx="80" cy="248" r="7"/>
-    <circle class="mark somatic" cx="108" cy="248" r="7"/>
-    <circle class="mark somatic" cx="136" cy="248" r="7"/>
-    <circle class="mark somatic" cx="164" cy="248" r="7"/>
-    <circle class="mark somatic" cx="192" cy="248" r="7"/>
-    <circle class="mark somatic" cx="220" cy="248" r="7"/>
-    <circle class="mark somatic" cx="248" cy="248" r="7"/>
-    <circle class="mark somatic" cx="276" cy="248" r="7"/>
-  </g>
-  <text class="tick mid" x="165" y="278">27 個小圓示意約 1,000 個變異</text>
+  <text class="tick zh" x="228" y="146">有哪幾種狀態</text>
+  <text class="tick mono" x="228" y="170">000 · 100 · 110 · 101</text>
+  <text class="tick zh" x="228" y="216">誰在誰之前</text>
+  <text class="tick mono" x="228" y="240">100 → 110 · 100 → 101</text>
+  <text class="tick zh" x="228" y="286">各佔多少分子</text>
+  <text class="tick mono" x="228" y="310">.66 · .19 · .05 · .07</text>
 
-  <text class="tick bold zh mid bad" x="165" y="306">估出 K ＝ 1（此峰）</text>
-  <text class="tick zh mid" x="165" y="330">1,000 個全部有解 —— 但併成一群</text>
+  <text class="tick bold zh" x="34" y="356">三件事都在「一個視窗、一條拷貝」之內 ——</text>
+  <text class="tick bold zh" x="34" y="376">沒有用到任何單位以外的東西</text>
 
-  <path class="conn" d="M318,242 L352,242" marker-end="url(#arrow)"/>
+  <!-- 定不下來 -->
+  <rect class="box warn" x="512" y="58" width="470" height="326" rx="8"/>
+  <text class="lbl bold zh warn" x="528" y="96">定不下來 —— 每一項各有一個名字</text>
 
-  <!-- ══════════ 中：那一條約束 ══════════ -->
-  <text class="lbl bold zh ok" x="360" y="120">加入的那一條約束</text>
-  <rect class="box ok" x="360" y="136" width="270" height="212" rx="8"/>
+  <text class="tick zh" x="528" y="140">110 那一支對應哪一個全域群？</text>
+  <text class="tick mono warn" x="546" y="164">UNLINKED_TO_GLOBAL</text>
 
-  <text class="tick zh" x="376" y="164">i 與 j 落在<tspan class="bold">同一個單位</tspan>裡</text>
+  <text class="tick zh" x="528" y="204">0.05 換算成細胞比例是多少？</text>
+  <text class="tick mono warn" x="546" y="228">CELL_SCALE_UNAVAILABLE</text>
 
-  <!-- 兩條分子，各只帶一個 -->
-  <rect class="read hp1" x="376" y="182" width="112" height="14" rx="7"/>
-  <circle class="mark somatic" cx="404" cy="189" r="6"/>
-  <text class="tick" x="496" y="194">帶 i，不帶 j</text>
+  <text class="tick zh" x="528" y="268">有沒有第四支被錯誤地板吃掉？</text>
+  <text class="tick mono warn" x="546" y="292">FLOOR_LIMITED</text>
 
-  <rect class="read hp2" x="376" y="210" width="112" height="14" rx="7"/>
-  <circle class="mark somatic" cx="460" cy="217" r="6"/>
-  <text class="tick" x="496" y="222">帶 j，不帶 i</text>
+  <text class="tick zh" x="528" y="332">沒看到 011，是不存在還是沒抽到？</text>
+  <text class="tick mono warn" x="546" y="356">ORDER_UNRESOLVED</text>
 
-  <rect class="box ghost bad" x="372" y="234" width="246" height="40" rx="6"/>
-  <text class="tick bold zh bad" x="384" y="259">沒有任何分子同時帶有兩者</text>
-
-  <text class="lbl mono mid" x="495" y="300">z_i ≠ z_j</text>
-  <text class="tick zh mid" x="495" y="330">兩者不可能屬於同一群</text>
-
-  <path class="conn" d="M638,242 L672,242" marker-end="url(#arrow)"/>
-
-  <!-- ══════════ 右：加入之後 ══════════ -->
-  <text class="lbl bold zh" x="680" y="120">加入之後</text>
-  <rect class="box plain" x="680" y="136" width="300" height="212" rx="8"/>
-
-  <text class="tick zh mid" x="830" y="164">兩個成分，位置仍然相同</text>
-
-  <!-- 同一批圓：只有 i 與 j 被釘住 -->
-  <g>
-    <circle class="mark hp1" cx="712" cy="196" r="7"/>
-    <circle class="mark ref" cx="740" cy="196" r="7"/>
-    <circle class="mark ref" cx="768" cy="196" r="7"/>
-    <circle class="mark ref" cx="796" cy="196" r="7"/>
-    <circle class="mark ref" cx="824" cy="196" r="7"/>
-    <circle class="mark ref" cx="852" cy="196" r="7"/>
-    <circle class="mark ref" cx="880" cy="196" r="7"/>
-    <circle class="mark ref" cx="908" cy="196" r="7"/>
-    <circle class="mark hp2" cx="936" cy="196" r="7"/>
-    <circle class="mark ref" cx="712" cy="222" r="7"/>
-    <circle class="mark ref" cx="740" cy="222" r="7"/>
-    <circle class="mark ref" cx="768" cy="222" r="7"/>
-    <circle class="mark ref" cx="796" cy="222" r="7"/>
-    <circle class="mark ref" cx="824" cy="222" r="7"/>
-    <circle class="mark ref" cx="852" cy="222" r="7"/>
-    <circle class="mark ref" cx="880" cy="222" r="7"/>
-    <circle class="mark ref" cx="908" cy="222" r="7"/>
-    <circle class="mark ref" cx="936" cy="222" r="7"/>
-    <circle class="mark ref" cx="712" cy="248" r="7"/>
-    <circle class="mark ref" cx="740" cy="248" r="7"/>
-    <circle class="mark ref" cx="768" cy="248" r="7"/>
-    <circle class="mark ref" cx="796" cy="248" r="7"/>
-    <circle class="mark ref" cx="824" cy="248" r="7"/>
-    <circle class="mark ref" cx="852" cy="248" r="7"/>
-    <circle class="mark ref" cx="880" cy="248" r="7"/>
-    <circle class="mark ref" cx="908" cy="248" r="7"/>
-    <circle class="mark ref" cx="936" cy="248" r="7"/>
-  </g>
-  <text class="tick mid hp1" x="712" y="182">i</text>
-  <text class="tick mid hp2" x="936" y="182">j</text>
-  <text class="tick mid" x="830" y="278">實心 ＝ 已釘住 2 個　空心 ＝ 未定 998 個</text>
-
-  <text class="tick bold zh mid ok" x="830" y="306">K ＝ 2（此峰）</text>
-  <text class="tick zh mid" x="830" y="330">但只有 2 個變異的歸屬被決定</text>
-
-  <!-- ══════════ 下：收支 ══════════ -->
-  <line class="axis" x1="20" y1="382" x2="980" y2="382"/>
-
-  <rect class="box ok" x="20" y="404" width="470" height="182" rx="8"/>
-  <text class="lbl bold zh ok" x="40" y="436">確定了這三件事</text>
-  <text class="anno zh" x="40" y="470">① 此峰的成分數由 1 變成 2</text>
-  <text class="anno zh" x="40" y="500">② 這兩個成分<tspan class="bold">確實相異</tspan>，不是同一群的雜訊</text>
-  <text class="anno zh" x="40" y="530">③ 樹的拓撲由線性改為分支</text>
-  <text class="tick zh" x="40" y="562">—— 三件都是<tspan class="bold">群層級</tspan>的性質</text>
-
-  <rect class="box bad" x="510" y="404" width="470" height="182" rx="8"/>
-  <text class="lbl bold zh bad" x="530" y="436">沒有確定這兩件事</text>
-  <text class="anno zh" x="530" y="470">① 其餘 998 個變異各屬哪一群</text>
-  <text class="anno zh" x="530" y="500">② 兩群各自佔多少（π_B 與 π_C 的分配）</text>
-  <text class="tick zh" x="530" y="532">兩個成分的 θ 相等，所以那 998 個對它們的</text>
-  <text class="tick zh" x="530" y="556">似然完全相同 —— 除非各自另有約束連到 i 或 j</text>
-
-  <rect class="box ghost accent" x="20" y="606" width="960" height="98" rx="8"/>
-  <text class="lbl bold zh" x="40" y="638">系統發生重建要的是「有幾群、群間什麼關係」，不是逐一指派變異。</text>
-  <text class="anno zh" x="40" y="666">所以最稀疏的一對只有 28 個單位仍然足夠 —— 28 個遠不足以指派 1,000 個變異，</text>
-  <text class="anno zh" x="40" y="692">但對「這兩個成分是不是同一個」這個是非判定則已然充足。</text>
-</svg><figcaption>圖上畫的是<b>前一篇</b>的算法：一個單位告訴全域模型
-「<math><mi>i</mi></math> 與 <math><mi>j</mi></math> 不可同群」之後，那根峰的成分數由 1 變成 2、拓撲由線性改為分支，
-但同一根峰裡另外 998 個變異各屬哪一群、兩群各佔多少，<b>完全沒有被決定</b>。
-本規格不把約束送回全域（見上一節），所以左右兩欄的內容不一樣，
-但<b>形狀一樣</b>，而且這個形狀就是本節的輸出語義：
-一個單位定得下來的是狀態集合與它們的先後，定不下來的是
-「這一支對應哪一個全域群」與「這些分子來自哪一群細胞」。
-旗標的作用，就是讓右欄那些沒定下來的東西<b>出現在輸出裡</b>，而不是被沉默地補齊。</figcaption></figure>
+  <!-- 結論 -->
+  <rect class="box accent" x="18" y="404" width="964" height="82" rx="8"/>
+  <text class="lbl bold zh accent" x="34" y="438">旗標不是免責聲明，是欄位</text>
+  <text class="anno zh" x="34" y="470">右格每一項都有名字，所以「對多少比例的資料拒絕作答」查得出來；被沉默補齊的東西在統計量上是隱形的。</text>
+</svg><figcaption>把上表讀成一張對照：左格三件事全部由該單位自己的分子定出來，
+右格四件事它定不下來 —— 而<b>每一項各對應上表的一個旗標</b>。
+兩格的分界就是第二節那條範圍：問題只要越出「一個視窗、一條拷貝」，
+答案就不在左格。這也是為什麼旗標必須是欄位而不是註解：
+右格每一項都有名字，「這條流程對多少比例的資料拒絕作答」才查得出來。</figcaption></figure>
 
 <p class="prose"><code>REFINES_GLOBAL</code> 是這條路線的<b>操作型定義</b>：
 「比全域方法解析度高」這句話在這裡等於「有多少個單位掛上這個旗標，
