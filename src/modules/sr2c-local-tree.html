@@ -71,6 +71,10 @@
 <p class="prose">「全域方法犧牲了局部解析度」這句話如果只是印象，就沒有價值。
 以下把它拆成三條各自可檢驗的敘述。</p>
 
+{{svg:sr2-vaf-route | [wide] 這是被論證針對的那一系：觀測進入模型的唯一形式是每個變異的邊際
+{{m: (a_m,d_m)}} 與該處拷貝數。下面三條的前提就是這張圖 ——
+凡不符合這張圖的方法（例如把成對共現也寫進似然的 PairClone／TreeClone），三條都不適用。}}
+
 <p class="prose"><b>其一：等值 CCF 的兩支 lineage 不可辨識，這是可以證的。</b>
 設一個估計器的似然只透過每個變異的邊際計數 {{m: (a_m,d_m)}} 與該處拷貝數依賴資料。
 若兩個 clone 的 CCF 相同，則它們給出的 {{m: θ}} 相同，
@@ -92,12 +96,72 @@
 同樣那三個變異，若三者共現的狀態在 20 條跨越分子中出現 5 條，
 對照就地估到的錯誤地板 0.01，對數似然比約 12 nats。
 證據量的差別不來自資料量 —— 兩條路線看的是同一批 read ——
-而來自<b>共現這個統計量在全域似然裡沒有可以放的位置</b>。</p>
+而來自<b>它們被摘要成不同的統計量</b>。</p>
 
-{{svg:sr2c-evidence-budget | [wide] 兩欄用的是同一批 read、同一組三個變異。
-左欄把它們摘要成三個邊際計數，右欄摘要成一張共現表。
-1.3 對 8.0 是「開不出來」，11.9 對地板是「分得出來」——
-中間的差距是摘要方式造成的，不是資料量。}}
+{{svg:sr2c-evidence-budget | [wide] 三個數字畫在同一根以 nats 為單位的尺上，所以可以直接比較。
+垂直虛線是「在頻率譜上多開一群」要付的代價。
+同一組三個變異，摘要成邊際計數時停在門檻左邊很遠處，摘要成共現時遠遠越過。
+最下面那行是這張圖必須自帶的但書，見下一小節。}}
+
+<h3>但這條論證對 PairClone／TreeClone <b>不</b>成立</h3>
+
+<p class="prose">上面三條有一個共同的前提：<b>估計器的似然只透過每個變異的邊際計數依賴資料</b>。
+PyClone、SciClone、PhyloWGS、Pairtree、DPClust、CliP、MOBSTER 這一系滿足這個前提，
+而它們正是這個領域被系統性評比的那一群。<b>但 PairClone 與 TreeClone 不滿足。</b></p>
+
+<p class="prose">PairClone 直接對「落在同一條短讀上的一對鄰近 SNV」建模，
+其基因型是一個 {{m: 2 × 2}} 矩陣（兩條 haplotype × 兩個位點），
+所以它<b>本來就帶著相位</b>；TreeClone 再加上一個樹的先驗，輸出 subclone 系統發生。
+換句話說，<b>它們把共現這條通道寫進了全域似然，而且明說相位資訊在某些情況下是關鍵</b>。
+對它們而言：其一那個「只有邊際」的前提不成立；
+其二那個代價與證據不對等也不成立 —— 共現進來之後，三個變異提供的就不是 0.43 nats；
+其三更是直接被推翻。<b>面對這兩篇，上面整段論證失效。</b></p>
+
+<h4>剩下的差別是通道的<b>寬度</b>，不是有沒有這條通道</h4>
+
+<p class="prose">真正的差別在於：成對共現要求兩個 sSNV 落在<b>同一條讀序</b>上，
+而短讀與長讀的跨距差兩個數量級。以 Poisson 估一個 sSNV 有伴的機率：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>讀長</th><th>5／Mb</th><th>50／Mb</th><th>來源</th></tr></thead>
+<tbody>
+<tr><td>短讀 300 bp</td><td>約 0.15%</td><td>約 1.5%</td><td>{{m: 1−e^{−λL}}}，{{m: L=300}}</td></tr>
+<tr><td>長讀 20 kb（單條）</td><td>約 9.5%</td><td>約 63%</td><td>同式，{{m: L=20{,}000}}</td></tr>
+<tr><td>長讀 ＋ 傳遞連鎖（實測）</td><td colspan="2"><b>40.5% – 98.1%</b></td><td>七個 ONT 資料集，見第二節</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">所以正確的說法不是「全域方法看不到共現」，而是：
+<b>在短讀上這條通道幾乎是空的 —— 能用的位點對佔全部 sSNV 不到 2% ——
+所以它改變不了全域答案；長讀把同一條通道撐開兩個數量級之後，
+它才多到值得為它定義一個不同的估計目標。</b>
+PairClone／TreeClone 開的是同一扇門，只是門後幾乎沒有東西。</p>
+
+<p class="prose">在這個修正之後，本規格相對於它們仍然不同的地方只剩四處，而且都比原本的說法弱：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>差異</th><th>強度</th></tr></thead>
+<tbody>
+<tr><td>可用的位點對多兩個數量級，且 {{m: k}} 可變（不限於成對）</td><td><b>強</b>：可量測，見上表</td></tr>
+<tr><td>交付物是逐單位目錄 ＋ 旗標 ＋ 打散虛無分布，不是一個全域後驗</td><td>中：是「報告什麼」的差別，不是「能不能推論」的差別</td></tr>
+<tr><td>第二個交付物（給 caller 的特徵）完全在它們的範圍之外</td><td><b>強</b>：不重疊</td></tr>
+<tr><td>整條分子的家族誤標通道在短讀上不存在</td><td>中：穩健性，不是估計目標</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="guardrail">
+<p class="guardrail__hd">成文前必須查證的一點</p>
+<p class="prose">PairClone 的 {{m: 2 × 2}} 基因型已經把一對位點的兩條染色體拷貝分開表示，
+所以它<b>可能已經</b>處理了「trans 與分支演化長得一樣」這個混淆
+（本教材的第 14 條警告）。若確實如此，
+那麼「以 germline 相位切開單位」這一點就<b>不是</b>本規格相對於它們的差異，
+只是換一種實作方式。上表刻意沒有把它列為差異，直到讀完原文為止。
+同樣要查的還有 CliP、LICHeE，以及任何以 read linkage 輔助 subclone 重建的後續工作。</p>
+</div>
 
 <p class="prose">必須同時說清楚反面：<b>對全域方法自己的目標而言，邊際幾乎就是充分的。</b>
 細胞層級的群比例本來就是一個跨全基因體的量，用上萬個變異的邊際去估它，
@@ -934,7 +998,7 @@ solver 122.03 秒、census 58.96 秒、峰值常駐記憶體 356.7 MB、
 <tbody>
 <tr><td>由邊際 VAF 與拷貝數重建細胞層級 clone tree</td><td>PyClone、SciClone、PhyloWGS、Pairtree、DPClust</td><td>不可宣稱全域樹準確度提升</td></tr>
 <tr><td>把中性演化的尾巴與真正的 subclone 分開</td><td>MOBSTER</td><td>不可宣稱首次處理「頻率群集不等於 clone」</td></tr>
-<tr><td>以<b>成對</b>位點的分子狀態建 subclone 與樹</td><td>PairClone、TreeClone</td><td>不可宣稱多位點共現本身為新意</td></tr>
+<tr><td>以<b>成對</b>位點的分子狀態（含相位）建 subclone 與樹</td><td>PairClone、TreeClone</td><td><b>不可宣稱把共現寫進似然為新意，也不可宣稱全域方法只吃邊際</b> —— 差別在可用位點對的數量級</td></tr>
 <tr><td>相位輔助的等位／subclonal 拷貝數</td><td>Battenberg、Refphase、HATCHet2</td><td>不可宣稱 phased CN 為新意</td></tr>
 <tr><td>somatic caller 使用 germline 相位通道</td><td>ClairS、DeepSomatic</td><td><b>不可宣稱單倍型感知呼叫為新意</b> —— 第 1 層是基準不是貢獻</td></tr>
 </tbody>
@@ -1028,9 +1092,14 @@ ClairS 的相位通道停在兩條 germline 單倍型這一層。</p>
 <li><b>與整合篇的關係尚未決定。</b>本規格刻意切斷回饋，整合篇則走完整聯合。
 兩者不是替代關係，但如果聯合模型可行，本規格的局部後驗應該是它的一個近似 ——
 這個近似有多差，沒有評估。</li>
-<li><b>「首次」尚不可用。</b>PairClone、TreeClone、Pairtree、CliP、LICHeE 與
-以 read linkage 輔助 subclone 的既有工作都需要系統性檢索之後，
-才能界定本頁列出的那兩處候選新意是否真的空著。</li>
+<li><b>「首次」尚不可用，而且門檻比原本以為的高。</b>PairClone 與 TreeClone
+已經把成對共現與相位寫進全域似然，所以候選新意不能再宣稱在「使用共現」這件事上，
+只能落在「可用位點對多兩個數量級、{{m: k}} 可變、逐單位交付」這幾點。
+Pairtree、CliP、LICHeE 與任何以 read linkage 輔助 subclone 的後續工作仍待系統檢索。</li>
+<li><b>短讀成對共現的實際產量沒有實測過。</b>上表那個 0.15%–1.5% 是 Poisson 估計，
+不是量出來的；PairClone／TreeClone 論文用的資料集實際有幾對可用，
+以及它們在那個產量下對全域結論的改變幅度有多大，會直接決定
+「長讀多兩個數量級」這句話值多少。這是說服審稿人最需要的一個數字，目前沒有。</li>
 </ul>
 
 <h3>原始文獻與程式碼</h3>
