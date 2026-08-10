@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
+  <title>單倍型標籤的五個值，以及視窗如何由讀序連鎖的傳遞閉包長出來</title>
+  <desc>上排三格說明體細胞單倍型標記輸出的標籤詞彙恰好只有五個值。
+        左格是 germline 的兩條：HP1 與 HP2，它們是定相軟體給的兩條單倍型，
+        標號只在這個 phase set 內有效。
+        中格是可歸因的體細胞改變：HP1-1 與 HP2-1，
+        表示該分子的體細胞改變可歸因於第一個數字所指的那條單倍型，詞彙到此為止。
+        右格是無法歸因的 HP3：兩條單倍型都歸不上去，
+        所以「一個單位只看得到一條染色體拷貝」這個假設對它並不成立。
+        中排說明視窗的定義：在同一個 phase set 內，
+        只要有某一條讀序同時覆蓋至少兩個體細胞變異，該段就構成一個視窗；
+        若另一條讀序疊到已連鎖的位點又碰到新的位點，兩段就合併成更長的視窗。
+        圖中左邊三條讀序彼此重疊，把五個位點連成一個視窗；
+        右邊兩條之中，一條連起兩個位點形成第二個視窗，另一條只覆蓋單一位點因而沒有連鎖。
+        因此位點數 k 數的是位點而不是讀序，一個由數條讀序接起來的視窗可能一條全跨分子都沒有。
+        最下方是兩件容易被誤讀的事：
+        後綴不是獲得序列，1-1 是一個標籤而不是「1 再加一步」，不認得的標籤一律排除；
+        搜尋成本由 q 決定而不是 k，q 是該家族內真的有變化的位點數，恆有 q 小於等於 k。</desc>
+
+  <text class="ttl zh" x="20" y="36">標籤只有五個值，視窗由讀序連鎖長出來</text>
+
+  <!-- 標籤詞彙 -->
+  <rect class="box" x="18" y="56" width="310" height="194" rx="8"/>
+  <text class="lbl bold zh" x="34" y="92">germline 兩條</text>
+  <rect class="box plain" x="34" y="110" width="90" height="36" rx="6"/>
+  <rect class="box plain" x="140" y="110" width="90" height="36" rx="6"/>
+  <text class="tick mono mid" x="79" y="133">HP1</text>
+  <text class="tick mono mid" x="185" y="133">HP2</text>
+  <text class="tick zh" x="34" y="176">定相軟體給的兩條</text>
+  <text class="tick zh" x="34" y="204">單倍型，標號只在</text>
+  <text class="tick zh" x="34" y="232">這個 phase set 內有效</text>
+
+  <rect class="box" x="345" y="56" width="310" height="194" rx="8"/>
+  <text class="lbl bold zh" x="361" y="92">可歸因的體細胞改變</text>
+  <rect class="box plain" x="361" y="110" width="110" height="36" rx="6"/>
+  <rect class="box plain" x="487" y="110" width="110" height="36" rx="6"/>
+  <text class="tick mono mid" x="416" y="133">HP1-1</text>
+  <text class="tick mono mid" x="542" y="133">HP2-1</text>
+  <text class="tick zh" x="361" y="176">體細胞改變可歸因於</text>
+  <text class="tick zh" x="361" y="204">第一個數字那條單倍型</text>
+  <text class="tick zh" x="361" y="232">詞彙就到此為止</text>
+
+  <rect class="box warn" x="672" y="56" width="310" height="194" rx="8"/>
+  <text class="lbl bold zh warn" x="688" y="92">無法歸因</text>
+  <rect class="box plain" x="688" y="110" width="90" height="36" rx="6"/>
+  <text class="tick mono mid" x="733" y="133">HP3</text>
+  <text class="tick zh" x="688" y="176">兩條都歸不上去</text>
+  <text class="tick zh warn" x="688" y="204">「一個單位只看得到</text>
+  <text class="tick zh warn" x="688" y="232">一條拷貝」對它不成立</text>
+
+  <!-- 視窗 -->
+  <rect class="box accent" x="18" y="270" width="964" height="200" rx="8"/>
+  <text class="lbl bold zh" x="34" y="304">視窗 ＝ 同一個 phase set 內、讀序連鎖的傳遞閉包</text>
+
+  <rect class="read hp1" x="100" y="318" width="110" height="14" rx="6"/>
+  <rect class="read hp1" x="160" y="336" width="200" height="14" rx="6"/>
+  <rect class="read hp1" x="290" y="354" width="150" height="14" rx="6"/>
+  <rect class="read hp1" x="680" y="318" width="120" height="14" rx="6"/>
+  <rect class="read hp0" x="840" y="336" width="70" height="14" rx="6"/>
+
+  <line class="axis" x1="40" y1="386" x2="960" y2="386"/>
+  <circle class="mark somatic" cx="120" cy="386" r="5"/>
+  <circle class="mark somatic" cx="180" cy="386" r="5"/>
+  <circle class="mark somatic" cx="300" cy="386" r="5"/>
+  <circle class="mark somatic" cx="340" cy="386" r="5"/>
+  <circle class="mark somatic" cx="420" cy="386" r="5"/>
+  <circle class="mark somatic" cx="700" cy="386" r="5"/>
+  <circle class="mark somatic" cx="760" cy="386" r="5"/>
+  <circle class="mark somatic" cx="860" cy="386" r="5"/>
+
+  <line class="axis accent" x1="100" y1="406" x2="440" y2="406"/>
+  <line class="axis accent" x1="680" y1="406" x2="800" y2="406"/>
+
+  <text class="tick mono mid" x="270" y="428">W₁ · k=5</text>
+  <text class="tick mono mid" x="740" y="428">W₂ · k=2</text>
+  <text class="tick zh" x="826" y="428">沒有連鎖</text>
+  <text class="tick zh" x="34" y="456">k 數的是位點不是 read —— 一個由數條 read 接起來的視窗，可能一條全跨分子都沒有。</text>
+
+  <!-- 兩件會被誤讀的事 -->
+  <rect class="box bad" x="18" y="490" width="964" height="110" rx="8"/>
+  <text class="lbl bold zh bad" x="34" y="524">兩件會被誤讀的事</text>
+  <text class="anno zh" x="34" y="556">後綴不是獲得序列：1-1 是一個標籤，不是「1 再加一步」；不認得的標籤一律排除。</text>
+  <text class="anno zh" x="34" y="584">搜尋成本由 q 決定不是 k：q 是該家族內真的有變化的位點數，恆有 q ≤ k。</text>
+</svg>

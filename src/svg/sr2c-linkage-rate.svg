@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
+  <title>落入任一視窗的體細胞變異比例，在七個資料集之間差超過兩倍</title>
+  <desc>七條橫向長條，每條是一個資料集，長度是該資料集中落入任一分析視窗的
+        體細胞單核苷酸變異位點比例，右側另列該資料集的變異總數。
+        由低到高分別是：HCC1395_NYGC 四成零五、HCC1395_HKU 四成五七、
+        H1437 六成九四、H2009 九成二五、HCC1937 九成七七、HCC1954 九成七七、
+        COLO829 九成八一。最低與最高之間相差超過兩倍，而且不依癌別排序：
+        四個乳癌資料集自己就橫跨了幾乎整個範圍。
+        最前面兩條是同一株細胞株經過兩條不同流程的結果，兩者只差 5.2 個百分點，
+        所以其他資料集之間五十個百分點以上的落差不是技術雜訊。
+        因此連鎖率必須逐樣本先算再決定要不要跑，它是分層報告的第一個分層變數，
+        而不是事後的說明。</desc>
+
+  <text class="ttl zh" x="20" y="36">連鎖率才是閘門，而它逐樣本差很多</text>
+
+  <text class="tick bold zh" x="34" y="64">資料集</text>
+  <text class="tick bold zh" x="250" y="64">落入任一視窗的 sSNV 位點比例</text>
+  <text class="tick bold zh" x="820" y="64">比例</text>
+  <text class="tick bold zh end" x="980" y="64">sSNV 總數</text>
+
+  <rect class="bar warn" x="250" y="83" width="227" height="22" rx="4"/>
+  <text class="tick mono" x="34" y="100">HCC1395_NYGC</text>
+  <text class="tick mono" x="820" y="100">40.5%</text>
+  <text class="tick mono end" x="980" y="100">79,739</text>
+
+  <rect class="bar warn" x="250" y="125" width="256" height="22" rx="4"/>
+  <text class="tick mono" x="34" y="142">HCC1395_HKU</text>
+  <text class="tick mono" x="820" y="142">45.7%</text>
+  <text class="tick mono end" x="980" y="142">79,687</text>
+
+  <rect class="bar somatic" x="250" y="167" width="389" height="22" rx="4"/>
+  <text class="tick mono" x="34" y="184">H1437</text>
+  <text class="tick mono" x="820" y="184">69.4%</text>
+  <text class="tick mono end" x="980" y="184">77,080</text>
+
+  <rect class="bar somatic" x="250" y="209" width="518" height="22" rx="4"/>
+  <text class="tick mono" x="34" y="226">H2009</text>
+  <text class="tick mono" x="820" y="226">92.5%</text>
+  <text class="tick mono end" x="980" y="226">154,465</text>
+
+  <rect class="bar somatic" x="250" y="251" width="547" height="22" rx="4"/>
+  <text class="tick mono" x="34" y="268">HCC1937</text>
+  <text class="tick mono" x="820" y="268">97.7%</text>
+  <text class="tick mono end" x="980" y="268">18,690</text>
+
+  <rect class="bar somatic" x="250" y="293" width="547" height="22" rx="4"/>
+  <text class="tick mono" x="34" y="310">HCC1954</text>
+  <text class="tick mono" x="820" y="310">97.7%</text>
+  <text class="tick mono end" x="980" y="310">22,400</text>
+
+  <rect class="bar somatic" x="250" y="335" width="549" height="22" rx="4"/>
+  <text class="tick mono" x="34" y="352">COLO829</text>
+  <text class="tick mono" x="820" y="352">98.1%</text>
+  <text class="tick mono end" x="980" y="352">37,788</text>
+
+  <line class="guide" x1="250" y1="374" x2="810" y2="374"/>
+  <text class="tick zh" x="250" y="392">0</text>
+  <text class="tick zh end" x="810" y="392">100%</text>
+
+  <rect class="box warn" x="18" y="410" width="964" height="94" rx="8"/>
+  <text class="lbl bold zh warn" x="34" y="444">同一株細胞株、兩條流程，只差 5.2 個百分點</text>
+  <text class="anno zh" x="34" y="478">所以其餘五十個百分點以上的落差不是技術雜訊。連鎖率要逐樣本先算，它是第一個分層變數。</text>
+</svg>
