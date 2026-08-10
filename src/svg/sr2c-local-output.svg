@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 564">
+  <title>一個單位的輸出：稀疏狀態表、唯一的相容樹，以及可以計數的旗標</title>
+  <desc>三格由左到右。第一格是一個單位的稀疏狀態表：
+        全參考狀態 62 條、只帶第一個變異的 18 條、同時帶第一與第二個的 5 條、
+        同時帶第一與第三個的 7 條，而同時帶第二與第三個的是 0 條，
+        另外還有覆蓋遮罩不完整的分子另行計數。
+        這個單位的錯誤地板約為百分之一乘上分子總數，也就是不到一條，
+        所以 5 條遠高於地板，而 0 條還不足以排除那個狀態存在。
+        第二格是由這些狀態建出來的樹：全參考在最上，其下是只帶第一個變異的狀態，
+        再往下分成兩支，分別再加上第二個或第三個變異。
+        因為狀態集合通過四配子檢定，這棵樹是唯一的；
+        所以困難的地方不是搜尋樹，而是決定哪些狀態的比例高於地板。
+        第三格是這個單位輸出的那一列：狀態集合與各自比例、先後關係與後驗、
+        有效分子數與遮罩分布，以及四個旗標。
+        旗標是這條路線可以計數的產出，不是修辭。
+        最下方指出：四格全滿代表四配子檢定失敗，那不是一個新的 lineage，
+        而是這個單位的錯誤地板偏高，所以相容性檢定同時是品質訊號。</desc>
+
+  <text class="ttl zh" x="20" y="36">一個單位輸出什麼</text>
+
+  <!-- ① 狀態表 -->
+  <rect class="box" x="18" y="58" width="310" height="382" rx="8"/>
+  <text class="lbl bold zh" x="34" y="94">① 稀疏狀態表</text>
+  <text class="tick mono" x="34" y="136">000</text>
+  <text class="tick mono end" x="200" y="136">62</text>
+  <text class="tick mono" x="34" y="164">100</text>
+  <text class="tick mono end" x="200" y="164">18</text>
+  <text class="tick mono" x="34" y="192">110</text>
+  <text class="tick mono end" x="200" y="192">5</text>
+  <text class="tick mono" x="34" y="220">101</text>
+  <text class="tick mono end" x="200" y="220">7</text>
+  <text class="tick mono" x="34" y="248">011</text>
+  <text class="tick mono end" x="200" y="248">0</text>
+  <text class="tick zh" x="34" y="280">覆蓋遮罩不完整的另計</text>
+  <text class="tick zh" x="34" y="322">地板約為分子總數的百分之一</text>
+  <text class="tick zh ok" x="34" y="352">5 條遠高於地板</text>
+  <text class="tick zh warn" x="34" y="382">0 條還不足以排除</text>
+
+  <!-- ② 相容則樹唯一 -->
+  <rect class="box accent" x="345" y="58" width="310" height="382" rx="8"/>
+  <text class="lbl bold zh" x="361" y="94">② 相容則樹唯一</text>
+  <circle class="cell normal" cx="500" cy="150" r="20"/>
+  <circle class="cell tumor" cx="500" cy="228" r="20"/>
+  <circle class="cell clone1" cx="430" cy="316" r="20"/>
+  <circle class="cell clone2" cx="570" cy="316" r="20"/>
+  <line class="conn" x1="500" y1="170" x2="500" y2="206"/>
+  <line class="conn" x1="494" y1="247" x2="440" y2="298"/>
+  <line class="conn" x1="506" y1="247" x2="560" y2="298"/>
+  <text class="tick mono mid" x="500" y="155">000</text>
+  <text class="tick mono mid" x="500" y="233">100</text>
+  <text class="tick mono mid" x="430" y="321">110</text>
+  <text class="tick mono mid" x="570" y="321">101</text>
+  <text class="tick zh" x="361" y="382">難的是選狀態，不是搜尋樹</text>
+  <text class="tick zh" x="361" y="352">四配子檢定通過，樹就唯一</text>
+
+  <!-- ③ 輸出 -->
+  <rect class="box" x="672" y="58" width="310" height="382" rx="8"/>
+  <text class="lbl bold zh" x="688" y="94">③ 輸出這一列</text>
+  <text class="tick zh" x="688" y="136">狀態集合與各自比例</text>
+  <text class="tick zh" x="688" y="164">先後關係，附後驗</text>
+  <text class="tick zh" x="688" y="192">有效分子數與遮罩分布</text>
+  <text class="tick bold zh" x="688" y="226">旗標</text>
+  <text class="tick mono ok" x="688" y="254">REFINES_GLOBAL</text>
+  <text class="tick mono warn" x="688" y="282">FLOOR_LIMITED</text>
+  <text class="tick mono warn" x="688" y="310">ORDER_UNRESOLVED</text>
+  <text class="tick mono bad" x="688" y="338">INCOMPATIBLE</text>
+  <text class="tick zh" x="688" y="382">旗標是可以計數的產出</text>
+
+  <!-- 相容性 -->
+  <rect class="box bad" x="18" y="464" width="964" height="84" rx="8"/>
+  <text class="lbl bold zh bad" x="34" y="498">四格全滿 ＝ 四配子檢定失敗 ＝ 不相容</text>
+  <text class="anno zh" x="34" y="530">那不是一個新的 lineage，是這個單位的錯誤地板偏高 —— 相容性檢定同時是品質訊號。</text>
+</svg>

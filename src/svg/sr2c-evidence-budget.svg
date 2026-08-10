@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640">
+  <title>同樣三個變異，走全域似然只值 1.3 nats，走局部共現值約 12 nats</title>
+  <desc>以同一組證據為例，說明為什麼局部結構走不進全域似然。
+        上方設定：一支只在這個視窗內與母群體不同的 lineage，帶有三個體細胞變異，
+        細胞比例 0.15，母群體 0.20，該處深度 50，跨越這幾個位點的分子 20 條。
+        左欄是全域路線。每個變異能提供的分離證據約等於深度乘上兩個期望值差的平方，
+        再除以兩倍的變異數，算出來每個變異約 0.43 nats，三個變異合計約 1.3 nats。
+        而多開一群要付的 BIC 代價是二分之一乘以參數個數乘以有效觀測數的對數，
+        參數兩個、有效觀測三千時約為 8 nats。1.3 小於 8，所以這一群開不出來。
+        右欄是局部路線。同樣三個變異，若三者共現的狀態在 20 條跨越分子裡出現 5 條，
+        對照錯誤地板 0.01，對數似然比約為 5 乘以 ln 25 再減 15 乘以 0.277，
+        大約 12 nats，遠高於區分兩個局部結構所需的代價。
+        最下方是結論：差別不在資料量，而在同一份證據能不能寫進那條似然。
+        全域似然只吃邊際計數，共現這個通道在它的模型裡沒有位置。</desc>
+
+  <text class="ttl zh" x="20" y="36">同一組證據，兩條路線算出來的量差一個數量級</text>
+
+  <!-- 設定 -->
+  <rect class="box sunken" x="18" y="56" width="964" height="86" rx="8"/>
+  <text class="tick bold zh" x="34" y="84">共同設定：一支只在這個視窗裡與母群體不同的 lineage，帶三個體細胞變異</text>
+  <text class="tick zh" x="34" y="112">母群體細胞比例 0.20 · 這支 0.15 · 該處深度 50 · 跨越這幾個位點的分子 20 條</text>
+  <text class="tick zh" x="34" y="134">兩條路線看的是同一批 read，只是把它們摘要成不同的統計量。</text>
+
+  <!-- 左：全域 -->
+  <rect class="box" x="18" y="164" width="470" height="360" rx="8"/>
+  <text class="lbl bold zh" x="34" y="198">全域路線：邊際 VAF</text>
+
+  <rect class="box sunken" x="34" y="216" width="438" height="96" rx="6"/>
+  <text class="tick zh" x="48" y="244">每個變異能提供的分離證據</text>
+  <text class="tick mono" x="48" y="272">≈ d(θ₁−θ₂)² / 2θ̄(1−θ̄)</text>
+  <text class="tick mono" x="48" y="300">= 50 × 0.05² / (2 × 0.175 × 0.825) = 0.43</text>
+
+  <text class="anno zh" x="34" y="344">三個變異合計</text>
+  <text class="anno bold zh mono end" x="472" y="344">1.3 nats</text>
+  <rect class="bar ok" x="34" y="358" width="57" height="18" rx="4"/>
+
+  <text class="anno zh" x="34" y="410">多開一群要付的代價</text>
+  <text class="anno bold zh mono end" x="472" y="410">8.0 nats</text>
+  <rect class="bar bad" x="34" y="424" width="350" height="18" rx="4"/>
+  <text class="tick zh" x="34" y="466">代價 ＝ ½ × 參數 2 個 × ln(有效觀測 3000)</text>
+
+  <text class="anno bold zh bad" x="34" y="502">1.3 ＜ 8.0：這一群開不出來</text>
+
+  <!-- 右：局部 -->
+  <rect class="box accent" x="512" y="164" width="470" height="360" rx="8"/>
+  <text class="lbl bold zh" x="528" y="198">局部路線：同一條分子上的共現</text>
+
+  <rect class="box sunken" x="528" y="216" width="438" height="96" rx="6"/>
+  <text class="tick zh" x="542" y="244">三者共現的狀態在 20 條裡出現 5 條</text>
+  <text class="tick mono" x="542" y="272">log LR = 5·ln(0.25/0.01) + 15·ln(0.75/0.99)</text>
+  <text class="tick mono" x="542" y="300">= 16.1 − 4.2 = 11.9</text>
+
+  <text class="anno zh" x="528" y="344">同樣三個變異，這條路給出</text>
+  <text class="anno bold zh mono end" x="966" y="344">11.9 nats</text>
+  <rect class="bar ok" x="528" y="358" width="350" height="18" rx="4"/>
+
+  <text class="anno zh" x="528" y="410">對照的是就地估到的錯誤地板</text>
+  <text class="anno bold zh mono end" x="966" y="410">0.01</text>
+  <rect class="bar warn" x="528" y="424" width="14" height="18" rx="4"/>
+  <text class="tick zh" x="528" y="466">地板由逐位點錯誤與家族誤標算出，不是常數</text>
+
+  <text class="anno bold zh ok" x="528" y="502">11.9 ≫ 分辨兩個局部結構所需</text>
+
+  <!-- 結論 -->
+  <rect class="box bad" x="18" y="546" width="964" height="80" rx="8"/>
+  <text class="anno bold zh bad" x="34" y="578">差別不在資料量，而在同一份證據能不能寫進那條似然。</text>
+  <text class="anno zh" x="34" y="610">全域似然只吃邊際計數；共現這個通道在它的模型裡沒有可以放的位置。</text>
+</svg>

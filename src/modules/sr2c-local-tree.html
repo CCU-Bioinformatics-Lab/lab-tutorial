@@ -1,0 +1,760 @@
+<!--tw
+{
+  "objectives": [
+    "把估計目標由全域細胞層級的 clone tree 換成單位內的分子系譜，並寫出這個目標的形式定義",
+    "用證據預算說明局部結構為何走不進以邊際 VAF 為觀測的全域似然，而不是「全域方法不夠準」",
+    "寫出局部生成模型：狀態集合、四配子相容性、節點分子比例與兩個錯誤通道",
+    "說明全域頻率譜如何以單向先驗進入局部推論，而不把同一批 read 算兩次",
+    "定義輸出語義與旗標，並給出 REFINES_GLOBAL 這個可計數、且有虛無分布可比的產出",
+    "規格化給 somatic variant caller 的三層特徵、留一法、缺席契約與分層驗收",
+    "列出驗收條件、實作分期，以及這條路線不可宣稱的事"
+  ]
+}
+-->
+
+<section data-part="why">
+<h2>為什麼重要</h2>
+
+<h3>換掉的是目標，不是方法</h3>
+
+<p class="prose">前一篇把兩類觀測寫成兩個相乘的因子，接上同一組全域參數
+{{m: (w,T,z)}}，目標仍然是一棵全基因體、細胞層級的 [[clone tree]]。
+這個目標有一個現實問題：以邊際 VAF 與 [[allele-specific copy number|等位特異拷貝數]]
+為觀測的既有方法已經成熟且被系統性評比過，
+要在<b>同一個目標</b>上勝過它們，需要的證據量遠大於多變異區域能提供的。
+中篇的計算已經指出，可用的多變異單位在低突變負荷樣本只有數百個。</p>
+
+<p class="prose">本篇因此換一個估計目標：<b>不重建全域的細胞層級系統發生，
+而是重建每一個單位內部的分子系譜</b> —— 哪幾種局部狀態真的存在、
+各佔多少分子、以及它們之間的先後關係。這個目標的解析度單位是
+「一個視窗、一條染色體拷貝」，不是「全基因體共用的一個 CCF 位置」。</p>
+
+{{svg:sr2c-estimand | [wide] 左右兩欄的差別不在誰比較準，在解析度的單位不同。
+左欄一個節點是一群細胞，要數千個變異才撐得起來；
+右欄一個節點是一類分子狀態，數十條跨越分子就有判別力，
+但它只在這個單位內部有定義。}}
+
+<div class="guardrail guardrail--info">
+<p class="guardrail__hd">這份規格允許宣稱什麼</p>
+<p class="prose">LiLT（<b>Li</b>nked-molecule <b>L</b>ocal <b>T</b>ree）是實作規格的工作名稱，
+不構成方法已完成或「首次」的證據。可以宣稱的是：
+<b>在同一批分子上直接觀測到的共現，能分辨若干組在邊際 VAF 與拷貝數上完全等價的局部結構</b>，
+而且這種等價是<b>可辨識性</b>問題，不是精度問題。
+不可以宣稱的是：全域 clone tree 的準確度提升、細胞層級群數的修正，
+或「比 PhyloWGS／Pairtree 準」。那是另一個目標，本規格沒有量它。</p>
+</div>
+
+<h3>全域方法在哪裡失去局部解析度 —— 三個機制，其中兩個是算得出來的</h3>
+
+<p class="prose">「全域方法犧牲了局部解析度」這句話如果只是印象，就沒有價值。
+以下把它拆成三條各自可檢驗的敘述。</p>
+
+<p class="prose"><b>其一：等值 CCF 的兩支 lineage 不可辨識，這是可以證的。</b>
+設一個估計器的似然只透過每個變異的邊際計數 {{m: (a_m,d_m)}} 與該處拷貝數依賴資料。
+若兩個 clone 的 CCF 相同，則它們給出的 {{m: θ}} 相同，
+於是把任何一個變異在這兩群之間改指派，似然完全不變。
+因此「這些變異分成哪兩支」以及由此決定的樹形，在該似然下<b>沒有</b>最大值可言 ——
+它是一整片等值面。中篇第三節那個 {{m: K=2}} 的例子就是這件事的一個實例。
+這條敘述與樣本量、深度都無關。</p>
+
+<p class="prose"><b>其二：代價與證據不對等，所以區域專屬的 lineage 付不起一個全域群。</b>
+在頻率譜上多開一群要付的代價約為 {{m: \frac{1}{2}p_K\log M_{eff}}}；
+參數兩個、有效觀測三千時約 8 nats。
+而一個變異能提供的分離證據約為 {{m: d(θ_1−θ_2)^2 / 2\bar{θ}(1−\bar{θ})}}，
+在深度 50、兩群期望值 0.20 與 0.15 時約 0.43 nats。
+一支只在某個視窗內與母群體不同、因而只帶三個變異的 lineage，
+總共只能提供約 1.3 nats —— 差得不是一點點。
+<b>這不是「不容易偵測」，是它在那個模型的支撐集上開不出來。</b></p>
+
+<p class="prose"><b>其三：同一份證據換一條通道就夠了。</b>
+同樣那三個變異，若三者共現的狀態在 20 條跨越分子中出現 5 條，
+對照就地估到的錯誤地板 0.01，對數似然比約 12 nats。
+證據量的差別不來自資料量 —— 兩條路線看的是同一批 read ——
+而來自<b>共現這個統計量在全域似然裡沒有可以放的位置</b>。</p>
+
+{{svg:sr2c-evidence-budget | [wide] 兩欄用的是同一批 read、同一組三個變異。
+左欄把它們摘要成三個邊際計數，右欄摘要成一張共現表。
+1.3 對 8.0 是「開不出來」，11.9 對地板是「分得出來」——
+中間的差距是摘要方式造成的，不是資料量。}}
+
+<p class="prose">必須同時說清楚反面：<b>對全域方法自己的目標而言，邊際幾乎就是充分的。</b>
+細胞層級的群比例本來就是一個跨全基因體的量，用上萬個變異的邊際去估它，
+比用幾百個單位的共現去估準得多。
+所以正確的說法不是「它們不夠好」，而是<b>兩者估的量不同、解析度的單位不同</b>；
+局部路線的代價是每個單位只有數十條分子，單位層級的後驗一定很寬。</p>
+
+<h3>第二個交付物，給了第一個一個可以驗的終點</h3>
+
+<p class="prose">局部系譜這個目標有一個結構性的困難：<b>沒有金標準</b>。
+單細胞資料給得出部分細胞層級的樹，但給不出「某段 DNA 上分子的先後」。
+所以本規格同時定義第二個交付物：把局部結構做成
+[[ClairS]]、[[DeepSomatic]] 這類 somatic caller 的<b>額外特徵通道</b>。</p>
+
+<p class="prose">這個交付物有一個局部系譜本身沒有的性質：<b>它有硬終點</b>。
+somatic calling 有既有的 truth set 與 precision／recall 曲線，
+不需要 clone tree 的金標準就能判定特徵有沒有用。
+更重要的是它的機制已經被驗證過一次 —— ClairS 之所以用相位通道，
+理由正是「真變異的支持 read 集中在同一條 germline 單倍型上，
+定序錯誤則散在兩條之間」。<b>本規格做的是把同一個邏輯往下推一層</b>：
+不只問「在哪一條 germline 單倍型」，還問「在那條單倍型的哪一支 somatic lineage」。</p>
+</section>
+
+
+<section data-part="concept">
+<h2>概念與互動</h2>
+
+<h3>一、估計目標的形式定義</h3>
+
+<p class="prose">沿用前一篇的<b>單位</b>：{{m: u}} 是一個「區域 × [[somatic haplotype|單倍型家族]]」，
+其位點集合為 {{m: J_u}}、{{m: k_u=|J_u|}}。
+一個單位裡的分子全部來自同一條染色體拷貝，另一條屬於另一個單位。</p>
+
+<p class="prose"><b>局部狀態</b>為 {{m: h ∈ \{0,1\}^{k_u}}}。
+<b>局部系譜</b> {{m: L_u=(X_u,E_u)}} 由兩件事構成：有正質量的狀態集合
+{{m: X_u ⊆ \{0,1\}^{k_u}}}，以及 {{m: X_u}} 上由集合包含關係決定的有根樹。
+根是全參考狀態 {{m: 0^{k_u}}}。每個狀態 {{m: h∈X_u}} 另有
+<b>專屬分子比例</b> {{m: ν_{u,h} ≥ 0}}，且 {{m: \sum_h ν_{u,h}=1}}。</p>
+
+<p class="prose">要注意 {{m: ν}} 是<b>專屬</b>的，不是累積的：
+一條分子只由它所屬那個節點的狀態產生，不由祖先節點產生。
+祖先節點的 {{m: ν}} 因此是「還停留在該狀態的分子」的比例，可以很小。
+樹的形狀不對 {{m: ν}} 施加單調性，它只規定<b>哪些狀態可以同時存在</b>。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>估計目標的層級</th><th>內容</th><th>需要什麼</th><th>條件不足時的輸出</th></tr></thead>
+<tbody>
+<tr><td>分子層</td><td>{{m: X_u}} 與 {{m: ν_u}}</td><td>只需要該單位的 read 與就地估到的錯誤率</td><td><code>FLOOR_LIMITED</code></td></tr>
+<tr><td>系譜層</td><td>{{m: X_u}} 上的先後關係</td><td>兩個單一狀態皆可見，且雙狀態的有無高於地板</td><td><code>ORDER_UNRESOLVED</code></td></tr>
+<tr><td>細胞層</td><td>各節點的 [[cancer cell fraction|CCF]]</td><td>純度與該處 [[copy number|拷貝數]]，由階段 G 提供</td><td>只報分子比例，標 <code>CELL_SCALE_UNAVAILABLE</code></td></tr>
+<tr><td>對應層</td><td>局部節點對應到哪一個全域群</td><td>節點內至少一個變異有可信的全域指派</td><td><code>UNLINKED_TO_GLOBAL</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="guardrail">
+<p class="guardrail__hd">局部節點是一類分子狀態，不是一群細胞</p>
+<p class="prose">一個節點只表示「這些分子在 {{m: J_u}} 上帶有同一組突變」。
+兩群基因體其他地方不同、但在這個視窗內完全相同的細胞，會落進<b>同一個</b>節點。
+本實驗室的甲基化觀測正是這件事的實例：單一個「單倍型 ＋ 等位」狀態之下，
+仍可再分出數群甲基化模式。因此節點數的正確讀法恆為「<b>至少</b>此數」，
+而把節點數當成細胞群數會系統性低估。反向也不成立：
+同一群細胞在不同單位裡對應到不同的局部狀態，因為每個單位看的位點集合不同。</p>
+</div>
+
+<h4>四配子相容性：給定狀態集合，樹幾乎是決定的</h4>
+
+<p class="prose">兩個位點 {{m: j,j'}} 稱為<b>相容</b>，若四種樣式
+{{m: 00,01,10,11}} 中至多出現三種。若 {{m: X_u}} 中所有位點兩兩相容，
+則存在一棵樹使每個突變只發生一次（perfect phylogeny），
+而且<b>給定 {{m: X_u}}，那棵樹本質上是唯一的</b>。</p>
+
+{{svg:rg-unit-classes | [wide] 三欄的邊際計數刻意設為相同，用以顯示僅憑邊際無法區分三者。
+左欄為串接，中欄為分岔，右欄四格皆非空為不相容。
+在本規格下，前兩者是不同的局部系譜，第三者是四配子檢定失敗。}}
+
+<p class="prose">這給出兩個實作上的結論。第一，<b>困難不在搜尋樹，在決定狀態集合</b> ——
+哪些狀態的比例真的高於地板。第二，四配子檢定失敗（四格皆非空）
+<b>不是</b>發現了一支新的 lineage，而是這個單位的錯誤地板偏高或家族誤標偏多，
+所以它同時是一個品質訊號。</p>
+
+{{svg:sr2c-local-output | [wide] 稀疏狀態表 → 相容則樹唯一 → 輸出這一列。
+中間那棵樹沒有經過搜尋：狀態集合一旦選定，包含關係就把樹決定了。
+右邊四個旗標是這條路線可以計數的產出。}}
+
+<h4>一條邊可以帶多個突變 —— 記帳節點因此消失</h4>
+
+<p class="prose">前一篇的候選列舉採「一步一個突變」的超立方體表示法，
+於是同一條全域邊上的多個突變會在局部被迫拆成數段，中間補進純粹<b>記帳</b>用的節點。
+本規格改為允許一條邊帶多個突變，這一類節點隨表示法一起消失。</p>
+
+{{svg:rg-steiner-latent | [wide] 樹的成本等於固定節點數加潛在節點數減一，
+故最小成本等價於潛在節點數最少。潛在節點為該樹所需、但無任何觀測支持的狀態。}}
+
+<p class="prose">但<b>真正因無限位點假設而必需的中間狀態仍然存在</b>，不可以一併宣稱消掉：
+觀測到 {{m: 110}} 與 {{m: 101}} 而 {{m: 100}} 未觀測到時，
+兩者若不共用一個帶第一個突變的祖先，第一個突變就得發生兩次。
+差別在於<b>身分變乾淨了</b>：這種節點只剩兩種可能 ——
+現存但沒抽到（{{m: ν>0}}，抽樣零），或已被後代取代的歷史狀態（{{m: ν=0}}）——
+不再有前一篇表中那個「只因表示法而存在」的第三種。
+[[latent node]] 那條警告在這裡仍然適用，但它的適用範圍窄了一半。</p>
+
+<h3>二、局部生成模型</h3>
+
+<p class="prose">由 {{m: ν_u}} 到一條 read 上看到的字母，中間三層與前一篇相同，
+此處只寫出必要的式子並標明差異。</p>
+
+{{svg:sr2b-emission | [wide] 全域參數投影成局部狀態比例，再依每條 read 的覆蓋遮罩邊際化，
+最後通過觀測錯誤通道。本規格改動的只有最上面一層：
+局部比例不再是全域參數的確定函數，而是帶先驗的自由參數。}}
+
+<h4>覆蓋遮罩：沒覆蓋到的位點要邊際化</h4>
+
+{{eq}}
+q_{u,M}(y) = \sum_{h : h_M = y} ν_{u,h}
+{{note}}
+{{m: M ⊆ J_u}} 是該 read 的覆蓋遮罩，{{m: y}} 是它讀到的字母。
+沒覆蓋到的位點<b>不可以</b>填成參考型 —— 那會把一條中立的 read 變成反對某個狀態的證據。
+{{/eq}}
+
+{{svg:rg-partial-reads | [wide] 約八成的 read 僅覆蓋三個位點中的一個。
+將同一批 read 依位點對拆分後可見：此單位的判定依據為 17 與 20 兩個數字，而非 194；
+其中一對僅有 3 條 read，仍產出了一條關係判定。}}
+
+<p class="prose">整個單位共用<b>一組</b> {{m: ν_u}}，每條 read 由它自己的遮罩投影出來；
+不同遮罩不各配一個獨立的比例向量，因為它們取樣的是同一池分子。
+在 PCR-free 長讀下，一條 read 就是一條分子，
+所以單位內部的計數<b>預設為 multinomial</b>，額外離散度沒有來源；
+只有殘差真的顯示過度離散時才加，而且要說得出它來自哪裡。</p>
+
+<h4>兩個形狀不同的錯誤通道與地板</h4>
+
+{{svg:sr2b-mistag | [wide] 左右兩種錯誤的形狀不同：一種一次改一個字母，一種一次搬走整條分子。
+位點差得越多，逐位點錯誤的機率掉得越快，而誤標完全不受位點數影響 ——
+所以差三個位點時，能造出假狀態的幾乎只剩誤標這一條路。}}
+
+{{eq}}
+ν^{obs}_{u,h} = (1−ε_u)·ν_{u,h} + ε_u·r_{u,h}
+{{note}}
+{{m: r_{u,h}}} 由逐位點錯誤與整條分子的家族誤標算出，不是自由參數。
+{{m: ε_u r_{u,h}}} 就是這個單位能分辨的最小比例，也是所有偵測下界的來源。
+{{/eq}}
+
+{{svg:sr2b-zero-kinds | [wide] 三欄的觀測一模一樣，都是「這一格計數為 0」。
+分得開它們的不是那個 0，而是跨越深度、其他單位的證據，與就地估到的錯誤率。
+中間那條警告在本規格同樣成立：Dirichlet 的參數不可以是零。}}
+
+<p class="prose">家族誤標尤其要<b>成對</b>估計，因為它連結同一區域的兩個單位。
+在 {{m: k ≥ 2}} 時它是假狀態的主要來源：只寫逐位點錯誤的話，
+全 {{m: 0}} 背景上出現的 {{m: 111}} 在模型眼中「錯誤造不出來」（約 {{m: ε^3}}），
+於是只剩一個解釋 —— 一支新的 lineage。而它真正的來源是隔壁那個家族。</p>
+
+<h4>方向是 nuisance，但這裡的用途不同</h4>
+
+<p class="prose">家族標號在每個 [[phase block|phase set]] 內獨立決定，
+故引入 {{m: σ_u ∈ \{原樣, 對調\}}} 並邊際化。
+與前一篇不同的是：<b>局部系譜的形狀完全不依賴 {{m: σ_u}}</b> ——
+單位內部的狀態集合與包含關係與家族標號無關。
+{{m: σ_u}} 只在兩處才要緊：把節點對應到某一條 germline 單倍型（第六節的第 1 層特徵），
+以及把節點對應到全域群。所以本規格的 {{m: σ_u}} 不進核心推論，只進註解層。</p>
+
+<h4>與前一篇的唯一結構差異</h4>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>項目</th><th>前一篇（全域目標）</th><th>本規格（局部目標）</th></tr></thead>
+<tbody>
+<tr><td>局部比例 {{m: ν_u}}</td><td>全域 {{m: (w,T,z)}} 的<b>確定函數</b>，沒有自由度</td><td><b>自由參數</b>，帶來自階段 G 的先驗</td></tr>
+<tr><td>換得的東西</td><td>每個單位都對全域參數施加限制</td><td>單位內部可以出現全域表達不了的結構</td></tr>
+<tr><td>付出的代價</td><td>局部只能表達全域已經有的群</td><td>單位之間不再互相限制，後驗較寬</td></tr>
+<tr><td>推論結構</td><td>全域取樣的內層包住每個單位</td><td>單位彼此獨立，可完全平行</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">這張表就是整份規格的決定點。
+<b>讓 {{m: ν_u}} 自由，正是「提高局部解析度」的技術內容</b>；
+它同時也是「不再限制全域參數」的原因。兩件事是同一個改動的兩面，不能只要一面。</p>
+
+<h3>三、全域訊號怎麼進來，而不把同一批 read 算兩次</h3>
+
+<p class="prose">局部比例自由之後，20 條分子撐不起一個穩定的估計。
+全域頻率譜在這裡仍然有用 —— 但只能<b>單向</b>進來。
+可以這樣做的理由，正是前一篇為了讓似然相乘而建立的那個性質：
+單變異區域 {{m: S_1}} 與多變異單位 {{m: S_2}} 的 read <b>沒有交集</b>。</p>
+
+{{svg:sr2c-two-stage | [wide] 上方是同一個切法：兩堆的 read 互不重疊。
+因此階段 G 只用 {{m: S_1}} 擬合，其輸出對階段 L 而言是一份<b>獨立</b>的先驗。
+中間只有一個單向箭頭 —— 局部不回饋全域，是刻意切斷的。}}
+
+<h4>階段 G：只用 {{m: S_1}}</h4>
+
+<p class="prose">階段 G 是一個標準的 [[mutation frequency spectrum|頻率譜]]分群，
+用哪一個既有實作都可以，它<b>不是</b>本規格的貢獻。它必須輸出四樣東西：
+純度 {{m: \hat{ρ}}}；CCF 原子的位置 {{m: \hat{c}_j}} 與權重 {{m: \hat{ω}_j}}；
+各原子的後驗不確定度；以及分層估到的 overdispersion {{m: \hat{φ}(d,CN)}}。</p>
+
+<p class="prose">唯一的硬性要求是：<b>{{m: S_2}} 的位點必須整批排除</b>。
+這只損失約 9.5% 的變異，對頻率譜幾乎沒有影響，
+但它是這條路線不重複計數的<b>全部</b>依據。
+它也是可以寫成檢查程式的：階段 G 的輸入位點集合與 {{m: S_2}} 的交集必須為空。</p>
+
+<div class="guardrail">
+<p class="guardrail__hd">兩個必須量出來、而不是宣稱掉的邊界</p>
+<p class="prose"><b>其一，深度不是嚴格互斥的。</b>拷貝數分段與純度用的是全基因體深度，
+其中含有 {{m: S_2}} 視窗的 read。一個 20 kb 視窗通常佔其所屬 CN 區段不到 1%，
+所以這個洩漏有界 —— 但界線要實際算出來寫進報告，
+嚴格版本則在 CN 分段時把 {{m: S_2}} 視窗一併排除，並比較兩者的差異。
+<b>其二，先驗不是硬約束。</b>階段 G 的原子若當成 {{m: ν}} 只能取的值，
+局部解析度就歸零了；下面那個逃逸質量存在的唯一理由，就是不讓這件事發生。</p>
+</div>
+
+<h4>先驗：原子加上逃逸質量</h4>
+
+{{svg:sr2c-prior-atoms | [wide] 左：20 條分子自己的似然又寬又平。
+中：階段 G 給的先驗是幾根窄峰加上一條不為零的底線。
+右：後驗被拉緊，但那條底線保留了「這一支只在局部存在」的可能。}}
+
+<p class="prose">先在細胞尺度上寫先驗，再換算成分子比例。設節點 {{m: h}} 的細胞比例為
+{{m: c_{u,h}}}：</p>
+
+{{eq}}
+p(c_{u,h}) = (1−λ)\sum_j \hat{ω}_j · Beta(c_{u,h}; a_j, b_j) + λ · Beta(c_{u,h}; a_0, b_0)
+{{note}}
+{{m: (a_j,b_j)}} 由階段 G 第 {{m: j}} 個原子的後驗均值與變異決定；
+{{m: (a_0,b_0)}} 是弱的擴散成分。{{m: λ}} 是<b>逃逸質量</b>：
+先驗上認為這一支不對應任何全域群的機率。
+{{m: λ→0}} 把局部結構強行貼回全域原子（解析度歸零）；
+{{m: λ→1}} 等於丟掉全域資訊。{{m: λ}} 必須預先登錄並做敏感度分析。
+{{/eq}}
+
+<p class="prose">由細胞比例換算為單位內的分子比例，用的是前一篇那條把拷貝數放進分母的式子：
+一個 clone 在該處的每一條拷貝各貢獻一份，分母是該單位全部的分子數。
+正常細胞是其中一項，其局部狀態恆為全參考 —— 所以純度不是額外的換算因子。
+若該處的 CN 或 multiplicity 未定，這一步就停在分子尺度，輸出標
+<code>CELL_SCALE_UNAVAILABLE</code>，而<b>不是</b>套一個預設的二倍體值。</p>
+
+<h4>先後關係的先驗：[[pigeonhole|鴿籠]]只能軟用</h4>
+
+{{eq}}
+\log p(L_u) = \sum_{(h,h') ∈ E_u} \log ω_{anc}(h,h') + κ_{split}·|X_u|
+{{note}}
+{{m: ω_{anc}}} 由兩端節點所含變異在階段 G 的群指派後驗算出：
+若祖先端的群 CCF 不小於後代端，該邊獲得較高的先驗。
+{{m: κ_{split}<0}} 是狀態數的複雜度罰則。
+兩者都必須是<b>軟</b>的：階段 G 的群指派本身有不確定度，
+把它當成硬性排序會讓局部推論繼承全域的錯誤而且不留痕跡。
+{{/eq}}
+
+{{svg:sr2-two-topologies | [wide] 這張圖說明先驗為什麼只能是軟的：
+頻率譜給出的不是一棵樹，而是一棵<b>部分決定</b>的樹 ——
+上排三群在鴿籠之下有兩棵樹同時通過。
+本規格用來當先驗的，只有兩棵樹的<b>交集</b>那一部分；
+未定的那幾格必須留給局部觀測，不可以先挑一棵印出來。}}
+
+<p class="prose">為什麼不做完整的聯合模型：那正是前一篇與整合篇的規格。
+本規格<b>刻意</b>切斷回饋（cut posterior），換三件事 ——
+單位之間完全獨立因而可以平行、局部比例不會被全域參數壓平、
+以及每一個單位的結論可以單獨檢視與反駁。
+代價是這個後驗不是任何聯合模型的邊際分布，
+報告中必須如此稱呼，不得寫成「聯合估計」。</p>
+
+<h3>四、模型選擇與輸出語義</h3>
+
+<p class="prose">每個單位的推論目標是 {{m: X_u}} 的後驗。
+候選狀態集合由「觀測到的樣式 ∪ 相容性所需的中間狀態」產生，
+再對每個候選算邊際似然（{{m: ν}} 依上節先驗積掉），最後正規化成後驗。
+{{m: X_u}} 不取單一最大值，而是輸出前若干個候選與各自的質量。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>旗標</th><th>觸發條件</th><th>讀法</th></tr></thead>
+<tbody>
+<tr><td><code>REFINES_GLOBAL</code></td><td>後驗有足量質量落在「至少兩個節點，其所含變異被階段 G 高信心指派到<b>同一</b>群」的候選上</td><td>本規格的主要產出：全域表達不了的結構</td></tr>
+<tr><td><code>GLOBAL_CONSISTENT</code></td><td>後驗主質量的節點與群一一對應</td><td>局部只是把全域結果再確認一次</td></tr>
+<tr><td><code>LOCAL_ONLY_LINEAGE</code></td><td>某節點的比例後驗主要由逃逸成分承接</td><td>該支在全域頻率譜上沒有對應的峰</td></tr>
+<tr><td><code>CONTRADICTS_GLOBAL</code></td><td>局部包含關係與階段 G 的鴿籠排序相反</td><td>診斷量：多半是地板、誤標或階段 G 的群指派有問題</td></tr>
+<tr><td><code>FLOOR_LIMITED</code></td><td>有效分子數不足以把該狀態與地板分開</td><td>不是「不存在」</td></tr>
+<tr><td><code>ORDER_UNRESOLVED</code></td><td>雙狀態格的跨越深度過低</td><td>節點存在但先後未定</td></tr>
+<tr><td><code>INCOMPATIBLE</code></td><td>四配子檢定失敗</td><td>品質訊號，不是新 lineage</td></tr>
+<tr><td><code>KATAEGIS_DOWNWEIGHTED</code></td><td>該單位被判定為局部超突變叢</td><td>整叢降權為一個有效觀測</td></tr>
+<tr><td><code>STATE_CAP_REACHED</code></td><td>候選狀態集合觸及列舉上限</td><td>不得在截斷後仍回報通過</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose"><code>REFINES_GLOBAL</code> 是這條路線的<b>操作型定義</b>：
+「比全域方法解析度高」這句話在這裡等於「有多少個單位掛上這個旗標，
+而且顯著多於虛無分布」。第八節會給出那個虛無分布怎麼產生。
+沒有這個定義，前面所有論述都不可檢驗。</p>
+
+<h3>五、跨單位：可以合併什麼</h3>
+
+<p class="prose">前一篇的規則是「可以合併的是機率，不是標籤」。
+在本規格下更嚴格：<b>連機率都不合併</b>，因為 {{m: ν_u}} 是每個單位自己的參數，
+不同單位的後驗沒有共同的參數可以相乘。局部拓撲當然更不可以拼接成一棵大樹 ——
+局部標籤只在該單位內有定義。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>跨單位的產出</th><th>可否</th><th>條件</th></tr></thead>
+<tbody>
+<tr><td>單位層級的目錄（每個單位一列 ＋ 旗標）</td><td>可</td><td>本規格的主要交付物</td></tr>
+<tr><td>樣本層統計量：<code>REFINES_GLOBAL</code> 的個數、局部分岔比例、節點數分布</td><td>可</td><td>必須同時報第八節的虛無分布</td></tr>
+<tr><td>把局部樹拼成一棵全基因體的樹</td><td><b>不可</b></td><td>標籤跨單位無定義，且不同單位看的位點集合不同</td></tr>
+<tr><td>把成對的祖先／互斥關係匯出給全域方法</td><td>有條件</td><td>使用它的全域擬合必須排除 {{m: S_2}} 的 read，否則就是重複計數</td></tr>
+<tr><td>把節點數加總當成全基因體的群數</td><td><b>不可</b></td><td>節點是分子狀態，且各單位互不對齊</td></tr>
+</tbody>
+</table>
+</div>
+
+{{svg:rg-three-tiers | [wide] read 跨距限制的是能否計數共現，
+[[phase block]] 限制的是能否確定兩個位點是否位於同一條染色體。
+本規格的每一列都只能自最上層產生，而該層亦為三者中範圍最小者 ——
+這就是「不可拼接成一棵大樹」的物理來源，不是保守的選擇。}}
+
+<h3>六、第二個交付物：給 somatic caller 的特徵</h3>
+
+<h4>錨點與候選必須分開</h4>
+
+<p class="prose">這裡有一個明顯的循環：局部系譜要靠可信的 somatic 變異才建得起來，
+而我們想幫的正是那些不可信的候選。解法是把兩者分成兩個角色：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>角色</th><th>來源</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td>錨點</td><td>germline het 位點 ＋ 通過嚴格門檻的 somatic 呼叫</td><td>建構該單位的局部系譜</td></tr>
+<tr><td>候選</td><td>caller 在寬鬆門檻下的候選集合</td><td>被評分的對象，<b>不進</b>錨點集合</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">因此每個候選 {{m: m}} 的特徵，都是對<b>把它拿掉之後</b>建成的局部系譜
+{{m: L_u^{(−m)}}} 算出來的。這條留一法不是保險，是必要條件：
+否則特徵會直接把「這個候選有幾條 ALT read」抄一遍，
+在訓練時看起來很有效，在真正的低頻變異上完全沒有幫助。
+錨點也<b>不得</b>取自 truth set —— 那是最典型的[[data leakage|資料洩漏]]。</p>
+
+<h4>三層特徵</h4>
+
+{{svg:sr2c-caller-tiers | [wide] 三層的覆蓋率與要打敗的基準都不同。
+第 1 層是 ClairS 已有的相位通道，是基準而不是貢獻；
+第 2 層只有約一成的候選有，但它是唯一沒有現成替代的一層。}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>層</th><th>欄位</th><th>意義</th></tr></thead>
+<tbody>
+<tr><td>0</td><td><code>vaf_grid_dist</code></td><td>觀測 VAF 與「階段 G 原子 × 該處 CN／multiplicity」所隱含的期望值格點的最近距離，以抽樣標準差為單位</td></tr>
+<tr><td>0</td><td><code>floor_ratio</code></td><td>ALT 分子數 ÷ 該單位錯誤地板的期望分子數</td></tr>
+<tr><td>0</td><td><code>purity</code>、<code>cn_local</code>、<code>phi_stratum</code></td><td>樣本與區段層的脈絡量</td></tr>
+<tr><td>1</td><td><code>hp_concentration</code></td><td>ALT 分子集中在單一 germline 單倍型的比例</td></tr>
+<tr><td>1</td><td><code>hp_depth_ratio</code>、<code>hp_untagged_frac</code></td><td>該單倍型的深度脈絡與未標記比例</td></tr>
+<tr><td>2</td><td><code>lineage_coherence</code></td><td>ALT 分子在 {{m: L_u^{(−m)}}} 各節點上的集中度：最大節點佔比</td></tr>
+<tr><td>2</td><td><code>llr_nested</code></td><td>對數似然比：「ALT 分子構成某一節點的巢狀子群」對「ALT 分子依 {{m: ν_u}} 隨機散布」</td></tr>
+<tr><td>2</td><td><code>four_gamete_viol</code></td><td>把候選加進 {{m: X_u}} 後是否產生四配子違反，及其超過地板的程度</td></tr>
+<tr><td>2</td><td><code>expected_vaf_local</code></td><td>最佳配對節點的 {{m: ν}} 換算出的期望 VAF，與觀測值的差</td></tr>
+<tr><td>2</td><td><code>n_span</code>、<code>k_u</code>、<code>state_entropy</code></td><td>證據量與局部複雜度的脈絡量</td></tr>
+<tr><td>全部</td><td><code>tier0_ok</code>、<code>tier1_ok</code>、<code>tier2_ok</code></td><td>該層是否可用的指示通道</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">第 2 層的核心是 <code>llr_nested</code>，而它的邏輯與 ClairS 的相位通道相同、
+只是往下一層：真的低頻 somatic 變異來自某一支既有的 lineage，
+所以它的支持分子應該<b>整齊地落在該節點的後代位置上</b>；
+定序錯誤與嵌合則對局部系譜完全無所謂，會散落在各節點之間。
+差別在於相位通道分的是兩條 germline 單倍型，
+這一層分的是同一條單倍型內部的數支 somatic lineage。</p>
+
+<div class="guardrail">
+<p class="guardrail__hd">缺席不是零</p>
+<p class="prose">約九成的候選落在單變異區域，第 2 層對它們<b>不存在</b>。
+把缺席欄位填 0 會讓模型學到「0 代表沒有支持」，
+而那正好與「這個位點根本沒有可用的單位」相反。
+每一層都必須有獨立的可用性指示通道，訓練資料必須同時包含可用與不可用的兩種樣本，
+而且驗收時<b>三層各報一次 precision／recall，並另報不可用子集</b>；
+只報總體的話，一成樣本上的增益會被九成稀釋到看不出來，
+一成樣本上的傷害同樣會被藏住。</p>
+</div>
+
+<h4>三種整合方式</h4>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>方式</th><th>做法</th><th>成本</th><th>風險</th></tr></thead>
+<tbody>
+<tr><td>A · 事後重新評分</td><td>以 caller 分數 ＋ 特徵訓練一個小模型，只改排序</td><td>低，不需重訓 caller</td><td>受限於 caller 已經丟掉的候選</td></tr>
+<tr><td>B · 加成輸入通道</td><td>把特徵接進 caller 的張量後重訓</td><td>高，需要完整訓練資料與算力</td><td>上限最高，但難以歸因是哪一層有用</td></tr>
+<tr><td>C · 前置過濾</td><td>用特徵先砍候選</td><td>低</td><td><b>不建議</b>：不可逆，且會安靜地傷害 recall</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">建議順序是 A 先做。它便宜、可歸因（每一層可以單獨加減）、
+而且如果 A 沒有效果，B 幾乎不可能有 —— 因為 A 的失敗代表這些特徵
+在 caller 已有的資訊之外沒有增量。</p>
+
+<h4>訓練與評估的切分</h4>
+
+<ul class="prose">
+<li><b>不可以用逐變異的隨機切分。</b>同一個單位裡的候選共用一份局部系譜，
+彼此高度相關；隨機切分會讓同一個單位同時出現在訓練與驗證集，
+指標會系統性偏高。切分必須以<b>樣本</b>為單位，區域層另做一次巢狀檢查。</li>
+<li><b>錨點必須由 caller 自己產生</b>，不得取自 truth set 或 [[high-confidence region|高信心區域]]的標註。</li>
+<li>訓練與推論時的特徵必須由<b>同一條管線</b>算出；階段 G 的實作、
+{{m: λ}}、地板估計方式都要寫進 provenance。</li>
+<li>驗收須跨純度、突變負荷、平台與 basecaller 分層報告，
+以檢查[[distribution shift|分布偏移]]。</li>
+</ul>
+
+<h3>七、推論演算法與計算預算</h3>
+
+<ol class="prose">
+<li><b>前處理。</b>依單位輸出稀疏狀態表，每列為
+（單位、phase set、位點集合、覆蓋遮罩、字母樣式、計數）。遮罩不得先併掉。</li>
+<li><b>就地校準。</b>由 germline-only 單位、matched normal 與已知重複區估
+逐位點錯誤率與家族誤標率，成對估計並分層借力。</li>
+<li><b>階段 G。</b>只用 {{m: S_1}}，輸出原子、權重、純度與 {{m: \hat{φ}}}，
+並斷言與 {{m: S_2}} 的位點交集為空。</li>
+<li><b>候選狀態集合列舉。</b>先取計數高於地板的樣式，再補相容性所需的中間狀態；
+{{m: k_u ≤ 4}} 時狀態空間至多 16 格，候選集合可完整列舉。
+觸及上限時輸出 <code>STATE_CAP_REACHED</code>。</li>
+<li><b>邊際似然。</b>對每個候選，{{m: ν}} 依第三節先驗積掉。
+先驗是 Beta 混合、似然是 multinomial，非共軛，
+故以每個候選數十個 quadrature 或 Monte Carlo 點計算並回報數值誤差。</li>
+<li><b>階段 G 不確定度的傳遞。</b>由階段 G 後驗抽 {{m: S}} 組
+{{m: (\hat{ρ},\hat{c},\hat{ω})}}，逐組重算再平均。
+{{m: S}} 過小會低估區間寬度，須在收斂契約中登錄。</li>
+<li><b>輸出。</b>每個單位一列，含前若干個 {{m: X_u}} 候選與質量、
+節點比例的區間、旗標與有效分子數。</li>
+</ol>
+
+<p class="prose">成本量級：單位約 {{m: 10^5}} 個，每個單位候選集合約 {{m: 10^2}}，
+每個候選數十個積分點，階段 G 抽樣 {{m: S ≈ 50}}。
+關鍵在於<b>沒有全域取樣包在外層</b>，所以整份工作是尷尬平行的，
+成本隨單位數線性成長。這是放棄全域目標換來的直接好處，
+也是它與整合篇那條路線在工程上的主要差別。</p>
+
+<h3>八、驗收條件</h3>
+
+<h4>核心：局部打散的負對照</h4>
+
+<p class="prose">單位層級的結論沒有金標準，但有一個乾淨的負對照。
+在<b>每個單位內部</b>打散分子的 somatic–somatic 配對，同時保留：
+每個位點的 somatic 邊際計數、每條分子的覆蓋遮罩、
+每個位點的 germline–somatic 列聯表、深度與品質分層。
+打散之後，資料在所有邊際統計量上與原始資料相同，
+<b>唯一被移除的就是共現</b>。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>比較</th><th>量什麼</th><th>結論的讀法</th></tr></thead>
+<tbody>
+<tr><td>原始 vs 打散</td><td><code>REFINES_GLOBAL</code> 的個數</td><td>差值即本規格的主要效果量；打散提供虛無分布</td></tr>
+<tr><td>原始 vs 打散</td><td>留一分子的預測似然</td><td>共現是否真的攜帶邊際以外的資訊</td></tr>
+<tr><td>逐單位</td><td>可置換分子比例、實際改變比例、獨立打散份數</td><td>三者任一過低時輸出 <code>SHUFFLE_UNDERPOWERED</code>，不得把「沒有差別」解讀為「沒有共現訊號」</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>其餘各層</h4>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>層級</th><th>必須通過的測試</th><th>失敗意義</th></tr></thead>
+<tbody>
+<tr><td>機率核</td><td>每個遮罩下的樣式機率加總為 1；部分覆蓋 read 的邊際化結果與顯式加總一致</td><td>似然未正規化或把未覆蓋位點當成參考型</td></tr>
+<tr><td>相容性</td><td>對隨機狀態集合，四配子檢定的結果與 perfect phylogeny 建構的成敗一致</td><td>相容性判定與樹建構不同源</td></tr>
+<tr><td>地板</td><td>以 germline-only 單位（無 somatic 訊號）估到的假狀態率與模型預測一致</td><td>地板訂錯 —— 訂低會生出假 lineage，訂高會吃掉真的低頻支</td></tr>
+<tr><td>先驗影響</td><td>{{m: λ}} 掃描下 <code>REFINES_GLOBAL</code> 的個數變化須平滑且可解釋</td><td>結論由先驗而非資料決定</td></tr>
+<tr><td>可辨識性</td><td>刻意合成兩支 CCF 相同的 lineage：僅用邊際的擬合必須<b>無法</b>分開，加入共現後必須分開</td><td>程式以隱藏的先驗或 bug 假造了可辨識性</td></tr>
+<tr><td>重現性</td><td>同細胞株跨 basecaller、跨機構的單位分類一致度；與既有實作的 0.909 對照</td><td>分類是流程雜訊而非訊號</td></tr>
+<tr><td>半合成</td><td>兩株已知細胞株依已知比例混合，在兩者基因型相異的視窗回收兩支結構</td><td>局部推論在已知答案上就不對</td></tr>
+<tr><td>下游</td><td>三層特徵各自的 precision／recall 增益，含不可用子集</td><td>特徵沒有增量，或在多數子集上造成傷害</td></tr>
+<tr><td>留一法</td><td>候選出現在自己的錨點集合時必須直接失敗</td><td>特徵抄了候選自己的 ALT 計數</td></tr>
+<tr><td>切分</td><td>{{m: S_1}} 與階段 G 輸入位點的交集為空；訓練／驗證不共用樣本</td><td>重複計數或資料洩漏</td></tr>
+</tbody>
+</table>
+</div>
+
+{{svg:rg-detection-window | [wide] 窄視窗下每個家族 60 條分子、錯誤率千分之五時，
+可偵測的比例下界約為 0.05。該下界應逐單位計算，不宜採用固定常數 ——
+它正是第二節那個錯誤地板的數值。}}
+
+<h3>九、實作分期</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>階段</th><th>做什麼</th><th>可單獨驗證的內容</th><th>不得宣稱之事</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>稀疏狀態表（含遮罩）與就地錯誤率校準</td><td>能重現現行分類的計數；地板與 germline-only 單位一致</td><td>任何生物學結論</td></tr>
+<tr><td>1</td><td>單一單位的局部後驗，先驗用平坦的</td><td>機率核、相容性、邊際化三項測試</td><td>解析度優於全域</td></tr>
+<tr><td>2</td><td>階段 G（限 {{m: S_1}}）＋ 原子先驗 ＋ 逃逸質量</td><td>{{m: λ}} 敏感度；合成的等值 CCF 例子可分開</td><td>真實樣本的準確度</td></tr>
+<tr><td>3</td><td>全樣本跑完，輸出目錄與 <code>REFINES_GLOBAL</code> 計數</td><td>打散負對照的效果量與虛無分布</td><td>細胞層級的群數</td></tr>
+<tr><td>4</td><td>第 0、1 層特徵 ＋ 事後重新評分</td><td>是否勝過 caller 既有的相位通道</td><td>第 2 層的貢獻</td></tr>
+<tr><td>5</td><td>第 2 層特徵，分層報告</td><td>可用子集上的增益、不可用子集上的無害</td><td>總體平均掩蓋分層差異</td></tr>
+<tr><td>6</td><td>重現性與癌別關聯；匯出成對關係</td><td>跨 basecaller 一致度</td><td>沒有金標準的準確度宣稱</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+
+<section data-part="evidence">
+<h2>真實資料與證據</h2>
+
+<h3>庫存：原料已經在了</h3>
+
+<p class="prose">以下數值來自本實驗室既有實作在七個資料集、六個生物樣本、chr1–22 上的輸出。
+在本規格的脈絡下，它們的意義與前一篇不同：不再是「有幾條約束」，
+而是「有幾個單位可以各自輸出一列」。</p>
+
+{{svg:rg-class-spectrum | [wide] 七個資料集的區域分類組成。
+在本規格下這張圖量的是局部系譜的形狀分布：
+「分支類」僅佔 6%–22%，而分岔正是全域頻率譜最無能為力的形狀。}}
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>觀測</th><th>數值</th><th>在本規格的意義</th></tr></thead>
+<tbody>
+<tr><td>可分析單位總數</td><td>85,941 個含突變的「區域 × 單倍型家族」</td><td>目錄的列數上限，不需重新定序</td></tr>
+<tr><td>候選集合可完整列舉</td><td>75,224 個（<b>87.53%</b>）</td><td>第七節第 4 步可完整列舉的比例</td></tr>
+<tr><td>分支類的比例</td><td>各資料集 <b>6%–22%</b></td><td>最可能掛上 <code>REFINES_GLOBAL</code> 的一類</td></tr>
+<tr><td>多層無分支的比例</td><td>38.1%–53.3%</td><td>先後關係的來源，數量最多</td></tr>
+<tr><td>更換 basecaller 的重現性</td><td>同細胞株跨機構 <b>0.909</b></td><td>第八節重現性測試的既有對照值</td></tr>
+<tr><td>單一單位的覆蓋結構</td><td>194 條 read，覆蓋 3 個位點者僅 3 條</td><td>遮罩必須留下來的直接依據</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">三點必須先講清楚。<b>其一，這些數字支持的是「原料充足」，不是「結論成立」。</b>
+6%–22% 的分支類是<b>上限</b>：判定分岔需要兩個單一狀態皆存在，
+<b>且</b>雙狀態的缺席不是抽樣零也不是錯誤地板 —— 後者正是第二節要檢驗的對象。
+<b>其二，0.909 是重現性，不是準確度。</b>它證明分類不是流程雜訊，
+不證明分類是對的；改成本規格的推論之後應重算此值並比較。
+<b>其三，有一項計數需要釐清。</b>各資料集的單位數總和為 71,955，
+而結論中引用的數值為 85,941；兩者可能計數不同的對象，成文前須確認。</p>
+
+<h3>既有方法佔據的邊界</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>既有能力</th><th>代表方法</th><th>本規格不可據此宣稱之處</th></tr></thead>
+<tbody>
+<tr><td>由邊際 VAF 與拷貝數重建細胞層級 clone tree</td><td>PyClone、SciClone、PhyloWGS、Pairtree、DPClust</td><td>不可宣稱全域樹準確度提升</td></tr>
+<tr><td>把中性演化的尾巴與真正的 subclone 分開</td><td>MOBSTER</td><td>不可宣稱首次處理「頻率群集不等於 clone」</td></tr>
+<tr><td>以<b>成對</b>位點的分子狀態建 subclone 與樹</td><td>PairClone、TreeClone</td><td>不可宣稱多位點共現本身為新意</td></tr>
+<tr><td>相位輔助的等位／subclonal 拷貝數</td><td>Battenberg、Refphase、HATCHet2</td><td>不可宣稱 phased CN 為新意</td></tr>
+<tr><td>somatic caller 使用 germline 相位通道</td><td>ClairS、DeepSomatic</td><td><b>不可宣稱單倍型感知呼叫為新意</b> —— 第 1 層是基準不是貢獻</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">候選新意因此只剩兩處，而且都必須先做文獻檢索才能使用「首次」二字：
+其一，<b>把可變 {{m: k}} 的多位點共現當成估計目標本身</b>（而不是當成全域樹的約束），
+並以逐單位的旗標與打散負對照給出可計數的效果量；
+其二，<b>把同一條 germline 單倍型內部的 somatic lineage 一致性做成 caller 的特徵通道</b>。
+PairClone 與 TreeClone 處理的是成對位點且目標仍是全域 subclone 結構；
+ClairS 的相位通道停在兩條 germline 單倍型這一層。</p>
+</section>
+
+
+<section data-part="predict">
+<h2>預測與結果檢視</h2>
+
+{{ask}}
+<p class="prose">既然不跟全域方法比準確度，又沒有金標準，
+那怎麼知道這條路線不是把雜訊當成 subclone？</p>
+{{reveal}}
+<p class="prose"><b>靠兩個東西：一個有虛無分布的計數，與一個有 truth set 的下游終點。</b></p>
+
+<p class="prose">第一個是 <code>REFINES_GLOBAL</code> 的個數。
+它本身不是證據 —— 錯誤地板訂低一點，這個數字就會漲。
+真正的證據是它與<b>打散對照</b>的差：打散保留了所有邊際統計量、
+所有覆蓋遮罩、所有 germline–somatic 列聯表，只移除 somatic 之間的共現。
+如果這個數字在打散後掉不下來，那它量到的就是覆蓋幾何或錯誤率，不是共現。
+這個對照不需要金標準，而且它會<b>反過來咬自己</b> —— 這正是它有用的原因。</p>
+
+<p class="prose">第二個是 somatic calling 的 precision／recall。
+這裡有既有的 truth set，判定不需要任何 clone tree 的真值。
+而且它要求的東西比「局部結構看起來合理」嚴格得多：
+特徵必須在留一法之下、在 caller 已有的相位通道<b>之外</b>還有增量，
+還要在沒有第 2 層的九成候選上不造成傷害。三個條件任一不過，這條路線就沒有站住。</p>
+
+<p class="prose">反過來說，有兩件事這兩個檢驗都<b>不能</b>證明，必須自己標明：
+它們不能證明局部節點對應到真實的細胞群（節點是分子狀態，甲基化的觀測已經指出同一狀態下還分得出數群）；
+也不能證明全域 clone tree 因此變準了 —— 那要另外量，而本規格沒有量它。</p>
+{{/ask}}
+
+<h3>預期結果模式</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>資料情境</th><th>預期輸出</th><th>正確結論</th></tr></thead>
+<tbody>
+<tr><td>單一 clone、突變負荷低</td><td>幾乎全部 <code>GLOBAL_CONSISTENT</code>，打散後無差異</td><td>局部沒有可加的資訊，這是正確的負結果</td></tr>
+<tr><td>兩支 CCF 相同的 lineage，且其變異落在同一批單位</td><td>該批單位掛 <code>REFINES_GLOBAL</code>，打散後消失</td><td>本規格的主要成立情境</td></tr>
+<tr><td>兩支 CCF 相同，但變異散在不同單位</td><td>無旗標，與單一 clone 無法區分</td><td>read 跨距的硬上限，不是模型失敗</td></tr>
+<tr><td>家族誤標率偏高</td><td><code>INCOMPATIBLE</code> 比例上升，<code>REFINES_GLOBAL</code> 同步上升，但打散後不下降</td><td>是地板問題，不得解讀為 subclone</td></tr>
+<tr><td>kataegis 叢</td><td>單一視窗貢獻大量高度相關的單位</td><td>整叢降權為一個有效觀測</td></tr>
+<tr><td>下游：第 2 層可用的子集</td><td>precision 上升而 recall 持平或微升</td><td>可歸因於 lineage 一致性</td></tr>
+<tr><td>下游：第 2 層不可用的子集</td><td>指標不變</td><td>缺席通道有效；若下降則缺席契約寫錯了</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>尚未解決的問題</h3>
+
+<ul class="prose">
+<li><b>整條路線尚未經實測。</b>本頁各項皆有結構性的理由，但都未在真實資料上檢驗。
+最小的驗證是第八節那個等值 CCF 的合成例子：確認僅用邊際的擬合必然分不開，
+再量需要多少條跨越分子、地板要估得多準才分得開而不誤拆。</li>
+<li><b>{{m: λ}} 沒有客觀的訂法。</b>它是這條路線唯一一個靠判斷的旋鈕。
+可以掃描與做敏感度分析，但「掃出來最好看的那個值」不是估計。
+是否有辦法由資料本身（例如以留一單位的預測似然）把它定下來，尚未回答。</li>
+<li><b>階段 G 的錯誤會整批傳下去。</b>切斷回饋的代價是局部無法修正全域；
+若階段 G 的群數少算一個，所有原子都會偏，而局部只會用逃逸質量吸收，
+表現為 <code>LOCAL_ONLY_LINEAGE</code> 大量出現。這個失效模式的診斷還沒設計。</li>
+<li><b>第 2 層特徵的覆蓋率可能是致命傷。</b>約九成的候選沒有這一層。
+若增益只出現在一成的候選上，整體指標的改善可能小到無法與雜訊區分 ——
+分層報告能看到它，但要說服人這值得做，需要先算出分層樣本量夠不夠。</li>
+<li><b>單位的來源有偏性。</b>它們只來自變異密集的區域，
+而密集有時並非偶然（kataegis）。降權規則已寫，但降權的強度沒有依據。</li>
+<li><b>與整合篇的關係尚未決定。</b>本規格刻意切斷回饋，整合篇則走完整聯合。
+兩者不是替代關係，但如果聯合模型可行，本規格的局部後驗應該是它的一個近似 ——
+這個近似有多差，沒有評估。</li>
+<li><b>「首次」尚不可用。</b>PairClone、TreeClone、Pairtree、CliP、LICHeE 與
+以 read linkage 輔助 subclone 的既有工作都需要系統性檢索之後，
+才能界定第八節那兩處候選新意是否真的空著。</li>
+</ul>
+
+<h3>原始文獻與程式碼</h3>
+
+<p class="prose">本頁「庫存」一節的數值均出自：廖子游，
+<i>Subclonal reconstruction using somatic haplotagging and methylation profiles with
+Nanopore sequencing</i>，國立中正大學資訊工程學系碩士學位口試，2026 年 7 月 30 日。</p>
+
+<p class="prose">以 read 上的多位點狀態計數直接建模 subclone，最接近的既有做法是
+Zhou T, Sengupta S, Müller P, Ji Y, <i>PairClone: a Bayesian subclone caller based on mutation pairs</i>，
+<i>J R Stat Soc Ser C</i> 2019;68:705–725
+（<a href="https://academic.oup.com/jrsssc/article/68/3/705/7058355">academic.oup.com</a>）；
+以及 Zhou T et al., <i>TreeClone: Reconstruction of tumor subclone phylogeny based on genotype pairs</i>，
+<a href="https://arxiv.org/abs/1703.03853">arXiv:1703.03853</a>。</p>
+
+<p class="prose">作為對照基準的全域重建路線：SciClone，Miller CA et al., <i>PLoS Comput Biol</i>
+2014;10:e1003665；PyClone，Roth A et al., <i>Nat Methods</i> 2014;11:396–398；
+PhyloWGS，Deshwar AG et al., <i>Genome Biol</i> 2015;16:35
+（<a href="https://doi.org/10.1186/s13059-015-0602-8">doi 10.1186/s13059-015-0602-8</a>）；
+Pairtree，Wintersinger JA et al., <i>Blood Cancer Discov</i> 2022;3:208–219
+（<a href="https://doi.org/10.1158/2643-3230.BCD-21-0092">doi 10.1158/2643-3230.BCD-21-0092</a>），
+程式碼在 <a href="https://github.com/morrislab/pairtree"><code>github.com/morrislab/pairtree</code></a>；
+MOBSTER，Caravagna G et al., <i>Nat Genet</i> 2020;52:898–907
+（<a href="https://doi.org/10.1038/s41588-020-0675-5">doi 10.1038/s41588-020-0675-5</a>）。
+評比數據見 Salcedo A et al., <i>Nat Biotechnol</i> 2024
+（<a href="https://doi.org/10.1038/s41587-024-02250-y">doi 10.1038/s41587-024-02250-y</a>）。</p>
+
+<p class="prose">下游 caller：ClairS，Zheng Z et al., <i>ClairS: a deep-learning method for long-read
+somatic small variant calling</i>，<a href="https://doi.org/10.1101/2023.08.17.553778">bioRxiv 2023，doi 10.1101/2023.08.17.553778</a>，
+程式碼在 <a href="https://github.com/HKU-BAL/ClairS"><code>github.com/HKU-BAL/ClairS</code></a>；
+DeepSomatic，Park J, Cook DE, Chang PC et al., <i>Accurate somatic small variant discovery for
+multiple sequencing technologies with DeepSomatic</i>，<i>Nat Biotechnol</i> 2025
+（<a href="https://doi.org/10.1038/s41587-025-02839-x">doi 10.1038/s41587-025-02839-x</a>），
+程式碼在 <a href="https://github.com/google/deepsomatic"><code>github.com/google/deepsomatic</code></a>。</p>
+
+<p class="prose">「切斷回饋」這個做法的統計出處為 Plummer M, <i>Cuts in Bayesian graphical models</i>,
+<i>Stat Comput</i> 2015;25:37–43
+（<a href="https://doi.org/10.1007/s11222-014-9503-z">doi 10.1007/s11222-014-9503-z</a>）；
+該文同時指出這類後驗<b>不是</b>任何聯合模型的邊際分布，也指出其計算上的陷阱，
+是第三節那句「不得寫成聯合估計」的依據。
+四配子檢定與 perfect phylogeny 的標準參考為 Gusfield D,
+<i>Efficient algorithms for inferring evolutionary trees</i>, <i>Networks</i> 1991;21:19–28；
+簡約假設的原始出處為 Camin JH, Sokal RR,
+<i>A method for deducing branching sequences in phylogeny</i>, <i>Evolution</i> 1965;19:311–326。</p>
+
+<p class="prose">前處理所依賴的單倍型標記見 LongPhase-S 預印本
+（<a href="https://www.biorxiv.org/content/10.1101/2025.11.20.689492v1">bioRxiv, 2025，doi 10.1101/2025.11.20.689492</a>），
+程式碼在 <a href="https://github.com/CCU-Bioinformatics-Lab/longphase-s"><code>github.com/CCU-Bioinformatics-Lab/longphase-s</code></a>。
+參數名稱與欄位一律以<b>原始碼</b>為準。</p>
+</section>

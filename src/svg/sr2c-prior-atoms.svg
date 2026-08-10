@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 568">
+  <title>全域頻率譜當作局部比例的先驗：原子加上逃逸質量</title>
+  <desc>三個並排的分布圖，橫軸都是某一個局部狀態的分子比例。
+        左圖是稀疏局部計數自己的似然：只有 20 條跨越分子時，這條曲線又寬又平，
+        單靠這個單位什麼都定不下來。
+        中圖是階段 G 的全域頻率譜提供的先驗：幾根很窄的尖峰落在全域算出來的 CCF 位置上，
+        底下另有一條很低但不為零的水平線，代表逃逸質量，
+        它保留了「這一支 lineage 只在局部存在、全域頻譜上沒有對應的峰」這個可能。
+        右圖是兩者合起來的後驗：主峰被拉到某一個原子上而變窄，
+        同時仍留下一個較小的次峰，那是只有局部看得到的那一支。
+        最下方是警告：逃逸質量是這條路線唯一一個靠判斷的旋鈕。
+        設成零，局部結構會被強行貼回全域原子，解析度歸零，等於沒做這一階段；
+        設成一，等於丟掉全域資訊，20 條分子撐不起任何結論。
+        它必須預先登錄並做敏感度分析。</desc>
+
+  <text class="ttl zh" x="20" y="36">全域頻率譜怎麼變成局部比例的先驗</text>
+
+  <!-- 左：稀疏計數的似然 -->
+  <rect class="box" x="18" y="58" width="310" height="342" rx="8"/>
+  <text class="lbl bold zh" x="34" y="94">稀疏的局部計數</text>
+  <text class="tick zh" x="34" y="120">20 條分子，比例定不下來</text>
+  <line class="axis" x1="40" y1="290" x2="306" y2="290"/>
+  <path class="axis accent" d="M46,288 C100,288 105,180 173,180 C241,180 246,288 300,288"/>
+  <text class="tick zh" x="34" y="336">似然很寬</text>
+  <text class="tick zh" x="34" y="366">單靠這 20 條，什麼都定不下來</text>
+
+  <!-- 中：全域頻譜給的先驗 -->
+  <rect class="box" x="345" y="58" width="310" height="342" rx="8"/>
+  <text class="lbl bold zh" x="361" y="94">全域頻譜給的先驗</text>
+  <text class="tick zh" x="361" y="120">原子 ＋ 逃逸質量</text>
+  <line class="axis" x1="367" y1="290" x2="633" y2="290"/>
+  <line class="axis accent" x1="420" y1="290" x2="420" y2="162"/>
+  <line class="axis accent" x1="500" y1="290" x2="500" y2="200"/>
+  <line class="axis accent" x1="572" y1="290" x2="572" y2="236"/>
+  <line class="guide somatic" x1="367" y1="276" x2="633" y2="276"/>
+  <text class="tick zh" x="361" y="336">尖峰的位置來自階段 G</text>
+  <text class="tick zh" x="361" y="366">那條低線是逃逸質量</text>
+
+  <!-- 右：合起來的後驗 -->
+  <rect class="box accent" x="672" y="58" width="310" height="342" rx="8"/>
+  <text class="lbl bold zh" x="688" y="94">合起來的後驗</text>
+  <text class="tick zh" x="688" y="120">收緊，但沒有把逃逸封死</text>
+  <line class="axis" x1="694" y1="290" x2="960" y2="290"/>
+  <path class="axis accent" d="M726,290 L748,150 L770,290"/>
+  <path class="axis ok" d="M862,290 L882,232 L902,290"/>
+  <text class="tick zh" x="688" y="336">主峰貼上其中一個原子</text>
+  <text class="tick zh ok" x="688" y="366">次峰是局部才看得到的那一支</text>
+
+  <!-- 警告 -->
+  <rect class="box warn" x="18" y="424" width="964" height="124" rx="8"/>
+  <text class="lbl bold zh warn" x="34" y="458">逃逸質量是這條路線唯一一個靠判斷的旋鈕</text>
+  <text class="anno zh" x="34" y="490">設成 0：局部結構被強行貼回全域原子，解析度歸零 —— 等於沒做這一階段。</text>
+  <text class="anno zh" x="34" y="522">設成 1：等於丟掉全域資訊，20 條分子撐不起結論。它必須預先登錄並做敏感度分析。</text>
+</svg>
