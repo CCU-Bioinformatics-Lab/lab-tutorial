@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 568">
+  <title>單位實際長什麼樣：多數只有兩個位點，多數形狀是鏈</title>
+  <desc>左欄是每個視窗含幾個體細胞變異位點。
+        位點數等於二是七個資料集中六個的最大單一類，但集中程度差很多：
+        HCC1395_NYGC 有七成六七的視窗只有兩個位點，H2009 只有一成六八，
+        而且只有 H2009 把位點數一路填到上限十二。
+        因此多數單位講的是一對位點之間的關係，要談多層系譜得位點數至少三個。
+        右欄是重建出來的形狀組成。無分支的類別在每個資料集都佔多數，
+        由七成一七到八成八五，有分支的類別到處都是少數。
+        原因寫在下方的方塊裡：一條鏈只要一個觀測到的樣式就建得起來，
+        一個分岔卻要兩個互不包含的樣式，
+        所以分岔稀少反映的是這個單位帶了多少不同的樣式證據，不只是底下的結構。
+        最下方指出這件事限制了什麼、又沒有限制什麼：
+        它限制了深度，多數單位只講得出一對位點的先後；
+        但它沒有限制可偵測性，前面那個證據預算在兩個位點時就成立，
+        位點數增加買到的是深度，不是分不分得出來。</desc>
+
+  <text class="ttl zh" x="20" y="36">單位實際長什麼樣</text>
+
+  <!-- 位點數 -->
+  <rect class="box" x="18" y="58" width="470" height="342" rx="8"/>
+  <text class="lbl bold zh" x="34" y="94">一個視窗有幾個位點</text>
+  <text class="tick zh" x="34" y="120">k=2 在七個資料集中有六個是最大類</text>
+
+  <text class="tick mono" x="34" y="164">HCC1395_NYGC</text>
+  <rect class="bar" x="34" y="174" width="300" height="18" rx="4"/>
+  <rect class="bar somatic" x="34" y="174" width="230" height="18" rx="4"/>
+  <text class="tick mono" x="344" y="188">76.7%</text>
+
+  <text class="tick mono" x="34" y="228">H2009</text>
+  <rect class="bar" x="34" y="238" width="300" height="18" rx="4"/>
+  <rect class="bar somatic" x="34" y="238" width="50" height="18" rx="4"/>
+  <text class="tick mono" x="344" y="252">16.8%</text>
+
+  <text class="tick zh" x="34" y="298">深色 ＝ 只有兩個位點的視窗</text>
+  <text class="tick zh" x="34" y="328">只有 H2009 把 k 一路填到上限 12</text>
+  <text class="tick bold zh" x="34" y="368">多數單位講的是一對位點的關係</text>
+
+  <!-- 形狀 -->
+  <rect class="box" x="512" y="58" width="470" height="342" rx="8"/>
+  <text class="lbl bold zh" x="528" y="94">重建出來的形狀</text>
+  <text class="tick zh" x="528" y="120">無分支類在每個資料集都佔多數</text>
+
+  <rect class="bar" x="528" y="150" width="420" height="26" rx="4"/>
+  <rect class="bar ok" x="528" y="150" width="301" height="26" rx="4"/>
+  <rect class="bar warn" x="829" y="150" width="71" height="26" rx="4"/>
+  <text class="tick zh" x="528" y="202">無分支 71.7%–88.5%</text>
+  <text class="tick zh end" x="948" y="202">有分支：少數</text>
+
+  <rect class="box sunken" x="528" y="222" width="420" height="112" rx="6"/>
+  <text class="tick bold zh" x="544" y="252">為什麼分岔這麼少</text>
+  <text class="tick zh" x="544" y="282">一條鏈只要一個觀測到的樣式</text>
+  <text class="tick zh" x="544" y="312">一個分岔要兩個互不包含的樣式</text>
+  <text class="tick bold zh warn" x="528" y="368">稀少反映的是樣式證據量</text>
+
+  <!-- 限制了什麼 -->
+  <rect class="box accent" x="18" y="424" width="964" height="124" rx="8"/>
+  <text class="lbl bold zh" x="34" y="458">這限制了什麼，又沒有限制什麼</text>
+  <text class="anno zh" x="34" y="490">限制了<tspan class="bold">深度</tspan>：多數單位只講得出一對位點的先後，談不上多層系譜。</text>
+  <text class="anno zh" x="34" y="522">沒有限制<tspan class="bold">可偵測性</tspan>：前面那個證據預算在 k=2 就成立 —— k 變大買的是深度。</text>
+</svg>
