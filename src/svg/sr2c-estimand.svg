@@ -1,88 +1,139 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 692">
-  <title>兩種估計目標：全域細胞層級的 clone tree 與局部分子層級的系譜</title>
-  <desc>左右兩欄並列，比較兩個不同的估計目標。
-        左欄是既有做法的目標：一棵細胞層級的 clone tree。
-        它的估計對象是全基因體上的細胞群數、各群比例與樹的形狀。
-        觀測以每個變異的邊際 VAF 加上拷貝數的形式進入似然。
-        一個「群」的定義是全基因體共用的一個 CCF 位置，
-        所以它分不出細胞比例相同的兩支 lineage，
-        而且要數千個變異才撐得起一群。
-        右欄是本規格的目標：一個視窗內的分子系譜。
-        它的估計對象是單位內各個局部狀態的比例與先後關係。
-        觀測以同一條分子上多個位點的共現形式進入似然。
-        一個「節點」只在這個單位內有定義，
-        所以它分不出跨越 read 距離以外的任何關係，
-        但數十條跨越分子就有判別力。
-        最下方是結論：兩欄不是好壞之分，而是解析度的層級不同。
-        左欄回答整個腫瘤有幾群細胞，右欄回答這一段 DNA 上分子的先後長什麼樣。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800">
+  <title>同一批變異，做成一棵全域樹，或做成幾百棵局部小樹</title>
+  <desc>由上而下三層，說明估計目標的改動。
+        最上層是同一批觀測：一條全基因體的長條，上面散布著體細胞變異；
+        其中四段用虛線框起來，那是有讀序把兩個以上變異連鎖起來的區域，依序標為 R1 到 R4；
+        框外還有許多變異沒有被任何讀序連鎖起來。
+        中間一層是既有做法：把所有變異匯集成每個變異的邊際等位頻率，
+        輸出<b>一棵</b>細胞層級的樹。這棵樹的一個節點是一群細胞，
+        解析度的單位是一個全基因體共用的細胞比例位置，
+        所以細胞比例相同的兩支 lineage 必然被併成同一個節點。
+        最下層是本規格：每一個框起來的區域，各自依兩條染色體拷貝再切成兩個單位，
+        每個單位各輸出一棵小樹，因此圖上有八棵彼此獨立的小樹。
+        八棵的形狀各不相同：有的只有一條邊，有的是一條鏈，有的分岔，
+        而且同一個區域的兩個家族可以是不同的形狀 —— 這是資料決定的輸出，不是設定。
+        沒有被連鎖起來的變異不產生任何小樹。
+        最下方的結論是：兩邊看的是同一批讀序，差別只在把它們摘要成什麼。
+        左邊是每個變異的邊際計數，右邊是同一條分子上的共現。
+        而那些小樹不接成一棵大樹，因為局部標籤只在單位內有定義。</desc>
 
-  <text class="ttl zh" x="20" y="36">估計目標換掉了，不是同一個目標換一個方法</text>
+  <text class="ttl zh" x="20" y="36">同一批變異：匯集成一棵樹，或留成幾百棵小樹</text>
 
-  <!-- 左欄：全域細胞層級 -->
-  <rect class="box" x="18" y="58" width="470" height="510" rx="8"/>
-  <text class="lbl bold zh" x="34" y="92">既有做法的目標</text>
-  <text class="tick zh" x="34" y="118">一棵細胞層級的 clone tree</text>
+  <!-- ── 同一批觀測 ── -->
+  <rect class="box" x="18" y="56" width="964" height="94" rx="8"/>
+  <text class="lbl bold zh" x="34" y="86">同一批 read、同一批體細胞變異</text>
 
-  <circle class="cell tumor" cx="80" cy="152" r="15"/>
-  <circle class="cell clone1" cx="60" cy="212" r="15"/>
-  <circle class="cell clone2" cx="122" cy="212" r="15"/>
-  <line class="conn" x1="80" y1="167" x2="62" y2="197"/>
-  <line class="conn" x1="80" y1="167" x2="120" y2="197"/>
+  <rect class="box sunken" x="34" y="96" width="932" height="26" rx="4"/>
+  <rect class="box ghost" x="110" y="92" width="70" height="34" rx="4"/>
+  <rect class="box ghost" x="330" y="92" width="60" height="34" rx="4"/>
+  <rect class="box ghost" x="550" y="92" width="75" height="34" rx="4"/>
+  <rect class="box ghost" x="790" y="92" width="70" height="34" rx="4"/>
 
-  <text class="tick zh" x="170" y="152">一群 ＝ 全基因體共用的 CCF</text>
-  <text class="tick zh" x="170" y="180">數千個變異一起撐起一群</text>
-  <text class="tick zh" x="170" y="208">圖上的節點是一個細胞群</text>
+  <circle class="mark somatic" cx="122" cy="109" r="5"/>
+  <circle class="mark somatic" cx="145" cy="109" r="5"/>
+  <circle class="mark somatic" cx="168" cy="109" r="5"/>
+  <circle class="mark somatic" cx="342" cy="109" r="5"/>
+  <circle class="mark somatic" cx="378" cy="109" r="5"/>
+  <circle class="mark somatic" cx="562" cy="109" r="5"/>
+  <circle class="mark somatic" cx="587" cy="109" r="5"/>
+  <circle class="mark somatic" cx="612" cy="109" r="5"/>
+  <circle class="mark somatic" cx="802" cy="109" r="5"/>
+  <circle class="mark somatic" cx="825" cy="109" r="5"/>
+  <circle class="mark somatic" cx="848" cy="109" r="5"/>
+  <circle class="mark somatic" cx="60" cy="109" r="5"/>
+  <circle class="mark somatic" cx="230" cy="109" r="5"/>
+  <circle class="mark somatic" cx="270" cy="109" r="5"/>
+  <circle class="mark somatic" cx="440" cy="109" r="5"/>
+  <circle class="mark somatic" cx="480" cy="109" r="5"/>
+  <circle class="mark somatic" cx="672" cy="109" r="5"/>
+  <circle class="mark somatic" cx="710" cy="109" r="5"/>
+  <circle class="mark somatic" cx="740" cy="109" r="5"/>
+  <circle class="mark somatic" cx="900" cy="109" r="5"/>
+  <circle class="mark somatic" cx="940" cy="109" r="5"/>
 
-  <text class="tick bold zh" x="34" y="266">估計對象</text>
-  <text class="tick zh" x="34" y="292">全基因體的細胞群數、比例與樹</text>
+  <text class="tick mono mid" x="145" y="144">R₁</text>
+  <text class="tick mono mid" x="360" y="144">R₂</text>
+  <text class="tick mono mid" x="587" y="144">R₃</text>
+  <text class="tick mono mid" x="825" y="144">R₄</text>
 
-  <text class="tick bold zh" x="34" y="328">觀測進入似然的形式</text>
-  <text class="tick zh" x="34" y="354">每個變異的邊際 VAF ＋ 拷貝數</text>
+  <!-- ── 既有做法：一棵 ── -->
+  <rect class="box" x="18" y="170" width="964" height="220" rx="8"/>
+  <text class="lbl bold zh" x="34" y="204">既有做法：全部匯集成邊際 VAF，輸出一棵樹</text>
 
-  <text class="tick bold zh" x="34" y="390">解析度的單位</text>
-  <text class="tick zh" x="34" y="416">一個全基因體共用的 CCF 位置</text>
+  <text class="tick zh" x="34" y="270">數千個變異的邊際計數匯在一起</text>
+  <text class="tick zh" x="34" y="298">位置資訊在匯集時就沒了</text>
 
-  <text class="tick bold zh bad" x="34" y="452">永遠分不出來的</text>
-  <text class="tick zh" x="34" y="478">CCF 相同的兩支 lineage</text>
+  <line class="conn" x1="500" y1="278" x2="458" y2="294"/>
+  <line class="conn" x1="500" y1="278" x2="542" y2="294"/>
+  <line class="conn" x1="450" y1="324" x2="450" y2="338"/>
+  <circle class="cell normal" cx="500" cy="262" r="16"/>
+  <circle class="cell tumor" cx="450" cy="308" r="16"/>
+  <circle class="cell tumor" cx="550" cy="308" r="16"/>
+  <circle class="cell tumor" cx="450" cy="354" r="16"/>
 
-  <text class="tick bold zh" x="34" y="514">撐起一個結論要多少證據</text>
-  <text class="tick zh" x="34" y="540">數千個變異</text>
+  <text class="tick zh" x="640" y="270">一個節點 ＝ 一群細胞</text>
+  <text class="tick zh" x="640" y="298">解析度單位：全基因體共用的 CCF</text>
+  <text class="tick zh bad" x="640" y="326">CCF 相同的兩支必然併成一個節點</text>
 
-  <!-- 右欄：局部分子層級 -->
-  <rect class="box accent" x="512" y="58" width="470" height="510" rx="8"/>
-  <text class="lbl bold zh" x="528" y="92">本規格的目標</text>
-  <text class="tick zh" x="528" y="118">一個視窗內的分子系譜</text>
+  <!-- ── 本規格：每個區域 × 每條拷貝各一棵 ── -->
+  <rect class="box accent" x="18" y="410" width="964" height="272" rx="8"/>
+  <text class="lbl bold zh" x="34" y="444">本規格：每個區域 × 每條染色體拷貝各一棵</text>
 
-  <rect class="read hp1" x="528" y="140" width="200" height="14" rx="6"/>
-  <rect class="read hp1" x="528" y="162" width="200" height="14" rx="6"/>
-  <rect class="read hp1" x="528" y="184" width="200" height="14" rx="6"/>
-  <rect class="read hp1" x="528" y="206" width="200" height="14" rx="6"/>
-  <circle class="mark somatic" cx="576" cy="147" r="6"/>
-  <circle class="mark somatic" cx="648" cy="147" r="6"/>
-  <circle class="mark somatic" cx="576" cy="169" r="6"/>
-  <circle class="mark somatic" cx="576" cy="191" r="6"/>
+  <text class="tick mono mid" x="145" y="472">R₁</text>
+  <text class="tick mono mid" x="360" y="472">R₂</text>
+  <text class="tick mono mid" x="587" y="472">R₃</text>
+  <text class="tick mono mid" x="825" y="472">R₄</text>
 
-  <text class="tick zh" x="748" y="152">同一條分子上的共現</text>
-  <text class="tick zh" x="748" y="180">節點只在這個單位內有定義</text>
-  <text class="tick zh" x="748" y="208">圖上的節點是一類分子狀態</text>
+  <text class="tick mono" x="34" y="500">HP1</text>
+  <line class="conn" x1="145" y1="503" x2="145" y2="511"/>
+  <circle class="cell normal" cx="145" cy="494" r="9"/>
+  <circle class="cell tumor" cx="145" cy="520" r="9"/>
 
-  <text class="tick bold zh" x="528" y="266">估計對象</text>
-  <text class="tick zh" x="528" y="292">單位內各局部狀態的比例與先後</text>
+  <line class="conn" x1="360" y1="503" x2="360" y2="511"/>
+  <line class="conn" x1="360" y1="529" x2="360" y2="537"/>
+  <circle class="cell normal" cx="360" cy="494" r="9"/>
+  <circle class="cell tumor" cx="360" cy="520" r="9"/>
+  <circle class="cell tumor" cx="360" cy="546" r="9"/>
 
-  <text class="tick bold zh" x="528" y="328">觀測進入似然的形式</text>
-  <text class="tick zh" x="528" y="354">同一條分子上多個位點的共現</text>
+  <line class="conn" x1="587" y1="503" x2="587" y2="511"/>
+  <circle class="cell normal" cx="587" cy="494" r="9"/>
+  <circle class="cell tumor" cx="587" cy="520" r="9"/>
 
-  <text class="tick bold zh" x="528" y="390">解析度的單位</text>
-  <text class="tick zh" x="528" y="416">一個視窗、一條染色體拷貝</text>
+  <line class="conn" x1="825" y1="503" x2="825" y2="511"/>
+  <circle class="cell normal" cx="825" cy="494" r="9"/>
+  <circle class="cell tumor" cx="825" cy="520" r="9"/>
 
-  <text class="tick bold zh bad" x="528" y="452">永遠分不出來的</text>
-  <text class="tick zh" x="528" y="478">跨越 read 距離以外的任何關係</text>
+  <text class="tick mono" x="34" y="586">HP2</text>
+  <line class="conn" x1="145" y1="589" x2="145" y2="597"/>
+  <line class="conn" x1="145" y1="615" x2="145" y2="623"/>
+  <circle class="cell normal" cx="145" cy="580" r="9"/>
+  <circle class="cell tumor" cx="145" cy="606" r="9"/>
+  <circle class="cell tumor" cx="145" cy="632" r="9"/>
 
-  <text class="tick bold zh" x="528" y="514">撐起一個結論要多少證據</text>
-  <text class="tick zh" x="528" y="540">數十條跨越分子</text>
+  <line class="conn" x1="354" y1="588" x2="338" y2="598"/>
+  <line class="conn" x1="366" y1="588" x2="382" y2="598"/>
+  <circle class="cell normal" cx="360" cy="580" r="9"/>
+  <circle class="cell tumor" cx="334" cy="606" r="9"/>
+  <circle class="cell tumor" cx="386" cy="606" r="9"/>
 
-  <!-- 結論 -->
-  <rect class="box sunken" x="18" y="588" width="964" height="90" rx="8"/>
-  <text class="anno bold zh" x="34" y="620">兩欄不是好壞之分，是解析度的層級不同。</text>
-  <text class="anno zh" x="34" y="654">左欄回答「整個腫瘤有幾群細胞」；右欄回答「這一段 DNA 上，分子的先後長什麼樣」。</text>
+  <line class="conn" x1="587" y1="589" x2="587" y2="597"/>
+  <line class="conn" x1="581" y1="614" x2="565" y2="624"/>
+  <line class="conn" x1="593" y1="614" x2="609" y2="624"/>
+  <circle class="cell normal" cx="587" cy="580" r="9"/>
+  <circle class="cell tumor" cx="587" cy="606" r="9"/>
+  <circle class="cell tumor" cx="561" cy="632" r="9"/>
+  <circle class="cell tumor" cx="613" cy="632" r="9"/>
+
+  <line class="conn" x1="825" y1="589" x2="825" y2="597"/>
+  <line class="conn" x1="825" y1="615" x2="825" y2="623"/>
+  <circle class="cell normal" cx="825" cy="580" r="9"/>
+  <circle class="cell tumor" cx="825" cy="606" r="9"/>
+  <circle class="cell tumor" cx="825" cy="632" r="9"/>
+
+  <text class="tick zh" x="34" y="664">形狀各不相同，同一個區域的兩個家族也可以不同；沒有連鎖的變異不產生小樹。</text>
+
+  <!-- ── 結論 ── -->
+  <rect class="box sunken" x="18" y="702" width="964" height="88" rx="8"/>
+  <text class="anno bold zh" x="34" y="736">兩邊看的是同一批 read，差別只在摘要成什麼。</text>
+  <text class="anno zh" x="34" y="768">左是每個變異的邊際計數；右是同一條分子上的共現。小樹不接成一棵大樹 —— 標籤只在單位內有定義。</text>
 </svg>
