@@ -246,10 +246,11 @@
 或「比 PhyloWGS／Pairtree 準」。那是另一個目標，本規格沒有量它。</p>
 </div>
 
-<h3 id="全域方法在哪裡失去局部解析度-三個機制-其中兩個是算得出來的">全域方法在哪裡失去局部解析度 —— 三個機制，其中兩個是算得出來的</h3>
+<h3 id="為什麼頻率譜不容易看到局部的結構">為什麼頻率譜不容易看到局部的結構</h3>
 
-<p class="prose">「全域方法犧牲了局部解析度」這句話如果只是印象，就沒有價值。
-以下把它拆成三條各自可檢驗的敘述。</p>
+<p class="prose">「全域方法犧牲了局部解析度」如果只是印象，就沒有價值。
+它其實是<b>一個</b>機制，而且可以換算成一個讀者能直接拿去對照自己資料的數字：
+<b>要說服頻率譜「這裡是兩群不是一群」，需要幾個變異？</b></p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" class="dia-svg" role="img" aria-labelledby="sr2-vaf-route__title" aria-describedby="sr2-vaf-route__desc">
   <title id="sr2-vaf-route__title">僅以 VAF 頻率譜重建 subclone 的四個步驟，及三項限制各自所在的參數</title>
@@ -393,172 +394,148 @@
   <text class="anno zh" x="690" y="606">位移，將汙染群的組成。</text>
   <text class="tick bold mono" x="690" y="638">參數：c</text>
   <text class="tick bold zh ok" x="690" y="662">→ 由用途三補足</text>
-</svg><figcaption>這是被論證針對的那一系：觀測進入模型的唯一形式是每個變異的邊際
-<math><mo>(</mo><msub><mi>a</mi><mi>m</mi></msub><mo>,</mo><msub><mi>d</mi><mi>m</mi></msub><mo>)</mo></math> 與該處拷貝數。下面三條的前提就是這張圖 ——
-凡不符合這張圖的方法（例如把成對共現也寫進似然的 PairClone／TreeClone），三條都不適用。</figcaption></figure>
+</svg><figcaption>先看清楚被討論的是哪一系：
+觀測進入模型的唯一形式是每個變異的<b>邊際</b>計數與該處拷貝數。
+PyClone、SciClone、PhyloWGS、Pairtree、DPClust、MOBSTER 都在這張圖裡，
+而它們正是這個領域被系統性評比的那一群。</figcaption></figure>
 
-<p class="prose"><b>其一：等值 CCF 的兩支 lineage 不可辨識，這是可以證的。</b>
-設一個估計器的似然只透過每個變異的邊際計數 <math><mo>(</mo><msub><mi>a</mi><mi>m</mi></msub><mo>,</mo><msub><mi>d</mi><mi>m</mi></msub><mo>)</mo></math> 與該處拷貝數依賴資料。
-若兩個 clone 的 CCF 相同，則它們給出的 <math><mi>θ</mi></math> 相同，
-於是把任何一個變異在這兩群之間改指派，似然完全不變。
-因此「這些變異分成哪兩支」以及由此決定的樹形，在該似然下<b>沒有</b>最大值可言 ——
-它是一整片等值面。中篇第三節那個 <math><mi>K</mi><mo>=</mo><mn>2</mn></math> 的例子就是這件事的一個實例。
-這條敘述與樣本量、深度都無關。</p>
-
-<p class="prose"><b>其二：代價與證據不對等，所以區域專屬的 lineage 付不起一個全域群。</b>
-在頻率譜上多開一群要付的代價約為 <math><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>p</mi><mi>K</mi></msub><mi>log</mi><msub><mi>M</mi><mi>eff</mi></msub></math>；
-參數兩個、有效觀測三千時約 8 nats。
-而一個變異能提供的分離證據約為 <math><mi>d</mi><mo>(</mo><msub><mi>θ</mi><mn>1</mn></msub><mo>−</mo><msub><mi>θ</mi><mn>2</mn></msub><msup><mo>)</mo><mn>2</mn></msup><mo>/</mo><mn>2</mn><mover accent="true"><mi>θ</mi><mo>‾</mo></mover><mo>(</mo><mn>1</mn><mo>−</mo><mover accent="true"><mi>θ</mi><mo>‾</mo></mover><mo>)</mo></math>，
-在深度 50、兩群期望值 0.20 與 0.15 時約 0.43 nats。
-一支只在某個視窗內與母群體不同、因而只帶三個變異的 lineage，
-總共只能提供約 1.3 nats —— 差得不是一點點。
-<b>這不是「不容易偵測」，是它在那個模型的支撐集上開不出來。</b></p>
-
-<p class="prose"><b>其三：同一份證據換一條通道就夠了。</b>
-同樣那三個變異，若三者共現的狀態在 20 條跨越分子中出現 5 條，
-對照就地估到的錯誤地板 0.01，對數似然比約 12 nats。
-證據量的差別不來自資料量 —— 兩條路線看的是同一批 read ——
-而來自<b>它們被摘要成不同的統計量</b>。</p>
-
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" class="dia-svg" role="img" aria-labelledby="sr2c-evidence-budget__title" aria-describedby="sr2c-evidence-budget__desc">
-  <title id="sr2c-evidence-budget__title">同一批 read 摘要成邊際計數只值 1.3 nats，摘要成共現值 11.9 nats</title>
-  <desc id="sr2c-evidence-budget__desc">把三個數字畫在同一根以 nats 為單位的尺上，所以它們可以直接比較。
-        共同設定是：一支只在這個視窗裡與母群體不同的 lineage，帶三個體細胞變異，
-        母群體細胞比例 0.20、這支 0.15、該處深度 50、跨越這三個位點的分子 20 條。
-        兩條路線看的是同一批讀序，差別只在把它們摘要成什麼統計量。
-        尺上有一條垂直虛線立在 8.0 nats 的位置，那是在頻率譜上多開一群要付的代價，
-        等於二分之一乘以參數兩個再乘以三千的自然對數。
-        第一根長條是全域路線：把三個變異摘要成各自的邊際等位頻率，合計只有 1.3 nats，
-        停在虛線左邊很遠的地方，差了 6.7 nats，所以這一群開不出來。
-        第二根長條是局部路線：同樣三個變異，改看它們在同一條分子上的共現，
-        三者共現的狀態在二十條跨越分子中出現五條，對照就地估到的錯誤地板，
-        對數似然比是 11.9 nats，遠遠越過那條虛線。
-        結論是：差別不在資料量，而在同一份證據能不能寫進那條似然。
-        以邊際等位頻率為觀測的那一系方法只吃邊際計數，共現進不去。
-        但這不是所有全域方法的通則，PairClone 與 TreeClone 就把成對共現寫進了全域似然。</desc>
-
-  <text class="ttl zh" x="20" y="36">同一批 read，兩種摘要方式，差一個數量級</text>
-
-  <!-- 共同設定 -->
-  <rect class="box sunken" x="18" y="56" width="964" height="76" rx="8"/>
-  <text class="tick bold zh" x="34" y="86">共同設定：一支只在這個視窗裡與母群體不同的 lineage，帶三個體細胞變異</text>
-  <text class="tick zh" x="34" y="112">母群體 0.20 · 這支 0.15 · 深度 50 · 跨越這三個位點的分子 20 條 · 兩條路線看的是同一批 read</text>
-
-  <!-- 同一根尺 -->
-  <rect class="box" x="18" y="152" width="964" height="310" rx="8"/>
-  <text class="lbl bold zh" x="34" y="186">兩種摘要方式，畫在同一根尺上</text>
-
-  <text class="tick bold zh mid" x="661" y="216">多開一群的門檻 8.0 nats</text>
-  <text class="tick zh mid" x="661" y="238">½ × 參數 2 × ln(3000)</text>
-
-  <rect class="bar bad" x="230" y="280" width="70" height="30" rx="4"/>
-  <rect class="bar ok" x="230" y="330" width="641" height="30" rx="4"/>
-
-  <line class="guide somatic" x1="661" y1="248" x2="661" y2="392"/>
-
-  <text class="tick bold zh end" x="215" y="286">全域：邊際 VAF</text>
-  <text class="tick zh end" x="215" y="308">三個變異合計</text>
-  <text class="tick mono bad" x="310" y="292">1.3 nats</text>
-  <text class="tick zh bad" x="424" y="292">差 6.7 nats，開不出來</text>
-
-  <text class="tick bold zh end" x="215" y="336">局部：分子上的共現</text>
-  <text class="tick zh end" x="215" y="358">同樣三個變異</text>
-  <text class="tick mono ok" x="881" y="350">11.9 nats</text>
-
-  <line class="axis" x1="230" y1="390" x2="930" y2="390"/>
-  <line class="axis" x1="230" y1="390" x2="230" y2="397"/>
-  <line class="axis" x1="338" y1="390" x2="338" y2="397"/>
-  <line class="axis" x1="445" y1="390" x2="445" y2="397"/>
-  <line class="axis" x1="553" y1="390" x2="553" y2="397"/>
-  <line class="axis" x1="661" y1="390" x2="661" y2="397"/>
-  <line class="axis" x1="769" y1="390" x2="769" y2="397"/>
-  <line class="axis" x1="876" y1="390" x2="876" y2="397"/>
-  <text class="tick mono mid" x="230" y="416">0</text>
-  <text class="tick mono mid" x="338" y="416">2</text>
-  <text class="tick mono mid" x="445" y="416">4</text>
-  <text class="tick mono mid" x="553" y="416">6</text>
-  <text class="tick mono mid" x="661" y="416">8</text>
-  <text class="tick mono mid" x="769" y="416">10</text>
-  <text class="tick mono mid" x="876" y="416">12</text>
-  <text class="tick zh" x="34" y="416">單位：nats</text>
-
-  <text class="tick zh" x="34" y="446">左邊那根停在門檻前面 —— 同一支 lineage 在頻率譜上開不出一群；右邊那根越過門檻。</text>
-
-  <!-- 結論 -->
-  <rect class="box accent" x="18" y="482" width="964" height="118" rx="8"/>
-  <text class="lbl bold zh" x="34" y="516">差別不在資料量，在同一份證據能不能寫進那條似然</text>
-  <text class="anno zh" x="34" y="548">以邊際 VAF 為觀測的那一系（PyClone、PhyloWGS、Pairtree）只吃邊際計數，共現進不去。</text>
-  <text class="anno zh warn" x="34" y="580">但這不是全域方法的通則 —— PairClone／TreeClone 把成對共現寫進了全域似然。</text>
-</svg><figcaption>三個數字畫在同一根以 nats 為單位的尺上，所以可以直接比較。
-垂直虛線是「在頻率譜上多開一群」要付的代價。
-同一組三個變異，摘要成邊際計數時停在門檻左邊很遠處，摘要成共現時遠遠越過。
-最下面那行是這張圖必須自帶的但書，見下一小節。</figcaption></figure>
-
-<h3 id="但這條論證對-pairclone-treeclone-不成立">但這條論證對 PairClone／TreeClone <b>不</b>成立</h3>
-
-<p class="prose">上面三條有一個共同的前提：<b>估計器的似然只透過每個變異的邊際計數依賴資料</b>。
-PyClone、SciClone、PhyloWGS、Pairtree、DPClust、CliP、MOBSTER 這一系滿足這個前提，
-而它們正是這個領域被系統性評比的那一群。<b>但 PairClone 與 TreeClone 不滿足。</b></p>
-
-<p class="prose">PairClone 直接對「落在同一條短讀上的一對鄰近 SNV」建模，
-其基因型是一個 <math><mn>2</mn><mo>×</mo><mn>2</mn></math> 矩陣（兩條 haplotype × 兩個位點），
-所以它<b>本來就帶著相位</b>；TreeClone 再加上一個樹的先驗，輸出 subclone 系統發生。
-換句話說，<b>它們把共現這條通道寫進了全域似然，而且明說相位資訊在某些情況下是關鍵</b>。
-對它們而言：其一那個「只有邊際」的前提不成立；
-其二那個代價與證據不對等也不成立 —— 共現進來之後，三個變異提供的就不是 0.43 nats；
-其三更是直接被推翻。<b>面對這兩篇，上面整段論證失效。</b></p>
-
-<h4 id="剩下的差別是通道的寬度-不是有沒有這條通道">剩下的差別是通道的<b>寬度</b>，不是有沒有這條通道</h4>
-
-<p class="prose">真正的差別在於：成對共現要求兩個 sSNV 落在<b>同一條讀序</b>上，
-而短讀與長讀的跨距差兩個數量級。以 Poisson 估一個 sSNV 有伴的機率：</p>
+<h4 id="答案取決於兩群靠得多近-而且不是慢慢變多">答案取決於兩群靠得多近，而且不是慢慢變多</h4>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th scope="col">讀長</th><th scope="col">5／Mb</th><th scope="col">50／Mb</th><th scope="col">來源</th></tr></thead>
+<thead><tr><th scope="col">兩群的期望 VAF</th><th scope="col">頻率譜大約需要幾個變異才分得開</th></tr></thead>
 <tbody>
-<tr><td>短讀 300 bp</td><td>約 0.15%</td><td>約 1.5%</td><td><math><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi><mi>L</mi></mrow></msup></math>，<math><mi>L</mi><mo>=</mo><mn>300</mn></math></td></tr>
-<tr><td>長讀 20 kb（單條）</td><td>約 9.5%</td><td>約 63%</td><td>同式，<math><mi>L</mi><mo>=</mo><mn>20</mn><mo>,</mo><mn>000</mn></math></td></tr>
-<tr><td>長讀 ＋ 傳遞連鎖（實測）</td><td colspan="2"><b>40.5% – 98.1%</b></td><td>七個 ONT 資料集，見第二節</td></tr>
+<tr><td>0.20 對 0.10</td><td>約 4 個</td></tr>
+<tr><td>0.20 對 0.15</td><td>約 20 個</td></tr>
+<tr><td>0.20 對 0.18</td><td>約 120 個</td></tr>
+<tr><td>0.20 對 0.20</td><td><b>永遠不夠</b></td></tr>
 </tbody>
 </table>
 </div>
 
-<p class="prose">所以正確的說法不是「全域方法看不到共現」，而是：
-<b>在短讀上這條通道幾乎是空的 —— 能用的位點對佔全部 sSNV 不到 2% ——
-所以它改變不了全域答案；長讀把同一條通道撐開兩個數量級之後，
-它才多到值得為它定義一個不同的估計目標。</b>
-PairClone／TreeClone 開的是同一扇門，只是門後幾乎沒有東西。</p>
+<p class="prose">最後一列不是「很難」，是<b>沒有答案</b>。
+兩群的期望 VAF 相同時，把任何一個變異從這一群改指派到另一群，
+<b>直方圖完全不變</b> —— 兩群本來就落在同一根柱子裡。
+加深度、加樣本、換更好的演算法都不會動它。
+中篇第三節那個 <math><mi>K</mi><mo>=</mo><mn>2</mn></math> 的例子就是這一列的實例。</p>
 
-<p class="prose">在這個修正之後，本規格相對於它們仍然不同的地方只剩四處，而且都比原本的說法弱：</p>
+<h4 id="而一支只在一個視窗裡不同的-lineage-本來就帶不起那麼多變異">而一支只在一個視窗裡不同的 lineage，本來就帶不起那麼多變異</h4>
 
-<div class="table-wrap">
-<table>
-<thead><tr><th scope="col">差異</th><th scope="col">強度</th></tr></thead>
-<tbody>
-<tr><td>可用的位點對多兩個數量級，且 <math><mi>k</mi></math> 可變（不限於成對）</td><td><b>強</b>：可量測，見上表</td></tr>
-<tr><td>交付物是逐單位目錄 ＋ 旗標 ＋ 打散虛無分布，不是一個全域後驗</td><td>中：是「報告什麼」的差別，不是「能不能推論」的差別</td></tr>
-<tr><td>第二個交付物（給 caller 的特徵）完全在它們的範圍之外</td><td><b>強</b>：不重疊</td></tr>
-<tr><td>整條分子的家族誤標通道在短讀上不存在</td><td>中：穩健性，不是估計目標</td></tr>
-</tbody>
-</table>
+<p class="prose">這是問題的另一半。一支細胞群若只在某個視窗內與它的母群體不同，
+它與母群體的全部差別<b>就是那個視窗裡的那幾個突變</b> —— 三個、五個。
+對照上表，它落在「開不出來」那一側，而且通常離得很遠。
+<b>所以這不是「不容易偵測」，是它在那個模型裡開不出來。</b></p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 618" class="dia-svg" role="img" aria-labelledby="sr2c-evidence-budget__title" aria-describedby="sr2c-evidence-budget__desc">
+  <title id="sr2c-evidence-budget__title">頻率譜要分開兩群需要幾個變異，以及同一批分子只要幾條就夠</title>
+  <desc id="sr2c-evidence-budget__desc">上半是一組橫向長條，回答一個問題：要說服頻率譜「這裡是兩群不是一群」，需要幾個變異。
+        答案取決於兩群的期望變異等位頻率差多少。
+        兩群是 0.20 對 0.10 時，大約四個變異就夠；
+        0.20 對 0.15 時要約二十個；0.20 對 0.18 時要約一百二十個；
+        而兩群相同時，長條直接衝出畫面 —— 永遠不夠。
+        最後一列不是「很難」而是沒有答案：兩群的期望頻率相同時，
+        把任何一個變異在兩群之間改指派，直方圖完全不變，
+        所以加深度、加樣本、換更好的演算法都不會把它們分開。
+        下半是同一批讀序換一種看法。
+        假設那三個突變並不共存，那麼在二十條跨越它們的分子裡，
+        同時帶三個突變的分子預期只有錯誤地板那麼多，
+        也就是百分之一乘以二十條，約零點二條。
+        而實際觀測到五條。
+        預期零點二、實際五 —— 這裡不需要任何門檻，也不需要統計檢定，結論就出來了。</desc>
+
+  <text class="ttl zh" x="20" y="36">要說服頻率譜多開一群，需要幾個變異？</text>
+
+  <!-- 需要幾個變異 -->
+  <rect class="box" x="18" y="56" width="964" height="292" rx="8"/>
+  <text class="lbl bold zh" x="34" y="90">兩群靠得越近，需要的變異越多 —— 而且不是慢慢變多</text>
+  <text class="tick zh" x="34" y="116">下表固定深度 50，只改變兩群的期望 VAF</text>
+
+  <text class="tick bold zh end" x="250" y="150">兩群的期望 VAF</text>
+  <text class="tick bold zh" x="270" y="150">頻率譜需要幾個變異才分得開</text>
+
+  <rect class="bar ok" x="270" y="168" width="13" height="24" rx="4"/>
+  <text class="tick zh end" x="250" y="186">0.20 對 0.10</text>
+  <text class="tick zh" x="295" y="186">約 4 個</text>
+
+  <rect class="bar warn" x="270" y="206" width="67" height="24" rx="4"/>
+  <text class="tick zh end" x="250" y="224">0.20 對 0.15</text>
+  <text class="tick zh" x="349" y="224">約 20 個</text>
+
+  <rect class="bar bad" x="270" y="244" width="400" height="24" rx="4"/>
+  <text class="tick zh end" x="250" y="262">0.20 對 0.18</text>
+  <text class="tick zh" x="682" y="262">約 120 個</text>
+
+  <rect class="bar bad" x="270" y="282" width="560" height="24" rx="4"/>
+  <line class="conn bad thick" x1="830" y1="294" x2="880" y2="294" marker-end="url(#arrow)"/>
+  <text class="tick zh end" x="250" y="300">0.20 對 0.20</text>
+  <text class="tick bold zh bad" x="892" y="300">永遠不夠</text>
+
+  <text class="tick zh" x="270" y="332">兩群的期望 VAF 相同時，把任何一個變異改指派到另一群，直方圖完全不變。</text>
+
+  <!-- 換成共現 -->
+  <rect class="box accent" x="18" y="368" width="964" height="230" rx="8"/>
+  <text class="lbl bold zh" x="34" y="402">同一批 read，換成「它們在不在同一條分子上」</text>
+
+  <rect class="box sunken" x="34" y="420" width="440" height="130" rx="6"/>
+  <text class="tick zh" x="50" y="448">若這三個突變<tspan class="bold">不</tspan>共存，20 條分子裡預期</text>
+  <text class="anno bold zh mid bad" x="254" y="502" style="font-size:40px">0.2 條</text>
+  <text class="tick zh mid" x="254" y="534">錯誤地板 1% × 20 條</text>
+
+  <rect class="box sunken" x="506" y="420" width="442" height="130" rx="6"/>
+  <text class="tick zh" x="522" y="448">實際觀測到</text>
+  <text class="anno bold zh mid ok" x="727" y="502" style="font-size:40px">5 條</text>
+  <text class="tick zh mid" x="727" y="534">同時帶三個突變的分子</text>
+
+  <text class="tick zh" x="34" y="578">不需要門檻，也不需要統計檢定：預期 0.2、實際 5，結論就出來了。</text>
+</svg><figcaption>上半：需要的變異數隨兩群靠近而爆炸，
+相同時直接衝出畫面。下半：同一批 read 換成「在不在同一條分子上」之後，
+同樣三個變異，20 條分子就給出預期 0.2 對實際 5。</figcaption></figure>
+
+<h4 id="同一批-read-換一種看法">同一批 read，換一種看法</h4>
+
+<p class="prose">把那三個變異換成「它們在不在<b>同一條分子</b>上」，需要的證據量完全不同。
+假設這三個突變其實<b>不</b>共存，那麼在 20 條跨越它們的分子裡，
+同時帶三個突變的分子預期只有錯誤地板那麼多 —— 1% × 20 條 ≈ <b>0.2 條</b>。</p>
+
+<p class="prose"><b>而實際看到 5 條。</b></p>
+
+<p class="prose">這裡不需要門檻，也不需要任何統計檢定：預期 0.2、實際 5，結論就出來了。
+而兩條路線看的是<b>同一批 read</b> —— 差別不在資料量，在把它們摘要成什麼。</p>
+
+<details class="reveal">
+<summary>上面那幾個數字是怎麼算出來的</summary>
+<div class="reveal__a">
+<p class="prose">「需要幾個變異」＝<b>多開一群要付的代價</b> ÷ <b>每個變異能提供的證據</b>，
+兩者都是對數似然，單位是 nat（自然對數底下的資訊量）。
+本文刻意不用 nat 當敘述單位，因為換算成「幾個變異」之後，
+讀者可以直接跟手上的資料比較。</p>
+<ul class="prose">
+<li><b>代價</b>是模型複雜度罰則 <math><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>p</mi><mi>K</mi></msub><mi>log</mi><msub><mi>M</mi><mi>eff</mi></msub></math>：
+參數兩個、有效觀測三千時約 8。</li>
+<li><b>每個變異的證據</b>約為 <math><mi>d</mi><mo>(</mo><msub><mi>θ</mi><mn>1</mn></msub><mo>−</mo><msub><mi>θ</mi><mn>2</mn></msub><msup><mo>)</mo><mn>2</mn></msup><mo>/</mo><mn>2</mn><mover accent="true"><mi>θ</mi><mo>‾</mo></mover><mo>(</mo><mn>1</mn><mo>−</mo><mover accent="true"><mi>θ</mi><mo>‾</mo></mover><mo>)</mo></math>，
+其中 <math><mi>d</mi></math> 是深度、<math><mi>θ</mi></math> 是兩群的期望 VAF。
+深度 50、0.20 對 0.15 時約 0.43，故 <math><mn>8</mn><mo>÷</mo><mn>0.43</mn><mo>≈</mo><mn>19</mn></math>，表中記為「約 20」。</li>
+<li><math><msub><mi>θ</mi><mn>1</mn></msub><mo>=</mo><msub><mi>θ</mi><mn>2</mn></msub></math> 時分子為零、商為無限大 —— 那就是最後一列。
+<b>表中那四列是同一條曲線上的四個點</b>，不是四件不同的事。</li>
+<li>共現那一側：<math><mn>5</mn></math> 條對 <math><mn>0.2</mn></math> 條的對數似然比約 12，
+遠高於分辨兩個局部結構所需。錯誤地板 1% 的來源是逐位點錯誤與家族誤標（第三節），
+它<b>不是常數</b>，要逐單位估。</li>
+</ul>
 </div>
+</details>
 
-<div class="guardrail">
-<p class="guardrail__hd">成文前必須查證的一點</p>
-<p class="prose">PairClone 的 <math><mn>2</mn><mo>×</mo><mn>2</mn></math> 基因型已經把一對位點的兩條染色體拷貝分開表示，
-所以它<b>可能已經</b>處理了「trans 與分支演化長得一樣」這個混淆
-（本教材的第 14 條警告）。若確實如此，
-那麼「以 germline 相位切開單位」這一點就<b>不是</b>本規格相對於它們的差異，
-只是換一種實作方式。上表刻意沒有把它列為差異，直到讀完原文為止。
-同樣要查的還有 CliP、LICHeE，以及任何以 read linkage 輔助 subclone 重建的後續工作。</p>
-</div>
+<h4 id="一個必要的但書">一個必要的但書</h4>
 
-<p class="prose">必須同時說清楚反面：<b>對全域方法自己的目標而言，邊際幾乎就是充分的。</b>
-細胞層級的群比例本來就是一個跨全基因體的量，用上萬個變異的邊際去估它，
-比用幾百個單位的共現去估準得多。
-所以正確的說法不是「它們不夠好」，而是<b>兩者估的量不同、解析度的單位不同</b>；
-局部路線的代價是每個單位只有數十條分子，單位層級的後驗一定很寬。</p>
+<p class="prose">上面整段的前提是「似然只吃邊際計數」。有兩個既有方法<b>不</b>滿足這個前提：
+<b>PairClone 與 TreeClone 已經把「同一條短讀上一對鄰近 SNV 的共現」寫進了全域似然</b>。
+所以對它們而言，上面那句「頻率譜看不到共現」並不成立。</p>
+
+<p class="prose">但它們是<b>短讀</b>方法，而這條通道的寬度完全由讀長決定 ——
+兩個 sSNV 要落在同一條讀序上才數得到。
+300 bp 的短讀在 5–50／Mb 的突變負荷下只有 <b>0.15%–1.5%</b> 的 sSNV 有伴；
+ONT 的實測是 <b>40.5%–98.1%</b>（第二節）。
+<b>同一扇門，門後的東西差兩個數量級</b> —— 這才是本規格與它們的實際差別，
+而不是「有沒有用共現」。</p>
 
 <h3 id="第二個交付物-給了第一個一個可以驗的終點">第二個交付物，給了第一個一個可以驗的終點</h3>
 
@@ -1241,7 +1218,7 @@ Poisson 模型給的單一數字在這裡沒有用：真正該做的是逐樣本
 <thead><tr><th scope="col"><math><mi>k</mi><mo>=</mo><mn>2</mn></math> 佔多數</th><th scope="col">影響</th></tr></thead>
 <tbody>
 <tr><td><b>限制了深度</b></td><td>多數單位只講得出「這兩個突變共不共存、誰在前」，談不上多層局部系譜</td></tr>
-<tr><td><b>沒有限制可偵測性</b></td><td>前面那個 12 nats 的計算在 <math><mi>k</mi><mo>=</mo><mn>2</mn></math> 同樣成立 —— 它算的是「某個共現狀態存在」對「只有錯誤地板」的比值，與位點數無關</td></tr>
+<tr><td><b>沒有限制可偵測性</b></td><td>第一節那個「預期 0.2 條、實際 5 條」在 <math><mi>k</mi><mo>=</mo><mn>2</mn></math> 同樣成立 —— 它比的是「某個共現狀態存在」與「只有錯誤地板」，與位點數無關</td></tr>
 <tr><td>對 <code>REFINES_GLOBAL</code></td><td>不影響：分辨兩支等值 CCF 的 lineage 只需要一對位點的共現或互斥</td></tr>
 <tr><td>對交付物的描述</td><td><b>要改</b>：主要交付物是「全基因體的成對分子關係目錄」，深層局部系譜是其中的少數</td></tr>
 </tbody>
@@ -3146,7 +3123,7 @@ ClairS 的相位通道停在兩條 germline 單倍型這一層。</p>
 已經把成對共現與相位寫進全域似然，所以候選新意不能再宣稱在「使用共現」這件事上，
 只能落在「可用位點對多兩個數量級、<math><mi>k</mi></math> 可變、逐單位交付」這幾點。
 Pairtree、CliP、LICHeE 與任何以 read linkage 輔助 subclone 的後續工作仍待系統檢索。</li>
-<li><b>短讀成對共現的實際產量沒有實測過。</b>上表那個 0.15%–1.5% 是 Poisson 估計，
+<li><b>短讀成對共現的實際產量沒有實測過。</b>第一節那個 0.15%–1.5% 是 Poisson 估計，
 不是量出來的；PairClone／TreeClone 論文用的資料集實際有幾對可用，
 以及它們在那個產量下對全域結論的改變幅度有多大，會直接決定
 「長讀多兩個數量級」這句話值多少。這是說服審稿人最需要的一個數字，目前沒有。</li>
@@ -3209,7 +3186,7 @@ multiple sequencing technologies with DeepSomatic</i>，<i>Nat Biotechnol</i> 20
     <nav class="pager" aria-label="模組導覽"><span></span><span></span></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>Clair3</dt><dd>以深度學習做 germline variant calling 的工具，長 read 上常用。</dd><dt>ClairS</dt><dd>配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。</dd><dt>DeepSomatic</dt><dd>Google 的 somatic variant caller，同樣有 tumor-only 版本。</dd><dt>DeepVariant</dt><dd>Google 開發的 germline variant caller，把 pileup 轉成影像再用 CNN 分類。</dd><dt>LOH（異型合子性喪失）</dt><dd>原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</dd><dt>LongPhase</dt><dd>實驗室開發的長 read phasing 工具，是後續所有工具的共同基礎。輸出 germline haplotype。</dd><dt>LongPhase-S</dt><dd>配對 tumor–normal 版本。做腫瘤 DNA 比例估計（輸出欄位名為 purity）、比例感知的 somatic variant 過濾，以及 somatic haplotagging。</dd><dt>allele-specific copy number（等位特異拷貝數）</dt><dd>把一個區段的總拷貝數拆成兩個親源等位各自的份數，通常記為 major 與 minor。總拷貝數相同而兩個等位不同的狀態（例如 2+0 與 1+1）在深度上完全一致，只有 B-allele frequency 分得開 —— copy-neutral LOH 即為此類。</dd><dt>cancer cell fraction（癌細胞比例）</dt><dd>帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（<math><mo>≈</mo><mn>1</mn></math>）與 subclonal（<math><mo>&lt;</mo><mn>1</mn></math>）突變。<b>不等於 VAF。</b></dd><dt>clone tree（克隆演化樹）</dt><dd>描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</dd><dt>copy number（拷貝數）</dt><dd>某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。</dd><dt>data leakage（資料洩漏）</dt><dd>訓練或模型選擇階段取得了評估資料的資訊，讓效能被高估。實驗室的做法是<b>按染色體切分</b>，確保同一個位點不會同時出現在訓練、驗證與最終測試中。</dd><dt>distribution shift（分布偏移）</dt><dd>測試資料的組成與訓練資料存在顯著差異（例如正負樣本比例不同），使得模型表現不如預期。</dd><dt>haplotagging</dt><dd>根據已 phase 好的 variants，把每一條 read 指派到 HP1 或 HP2，並把結果寫回 BAM 的 <code>HP</code> tag。</dd><dt>high-confidence region</dt><dd>benchmark 建立者指定的高可信度區間，通常以 BED 檔表示；區間外不宜視為具有相同標註可靠度。</dd><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>mutation frequency spectrum（突變頻率譜）</dt><dd>把一份樣本裡所有 somatic 變異的 VAF 畫成直方圖後得到的分布。分布上的峰與肩對應不同大小的細胞群，最低頻端的尾巴斜率則被用來判斷有沒有天擇。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>pigeonhole（鴿籠原理）</dt><dd>由父代與子代的細胞比例限制樹形的算術規則：一個細胞至多屬於父節點底下的<b>一個</b>子節點，所以各子節點的細胞比例加起來不得超過父節點。名稱來自鴿籠原理 —— 東西放進籠子，總量不會憑空變多。在 subclone 重建的文獻中也稱為 sum rule 或 crossing rule。<b>它只能排除樹，不能挑出樹</b>：通過檢查的候選通常仍不只一棵，其餘要靠 parsimony 之類的偏好決定。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv3"><a href="#換掉的是目標-不是方法">換掉的是目標，不是方法</a></li><li class="lv3"><a href="#全域方法在哪裡失去局部解析度-三個機制-其中兩個是算得出來的">全域方法在哪裡失去局部解析度 —— 三個機制，其中兩個是算得出來的</a></li><li class="lv3"><a href="#但這條論證對-pairclone-treeclone-不成立">但這條論證對 PairClone／TreeClone 不成立</a></li><li class="lv4"><a href="#剩下的差別是通道的寬度-不是有沒有這條通道">剩下的差別是通道的寬度，不是有沒有這條通道</a></li><li class="lv3"><a href="#第二個交付物-給了第一個一個可以驗的終點">第二個交付物，給了第一個一個可以驗的終點</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#一-估計目標的形式定義">一、估計目標的形式定義</a></li><li class="lv4"><a href="#四配子相容性-給定狀態集合-樹幾乎是決定的">四配子相容性：給定狀態集合，樹幾乎是決定的</a></li><li class="lv4"><a href="#一條邊可以帶多個突變-記帳節點因此消失">一條邊可以帶多個突變 —— 記帳節點因此消失</a></li><li class="lv3"><a href="#二-從-bam-到單位-前處理契約">二、從 BAM 到單位：前處理契約</a></li><li class="lv4"><a href="#工具鏈與必須釘住的參數">工具鏈與必須釘住的參數</a></li><li class="lv4"><a href="#標籤詞彙只有五個值-而-hp3-是一個真的問題">標籤詞彙只有五個值，而 HP3 是一個真的問題</a></li><li class="lv4"><a href="#視窗不是固定寬度-是讀序連鎖的傳遞閉包">視窗不是固定寬度，是讀序連鎖的傳遞閉包</a></li><li class="lv4"><a href="#連鎖率才是真正的閘門-而它逐樣本差很大">連鎖率才是真正的閘門，而它逐樣本差很大</a></li><li class="lv4"><a href="#連鎖進來之後-多數單位只有兩個位點">連鎖進來之後，多數單位只有兩個位點</a></li><li class="lv3"><a href="#三-局部生成模型">三、局部生成模型</a></li><li class="lv4"><a href="#覆蓋遮罩-沒覆蓋到的位點要邊際化">覆蓋遮罩：沒覆蓋到的位點要邊際化</a></li><li class="lv4"><a href="#兩個形狀不同的錯誤通道與地板">兩個形狀不同的錯誤通道與地板</a></li><li class="lv4"><a href="#只准-0-1-loh-區域會被系統性誤讀">只准 0 → 1：LOH 區域會被系統性誤讀</a></li><li class="lv4"><a href="#方向是-nuisance-但這裡的用途不同">方向是 nuisance，但這裡的用途不同</a></li><li class="lv4"><a href="#與前一篇的唯一結構差異">與前一篇的唯一結構差異</a></li><li class="lv3"><a href="#四-全域訊號怎麼進來-而不把同一批-read-算兩次">四、全域訊號怎麼進來，而不把同一批 read 算兩次</a></li><li class="lv4"><a href="#階段-g-只用-s1">階段 G：只用 S1</a></li><li class="lv4"><a href="#先驗-原子加上逃逸質量">先驗：原子加上逃逸質量</a></li><li class="lv4"><a href="#先後關係的先驗-鴿籠只能軟用">先後關係的先驗：鴿籠只能軟用</a></li><li class="lv3"><a href="#五-模型選擇與輸出語義">五、模型選擇與輸出語義</a></li><li class="lv3"><a href="#六-跨單位-可以合併什麼">六、跨單位：可以合併什麼</a></li><li class="lv3"><a href="#七-第二個交付物-給-somatic-caller-的特徵">七、第二個交付物：給 somatic caller 的特徵</a></li><li class="lv4"><a href="#錨點與候選必須分開">錨點與候選必須分開</a></li><li class="lv4"><a href="#三層特徵">三層特徵</a></li><li class="lv4"><a href="#三種整合方式">三種整合方式</a></li><li class="lv4"><a href="#訓練與評估的切分">訓練與評估的切分</a></li><li class="lv3"><a href="#八-推論演算法與計算預算">八、推論演算法與計算預算</a></li><li class="lv4"><a href="#上限-棄權-以及棄權必須留在分母裡">上限、棄權，以及棄權必須留在分母裡</a></li><li class="lv4"><a href="#成本-既有實作已經量過">成本：既有實作已經量過</a></li><li class="lv3"><a href="#九-驗收條件">九、驗收條件</a></li><li class="lv4"><a href="#核心-局部打散的負對照">核心：局部打散的負對照</a></li><li class="lv4"><a href="#其餘各層">其餘各層</a></li><li class="lv3"><a href="#十-實作分期">十、實作分期</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#庫存-原料已經在了">庫存：原料已經在了</a></li><li class="lv3"><a href="#分岔為什麼稀少-一個機械性的理由-不是生物學結論">分岔為什麼稀少：一個機械性的理由，不是生物學結論</a></li><li class="lv3"><a href="#既有方法佔據的邊界">既有方法佔據的邊界</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv3"><a href="#預期結果模式">預期結果模式</a></li><li class="lv3"><a href="#尚未解決的問題">尚未解決的問題</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv3"><a href="#換掉的是目標-不是方法">換掉的是目標，不是方法</a></li><li class="lv3"><a href="#為什麼頻率譜不容易看到局部的結構">為什麼頻率譜不容易看到局部的結構</a></li><li class="lv4"><a href="#答案取決於兩群靠得多近-而且不是慢慢變多">答案取決於兩群靠得多近，而且不是慢慢變多</a></li><li class="lv4"><a href="#而一支只在一個視窗裡不同的-lineage-本來就帶不起那麼多變異">而一支只在一個視窗裡不同的 lineage，本來就帶不起那麼多變異</a></li><li class="lv4"><a href="#同一批-read-換一種看法">同一批 read，換一種看法</a></li><li class="lv4"><a href="#一個必要的但書">一個必要的但書</a></li><li class="lv3"><a href="#第二個交付物-給了第一個一個可以驗的終點">第二個交付物，給了第一個一個可以驗的終點</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#一-估計目標的形式定義">一、估計目標的形式定義</a></li><li class="lv4"><a href="#四配子相容性-給定狀態集合-樹幾乎是決定的">四配子相容性：給定狀態集合，樹幾乎是決定的</a></li><li class="lv4"><a href="#一條邊可以帶多個突變-記帳節點因此消失">一條邊可以帶多個突變 —— 記帳節點因此消失</a></li><li class="lv3"><a href="#二-從-bam-到單位-前處理契約">二、從 BAM 到單位：前處理契約</a></li><li class="lv4"><a href="#工具鏈與必須釘住的參數">工具鏈與必須釘住的參數</a></li><li class="lv4"><a href="#標籤詞彙只有五個值-而-hp3-是一個真的問題">標籤詞彙只有五個值，而 HP3 是一個真的問題</a></li><li class="lv4"><a href="#視窗不是固定寬度-是讀序連鎖的傳遞閉包">視窗不是固定寬度，是讀序連鎖的傳遞閉包</a></li><li class="lv4"><a href="#連鎖率才是真正的閘門-而它逐樣本差很大">連鎖率才是真正的閘門，而它逐樣本差很大</a></li><li class="lv4"><a href="#連鎖進來之後-多數單位只有兩個位點">連鎖進來之後，多數單位只有兩個位點</a></li><li class="lv3"><a href="#三-局部生成模型">三、局部生成模型</a></li><li class="lv4"><a href="#覆蓋遮罩-沒覆蓋到的位點要邊際化">覆蓋遮罩：沒覆蓋到的位點要邊際化</a></li><li class="lv4"><a href="#兩個形狀不同的錯誤通道與地板">兩個形狀不同的錯誤通道與地板</a></li><li class="lv4"><a href="#只准-0-1-loh-區域會被系統性誤讀">只准 0 → 1：LOH 區域會被系統性誤讀</a></li><li class="lv4"><a href="#方向是-nuisance-但這裡的用途不同">方向是 nuisance，但這裡的用途不同</a></li><li class="lv4"><a href="#與前一篇的唯一結構差異">與前一篇的唯一結構差異</a></li><li class="lv3"><a href="#四-全域訊號怎麼進來-而不把同一批-read-算兩次">四、全域訊號怎麼進來，而不把同一批 read 算兩次</a></li><li class="lv4"><a href="#階段-g-只用-s1">階段 G：只用 S1</a></li><li class="lv4"><a href="#先驗-原子加上逃逸質量">先驗：原子加上逃逸質量</a></li><li class="lv4"><a href="#先後關係的先驗-鴿籠只能軟用">先後關係的先驗：鴿籠只能軟用</a></li><li class="lv3"><a href="#五-模型選擇與輸出語義">五、模型選擇與輸出語義</a></li><li class="lv3"><a href="#六-跨單位-可以合併什麼">六、跨單位：可以合併什麼</a></li><li class="lv3"><a href="#七-第二個交付物-給-somatic-caller-的特徵">七、第二個交付物：給 somatic caller 的特徵</a></li><li class="lv4"><a href="#錨點與候選必須分開">錨點與候選必須分開</a></li><li class="lv4"><a href="#三層特徵">三層特徵</a></li><li class="lv4"><a href="#三種整合方式">三種整合方式</a></li><li class="lv4"><a href="#訓練與評估的切分">訓練與評估的切分</a></li><li class="lv3"><a href="#八-推論演算法與計算預算">八、推論演算法與計算預算</a></li><li class="lv4"><a href="#上限-棄權-以及棄權必須留在分母裡">上限、棄權，以及棄權必須留在分母裡</a></li><li class="lv4"><a href="#成本-既有實作已經量過">成本：既有實作已經量過</a></li><li class="lv3"><a href="#九-驗收條件">九、驗收條件</a></li><li class="lv4"><a href="#核心-局部打散的負對照">核心：局部打散的負對照</a></li><li class="lv4"><a href="#其餘各層">其餘各層</a></li><li class="lv3"><a href="#十-實作分期">十、實作分期</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#庫存-原料已經在了">庫存：原料已經在了</a></li><li class="lv3"><a href="#分岔為什麼稀少-一個機械性的理由-不是生物學結論">分岔為什麼稀少：一個機械性的理由，不是生物學結論</a></li><li class="lv3"><a href="#既有方法佔據的邊界">既有方法佔據的邊界</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv3"><a href="#預期結果模式">預期結果模式</a></li><li class="lv3"><a href="#尚未解決的問題">尚未解決的問題</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">
