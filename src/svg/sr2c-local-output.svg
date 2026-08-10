@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 564">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 460">
   <title>一個單位的輸出：稀疏狀態表、唯一的相容樹，以及可以計數的旗標</title>
   <desc>三格由左到右。第一格是一個單位的稀疏狀態表：
         全參考狀態 62 條、只帶第一個變異的 18 條、同時帶第一與第二個的 5 條、
@@ -12,9 +12,7 @@
         所以困難的地方不是搜尋樹，而是決定哪些狀態的比例高於地板。
         第三格是這個單位輸出的那一列：狀態集合與各自比例、先後關係與後驗、
         有效分子數與遮罩分布，以及四個旗標。
-        旗標是這條路線可以計數的產出，不是修辭。
-        最下方指出：四格全滿代表四配子檢定失敗，那不是一個新的 lineage，
-        而是這個單位的錯誤地板偏高，所以相容性檢定同時是品質訊號。</desc>
+        旗標是這條路線可以計數的產出，不是修辭。</desc>
 
   <text class="ttl zh" x="20" y="36">一個單位輸出什麼</text>
 
@@ -65,9 +63,4 @@
   <text class="tick mono warn" x="688" y="310">ORDER_UNRESOLVED</text>
   <text class="tick mono bad" x="688" y="338">INCOMPATIBLE</text>
   <text class="tick zh" x="688" y="382">旗標是可以計數的產出</text>
-
-  <!-- 相容性 -->
-  <rect class="box bad" x="18" y="464" width="964" height="84" rx="8"/>
-  <text class="lbl bold zh bad" x="34" y="498">四格全滿 ＝ 四配子檢定失敗 ＝ 不相容</text>
-  <text class="anno zh" x="34" y="530">那不是一個新的 lineage，是這個單位的錯誤地板偏高 —— 相容性檢定同時是品質訊號。</text>
 </svg>
