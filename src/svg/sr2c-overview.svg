@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 770">
+  <title>整條路線的總覽：從配對 BAM 到兩份交付物</title>
+  <desc>由上而下的五段流程。
+        最上是輸入：腫瘤與正常配對的 ONT BAM、參考基因體、
+        germline 候選 VCF 與寬鬆門檻的 somatic 候選集合。
+        接著是階段 0 的前處理，沿用既有工具、不是本規格的貢獻：
+        germline 呼叫、定相、somatic 呼叫、體細胞標記，產生含覆蓋遮罩的稀疏狀態表；
+        同時把位點依區域切成互斥的兩堆 ——
+        S1 是只有一個變異的區域，S2 是兩個以上變異的單位，兩堆的讀序沒有交集。
+        然後是階段 G：只吃 S1，做標準的頻率譜分群，用哪一個既有實作都可以，
+        輸出純度、CCF 原子的位置與權重、以及過度離散；
+        硬性要求是 S2 的位點必須整批排除。
+        再來是階段 L，本規格的核心：每個 S2 單位各推論一次，
+        吃該單位的狀態表加上階段 G 的先驗，而且是單向的 —— 局部不回饋全域；
+        輸出該單位的狀態集合、各自比例、先後關係與旗標。
+        最下是兩份交付物：
+        A 是逐單位目錄，每個單位一列，加上樣本層統計量與打散對照給的虛無分布；
+        B 是給 somatic variant caller 的三層特徵，逐層報告覆蓋率與增益，
+        並附留一法與缺席指示通道。</desc>
+
+  <text class="ttl zh" x="20" y="36">整條路線：兩個階段，兩份交付物</text>
+
+  <!-- 輸入 -->
+  <rect class="box sunken" x="18" y="56" width="964" height="84" rx="8"/>
+  <text class="lbl bold zh" x="34" y="92">輸入</text>
+  <text class="tick zh" x="140" y="90">腫瘤／正常配對的 ONT BAM ＋ 參考基因體</text>
+  <text class="tick zh" x="140" y="118">germline 候選 VCF、somatic 候選集合（寬鬆門檻）</text>
+
+  <line class="conn thick" x1="500" y1="140" x2="500" y2="166" marker-end="url(#arrow)"/>
+
+  <!-- 階段 0 -->
+  <rect class="box" x="18" y="172" width="964" height="134" rx="8"/>
+  <text class="lbl bold zh" x="34" y="208">階段 0</text>
+  <text class="tick bold zh" x="140" y="206">前處理 · 沿用既有工具，不是本規格的貢獻</text>
+  <text class="tick zh" x="140" y="234">germline 呼叫 → 定相 → somatic 呼叫 → 體細胞標記 → 稀疏狀態表（含覆蓋遮罩）</text>
+  <rect class="box sunken" x="140" y="252" width="330" height="38" rx="6"/>
+  <text class="tick zh" x="156" y="276">S₁ · 只有一個變異的區域</text>
+  <rect class="box accent" x="490" y="252" width="330" height="38" rx="6"/>
+  <text class="tick zh" x="506" y="276">S₂ · 兩個以上變異的單位</text>
+  <text class="tick bold zh" x="840" y="276">read 互斥</text>
+
+  <line class="conn thick" x1="500" y1="306" x2="500" y2="332" marker-end="url(#arrow)"/>
+
+  <!-- 階段 G -->
+  <rect class="box" x="18" y="338" width="964" height="114" rx="8"/>
+  <text class="lbl bold zh" x="34" y="374">階段 G</text>
+  <text class="tick bold zh" x="140" y="372">只吃 S₁ —— 標準頻率譜分群，用哪個既有實作都可以</text>
+  <text class="tick zh" x="140" y="400">輸出：純度、CCF 原子的位置與權重、overdispersion</text>
+  <text class="tick zh bad" x="140" y="428">硬性要求：S₂ 的位點必須整批排除</text>
+
+  <line class="conn thick" x1="500" y1="452" x2="500" y2="478" marker-end="url(#arrow)"/>
+  <text class="tick bold zh" x="520" y="470">單向</text>
+
+  <!-- 階段 L -->
+  <rect class="box accent" x="18" y="484" width="964" height="114" rx="8"/>
+  <text class="lbl bold zh" x="34" y="520">階段 L</text>
+  <text class="tick bold zh" x="140" y="518">每個 S₂ 單位各推論一次 —— 本規格的核心</text>
+  <text class="tick zh" x="140" y="546">吃：該單位的狀態表 ＋ 階段 G 的先驗（局部不回饋全域）</text>
+  <text class="tick zh" x="140" y="574">輸出：狀態集合、各自比例、先後關係、旗標</text>
+
+  <line class="conn thick" x1="500" y1="598" x2="500" y2="624" marker-end="url(#arrow)"/>
+
+  <!-- 交付物 -->
+  <rect class="box" x="18" y="630" width="964" height="122" rx="8"/>
+  <text class="lbl bold zh" x="34" y="666">交付物</text>
+  <rect class="box accent" x="140" y="648" width="400" height="90" rx="6"/>
+  <text class="tick bold zh" x="156" y="676">A · 逐單位目錄</text>
+  <text class="tick zh" x="156" y="702">每單位一列 ＋ 樣本層統計量</text>
+  <text class="tick zh" x="156" y="728">＋ 打散對照給的虛無分布</text>
+  <rect class="box accent" x="560" y="648" width="400" height="90" rx="6"/>
+  <text class="tick bold zh" x="576" y="676">B · 給 somatic caller 的特徵</text>
+  <text class="tick zh" x="576" y="702">三層，逐層報告覆蓋率與增益</text>
+  <text class="tick zh" x="576" y="728">留一法 ＋ 缺席指示通道</text>
+</svg>
