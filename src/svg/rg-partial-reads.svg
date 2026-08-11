@@ -1,18 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540">
-  <title>一個真實區域的 read 覆蓋：八成的分子只看得到一個位點</title>
+  <title>一個真實連鎖視窗的 read 覆蓋：八成的分子只看得到一個位點</title>
   <desc>上半是一個真實分析單位裡 read 覆蓋情況的統計。
-        這個單位有三個 somatic 位點、一百九十四條 read，視窗寬三十九點四 kb。
+        這個連鎖區段有三個 somatic 位點、一百九十四條 read，連鎖視窗寬三十九點四 kb。
         三條長條由上而下分別是：同時蓋到三個位點的 read 只有三條，佔百分之一點五；
         蓋到兩個位點的三十一條，佔百分之十六；只蓋到一個位點的一百六十條，佔百分之八十二點五。
         下半把同一批 read 按位點對拆開，看每一對到底有幾條 read 同時蓋到。
         第一對與第二對各有十七條與二十條，分別判出分岔與串接；
         第三對只有三條，而且三條都是參考型，什麼也判不出來。
-        最下方是這張圖的結論：這個單位的演化樹靠的是十七與二十這兩個數字，不是一百九十四；
+        最下方是這張圖的結論：這個連鎖區段的演化樹靠的是十七與二十這兩個數字，不是一百九十四；
         而第三對實質上缺乏資料，仍被演算法判定了關係。
-        讀法是：有效樣本數是「每一個位點對各自的跨越深度」，不是這個單位的總 read 數。</desc>
+        讀法是：有效樣本數是「每一個位點對各自的跨越深度」，不是這個連鎖區段的總 read 數。</desc>
 
   <text class="ttl zh" x="20" y="36">真實資料的覆蓋結構</text>
-  <text class="tick mono" x="20" y="62">HCC1395_HKU · chr12:981,725–1,021,146 · HP1 · k=3 · 194 reads · 視窗 39.4 kb</text>
+  <text class="tick mono" x="20" y="62">HCC1395_HKU · chr12:981,725–1,021,146 · HP1 · k=3 · 194 reads · 連鎖視窗 39.4 kb</text>
 
   <!-- 覆蓋統計 -->
   <text class="lbl bold zh" x="20" y="106">一條 read 蓋得到幾個位點</text>
@@ -55,6 +55,6 @@
 
   <!-- 結論 -->
   <rect class="box bad" x="24" y="466" width="952" height="62" rx="8"/>
-  <text class="anno zh" x="48" y="494">這個單位的樹靠的是 <tspan class="bold">17 與 20</tspan>，不是 194。而 S1 × S3 那一對<tspan class="bold">沒有資料</tspan>，</text>
+  <text class="anno zh" x="48" y="494">這個連鎖區段的樹靠的是 <tspan class="bold">17 與 20</tspan>，不是 194。而 S1 × S3 那一對<tspan class="bold">沒有資料</tspan>，</text>
   <text class="anno zh bad" x="48" y="520">卻一樣被演算法決定了關係 —— 「沒看到」被當成了「不存在」。</text>
 </svg>

@@ -129,7 +129,7 @@
 
   <text class="lbl bold zh" x="520" y="432">該條約束的作用</text>
   <rect class="box sunken" x="520" y="448" width="460" height="118" rx="6"/>
-  <text class="tick mono" x="536" y="478">i ∈ B, j ∈ C, 同一單位, 無分子同時帶 → z_i ≠ z_j</text>
+  <text class="tick mono" x="536" y="478">i ∈ B, j ∈ C, 同一連鎖區段, 無分子同時帶 → z_i ≠ z_j</text>
   <text class="anno zh" x="536" y="508">K ＝ 2 時該峰僅一個成分 → 必然 z_i ＝ z_j</text>
   <text class="anno zh" x="536" y="530">→ 該解<tspan class="bold">不可行</tspan>；最優可行解為 K ＝ 3。</text>
   <text class="anno zh" x="536" y="552">pigeonhole 至此容許分支：0.40 ＋ 0.40 ≤ 1.00 ✓</text>

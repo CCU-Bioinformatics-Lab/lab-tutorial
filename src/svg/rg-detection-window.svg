@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 450">
-  <title>可分析的頻率視窗：傳統 VAF 擬合區間與譜系內比例區間的比較</title>
-  <desc>兩條橫軸畫的是同一件事在兩條路線上的可用範圍，範圍都以「佔細胞的比例」為單位。
+  <title>可分析的頻率連鎖視窗：傳統 VAF 擬合區間與譜系內比例區間的比較</title>
+  <desc>兩條橫軸畫的是同一件事在兩條路線上的可用範圍，範圍都以「佔細胞的比例」為連鎖區段。
         上排是傳統做法：原始研究刻意只在 VAF 零點一二到零點二四之間擬合，
         更低的一端混著假陽性，更高的一端已經進入 clonal 峰。
         把它換算成細胞比例，在純度零點六的樣本上大約是零點四到零點八，是一段相當窄的區間。
-        下排是本頁的做法：下界由每一個單位自己的深度與錯誤率決定，不是一個固定常數，
+        下排是本頁的做法：下界由每一個連鎖區段自己的深度與錯誤率決定，不是一個固定常數，
         在每個家族六十條分子、錯誤率千分之五時大約是零點零五；
         上界則由譜系內的 clonal 堆積決定，暫定零點五。
         右側的表列出下界怎麼隨分子數與錯誤率變化。
         底下標出一個重要提醒：上界零點五是全文最弱的一個數字，必須由模擬重新推定。
         讀法是：把比例改成在譜系內部量，動態範圍不但沒有變窄，反而變寬了。</desc>
 
-  <text class="ttl zh" x="20" y="36">可分析的比例視窗</text>
+  <text class="ttl zh" x="20" y="36">可分析的比例連鎖視窗</text>
 
   <!-- 上：傳統 -->
   <text class="lbl bold zh" x="20" y="92">傳統 VAF 擬合區間</text>
@@ -31,7 +31,7 @@
   <text class="tick mid" x="620" y="310">1.0</text>
   <rect class="region" x="88" y="262" width="252" height="22" rx="4"/>
   <rect class="box ghost ok" x="88" y="262" width="252" height="22" rx="4"/>
-  <text class="tick zh mid" x="214" y="256">約 0.05–0.5，且下界逐單位計算</text>
+  <text class="tick zh mid" x="214" y="256">約 0.05–0.5，且下界逐連鎖區段計算</text>
 
   <!-- 右側：下界表 -->
   <rect class="box" x="660" y="76" width="316" height="230" rx="8"/>
@@ -52,7 +52,7 @@
   <text class="tick mono mid" x="712" y="266">100</text>
   <text class="tick mono mid ok" x="798" y="266">0.04</text>
   <text class="tick mono mid" x="900" y="266">0.05</text>
-  <text class="tick zh mid" x="818" y="294">下界不是常數，要逐單位算</text>
+  <text class="tick zh mid" x="818" y="294">下界不是常數，要逐連鎖區段算</text>
 
   <text class="anno zh ok" x="20" y="356">把比例改成在譜系內部量，動態範圍不但沒有變窄，反而變寬。</text>
   <text class="anno zh bad" x="20" y="390">但上界 0.5 是本頁最弱的一個數字：它是從傳統區間的比例類推來的，</text>

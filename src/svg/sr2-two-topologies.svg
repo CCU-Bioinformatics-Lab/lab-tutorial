@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 990">
-  <title>三份證據如何把相容的候選樹砍到只剩一棵：頻率譜給一棵部分決定的樹，兩個單位各給一個局部拓撲</title>
+  <title>三份證據如何把相容的候選樹砍到只剩一棵：頻率譜給一棵部分決定的樹，兩個連鎖區段各給一個局部拓撲</title>
   <desc>本圖延續前一個數值例，純度零點六、二倍體，A、B、C 的細胞比例是一點零零、
         零點四零、零點四零，另加第四群 D，細胞比例零點二零，是 B 的後代。
         上排是三份證據各自說了什麼。
@@ -10,10 +10,10 @@
         取兩棵的共同部分，就是頻率譜真正確定的東西：A 是根，X 在 A 之下。
         未定的有兩件：D 掛在 A 之下還是掛在 X 之下，以及 X 是一群還是兩群。
         所以頻率譜給的是一棵部分決定的樹，不是一棵完整的樹。
-        第二份是單位甲。它含有兩個變異 i 與 j，觀測到沒有分子同時帶有兩者，
+        第二份是連鎖區段甲。它含有兩個變異 i 與 j，觀測到沒有分子同時帶有兩者，
         所以兩者分屬兩群 P 與 Q，而且兩群互不包含。
         這同時做了兩件事：把群數由三修正為四，並指出 P 與 Q 誰都不是誰的祖先。
-        第三份是單位乙。它含有兩個變異 p 與 q，觀測到帶 q 的分子全部也帶 p，
+        第三份是連鎖區段乙。它含有兩個變異 p 與 q，觀測到帶 q 的分子全部也帶 p，
         所以 q 所在的群巢狀於 p 所在的群之內，另附零點五零的比值。
         中排說明目標函數的兩項各自負責什麼、又各自不負責什麼。
         左邊是 beta 二項混合這一項，圖上畫的是三根峰各自的成分曲線：
@@ -65,11 +65,11 @@
   <text class="tick bold zh bad" x="36" y="432">✗ 未定：D 掛在 A 還是 X 之下</text>
   <text class="tick bold zh bad" x="36" y="454">✗ 未定：X 是一群，還是兩群</text>
 
-  <!-- ═══════════ ② 單位甲 ═══════════ -->
-  <text class="lbl bold zh ok" x="350" y="118">② 單位甲給的：<tspan class="bold">分岔</tspan></text>
+  <!-- ═══════════ ② 連鎖區段甲 ═══════════ -->
+  <text class="lbl bold zh ok" x="350" y="118">② 連鎖區段甲給的：<tspan class="bold">分岔</tspan></text>
   <rect class="box ok" x="350" y="134" width="310" height="330" rx="8"/>
 
-  <text class="tick zh" x="366" y="164">兩個變異 i、j 落在同一個單位</text>
+  <text class="tick zh" x="366" y="164">兩個變異 i、j 落在同一個連鎖區段</text>
   <rect class="read hp1" x="366" y="178" width="112" height="13" rx="6"/>
   <circle class="mark somatic" cx="390" cy="184" r="5"/>
   <rect class="read hp2" x="366" y="198" width="112" height="13" rx="6"/>
@@ -90,11 +90,11 @@
   <text class="tick zh" x="366" y="410">① 把 0.40 那一群拆開 → 群數 3 修正為 <tspan class="bold">4</tspan></text>
   <text class="tick zh" x="366" y="440">② 指出 P 與 Q <tspan class="bold">誰都不是誰的祖先</tspan></text>
 
-  <!-- ═══════════ ③ 單位乙 ═══════════ -->
-  <text class="lbl bold zh ok" x="680" y="118">③ 單位乙給的：<tspan class="bold">一條線</tspan></text>
+  <!-- ═══════════ ③ 連鎖區段乙 ═══════════ -->
+  <text class="lbl bold zh ok" x="680" y="118">③ 連鎖區段乙給的：<tspan class="bold">一條線</tspan></text>
   <rect class="box ok" x="680" y="134" width="300" height="330" rx="8"/>
 
-  <text class="tick zh" x="696" y="164">兩個變異 p、q 落在同一個單位</text>
+  <text class="tick zh" x="696" y="164">兩個變異 p、q 落在同一個連鎖區段</text>
   <rect class="read hp1" x="696" y="178" width="112" height="13" rx="6"/>
   <circle class="mark somatic" cx="720" cy="184" r="5"/>
   <rect class="read hp1" x="696" y="198" width="112" height="13" rx="6"/>

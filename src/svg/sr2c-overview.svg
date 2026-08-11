@@ -11,12 +11,12 @@
         兩堆的 read 沒有交集，因此下方有兩支箭頭分別把 S1 送進階段 G、把 S2 送進階段 L。
         第三層左邊是階段 G，畫成一張變異等位頻率的直方圖，
         上面有幾個峰，峰頂各標一個圓點代表被定出來的 CCF 原子；
-        右邊是階段 L，畫出某一個單位的四條分子，
+        右邊是階段 L，畫出某一個連鎖區段的四條分子，
         每條分子上有三個位點，實心代表帶有變異、空心代表參考型，
         右方由這些分子推出一棵小小的局部系譜。
         兩者之間有一支由左指向右的箭頭，標著單向：階段 G 的結果只當作階段 L 的先驗，局部不回饋全域。
         最下層是兩份交付物：
-        左邊是逐單位目錄，畫成數列，每一列是一棵小樹加上幾個顏色不同的旗標；
+        左邊是逐連鎖區段目錄，畫成數列，每一列是一棵小樹加上幾個顏色不同的旗標；
         右邊是給 somatic caller 的特徵，畫成一疊通道，
         上面三條是本規格新增的三層特徵，下面三條是 caller 原本就有的。</desc>
 
@@ -93,8 +93,8 @@
   <rect class="box ghost" x="346" y="262" width="42" height="30" rx="4"/>
   <rect class="box ghost" x="542" y="262" width="42" height="30" rx="4"/>
   <rect class="box ghost" x="852" y="262" width="42" height="30" rx="4"/>
-  <text class="tick zh" x="160" y="312">S₁ · 單變異區域（多數）</text>
-  <text class="tick zh" x="560" y="312">S₂ · 虛線框起來的多變異單位</text>
+  <text class="tick zh" x="160" y="312">S₁ · 單變異連鎖視窗（多數）</text>
+  <text class="tick zh" x="560" y="312">S₂ · 虛線框起來的多變異連鎖區段</text>
 
   <line class="conn thick" x1="250" y1="330" x2="250" y2="352" marker-end="url(#arrow)"/>
   <line class="conn thick" x1="750" y1="330" x2="750" y2="352" marker-end="url(#arrow)"/>
@@ -139,7 +139,7 @@
   <!-- ═══ 階段 L ═══ -->
   <rect class="box accent" x="522" y="356" width="460" height="210" rx="8"/>
   <text class="lbl bold zh" x="538" y="392">階段 L</text>
-  <text class="tick zh" x="538" y="416">每個單位一次</text>
+  <text class="tick zh" x="538" y="416">每個連鎖區段一次</text>
 
   <rect class="read hp1" x="560" y="440" width="150" height="14" rx="6"/>
   <rect class="read hp1" x="560" y="462" width="150" height="14" rx="6"/>
@@ -157,7 +157,7 @@
   <circle class="mark ref" cx="583" cy="513" r="5"/>
   <circle class="mark ref" cx="623" cy="513" r="5"/>
   <circle class="mark ref" cx="663" cy="513" r="5"/>
-  <text class="tick zh mid" x="635" y="534">該單位的分子</text>
+  <text class="tick zh mid" x="635" y="534">該連鎖區段的分子</text>
 
   <line class="conn" x1="725" y1="478" x2="761" y2="478" marker-end="url(#arrow)"/>
 
@@ -177,7 +177,7 @@
   <text class="lbl bold zh" x="34" y="634">交付物</text>
 
   <rect class="box accent" x="160" y="616" width="390" height="166" rx="8"/>
-  <text class="tick bold zh" x="176" y="644">A · 逐單位目錄</text>
+  <text class="tick bold zh" x="176" y="644">A · 逐連鎖區段目錄</text>
   <line class="conn" x1="196" y1="672" x2="188" y2="682"/>
   <line class="conn" x1="196" y1="672" x2="206" y2="682"/>
   <circle class="cell normal" cx="196" cy="666" r="5"/>
@@ -200,7 +200,7 @@
   <rect class="bar bad" x="240" y="733" width="86" height="14" rx="4"/>
   <rect class="bar" x="336" y="733" width="74" height="14" rx="4"/>
   <rect class="bar" x="420" y="733" width="100" height="14" rx="4"/>
-  <text class="tick zh" x="176" y="772">每單位一列：小樹 ＋ 比例 ＋ 旗標</text>
+  <text class="tick zh" x="176" y="772">每連鎖區段一列：小樹 ＋ 比例 ＋ 旗標</text>
 
   <rect class="box accent" x="570" y="616" width="390" height="166" rx="8"/>
   <text class="tick bold zh" x="586" y="644">B · 給 caller 的特徵</text>

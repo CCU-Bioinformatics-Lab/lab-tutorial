@@ -52,5 +52,5 @@
   <text class="lbl bold zh accent" x="48" y="384">修正：每一對先過檢定力這一關</text>
   <text class="anno zh" x="48" y="416">用該位點對自己的跨越深度算檢定力；不足的標成「未定」，</text>
   <text class="anno zh" x="48" y="444">不允許它的「缺席」去約束樹，並且在報告裡逐條列出來。</text>
-  <text class="tick zh" x="48" y="470">預期效果：目前被歸進「單層無分支」的單位，會有一部分正確地移到「未解析」。</text>
+  <text class="tick zh" x="48" y="470">預期效果：目前被歸進「單層無分支」的連鎖區段，會有一部分正確地移到「未解析」。</text>
 </svg>

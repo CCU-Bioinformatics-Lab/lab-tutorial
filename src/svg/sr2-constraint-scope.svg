@@ -70,7 +70,7 @@
   <text class="lbl bold zh ok" x="360" y="120">加入的那一條約束</text>
   <rect class="box ok" x="360" y="136" width="270" height="212" rx="8"/>
 
-  <text class="tick zh" x="376" y="164">i 與 j 落在<tspan class="bold">同一個單位</tspan>裡</text>
+  <text class="tick zh" x="376" y="164">i 與 j 落在<tspan class="bold">同一個連鎖區段</tspan>裡</text>
 
   <!-- 兩條分子，各只帶一個 -->
   <rect class="read hp1" x="376" y="182" width="112" height="14" rx="7"/>
@@ -151,6 +151,6 @@
 
   <rect class="box ghost accent" x="20" y="606" width="960" height="98" rx="8"/>
   <text class="lbl bold zh" x="40" y="638">系統發生重建要的是「有幾群、群間什麼關係」，不是逐一指派變異。</text>
-  <text class="anno zh" x="40" y="666">所以最稀疏的一對只有 28 個單位仍然足夠 —— 28 個遠不足以指派 1,000 個變異，</text>
+  <text class="anno zh" x="40" y="666">所以最稀疏的一對只有 28 個連鎖區段仍然足夠 —— 28 個遠不足以指派 1,000 個變異，</text>
   <text class="anno zh" x="40" y="692">但對「這兩個成分是不是同一個」這個是非判定則已然充足。</text>
 </svg>

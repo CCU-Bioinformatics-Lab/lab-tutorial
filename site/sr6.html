@@ -155,7 +155,7 @@ mutation 間的共現、互斥與巢狀關係。這些關係限制共享的 clon
 再間接縮小 purity／ploidy 的可行集合。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" class="dia-svg" role="img" aria-labelledby="rg-cancellation__title" aria-describedby="rg-cancellation__desc">
-  <title id="rg-cancellation__title">純度、拷貝數與 multiplicity 為什麼在單位內的比值裡消掉</title>
+  <title id="rg-cancellation__title">純度、拷貝數與 multiplicity 為什麼在連鎖區段內的比值裡消掉</title>
   <desc id="rg-cancellation__desc">上半畫一個分析單位裡的分子來源。
         正常細胞貢獻的分子在所有 somatic 位點上都是參考型，所以它們全部落在「全 0」那一格，
         不會進到其他任何一格。兩個腫瘤 clone 各自貢獻自己的組成格。
@@ -171,7 +171,7 @@ mutation 間的共現、互斥與巢狀關係。這些關係限制共享的 clon
   <text class="ttl zh" x="20" y="36">為什麼三個估計值會消掉</text>
 
   <!-- 分子來源 -->
-  <text class="lbl bold zh" x="20" y="82">一個單位裡的分子來源</text>
+  <text class="lbl bold zh" x="20" y="82">一個連鎖區段裡的分子來源</text>
 
   <rect class="box plain" x="24" y="98" width="230" height="96" rx="8"/>
   <text class="tick bold zh mid" x="139" y="122">正常細胞</text>
@@ -225,7 +225,7 @@ mutation 間的共現、互斥與巢狀關係。這些關係限制共享的 clon
 allelic imbalance 或外部 DNA-content evidence 確立尺度。</figcaption></figure>
 
 <p class="prose">因此，稀疏 multi-SNV haplotypes 的主要用途不是增加大量計數，
-而是排除原本完全等價的參數模式。若這些單位未連到 truncal scale、post-WGD mutation 或
+而是排除原本完全等價的參數模式。若這些連鎖區段未連到 truncal scale、post-WGD mutation 或
 informative allele-specific CN，預期結果為 clone topology 改善，而非 absolute purity／ploidy 改善。</p>
 </section>
 
@@ -596,10 +596,10 @@ support、reference、uninformative 三類 alignment mark 的 calibrated categor
   <title id="sr2b-emission__title">生成模型：從全域的 clone 一路長到一條 read 上看到的字母</title>
   <desc id="sr2b-emission__desc">五層，上排三格下排兩格，每一層只做一件事，中間沒有自由參數。
         第一層是全域物件：一棵 clone tree、每個 clone 的細胞比例，以及每個突變掛在哪個 clone 上。
-        全基因體只有這一份，所有單位共用。
-        第二層把全域物件投影到一個單位上。一個單位是一個區域乘一個單倍型家族，
-        所以只看得到一條染色體拷貝，另一條拷貝屬於另一個單位。
-        投影的結果是每個 clone 在這個單位上的局部基因型，
+        全基因體只有這一份，所有連鎖區段共用。
+        第二層把全域物件投影到一個連鎖區段上。一個連鎖區段是一個連鎖視窗乘一個單倍型家族，
+        所以只看得到一條染色體拷貝，另一條拷貝屬於另一個連鎖區段。
+        投影的結果是每個 clone 在這個連鎖區段上的局部基因型，
         例如全參考、只帶第二個突變、三個都帶。
         第三層把細胞比例換成分子比例：一個細胞貢獻幾條分子，取決於它在這裡有幾份拷貝，
         所以權重是細胞比例乘上該家族的拷貝數，再除以全部分子數。正常細胞只落在全參考那一格。
@@ -611,16 +611,16 @@ support、reference、uninformative 三類 alignment mark 的 calibrated categor
         會同時支持所有第一與第三位點相符的完整狀態。
         右下角說明 k 等於一時這整條路徑退化成什麼：只有兩格，
         第三層的比例就是期望 VAF，第五層沒有部分覆蓋的問題，得到的正是 beta-binomial。
-        最下方標注：所有單位共用第一層，這就是合併發生的地方，不需要任何對齊步驟；
+        最下方標注：所有連鎖區段共用第一層，這就是合併發生的地方，不需要任何對齊步驟；
         而局部表格不是第二批資料，同一批 read 不可以在兩邊各算一次。
         讀法是：局部看到的每一個數字，都是同一組全域參數投影下來的。</desc>
 
-  <text class="ttl zh" x="20" y="36">生成模型：全域 clone → 單位 → 分子 → 通道 → 一條 read</text>
+  <text class="ttl zh" x="20" y="36">生成模型：全域 clone → 連鎖區段 → 分子 → 通道 → 一條 read</text>
 
   <!-- ① 全域 -->
   <rect class="box accent" x="18" y="58" width="308" height="212" rx="8"/>
   <text class="lbl bold zh accent" x="34" y="88">① 全域參數</text>
-  <text class="tick zh" x="34" y="112">只有一份，所有單位共用</text>
+  <text class="tick zh" x="34" y="112">只有一份，所有連鎖區段共用</text>
   <circle class="mark somatic" cx="90" cy="150" r="11"/>
   <circle class="mark somatic" cx="150" cy="192" r="11"/>
   <circle class="mark somatic" cx="90" cy="234" r="11"/>
@@ -634,8 +634,8 @@ support、reference、uninformative 三類 alignment mark 的 calibrated categor
 
   <!-- ② 投影 -->
   <rect class="box" x="346" y="58" width="308" height="212" rx="8"/>
-  <text class="lbl bold zh" x="362" y="88">② 投影到一個單位</text>
-  <text class="tick zh" x="362" y="112">單位 ＝ 區域 × 單倍型家族</text>
+  <text class="lbl bold zh" x="362" y="88">② 投影到一個連鎖區段</text>
+  <text class="tick zh" x="362" y="112">連鎖區段 ＝ 連鎖視窗 × 單倍型家族</text>
   <rect class="read hp1" x="362" y="130" width="180" height="20" rx="10"/>
   <text class="tick mono" x="370" y="145">000</text>
   <text class="tick zh" x="556" y="145">正常</text>
@@ -646,7 +646,7 @@ support、reference、uninformative 三類 alignment mark 的 calibrated categor
   <text class="tick mono" x="370" y="205">111</text>
   <text class="tick zh" x="556" y="205">clone B</text>
   <text class="tick bold zh" x="362" y="238">只看得到一條拷貝</text>
-  <text class="tick zh" x="362" y="260">另一條在另一個單位裡</text>
+  <text class="tick zh" x="362" y="260">另一條在另一個連鎖區段裡</text>
 
   <!-- ③ 分子 -->
   <rect class="box" x="674" y="58" width="308" height="212" rx="8"/>
@@ -698,12 +698,12 @@ support、reference、uninformative 三類 alignment mark 的 calibrated categor
   <!-- 合併 -->
   <rect class="box sunken" x="512" y="516" width="470" height="130" rx="8"/>
   <text class="lbl bold zh" x="528" y="546">合併在哪裡發生</text>
-  <text class="tick zh" x="528" y="576">每個單位各自跑完 ②③④⑤，</text>
+  <text class="tick zh" x="528" y="576">每個連鎖區段各自跑完 ②③④⑤，</text>
   <text class="tick zh" x="528" y="600">但都由同一組 ① 算出來，</text>
   <text class="tick bold zh accent" x="528" y="624">相乘即完成，不需要對齊步驟。</text>
 
-  <text class="anno bold zh bad" x="18" y="678">局部表格不是第二批資料：它與 95% 區域的 VAF 由同一組參數產生。</text>
-  <text class="tick zh" x="18" y="706">所以同一批 read 不可以在兩邊各算一次 —— 多變異單位的邊際 VAF 已含在它的聯合表裡。</text>
+  <text class="anno bold zh bad" x="18" y="678">局部表格不是第二批資料：它與 95% 連鎖視窗的 VAF 由同一組參數產生。</text>
+  <text class="tick zh" x="18" y="706">所以同一批 read 不可以在兩邊各算一次 —— 多變異連鎖區段的邊際 VAF 已含在它的聯合表裡。</text>
 </svg><figcaption>全域 clone 與 copy states 投影成局部 <math><msup><mn>2</mn><mi>k</mi></msup></math> haplotype states，
 再依每條 read 的 coverage mask 邊際化並通過觀測錯誤通道。LiFT-CN 的差別是 local state weights
 由 purity、clone fractions 與 physical copy lineages 共同決定，中間沒有可自由吸收資料的 local proportion。</figcaption></figure>
@@ -735,7 +735,7 @@ whole-read artifact probability 則採 stratum-pooled hierarchy：</p>
         每個位點各自獨立，所以要一次改對三個位點才會生出一個完全不同的狀態，
         機率是單點錯誤率的三次方，小到可以忽略。
         右邊是整條分子的家族誤標。一條本來屬於另一個單倍型家族的分子被標錯，
-        整條就這樣跳到這個單位裡，它的三個位點是一起過來的，
+        整條就這樣跳到這個連鎖區段裡，它的三個位點是一起過來的，
         所以機率只有一個誤標率，跟位點數完全無關。
         中間下方是兩者的比較表。以單點錯誤率千分之五為例，
         差一個位點時兩者相當；差兩個位點時誤標大約高一百倍；
@@ -782,7 +782,7 @@ whole-read artifact probability 則採 stratum-pooled hierarchy：</p>
   <text class="tick mono" x="826" y="167">1</text>
 
   <path class="conn bad" d="M690,178 L690,196" marker-end="url(#arrow-sm)"/>
-  <text class="tick zh bad" x="704" y="194">整條被標到這個單位</text>
+  <text class="tick zh bad" x="704" y="194">整條被標到這個連鎖區段</text>
 
   <rect class="read hp2" x="526" y="202" width="330" height="24" rx="12"/>
   <text class="tick mono bad bold" x="538" y="219">1</text>
@@ -1266,7 +1266,7 @@ LiFT-CN 的候選新意只位於六列能力的交集，
 <li>single-locus 與 multi-locus molecules 的互斥計數，以及每個 coverage mask 的數量；</li>
 <li>每個 phase-connected component 的 loci、units、independent molecules 與 Hamming-separated states；</li>
 <li>可能連到 truncal scale、互斥 branch covering set、post-gain 或 post-WGD timing 的候選 units；</li>
-<li>copy-number-neutral、LOH、gain、amplification 與 excluded regions 內的單位數；</li>
+<li>copy-number-neutral、LOH、gain、amplification 與 excluded regions 內的連鎖區段數；</li>
 	<li>discovery、inference 與 evaluation folds 的 candidate retention、VAF、depth 與 context 分布；</li>
 <li>base-error 與 whole-read artifact posterior，以及低頻 states 相對於 error floor 的距離。</li>
 <li>E-shuffle strata 的 molecule-count distribution、singleton fraction、size 至少 2 的 strata 數、

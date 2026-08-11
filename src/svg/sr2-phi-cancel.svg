@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600">
   <title>同一批分子上的兩個變異量不到 φ，因為偏移是它們共有的</title>
   <desc>左右兩欄的差別只有一件事：兩個變異是不是落在同一批分子上。
-        左欄是同一個單位裡的兩個變異。定序拿到的那一池分子，
+        左欄是同一個連鎖區段裡的兩個變異。定序拿到的那一池分子，
         它的真實變異比例本來就會偏離期望值一點點，而 φ 想量的正是這個偏離。
         關鍵在於這兩個變異讀的是同一池分子，
         所以那個偏離對兩者是完全一樣的，兩個觀測到的頻率一起往同一個方向移。
@@ -19,7 +19,7 @@
 
   <!-- 左：同一批分子 -->
   <rect class="box warn" x="18" y="58" width="470" height="290" rx="8"/>
-  <text class="lbl bold zh warn" x="34" y="88">同一個單位裡的兩個變異</text>
+  <text class="lbl bold zh warn" x="34" y="88">同一個連鎖區段裡的兩個變異</text>
   <text class="tick zh" x="34" y="112">S1 與 S2 讀的是同一池分子</text>
 
   <rect class="box sunken" x="34" y="126" width="438" height="72" rx="6"/>

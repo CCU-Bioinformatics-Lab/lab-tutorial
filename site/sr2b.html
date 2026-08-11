@@ -53,7 +53,7 @@
 
 <div class="wrap ">
   <main class="main" id="main">
-    <header class="mhead"><p class="mhead__kicker">研究指引 · Subclone 系統發生重建 · Part 3 — the joint estimator and its feasibility</p><h1>下篇：完整的估計式，以及它能不能建起來</h1><p class="mhead__sub">把兩類觀測寫成兩個相乘的因子，說明 beta-binomial 為何只是它在單一變異時的邊界情形；再逐層寫出一個多變異單位的生成模型 —— 分子權重、覆蓋遮罩、兩種形狀不同的錯誤、三種不同的「沒有」—— 最後是現行實作要改的兩處與實作分期。</p><p class="mhead__meta"><a class="chip" href="sr2.html">建議先修：5% 能補的三格</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>寫出把兩類觀測合起來的完整估計式，並說明為何是兩個因子相乘而不是兩項相加</li><li>把一個多變異單位的生成過程逐層寫出來：全域 clone 如何投影成局部分子比例，再如何長成一條 read</li><li>區分抽樣零、結構零與錯誤地板，並說明為何 Dirichlet 參數不可為零這件事就是「零不代表不可能」的數學形式</li><li>說明分岔與不可同群這類分類為何是輸出而不是證據，以及現行實作要改的兩處各是什麼</li><li>依 Poisson 模型算出給定突變負荷下的可用單位產量，並說明該數量為何足夠</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">研究指引 · Subclone 系統發生重建 · Part 3 — the joint estimator and its feasibility</p><h1>下篇：完整的估計式，以及它能不能建起來</h1><p class="mhead__sub">把兩類觀測寫成兩個相乘的因子，說明 beta-binomial 為何只是它在單一變異時的邊界情形；再逐層寫出一個多變異單位的生成模型 —— 分子權重、覆蓋遮罩、兩種形狀不同的錯誤、三種不同的「沒有」—— 最後是現行實作要改的兩處與實作分期。</p><p class="mhead__meta"><a class="chip" href="sr2.html">建議先修：5% 能補的三格</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>寫出把兩類觀測合起來的完整估計式，並說明為何是兩個因子相乘而不是兩項相加</li><li>把一個多變異連鎖區段的生成過程逐層寫出來：全域 clone 如何投影成局部分子比例，再如何長成一條 read</li><li>區分抽樣零、結構零與錯誤地板，並說明為何 Dirichlet 參數不可為零這件事就是「零不代表不可能」的數學形式</li><li>說明分岔與不可同群這類分類為何是輸出而不是證據，以及現行實作要改的兩處各是什麼</li><li>依 Poisson 模型算出給定突變負荷下的可用連鎖區段產量，並說明該數量為何足夠</li></ul></section>
 
 <section data-part="why" class="part" id="part-why">
 <h2 data-num="①" id="為什麼重要">為什麼重要</h2>
@@ -61,21 +61,21 @@
 <p class="prose">中篇確立了三件事：僅以 VAF 頻率譜重建時，
 <b>群數 K 不可辨識</b>、<b>峰寬 φ 與 K 不可區辨</b>、
 <b>成分位置 c 依賴三個外部估計值</b>；
-而多變異區域的觀測正好各補一格，且三者作用在同一組變數
+而多變異連鎖視窗的觀測正好各補一格，且三者作用在同一組變數
 <math><mi>z</mi></math>、<math><mi>φ</mi></math>、<math><mi>c</mi></math> 上。</p>
 
 <p class="prose">把三者合起來的最直接寫法，是把頻率的對數似然與一串「關係約束」的對數證據
 <b>相加</b>，再給每條關係一個權重。這個寫法有一個結構缺陷，而且它不是細節：
-<b>多變異區域的 read 會被計兩次</b> —— 一次是它們各自的 VAF 進了頻率項，
+<b>多變異連鎖視窗的 read 會被計兩次</b> —— 一次是它們各自的 VAF 進了頻率項，
 一次是同一批分子被換算成關係又進了第二項。
 兩項因此不是獨立的資料集，那個和也就不是一個 likelihood；
 權重之所以必須存在，正是為了事後稀釋這個重複。</p>
 
 <p class="prose">本頁採取另一條路，而它其實更簡單：<b>不要把 read 換算成關係，直接對 read 建模。</b>
-把觀測依區域切成互不重疊的兩類 —— 只有一個變異的區域，與兩個以上變異的單位 ——
+把觀測依連鎖視窗切成互不重疊的兩類 —— 只有一個變異的連鎖視窗，與兩個以上變異的連鎖區段 ——
 兩類各寫一個因子，相乘即得完整的 likelihood。
-單變異區域那個因子正是原本的 beta-binomial；
-多變異單位那個因子是同一個模型在多個位點上的一般形式。
+單變異連鎖視窗那個因子正是原本的 beta-binomial；
+多變異連鎖區段那個因子是同一個模型在多個位點上的一般形式。
 <b>兩者不是兩個模型，beta-binomial 是它在 <math><mi>k</mi><mo>=</mo><mn>1</mn></math> 時的邊界情形。</b></p>
 
 <p class="prose">這個改動的代價與收益都很集中。收益是：權重、關係的可信度、以及為了保護硬約束而設的門檻
@@ -83,9 +83,9 @@
 代價是：觀測通道必須寫完整 —— 逐位點的定序錯誤與整條分子的家族誤標形狀不同，
 少寫一種，錯誤造出來的少數幾條 read 就會被讀成一個新的 clone。</p>
 
-<p class="prose">因此本頁的順序是：先寫出估計式（第一節），再逐層寫出多變異單位的生成過程
+<p class="prose">因此本頁的順序是：先寫出估計式（第一節），再逐層寫出多變異連鎖區段的生成過程
 （第二節）與它的預設抽樣分布（第三節）；接著處理三種不同的「沒有」（第四節）、
-分類為何是輸出而不是輸入（第五節）、數百個單位如何合併（第六節）；
+分類為何是輸出而不是輸入（第五節）、數百個連鎖區段如何合併（第六節）；
 最後是現行實作要改的兩處（第七節）、兩類與相位有關的誤讀（第八節）、
 產量與參數取捨（第九、十節）與實作分期（第十一節）。</p>
 </section>
@@ -120,16 +120,16 @@ multiplicity。若該區段二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub>
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" class="dia-svg" role="img" aria-labelledby="sr2b-two-factors__title" aria-describedby="sr2b-two-factors__desc">
   <title id="sr2b-two-factors__title">同一批 read 不能算兩次：由相加的合成目標改為相乘的兩個因子</title>
   <desc id="sr2b-two-factors__desc">上半是原本的寫法。全基因體一萬五千五百個變異全部進入頻率項，
-        其中落在多變異區域的一千四百七十五個變異，
+        其中落在多變異連鎖視窗的一千四百七十五個變異，
         它們的 read 又被拿去算成關係約束，再加進第二項。
         中間用兩條指向同一疊 read 的箭頭標出問題：同一批分子被計了兩次，
         所以那個和不是一個真正的 likelihood，只能叫合成目標，
         而且必須另外校準一個權重來稀釋重複的部分。
-        下半是改過的寫法。把觀測依區域切成兩類互不重疊的集合：
-        只有一個變異的區域走 beta-binomial，兩個以上變異的單位走聯合的狀態表模型。
+        下半是改過的寫法。把觀測依連鎖視窗切成兩類互不重疊的集合：
+        只有一個變異的連鎖視窗走 beta-binomial，兩個以上變異的連鎖區段走聯合的狀態表模型。
         兩類的 read 沒有交集，所以兩個因子相乘就是一個真正的 likelihood，
         不需要權重，也沒有東西被算第二次。
-        右下角標注一句關鍵的話：多變異單位的邊際 VAF 已經包含在它的聯合表裡，
+        右下角標注一句關鍵的話：多變異連鎖區段的邊際 VAF 已經包含在它的聯合表裡，
         所以不可以再把它加回頻率項。
         讀法是：權重原本是用來修補重複計數的補丁，把觀測切乾淨之後那個補丁就不需要了。</desc>
 
@@ -169,24 +169,24 @@ multiplicity。若該區段二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub>
   <text class="lbl bold zh ok" x="34" y="326">改成：兩個因子相乘，觀測先切成互不重疊的兩類</text>
 
   <rect class="box" x="36" y="342" width="380" height="76" rx="8"/>
-  <text class="lbl zh" x="50" y="368">只有一個變異的區域（95%）</text>
+  <text class="lbl zh" x="50" y="368">只有一個變異的連鎖視窗（95%）</text>
   <text class="tick zh" x="50" y="392">beta-binomial，一個位點兩格</text>
   <text class="tick mono" x="50" y="412">14,025 個變異</text>
 
   <text class="lbl bold mid" x="446" y="386">×</text>
 
   <rect class="box accent" x="476" y="342" width="380" height="76" rx="8"/>
-  <text class="lbl zh accent" x="490" y="368">兩個以上變異的單位（5%）</text>
-  <text class="tick zh" x="490" y="392">聯合狀態表，一個單位 2ᵏ 格</text>
+  <text class="lbl zh accent" x="490" y="368">兩個以上變異的連鎖區段（5%）</text>
+  <text class="tick zh" x="490" y="392">聯合狀態表，一個連鎖區段 2ᵏ 格</text>
   <text class="tick mono" x="490" y="412">1,475 個變異</text>
 
   <rect class="box ok" x="880" y="342" width="88" height="76" rx="8"/>
   <text class="tick bold zh ok mid" x="924" y="374">沒有</text>
   <text class="tick bold zh ok mid" x="924" y="398">交集</text>
 
-  <text class="anno bold zh accent" x="18" y="480">多變異單位的邊際 VAF <tspan class="bold">已經含在它的聯合表裡</tspan> —— 不可以再加回頻率項。</text>
+  <text class="anno bold zh accent" x="18" y="480">多變異連鎖區段的邊際 VAF <tspan class="bold">已經含在它的聯合表裡</tspan> —— 不可以再加回頻率項。</text>
   <text class="tick zh" x="18" y="508">權重原本是修補重複計數的補丁；觀測切乾淨之後，那個補丁就不需要了。</text>
-</svg><figcaption>上半是相加的寫法：多變異區域的 read 同時進了兩項，
+</svg><figcaption>上半是相加的寫法：多變異連鎖視窗的 read 同時進了兩項，
 所以那個和不是 likelihood，權重是為了修補重複計數才存在的。
 下半把觀測切成互不重疊的兩類，兩個因子相乘即為完整的 likelihood，權重隨之消失。</figcaption></figure>
 
@@ -194,14 +194,14 @@ multiplicity。若該區段二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub>
 
 <p class="prose"><math><mi>Θ</mi><mo>=</mo><mo>(</mo><mi>w</mi><mo>,</mo><mi>T</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>ρ</mi><mo>,</mo><mi>e</mi><mo>)</mo></math> 是全域參數：<math><mi>w</mi></math> 為各 clone 的細胞比例、
 <math><mi>T</mi></math> 為 <span class="term" data-term="clone tree" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clone-tree-0">clone tree<span class="term__pop" id="gd-clone-tree-0" role="tooltip"><b class="term__hd">clone tree <i>克隆演化樹</i></b><span class="term__def" data-lang="zh">描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</span><span class="term__def" data-lang="en" lang="en">A tree describing ancestral relationships among cell populations in a tumour: nodes are groups of cells sharing a mutation set, edges represent additional mutations acquired on top of an ancestor. Multiple trees are often compatible with the same clusters.</span><a class="term__more" href="glossary.html#clone-tree">完整條目 →</a></span></span>、<math><mi>z</mi></math> 為突變到 clone 的指派、<math><mi>ρ</mi></math> 為純度、
-<math><mi>e</mi></math> 為觀測通道的錯誤參數。<math><msub><mi>S</mi><mn>1</mn></msub></math> 是只含一個變異的區域，
-<math><msub><mi>S</mi><mn>2</mn></msub></math> 是含兩個以上變異的單位。
+<math><mi>e</mi></math> 為觀測通道的錯誤參數。<math><msub><mi>S</mi><mn>1</mn></msub></math> 是只含一個變異的連鎖視窗，
+<math><msub><mi>S</mi><mn>2</mn></msub></math> 是含兩個以上變異的連鎖區段。
 <b><math><msub><mi>S</mi><mn>1</mn></msub></math> 與 <math><msub><mi>S</mi><mn>2</mn></msub></math> 的 read 沒有交集，這是這條式子成立的全部條件</b> ——
 也正是相加那個寫法沒有滿足的條件。</p>
 
 <p class="prose">要點在於 <math><msub><mi>S</mi><mn>2</mn></msub></math> 的因子<b>已經包含</b>那些變異的邊際 VAF：
 一張 <math><msup><mn>2</mn><mi>k</mi></msup></math> 格的聯合表沿任一個位點加總，得到的就是該位點的 alt／ref 計數。
-所以把多變異單位的變異再放回第一個乘積，就是把同一批 read 算第二次。</p>
+所以把多變異連鎖區段的變異再放回第一個乘積，就是把同一批 read 算第二次。</p>
 
 <div class="eq"><math display="block"><mi>Score</mi><mo>(</mo><mi>K</mi><mo>,</mo><mi>Θ</mi><mo>)</mo><mo>=</mo><mi>log</mi><mi>P</mi><mo>(</mo><mi>D</mi><mo>∣</mo><mi>Θ</mi><mo>)</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>p</mi><mi>K</mi></msub><mi>log</mi><msub><mi>M</mi><mi>eff</mi></msub><mo>+</mo><mi>log</mi><mi>p</mi><mo>(</mo><mi>K</mi><mo>)</mo><mo>,</mo><mspace width="2em"/><mover accent="true"><mi>K</mi><mo>^</mo></mover><mo>=</mo><mi>arg</mi><msub><mi>max</mi><mi>K</mi></msub><mi>Score</mi><mo>(</mo><mi>K</mi><mo>,</mo><msub><mover accent="true"><mi>Θ</mi><mo>^</mo></mover><mi>K</mi></msub><mo>)</mo></math></div>
 
@@ -217,20 +217,20 @@ multiplicity。若該區段二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub>
 以下各項定義的目的，是讓後續實作能逐項測試；在合成資料與真實重複資料通過末節所列驗證之前，
 不得把 <math><mi>Score</mi></math> 的最大值當成已證實的生物學結論。</p>
 
-<h3 id="二-一個多變異單位的生成模型">二、一個多變異單位的生成模型</h3>
+<h3 id="二-一個多變異連鎖區段的生成模型">二、一個多變異連鎖區段的生成模型</h3>
 
 <p class="prose">上式的 <math><msub><mi>P</mi><mi>u</mi></msub><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><mi>Θ</mi><mo>)</mo></math> 是整份規格的核心。它必須從全域參數<b>一路長到一條 read
 上看到的字母</b>，中間不能有任何自由參數 —— 一旦局部比例可以自己亂動，
-這個單位就不再對全域參數施加任何限制，整條路線也就白做了。</p>
+這個連鎖區段就不再對全域參數施加任何限制，整條路線也就白做了。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 720" class="dia-svg" role="img" aria-labelledby="sr2b-emission__title" aria-describedby="sr2b-emission__desc">
   <title id="sr2b-emission__title">生成模型：從全域的 clone 一路長到一條 read 上看到的字母</title>
   <desc id="sr2b-emission__desc">五層，上排三格下排兩格，每一層只做一件事，中間沒有自由參數。
         第一層是全域物件：一棵 clone tree、每個 clone 的細胞比例，以及每個突變掛在哪個 clone 上。
-        全基因體只有這一份，所有單位共用。
-        第二層把全域物件投影到一個單位上。一個單位是一個區域乘一個單倍型家族，
-        所以只看得到一條染色體拷貝，另一條拷貝屬於另一個單位。
-        投影的結果是每個 clone 在這個單位上的局部基因型，
+        全基因體只有這一份，所有連鎖區段共用。
+        第二層把全域物件投影到一個連鎖區段上。一個連鎖區段是一個連鎖視窗乘一個單倍型家族，
+        所以只看得到一條染色體拷貝，另一條拷貝屬於另一個連鎖區段。
+        投影的結果是每個 clone 在這個連鎖區段上的局部基因型，
         例如全參考、只帶第二個突變、三個都帶。
         第三層把細胞比例換成分子比例：一個細胞貢獻幾條分子，取決於它在這裡有幾份拷貝，
         所以權重是細胞比例乘上該家族的拷貝數，再除以全部分子數。正常細胞只落在全參考那一格。
@@ -242,16 +242,16 @@ multiplicity。若該區段二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub>
         會同時支持所有第一與第三位點相符的完整狀態。
         右下角說明 k 等於一時這整條路徑退化成什麼：只有兩格，
         第三層的比例就是期望 VAF，第五層沒有部分覆蓋的問題，得到的正是 beta-binomial。
-        最下方標注：所有單位共用第一層，這就是合併發生的地方，不需要任何對齊步驟；
+        最下方標注：所有連鎖區段共用第一層，這就是合併發生的地方，不需要任何對齊步驟；
         而局部表格不是第二批資料，同一批 read 不可以在兩邊各算一次。
         讀法是：局部看到的每一個數字，都是同一組全域參數投影下來的。</desc>
 
-  <text class="ttl zh" x="20" y="36">生成模型：全域 clone → 單位 → 分子 → 通道 → 一條 read</text>
+  <text class="ttl zh" x="20" y="36">生成模型：全域 clone → 連鎖區段 → 分子 → 通道 → 一條 read</text>
 
   <!-- ① 全域 -->
   <rect class="box accent" x="18" y="58" width="308" height="212" rx="8"/>
   <text class="lbl bold zh accent" x="34" y="88">① 全域參數</text>
-  <text class="tick zh" x="34" y="112">只有一份，所有單位共用</text>
+  <text class="tick zh" x="34" y="112">只有一份，所有連鎖區段共用</text>
   <circle class="mark somatic" cx="90" cy="150" r="11"/>
   <circle class="mark somatic" cx="150" cy="192" r="11"/>
   <circle class="mark somatic" cx="90" cy="234" r="11"/>
@@ -265,8 +265,8 @@ multiplicity。若該區段二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub>
 
   <!-- ② 投影 -->
   <rect class="box" x="346" y="58" width="308" height="212" rx="8"/>
-  <text class="lbl bold zh" x="362" y="88">② 投影到一個單位</text>
-  <text class="tick zh" x="362" y="112">單位 ＝ 區域 × 單倍型家族</text>
+  <text class="lbl bold zh" x="362" y="88">② 投影到一個連鎖區段</text>
+  <text class="tick zh" x="362" y="112">連鎖區段 ＝ 連鎖視窗 × 單倍型家族</text>
   <rect class="read hp1" x="362" y="130" width="180" height="20" rx="10"/>
   <text class="tick mono" x="370" y="145">000</text>
   <text class="tick zh" x="556" y="145">正常</text>
@@ -277,7 +277,7 @@ multiplicity。若該區段二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub>
   <text class="tick mono" x="370" y="205">111</text>
   <text class="tick zh" x="556" y="205">clone B</text>
   <text class="tick bold zh" x="362" y="238">只看得到一條拷貝</text>
-  <text class="tick zh" x="362" y="260">另一條在另一個單位裡</text>
+  <text class="tick zh" x="362" y="260">另一條在另一個連鎖區段裡</text>
 
   <!-- ③ 分子 -->
   <rect class="box" x="674" y="58" width="308" height="212" rx="8"/>
@@ -329,26 +329,26 @@ multiplicity。若該區段二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub>
   <!-- 合併 -->
   <rect class="box sunken" x="512" y="516" width="470" height="130" rx="8"/>
   <text class="lbl bold zh" x="528" y="546">合併在哪裡發生</text>
-  <text class="tick zh" x="528" y="576">每個單位各自跑完 ②③④⑤，</text>
+  <text class="tick zh" x="528" y="576">每個連鎖區段各自跑完 ②③④⑤，</text>
   <text class="tick zh" x="528" y="600">但都由同一組 ① 算出來，</text>
   <text class="tick bold zh accent" x="528" y="624">相乘即完成，不需要對齊步驟。</text>
 
-  <text class="anno bold zh bad" x="18" y="678">局部表格不是第二批資料：它與 95% 區域的 VAF 由同一組參數產生。</text>
-  <text class="tick zh" x="18" y="706">所以同一批 read 不可以在兩邊各算一次 —— 多變異單位的邊際 VAF 已含在它的聯合表裡。</text>
+  <text class="anno bold zh bad" x="18" y="678">局部表格不是第二批資料：它與 95% 連鎖視窗的 VAF 由同一組參數產生。</text>
+  <text class="tick zh" x="18" y="706">所以同一批 read 不可以在兩邊各算一次 —— 多變異連鎖區段的邊際 VAF 已含在它的聯合表裡。</text>
 </svg><figcaption>五層各做一件事，中間沒有自由參數。
-注意第二層：一個單位只看得到一條染色體拷貝，另一條在另一個單位裡 ——
+注意第二層：一個連鎖區段只看得到一條染色體拷貝，另一條在另一個連鎖區段裡 ——
 這決定了第三層的分母該怎麼寫。第五層的部分覆蓋是<b>邊際化</b>，不是填成參考型。</figcaption></figure>
 
-<h4 id="單位-局部基因型與分子權重">單位、局部基因型與分子權重</h4>
+<h4 id="連鎖區段-局部基因型與分子權重">連鎖區段、局部基因型與分子權重</h4>
 
-<p class="prose">一個<b>單位</b> <math><mi>u</mi></math> 是一個「區域 × <span class="term" data-term="somatic haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-somatic-haplotype-1">單倍型家族<span class="term__pop" id="gd-somatic-haplotype-1" role="tooltip"><b class="term__hd">somatic haplotype</b><span class="term__def" data-lang="zh">在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</span><span class="term__def" data-lang="en" lang="en">A sub-level beneath the germline haplotype: HP1-1 and HP2-1 carry somatic mutations derived from HP1 and HP2; HP3 is unassignable.</span><a class="term__more" href="glossary.html#somatic-haplotype">完整條目 →</a></span></span>」。
-這個切法很重要：它表示<b>一個單位裡的 read 全部來自同一條染色體拷貝</b>，
-另一條拷貝屬於另一個單位。因此
-<b>不可以在單位內部再把兩條拷貝混起來寫成各佔一半</b> ——
+<p class="prose">一個<b>連鎖區段</b> <math><mi>u</mi></math> 是一個<b>單倍型連鎖區段</b>：一個連鎖視窗 × 一條 <span class="term" data-term="somatic haplotype" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-somatic-haplotype-1">單倍型家族<span class="term__pop" id="gd-somatic-haplotype-1" role="tooltip"><b class="term__hd">somatic haplotype</b><span class="term__def" data-lang="zh">在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</span><span class="term__def" data-lang="en" lang="en">A sub-level beneath the germline haplotype: HP1-1 and HP2-1 carry somatic mutations derived from HP1 and HP2; HP3 is unassignable.</span><a class="term__more" href="glossary.html#somatic-haplotype">完整條目 →</a></span></span>。
+這個切法很重要：它表示<b>一個連鎖區段裡的 read 全部來自同一條染色體拷貝</b>，
+另一條拷貝屬於另一個連鎖區段。因此
+<b>不可以在連鎖區段內部再把兩條拷貝混起來寫成各佔一半</b> ——
 那是尚未依家族分組時的寫法，用在已分組的資料上會把細胞比例整體算錯將近一倍。</p>
 
 <p class="prose">設 clone <math><mi>g</mi></math> 在拷貝 <math><mi>b</mi></math> 上的全域基因型為 <math><msub><mi>G</mi><mrow><mi>g</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>m</mi></mrow></msub><mo>∈</mo><mo>{</mo><mn>0,1</mn><mo>}</mo></math>，
-投影到單位 <math><mi>u</mi></math> 的那幾個位點，即得局部基因型
+投影到連鎖區段 <math><mi>u</mi></math> 的那幾個位點，即得局部基因型
 <math><msub><mi>H</mi><mi>ugb</mi></msub><mo>∈</mo><mo>{</mo><mn>0,1</mn><msup><mo>}</mo><msub><mi>k</mi><mi>u</mi></msub></msup></math>。基因型寫在<b>拷貝</b>這一層而不是 clone 這一層，
 是為了讓 cis／trans 與 LOH 有地方表達。分子權重則為：</p>
 
@@ -366,7 +366,7 @@ multiplicity。若該區段二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub>
 
 <h4 id="覆蓋遮罩-沒覆蓋到的位點要邊際化">覆蓋遮罩：沒覆蓋到的位點要邊際化</h4>
 
-<p class="prose">一條 read 只覆蓋單位裡的一部分位點。設其<b>覆蓋遮罩</b>為
+<p class="prose">一條 read 只覆蓋連鎖區段裡的一部分位點。設其<b>覆蓋遮罩</b>為
 <math><mi>M</mi><mo>⊆</mo><msub><mi>J</mi><mi>u</mi></msub></math>、觀測到的字母為 <math><mi>y</mi><mo>∈</mo><mo>{</mo><mn>0,1</mn><msup><mo>}</mo><mrow><mo>|</mo><mi>M</mi><mo>|</mo></mrow></msup></math>，則</p>
 
 <div class="eq"><math display="block"><msub><mi>q</mi><mrow><mi>u</mi><mo>,</mo><mi>M</mi></mrow></msub><mo>(</mo><mi>y</mi><mo>)</mo><mo>=</mo><munder><mo>∑</mo><mrow><mi>h</mi><mo>:</mo><msub><mi>h</mi><mi>M</mi></msub><mo>=</mo><mi>y</mi></mrow></munder><msub><mi>q</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math></div>
@@ -376,10 +376,10 @@ multiplicity。若該區段二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub>
 <math><mn>101</mn></math> 與 <math><mn>111</mn></math>。<b>沒覆蓋到的位點不可以填成參考型</b> ——
 那會把一條中立的 read 變成一條反對 <math><mn>111</mn></math> 的證據。</p>
 
-<h4 id="一個單位一個-p-不是一個遮罩一個">一個單位一個 p，不是一個遮罩一個</h4>
+<h4 id="一個連鎖區段一個-p-不是一個遮罩一個">一個連鎖區段一個 p，不是一個遮罩一個</h4>
 
-<p class="prose">同一個單位裡不同遮罩的 read 取樣的是<b>同一池分子</b>，
-所以它們的比例是相關的。正確的寫法是讓整個單位共用一個潛在比例向量，
+<p class="prose">同一個連鎖區段裡不同遮罩的 read 取樣的是<b>同一池分子</b>，
+所以它們的比例是相關的。正確的寫法是讓整個連鎖區段共用一個潛在比例向量，
 每條 read 各自從它自己的遮罩投影出來：</p>
 
 <div class="eq"><math display="block"><msub><mi>p</mi><mi>u</mi></msub><mo>∼</mo><mi>Dirichlet</mi><mo>(</mo><msub><mi>τ</mi><mi>u</mi></msub><mo>·</mo><msub><mi>q</mi><mi>u</mi></msub><mo>)</mo><mo>,</mo><mspace width="2em"/><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>M</mi><mi>i</mi></msub><mo>,</mo><msub><mi>p</mi><mi>u</mi></msub><mo>∼</mo><mi>Categorical</mi><mo>(</mo><msub><mi>Proj</mi><msub><mi>M</mi><mi>i</mi></msub></msub><mo>(</mo><msub><mi>p</mi><mi>u</mi></msub><mo>)</mo><mo>)</mo></math></div>
@@ -387,7 +387,7 @@ multiplicity。若該區段二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub>
 <p class="prose">若改成「每個遮罩各自一個 Dirichlet-multinomial」，
 等於宣稱不同遮罩的 read 來自互相獨立的分子池。那是一個
 composite likelihood 近似，可以用，但必須<b>如此稱呼</b>，
-而且它會低估同一單位內部的相關性。</p>
+而且它會低估同一連鎖區段內部的相關性。</p>
 
 <h4 id="觀測通道-兩種形狀不同的錯誤">觀測通道：兩種形狀不同的錯誤</h4>
 
@@ -399,7 +399,7 @@ composite likelihood 近似，可以用，但必須<b>如此稱呼</b>，
         每個位點各自獨立，所以要一次改對三個位點才會生出一個完全不同的狀態，
         機率是單點錯誤率的三次方，小到可以忽略。
         右邊是整條分子的家族誤標。一條本來屬於另一個單倍型家族的分子被標錯，
-        整條就這樣跳到這個單位裡，它的三個位點是一起過來的，
+        整條就這樣跳到這個連鎖區段裡，它的三個位點是一起過來的，
         所以機率只有一個誤標率，跟位點數完全無關。
         中間下方是兩者的比較表。以單點錯誤率千分之五為例，
         差一個位點時兩者相當；差兩個位點時誤標大約高一百倍；
@@ -446,7 +446,7 @@ composite likelihood 近似，可以用，但必須<b>如此稱呼</b>，
   <text class="tick mono" x="826" y="167">1</text>
 
   <path class="conn bad" d="M690,178 L690,196" marker-end="url(#arrow-sm)"/>
-  <text class="tick zh bad" x="704" y="194">整條被標到這個單位</text>
+  <text class="tick zh bad" x="704" y="194">整條被標到這個連鎖區段</text>
 
   <rect class="read hp2" x="526" y="202" width="330" height="24" rx="12"/>
   <text class="tick mono bad bold" x="538" y="219">1</text>
@@ -501,7 +501,7 @@ composite likelihood 近似，可以用，但必須<b>如此稱呼</b>，
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="rg-error-gates__title" aria-describedby="rg-error-gates__desc">
   <title id="rg-error-gates__title">觀測要經過幾道閘門：每個位點一道，最後兩個家族之間再交換一次</title>
-  <desc id="rg-error-gates__desc">兩條並排的通道分別是同一個視窗的兩個單倍型家族。
+  <desc id="rg-error-gates__desc">兩條並排的通道分別是同一個連鎖視窗的兩個單倍型家族。
         每條通道由左到右經過相同的幾個階段。
         起點是真實的分子組成。
         接著是每個位點各一道錯誤閘門，閘門會把參考型讀成變異型，也會把變異型讀成參考型，
@@ -511,8 +511,8 @@ composite likelihood 近似，可以用，但必須<b>如此稱呼</b>，
         但有一小部分會被標到另一條通道去，圖上用兩條交叉的虛線表示。
         終點是實際觀測到的計數。
         圖的下方指出這件事的後果：因為交換閘門把兩條通道接在一起，
-        兩個家族必須一起估。分開估會讓譜系內比例每個單位都往零點五偏一點，
-        而且幾萬個單位偏的方向相同，那不是把譜變寬，是把整條譜平移。
+        兩個家族必須一起估。分開估會讓譜系內比例每個連鎖區段都往零點五偏一點，
+        而且幾萬個連鎖區段偏的方向相同，那不是把譜變寬，是把整條譜平移。
         讀法是：公式裡的三個符號各對應圖上一道閘門。</desc>
 
   <text class="ttl zh" x="20" y="36">觀測要經過幾道閘門</text>
@@ -575,24 +575,24 @@ composite likelihood 近似，可以用，但必須<b>如此稱呼</b>，
 
   <!-- 說明 -->
   <text class="anno zh" x="24" y="382">ε 是「把 REF 讀成 ALT」，η 是「把 ALT 讀成 REF」—— 兩個方向機率不同，所以閘門不對稱。</text>
-  <text class="anno zh" x="24" y="410">兩者都可以用同一個視窗裡的 germline 雜合位點就地估出來，不必外部參數。</text>
+  <text class="anno zh" x="24" y="410">兩者都可以用同一個連鎖視窗裡的 germline 雜合位點就地估出來，不必外部參數。</text>
 
   <rect class="box bad" x="24" y="430" width="952" height="60" rx="8"/>
-  <text class="anno zh bad" x="48" y="458">交換閘門把兩條通道接在一起，所以<tspan class="bold">兩個家族必須一起估</tspan>。分開估會讓 ϱ 每個單位</text>
-  <text class="anno zh bad" x="48" y="482">都往 0.5 偏一點，而且幾萬個單位偏的方向相同 —— 那不是把譜變寬，是把整條譜平移。</text>
+  <text class="anno zh bad" x="48" y="458">交換閘門把兩條通道接在一起，所以<tspan class="bold">兩個家族必須一起估</tspan>。分開估會讓 ϱ 每個連鎖區段</text>
+  <text class="anno zh bad" x="48" y="482">都往 0.5 偏一點，而且幾萬個連鎖區段偏的方向相同 —— 那不是把譜變寬，是把整條譜平移。</text>
 </svg><figcaption>每個位點一道錯誤閘門；最末一道為家族交換閘門，
 少部分分子被標至另一條通道。交換閘門連結兩條通道，故兩個家族必須一併估計。</figcaption></figure>
 
 <h4 id="hp1-hp2-的方向是-nuisance">HP1／HP2 的方向是 nuisance</h4>
 
-<p class="prose">單位的家族標號在每個 phase set 內獨立決定，
-所以「這個單位的家族一」對應到全域基因型的哪一條拷貝 <math><mi>b</mi></math> 並不確定。
+<p class="prose">連鎖區段的家族標號在每個 phase set 內獨立決定，
+所以「這個連鎖區段的家族一」對應到全域基因型的哪一條拷貝 <math><mi>b</mi></math> 並不確定。
 處理方式是引入一個局部方向變數 <math><msub><mi>σ</mi><mi>u</mi></msub><mo>∈</mo><mo>{</mo><mi>原</mi><mi>樣</mi><mo>,</mo><mi>對</mi><mi>調</mi><mo>}</mo></math> 並把它邊際化：</p>
 
 <div class="eq"><math display="block"><mi>P</mi><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><mi>Θ</mi><mo>)</mo><mo>=</mo><munder><mo>∑</mo><msub><mi>σ</mi><mi>u</mi></msub></munder><mi>P</mi><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><mi>Θ</mi><mo>,</mo><msub><mi>σ</mi><mi>u</mi></msub><mo>)</mo><mo>·</mo><mi>P</mi><mo>(</mo><msub><mi>σ</mi><mi>u</mi></msub><mo>)</mo></math></div>
 
-<p class="prose">兩個細節值得寫明。其一，<math><mi>σ</mi></math> 是<b>每個「區域 × phase set」一個</b>，
-不是每個單位一個 —— 同一個區域的兩個家族互為補集，共用同一個方向。
+<p class="prose">兩個細節值得寫明。其一，<math><mi>σ</mi></math> 是每個連鎖視窗一個，
+不是每個連鎖區段一個 —— 同一個連鎖視窗的兩個家族互為補集，共用同一個方向。
 其二，若兩個 phase set 之間沒有共享的變異，也沒有其他錨點，而且相關 clone 的比例又相同，
 則它們的對應關係<b>真的</b>不可辨識。此時正確的輸出是保留數個等價的對應，
 而不是挑一個印出來。</p>
@@ -606,16 +606,16 @@ multinomial。理由是 guardrail 第 7 條的直接後果：</p>
 那是一個<b>兩段抽樣</b>的結構：先從細胞抽出分子，再從分子抽出 read。
 而 PCR-free 的長讀定序<b>沒有第二段</b>：<b>一條 read 就是一條分子</b>，
 不存在同一條分子被讀到兩次的情形。細胞數又以百萬計，
-第一段抽樣的變異小到可以忽略。所以在一個單位內部，
+第一段抽樣的變異小到可以忽略。所以在一個連鎖區段內部，
 read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源。</p>
 
 <p class="prose">這給出一條明確的實作規則：<b>先用 multinomial，只有在殘差真的顯示額外離散時才加
-<math><msub><mi>τ</mi><mi>u</mi></msub></math></b>，而且要說得出它來自哪裡（區域內部的 mapping 或覆蓋不均，
-而非分子抽樣）。<math><msub><mi>τ</mi><mi>u</mi></msub></math> 若要估，也必須跨可比較的單位分層借力 ——
+<math><msub><mi>τ</mi><mi>u</mi></msub></math></b>，而且要說得出它來自哪裡（連鎖視窗內部的 mapping 或覆蓋不均，
+而非分子抽樣）。<math><msub><mi>τ</mi><mi>u</mi></msub></math> 若要估，也必須跨可比較的連鎖區段分層借力 ——
 一張稀疏的計數表沒有能力同時定出 <math><msub><mi>q</mi><mi>u</mi></msub></math> 與它自己的離散度。</p>
 
 <p class="prose">順帶一提，這也讓中篇用途二的估計方式需要重新檢查。
-用途二以「同一單位、同一條單倍型上數個變異之間的離散度」量測 <math><mi>φ</mi></math>。
+用途二以「同一連鎖區段、同一條單倍型上數個變異之間的離散度」量測 <math><mi>φ</mi></math>。
 但若這些變異位於<b>同一批分子</b>上，分子池的偏離是它們<b>共有</b>的，
 在兩者相減時會消去 —— 剩下的只有各自的 read 抽樣與 base error。
 這樣估出來的 <math><mover accent="true"><mi>φ</mi><mo>^</mo></mover></math> 會<b>偏低</b>，而偏低的 <math><mover accent="true"><mi>φ</mi><mo>^</mo></mover></math> 正好把
@@ -692,12 +692,12 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
   <!-- 對照 -->
   <rect class="box sunken" x="18" y="462" width="964" height="94" rx="8"/>
   <text class="lbl bold zh" x="34" y="490">三者的觀測一模一樣，都是「這一格計數為 0」</text>
-  <text class="anno zh" x="34" y="522">分得開它們的不是那個 0，是跨越深度、其他單位的證據，以及就地估到的錯誤率。</text>
+  <text class="anno zh" x="34" y="522">分得開它們的不是那個 0，是跨越深度、其他連鎖區段的證據，以及就地估到的錯誤率。</text>
   <text class="anno bold zh bad" x="34" y="548">混為一談的後果：錯誤造出來的少數幾條 read，會被讀成一個新的 clone。</text>
 
   <text class="tick zh" x="18" y="584">讀法：門檻只能把三種零一起丟掉；似然可以分別給它們不同的重量。</text>
 </svg><figcaption>三欄的觀測一模一樣，都是「這一格計數為 0」。
-分得開它們的不是那個 0，而是跨越深度、其他單位的證據，與就地估到的錯誤率。
+分得開它們的不是那個 0，而是跨越深度、其他連鎖區段的證據，與就地估到的錯誤率。
 中間那條警告是這一節的關鍵：Dirichlet 的參數不可以是零。</figcaption></figure>
 
 <aside class="guardrail" id="guard-20"><p class="guardrail__hd">重要區分 #20：一格是空的，有三種不同的成因</p><b>抽樣零</b>：該狀態存在（<math><msub><mi>q</mi><mi>h</mi></msub><mo>&gt;</mo><mn>0</mn></math>），只是跨越這幾個位點的分子太少沒抽到。
@@ -721,7 +721,7 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
 
 <p class="prose">這不是為了數值穩定而加的小常數。
 <b>它就是「零不代表不可能」這句話的數學形式</b> ——
-<math><msub><mi>ε</mi><mi>u</mi></msub><msub><mi>r</mi><mi>h</mi></msub></math> 的大小正是這個單位能分辨的最小比例，
+<math><msub><mi>ε</mi><mi>u</mi></msub><msub><mi>r</mi><mi>h</mi></msub></math> 的大小正是這個連鎖區段能分辨的最小比例，
 也就是第十節那個偵測下界的來源。若 <math><msub><mi>r</mi><mi>h</mi></msub></math> 由第二節的兩個錯誤通道算出來，
 這個地板是<b>可以就地估計</b>的量，不需要另設參數。</p>
 
@@ -815,7 +815,7 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
 <h3 id="五-分類是輸出-不是輸入">五、分類是輸出，不是輸入</h3>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="rg-unit-classes__title" aria-describedby="rg-unit-classes__desc">
-  <title id="rg-unit-classes__title">一個 k＝2 單位的聯合計數表只會落入三類：串接、分岔、不相容</title>
+  <title id="rg-unit-classes__title">一個 k＝2 連鎖區段的聯合計數表只會落入三類：串接、分岔、不相容</title>
   <desc id="rg-unit-classes__desc">三欄各是一個分析單位的聯合計數表，表格是二乘二，
         行代表第一個位點是參考型或變異型，列代表第二個位點是參考型或變異型。
         三欄的邊際計數刻意做成一樣，差別只在四個格子怎麼分配。
@@ -902,7 +902,7 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
 左欄為串接，中欄為分岔，右欄四格皆非空為不相容。
 在本頁的模型下，這三種形狀不再是餵進去的約束，而是狀態表本身的形狀。</figcaption></figure>
 
-<p class="prose">現行流程對每個單位所做的分類（分岔／串接／不相容）在新的寫法下<b>照樣產生</b>，
+<p class="prose">現行流程對每個連鎖區段所做的分類（分岔／串接／不相容）在新的寫法下<b>照樣產生</b>，
 但它們的地位變了：<b>它們是 <math><msub><mi>q</mi><mi>u</mi></msub></math> 的形狀，不是額外的證據</b>。</p>
 
 <div class="table-wrap">
@@ -918,7 +918,7 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
 </div>
 
 <p class="prose">由此得到一條必須寫進實作的規則：
-<b>凡其原始狀態表已經進入似然的單位，不得再為它加一條約束項。</b>
+<b>凡其原始狀態表已經進入似然的連鎖區段，不得再為它加一條約束項。</b>
 分岔摘要仍可以印出來給人看、畫成圖、當作 QC，但那是<b>衍生輸出</b>，
 不是另一份獨立證據。這條規則就是第一節那個「兩個因子相乘」在實作層的說法。</p>
 
@@ -935,13 +935,13 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
 </table>
 </div>
 
-<h3 id="六-數百個單位的局部形狀不同-這是預期-不是矛盾">六、數百個單位的局部形狀不同 —— 這是預期，不是矛盾</h3>
+<h3 id="六-數百個連鎖區段的局部形狀不同-這是預期-不是矛盾">六、數百個連鎖區段的局部形狀不同 —— 這是預期，不是矛盾</h3>
 
-<p class="prose">通過品質檢查的單位有數百個，而它們的局部拓撲<b>形狀各不相同</b>：
+<p class="prose">通過品質檢查的連鎖區段有數百個，而它們的局部拓撲<b>形狀各不相同</b>：
 有的是一條線，有的是分岔，有的只有一個節點。此現象本身不構成衝突。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 990" class="dia-svg" role="img" aria-labelledby="sr2-two-topologies__title" aria-describedby="sr2-two-topologies__desc">
-  <title id="sr2-two-topologies__title">三份證據如何把相容的候選樹砍到只剩一棵：頻率譜給一棵部分決定的樹，兩個單位各給一個局部拓撲</title>
+  <title id="sr2-two-topologies__title">三份證據如何把相容的候選樹砍到只剩一棵：頻率譜給一棵部分決定的樹，兩個連鎖區段各給一個局部拓撲</title>
   <desc id="sr2-two-topologies__desc">本圖延續前一個數值例，純度零點六、二倍體，A、B、C 的細胞比例是一點零零、
         零點四零、零點四零，另加第四群 D，細胞比例零點二零，是 B 的後代。
         上排是三份證據各自說了什麼。
@@ -952,10 +952,10 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
         取兩棵的共同部分，就是頻率譜真正確定的東西：A 是根，X 在 A 之下。
         未定的有兩件：D 掛在 A 之下還是掛在 X 之下，以及 X 是一群還是兩群。
         所以頻率譜給的是一棵部分決定的樹，不是一棵完整的樹。
-        第二份是單位甲。它含有兩個變異 i 與 j，觀測到沒有分子同時帶有兩者，
+        第二份是連鎖區段甲。它含有兩個變異 i 與 j，觀測到沒有分子同時帶有兩者，
         所以兩者分屬兩群 P 與 Q，而且兩群互不包含。
         這同時做了兩件事：把群數由三修正為四，並指出 P 與 Q 誰都不是誰的祖先。
-        第三份是單位乙。它含有兩個變異 p 與 q，觀測到帶 q 的分子全部也帶 p，
+        第三份是連鎖區段乙。它含有兩個變異 p 與 q，觀測到帶 q 的分子全部也帶 p，
         所以 q 所在的群巢狀於 p 所在的群之內，另附零點五零的比值。
         中排說明目標函數的兩項各自負責什麼、又各自不負責什麼。
         左邊是 beta 二項混合這一項，圖上畫的是三根峰各自的成分曲線：
@@ -1007,11 +1007,11 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
   <text class="tick bold zh bad" x="36" y="432">✗ 未定：D 掛在 A 還是 X 之下</text>
   <text class="tick bold zh bad" x="36" y="454">✗ 未定：X 是一群，還是兩群</text>
 
-  <!-- ═══════════ ② 單位甲 ═══════════ -->
-  <text class="lbl bold zh ok" x="350" y="118">② 單位甲給的：<tspan class="bold">分岔</tspan></text>
+  <!-- ═══════════ ② 連鎖區段甲 ═══════════ -->
+  <text class="lbl bold zh ok" x="350" y="118">② 連鎖區段甲給的：<tspan class="bold">分岔</tspan></text>
   <rect class="box ok" x="350" y="134" width="310" height="330" rx="8"/>
 
-  <text class="tick zh" x="366" y="164">兩個變異 i、j 落在同一個單位</text>
+  <text class="tick zh" x="366" y="164">兩個變異 i、j 落在同一個連鎖區段</text>
   <rect class="read hp1" x="366" y="178" width="112" height="13" rx="6"/>
   <circle class="mark somatic" cx="390" cy="184" r="5"/>
   <rect class="read hp2" x="366" y="198" width="112" height="13" rx="6"/>
@@ -1032,11 +1032,11 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
   <text class="tick zh" x="366" y="410">① 把 0.40 那一群拆開 → 群數 3 修正為 <tspan class="bold">4</tspan></text>
   <text class="tick zh" x="366" y="440">② 指出 P 與 Q <tspan class="bold">誰都不是誰的祖先</tspan></text>
 
-  <!-- ═══════════ ③ 單位乙 ═══════════ -->
-  <text class="lbl bold zh ok" x="680" y="118">③ 單位乙給的：<tspan class="bold">一條線</tspan></text>
+  <!-- ═══════════ ③ 連鎖區段乙 ═══════════ -->
+  <text class="lbl bold zh ok" x="680" y="118">③ 連鎖區段乙給的：<tspan class="bold">一條線</tspan></text>
   <rect class="box ok" x="680" y="134" width="300" height="330" rx="8"/>
 
-  <text class="tick zh" x="696" y="164">兩個變異 p、q 落在同一個單位</text>
+  <text class="tick zh" x="696" y="164">兩個變異 p、q 落在同一個連鎖區段</text>
   <rect class="read hp1" x="696" y="178" width="112" height="13" rx="6"/>
   <circle class="mark somatic" cx="720" cy="184" r="5"/>
   <rect class="read hp1" x="696" y="198" width="112" height="13" rx="6"/>
@@ -1134,14 +1134,14 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
   <text class="tick zh" x="866" y="916">形狀唯一；</text>
   <text class="tick zh" x="866" y="938">P、Q 標號</text>
   <text class="tick zh" x="866" y="960">可整組對調</text>
-</svg><figcaption>延續中篇第三節那個例子（ρ、A、B、C 都不變），只加上第四群 D 與兩個單位。
+</svg><figcaption>延續中篇第三節那個例子（ρ、A、B、C 都不變），只加上第四群 D 與兩個連鎖區段。
 上排是三份證據各自說了什麼 —— 注意頻率譜給的是一棵<b>部分決定</b>的樹，不是一棵完整的樹。
 中排說明目標函數的兩項各自回答什麼、又各自不回答什麼。
 下排是三者合起來時，相容的候選樹如何被砍到只剩一棵。</figcaption></figure>
 
-<p class="prose">成因是每個單位只裝得下落在該視窗內的那幾個變異。
-上圖的單位甲裝到的是 B 群與 C 群的變異，兩群互不包含，故其局部形狀是<b>分岔</b>；
-單位乙裝到的是 B 群與 D 群的變異，後者巢狀於前者，故其局部形狀是<b>一條線</b>。
+<p class="prose">成因是每個連鎖區段只裝得下落在該連鎖視窗內的那幾個變異。
+上圖的連鎖區段甲裝到的是 B 群與 C 群的變異，兩群互不包含，故其局部形狀是<b>分岔</b>；
+連鎖區段乙裝到的是 B 群與 D 群的變異，後者巢狀於前者，故其局部形狀是<b>一條線</b>。
 兩者皆為<b>同一棵全域 clone tree 在不同變異子集上的投影</b> ——
 形狀相異是因為子集相異，而非證據衝突。</p>
 
@@ -1162,7 +1162,7 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
 </table>
 </div>
 
-<p class="prose">兩個單位補的正是右欄那兩格，而且各補一格：
+<p class="prose">兩個連鎖區段補的正是右欄那兩格，而且各補一格：
 甲的狀態表在「兩個突變同時出現」那一格只有錯誤地板的量，乙則相反。
 候選數因此逐步收斂 —— 這就是「合起來更好」的具體內容：</p>
 
@@ -1205,10 +1205,10 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
 <p class="prose">第二項尤其值得看清楚：<b>「D 掛在 B 之下還是 C 之下」在頻率上永遠沒有答案。</b>
 B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>的直方圖 ——
 這不是精度問題，是中篇第三節那個不可辨識性換一個位置再出現一次。
-單位乙的共現觀測是唯一回答得了的證據。</p>
+連鎖區段乙的共現觀測是唯一回答得了的證據。</p>
 
-<p class="prose">而三項改變都<b>不需要先把兩個單位對齊</b>：
-兩個單位各自算出自己那張表的機率，而兩張表都由同一組
+<p class="prose">而三項改變都<b>不需要先把兩個連鎖區段對齊</b>：
+兩個連鎖區段各自算出自己那張表的機率，而兩張表都由同一組
 <math><mo>(</mo><mi>w</mi><mo>,</mo><mi>T</mi><mo>,</mo><mi>z</mi><mo>)</mo></math> 產生，相乘即完成合併。
 <b>形狀不同從頭到尾都不是需要處理的問題</b>，而合併也不需要任何對齊步驟。</p>
 
@@ -1218,13 +1218,13 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 
 <p class="prose">由此導出一條實作規則，與第八節那條互為表裡：
 <b>可以合併的是機率，不是標籤。</b>
-局部標籤（HP1-1）僅在該區域內有定義，跨區域的同名標籤並非同一條，
+局部標籤（HP1-1）僅在該連鎖視窗內有定義，跨連鎖視窗的同名標籤並非同一條，
 故不得將局部拓撲拼接成一棵大樹。所要合併者是它們對 <math><mo>(</mo><mi>w</mi><mo>,</mo><mi>T</mi><mo>,</mo><mi>z</mi><mo>)</mo></math> 的支持度 ——
 而這組參數本就只有一份。</p>
 
 <h4 id="真正的矛盾長什麼樣">真正的矛盾長什麼樣</h4>
 
-<p class="prose">真正的矛盾並非形狀相異，而是<b>整組單位找不到任何一組
+<p class="prose">真正的矛盾並非形狀相異，而是<b>整組連鎖區段找不到任何一組
 <math><mo>(</mo><mi>w</mi><mo>,</mo><mi>T</mi><mo>,</mo><mi>z</mi><mo>)</mo></math> 能同時給出夠高的機率</b>。在舊的硬約束寫法下，它會表現為三種無解形式；
 在似然寫法下它不再讓求解器卡住，但<b>仍然是必須報告的診斷量</b>：</p>
 
@@ -1232,20 +1232,20 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 <table>
 <thead><tr><th scope="col">形式</th><th scope="col">例</th><th scope="col">成因</th></tr></thead>
 <tbody>
-<tr><td>直接對立</td><td>一個單位的表說兩者不共存，另一個說共存</td><td>其中一個是抽樣零或錯誤地板被讀成結構零</td></tr>
-<tr><td>違反傳遞性</td><td>三個單位兩兩相容，合起來卻無解</td><td>同上，惟須三個單位方能顯現</td></tr>
+<tr><td>直接對立</td><td>一個連鎖區段的表說兩者不共存，另一個說共存</td><td>其中一個是抽樣零或錯誤地板被讀成結構零</td></tr>
+<tr><td>違反傳遞性</td><td>三個連鎖區段兩兩相容，合起來卻無解</td><td>同上，惟須三個連鎖區段方能顯現</td></tr>
 <tr><td>祖先關係成環</td><td><math><msub><mi>z</mi><mi>a</mi></msub><mo>→</mo><msub><mi>z</mi><mi>b</mi></msub><mo>→</mo><msub><mi>z</mi><mi>c</mi></msub><mo>→</mo><msub><mi>z</mi><mi>a</mi></msub></math></td><td>任何樹皆不可能，通常是第七節的排序偏誤將分岔判為串接</td></tr>
 </tbody>
 </table>
 </div>
 
 <p class="prose">處理方式已內建：由於沒有任何一格的機率是 0，
-求解器不會因矛盾而無解，它取總機率最大的那組參數，少數異常的單位被多數蓋過。
+求解器不會因矛盾而無解，它取總機率最大的那組參數，少數異常的連鎖區段被多數蓋過。
 此即第四節堅持要有錯誤地板的理由 —— 那個地板同時是「零不代表不可能」與
 「矛盾不會炸掉求解器」這兩件事的來源。</p>
 
-<p class="prose">而<b>殘差本身是一個診斷量</b>：擬合後各單位的狀態表與模型預測的差距，
-估計的是整條產線的錯誤率，邏輯與以「不相容單位」估計單倍型標記錯誤率相同，
+<p class="prose">而<b>殘差本身是一個診斷量</b>：擬合後各連鎖區段的狀態表與模型預測的差距，
+估計的是整條產線的錯誤率，邏輯與以「不相容連鎖區段」估計單倍型標記錯誤率相同，
 僅是提升至全域這一層。報告應予載明。</p>
 
 <p class="prose">惟此處有一個陷阱：<b>殘差小不代表模型正確。</b>
@@ -1258,20 +1258,20 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 <h4 id="其一-覆蓋遮罩要留下來-而不是併掉">其一：覆蓋遮罩要留下來，而不是併掉</h4>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" class="dia-svg" role="img" aria-labelledby="rg-partial-reads__title" aria-describedby="rg-partial-reads__desc">
-  <title id="rg-partial-reads__title">一個真實區域的 read 覆蓋：八成的分子只看得到一個位點</title>
+  <title id="rg-partial-reads__title">一個真實連鎖視窗的 read 覆蓋：八成的分子只看得到一個位點</title>
   <desc id="rg-partial-reads__desc">上半是一個真實分析單位裡 read 覆蓋情況的統計。
-        這個單位有三個 somatic 位點、一百九十四條 read，視窗寬三十九點四 kb。
+        這個連鎖區段有三個 somatic 位點、一百九十四條 read，連鎖視窗寬三十九點四 kb。
         三條長條由上而下分別是：同時蓋到三個位點的 read 只有三條，佔百分之一點五；
         蓋到兩個位點的三十一條，佔百分之十六；只蓋到一個位點的一百六十條，佔百分之八十二點五。
         下半把同一批 read 按位點對拆開，看每一對到底有幾條 read 同時蓋到。
         第一對與第二對各有十七條與二十條，分別判出分岔與串接；
         第三對只有三條，而且三條都是參考型，什麼也判不出來。
-        最下方是這張圖的結論：這個單位的演化樹靠的是十七與二十這兩個數字，不是一百九十四；
+        最下方是這張圖的結論：這個連鎖區段的演化樹靠的是十七與二十這兩個數字，不是一百九十四；
         而第三對實質上缺乏資料，仍被演算法判定了關係。
-        讀法是：有效樣本數是「每一個位點對各自的跨越深度」，不是這個單位的總 read 數。</desc>
+        讀法是：有效樣本數是「每一個位點對各自的跨越深度」，不是這個連鎖區段的總 read 數。</desc>
 
   <text class="ttl zh" x="20" y="36">真實資料的覆蓋結構</text>
-  <text class="tick mono" x="20" y="62">HCC1395_HKU · chr12:981,725–1,021,146 · HP1 · k=3 · 194 reads · 視窗 39.4 kb</text>
+  <text class="tick mono" x="20" y="62">HCC1395_HKU · chr12:981,725–1,021,146 · HP1 · k=3 · 194 reads · 連鎖視窗 39.4 kb</text>
 
   <!-- 覆蓋統計 -->
   <text class="lbl bold zh" x="20" y="106">一條 read 蓋得到幾個位點</text>
@@ -1314,15 +1314,15 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 
   <!-- 結論 -->
   <rect class="box bad" x="24" y="466" width="952" height="62" rx="8"/>
-  <text class="anno zh" x="48" y="494">這個單位的樹靠的是 <tspan class="bold">17 與 20</tspan>，不是 194。而 S1 × S3 那一對<tspan class="bold">沒有資料</tspan>，</text>
+  <text class="anno zh" x="48" y="494">這個連鎖區段的樹靠的是 <tspan class="bold">17 與 20</tspan>，不是 194。而 S1 × S3 那一對<tspan class="bold">沒有資料</tspan>，</text>
   <text class="anno zh bad" x="48" y="520">卻一樣被演算法決定了關係 —— 「沒看到」被當成了「不存在」。</text>
 </svg><figcaption>約八成的 read 僅覆蓋三個位點中的一個。
-將同一批 read 依位點對拆分後可見：此單位的判定依據為 17 與 20 兩個數字，而非 194；
+將同一批 read 依位點對拆分後可見：此連鎖區段的判定依據為 17 與 20 兩個數字，而非 194；
 其中一對僅有 3 條 read，仍產出了一條關係判定。</figcaption></figure>
 
-<p class="prose">一個單位的有效樣本數<b>並非其總 read 數</b>，
+<p class="prose">一個連鎖區段的有效樣本數<b>並非其總 read 數</b>，
 而是<b>各位點組合分別有幾條 read 同時覆蓋</b>。
-上圖單位的三個位點對，跨越深度分別為 20、17 與 <b>3</b>。</p>
+上圖連鎖區段的三個位點對，跨越深度分別為 20、17 與 <b>3</b>。</p>
 
 <p class="prose">舊的做法是設一道門檻把跨越深度不足的丟掉 ——
 因為在硬約束的寫法下，一條由 <math><mi>n</mi><mo>=</mo><mn>3</mn></math> 產生的假「不可同群」代價極高。
@@ -1383,22 +1383,22 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
   <text class="lbl bold zh accent" x="48" y="384">修正：每一對先過檢定力這一關</text>
   <text class="anno zh" x="48" y="416">用該位點對自己的跨越深度算檢定力；不足的標成「未定」，</text>
   <text class="anno zh" x="48" y="444">不允許它的「缺席」去約束樹，並且在報告裡逐條列出來。</text>
-  <text class="tick zh" x="48" y="470">預期效果：目前被歸進「單層無分支」的單位，會有一部分正確地移到「未解析」。</text>
+  <text class="tick zh" x="48" y="470">預期效果：目前被歸進「單層無分支」的連鎖區段，會有一部分正確地移到「未解析」。</text>
 </svg><figcaption>「此狀態未出現」有兩種成因：該類細胞確實不存在，
 或無 read 跨越該對位點。舊做法將兩者等同處理；似然寫法讓第二種成因
 自動只貢獻很少的證據，不需要門檻就分得開。</figcaption></figure>
 
 <p class="prose">所以這一步的改動不是加一道閘門，而是<b>把遮罩存下來</b>：
-狀態表要記成 <math><mo>(</mo><mi>單</mi><mi>位</mi><mo>,</mo><mi>phase</mi><mi>set</mi><mo>,</mo><mi>位</mi><mi>點</mi><mi>集</mi><mi>合</mi><mo>,</mo><mi>覆</mi><mi>蓋</mi><mi>遮</mi><mi>罩</mi><mo>,</mo><mi>字</mi><mi>母</mi><mi>樣</mi><mi>式</mi><mo>,</mo><mi>計</mi><mi>數</mi><mo>)</mo></math> 的稀疏列，
+狀態表要記成 <math><mo>(</mo><mi>連</mi><mi>鎖</mi><mi>區</mi><mi>段</mi><mo>,</mo><mi>phase</mi><mi>set</mi><mo>,</mo><mi>位</mi><mi>點</mi><mi>集</mi><mi>合</mi><mo>,</mo><mi>覆</mi><mi>蓋</mi><mi>遮</mi><mi>罩</mi><mo>,</mo><mi>字</mi><mi>母</mi><mi>樣</mi><mi>式</mi><mo>,</mo><mi>計</mi><mi>數</mi><mo>)</mo></math> 的稀疏列，
 而不是先把部分覆蓋的 read 併進某個完整狀態。
-門檻退居為<b>報告量</b>：收得幾條、各遮罩各有幾條、哪些單位的證據其實很薄。</p>
+門檻退居為<b>報告量</b>：收得幾條、各遮罩各有幾條、哪些連鎖區段的證據其實很薄。</p>
 
 <pre><code>for each unit u:
     for each read r spanning ≥1 site in u:
         emit (u, phase_set, sites(u), mask(r), pattern(r), 1)
     aggregate → sparse rows
-report: 每個遮罩的 read 數、單位的最大跨越深度、
-        以及「若某狀態真佔 5%，這個單位看得到它的機率」</code></pre>
+report: 每個遮罩的 read 數、連鎖區段的最大跨越深度、
+        以及「若某狀態真佔 5%，這個連鎖區段看得到它的機率」</code></pre>
 
 <p class="prose">可跨越範圍受限的成因，來自以下三層結構：</p>
 
@@ -1523,7 +1523,7 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 </svg><figcaption>三種形狀的祖先後代配對數分別為 3、1、0。
 串接得到正分，星狀恆為 0 —— 故最小成本候選中同時存在此二形狀時，分支形狀恆不獲選。</figcaption></figure>
 
-<p class="prose">其後果為：<b>本應呈現分岔的單位，將改為呈現串接。</b>
+<p class="prose">其後果為：<b>本應呈現分岔的連鎖區段，將改為呈現串接。</b>
 而分岔是拆峰能力<b>唯一</b>的來源，因此該偏誤系統性地移除拆峰的能力，
 使中篇第三節所述的 K ＝ 2 得以維持。</p>
 
@@ -1550,10 +1550,10 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
         而 block B 的 H1 對應上排第二條拷貝 —— 兩個 block 的 H1 不是同一條染色體。
         這個任意性寫成每個 block 一個正負號，圖上標為 σ。
         下排分成兩欄說明後果。左欄是不受影響的：clone tree 談的是細胞的祖先關係，
-        不是哪一條親源染色體帶著變異，所以每個單位內部算出來的量都與 σ 無關。
+        不是哪一條親源染色體帶著變異，所以每個連鎖區段內部算出來的量都與 σ 無關。
         右欄是會出錯的：任何把不同 block 的 H1 加總在一起的統計都沒有意義，
         跨 block 的單倍型特異拷貝數、跨 block 比較甲基化偏向也都需要先定出 σ。
-        讀法是：所有全基因體統計都必須只由「單位內部的量」組成，這樣才自動與 σ 無關。</desc>
+        讀法是：所有全基因體統計都必須只由「連鎖區段內部的量」組成，這樣才自動與 σ 無關。</desc>
 
   <text class="ttl zh" x="20" y="36">H1／H2 只在同一個 phase block 內有意義</text>
 
@@ -1594,7 +1594,7 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
   <text class="lbl bold zh ok" x="44" y="400">不受影響</text>
   <text class="anno zh" x="44" y="430">clone tree 談的是細胞的祖先關係，</text>
   <text class="anno zh" x="44" y="458">不是哪一條親源染色體帶著變異。</text>
-  <text class="anno zh" x="44" y="486">單位內部算出的量與 σ 無關，可直接邊際化。</text>
+  <text class="anno zh" x="44" y="486">連鎖區段內部算出的量與 σ 無關，可直接邊際化。</text>
 
   <rect class="box bad" x="516" y="368" width="460" height="150" rx="8"/>
   <text class="lbl bold zh bad" x="536" y="400">會靜靜出錯</text>
@@ -1602,14 +1602,14 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
   <text class="anno zh" x="536" y="458">跨 block 的單倍型特異拷貝數；</text>
   <text class="anno zh" x="536" y="486">跨 block 比較甲基化偏向。這些都要先定出 σ。</text>
 
-  <text class="anno zh bold" x="24" y="550">設計規則：所有全基因體統計只能由「單位內部的量」組成 —— 這樣才自動與 σ 無關。</text>
+  <text class="anno zh bold" x="24" y="550">設計規則：所有全基因體統計只能由「連鎖區段內部的量」組成 —— 這樣才自動與 σ 無關。</text>
 </svg><figcaption>上排為物理事實：兩條染色體拷貝各自連續。
 中排為軟體輸出：block A 的 H1 對應拷貝 ①，block B 的 H1 對應拷貝 ② —— 兩個 H1 並非同一條。</figcaption></figure>
 
 <aside class="guardrail" id="guard-13"><p class="guardrail__hd">重要區分 #13：不同 phase block 的 H1 不是同一條染色體</p>相位軟體在每個 block 內將 read 分為兩組並標記為 H1、H2，
 但<b>標號在各 block 內獨立決定</b>。
 
-<b>可容許之處</b>：每個單位的狀態表都在單一 phase set 內產生，
+<b>可容許之處</b>：每個連鎖區段的狀態表都在單一 phase set 內產生，
 且第二節的 <math><msub><mi>σ</mi><mi>u</mi></msub></math> 已經把方向邊際化，故核心推論不受影響。
 
 <b>限制</b>：任何將不同 block 的 H1 合併計算的判斷皆無意義，且不會產生錯誤訊息。
@@ -1617,55 +1617,54 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 跨 block 的 H1 並非同一條染色體。
 
 由此可導出一條可實作為檢查程式的規則：
-<b>每一張狀態表皆須在單一單位內部產生，不得跨單位拼接。</b></aside>
+<b>每一張狀態表皆須在單一連鎖區段內部產生，不得跨連鎖區段拼接。</b></aside>
 
 <aside class="guardrail" id="guard-14"><p class="guardrail__hd">重要區分 #14：trans 不等於分支演化</p>若兩個變異分別位於同一細胞的兩條染色體拷貝上（trans），
 則兩者永不出現於同一條分子。計數表因而呈現
 <code>00</code>、<code>10</code>、<code>01</code>，而 <code>11</code> 一格為空 ——
 <b>此形態與兩群互不包含的 subclone 完全相同</b>。
 
-現行流程已先依單倍型家族分組，此設計正確 —— trans 的兩個變異會落進<b>兩個不同的單位</b>，
-所以在單位內部根本不會相遇。這也正是第二節堅持
-「一個單位只看得到一條拷貝」的理由之一。
+現行流程已先依單倍型家族分組，此設計正確 —— trans 的兩個變異會落進<b>兩個不同的連鎖區段</b>，
+所以在連鎖區段內部根本不會相遇。這也正是第二節堅持
+「一個連鎖區段只看得到一條拷貝」的理由之一。
 
 殘餘的風險來自家族<b>標錯</b>（第 19 條），而非 trans 本身；
 它由觀測通道的 <math><mi>η</mi></math> 承接，不會變成一格硬性的空缺。</aside>
 
-<h3 id="九-單位預算">九、單位預算</h3>
+<h3 id="九-連鎖區段預算">九、連鎖區段預算</h3>
 
 <h4 id="兩個-5-的分母不同">兩個 5% 的分母不同</h4>
 
-<p class="prose">本頁所稱的「<b>5%</b>」為<b>區域</b>的比例：含變異的區域中，
+<p class="prose">本頁所稱的「5%」為固定寬度視窗的比例：含變異的視窗中，
 僅 5% 含有兩個以上的變異。以下推導所用者則為<b>變異</b>的比例，其分母不同 ——
-由於每個多變異區域至少含兩個變異，「5% 的區域」對應 <b>9.5% 的變異</b>。
-兩個數字皆正確，但計數的對象不同；<b>可用單位的產量由後者決定</b>。</p>
+由於每個多變異視窗至少含兩個變異，「5% 的視窗」對應 <b>9.5% 的變異</b>。
+兩個數字皆正確，但計數的對象不同；<b>可用連鎖區段的產量由後者決定</b>。</p>
 
 <h4 id="推導">推導</h4>
 
-<p class="prose">設變異在基因體上依 Poisson 分布。令 λ 為每個視窗的期望變異數：
-每 Mb 5 個、視窗 20 kb 時 λ ＝ 0.1；基因體 3.1 Gb 切分為 155,000 個視窗。
+<p class="prose">設變異在基因體上依 Poisson 分布。令 λ 為每個固定寬度視窗的期望變異數：每 Mb 5 個、視窗寬 20 kb 時λ ＝ 0.1；基因體 3.1 Gb 切分為 155,000 個固定寬度視窗。
 三個關鍵比例皆為 λ 的閉式函數：</p>
 
 <div class="table-wrap">
 <table>
 <thead><tr><th scope="col">量</th><th scope="col">閉式</th><th scope="col">數值</th></tr></thead>
 <tbody>
-<tr><td>含變異的視窗</td><td><math><mn>155,000</mn><mo>×</mo><mo>(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup><mo>)</mo></math></td><td><math><mn>14,750</mn></math></td></tr>
+<tr><td>含變異的固定寬度視窗</td><td><math><mn>155,000</mn><mo>×</mo><mo>(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup><mo>)</mo></math></td><td><math><mn>14,750</mn></math></td></tr>
 <tr><td>其中僅含單一變異的比例</td><td><math><mi>λ</mi><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup><mo>/</mo><mo>(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup><mo>)</mo></math></td><td><math><mn>95.1%</mn></math>（上篇所述的 95%）</td></tr>
-<tr><td>落於多變異視窗的<b>變異</b>比例</td><td><math><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup></math></td><td><math><mn>9.5%</mn></math>（本節所用者）</td></tr>
-<tr><td>　即多變異區域的變異數</td><td><math><mn>15,500</mn><mo>×</mo><mn>0.095</mn></math></td><td><math><mn>1,475</mn></math> 個變異</td></tr>
-<tr><td>相鄰位點對（每個含 <math><mi>k</mi></math> 個變異的視窗貢獻 <math><mi>k</mi><mo>−</mo><mn>1</mn></math> 對）</td><td><math><mn>155,000</mn><mo>×</mo><mo>(</mo><mi>λ</mi><mo>−</mo><mo>(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup><mo>)</mo><mo>)</mo></math></td><td><math><mn>750</mn></math></td></tr>
+<tr><td>落於多變異固定寬度視窗的變異比例<math><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup></math></td><td><math><mn>9.5%</mn></math>（本節所用者）</td></tr>
+<tr><td>　即多變異固定寬度視窗的變異數</td><td><math><mn>15,500</mn><mo>×</mo><mn>0.095</mn></math></td><td><math><mn>1,475</mn></math> 個變異</td></tr>
+<tr><td>相鄰位點對（每個含 <math><mi>k</mi></math> 個變異的固定寬度視窗貢獻 <math><mi>k</mi><mo>−</mo><mn>1</mn></math> 對）</td><td><math><mn>155,000</mn><mo>×</mo><mo>(</mo><mi>λ</mi><mo>−</mo><mo>(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi></mrow></msup><mo>)</mo><mo>)</mo></math></td><td><math><mn>750</mn></math></td></tr>
 <tr><td>　再乘上「兩個變異落於同一單倍型家族」</td><td><math><mo>×</mo><mn>1</mn><mo>/</mo><mn>2</mn></math></td><td><math><mn>375</mn></math>，約當表列的 369</td></tr>
 </tbody>
 </table>
 </div>
 
 <p class="prose">依上述模型，若腫瘤含三群、質量分別為 0.60／0.25／0.15，
-則跨第 i 群與第 j 群的單位數為總數乘以 2w<sub>i</sub>w<sub>j</sub>：</p>
+則跨第 i 群與第 j 群的連鎖區段數為總數乘以 2w<sub>i</sub>w<sub>j</sub>：</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th scope="col">突變負荷</th><th scope="col">同家族多變異單位</th><th scope="col">群 1×2</th><th scope="col">群 1×3</th><th scope="col">群 2×3</th></tr></thead>
+<thead><tr><th scope="col">突變負荷</th><th scope="col">同家族多變異連鎖區段</th><th scope="col">群 1×2</th><th scope="col">群 1×3</th><th scope="col">群 2×3</th></tr></thead>
 <tbody>
 <tr><td>5／Mb</td><td>約 369</td><td>111</td><td>66</td><td><b>28</b></td></tr>
 <tr><td>20／Mb</td><td>約 5,100</td><td>1,533</td><td>920</td><td>383</td></tr>
@@ -1674,8 +1673,8 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 </table>
 </div>
 
-<p class="prose">充足性的依據已見於中篇第三節：這些單位的作用在於<b>確立成分存在且相異</b>，
-而非指派 15,500 個點。最稀疏的一對有 28 個獨立單位，
+<p class="prose">充足性的依據已見於中篇第三節：這些連鎖區段的作用在於<b>確立成分存在且相異</b>，
+而非指派 15,500 個點。最稀疏的一對有 28 個獨立連鎖區段，
 對「兩個成分是否相同」此一是非判定為充足。</p>
 
 <p class="prose"><b>惟這個預算對第十一節的分期很敏感。</b>
@@ -1683,19 +1682,19 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 在 CN 變異廣泛的實體腫瘤中可能只剩一半甚至更少，
 最稀疏的那一對會從 28 掉到十幾個 —— 那時充足性的論證就不成立了。
 因此分期的第一階段應優先選<b>高突變負荷</b>的樣本；
-低負荷樣本要等到允許非中性區域之後才有足夠的單位。
-報告須載明各階段實際納入與排除的單位數。</p>
+低負荷樣本要等到允許非中性區域之後才有足夠的連鎖區段。
+報告須載明各階段實際納入與排除的連鎖區段數。</p>
 
 <p class="prose">另需明確界定<b>配對慣例</b>：上式所計為<b>相鄰</b>位點對；
-若改為視窗內<b>全配對</b>（每個視窗 <math><mi>C</mi><mo>(</mo><mi>k</mi><mo>,</mo><mn>2</mn><mo>)</mo></math> 對），在低負荷下兩者相近
+若改為視窗內全配對（每個固定寬度視窗<math><mi>C</mi><mo>(</mo><mi>k</mi><mo>,</mo><mn>2</mn><mo>)</mo></math> 對），在低負荷下兩者相近
 （5／Mb：388 與 375），但在高負荷下顯著分離 —— 50／Mb 時全配對約為 38,750，
 相鄰配對約為 28,500。表列的 24,500 屬相鄰配對。</p>
 
-<h3 id="十-視窗寬度-單位產量與品質的取捨">十、視窗寬度：單位產量與品質的取捨</h3>
+<h3 id="十-連鎖視窗寬度-連鎖區段產量與品質的取捨">十、連鎖視窗寬度：連鎖區段產量與品質的取捨</h3>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th scope="col">項目</th><th scope="col">寬視窗（現行約 39 kb）</th><th scope="col">窄視窗（<math><mo>≤</mo><mtext>read 跨距</mtext></math>）</th></tr></thead>
+<thead><tr><th scope="col">項目</th><th scope="col">寬連鎖視窗（現行約 39 kb）</th><th scope="col">窄連鎖視窗（<math><mo>≤</mo><mtext>read 跨距</mtext></math>）</th></tr></thead>
 <tbody>
 <tr><td>可納入的位點數 <math><mi>k</mi></math></td><td>多</td><td>少</td></tr>
 <tr><td>完整覆蓋的 read 比例</td><td>低（多數 read 只覆蓋部分位點）</td><td>高（多數 read 覆蓋全部位點）</td></tr>
@@ -1706,19 +1705,19 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 </div>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 450" class="dia-svg" role="img" aria-labelledby="rg-detection-window__title" aria-describedby="rg-detection-window__desc">
-  <title id="rg-detection-window__title">可分析的頻率視窗：傳統 VAF 擬合區間與譜系內比例區間的比較</title>
-  <desc id="rg-detection-window__desc">兩條橫軸畫的是同一件事在兩條路線上的可用範圍，範圍都以「佔細胞的比例」為單位。
+  <title id="rg-detection-window__title">可分析的頻率連鎖視窗：傳統 VAF 擬合區間與譜系內比例區間的比較</title>
+  <desc id="rg-detection-window__desc">兩條橫軸畫的是同一件事在兩條路線上的可用範圍，範圍都以「佔細胞的比例」為連鎖區段。
         上排是傳統做法：原始研究刻意只在 VAF 零點一二到零點二四之間擬合，
         更低的一端混著假陽性，更高的一端已經進入 clonal 峰。
         把它換算成細胞比例，在純度零點六的樣本上大約是零點四到零點八，是一段相當窄的區間。
-        下排是本頁的做法：下界由每一個單位自己的深度與錯誤率決定，不是一個固定常數，
+        下排是本頁的做法：下界由每一個連鎖區段自己的深度與錯誤率決定，不是一個固定常數，
         在每個家族六十條分子、錯誤率千分之五時大約是零點零五；
         上界則由譜系內的 clonal 堆積決定，暫定零點五。
         右側的表列出下界怎麼隨分子數與錯誤率變化。
         底下標出一個重要提醒：上界零點五是全文最弱的一個數字，必須由模擬重新推定。
         讀法是：把比例改成在譜系內部量，動態範圍不但沒有變窄，反而變寬了。</desc>
 
-  <text class="ttl zh" x="20" y="36">可分析的比例視窗</text>
+  <text class="ttl zh" x="20" y="36">可分析的比例連鎖視窗</text>
 
   <!-- 上：傳統 -->
   <text class="lbl bold zh" x="20" y="92">傳統 VAF 擬合區間</text>
@@ -1738,7 +1737,7 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
   <text class="tick mid" x="620" y="310">1.0</text>
   <rect class="region" x="88" y="262" width="252" height="22" rx="4"/>
   <rect class="box ghost ok" x="88" y="262" width="252" height="22" rx="4"/>
-  <text class="tick zh mid" x="214" y="256">約 0.05–0.5，且下界逐單位計算</text>
+  <text class="tick zh mid" x="214" y="256">約 0.05–0.5，且下界逐連鎖區段計算</text>
 
   <!-- 右側：下界表 -->
   <rect class="box" x="660" y="76" width="316" height="230" rx="8"/>
@@ -1759,16 +1758,16 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
   <text class="tick mono mid" x="712" y="266">100</text>
   <text class="tick mono mid ok" x="798" y="266">0.04</text>
   <text class="tick mono mid" x="900" y="266">0.05</text>
-  <text class="tick zh mid" x="818" y="294">下界不是常數，要逐單位算</text>
+  <text class="tick zh mid" x="818" y="294">下界不是常數，要逐連鎖區段算</text>
 
   <text class="anno zh ok" x="20" y="356">把比例改成在譜系內部量，動態範圍不但沒有變窄，反而變寬。</text>
   <text class="anno zh bad" x="20" y="390">但上界 0.5 是本頁最弱的一個數字：它是從傳統區間的比例類推來的，</text>
   <text class="anno zh bad" x="20" y="418">必須由模擬重新推定，不要當成已知常數引用。</text>
-</svg><figcaption>窄視窗下每個家族 60 條分子、錯誤率千分之五時，
-可偵測的比例下界約為 0.05。該下界應逐單位計算，不宜採用固定常數 ——
+</svg><figcaption>窄連鎖視窗下每個家族 60 條分子、錯誤率千分之五時，
+可偵測的比例下界約為 0.05。該下界應逐連鎖區段計算，不宜採用固定常數 ——
 它正是第四節那個錯誤地板 <math><msub><mi>ε</mi><mi>u</mi></msub><msub><mi>r</mi><mi>h</mi></msub></math> 的數值。</figcaption></figure>
 
-<p class="prose">建議兩種視窗並行。<b>在似然的寫法下這不需要兩套權重</b>：
+<p class="prose">建議兩種連鎖視窗寬度並行。<b>在似然的寫法下這不需要兩套權重</b>：
 兩批都進同一個乘積，各自的證據量由各自的計數與遮罩決定。
 這是與舊寫法最直接的對照 —— 舊寫法必須替兩批各設一個 <math><msub><mi>ω</mi><mi>r</mi></msub></math>，
 新寫法什麼都不必設。</p>
@@ -1784,7 +1783,7 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 <tbody>
 <tr><td>1</td><td>存下稀疏狀態表（含覆蓋遮罩）；不改任何推論</td><td>能重現現行分類的計數</td></tr>
 <tr><td>2</td><td>把 read-AF 分數換成 multinomial 似然；仍只在局部</td><td>候選排序的變化可解釋；分岔比例回升</td></tr>
-<tr><td>3</td><td>加入觀測通道（逐位點 ＋ 家族誤標），就地估計</td><td>不相容單位的比例被錯誤率解釋掉</td></tr>
+<tr><td>3</td><td>加入觀測通道（逐位點 ＋ 家族誤標），就地估計</td><td>不相容連鎖區段的比例被錯誤率解釋掉</td></tr>
 <tr><td>4</td><td>接上全域 <math><mo>(</mo><mi>w</mi><mo>,</mo><mi>T</mi><mo>,</mo><mi>z</mi><mo>)</mo></math>；限 CN-neutral 雜合區域、純度與 CN 取外部值</td><td>合成資料上能還原已知的 K 與樹</td></tr>
 <tr><td>5</td><td>邊際化 <math><msub><mi>σ</mi><mi>u</mi></msub></math>；輸出未解對應而非強行統一標號</td><td>斷開的 phase set 被正確報成未解</td></tr>
 <tr><td>6</td><td>視殘差決定是否加 <math><msub><mi>τ</mi><mi>u</mi></msub></math>；放寬到 LOH／WGD／subclonal CN</td><td>加了 <math><mi>τ</mi></math> 之後結論是否改變</td></tr>
@@ -1796,15 +1795,15 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
   <title id="sr2-flow__title">實作流程：從 read 到全基因體的群與樹，以及每一步是沿用還是改寫</title>
   <desc id="sr2-flow__desc">八個步驟由上而下，右欄註明每一步的狀態是沿用、改寫還是新增。
         第一步前處理，用現有的變異判定與單倍型標記，沿用。
-        第二步切分析單位，一個單位是一個區域乘一個單倍型家族，鍵值要含 phase set，沿用。
+        第二步切分析單位，一個連鎖區段是一個連鎖視窗乘一個單倍型家族，鍵值要含 phase set，沿用。
         第三步抽狀態表，除了完整的狀態之外還要留下每一條 read 的覆蓋遮罩與計數，
         這一步要改寫：現行流程把部分覆蓋的 read 併進判定，
         新的做法是把遮罩本身存下來，因為似然要用它。
         第四步是現行的最小成本候選列舉，沿用，它負責產生候選的局部拓撲與必要的潛在節點。
         第五步是改寫的重點：把原本用 read-AF 差值總和排序的分數，
-        換成這個單位那張狀態表的似然，並且不再只留一個候選。
+        換成這個連鎖區段那張狀態表的似然，並且不再只留一個候選。
         第六步是新增的觀測通道，包含逐位點錯誤與整條分子的家族誤標，兩者形狀不同要分開估。
-        第七步把九成五單變異區域的頻率因子與百分之五多變異單位的狀態表因子相乘，
+        第七步把九成五單變異連鎖視窗的頻率因子與百分之五多變異連鎖區段的狀態表因子相乘，
         接到同一組全域參數上，這是整條路線的核心。
         第八步輸出全基因體的群與樹，並且逐條標明支持度、
         沒看到的狀態各自的比例上界，以及跨 phase set 沒解決的對應關係。
@@ -1822,7 +1821,7 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
   <text class="anno bold zh ok" x="656" y="94">沿用</text>
 
   <rect class="box" x="24" y="122" width="596" height="48" rx="8"/>
-  <text class="lbl zh" x="44" y="152">② 切單位：染色體＋phase set＋視窗＋家族</text>
+  <text class="lbl zh" x="44" y="152">② 切連鎖區段：染色體＋phase set＋連鎖視窗＋家族</text>
   <text class="anno bold zh ok" x="656" y="152">沿用</text>
 
   <rect class="box warn" x="24" y="180" width="596" height="56" rx="8"/>
@@ -1874,22 +1873,22 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 <math><mi>k</mi><mo>=</mo><mn>6</mn></math> 也只有 64 格，而實際觀測到的樣式遠少於此。
 真正的成本在於局部候選集合與 <math><msub><mi>σ</mi><mi>u</mi></msub></math> 的加總被包在全域取樣的內層。
 所以上限應由<b>候選列舉</b>的成本決定，不是由 <math><msup><mn>2</mn><mi>k</mi></msup></math> 決定。
-依第九節的 Poisson 模型，5／Mb 時 <math><mi>k</mi><mo>≤</mo><mn>4</mn></math> 已涵蓋多變異視窗的 99.99%，
-50／Mb 時仍有 98.6%（20 kb 視窗）—— 先做 <math><mi>k</mi><mo>≤</mo><mn>4</mn></math> 幾乎不損失任何資料。
-而 <math><mi>k</mi></math> 特別大的視窗多半是 kataegis，本來就該降權為一個有效觀測。</p>
+依第九節的 Poisson 模型，5／Mb 時 <math><mi>k</mi><mo>≤</mo><mn>4</mn></math> 已涵蓋多變異固定寬度視窗的 99.99%，
+50／Mb 時仍有 98.6%（固定寬度 20 kb 視窗）—— 先做 <math><mi>k</mi><mo>≤</mo><mn>4</mn></math> 幾乎不損失任何資料。
+而 <math><mi>k</mi></math> 特別大的連鎖視窗多半是 kataegis，本來就該降權為一個有效觀測。</p>
 </section>
 
 
 <section data-part="evidence" class="part" id="part-evidence">
 <h2 data-num="③" id="真實資料與證據">真實資料與證據</h2>
 
-<h3 id="現行實作的量測結果-可用單位的庫存">現行實作的量測結果：可用單位的庫存</h3>
+<h3 id="現行實作的量測結果-可用連鎖區段的庫存">現行實作的量測結果：可用連鎖區段的庫存</h3>
 
 <p class="prose">以下數值皆來自本實驗室既有實作在七個資料集、六個生物樣本、chr1–22 上的輸出，
 在本頁的脈絡下構成可寫成 <math><msub><mi>P</mi><mi>u</mi></msub></math> 的原料清單。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" class="dia-svg" role="img" aria-labelledby="rg-class-spectrum__title" aria-describedby="rg-class-spectrum__desc">
-  <title id="rg-class-spectrum__title">已經量到的全基因體譜：七個資料集的區域拓撲類別組成</title>
+  <title id="rg-class-spectrum__title">已經量到的全基因體譜：七個資料集的連鎖視窗拓撲類別組成</title>
   <desc id="rg-class-spectrum__desc">七條堆疊長條，每一條是一個資料集，橫軸是佔全部可分析單位的百分比。
         每條分成三段：單層無分支、多層無分支，以及其餘（分支類與未解析加起來）。
         單層無分支的範圍是一成九點五到四成六點八，
@@ -1903,7 +1902,7 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
         讀法是：這已經是一個可重現的全基因體單倍型頻譜，重新設計要建在它上面。</desc>
 
   <text class="ttl zh" x="20" y="36">已經量到的全基因體譜</text>
-  <text class="anno zh" x="20" y="66">七個資料集、六個生物樣本、chr1–22，每個單位是「區域 × 單倍型家族」。</text>
+  <text class="anno zh" x="20" y="66">七個資料集、六個生物樣本、chr1–22，每個連鎖區段是「連鎖視窗 × 單倍型家族」。</text>
 
   <text class="tick end" x="190" y="118">HCC1395_HKU</text>
   <rect class="bar" x="200" y="102" width="242" height="22" rx="2"/>
@@ -1975,7 +1974,7 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
   <text class="anno zh" x="48" y="470">兩個肺癌之間 0.86；跨癌別掉到 0.59–0.78。換了 basecaller 還守得住，代表訊號是真的。</text>
 
   <text class="anno zh bad" x="24" y="516">但這張圖還沒針對覆蓋幾何校正，所以類別比例還不能直接當成演化結論。</text>
-</svg><figcaption>七個資料集的區域分類組成。
+</svg><figcaption>七個資料集的連鎖視窗分類組成。
 在本頁的模型下這張圖的讀法變了：它不是「有幾條約束」，
 而是「狀態表的形狀分布」——「分支類」僅佔 6%–22%，
 是拆峰能力唯一的來源，最為稀缺。</figcaption></figure>
@@ -1984,12 +1983,12 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 <table>
 <thead><tr><th scope="col">觀測</th><th scope="col">數值</th><th scope="col">在本頁的意義</th></tr></thead>
 <tbody>
-<tr><td>可分析單位總數</td><td>85,941 個含突變的「區域 × 單倍型家族」</td><td>原料充足，不需重新定序</td></tr>
+<tr><td>可分析連鎖區段總數</td><td>85,941 個含突變的單倍型連鎖區段</td><td>原料充足，不需重新定序</td></tr>
 <tr><td>候選集合可完整列舉</td><td>75,224 個（<b>87.53%</b>）</td><td>可整組帶進全域推論的比例；其餘須另行處理</td></tr>
 <tr><td>分支類的比例</td><td>各資料集 <b>6%–22%</b></td><td>拆峰能力唯一的來源，最為稀缺</td></tr>
 <tr><td>多層無分支的比例</td><td>38.1%–53.3%</td><td>次序資訊的來源，數量最多</td></tr>
 <tr><td>更換 basecaller 的重現性</td><td>同細胞株跨機構 <b>0.909</b></td><td>此分類非流程雜訊</td></tr>
-<tr><td>單一單位的覆蓋結構</td><td>194 條 read，覆蓋 3 個位點者僅 3 條</td><td>遮罩必須留下來的直接依據</td></tr>
+<tr><td>單一連鎖區段的覆蓋結構</td><td>194 條 read，覆蓋 3 個位點者僅 3 條</td><td>遮罩必須留下來的直接依據</td></tr>
 </tbody>
 </table>
 </div>
@@ -2006,7 +2005,7 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 後者正是第四節所檢驗的對象。故 6%–22% 為<b>上限</b>，而非實際可用量。</p>
 
 <p class="prose"><b>其三，有一項計數需要釐清。</b>
-各資料集的單位數總和為 71,955，而結論中引用的數值為 85,941。
+各資料集的連鎖區段數總和為 71,955，而結論中引用的數值為 85,941。
 兩者可能計數不同的對象，此點須在成文之前確認。</p>
 </section>
 
@@ -2015,12 +2014,12 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 <h2 data-num="④" id="預測與結果檢視">預測與結果檢視</h2>
 
 <div class="reveal__q"><p class="prose">既然改成似然之後「證據弱的觀測自然只貢獻一點點」，
-那是不是就不必再管品質了 —— 把所有單位、所有遮罩全部丟進去就好？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>對一半。門檻確實不需要了，但有一件事變得更重要，不是更不重要。</b></p>
+那是不是就不必再管品質了 —— 把所有連鎖區段、所有遮罩全部丟進去就好？</p></div><details class="reveal"><summary>展開答案</summary><div class="reveal__a"><p class="prose"><b>對一半。門檻確實不需要了，但有一件事變得更重要，不是更不重要。</b></p>
 
 <p class="prose">舊寫法必須設門檻，是因為一條由 <math><mi>n</mi><mo>=</mo><mn>3</mn></math> 產生的假「不可同群」
 會<b>迫使混合模型分出一個不存在的群</b>，而且不留任何跡象。
 新寫法沒有這個失效模式：沒有任何一格的機率是 0，
-一個 <math><mi>n</mi><mo>=</mo><mn>3</mn></math> 的單位算出來的似然差異本來就很小。這一半是對的。</p>
+一個 <math><mi>n</mi><mo>=</mo><mn>3</mn></math> 的連鎖區段算出來的似然差異本來就很小。這一半是對的。</p>
 
 <p class="prose">但代價轉移到了<b>錯誤地板</b>身上。地板由第二節的兩個錯誤通道決定，
 而地板訂錯的後果與舊寫法的假約束<b>一樣嚴重、一樣安靜</b>：</p>
@@ -2034,8 +2033,8 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 </ul>
 
 <p class="prose">所以取捨並沒有消失，只是<b>從「要不要相信這條約束」變成「錯誤率估得準不準」</b>。
-好消息是後者是一個<b>可以就地量測</b>的量（不相容單位的比例、
-同一單位內互斥狀態的共現率），而前者從來都不是。
+好消息是後者是一個<b>可以就地量測</b>的量（不相容連鎖區段的比例、
+同一連鎖區段內互斥狀態的共現率），而前者從來都不是。
 這正是改寫的實際收益：把一個靠判斷的旋鈕，換成一個可以估計的參數。</p>
 
 <p class="prose">實際強度仍應藉重現性外部檢驗：
@@ -2049,14 +2048,14 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 <li><b>整條路線尚未經實測驗證。</b>上述各項皆有結構性的理由，但均未在真實資料上檢驗。
 最小的驗證即中篇第三節的數值例：合成 ρ ＝ 0.60、CCF 分別為 1.00／0.40／0.40 的三群，
 確認僅用 VAF 的分群必然給出 <math><mi>K</mi><mo>=</mo><mn>2</mn></math> 與線性樹，
-再量測需要多少個多變異單位、錯誤率要估得多準，方能正確分離而不誤拆。</li>
+再量測需要多少個多變異連鎖區段、錯誤率要估得多準，方能正確分離而不誤拆。</li>
 <li><b><math><mi>φ</mi></math> 的量測方式需要重新設計。</b>第三節指出：
 用同一批分子上的變異估 <math><mi>φ</mi></math> 會系統性偏低，而偏低的方向恰好偏向本路線想要的結論。
 改由相距夠遠的同群變異估計之後，<math><mover accent="true"><mi>φ</mi><mo>^</mo></mover></math> 會變大多少是一個必須先回答的問題 ——
 它直接決定用途二還剩多少效力。</li>
-<li><b>推論的計算成本尚未評估。</b>全域取樣的內層包了每個單位的候選集合與
-<math><msub><mi>σ</mi><mi>u</mi></msub></math> 加總，而單位有數萬個。這是整份規格中唯一沒有閉式估計的部分。</li>
-<li><b>單位的來源具有偏性。</b>它們僅來自變異密集的區域，
+<li><b>推論的計算成本尚未評估。</b>全域取樣的內層包了每個連鎖區段的候選集合與
+<math><msub><mi>σ</mi><mi>u</mi></msub></math> 加總，而連鎖區段有數萬個。這是整份規格中唯一沒有閉式估計的部分。</li>
+<li><b>連鎖區段的來源具有偏性。</b>它們僅來自變異密集的連鎖視窗，
 而變異密集有時並非偶然：<b>kataegis</b> 為一種局部超突變，
 單次事件於數十 kb 內產生一連串變異。
 該串變異幾乎必然同時發生且同屬一群，故將貢獻大量<b>高度相關</b>的證據，
@@ -2064,7 +2063,7 @@ report: 每個遮罩的 read 數、單位的最大跨越深度、
 <li><b>一個群未必對應單一細胞群體。</b>本實驗室的甲基化觀測顯示：
 單一個「單倍型 ＋ 等位」狀態之下仍可區分出五群甲基化模式。
 故 <math><mi>K</mi></math> 的正確讀法恆為「<b>至少</b>此數」。</li>
-<li><b>超出 read 跨距的關係仍不可觀測。</b>相距 100 kb 的兩個變異無法落入同一個單位，
+<li><b>超出 read 跨距的關係仍不可觀測。</b>相距 100 kb 的兩個變異無法落入同一個連鎖區段，
 與定序深度無關；第七節的三層結構為此設下硬上限。</li>
 </ul>
 
@@ -2082,10 +2081,10 @@ Nanopore sequencing</i>，國立中正大學資訊工程學系碩士學位口試
 以及 Zhou T et al., <i>TreeClone: Reconstruction of tumor subclone phylogeny based on genotype pairs</i>，
 <a href="https://arxiv.org/abs/1703.03853">arXiv:1703.03853</a>。
 兩者處理的是<b>成對</b>的位點與部分觀測的 read；本頁規格與其相異之處在於
-可變的 <math><mi>k</mi></math>、逐 phase set 的方向邊際化，以及與全基因體單變異區域的相乘接合。
+可變的 <math><mi>k</mi></math>、逐 phase set 的方向邊際化，以及與全基因體單變異連鎖視窗的相乘接合。
 此一相異性尚未經文獻檢索確認，成文前應先查證。</p>
 
-<p class="prose">單變異區域那個因子所屬路線的代表性實作：SciClone，Miller CA et al., <i>PLoS Comput Biol</i>
+<p class="prose">單變異連鎖視窗那個因子所屬路線的代表性實作：SciClone，Miller CA et al., <i>PLoS Comput Biol</i>
 2014;10:e1003665；PyClone，Roth A et al., <i>Nat Methods</i> 2014;11:396–398；
 MOBSTER，Caravagna G et al., <i>Nat Genet</i> 2020;52:898–907
 （<a href="https://doi.org/10.1038/s41588-020-0675-5">doi 10.1038/s41588-020-0675-5</a>），
@@ -2110,7 +2109,7 @@ MOBSTER，Caravagna G et al., <i>Nat Genet</i> 2020;52:898–907
     <nav class="pager" aria-label="模組導覽"><a class="prev" href="sr2.html"><small>← 上一模組</small>中篇：VAF 路線缺什麼，多變異區域能補上哪三格</a><a class="next" href="sr2c.html"><small>下一模組 →</small>補篇：把目標換成局部系譜，以及它能餵給 caller 什麼</a></nav>
     <section class="glossary-appendix"><h2>本模組術語</h2><dl><dt>clone tree（克隆演化樹）</dt><dd>描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</dd><dt>haplotagging</dt><dd>根據已 phase 好的 variants，把每一條 read 指派到 HP1 或 HP2，並把結果寫回 BAM 的 <code>HP</code> tag。</dd><dt>latent node（潛在節點）</dt><dd>建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</dd><dt>phase block</dt><dd>一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</dd><dt>pigeonhole（鴿籠原理）</dt><dd>由父代與子代的細胞比例限制樹形的算術規則：一個細胞至多屬於父節點底下的<b>一個</b>子節點，所以各子節點的細胞比例加起來不得超過父節點。名稱來自鴿籠原理 —— 東西放進籠子，總量不會憑空變多。在 subclone 重建的文獻中也稱為 sum rule 或 crossing rule。<b>它只能排除樹，不能挑出樹</b>：通過檢查的候選通常仍不只一棵，其餘要靠 parsimony 之類的偏好決定。</dd><dt>read-AF（read 層級的 ALT 比例）</dt><dd>在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。</dd><dt>somatic haplotype</dt><dd>在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。</dd></dl></section>
   </main>
-  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#一-完整的估計式">一、完整的估計式</a></li><li class="lv4"><a href="#兩個因子-不是兩項">兩個因子，不是兩項</a></li><li class="lv3"><a href="#二-一個多變異單位的生成模型">二、一個多變異單位的生成模型</a></li><li class="lv4"><a href="#單位-局部基因型與分子權重">單位、局部基因型與分子權重</a></li><li class="lv4"><a href="#覆蓋遮罩-沒覆蓋到的位點要邊際化">覆蓋遮罩：沒覆蓋到的位點要邊際化</a></li><li class="lv4"><a href="#一個單位一個-p-不是一個遮罩一個">一個單位一個 p，不是一個遮罩一個</a></li><li class="lv4"><a href="#觀測通道-兩種形狀不同的錯誤">觀測通道：兩種形狀不同的錯誤</a></li><li class="lv4"><a href="#hp1-hp2-的方向是-nuisance">HP1／HP2 的方向是 nuisance</a></li><li class="lv3"><a href="#三-預設是-multinomial-一條-read-是一個分子">三、預設是 multinomial：一條 read 是一個分子</a></li><li class="lv3"><a href="#四-三種不同的-沒有">四、三種不同的「沒有」</a></li><li class="lv4"><a href="#潛在節點的三種身分">潛在節點的三種身分</a></li><li class="lv3"><a href="#五-分類是輸出-不是輸入">五、分類是輸出，不是輸入</a></li><li class="lv3"><a href="#六-數百個單位的局部形狀不同-這是預期-不是矛盾">六、數百個單位的局部形狀不同 —— 這是預期，不是矛盾</a></li><li class="lv4"><a href="#合起來為什麼更準-解析度更高">合起來為什麼更準、解析度更高</a></li><li class="lv4"><a href="#真正的矛盾長什麼樣">真正的矛盾長什麼樣</a></li><li class="lv3"><a href="#七-現行實作要改的兩處">七、現行實作要改的兩處</a></li><li class="lv4"><a href="#其一-覆蓋遮罩要留下來-而不是併掉">其一：覆蓋遮罩要留下來，而不是併掉</a></li><li class="lv4"><a href="#其二-候選排序的分數要換成似然">其二：候選排序的分數要換成似然</a></li><li class="lv3"><a href="#八-兩類與相位有關的誤讀">八、兩類與相位有關的誤讀</a></li><li class="lv3"><a href="#九-單位預算">九、單位預算</a></li><li class="lv4"><a href="#兩個-5-的分母不同">兩個 5% 的分母不同</a></li><li class="lv4"><a href="#推導">推導</a></li><li class="lv3"><a href="#十-視窗寬度-單位產量與品質的取捨">十、視窗寬度：單位產量與品質的取捨</a></li><li class="lv3"><a href="#十一-實作分期">十一、實作分期</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#現行實作的量測結果-可用單位的庫存">現行實作的量測結果：可用單位的庫存</a></li><li class="lv3"><a href="#三項須注意的事項">三項須注意的事項</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv3"><a href="#尚未解決的問題">尚未解決的問題</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
+  <nav class="toc--sticky" aria-label="本頁目錄"><h2>本頁目錄</h2><ol><li class="lv2"><a href="#為什麼重要">為什麼重要</a></li><li class="lv2"><a href="#概念與互動">概念與互動</a></li><li class="lv3"><a href="#一-完整的估計式">一、完整的估計式</a></li><li class="lv4"><a href="#兩個因子-不是兩項">兩個因子，不是兩項</a></li><li class="lv3"><a href="#二-一個多變異連鎖區段的生成模型">二、一個多變異連鎖區段的生成模型</a></li><li class="lv4"><a href="#連鎖區段-局部基因型與分子權重">連鎖區段、局部基因型與分子權重</a></li><li class="lv4"><a href="#覆蓋遮罩-沒覆蓋到的位點要邊際化">覆蓋遮罩：沒覆蓋到的位點要邊際化</a></li><li class="lv4"><a href="#一個連鎖區段一個-p-不是一個遮罩一個">一個連鎖區段一個 p，不是一個遮罩一個</a></li><li class="lv4"><a href="#觀測通道-兩種形狀不同的錯誤">觀測通道：兩種形狀不同的錯誤</a></li><li class="lv4"><a href="#hp1-hp2-的方向是-nuisance">HP1／HP2 的方向是 nuisance</a></li><li class="lv3"><a href="#三-預設是-multinomial-一條-read-是一個分子">三、預設是 multinomial：一條 read 是一個分子</a></li><li class="lv3"><a href="#四-三種不同的-沒有">四、三種不同的「沒有」</a></li><li class="lv4"><a href="#潛在節點的三種身分">潛在節點的三種身分</a></li><li class="lv3"><a href="#五-分類是輸出-不是輸入">五、分類是輸出，不是輸入</a></li><li class="lv3"><a href="#六-數百個連鎖區段的局部形狀不同-這是預期-不是矛盾">六、數百個連鎖區段的局部形狀不同 —— 這是預期，不是矛盾</a></li><li class="lv4"><a href="#合起來為什麼更準-解析度更高">合起來為什麼更準、解析度更高</a></li><li class="lv4"><a href="#真正的矛盾長什麼樣">真正的矛盾長什麼樣</a></li><li class="lv3"><a href="#七-現行實作要改的兩處">七、現行實作要改的兩處</a></li><li class="lv4"><a href="#其一-覆蓋遮罩要留下來-而不是併掉">其一：覆蓋遮罩要留下來，而不是併掉</a></li><li class="lv4"><a href="#其二-候選排序的分數要換成似然">其二：候選排序的分數要換成似然</a></li><li class="lv3"><a href="#八-兩類與相位有關的誤讀">八、兩類與相位有關的誤讀</a></li><li class="lv3"><a href="#九-連鎖區段預算">九、連鎖區段預算</a></li><li class="lv4"><a href="#兩個-5-的分母不同">兩個 5% 的分母不同</a></li><li class="lv4"><a href="#推導">推導</a></li><li class="lv3"><a href="#十-連鎖視窗寬度-連鎖區段產量與品質的取捨">十、連鎖視窗寬度：連鎖區段產量與品質的取捨</a></li><li class="lv3"><a href="#十一-實作分期">十一、實作分期</a></li><li class="lv2"><a href="#真實資料與證據">真實資料與證據</a></li><li class="lv3"><a href="#現行實作的量測結果-可用連鎖區段的庫存">現行實作的量測結果：可用連鎖區段的庫存</a></li><li class="lv3"><a href="#三項須注意的事項">三項須注意的事項</a></li><li class="lv2"><a href="#預測與結果檢視">預測與結果檢視</a></li><li class="lv3"><a href="#尚未解決的問題">尚未解決的問題</a></li><li class="lv3"><a href="#原始文獻與程式碼">原始文獻與程式碼</a></li></ol></nav>
 </div>
 
 <footer class="site-footer">

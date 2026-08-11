@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
-  <title>純度、拷貝數與 multiplicity 為什麼在單位內的比值裡消掉</title>
+  <title>純度、拷貝數與 multiplicity 為什麼在連鎖區段內的比值裡消掉</title>
   <desc>上半畫一個分析單位裡的分子來源。
         正常細胞貢獻的分子在所有 somatic 位點上都是參考型，所以它們全部落在「全 0」那一格，
         不會進到其他任何一格。兩個腫瘤 clone 各自貢獻自己的組成格。
@@ -15,7 +15,7 @@
   <text class="ttl zh" x="20" y="36">為什麼三個估計值會消掉</text>
 
   <!-- 分子來源 -->
-  <text class="lbl bold zh" x="20" y="82">一個單位裡的分子來源</text>
+  <text class="lbl bold zh" x="20" y="82">一個連鎖區段裡的分子來源</text>
 
   <rect class="box plain" x="24" y="98" width="230" height="96" rx="8"/>
   <text class="tick bold zh mid" x="139" y="122">正常細胞</text>

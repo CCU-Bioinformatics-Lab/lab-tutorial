@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
-  <title>讓 5% 的多變異區域去改善 95% 的單變異頻率譜</title>
+  <title>讓 5% 的多變異連鎖視窗去改善 95% 的單變異頻率譜</title>
   <desc>上排左邊是 95% 單獨做不到的事：兩群細胞如果佔的比例剛好一樣，
         在一維的頻率軸上它們就是同一個點，堆成同一根長條。
         這種簡併跟定序深度無關 —— 再深也分不開，因為兩群的頻率本來就相等。
-        上排右邊是多變異區域給的東西：一條分子同時跨過兩個變異，
+        上排右邊是多變異連鎖視窗給的東西：一條分子同時跨過兩個變異，
         發現沒有任何分子同時帶著兩者，於是這兩個變異不可能屬於同一群細胞。
         這一個觀測就足以把那根長條拆成兩群。
         中排列出三種推論。第一種是分岔：兩個變異不共存那一格是空的。
@@ -20,7 +20,7 @@
         讀法是：5% 提供的不是更多資料點，是資料點之間的關係，而關係不需要多。</desc>
 
   <text class="ttl zh" x="20" y="36">讓 5% 去改善 95%</text>
-  <text class="anno zh" x="20" y="64">多變異區域很少，但它給的是<tspan class="bold">約束</tspan> —— 而約束不需要多。</text>
+  <text class="anno zh" x="20" y="64">多變異連鎖視窗很少，但它給的是<tspan class="bold">約束</tspan> —— 而約束不需要多。</text>
 
   <!-- 問題 -->
   <rect class="box ghost bad" x="24" y="84" width="468" height="200" rx="8"/>
@@ -40,7 +40,7 @@
 
   <!-- 解法 -->
   <rect class="box ghost ok" x="508" y="84" width="468" height="200" rx="8"/>
-  <text class="lbl bold zh mid" x="742" y="114">多變異區域給的東西</text>
+  <text class="lbl bold zh mid" x="742" y="114">多變異連鎖視窗給的東西</text>
 
   <circle class="mark somatic" cx="600" cy="146" r="6"/>
   <circle class="mark somatic" cx="800" cy="146" r="6"/>

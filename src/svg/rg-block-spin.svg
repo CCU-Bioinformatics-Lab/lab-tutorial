@@ -6,10 +6,10 @@
         而 block B 的 H1 對應上排第二條拷貝 —— 兩個 block 的 H1 不是同一條染色體。
         這個任意性寫成每個 block 一個正負號，圖上標為 σ。
         下排分成兩欄說明後果。左欄是不受影響的：clone tree 談的是細胞的祖先關係，
-        不是哪一條親源染色體帶著變異，所以每個單位內部算出來的量都與 σ 無關。
+        不是哪一條親源染色體帶著變異，所以每個連鎖區段內部算出來的量都與 σ 無關。
         右欄是會出錯的：任何把不同 block 的 H1 加總在一起的統計都沒有意義，
         跨 block 的單倍型特異拷貝數、跨 block 比較甲基化偏向也都需要先定出 σ。
-        讀法是：所有全基因體統計都必須只由「單位內部的量」組成，這樣才自動與 σ 無關。</desc>
+        讀法是：所有全基因體統計都必須只由「連鎖區段內部的量」組成，這樣才自動與 σ 無關。</desc>
 
   <text class="ttl zh" x="20" y="36">H1／H2 只在同一個 phase block 內有意義</text>
 
@@ -50,7 +50,7 @@
   <text class="lbl bold zh ok" x="44" y="400">不受影響</text>
   <text class="anno zh" x="44" y="430">clone tree 談的是細胞的祖先關係，</text>
   <text class="anno zh" x="44" y="458">不是哪一條親源染色體帶著變異。</text>
-  <text class="anno zh" x="44" y="486">單位內部算出的量與 σ 無關，可直接邊際化。</text>
+  <text class="anno zh" x="44" y="486">連鎖區段內部算出的量與 σ 無關，可直接邊際化。</text>
 
   <rect class="box bad" x="516" y="368" width="460" height="150" rx="8"/>
   <text class="lbl bold zh bad" x="536" y="400">會靜靜出錯</text>
@@ -58,5 +58,5 @@
   <text class="anno zh" x="536" y="458">跨 block 的單倍型特異拷貝數；</text>
   <text class="anno zh" x="536" y="486">跨 block 比較甲基化偏向。這些都要先定出 σ。</text>
 
-  <text class="anno zh bold" x="24" y="550">設計規則：所有全基因體統計只能由「單位內部的量」組成 —— 這樣才自動與 σ 無關。</text>
+  <text class="anno zh bold" x="24" y="550">設計規則：所有全基因體統計只能由「連鎖區段內部的量」組成 —— 這樣才自動與 σ 無關。</text>
 </svg>

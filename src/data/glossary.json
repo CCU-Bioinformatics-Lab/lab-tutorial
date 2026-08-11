@@ -941,5 +941,22 @@
    "tumour purity",
    "ploidy"
   ]
+ },
+ "連鎖視窗": {
+  "zh": "同一個 phase block 之內，由 read 連鎖的傳遞閉包所界定的一段：凡有某條 read 同時覆蓋至少兩個 somatic 位點，該段即成一個視窗；另一條 read 疊到已連鎖的位點又碰到新位點時，兩段合併成更長的視窗。<b>不是固定寬度</b>，也<b>不跨 phase block</b>。早期估算比例時所用的「20 kb 視窗」是固定寬度的近似，兩者的計數不可互換。",
+  "en": "Within a single phase block, the span defined by the transitive closure of read linkage: any read covering at least two somatic sites opens a window, and overlapping reads merge windows. It is not a fixed width and never crosses a phase block. The fixed-width 20 kb window used in early proportion estimates is an approximation; the two counts are not interchangeable.",
+  "see": [
+   "phase block",
+   "單倍型連鎖區段"
+  ]
+ },
+ "單倍型連鎖區段": {
+  "zh": "一個連鎖視窗再限定到一條單倍型家族 —— 也就是「一個連鎖視窗、一條染色體拷貝」。這是局部共現分析的最小單位：其中的 read 全部來自同一條染色體拷貝，另一條拷貝屬於另一個連鎖區段。因此一個連鎖視窗至多切出兩個連鎖區段，<b>連鎖區段數大於連鎖視窗數</b>，兩者不可混用為同一個分母。單倍型標號只在該區段內有定義，跨區段的同名標號並非同一條染色體。",
+  "en": "A linkage window restricted to one haplotype family — one window, one chromosome copy. It is the smallest unit of local co-occurrence analysis: all its reads come from the same chromosome copy, the other copy forming a separate segment. One window yields at most two segments, so segments outnumber windows and the two must not share a denominator. Haplotype labels are defined only within a segment.",
+  "see": [
+   "連鎖視窗",
+   "phase block",
+   "somatic haplotype"
+  ]
  }
 }

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
-  <title>落入任一視窗的體細胞變異比例，在七個資料集之間差超過兩倍</title>
-  <desc>七條橫向長條，每條是一個資料集，長度是該資料集中落入任一分析視窗的
+  <title>落入任一連鎖視窗的體細胞變異比例，在七個資料集之間差超過兩倍</title>
+  <desc>七條橫向長條，每條是一個資料集，長度是該資料集中落入任一分析連鎖視窗的
         體細胞單核苷酸變異位點比例，右側另列該資料集的變異總數。
         由低到高分別是：HCC1395_NYGC 四成零五、HCC1395_HKU 四成五七、
         H1437 六成九四、H2009 九成二五、HCC1937 九成七七、HCC1954 九成七七、
@@ -14,7 +14,7 @@
   <text class="ttl zh" x="20" y="36">連鎖率才是閘門，而它逐樣本差很多</text>
 
   <text class="tick bold zh" x="34" y="64">資料集</text>
-  <text class="tick bold zh" x="250" y="64">落入任一視窗的 sSNV 位點比例</text>
+  <text class="tick bold zh" x="250" y="64">落入任一連鎖視窗的 sSNV 位點比例</text>
   <text class="tick bold zh" x="820" y="64">比例</text>
   <text class="tick bold zh end" x="980" y="64">sSNV 總數</text>
 

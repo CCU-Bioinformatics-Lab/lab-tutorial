@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
-  <title>局部生成鏈：由這個單位的狀態比例，長到一條 read 上看到的字母</title>
+  <title>局部生成鏈：由這個連鎖區段的狀態比例，長到一條 read 上看到的字母</title>
   <desc>由左到右四格，說明一條讀序上的字母是怎麼產生的。
-        第一格是這個單位的狀態比例：四種局部狀態各佔多少分子，畫成四條長短不同的長條。
+        第一格是這個連鎖區段的狀態比例：四種局部狀態各佔多少分子，畫成四條長短不同的長條。
         這組比例是自由參數，先驗來自階段 G。
         第二格是從這組比例抽出一條分子，它有一個真實狀態，圖中畫的是帶第一與第二個變異、
         不帶第三個，也就是 110；實心圓代表帶有變異，空心圓代表參考型。
@@ -19,7 +19,7 @@
 
   <!-- ① 狀態比例 -->
   <rect class="box accent" x="18" y="60" width="222" height="240" rx="8"/>
-  <text class="tick bold zh" x="34" y="92">① 這個單位的狀態比例</text>
+  <text class="tick bold zh" x="34" y="92">① 這個連鎖區段的狀態比例</text>
   <text class="tick mono" x="34" y="126">000</text>
   <rect class="bar somatic" x="100" y="114" width="110" height="16" rx="4"/>
   <text class="tick mono" x="34" y="156">100</text>

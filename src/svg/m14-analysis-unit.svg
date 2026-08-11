@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530">
-  <title>分析單位怎麼切出來：phase set → 區域 → 單倍型家族</title>
+  <title>分析單位怎麼切出來：phase set → 連鎖視窗 → 單倍型家族</title>
   <desc>三層，由上到下是切分的順序。
         第一層是 phase set。跨越兩個 phase set 之間沒有相位關係，所以分析不能跨過去。
-        第二層在 phase set 內按 read 實際跨得到的距離切成區域，
-        圖上是三個區域，各含 2 個或 3 個 somatic 位點，每個區域有五條 read。
-        區域裡的 read 畫成虛線外框，代表這時候還不知道它們來自哪一條 haplotype。
-        第三層把中間那個區域的五條 read 按單倍型家族分成兩堆，三條一堆、兩條一堆，
+        第二層在 phase set 內按 read 實際跨得到的距離切成連鎖視窗，
+        圖上是三個連鎖視窗，各含 2 個或 3 個 somatic 位點，每個連鎖視窗有五條 read。
+        連鎖視窗裡的 read 畫成虛線外框，代表這時候還不知道它們來自哪一條 haplotype。
+        第三層把中間那個連鎖視窗的五條 read 按單倍型家族分成兩堆，三條一堆、兩條一堆，
         外框改成實線，代表來源已經由程式判定。
         第三層每一條 read 的 x 座標與第二層完全相同，因為那是同一批 read，只是重新分組。
-        讀法是：最小分析單位是「一個區域的一個單倍型家族」，不是整條染色體。</desc>
+        讀法是：最小分析單位是「一個連鎖視窗的一個單倍型家族」，不是整條染色體。</desc>
 
-  <text class="lbl bold zh" x="20" y="32">最小分析單位：一個區域的一個單倍型家族</text>
+  <text class="lbl bold zh" x="20" y="32">最小分析單位：一個連鎖視窗的一個單倍型家族</text>
   <text class="tick zh" x="20" y="58">上方小圓＝somatic 位點。虛線外框的 read ＝ 還不知道來自哪一條 haplotype。</text>
 
   <!-- ① phase set -->
@@ -22,8 +22,8 @@
   <path class="conn bad" d="M600,140 L616,128" marker-end="url(#arrow-sm)"/>
   <text class="tick zh bad" x="624" y="148">跨 phase set 之間沒有相位關係，分析不能跨過去</text>
 
-  <!-- ② 區域 -->
-  <text class="tick bold zh" x="24" y="210">② 切區域</text>
+  <!-- ② 連鎖視窗 -->
+  <text class="tick bold zh" x="24" y="210">② 切連鎖視窗</text>
   <circle class="mark somatic" cx="200" cy="176" r="6"/>
   <circle class="mark somatic" cx="260" cy="176" r="6"/>
   <circle class="mark somatic" cx="380" cy="176" r="6"/>

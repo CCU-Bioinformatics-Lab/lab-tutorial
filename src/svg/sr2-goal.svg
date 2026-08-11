@@ -1,24 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
-  <title>整體形狀：95% 的區域定峰在哪裡，5% 的區域定峰之間的關係</title>
-  <desc>上排兩欄是兩種區域各自貢獻什麼。
-        左欄是只有一個變異的區域，占九成五。它們每個給一個頻率值，
+  <title>整體形狀：95% 的連鎖視窗定峰在哪裡，5% 的連鎖視窗定峰之間的關係</title>
+  <desc>上排兩欄是兩種連鎖視窗各自貢獻什麼。
+        左欄是只有一個變異的連鎖視窗，占九成五。它們每個給一個頻率值，
         堆起來就是頻率譜，決定的是「峰落在哪裡」——也就是有幾群、各多大。
         這一欄提供的是統計量體，一萬五千個點。
-        右欄是有兩個以上變異的區域，占百分之五。它們每個給的不是頻率，而是關係：
+        右欄是有兩個以上變異的連鎖視窗，占百分之五。它們每個給的不是頻率，而是關係：
         哪兩個變異不可能同一群、哪兩個一定同一群、哪一群是哪一群的祖先。
         這一欄提供的是約束，數量只有幾百個，但要定的關係本來就只有幾個。
         中間的箭頭把兩者匯進同一個混合模型：
         頻率決定成分的位置，約束決定成分的個數、寬度、比例與先後。
         輸出是全基因體的群與樹，並且要標明哪些關係是由資料決定的、哪些是靠偏好補的。
         最下方為本頁的出發點：本實驗室現行的實作已在計算右欄的內容，
-        它每個區域都判過串接或分岔，只是那些判定停在區域層級，沒有送到全基因體這一層。
+        它每個連鎖視窗都判過串接或分岔，只是那些判定停在連鎖視窗層級，沒有送到全基因體這一層。
         讀法是：缺的不是資料，是把已經算出來的關係接上去。</desc>
 
-  <text class="ttl zh" x="20" y="36">整體形狀：兩種區域，各出一半的力</text>
+  <text class="ttl zh" x="20" y="36">整體形狀：兩種連鎖視窗，各出一半的力</text>
   <text class="anno zh" x="20" y="64">目標是<tspan class="bold">全基因體</tspan>的 subclone 重建，不是再多幾萬筆局部陳述。</text>
 
   <rect class="box ghost" x="24" y="88" width="448" height="196" rx="8"/>
-  <text class="lbl bold zh mid" x="248" y="120">95%　只有一個變異的區域</text>
+  <text class="lbl bold zh mid" x="248" y="120">95%　只有一個變異的連鎖視窗</text>
   <text class="anno zh mid" x="248" y="152">每個給一個<tspan class="bold">頻率值</tspan></text>
   <rect class="bar" x="150" y="186" width="20" height="30"/>
   <rect class="bar" x="176" y="172" width="20" height="44"/>
@@ -31,7 +31,7 @@
   <text class="tick zh mid" x="248" y="272">統計量體 —— 約 14,025 個點</text>
 
   <rect class="box ghost ok" x="528" y="88" width="448" height="196" rx="8"/>
-  <text class="lbl bold zh mid" x="752" y="120">5%　有兩個以上變異的區域</text>
+  <text class="lbl bold zh mid" x="752" y="120">5%　有兩個以上變異的連鎖視窗</text>
   <text class="anno zh mid" x="752" y="152">整批給一張<tspan class="bold">狀態表</tspan></text>
   <text class="tick mono" x="600" y="184">不可同群</text>
   <text class="tick mono" x="600" y="206">必定同群</text>
@@ -52,5 +52,5 @@
   <path class="conn thick" d="M500,420 L500,440" marker-end="url(#arrow)"/>
   <text class="anno bold zh mid" x="500" y="464">輸出：全基因體的群 ＋ 樹（並標明哪些關係由資料決定）</text>
 
-  <text class="anno zh" x="24" y="504">出發點：現行實作<tspan class="bold">已經在算右邊那一欄了</tspan> —— 每個區域都判過串接或分岔，只是停在區域層級沒送上去。</text>
+  <text class="anno zh" x="24" y="504">出發點：現行實作<tspan class="bold">已經在算右邊那一欄了</tspan> —— 每個連鎖視窗都判過串接或分岔，只是停在連鎖視窗層級沒送上去。</text>
 </svg>

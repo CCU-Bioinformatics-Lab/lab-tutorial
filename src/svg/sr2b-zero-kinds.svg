@@ -66,7 +66,7 @@
   <!-- 對照 -->
   <rect class="box sunken" x="18" y="462" width="964" height="94" rx="8"/>
   <text class="lbl bold zh" x="34" y="490">三者的觀測一模一樣，都是「這一格計數為 0」</text>
-  <text class="anno zh" x="34" y="522">分得開它們的不是那個 0，是跨越深度、其他單位的證據，以及就地估到的錯誤率。</text>
+  <text class="anno zh" x="34" y="522">分得開它們的不是那個 0，是跨越深度、其他連鎖區段的證據，以及就地估到的錯誤率。</text>
   <text class="anno bold zh bad" x="34" y="548">混為一談的後果：錯誤造出來的少數幾條 read，會被讀成一個新的 clone。</text>
 
   <text class="tick zh" x="18" y="584">讀法：門檻只能把三種零一起丟掉；似然可以分別給它們不同的重量。</text>
