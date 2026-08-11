@@ -3,10 +3,10 @@
   <desc>由左到右四格，說明一條讀序上的字母是怎麼產生的。
         第一格是這個連鎖區段的狀態比例：四種局部狀態各佔多少分子，畫成四條長短不同的長條。
         這組比例是自由參數，先驗來自全域基準。
-        第二格是從這組比例抽出一條分子，它有一個真實狀態，圖中畫的是帶第一與第二個變異、
-        不帶第三個，也就是 110；實心圓代表帶有變異，空心圓代表參考型。
-        第三格是覆蓋遮罩：這條讀序其實只跨得到前兩個位點，第三個位點沒有覆蓋到，
-        以虛線空心圓畫在讀序之外。沒覆蓋到的位點必須邊際化，不可以填成參考型。
+        第二格是從這組比例抽出一條分子，它有一個真實狀態，圖中畫的是三個位點皆帶變異的 111；
+        實心圓代表帶有變異，空心圓代表參考型。
+        第三格是覆蓋遮罩：第二個位點沒有可靠觀測，以虛線空心圓表示未知；
+        第一與第三個位點讀到 1 和 1。沒觀測到的位點必須邊際化，不可以填成參考型。
         第四格是兩個錯誤通道：逐位點錯誤一次只改一個字母，
         整條分子的家族誤標則一次把整條分子搬到另一個家族；
         通過這兩道之後看到的字母才是真正的資料。
@@ -22,12 +22,10 @@
   <text class="tick bold zh" x="34" y="92">① 這個連鎖區段的狀態比例</text>
   <text class="tick mono" x="34" y="126">000</text>
   <rect class="bar somatic" x="100" y="114" width="110" height="16" rx="4"/>
-  <text class="tick mono" x="34" y="156">100</text>
-  <rect class="bar somatic" x="100" y="144" width="62" height="16" rx="4"/>
-  <text class="tick mono" x="34" y="186">110</text>
-  <rect class="bar somatic" x="100" y="174" width="37" height="16" rx="4"/>
-  <text class="tick mono" x="34" y="216">101</text>
-  <rect class="bar somatic" x="100" y="204" width="37" height="16" rx="4"/>
+  <text class="tick mono" x="34" y="156">101</text>
+  <rect class="bar somatic" x="100" y="144" width="55" height="16" rx="4"/>
+  <text class="tick mono" x="34" y="186">111</text>
+  <rect class="bar somatic" x="100" y="174" width="18" height="16" rx="4"/>
   <text class="tick bold zh ok" x="34" y="262">自由參數</text>
   <text class="tick zh" x="34" y="286">先驗來自全域基準</text>
 
@@ -39,20 +37,20 @@
   <rect class="read hp1" x="296" y="150" width="160" height="14" rx="6"/>
   <circle class="mark somatic" cx="326" cy="157" r="6"/>
   <circle class="mark somatic" cx="376" cy="157" r="6"/>
-  <circle class="mark ref" cx="426" cy="157" r="6"/>
+  <circle class="mark somatic" cx="426" cy="157" r="6"/>
   <text class="tick zh" x="286" y="262">它的真實狀態</text>
-  <text class="tick mono" x="286" y="286">110</text>
+  <text class="tick mono" x="286" y="286">111</text>
 
   <line class="conn thick" x1="486" y1="170" x2="504" y2="170" marker-end="url(#arrow)"/>
 
   <!-- ③ 覆蓋遮罩 -->
   <rect class="box" x="510" y="60" width="210" height="240" rx="8"/>
   <text class="tick bold zh" x="526" y="92">③ 覆蓋遮罩</text>
-  <rect class="read hp1" x="536" y="150" width="110" height="14" rx="6"/>
+  <rect class="read hp1" x="536" y="150" width="160" height="14" rx="6"/>
   <circle class="mark somatic" cx="566" cy="157" r="6"/>
-  <circle class="mark somatic" cx="616" cy="157" r="6"/>
-  <circle class="mark ref" cx="666" cy="157" r="6" style="stroke-dasharray:3 2"/>
-  <text class="tick zh" x="526" y="262">第三個位點沒覆蓋到</text>
+  <circle class="mark ref" cx="616" cy="157" r="6" style="stroke-dasharray:3 2"/>
+  <circle class="mark somatic" cx="666" cy="157" r="6"/>
+  <text class="tick zh" x="526" y="262">第二個位點沒有可靠觀測</text>
   <text class="tick zh bad" x="526" y="286">要邊際化，不可填成 0</text>
 
   <line class="conn thick" x1="726" y1="170" x2="744" y2="170" marker-end="url(#arrow)"/>

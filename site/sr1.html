@@ -644,30 +644,30 @@ driver 變異的頻率本即偏向 0 與 1 兩端，不易在中間頻率被觀�
 
 <p class="prose">前述兩層不確定性表面上為兩個獨立的問題，實則同一。以兩個位點即可完整說明。</p>
 
-<p class="prose">設一個連鎖視窗內有兩個 somatic 位點 S1、S2。頻率給出兩個數字：
-S1 出現於 50% 的細胞、S2 出現於 30% 的細胞。
+<p class="prose">設一個連鎖視窗內有兩個 somatic 位點 A、B。頻率給出兩個數字：
+A 出現於 50% 的細胞、B 出現於 30% 的細胞。
 此二數字各自描述<b>單一位點</b>，此類分布稱為 <span class="term" data-term="marginal distribution" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-marginal-distribution-15">marginal distribution<span class="term__pop" id="gd-marginal-distribution-15" role="tooltip"><b class="term__hd">marginal distribution <i>邊際分布</i></b><span class="term__def" data-lang="zh">只描述單一變數的分布。VAF 與甲基化 β 值都是邊際統計：它們各自只講一個位點有多少比例帶有標記，不講兩個位點在同一個分子或同一個細胞上的搭配情形。</span><span class="term__def" data-lang="en" lang="en">A distribution over a single variable. VAF and methylation beta values are both marginal statistics: each describes one site in isolation and says nothing about how two sites co-occur on the same molecule or cell.</span><a class="term__more" href="glossary.html#marginal-distribution">完整條目 →</a></span></span>。</p>
 
-<p class="prose">而樹所要回答的問題為：<b>同時帶有 S1 與 S2 的細胞佔多少</b>。
+<p class="prose">而樹所要回答的問題為：<b>同時帶有 A 與 B 的細胞佔多少</b>。
 此為兩個位點<b>聯合</b>的分布，稱為 <span class="term" data-term="joint distribution" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-joint-distribution-16">joint distribution<span class="term__pop" id="gd-joint-distribution-16" role="tooltip"><b class="term__hd">joint distribution <i>聯合分布</i></b><span class="term__def" data-lang="zh">多個變數一起看的分布，也就是「哪些組合各出現多少」。演化樹的形狀取決於聯合分布，而不是邊際分布；長讀的價值在於一條分子上的組合是直接觀測到的。</span><span class="term__def" data-lang="en" lang="en">A distribution over several variables jointly, i.e. how often each combination occurs. Tree topology depends on the joint distribution, not the marginals; the value of long reads is that combinations on one molecule are observed directly.</span><a class="term__more" href="glossary.html#joint-distribution">完整條目 →</a></span></span>。
 由邊際分布無法推得聯合分布 —— 此非統計方法不足，而是該資訊確實不存在於資料中。</p>
 
 <p class="prose">更精確地說，邊際並非全無作用，它給出一個<b>區間</b>：
-同時帶有兩者的比例至多不超過 0.30（不可能多於帶有 S2 者），
+同時帶有兩者的比例至多不超過 0.30（不可能多於帶有 B 者），
 至少不低於 <math><mn>0.50</mn><mo>+</mo><mn>0.30</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>0</mn></math>（兩者可完全不重疊）。
 故邊際將答案限定於 0 至 0.30 之間，<b>而此區間無法再行收窄</b>。
 樹的形狀在此區間的兩端則完全不同。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 596" class="dia-svg" role="img" aria-labelledby="m14-marginal-vs-joint__title" aria-describedby="m14-marginal-vs-joint__desc">
   <title id="m14-marginal-vs-joint__title">邊際頻率相同的兩種細胞組成，聯合計數與樹卻不同</title>
-  <desc id="m14-marginal-vs-joint__desc">左右兩種細胞組成的邊際頻率刻意做成完全一樣：S1 出現在 50% 的細胞裡，S2 出現在 30% 的細胞裡。
-        左邊的組成是：3 個細胞同時帶有 S1 與 S2，2 個只帶 S1，5 個都沒有。
-        右邊的組成是：5 個只帶 S1，3 個只帶 S2，2 個都沒有，沒有任何細胞同時帶有兩者。
-        兩邊各自數出來的 S1 都是 5 個、S2 都是 3 個，所以邊際頻率相同。
-        差別出現在聯合計數表，而且剛好互換：左邊「只帶 S2」的 01 是 0 個、11 是 3 個；
+  <desc id="m14-marginal-vs-joint__desc">左右兩種細胞組成的邊際頻率刻意做成完全一樣：A 出現在 50% 的細胞裡，B 出現在 30% 的細胞裡。
+        左邊的組成是：3 個細胞同時帶有 A 與 B，2 個只帶 A，5 個都沒有。
+        右邊的組成是：5 個只帶 A，3 個只帶 B，2 個都沒有，沒有任何細胞同時帶有兩者。
+        兩邊各自數出來的 A 都是 5 個、B 都是 3 個，所以邊際頻率相同。
+        差別出現在聯合計數表，而且剛好互換：左邊「只帶 B」的 01 是 0 個、11 是 3 個；
         右邊 01 是 3 個、11 是 0 個。
-        因此左邊相容的樹是一條線，S2 出現在已經有 S1 的細胞裡；
-        右邊的樹分岔，因為只帶 S2 的那群細胞必須另外從起點長出來。
+        因此左邊相容的樹是一條線，B 出現在已經有 A 的細胞裡；
+        右邊的樹分岔，因為只帶 B 的那群細胞必須另外從起點長出來。
         兩邊都是每個突變只發生一次就解釋得通的樹。
         要點：邊際頻率不提供 01 與 11 兩格各自的計數，而樹的形狀正取決於此二格。</desc>
 
@@ -676,8 +676,8 @@ S1 出現於 50% 的細胞、S2 出現於 30% 的細胞。
 
   <!-- ══════════ 左：組成甲 ══════════ -->
   <rect class="box plain" x="20" y="100" width="470" height="412" rx="8"/>
-  <text class="tick bold zh" x="40" y="126">組成 甲　S1 ＝ 0.50　S2 ＝ 0.30</text>
-  <text class="tick zh" x="40" y="148">10 個腫瘤細胞。小方塊：左＝S1、右＝S2，實心＝帶有</text>
+  <text class="tick bold zh" x="40" y="126">組成 甲　A ＝ 0.50　B ＝ 0.30</text>
+  <text class="tick zh" x="40" y="148">10 個腫瘤細胞。小方塊：左＝A、右＝B，實心＝帶有</text>
 
   <rect class="bar somatic" x="41"  y="162" width="13" height="14" rx="2"/>
   <rect class="bar somatic" x="58"  y="162" width="13" height="14" rx="2"/>
@@ -729,11 +729,11 @@ S1 出現於 50% 的細胞、S2 出現於 30% 的細胞。
   <circle class="box plain" cx="100" cy="386" r="22"/>
   <text class="tick mid mono bold" x="100" y="391">00</text>
   <path class="conn somatic thick" d="M124,386 L216,386" marker-end="url(#arrow-sm)"/>
-  <text class="tick mid mono somatic" x="170" y="374">+S1</text>
+  <text class="tick mid mono somatic" x="170" y="374">+A</text>
   <circle class="box plain" cx="240" cy="386" r="22"/>
   <text class="tick mid mono bold" x="240" y="391">10</text>
   <path class="conn somatic thick" d="M264,386 L356,386" marker-end="url(#arrow-sm)"/>
-  <text class="tick mid mono somatic" x="310" y="374">+S2</text>
+  <text class="tick mid mono somatic" x="310" y="374">+B</text>
   <circle class="box plain" cx="380" cy="386" r="22"/>
   <text class="tick mid mono bold" x="380" y="391">11</text>
 
@@ -741,12 +741,12 @@ S1 出現於 50% 的細胞、S2 出現於 30% 的細胞。
   <text class="tick mid mono" x="240" y="457">01</text>
   <text class="tick zh" x="272" y="457">沒有任何細胞</text>
 
-  <text class="tick bold zh" x="40" y="496">線性：S2 只出現在已經有 S1 的細胞裡</text>
+  <text class="tick bold zh" x="40" y="496">線性：B 只出現在已經有 A 的細胞裡</text>
 
   <!-- ══════════ 右：組成乙 ══════════ -->
   <rect class="box plain" x="510" y="100" width="470" height="412" rx="8"/>
-  <text class="tick bold zh" x="530" y="126">組成 乙　S1 ＝ 0.50　S2 ＝ 0.30</text>
-  <text class="tick zh" x="530" y="148">10 個腫瘤細胞。小方塊：左＝S1、右＝S2，實心＝帶有</text>
+  <text class="tick bold zh" x="530" y="126">組成 乙　A ＝ 0.50　B ＝ 0.30</text>
+  <text class="tick zh" x="530" y="148">10 個腫瘤細胞。小方塊：左＝A、右＝B，實心＝帶有</text>
 
   <rect class="bar somatic" x="531" y="162" width="13" height="14" rx="2"/>
   <rect class="bar" x="548" y="162" width="13" height="14" rx="2"/>
@@ -798,9 +798,9 @@ S1 出現於 50% 的細胞、S2 出現於 30% 的細胞。
   <circle class="box plain" cx="590" cy="420" r="22"/>
   <text class="tick mid mono bold" x="590" y="425">00</text>
   <path class="conn somatic thick" d="M609,410 L708,392" marker-end="url(#arrow-sm)"/>
-  <text class="tick mid mono somatic" x="655" y="390">+S1</text>
+  <text class="tick mid mono somatic" x="655" y="390">+A</text>
   <path class="conn somatic thick" d="M609,430 L708,448" marker-end="url(#arrow-sm)"/>
-  <text class="tick mid mono somatic" x="655" y="466">+S2</text>
+  <text class="tick mid mono somatic" x="655" y="466">+B</text>
   <circle class="box plain" cx="730" cy="386" r="22"/>
   <text class="tick mid mono bold" x="730" y="391">10</text>
   <circle class="box plain" cx="730" cy="454" r="22"/>
@@ -809,23 +809,23 @@ S1 出現於 50% 的細胞、S2 出現於 30% 的細胞。
   <text class="tick mid mono" x="870" y="425">11</text>
   <text class="tick zh mid" x="870" y="386">沒有任何細胞</text>
 
-  <text class="tick bold zh" x="530" y="496">分支：有一群細胞只帶 S2，完全不帶 S1</text>
+  <text class="tick bold zh" x="530" y="496">分支：有一群細胞只帶 B，完全不帶 A</text>
 
   <line class="axis" x1="20" y1="520" x2="980" y2="520"/>
   <text class="anno zh bold" x="20" y="546">差別只有兩格：<tspan class="mono">01</tspan> 與 <tspan class="mono">11</tspan> 誰是空的 —— 而邊際頻率對這兩格完全沒有意見。</text>
   <text class="anno zh" x="20" y="574">兩邊都是「每個突變只發生一次」解釋得通的樹。若兩格都不是空的，就連這種樹都不存在了。</text>
 </svg><figcaption>兩種細胞組成，<b>上方兩個頻率刻意設為相同</b>（0.50 與 0.30），
 用以顯示僅憑此二數字無法區分兩者。
-<b>左</b>：帶有 S2 的 3 個細胞亦全部帶有 S1，故 S2 為 S1 的後代，樹為線性。
-<b>右</b>：無任何細胞同時帶有兩者，另有 3 個僅帶 S2，故 S2 須另行自起點衍生，樹為分支。
+<b>左</b>：帶有 B 的 3 個細胞亦全部帶有 A，故 B 為 A 的後代，樹為線性。
+<b>右</b>：無任何細胞同時帶有兩者，另有 3 個僅帶 B，故 B 須另行自起點衍生，樹為分支。
 下排為差異所在：<b>聯合計數表</b>，且兩者恰好互換 —— 左側 01 為空，右側 11 為空。
 此二格對應的邊際頻率完全相同。</figcaption></figure>
 
-<figure class="widget" data-widget="marginal-vs-joint" data-wid="sr1.mj"><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>滑桿僅改變一項：同時帶有 S1 與 S2 的細胞數。
+<figure class="widget" data-widget="marginal-vs-joint" data-wid="sr1.mj"><div class="widget__hd">互動練習</div><div class="widget__stage"></div><div class="widget__ctl"><button type="button" class="btn" data-act="check">檢查答案</button><button type="button" class="btn btn--ghost" data-act="reset">重設</button><output class="widget__msg" role="status" aria-live="polite"></output></div><figcaption>滑桿僅改變一項：同時帶有 A 與 B 的細胞數。
 上方兩個邊際頻率<b>始終不變</b>，下方的聯合計數表與右側的樹則隨之改變。
 將滑桿由 3 移至 0：兩端分別對應上圖的左與右，同一組邊際頻率相容於兩棵不同的樹。
 中間的 1 與 2 值得留意 —— 四種狀態皆出現時，<b>連「每個突變僅發生一次」的樹都不存在</b>，
-S2 必須發生兩次。真實資料中此情形通常表示某個 call 為假，或若干條 read 被指派至錯誤的 haplotype，
+B 必須發生兩次。真實資料中此情形通常表示某個 call 為假，或若干條 read 被指派至錯誤的 haplotype，
 而此點僅能由聯合觀測發現。
 切換至「僅有邊際頻率」，聯合計數表全部轉為問號，此即短讀路線的處境。</figcaption><noscript><p class="note">此互動需要 JavaScript。請改看上方的靜態圖說明相同概念。</p></noscript></figure>
 
@@ -1113,17 +1113,17 @@ methclone 要求單一條 read 跨越 <b>4 個相鄰的 CpG</b>（對應 <math><
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" class="dia-svg" role="img" aria-labelledby="sr1-longread-resolves__title" aria-describedby="sr1-longread-resolves__desc">
   <title id="sr1-longread-resolves__title">同樣的兩個 VAF，短讀留下兩棵樹，長讀只剩一棵</title>
   <desc id="sr1-longread-resolves__desc">左右兩半用的是同一顆腫瘤、同樣兩個 somatic 位點、同樣十條分子，
-        兩邊算出來的 VAF 也完全一樣：S1 是零點五零，S2 是零點三零。
+        兩邊算出來的 VAF 也完全一樣：A 是零點五零，B 是零點三零。
         差別只在讀長。
         左半是短讀：兩個位點相距三 kb，沒有任何一條 read 同時蓋得到，
         所以每條 read 只在一個位點上有值。能算出來的就只有那兩個 VAF。
-        這兩個數字同時相容於兩棵樹：一棵是 S2 長在 S1 的細胞裡，另一棵是兩者各自從起點長出來。
+        這兩個數字同時相容於兩棵樹：一棵是 B 長在 A 的細胞裡，另一棵是兩者各自從起點長出來。
         兩棵都通過檢查，所以分不出來。
         右半是長讀：一條分子就跨過兩個位點，所以每條 read 在兩個位點上都有值，
         可以直接數出組合。十條裡面，兩個位點都是參考型的有五條，
-        只帶 S1 的有兩條，兩個都帶的有三條，而只帶 S2 的一條也沒有。
-        只帶 S2 的分子不存在這件事，直接排除掉「兩者各自長出」那棵樹，
-        因為那棵樹必須要有只帶 S2 的細胞。於是只剩下一棵。
+        只帶 A 的有兩條，兩個都帶的有三條，而只帶 B 的一條也沒有。
+        只帶 B 的分子不存在這件事，直接排除掉「兩者各自長出」那棵樹，
+        因為那棵樹必須要有只帶 B 的細胞。於是只剩下一棵。
         最下方點出關鍵：多出來的不是精度，是一種新的觀測 ——
         邊際頻率不提供哪一格為空的資訊，而該空缺的一格正是決定樹形者。
         讀法是：兩邊的 VAF 刻意做成一模一樣，所以差別只可能來自組合。</desc>
@@ -1135,9 +1135,9 @@ methclone 要求單一條 read 跨越 <b>4 個相鄰的 CpG</b>（對應 <math><
   <rect class="box ghost bad" x="24" y="78" width="468" height="452" rx="8"/>
   <text class="lbl bold zh mid" x="258" y="110">短讀：一條只蓋得到一個位點</text>
 
-  <text class="tick mid" x="150" y="138">S1</text>
+  <text class="tick mid" x="150" y="138">A</text>
   <text class="tick zh mid" x="258" y="138">相距 3 kb</text>
-  <text class="tick mid" x="366" y="138">S2</text>
+  <text class="tick mid" x="366" y="138">B</text>
   <line class="axis" x1="60" y1="150" x2="456" y2="150"/>
   <line class="guide" x1="150" y1="144" x2="150" y2="156"/>
   <line class="guide" x1="366" y1="144" x2="366" y2="156"/>
@@ -1184,13 +1184,13 @@ methclone 要求單一條 read 跨越 <b>4 個相鄰的 CpG</b>（對應 <math><
   <circle class="mark somatic" cx="366" cy="268" r="4"/>
   <circle class="mark somatic" cx="366" cy="280" r="4"/>
 
-  <text class="anno mono mid" x="258" y="312">VAF(S1) = 5/10 = 0.50</text>
-  <text class="anno mono mid" x="258" y="334">VAF(S2) = 3/10 = 0.30</text>
+  <text class="anno mono mid" x="258" y="312">VAF(A) = 5/10 = 0.50</text>
+  <text class="anno mono mid" x="258" y="334">VAF(B) = 3/10 = 0.30</text>
   <text class="tick zh mid bad" x="258" y="360">能算的就只有這兩個數字 —— 組合看不到</text>
 
   <text class="tick zh mid" x="258" y="390">相容的樹</text>
 
-  <text class="tick zh mid" x="140" y="414">S2 長在 S1 裡</text>
+  <text class="tick zh mid" x="140" y="414">B 長在 A 裡</text>
   <circle class="mark ref" cx="140" cy="434" r="9"/>
   <line class="conn" x1="140" y1="443" x2="140" y2="459"/>
   <circle class="mark somatic" cx="140" cy="468" r="9"/>
@@ -1210,9 +1210,9 @@ methclone 要求單一條 read 跨越 <b>4 個相鄰的 CpG</b>（對應 <math><
   <rect class="box ghost ok" x="508" y="78" width="468" height="452" rx="8"/>
   <text class="lbl bold zh mid" x="742" y="110">長讀：一條跨過兩個位點</text>
 
-  <text class="tick mid" x="634" y="138">S1</text>
+  <text class="tick mid" x="634" y="138">A</text>
   <text class="tick zh mid" x="742" y="138">相距 3 kb</text>
-  <text class="tick mid" x="850" y="138">S2</text>
+  <text class="tick mid" x="850" y="138">B</text>
   <line class="axis" x1="544" y1="150" x2="940" y2="150"/>
   <line class="guide" x1="634" y1="144" x2="634" y2="156"/>
   <line class="guide" x1="850" y1="144" x2="850" y2="156"/>
@@ -1250,13 +1250,13 @@ methclone 要求單一條 read 跨越 <b>4 個相鄰的 CpG</b>（對應 <math><
   <circle class="mark somatic" cx="850" cy="268" r="4"/>
   <circle class="mark somatic" cx="850" cy="280" r="4"/>
 
-  <text class="anno mono mid" x="742" y="312">VAF(S1) = 5/10 = 0.50</text>
-  <text class="anno mono mid" x="742" y="334">VAF(S2) = 3/10 = 0.30</text>
-  <text class="tick zh mid ok" x="742" y="360">一模一樣，但還數得出組合：只帶 S2 的 0 條</text>
+  <text class="anno mono mid" x="742" y="312">VAF(A) = 5/10 = 0.50</text>
+  <text class="anno mono mid" x="742" y="334">VAF(B) = 3/10 = 0.30</text>
+  <text class="tick zh mid ok" x="742" y="360">一模一樣，但還數得出組合：只帶 B 的 0 條</text>
 
   <text class="tick zh mid" x="742" y="390">相容的樹</text>
 
-  <text class="tick zh mid" x="624" y="414">S2 長在 S1 裡</text>
+  <text class="tick zh mid" x="624" y="414">B 長在 A 裡</text>
   <circle class="mark ref" cx="624" cy="434" r="9"/>
   <line class="conn" x1="624" y1="443" x2="624" y2="459"/>
   <circle class="mark somatic" cx="624" cy="468" r="9"/>
@@ -1271,18 +1271,18 @@ methclone 要求單一條 read 跨越 <b>4 個相鄰的 CpG</b>（對應 <math><
   <circle class="mark somatic" cx="822" cy="470" r="9"/>
   <circle class="box ghost bad" cx="898" cy="470" r="9"/>
   <text class="lbl bold bad" x="924" y="474">✗</text>
-  <text class="tick zh mid bad" x="860" y="502">這棵樹需要「只帶 S2」的細胞</text>
+  <text class="tick zh mid bad" x="860" y="502">這棵樹需要「只帶 B」的細胞</text>
   <text class="tick zh mid bad" x="860" y="522">但一條分子也沒有</text>
 
   <!-- ══ 關鍵 ══ -->
   <rect class="box accent" x="24" y="548" width="952" height="60" rx="8"/>
   <text class="anno zh" x="48" y="576">長讀多給的不是精度，是<tspan class="bold">一種新的觀測</tspan>：哪一種組合是<tspan class="bold">空的</tspan>。</text>
   <text class="anno zh" x="48" y="600">邊際頻率不提供此資訊，而該空缺的一格正是決定樹形者。</text>
-</svg><figcaption>左右兩側的 VAF 刻意設為相同：S1＝0.50、S2＝0.30。
+</svg><figcaption>左右兩側的 VAF 刻意設為相同：A＝0.50、B＝0.30。
 左側兩個位點相距 3 kb，短讀無法跨越，故每條 read 僅在一個位點上有值 ——
 可計算者僅有該二數字，而該二數字同時相容於兩棵樹。
 右側單一條分子即跨越兩個位點，因而可計數組合：兩者皆帶有者 3 條，
-<b>僅帶 S2 者為零</b>。「兩者各自衍生」該棵樹需要存在僅帶 S2 的細胞，因而被排除，僅餘一棵。</figcaption></figure>
+<b>僅帶 B 者為零</b>。「兩者各自衍生」該棵樹需要存在僅帶 B 的細胞，因而被排除，僅餘一棵。</figcaption></figure>
 
 <p class="prose">此例的關鍵在於<b>被排除的那一格</b>。
 短讀一側並非量測較不準確 —— 其兩個 VAF 與長讀完全相同 ——
@@ -1291,7 +1291,7 @@ methclone 要求單一條 read 跨越 <b>4 個相鄰的 CpG</b>（對應 <math><
 
 <p class="prose">與前述區間的說法對照：邊際僅將「同時帶有兩者的比例」限定於 0 至 0.30 之間，
 兩端各對應一棵樹，中段無法收窄。此例中長讀將該比例直接計數為 <b>0.30</b>，
-恰為區間的上界，即「帶有 S2 的細胞全部亦帶有 S1」，區間收斂為一點，樹因而確定。</p>
+恰為區間的上界，即「帶有 B 的細胞全部亦帶有 A」，區間收斂為一點，樹因而確定。</p>
 
 <p class="prose">M9 已說明此觀測的形式：將每條 read 在 k 個 somatic 位點上的 R／A 記為 0／1 向量，
 即得一張狀態表；求步數最少且可達所有觀測狀態的樹，即為該連鎖視窗的候選演化次序。

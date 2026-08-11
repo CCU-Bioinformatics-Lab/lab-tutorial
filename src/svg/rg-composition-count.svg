@@ -56,7 +56,7 @@
   <text class="tick mono" x="614" y="154">(1 − ρ) · κ_N</text>
 
   <rect class="read hp1" x="560" y="180" width="40" height="12" rx="6"/>
-  <text class="anno zh" x="614" y="192">clone j　帶 S1，進 10</text>
+  <text class="anno zh" x="614" y="192">clone j　帶 A，進 10</text>
   <text class="tick mono" x="614" y="216">ρ · w_j · κ_j</text>
 
   <rect class="read hp2" x="560" y="242" width="40" height="12" rx="6"/>

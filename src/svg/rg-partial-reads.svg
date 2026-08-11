@@ -36,25 +36,25 @@
   <text class="lbl bold zh" x="20" y="312">把同一批 read 按位點對拆開</text>
 
   <rect class="box ok" x="24" y="330" width="300" height="120" rx="8"/>
-  <text class="anno bold mono mid" x="174" y="358">S1 × S3</text>
+  <text class="anno bold mono mid" x="174" y="358">A × C</text>
   <text class="lbl bold mono mid bad" x="174" y="392">n = 3</text>
   <text class="tick zh mid" x="174" y="418">三條都是參考型</text>
   <text class="tick zh mid bad" x="174" y="440">什麼也判不出來</text>
 
   <rect class="box ok" x="350" y="330" width="300" height="120" rx="8"/>
-  <text class="anno bold mono mid" x="500" y="358">S1 × S2</text>
+  <text class="anno bold mono mid" x="500" y="358">A × B</text>
   <text class="lbl bold mono mid" x="500" y="392">n = 17</text>
   <text class="tick mono mid" x="500" y="418">RA 12 · AR 5 · 沒有 AA</text>
   <text class="tick zh mid accent" x="500" y="440">判為分岔</text>
 
   <rect class="box ok" x="676" y="330" width="300" height="120" rx="8"/>
-  <text class="anno bold mono mid" x="826" y="358">S2 × S3</text>
+  <text class="anno bold mono mid" x="826" y="358">B × C</text>
   <text class="lbl bold mono mid" x="826" y="392">n = 20</text>
   <text class="tick mono mid" x="826" y="418">AA 6 · AR 9 · RR 5</text>
   <text class="tick zh mid ok" x="826" y="440">判為串接</text>
 
   <!-- 結論 -->
   <rect class="box bad" x="24" y="466" width="952" height="62" rx="8"/>
-  <text class="anno zh" x="48" y="494">這個連鎖區段的樹靠的是 <tspan class="bold">17 與 20</tspan>，不是 194。而 S1 × S3 那一對<tspan class="bold">沒有資料</tspan>，</text>
+  <text class="anno zh" x="48" y="494">這個連鎖區段的樹靠的是 <tspan class="bold">17 與 20</tspan>，不是 194。而 A × C 那一對<tspan class="bold">沒有資料</tspan>，</text>
   <text class="anno zh bad" x="48" y="520">卻一樣被演算法決定了關係 —— 「沒看到」被當成了「不存在」。</text>
 </svg>

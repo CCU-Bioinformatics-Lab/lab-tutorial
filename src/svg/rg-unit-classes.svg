@@ -1,85 +1,127 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
-  <title>一個 k＝2 連鎖區段的聯合計數表只會落入三類：串接、分岔、不相容</title>
-  <desc>三欄各是一個分析單位的聯合計數表，表格是二乘二，
-        行代表第一個位點是參考型或變異型，列代表第二個位點是參考型或變異型。
-        三欄的邊際計數刻意做成一樣，差別只在四個格子怎麼分配。
-        左欄是串接：只有全參考、只帶第一個、兩個都帶三種分子，
-        沒有任何分子只帶第二個，所以第二個變異一定發生在第一個變異的後代裡，樹是一條線。
-        中欄是分岔：只帶第二個那一格有分子，兩個都帶那一格是空的，
-        所以兩群細胞互不包含，樹分岔。
-        右欄是不相容：四個格子都有分子，這在每個變異只發生一次的假設下不可能，
-        代表某個變異判定是假的，或有 read 被分到錯的單倍型家族。
-        右欄因此不是生物學結果，而是品質指標，可以反過來估計分型錯誤率。
-        讀法是：三欄的邊際完全一樣，只有聯合計數分得出來。</desc>
+  <title>k＝2 的連鎖區段只會落入三類：串接、分岔、不相容</title>
+  <desc>一個只有兩個位點的連鎖區段，它的分子只可能有四種狀態：
+        兩個都不帶、只帶第一個、只帶第二個、兩個都帶。
+        三欄各是一種情形，每一欄把這四種狀態各自的分子數列出來。
+        三欄的邊際刻意做成完全相同：總數都是八十條，位點 A 的變異分子都是三十九條，
+        位點 B 的都是十七條 —— 這是整張圖的重點，因為它表示光看每個位點各自的頻率
+        分不出這三種情形，要看四種狀態怎麼分配。
+        左欄是串接：沒有任何分子只帶 B，所以帶 B 的分子全部也帶 A，
+        B 只可能長在 A 的後代裡。
+        中欄是分岔：沒有任何分子兩個都帶，所以 A 與 B 落在互不包含的兩支上。
+        右欄是不相容：四種狀態都有分子。在「每個變異只發生一次」的前提下這不可能，
+        所以它不是發現了一支新的 lineage，而是四配子檢定失敗 ——
+        代表這個連鎖區段的錯誤地板偏高或家族誤標偏多，是一個品質訊號。
+        讀法是：分類要用似然比檢定，不要對原始計數設門檻，
+        因為在偵測極限附近，兩種假設只差幾條分子。</desc>
 
-  <text class="ttl zh" x="20" y="36">同一組邊際，三種聯合計數表</text>
-  <text class="anno zh" x="20" y="66">三欄的邊際計數刻意相同 —— 重點正是「光看邊際分不出來」。</text>
+  <text class="ttl zh" x="20" y="36">同一組邊際，三種分子狀態分配</text>
+  <text class="anno zh" x="20" y="66">每一列是一種分子狀態：實心＝帶變異、空心＝參考型。<tspan class="bold">三欄的邊際完全相同</tspan>（見最下一列）。</text>
 
-  <!-- ── 左：串接 ─────────────────────────────────────────────── -->
-  <rect class="box ghost" x="24" y="84" width="296" height="330" rx="8"/>
-  <text class="lbl bold zh ok mid" x="172" y="114">串接 chain</text>
-  <text class="tick mid" x="136" y="150">S2 = R</text>
-  <text class="tick mid" x="212" y="150">S2 = A</text>
-  <text class="tick end" x="90" y="194">S1 = R</text>
-  <text class="tick end" x="90" y="246">S1 = A</text>
-  <rect class="box plain" x="100" y="166" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="176" y="166" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="100" y="218" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="176" y="218" width="72" height="44" rx="6"/>
-  <text class="lbl mono mid" x="136" y="196">41</text>
-  <text class="lbl mono mid ok" x="212" y="196">0</text>
-  <text class="lbl mono mid" x="136" y="248">22</text>
-  <text class="lbl mono mid" x="212" y="248">17</text>
-  <circle class="mark ref" cx="172" cy="292" r="8"/>
-  <line class="conn" x1="172" y1="300" x2="172" y2="326"/>
-  <circle class="mark somatic" cx="172" cy="334" r="8"/>
-  <line class="conn" x1="172" y1="342" x2="172" y2="368"/>
-  <circle class="mark somatic" cx="172" cy="376" r="8"/>
-  <text class="tick zh mid" x="172" y="402">S2 長在 S1 的後代裡</text>
+  <!-- ══════════ 左：串接 ══════════ -->
+  <rect class="box ghost" x="24" y="84" width="296" height="264" rx="8"/>
+  <text class="lbl bold zh ok mid" x="172" y="116">串接 chain</text>
+  <text class="tick mid" x="172" y="140">A → B</text>
 
-  <!-- ── 中：分岔 ─────────────────────────────────────────────── -->
-  <rect class="box ghost" x="352" y="84" width="296" height="330" rx="8"/>
-  <text class="lbl bold zh accent mid" x="500" y="114">分岔 fork</text>
-  <text class="tick mid" x="464" y="150">S2 = R</text>
-  <text class="tick mid" x="540" y="150">S2 = A</text>
-  <text class="tick end" x="418" y="194">S1 = R</text>
-  <text class="tick end" x="418" y="246">S1 = A</text>
-  <rect class="box plain" x="428" y="166" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="504" y="166" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="428" y="218" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="504" y="218" width="72" height="44" rx="6"/>
-  <text class="lbl mono mid" x="464" y="196">41</text>
-  <text class="lbl mono mid" x="540" y="196">17</text>
-  <text class="lbl mono mid" x="464" y="248">22</text>
-  <text class="lbl mono mid accent" x="540" y="248">0</text>
-  <circle class="mark ref" cx="500" cy="292" r="8"/>
-  <line class="conn" x1="500" y1="300" x2="452" y2="330"/>
-  <line class="conn" x1="500" y1="300" x2="548" y2="330"/>
-  <circle class="mark somatic" cx="448" cy="338" r="8"/>
-  <circle class="mark somatic" cx="552" cy="338" r="8"/>
-  <text class="tick zh mid" x="500" y="378">兩群細胞互不包含</text>
-  <text class="tick zh mid" x="500" y="402">S2 另外長出來</text>
+  <rect class="read hp1" x="44" y="163" width="140" height="14" rx="7"/>
+  <circle class="mark ref" cx="76" cy="170" r="6"/>
+  <circle class="mark ref" cx="152" cy="170" r="6"/>
+  <text class="tick mono" x="196" y="175">00</text>
+  <text class="tick mono end" x="300" y="175">41</text>
 
-  <!-- ── 右：不相容 ───────────────────────────────────────────── -->
-  <rect class="box ghost bad" x="680" y="84" width="296" height="330" rx="8"/>
-  <text class="lbl bold zh bad mid" x="828" y="114">不相容 incompatible</text>
-  <text class="tick mid" x="792" y="150">S2 = R</text>
-  <text class="tick mid" x="868" y="150">S2 = A</text>
-  <text class="tick end" x="746" y="194">S1 = R</text>
-  <text class="tick end" x="746" y="246">S1 = A</text>
-  <rect class="box plain" x="756" y="166" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="832" y="166" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="756" y="218" width="72" height="44" rx="6"/>
-  <rect class="box plain" x="832" y="218" width="72" height="44" rx="6"/>
-  <text class="lbl mono mid" x="792" y="196">38</text>
-  <text class="lbl mono mid bad" x="868" y="196">15</text>
-  <text class="lbl mono mid" x="792" y="248">20</text>
-  <text class="lbl mono mid bad" x="868" y="248">9</text>
-  <text class="ttl bad mid" x="828" y="316">✗</text>
-  <text class="tick zh mid bad" x="828" y="352">四格全滿 —— 在「每個變異</text>
-  <text class="tick zh mid bad" x="828" y="376">只發生一次」下不可能</text>
-  <text class="tick zh mid" x="828" y="402">這是品質指標，不是生物學</text>
+  <rect class="read hp1" x="44" y="201" width="140" height="14" rx="7"/>
+  <circle class="mark somatic" cx="76" cy="208" r="6"/>
+  <circle class="mark ref" cx="152" cy="208" r="6"/>
+  <text class="tick mono" x="196" y="213">10</text>
+  <text class="tick mono end" x="300" y="213">22</text>
 
-  <text class="anno zh" x="24" y="450">右欄的出現率可以反過來估計單倍型分型的錯誤率 —— 模型因此自帶一個校正用的觀測量。</text>
-  <text class="anno zh" x="24" y="482">分類要用似然比檢定，不是對原始計數設門檻：在偵測極限附近，兩種假設只差幾條 read。</text>
+  <rect class="read hp1 ghost" x="44" y="239" width="140" height="14" rx="7"/>
+  <circle class="mark ref" cx="76" cy="246" r="6"/>
+  <circle class="mark somatic" cx="152" cy="246" r="6"/>
+  <text class="tick mono ok" x="196" y="251">01</text>
+  <text class="tick mono end ok bold" x="300" y="251">0</text>
+
+  <rect class="read hp1" x="44" y="277" width="140" height="14" rx="7"/>
+  <circle class="mark somatic" cx="76" cy="284" r="6"/>
+  <circle class="mark somatic" cx="152" cy="284" r="6"/>
+  <text class="tick mono" x="196" y="289">11</text>
+  <text class="tick mono end" x="300" y="289">17</text>
+
+  <text class="tick zh ok mid" x="172" y="322">沒有分子「只帶 B」</text>
+  <text class="tick zh mid" x="172" y="342">→ B 長在 A 的後代裡</text>
+
+  <!-- ══════════ 中：分岔 ══════════ -->
+  <rect class="box ghost" x="352" y="84" width="296" height="264" rx="8"/>
+  <text class="lbl bold zh accent mid" x="500" y="116">分岔 fork</text>
+  <text class="tick mid" x="500" y="140">A ／ B</text>
+
+  <rect class="read hp1" x="372" y="163" width="140" height="14" rx="7"/>
+  <circle class="mark ref" cx="404" cy="170" r="6"/>
+  <circle class="mark ref" cx="480" cy="170" r="6"/>
+  <text class="tick mono" x="524" y="175">00</text>
+  <text class="tick mono end" x="628" y="175">24</text>
+
+  <rect class="read hp1" x="372" y="201" width="140" height="14" rx="7"/>
+  <circle class="mark somatic" cx="404" cy="208" r="6"/>
+  <circle class="mark ref" cx="480" cy="208" r="6"/>
+  <text class="tick mono" x="524" y="213">10</text>
+  <text class="tick mono end" x="628" y="213">39</text>
+
+  <rect class="read hp1" x="372" y="239" width="140" height="14" rx="7"/>
+  <circle class="mark ref" cx="404" cy="246" r="6"/>
+  <circle class="mark somatic" cx="480" cy="246" r="6"/>
+  <text class="tick mono" x="524" y="251">01</text>
+  <text class="tick mono end" x="628" y="251">17</text>
+
+  <rect class="read hp1 ghost" x="372" y="277" width="140" height="14" rx="7"/>
+  <circle class="mark somatic" cx="404" cy="284" r="6"/>
+  <circle class="mark somatic" cx="480" cy="284" r="6"/>
+  <text class="tick mono accent" x="524" y="289">11</text>
+  <text class="tick mono end accent bold" x="628" y="289">0</text>
+
+  <text class="tick zh accent mid" x="500" y="322">沒有分子「兩個都帶」</text>
+  <text class="tick zh mid" x="500" y="342">→ A、B 互不包含</text>
+
+  <!-- ══════════ 右：不相容 ══════════ -->
+  <rect class="box ghost bad" x="680" y="84" width="296" height="264" rx="8"/>
+  <text class="lbl bold zh bad mid" x="828" y="116">不相容 incompatible</text>
+  <text class="tick mid" x="828" y="140">四種都有</text>
+
+  <rect class="read hp1" x="700" y="163" width="140" height="14" rx="7"/>
+  <circle class="mark ref" cx="732" cy="170" r="6"/>
+  <circle class="mark ref" cx="808" cy="170" r="6"/>
+  <text class="tick mono" x="852" y="175">00</text>
+  <text class="tick mono end" x="956" y="175">33</text>
+
+  <rect class="read hp1" x="700" y="201" width="140" height="14" rx="7"/>
+  <circle class="mark somatic" cx="732" cy="208" r="6"/>
+  <circle class="mark ref" cx="808" cy="208" r="6"/>
+  <text class="tick mono" x="852" y="213">10</text>
+  <text class="tick mono end" x="956" y="213">30</text>
+
+  <rect class="read hp1" x="700" y="239" width="140" height="14" rx="7"/>
+  <circle class="mark ref" cx="732" cy="246" r="6"/>
+  <circle class="mark somatic" cx="808" cy="246" r="6"/>
+  <text class="tick mono bad" x="852" y="251">01</text>
+  <text class="tick mono end bad bold" x="956" y="251">8</text>
+
+  <rect class="read hp1" x="700" y="277" width="140" height="14" rx="7"/>
+  <circle class="mark somatic" cx="732" cy="284" r="6"/>
+  <circle class="mark somatic" cx="808" cy="284" r="6"/>
+  <text class="tick mono bad" x="852" y="289">11</text>
+  <text class="tick mono end bad bold" x="956" y="289">9</text>
+
+  <text class="ttl bad mid" x="828" y="326">✗</text>
+  <text class="tick zh mid bad" x="828" y="346">四配子檢定失敗，非新 lineage</text>
+
+  <!-- ══════════ 邊際：三欄真的一樣 ══════════ -->
+  <rect class="box sunken" x="24" y="364" width="296" height="42" rx="8"/>
+  <text class="tick zh mid" x="172" y="390">N 80 · A 的變異 39 · B 的 17</text>
+  <rect class="box sunken" x="352" y="364" width="296" height="42" rx="8"/>
+  <text class="tick zh mid" x="500" y="390">N 80 · A 的變異 39 · B 的 17</text>
+  <rect class="box sunken" x="680" y="364" width="296" height="42" rx="8"/>
+  <text class="tick zh mid" x="828" y="390">N 80 · A 的變異 39 · B 的 17</text>
+
+  <text class="anno zh" x="24" y="440">右欄的出現率可以反過來估計單倍型分型的錯誤率 —— 模型因此自帶一個校正用的觀測量。</text>
+  <text class="anno zh" x="24" y="472">分類要用似然比檢定，不是對原始計數設門檻：在偵測極限附近，兩種假設只差幾條分子。</text>
 </svg>

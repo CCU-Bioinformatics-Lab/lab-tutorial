@@ -44,8 +44,8 @@
 
   <circle class="mark somatic" cx="600" cy="146" r="6"/>
   <circle class="mark somatic" cx="800" cy="146" r="6"/>
-  <text class="tick mono mid" x="600" y="136">S1</text>
-  <text class="tick mono mid" x="800" y="136">S2</text>
+  <text class="tick mono mid" x="600" y="136">A</text>
+  <text class="tick mono mid" x="800" y="136">B</text>
   <rect class="read hp1" x="560" y="158" width="300" height="10" rx="5"/>
   <rect class="read hp1" x="560" y="174" width="300" height="10" rx="5"/>
   <rect class="read hp1" x="560" y="190" width="300" height="10" rx="5"/>
@@ -56,7 +56,7 @@
   <circle class="mark ref" cx="600" cy="195" r="4"/>
   <circle class="mark ref" cx="800" cy="195" r="4"/>
 
-  <text class="tick zh mid" x="742" y="222">沒有任何分子同時帶 S1 與 S2</text>
+  <text class="tick zh mid" x="742" y="222">沒有任何分子同時帶 A 與 B</text>
   <text class="anno bold zh ok mid" x="742" y="252">⇒ 兩者不可能同一群 ⇒ 峰必須拆開</text>
   <text class="tick zh mid" x="742" y="276">只要一個這樣的觀測就夠了</text>
 

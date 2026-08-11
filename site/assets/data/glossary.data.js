@@ -827,6 +827,7 @@ window.TW_GLOSSARY = {
    "m08",
    "m12",
    "sr1",
+   "sr2b",
    "sr3",
    "sr4"
   ]
@@ -869,6 +870,7 @@ window.TW_GLOSSARY = {
    "capstone",
    "m08",
    "sr1",
+   "sr2b",
    "sr2c",
    "sr3"
   ]
@@ -937,7 +939,8 @@ window.TW_GLOSSARY = {
   "slug": "mutation-multiplicity",
   "modules": [
    "m08",
-   "sr1"
+   "sr1",
+   "sr2b"
   ]
  },
  "LOH": {

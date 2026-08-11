@@ -20,7 +20,7 @@
   <!-- 左：同一批分子 -->
   <rect class="box warn" x="18" y="58" width="470" height="290" rx="8"/>
   <text class="lbl bold zh warn" x="34" y="88">同一個連鎖區段裡的兩個變異</text>
-  <text class="tick zh" x="34" y="112">S1 與 S2 讀的是同一池分子</text>
+  <text class="tick zh" x="34" y="112">A 與 B 讀的是同一池分子</text>
 
   <rect class="box sunken" x="34" y="126" width="438" height="72" rx="6"/>
   <text class="tick zh" x="48" y="150">這池分子的真實比例</text>
@@ -33,9 +33,9 @@
   <text class="tick mono mid" x="140" y="216">θ</text>
 
   <circle class="mark somatic" cx="250" cy="252" r="9"/>
-  <text class="tick mono" x="238" y="234">S1</text>
+  <text class="tick mono" x="238" y="234">A</text>
   <circle class="mark somatic" cx="262" cy="252" r="9"/>
-  <text class="tick mono" x="272" y="234">S2</text>
+  <text class="tick mono" x="272" y="234">B</text>
   <path class="conn bad" d="M150,296 L248,296" marker-end="url(#arrow-sm)"/>
   <text class="tick zh bad" x="262" y="300">兩個一起往同一邊移</text>
 
@@ -44,7 +44,7 @@
   <!-- 右：相距夠遠 -->
   <rect class="box ok" x="512" y="58" width="470" height="290" rx="8"/>
   <text class="lbl bold zh ok" x="528" y="88">相距夠遠的兩個變異</text>
-  <text class="tick zh" x="528" y="112">S1 與 S2 讀的是兩池獨立的分子</text>
+  <text class="tick zh" x="528" y="112">A 與 B 讀的是兩池獨立的分子</text>
 
   <rect class="box sunken" x="528" y="126" width="438" height="72" rx="6"/>
   <text class="tick zh" x="542" y="150">兩池各自偏離</text>
@@ -57,9 +57,9 @@
   <text class="tick mono mid" x="634" y="216">θ</text>
 
   <circle class="mark somatic" cx="720" cy="252" r="9"/>
-  <text class="tick mono" x="708" y="234">S1</text>
+  <text class="tick mono" x="708" y="234">A</text>
   <circle class="mark germline" cx="580" cy="252" r="9"/>
-  <text class="tick mono" x="568" y="234">S2</text>
+  <text class="tick mono" x="568" y="234">B</text>
   <path class="conn" d="M644,296 L718,296" marker-end="url(#arrow-sm)"/>
   <path class="conn" d="M624,296 L582,296" marker-end="url(#arrow-sm)"/>
   <text class="tick zh ok" x="736" y="300">各走各的</text>

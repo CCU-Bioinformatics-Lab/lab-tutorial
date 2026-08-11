@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
   <title>同樣的兩個 VAF，短讀留下兩棵樹，長讀只剩一棵</title>
   <desc>左右兩半用的是同一顆腫瘤、同樣兩個 somatic 位點、同樣十條分子，
-        兩邊算出來的 VAF 也完全一樣：S1 是零點五零，S2 是零點三零。
+        兩邊算出來的 VAF 也完全一樣：A 是零點五零，B 是零點三零。
         差別只在讀長。
         左半是短讀：兩個位點相距三 kb，沒有任何一條 read 同時蓋得到，
         所以每條 read 只在一個位點上有值。能算出來的就只有那兩個 VAF。
-        這兩個數字同時相容於兩棵樹：一棵是 S2 長在 S1 的細胞裡，另一棵是兩者各自從起點長出來。
+        這兩個數字同時相容於兩棵樹：一棵是 B 長在 A 的細胞裡，另一棵是兩者各自從起點長出來。
         兩棵都通過檢查，所以分不出來。
         右半是長讀：一條分子就跨過兩個位點，所以每條 read 在兩個位點上都有值，
         可以直接數出組合。十條裡面，兩個位點都是參考型的有五條，
-        只帶 S1 的有兩條，兩個都帶的有三條，而只帶 S2 的一條也沒有。
-        只帶 S2 的分子不存在這件事，直接排除掉「兩者各自長出」那棵樹，
-        因為那棵樹必須要有只帶 S2 的細胞。於是只剩下一棵。
+        只帶 A 的有兩條，兩個都帶的有三條，而只帶 B 的一條也沒有。
+        只帶 B 的分子不存在這件事，直接排除掉「兩者各自長出」那棵樹，
+        因為那棵樹必須要有只帶 B 的細胞。於是只剩下一棵。
         最下方點出關鍵：多出來的不是精度，是一種新的觀測 ——
         邊際頻率不提供哪一格為空的資訊，而該空缺的一格正是決定樹形者。
         讀法是：兩邊的 VAF 刻意做成一模一樣，所以差別只可能來自組合。</desc>
@@ -23,9 +23,9 @@
   <rect class="box ghost bad" x="24" y="78" width="468" height="452" rx="8"/>
   <text class="lbl bold zh mid" x="258" y="110">短讀：一條只蓋得到一個位點</text>
 
-  <text class="tick mid" x="150" y="138">S1</text>
+  <text class="tick mid" x="150" y="138">A</text>
   <text class="tick zh mid" x="258" y="138">相距 3 kb</text>
-  <text class="tick mid" x="366" y="138">S2</text>
+  <text class="tick mid" x="366" y="138">B</text>
   <line class="axis" x1="60" y1="150" x2="456" y2="150"/>
   <line class="guide" x1="150" y1="144" x2="150" y2="156"/>
   <line class="guide" x1="366" y1="144" x2="366" y2="156"/>
@@ -72,13 +72,13 @@
   <circle class="mark somatic" cx="366" cy="268" r="4"/>
   <circle class="mark somatic" cx="366" cy="280" r="4"/>
 
-  <text class="anno mono mid" x="258" y="312">VAF(S1) = 5/10 = 0.50</text>
-  <text class="anno mono mid" x="258" y="334">VAF(S2) = 3/10 = 0.30</text>
+  <text class="anno mono mid" x="258" y="312">VAF(A) = 5/10 = 0.50</text>
+  <text class="anno mono mid" x="258" y="334">VAF(B) = 3/10 = 0.30</text>
   <text class="tick zh mid bad" x="258" y="360">能算的就只有這兩個數字 —— 組合看不到</text>
 
   <text class="tick zh mid" x="258" y="390">相容的樹</text>
 
-  <text class="tick zh mid" x="140" y="414">S2 長在 S1 裡</text>
+  <text class="tick zh mid" x="140" y="414">B 長在 A 裡</text>
   <circle class="mark ref" cx="140" cy="434" r="9"/>
   <line class="conn" x1="140" y1="443" x2="140" y2="459"/>
   <circle class="mark somatic" cx="140" cy="468" r="9"/>
@@ -98,9 +98,9 @@
   <rect class="box ghost ok" x="508" y="78" width="468" height="452" rx="8"/>
   <text class="lbl bold zh mid" x="742" y="110">長讀：一條跨過兩個位點</text>
 
-  <text class="tick mid" x="634" y="138">S1</text>
+  <text class="tick mid" x="634" y="138">A</text>
   <text class="tick zh mid" x="742" y="138">相距 3 kb</text>
-  <text class="tick mid" x="850" y="138">S2</text>
+  <text class="tick mid" x="850" y="138">B</text>
   <line class="axis" x1="544" y1="150" x2="940" y2="150"/>
   <line class="guide" x1="634" y1="144" x2="634" y2="156"/>
   <line class="guide" x1="850" y1="144" x2="850" y2="156"/>
@@ -138,13 +138,13 @@
   <circle class="mark somatic" cx="850" cy="268" r="4"/>
   <circle class="mark somatic" cx="850" cy="280" r="4"/>
 
-  <text class="anno mono mid" x="742" y="312">VAF(S1) = 5/10 = 0.50</text>
-  <text class="anno mono mid" x="742" y="334">VAF(S2) = 3/10 = 0.30</text>
-  <text class="tick zh mid ok" x="742" y="360">一模一樣，但還數得出組合：只帶 S2 的 0 條</text>
+  <text class="anno mono mid" x="742" y="312">VAF(A) = 5/10 = 0.50</text>
+  <text class="anno mono mid" x="742" y="334">VAF(B) = 3/10 = 0.30</text>
+  <text class="tick zh mid ok" x="742" y="360">一模一樣，但還數得出組合：只帶 B 的 0 條</text>
 
   <text class="tick zh mid" x="742" y="390">相容的樹</text>
 
-  <text class="tick zh mid" x="624" y="414">S2 長在 S1 裡</text>
+  <text class="tick zh mid" x="624" y="414">B 長在 A 裡</text>
   <circle class="mark ref" cx="624" cy="434" r="9"/>
   <line class="conn" x1="624" y1="443" x2="624" y2="459"/>
   <circle class="mark somatic" cx="624" cy="468" r="9"/>
@@ -159,7 +159,7 @@
   <circle class="mark somatic" cx="822" cy="470" r="9"/>
   <circle class="box ghost bad" cx="898" cy="470" r="9"/>
   <text class="lbl bold bad" x="924" y="474">✗</text>
-  <text class="tick zh mid bad" x="860" y="502">這棵樹需要「只帶 S2」的細胞</text>
+  <text class="tick zh mid bad" x="860" y="502">這棵樹需要「只帶 B」的細胞</text>
   <text class="tick zh mid bad" x="860" y="522">但一條分子也沒有</text>
 
   <!-- ══ 關鍵 ══ -->
