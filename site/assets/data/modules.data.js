@@ -196,6 +196,16 @@ window.TW_MODULES = [
   "group": "研究指引"
  },
  {
+  "id": "sr2c",
+  "num": "補",
+  "title_zh": "補篇：把目標換成局部系譜，以及它能餵給 caller 什麼",
+  "title_en": "Supplement — a local estimand and features for somatic callers",
+  "short": "局部系譜與 caller 特徵",
+  "q": "如果全域那棵樹贏不了，換一個贏得了的目標算不算退讓？",
+  "sub": "不重建全域細胞層級的 clone tree，改為重建每個單位內部的分子系譜：先用證據預算說明局部結構為何走不進以邊際 VAF 為觀測的全域似然，再把前處理寫成契約（工具鏈門檻、HP3、視窗為讀序連鎖的傳遞閉包、逐樣本連鎖率），然後是局部生成模型、全域頻率譜如何以單向先驗進入而不重複計數、可計數的輸出旗標與其虛無分布，最後是給 ClairS／DeepSomatic 的三層特徵、留一法與分層驗收。",
+  "group": "研究指引"
+ },
+ {
   "id": "sr3",
   "num": "上",
   "title_zh": "上篇：純度、倍體與拷貝數為何只能一起估計",

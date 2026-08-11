@@ -583,6 +583,7 @@ window.TW_GLOSSARY = {
    "m11",
    "sr1",
    "sr2b",
+   "sr2c",
    "sr5"
   ]
  },
@@ -610,7 +611,8 @@ window.TW_GLOSSARY = {
   "slug": "haplotagging",
   "modules": [
    "m06",
-   "sr2b"
+   "sr2b",
+   "sr2c"
   ]
  },
  "somatic haplotype": {
@@ -626,7 +628,8 @@ window.TW_GLOSSARY = {
    "m04",
    "sr1",
    "sr2",
-   "sr2b"
+   "sr2b",
+   "sr2c"
   ]
  },
  "somatic haplotagging": {
@@ -690,7 +693,8 @@ window.TW_GLOSSARY = {
   "slug": "clair3",
   "modules": [
    "m05",
-   "m12"
+   "m12",
+   "sr2c"
   ]
  },
  "DeepVariant": {
@@ -702,7 +706,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "deepvariant",
   "modules": [
-   "m05"
+   "m05",
+   "sr2c"
   ]
  },
  "ClairS": {
@@ -717,7 +722,8 @@ window.TW_GLOSSARY = {
   "modules": [
    "m07",
    "m12",
-   "m13"
+   "m13",
+   "sr2c"
   ]
  },
  "DeepSomatic": {
@@ -729,7 +735,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "deepsomatic",
   "modules": [
-   "m07"
+   "m07",
+   "sr2c"
   ]
  },
  "tumour-normal": {
@@ -862,6 +869,7 @@ window.TW_GLOSSARY = {
    "capstone",
    "m08",
    "sr1",
+   "sr2c",
    "sr3"
   ]
  },
@@ -914,7 +922,8 @@ window.TW_GLOSSARY = {
    "m07",
    "m08",
    "m12",
-   "sr1"
+   "sr1",
+   "sr2c"
   ]
  },
  "mutation multiplicity": {
@@ -952,6 +961,7 @@ window.TW_GLOSSARY = {
    "m12",
    "m13",
    "sr1",
+   "sr2c",
    "sr3"
   ]
  },
@@ -1039,7 +1049,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "high-confidence-region",
   "modules": [
-   "m10"
+   "m10",
+   "sr2c"
   ]
  },
  "label noise": {
@@ -1065,7 +1076,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "data-leakage",
   "modules": [
-   "m10"
+   "m10",
+   "sr2c"
   ]
  },
  "distribution shift": {
@@ -1078,7 +1090,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "distribution-shift",
   "modules": [
-   "m10"
+   "m10",
+   "sr2c"
   ]
  },
  "cross-validation": {
@@ -1103,7 +1116,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "longphase",
   "modules": [
-   "m11"
+   "m11",
+   "sr2c"
   ]
  },
  "LongPhase-S": {
@@ -1117,7 +1131,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "longphase-s",
   "modules": [
-   "m12"
+   "m12",
+   "sr2c"
   ]
  },
  "LongPhase-TO": {
@@ -1191,7 +1206,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "mutation-frequency-spectrum",
   "modules": [
-   "sr1"
+   "sr1",
+   "sr2c"
   ]
  },
  "marginal distribution": {
@@ -1236,7 +1252,8 @@ window.TW_GLOSSARY = {
   "modules": [
    "sr1",
    "sr2",
-   "sr2b"
+   "sr2b",
+   "sr2c"
   ]
  },
  "parsimony": {
@@ -1266,7 +1283,8 @@ window.TW_GLOSSARY = {
   "slug": "latent-node",
   "modules": [
    "sr1",
-   "sr2b"
+   "sr2b",
+   "sr2c"
   ]
  },
  "epiallele": {
@@ -1325,7 +1343,8 @@ window.TW_GLOSSARY = {
   "slug": "pigeonhole",
   "modules": [
    "sr2",
-   "sr2b"
+   "sr2b",
+   "sr2c"
   ]
  },
  "B-allele frequency": {
@@ -1376,6 +1395,7 @@ window.TW_GLOSSARY = {
   ],
   "slug": "allele-specific-copy-number",
   "modules": [
+   "sr2c",
    "sr3"
   ]
  },
