@@ -1,27 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 660">
-  <title>給 somatic caller 的三層特徵，以及各層的覆蓋率與要打敗的基準</title>
-  <desc>三條橫向的帶狀區塊，由上而下是第 0 層、第 1 層與第 2 層特徵。
-        每一層左邊寫覆蓋率並畫成長條，中間寫這一層提供什麼，右邊寫它要打敗的基準。
-        第 0 層所有候選都有：把樣本層的 CCF 原子換算成這個位點的期望 VAF 格點，
+  <title>給 somatic caller 的三組特徵，以及各組的覆蓋率與比較基準</title>
+  <desc>三條橫向的帶狀區塊，由上而下是基礎特徵群、單倍型特徵群與局部系譜特徵群。
+        每一組左邊寫覆蓋率並畫成長條，中間寫它提供什麼，右邊寫它要打敗的基準。
+        基礎特徵群所有候選都有：把樣本層的 CCF 原子換算成這個位點的期望 VAF 格點，
         再加上就地估到的錯誤地板；要打敗的基準是 caller 自己從訓練資料學到的 VAF 分布。
-        第 1 層是有 germline 錨點的候選，佔多數：ALT 分子集中在哪一條 germline haplotype 上，
+        單倍型特徵群是有 germline 錨點的候選，佔多數：ALT 分子集中在哪一條 germline haplotype 上，
         以及該單倍型的深度脈絡；要打敗的基準是 ClairS 已經有的相位通道。
-        第 2 層只有連鎖進某個連鎖視窗的候選才有，這個比例逐樣本由四成到九成八：
+        局部系譜特徵群只有連鎖進某個連鎖視窗的候選才有，這個比例逐樣本由四成到九成八：
         ALT 分子與既有 somatic lineage 的一致性、巢狀似然比與四配子相容性；
-        這一層沒有現成基準，是本規格新增的。
+        這一組沒有現成基準，是本規格新增的。
         最下方兩個方塊是兩條必須寫進實作的規則。
         左邊是留一法：局部系譜只由錨點建成，被評分的候選本身不得列入錨點，
         否則特徵會直接把「這個候選有 ALT read」抄一遍。
-        右邊是缺席不是零：沒有連鎖進連鎖視窗的候選就沒有第 2 層，每一層都要有「這一層不可用」的指示通道，
-        而且必須證明在不可用的子集上沒有變差；驗收時三層各報一次 PR，不可只報總體。
-        第 2 層那條長條畫成一個範圍，淺色是上界九成八，深色是下界四成，
+        右邊是缺席不是零：沒有連鎖進連鎖視窗的候選就沒有局部系譜特徵，每一組都要有「這一組不可用」的指示通道，
+        而且必須證明在不可用的子集上沒有變差；驗收時三組各報一次 PR，不可只報總體。
+        局部系譜特徵群那條長條畫成一個範圍，淺色是上界九成八，深色是下界四成，
         因為這個覆蓋率逐樣本差超過兩倍，不是一個固定值。</desc>
 
-  <text class="ttl zh" x="20" y="36">三層特徵：覆蓋率不同，要打敗的基準也不同</text>
+  <text class="ttl zh" x="20" y="36">三組特徵：覆蓋率不同，要打敗的基準也不同</text>
 
-  <!-- 第 0 層 -->
+  <!-- 基礎特徵群 -->
   <rect class="box" x="18" y="58" width="964" height="120" rx="8"/>
-  <text class="lbl bold zh" x="34" y="96">第 0 層</text>
+  <text class="lbl bold zh" x="34" y="96">基礎特徵群</text>
   <text class="tick zh" x="34" y="124">所有候選都有</text>
   <rect class="bar ok" x="34" y="138" width="200" height="16" rx="4"/>
   <text class="tick zh" x="270" y="96">樣本層的 CCF 原子換算成</text>
@@ -30,9 +30,9 @@
   <text class="tick bold zh" x="660" y="96">要打敗的基準</text>
   <text class="tick zh" x="660" y="122">caller 自己學到的 VAF 分布</text>
 
-  <!-- 第 1 層 -->
+  <!-- 單倍型特徵群 -->
   <rect class="box" x="18" y="190" width="964" height="120" rx="8"/>
-  <text class="lbl bold zh" x="34" y="228">第 1 層</text>
+  <text class="lbl bold zh" x="34" y="228">單倍型特徵群</text>
   <text class="tick zh" x="34" y="256">有 germline 錨點的候選</text>
   <rect class="bar germline" x="34" y="270" width="170" height="16" rx="4"/>
   <text class="tick zh" x="270" y="228">ALT 分子集中在哪一條</text>
@@ -41,9 +41,9 @@
   <text class="tick bold zh" x="660" y="228">要打敗的基準</text>
   <text class="tick zh" x="660" y="254">ClairS 已經有的相位通道</text>
 
-  <!-- 第 2 層 -->
+  <!-- 局部系譜特徵群 -->
   <rect class="box accent" x="18" y="322" width="964" height="120" rx="8"/>
-  <text class="lbl bold zh" x="34" y="360">第 2 層</text>
+  <text class="lbl bold zh" x="34" y="360">局部系譜特徵群</text>
   <text class="tick zh" x="34" y="388">連鎖進連鎖視窗的候選</text>
   <rect class="bar" x="34" y="402" width="196" height="16" rx="4"/>
   <rect class="bar somatic" x="34" y="402" width="81" height="16" rx="4"/>
@@ -52,7 +52,7 @@
   <text class="tick zh" x="270" y="386">lineage 的一致性、巢狀似然比</text>
   <text class="tick zh" x="270" y="412">與四配子相容性</text>
   <text class="tick bold zh accent" x="660" y="360">沒有現成基準</text>
-  <text class="tick zh" x="660" y="386">這一層是本規格新增的</text>
+  <text class="tick zh" x="660" y="386">這一組是本規格新增的</text>
 
   <!-- 兩條規則 -->
   <rect class="box bad" x="18" y="466" width="470" height="170" rx="8"/>
@@ -64,8 +64,8 @@
 
   <rect class="box warn" x="512" y="466" width="470" height="170" rx="8"/>
   <text class="lbl bold zh warn" x="528" y="500">缺席不是零</text>
-  <text class="anno zh" x="528" y="532">沒連鎖進連鎖視窗就沒有第 2 層。每一層</text>
+  <text class="anno zh" x="528" y="532">沒連鎖進連鎖視窗就沒有局部系譜特徵。每一組</text>
   <text class="anno zh" x="528" y="560">都要有「不可用」的指示通道，而且</text>
   <text class="anno zh" x="528" y="588">必須證明在不可用的子集上沒有變差。</text>
-  <text class="tick zh" x="528" y="618">驗收時三層各報一次 PR，不可只報總體。</text>
+  <text class="tick zh" x="528" y="618">驗收時三組各報一次 PR，不可只報總體。</text>
 </svg>

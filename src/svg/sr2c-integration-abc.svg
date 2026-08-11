@@ -5,11 +5,11 @@
         方式 A 接在模型給分之後，只重新排序，所以不必重訓 caller，成本最低，
         但它只碰得到 caller 已經留下來的候選，被前面丟掉的救不回來。
         方式 B 把特徵接進張量之後重訓，位置最靠前，上限最高，
-        代價是需要完整訓練資料與算力，而且很難歸因是哪一層特徵有用。
+        代價是需要完整訓練資料與算力，而且很難歸因是哪一組特徵有用。
         方式 C 接在產生候選之前，直接用特徵先砍候選。
         它便宜，但它是不可逆的：被砍掉的候選不會出現在任何後續指標裡，
         所以它會安靜地傷害 recall，圖上因此標為不建議。
-        讀法是：建議順序是 A 先做，因為 A 可歸因、每一層可以單獨加減；
+        讀法是：建議順序是 A 先做，因為 A 可歸因、每一組特徵可以單獨加減；
         而如果 A 沒有效果，B 幾乎不可能有 —— A 的失敗代表這些特徵
         在 caller 已有的資訊之外沒有增量。</desc>
 
@@ -43,7 +43,7 @@
   <text class="tick zh" x="40" y="264"><tspan class="bold ok">A · 事後重新評分</tspan> —— 接在給分之後，只改排序。成本低、不必重訓；但只碰得到 caller 已留下的候選。</text>
 
   <rect class="box warn" x="20" y="290" width="960" height="42" rx="8"/>
-  <text class="tick zh" x="40" y="316"><tspan class="bold warn">B · 加成輸入通道</tspan> —— 特徵接進張量後重訓。上限最高；需要完整訓練資料與算力，且難以歸因哪一層有用。</text>
+  <text class="tick zh" x="40" y="316"><tspan class="bold warn">B · 加成輸入通道</tspan> —— 特徵接進張量後重訓。上限最高；需要完整訓練資料與算力，且難以歸因哪一組特徵有用。</text>
 
   <rect class="box bad" x="20" y="342" width="960" height="42" rx="8"/>
   <text class="tick zh" x="40" y="368"><tspan class="bold bad">C · 前置過濾（不建議）</tspan> —— 先砍候選。便宜，但<tspan class="bold">不可逆</tspan>：被砍掉的不出現在任何後續指標裡，會安靜地傷害 recall。</text>

@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640">
-  <title>階段 L 的七步推論流程、兩個上限與實測成本</title>
-  <desc>左側是階段 L 的七個步驟，由上而下：輸出稀疏狀態表、就地校準兩個錯誤率、
-        跑階段 G、列舉候選狀態集合、算邊際似然、把階段 G 的不確定度傳下來、輸出。
+  <title>局部推論的七步推論流程、兩個上限與實測成本</title>
+  <desc>左側是局部推論的七個步驟，由上而下：輸出稀疏狀態表、就地校準兩個錯誤率、
+        跑全域基準、列舉候選狀態集合、算邊際似然、把全域基準的不確定度傳下來、輸出。
         其中第四步與第五步用深色標出，因為只有這兩步與既有實作不同；
         第三步是沿用，不是本規格的貢獻。
         右側三張卡分別說明三件會影響實作的事。
@@ -16,12 +16,12 @@
         讀法是：這條流程沒有全域取樣包在外層，所以它是尷尬平行的，
         成本隨連鎖區段數線性成長。</desc>
 
-  <text class="ttl zh" x="20" y="36">階段 L 的七步，以及成本落在哪裡</text>
+  <text class="ttl zh" x="20" y="36">局部推論的七步，以及成本落在哪裡</text>
   <text class="anno zh" x="20" y="66">深色的兩步才是與既有實作的差異；<tspan class="bold">③ 是沿用，不是貢獻</tspan>。</text>
 
   <!-- ══ 左：七步 ══ -->
   <rect class="box ghost" x="20" y="88" width="540" height="470" rx="8"/>
-  <text class="lbl bold zh accent" x="44" y="122">階段 L 的七步</text>
+  <text class="lbl bold zh accent" x="44" y="122">局部推論的七步</text>
 
   <line class="guide" x1="32" y1="140" x2="32" y2="480"/>
 
@@ -32,7 +32,7 @@
   <text class="tick zh" x="60" y="210">② 就地校準：逐位點錯誤率與家族誤標率，成對估</text>
 
   <rect class="box sunken" x="44" y="238" width="488" height="34" rx="6"/>
-  <text class="tick zh" x="60" y="262">③ 階段 G：只用 S₁，斷言與 S₂ 的位點交集為空</text>
+  <text class="tick zh" x="60" y="262">③ 全域基準：只用 S₁，斷言與 S₂ 的位點交集為空</text>
 
   <rect class="box accent" x="44" y="290" width="488" height="34" rx="6"/>
   <text class="tick zh bold" x="60" y="314">④ 候選列舉：狀態空間 2^q，q=12 時 4,096 格</text>
@@ -41,12 +41,12 @@
   <text class="tick zh bold" x="60" y="366">⑤ 邊際似然：ν 依先驗積掉，候選整組留著不先砍</text>
 
   <rect class="box plain"  x="44" y="394" width="488" height="34" rx="6"/>
-  <text class="tick zh" x="60" y="418">⑥ 傳遞階段 G 的不確定度：抽 S ≈ 50 組逐組重算</text>
+  <text class="tick zh" x="60" y="418">⑥ 傳遞全域基準的不確定度：抽 S ≈ 50 組逐組重算</text>
 
   <rect class="box plain"  x="44" y="446" width="488" height="34" rx="6"/>
   <text class="tick zh" x="60" y="470">⑦ 輸出：候選與質量、節點比例區間、旗標、分子數</text>
 
-  <text class="tick zh accent" x="44" y="516">④⑤ 是本規格自己的部分，其餘六步既有實作都已具備。</text>
+  <text class="tick zh accent" x="44" y="516">④⑤ 是方法核心；其餘五步既有實作都已具備。</text>
   <text class="tick zh" x="44" y="542">沒有任何一步把全域取樣包在外層。</text>
 
   <!-- ══ 右上：上限與棄權 ══ -->

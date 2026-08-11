@@ -1,18 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640">
-  <title>兩階段：全域頻率譜只用單變異連鎖視窗擬合，再當作局部推論的先驗</title>
+  <title>單向先驗：全域頻率譜只用單變異連鎖視窗擬合</title>
   <desc>最上方是一條全基因體的長條，上面散布著幾個較深的色塊。
         長條的大部分是只含一個變異的連鎖視窗，稱為 S1，佔全部變異的九成；
         深色塊是含兩個以上變異的連鎖區段，稱為 S2，佔約一成。
         兩堆的 read 沒有交集，這正是前一篇用來把似然寫成兩個因子相乘的同一個性質。
-        中間是兩個方塊。左邊是階段 G：只用 S1 擬合全域頻率譜，
+        中間是兩個方塊。左邊是全域基準：只用 S1 擬合全域頻率譜，
         輸入是 S1 的 alt 計數、深度與拷貝數，輸出是純度、CCF 原子與權重、以及 overdispersion。
-        這一階段用哪一個既有實作都可以，不是本規格的貢獻，
+        全域基準可沿用任一既有實作，不是本規格的貢獻，
         唯一的硬性要求是 S2 的位點必須整批排除。
-        右邊是階段 L：每個 S2 連鎖區段各推論一次局部系譜，
-        輸入是該連鎖區段的稀疏狀態表，先驗來自階段 G，
+        右邊是局部推論：每個 S2 連鎖區段各推論一次局部系譜，
+        輸入是該連鎖區段的稀疏狀態表，先驗來自全域基準，
         輸出是局部狀態集合、比例、先後關係與旗標，連鎖區段之間彼此獨立、可以完全平行。
         兩個方塊之間只有一個單向箭頭：局部不回饋全域，這是刻意切斷的回饋。
-        最下方是警告：如果階段 G 用到了 S2 的 read，同一批 read 會先算進頻率項再算進局部項，
+        最下方是警告：如果全域基準用到了 S2 的 read，同一批 read 會先算進頻率項再算進局部項，
         那正是前一篇用兩個因子相乘避免掉的重複計數。
         另外拷貝數與純度用的是全基因體深度，其中含 S2 的 read，
         這個界線有限但必須量出來並報告。</desc>
@@ -32,13 +32,13 @@
   <text class="tick zh accent" x="560" y="130">S₂：兩個以上變異的連鎖區段（深色塊）</text>
   <text class="tick zh" x="34" y="158">兩堆的 read 沒有交集 —— 這正是前一篇用來把似然寫成兩個因子相乘的同一個性質。</text>
 
-  <!-- 階段 G -->
+  <!-- 全域基準-->
   <rect class="box" x="18" y="180" width="418" height="250" rx="8"/>
-  <text class="lbl bold zh" x="34" y="214">階段 G · 只用 S₁</text>
+  <text class="lbl bold zh" x="34" y="214">全域基準 · 只用 S₁</text>
   <text class="tick zh" x="34" y="248">輸入：S₁ 的 alt／depth／CN</text>
   <text class="tick zh" x="34" y="276">輸出：純度、CCF 原子與權重</text>
   <text class="tick zh" x="34" y="304">用哪一個既有實作都可以</text>
-  <text class="tick zh" x="34" y="332">這一階段不是本規格的貢獻</text>
+  <text class="tick zh" x="34" y="332">沿用既有方法，不是本規格的貢獻</text>
   <text class="tick bold zh bad" x="34" y="370">唯一的硬性要求</text>
   <text class="tick zh" x="34" y="398">S₂ 的位點必須整批排除</text>
 
@@ -48,11 +48,11 @@
   <text class="tick zh mid" x="500" y="330">局部不回饋全域</text>
   <text class="tick zh mid" x="500" y="354">（cut posterior）</text>
 
-  <!-- 階段 L -->
+  <!-- 局部推論-->
   <rect class="box accent" x="564" y="180" width="418" height="250" rx="8"/>
-  <text class="lbl bold zh" x="580" y="214">階段 L · 每個連鎖區段一次</text>
+  <text class="lbl bold zh" x="580" y="214">局部推論 · 每個連鎖區段一次</text>
   <text class="tick zh" x="580" y="248">輸入：該連鎖區段的稀疏狀態表</text>
-  <text class="tick zh" x="580" y="276">先驗：階段 G 的輸出</text>
+  <text class="tick zh" x="580" y="276">先驗：全域基準的輸出</text>
   <text class="tick zh" x="580" y="304">輸出：局部狀態集合與比例</text>
   <text class="tick zh" x="580" y="332">　　　先後關係與旗標</text>
   <text class="tick bold zh ok" x="580" y="370">連鎖區段之間彼此獨立</text>
@@ -60,7 +60,7 @@
 
   <!-- 警告 -->
   <rect class="box bad" x="18" y="452" width="964" height="170" rx="8"/>
-  <text class="lbl bold zh bad" x="34" y="486">如果階段 G 用到了 S₂ 的 read，這條路就白做了</text>
+  <text class="lbl bold zh bad" x="34" y="486">如果全域基準用到了 S₂ 的 read，這條路就白做了</text>
   <text class="anno zh" x="34" y="518">那等於把同一批 read 先算進頻率項，再算進局部項 —— 這正是前一篇指出、</text>
   <text class="anno zh" x="34" y="546">並且用「兩個因子相乘」避免掉的重複計數。</text>
   <text class="tick zh" x="34" y="578">另一個必須量出來的邊界：CN 與純度的估計用的是全基因體深度，其中含 S₂ 的 read。</text>
