@@ -125,9 +125,14 @@ clonality 與 depth（完整關係式見 M8）。因此不能只用「有沒有�
 
 {{svg:m07-read-level-evidence | [wide] 兩欄的支持 read <b>總數刻意設成一樣</b>（12 條裡 4 條，VAF 都是 0.33），因為重點正是「光看數量分不出來」。左欄 4 條全在 HP1；右欄 2 條在 HP1、2 條在 HP2。這個判準不需要配對正常樣本，只需要 read 夠長到同時蓋住 germline 錨點與候選位置 —— 所以它是 long read 才拿得到的證據。}}
 
+<details class="reveal reveal--aside">
+<summary>實作對照：LongPhase-S 與 LongPhase-TO</summary>
+<div class="reveal__a">
 <p class="prose">這個想法在兩個工具裡有不同的實作：LongPhase-S 做成 read-level 與 haplotype origin
 兩個過濾器（四個過濾器與各自的門檻見 M12）；LongPhase-TO 把它擴展成三個位點的
 [[triplet graph]]，用路徑結構判斷（見 M13）。</p>
+</div>
+</details>
 
 <h3>一句話總結</h3>
 

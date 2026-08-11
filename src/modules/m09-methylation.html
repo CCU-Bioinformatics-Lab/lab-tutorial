@@ -97,8 +97,14 @@ germline 的兩側都是混合；定序錯誤的 ALT 側只是 REF 的隨機子�
 它們的 allele 與 haplotype 相同，僅依序列無法區分，但甲基化模式可能不同。</p>
 
 <p class="prose">這個現象稱為 <b>within-ALT residual structure</b>；研究依其統計定義，在七個資料集中將其量化為主要殘餘變異來源（51.2%–80.4%）。
-（<b>資料集不等於細胞株</b>：同一個細胞株可能有多份不同 basecaller／流程的資料，例如 HCC1395 就有 HKU 與 NYGC 兩份，所以資料集數會多於細胞株數。）
 換句話說：<b>固定 haplotype 與 allele 後，仍可觀察到額外的 read-level 甲基化分群。</b></p>
+
+<details class="reveal reveal--aside">
+<summary>資料說明：資料集數為何多於細胞株數</summary>
+<div class="reveal__a">
+<p class="prose">資料集不等於細胞株。同一個細胞株可能有多份不同 basecaller／流程的資料；例如 HCC1395 有 HKU 與 NYGC 兩份。</p>
+</div>
+</details>
 
 <p class="prose">它的意義是：上一節那棵樹的<b>一個節點裡，可能還藏著更細的分群</b> ——
 序列證據已經用完了，但資料還沒說完。這正是甲基化在第二個題目裡的位置：
@@ -197,8 +203,13 @@ COLO829 為 9.5%、H2009 為 35.4%，資料集間差異明顯。不可評估的�
 </table>
 </div>
 
-<p class="prose">注意 <code>ML</code> 是<b>機率</b>而不是 0／1：要得到前面那張表，還需要一個門檻把機率二值化，
+<details class="reveal reveal--aside">
+<summary>資料格式：ML 是機率，不是二元標籤</summary>
+<div class="reveal__a">
+<p class="prose"><code>ML</code> 是<b>機率</b>而不是 0／1：要得到前面那張表，還需要一個門檻把機率二值化，
 或直接保留機率值。門檻怎麼定會影響分群結果，屬於分析選擇而非資料本身。</p>
+</div>
+</details>
 
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">重新比對可能遺失 MM/ML 標籤</p>

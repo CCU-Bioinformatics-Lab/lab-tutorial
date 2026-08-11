@@ -1923,9 +1923,14 @@ bcftools view -g het sample.vcf | grep -vc '^#'</code></pre>
 <p class="prose">在此示例中，indel F1 低於 SNV F1，表示 somatic-indel 的整體偵測效能仍有改善空間；
 後續方法會利用更多 read-level 特徵處理此問題。</p>
 
-<p class="prose">除了 homopolymer，還有一個原因是 <b>alignment 位置的模糊性</b>：
+<details class="reveal reveal--aside">
+<summary>補充：重複序列中的等價比對位置</summary>
+<div class="reveal__a">
+<p class="prose">除了 homopolymer，另一個原因是 <b>alignment 位置的模糊性</b>：
 同一個 deletion 在重複序列中可有多種等價表示位置，使不同 reads 的訊號分散。
 這些差異會反映在 <span class="term" data-term="CIGAR" tabindex="0" role="button" aria-expanded="false" aria-describedby="m03__gd-cigar-4">CIGAR<span class="term__pop" id="m03__gd-cigar-4" role="tooltip"><b class="term__hd">CIGAR</b><span class="term__def" data-lang="zh">描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。</span><span class="term__def" data-lang="en" lang="en">A compact string describing how read bases and reference positions are consumed by an alignment. For example, 5M1I5M has five alignment columns, one insertion, then five alignment columns; M may contain matches or mismatches.</span><a class="term__more" href="glossary.html#cigar">完整條目 →</a></span></span>；CIGAR 是描述 read 與參考序列對齊操作的字串。</p>
+</div>
+</details>
 
 <h3 id="m03__三項核心數值">三項核心數值</h3>
 
@@ -3688,8 +3693,13 @@ PEPPER-Margin-DeepVariant 都採用這個順序。</p>
   <text class="anno zh" x="20" y="542">需先建立 HP1／HP2 分群，再結合品質、比對與其他證據判讀。</text>
 </svg><figcaption>兩邊示意同一種畫面：中間是待判斷的候選位置，左右各有一個已知參考位點，將 read 分成兩個 haplotype 群組。左邊示意支持 read 集中於一群；右邊示意支持 read 分布於兩群。兩邊的<b>總數相近</b>，因此僅依數量難以區分，仍需整合品質與比對證據。</figcaption></figure>
 
-<p class="prose">要注意這個判準有邊界：系統性錯誤、mapping bias，以及腫瘤裡的 copy-number 變化或
+<details class="reveal reveal--aside">
+<summary>適用邊界：haplotype 一致性不能單獨定案</summary>
+<div class="reveal__a">
+<p class="prose">系統性錯誤、mapping bias，以及腫瘤裡的 copy-number 變化或
 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="m05__gd-loh-6">LOH<span class="term__pop" id="m05__gd-loh-6" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en" lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span>，都可能讓分布不符合上述的簡化模式。它是重要線索，不是單獨的判定依據。</p>
+</div>
+</details>
 </section>
 
 
@@ -5183,9 +5193,14 @@ clonality 與 depth（完整關係式見 M8）。因此不能只用「有沒有�
   <text class="anno zh" x="20" y="676">LongPhase-S 把它實作成 read-level 與 haplotype origin 兩個過濾器，門檻與細節見 M12。</text>
 </svg><figcaption>兩欄的支持 read <b>總數刻意設成一樣</b>（12 條裡 4 條，VAF 都是 0.33），因為重點正是「光看數量分不出來」。左欄 4 條全在 HP1；右欄 2 條在 HP1、2 條在 HP2。這個判準不需要配對正常樣本，只需要 read 夠長到同時蓋住 germline 錨點與候選位置 —— 所以它是 long read 才拿得到的證據。</figcaption></figure>
 
+<details class="reveal reveal--aside">
+<summary>實作對照：LongPhase-S 與 LongPhase-TO</summary>
+<div class="reveal__a">
 <p class="prose">這個想法在兩個工具裡有不同的實作：LongPhase-S 做成 read-level 與 haplotype origin
 兩個過濾器（四個過濾器與各自的門檻見 M12）；LongPhase-TO 把它擴展成三個位點的
 <span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="m07__gd-triplet-graph-12">triplet graph<span class="term__pop" id="m07__gd-triplet-graph-12" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en" lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span>，用路徑結構判斷（見 M13）。</p>
+</div>
+</details>
 
 <h3 id="m07__一句話總結">一句話總結</h3>
 
@@ -5725,8 +5740,13 @@ technologies with DeepSomatic</i>，Nature Biotechnology，2025。程式碼在
 
 <div class="eq"><math display="block"><mi>VAF</mi><mo>=</mo><mfrac><mrow><mi>purity</mi><mo>×</mo><mi>multiplicity</mi><mo>×</mo><mi>CCF</mi></mrow><mrow><mi>purity</mi><mo>×</mo><mi>totalCN</mi><mo>+</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>purity</mi><mo>)</mo><mo>×</mo><mn>2</mn></mrow></mfrac></math></div>
 
-<p class="prose">這是理想化模型：正常細胞的拷貝數設為 2，tumor totalCN 在此位置可代表腫瘤群體，且 read depth 與 DNA 量近似成正比；
+<details class="reveal reveal--aside">
+<summary>模型假設：這條 VAF 關係式何時成立</summary>
+<div class="reveal__a">
+<p class="prose">正常細胞的拷貝數設為 2，tumor totalCN 在此位置可代表腫瘤群體，且 read depth 與 DNA 量近似成正比；
 實務上仍需考慮 allele-specific copy number、mapping／定序偏差與估計不確定性。</p>
+</div>
+</details>
 
 <div class="table-wrap">
 <table>
@@ -6813,8 +6833,14 @@ germline 的兩側都是混合；定序錯誤的 ALT 側只是 REF 的隨機子�
 它們的 allele 與 haplotype 相同，僅依序列無法區分，但甲基化模式可能不同。</p>
 
 <p class="prose">這個現象稱為 <b>within-ALT residual structure</b>；研究依其統計定義，在七個資料集中將其量化為主要殘餘變異來源（51.2%–80.4%）。
-（<b>資料集不等於細胞株</b>：同一個細胞株可能有多份不同 basecaller／流程的資料，例如 HCC1395 就有 HKU 與 NYGC 兩份，所以資料集數會多於細胞株數。）
 換句話說：<b>固定 haplotype 與 allele 後，仍可觀察到額外的 read-level 甲基化分群。</b></p>
+
+<details class="reveal reveal--aside">
+<summary>資料說明：資料集數為何多於細胞株數</summary>
+<div class="reveal__a">
+<p class="prose">資料集不等於細胞株。同一個細胞株可能有多份不同 basecaller／流程的資料；例如 HCC1395 有 HKU 與 NYGC 兩份。</p>
+</div>
+</details>
 
 <p class="prose">它的意義是：上一節那棵樹的<b>一個節點裡，可能還藏著更細的分群</b> ——
 序列證據已經用完了，但資料還沒說完。這正是甲基化在第二個題目裡的位置：
@@ -6965,8 +6991,13 @@ COLO829 為 9.5%、H2009 為 35.4%，資料集間差異明顯。不可評估的�
 </table>
 </div>
 
-<p class="prose">注意 <code>ML</code> 是<b>機率</b>而不是 0／1：要得到前面那張表，還需要一個門檻把機率二值化，
+<details class="reveal reveal--aside">
+<summary>資料格式：ML 是機率，不是二元標籤</summary>
+<div class="reveal__a">
+<p class="prose"><code>ML</code> 是<b>機率</b>而不是 0／1：要得到前面那張表，還需要一個門檻把機率二值化，
 或直接保留機率值。門檻怎麼定會影響分群結果，屬於分析選擇而非資料本身。</p>
+</div>
+</details>
 
 <div class="guardrail guardrail--info">
 <p class="guardrail__hd">重新比對可能遺失 MM/ML 標籤</p>
@@ -7195,9 +7226,13 @@ caller 未產生的候選不會由此恢復；若後處理包含 re-calling 或 
 <b>依不同 cell line 的 benchmark 可靠度乘上相對應的權重</b>。
 此設計可能減少 benchmark 差異的影響，但比較不同論文的數字時，仍應確認 truth set 與加權方式是否一致。</p>
 
-<p class="prose">另一項常被忽略的限制是 <b><span class="term" data-term="high-confidence region" tabindex="0" role="button" aria-expanded="false" aria-describedby="m10__gd-high-confidence-region-4">high-confidence region<span class="term__pop" id="m10__gd-high-confidence-region-4" role="tooltip"><b class="term__hd">high-confidence region</b><span class="term__def" data-lang="zh">benchmark 建立者指定的高可信度區間，通常以 BED 檔表示；區間外不宜視為具有相同標註可靠度。</span><span class="term__def" data-lang="en" lang="en">Intervals that benchmark authors consider reliable, usually supplied as a BED file. Results outside those intervals should not be assumed to have the same label reliability.</span><a class="term__more" href="glossary.html#high-confidence-region">完整條目 →</a></span></span></b>。
-benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
+<details class="reveal reveal--aside">
+<summary>評估邊界：benchmark 只涵蓋高信心區域</summary>
+<div class="reveal__a">
+<p class="prose">benchmark 通常附一個 <b><span class="term" data-term="high-confidence region" tabindex="0" role="button" aria-expanded="false" aria-describedby="m10__gd-high-confidence-region-4">high-confidence region<span class="term__pop" id="m10__gd-high-confidence-region-4" role="tooltip"><b class="term__hd">high-confidence region</b><span class="term__def" data-lang="zh">benchmark 建立者指定的高可信度區間，通常以 BED 檔表示；區間外不宜視為具有相同標註可靠度。</span><span class="term__def" data-lang="en" lang="en">Intervals that benchmark authors consider reliable, usually supplied as a BED file. Results outside those intervals should not be assumed to have the same label reliability.</span><a class="term__more" href="glossary.html#high-confidence-region">完整條目 →</a></span></span></b> BED 檔，標示「我們有把握的區間」。
 區間外的標註信心通常較低，結果不宜直接解讀，除非有其他獨立驗證。</p>
+</div>
+</details>
 
 <h3 id="m10__三項可能造成評估偏差的因素">三項可能造成評估偏差的因素</h3>
 
@@ -8101,8 +8136,9 @@ samtools view tagged.bam | grep -c 'HP:i:'</code></pre>
 </table>
 </div>
 
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd"><code>-h</code> 不是 help</p>
+<details class="reveal reveal--aside">
+<summary>指令提醒：<code>-h</code> 不是 help</summary>
+<div class="reveal__a">
 <p class="prose">在 <code>phase</code> 與 <code>haplotag</code> 的選項表裡，
 <code>-h</code> 綁的是 <code>--svThreshold</code>（需要一個參數），
 而 help <b>只有長選項</b> <code>--help</code>，沒有對應的短選項。
@@ -8120,15 +8156,18 @@ samtools view tagged.bam | grep -c 'HP:i:'</code></pre>
 <code>-L</code> 是 <code>--overlapThreshold</code> —— 短選項的字母跟參數名稱沒有明顯關聯，
 所以指令寫長一點反而不容易記錯。</p>
 </div>
+</details>
 
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd">遇到 help 與實際不一致時</p>
+<details class="reveal reveal--aside">
+<summary>來源提醒：help 與實際參數不一致時</summary>
+<div class="reveal__a">
 <p class="prose">以上差異都是在原始碼裡核對過的：help 字串與 <code>longopts</code> 註冊表<b>本來就不完全一致</b>。
 權威是原始碼裡的 <code>longopts</code> 表 —— 在
 <a href="https://github.com/twolinin/LongPhase"><code>twolinin/longphase</code></a> 的 repo 根目錄，
 <code>phase</code> 看 <code>Phasing.cpp</code>、<code>haplotag</code> 看 <code>Haplotag.cpp</code>、
 <code>modcall</code> 看 <code>ModCall.cpp</code>。使用新參數前先檢索該表確認名稱，並記錄版本。</p>
 </div>
+</details>
 </section>
 
 
@@ -8785,10 +8824,15 @@ LongPhase-S 是接在它們後面的一層。</p>
 <b>最上方標出訓練標籤的來源</b>：五個樣本是把純腫瘤與正常的 BAM 依 read 數混出來的，
 所以已知的那個數字是<b>分子</b>的比例。最下方是訓練方式與外推的界線。</figcaption></figure>
 
-<p class="prose">為什麼只用兩個特徵就夠？因為要學的是一條單調的關係，不是分類問題；
+<details class="reveal reveal--aside">
+<summary>模型補充：為何迴歸只用兩個特徵</summary>
+<div class="reveal__a">
+<p class="prose">要學的是一條單調的關係，不是分類問題；
 特徵少也讓模型不容易在八個資料集上過擬合。
 代價是這條曲線只在<b>訓練資料涵蓋的範圍內</b>可信 ——
 這也是後面「判讀練習」要處理的問題。</p>
+</div>
+</details>
 
 <h3 id="m12__這個迴歸估的是哪一個量">這個迴歸估的是哪一個量</h3>
 
@@ -10019,9 +10063,14 @@ LongPhase-TO 做的是<b>再校正</b>（<span class="term" data-term="recalibra
 加上 LOH 佔了基因體多少。為什麼要加 LOH 這一項？因為 LOH 區本身就會把比值推向 1.0
 （那裡本來就只剩一條），只看比值分布會高估。兩個特徵一起看，才對得起來。</p>
 
+<details class="reveal reveal--aside">
+<summary>模型邊界：預訓練係數何時可能失準</summary>
+<div class="reveal__a">
 <p class="prose">這條式子的係數是在幾個已知答案的細胞株資料上配出來後<b>固定下來</b>的，
 之後每個樣本都用同一組係數。所以它的可靠度取決於新樣本跟當初那些細胞株像不像 ——
 這是所有預訓練模型共通的邊界條件，不是這個工具特有的問題。</p>
+</div>
+</details>
 </section>
 
 
@@ -10039,11 +10088,16 @@ LongPhase-TO 做的是<b>再校正</b>（<span class="term" data-term="recalibra
   --strict-pon-file PoN/1000g-pon.vcf.gz \
   --loh</code></pre>
 
-<p class="cli-note">四個容易寫錯的地方：<code>--caller</code> 只接受
+<details class="reveal reveal--aside">
+<summary>指令提醒：四個常見參數錯誤</summary>
+<div class="reveal__a">
+<p class="prose"><code>--caller</code> 只接受
 <code>clairs_to_ss</code>、<code>clairs_to_ssrs</code>、<code>deepsomatic_to</code>，寫錯會直接報錯結束。
 <code>--pon-file</code> 的值是<b>一個用逗號分隔的字串</b>，不是重複的旗標。
 <code>--strict-pon-file</code> 比 <code>--pon-file</code> 嚴格：它要求位置<b>與</b> ALT allele 都吻合才算命中。
 <code>--loh</code> 不加就不會輸出 LOH 區間。</p>
+</div>
+</details>
 
 <figure class="fig"><img src="assets/img/b/b-s31-somatic-calling.webp" srcset="assets/img/b/b-s31-somatic-calling.webp 1x, assets/img/b/b-s31-somatic-calling@2x.webp 2x" alt="LongPhase-TO 在真實資料上訓練後的 somatic calling 效能" loading="lazy" decoding="async"><figcaption>LongPhase-TO 的 somatic calling 結果。在此資料中，tumor-only 的絕對數值低於 tumor–normal；重點是相對於 baseline 的改善，實際差異取決於資料與評估設定。</figcaption></figure>
 
@@ -10159,8 +10213,9 @@ bcftools query -f '[%GT\t%GT2]\n' phased_prefix.vcf | \
 它跟一般定相用的 <code>--connectAdjacent</code>（預設 35）是<b>兩個不同的參數</b>，別看錯。</p>
 </div>
 
-<h3 id="m13__兩個版本的差異對照表">兩個版本的差異對照表</h3>
-
+<details class="reveal reveal--aside">
+<summary>實作查表：LongPhase-S 與 LongPhase-TO 的差異</summary>
+<div class="reveal__a">
 <p class="prose">在兩個工具之間切換時最容易搞混的六件事：</p>
 
 <div class="table-wrap">
@@ -10176,6 +10231,8 @@ bcftools query -f '[%GT\t%GT2]\n' phased_prefix.vcf | \
 </tbody>
 </table>
 </div>
+</div>
+</details>
 
 <section class="quiz" data-quiz="m13"><h2 id="m13__學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
 
@@ -10818,9 +10875,10 @@ read 證據支持一個分支式、多步驟的候選拓撲，其結構與 clone
 <p class="prose">第 5 點是這份教材真正要教會的事：把證據的邊界寫出來，而不是把話講滿。</p>
 </div>
 
-<h3 id="capstone__接下來讀什麼">接下來讀什麼</h3>
-
-<p class="prose">完成 capstone 之後，可依研究題目選擇補充方向：</p>
+<details class="reveal reveal--aside">
+<summary>延伸學習：完成 capstone 後可補哪些背景</summary>
+<div class="reveal__a">
+<p class="prose">可依研究題目選擇補充方向：</p>
 
 <div class="table-wrap">
 <table>
@@ -10835,6 +10893,8 @@ read 證據支持一個分支式、多步驟的候選拓撲，其結構與 clone
 
 <p class="prose">這三列的演算法背景都是本教材<b>尚未涵蓋</b>的部分 ——
 教材教的是怎麼判讀證據，不是怎麼訓練模型。若研究涉及這些方向，需要另外補足。</p>
+</div>
+</details>
 
 <section class="quiz" data-quiz="capstone"><h2 id="capstone__學習檢核">學習檢核</h2><div class="quiz__items"></div><noscript><p class="note">此測驗需要 JavaScript。本模組的重點已完整寫在上面的內文與圖裡，不看測驗也讀得完。</p></noscript></section>
 </section>
@@ -11411,9 +11471,14 @@ driver 變異的頻率本即偏向 0 與 1 兩端，不易在中間頻率被觀�
 <code>10</code> 或 <code>01</code>。方法只能補入其一，而所補入者
 係「模型為連通所假設」，並非觀測所得。</p>
 
-<p class="prose">因此 latent node 的解讀須謹慎：它<b>並非</b>「一群尚未被觀測到的細胞」。
+<details class="reveal reveal--aside">
+<summary>解讀邊界：latent node 不一定是未觀測細胞群</summary>
+<div class="reveal__a">
+<p class="prose">latent node <b>並非</b>「一群尚未被觀測到的細胞」。
 它可能對應真實的中間世代（該群細胞其後被取代），亦可能僅為此模型記帳上的需要。
 且此處有兩種並列的補法（補 <code>10</code> 或補 <code>01</code>），資料同樣無從擇一。</p>
+</div>
+</details>
 
 <aside class="guardrail" id="sr1__guard-11"><p class="guardrail__hd">重要區分 #11：頻率群集不等於 clone tree</p><p class="prose">閱讀「腫瘤演化樹」一類圖示時，須區分圖上的兩種內容：
 <b>群集</b>（群的數目與各群的大小）與<b>樹</b>（何者為何者的祖先）。</p>
@@ -11790,11 +11855,16 @@ CCF 換算是在<b>估計邊際</b>，簡約性則是在<b>推定聯合</b>。
 <p class="prose">2014 年的 methclone 即在執行此項工作：它自 read 直接計數 epiallele 的組成，
 再以組成的熵變化量衡量兩個時間點之間譜系結構的改變。</p>
 
-<p class="prose">其技術要求值得留意，因為該形式為<b>此類做法所共有</b>，各工具所選的數值不同而已。
+<details class="reveal reveal--aside">
+<summary>資料需求：epiallele 分析需要多少 CpG 與深度</summary>
+<div class="reveal__a">
+<p class="prose">該形式為<b>此類做法所共有</b>，各工具所選的數值不同而已。
 methclone 要求單一條 read 跨越 <b>4 個相鄰的 CpG</b>（對應 <math><msup><mn>2</mn><mn>4</mn></msup><mo>=</mo><mn>16</mn></math> 種可能組合），
 且該位置須有 <b>60× 以上的深度</b>，組成比例方能估得準確。
 亦即：同一條分子上須有足夠多的 CpG，且此類分子須有足夠的數量 ——
 4 為 methclone 的選擇，並非自然常數。</p>
+</div>
+</details>
 
 <h3 id="sr1__短讀相對於此門檻的位置">短讀相對於此門檻的位置</h3>
 
@@ -12670,11 +12740,16 @@ HP1-1 ⊂ HP1，且 HP1-1 與 HP1-2 為兄弟。前述六個 SNV 的例子之所
 它所回答的是「在此連鎖視窗內，這幾個變異的先後次序」。
 而其回答的品質直接取決於突變負荷：負荷越高，<math><mi>k</mi><mo>≥</mo><mn>2</mn></math> 的連鎖視窗越多，該偏序的可用範圍越大。</p>
 
-<p class="prose">一項技術細節須先釐清，否則兩張圖不對等：左側該類圖通常為<b>全基因體</b>尺度
+<details class="reveal reveal--aside">
+<summary>比較口徑：全基因體頻率圖如何由局部視窗匯總</summary>
+<div class="reveal__a">
+<p class="prose">左側該類圖通常為<b>全基因體</b>尺度
 （數千個位點全部納入），此處所繪為<b>單一連鎖視窗</b>。若要製作全基因體版本，
 即將各連鎖視窗各自算得的單倍型頻率全部匯入同一張直方圖 ——
 標籤具有局部性（跨連鎖視窗的 HP1-1 並非同一條，重要區分 #13 為此現象的極端情形），
 但<b>頻率值可以匯總</b>。</p>
+</div>
+</details>
 
 <p class="prose">故此路線所要檢驗的是一個具體的問題：
 <b>將頻率的計數單位由單一位點改為多位點的單倍型，重建所得的樹是否不同？</b>
@@ -13541,9 +13616,14 @@ pigeonhole 至此才容許分支 —— 所改變的是樹的拓撲，而非參�
 其中兩個成分位於同一位置 <math><mi>θ</mi><mo>=</mo><mn>0.12</mn></math>。
 pigeonhole 至此容許分支：<math><msub><mi>c</mi><mi>B</mi></msub><mo>+</mo><msub><mi>c</mi><mi>C</mi></msub><mo>=</mo><mn>0.80</mn><mo>≤</mo><msub><mi>c</mi><mi>A</mi></msub><mo>=</mo><mn>1.00</mn></math>。</p>
 
-<p class="prose">此處刻意說「機率極低」而非「不可行」：那一格空著也可能只是沒抽到，
+<details class="reveal reveal--aside">
+<summary>機率補充：空格不是結構零</summary>
+<div class="reveal__a">
+<p class="prose">此處說「機率極低」而非「不可行」：那一格空著也可能只是沒抽到，
 或只是定序錯誤沒把它造出來。<b>把它當成硬性的不可行是下篇要拆掉的一個誤讀</b> ——
 但只要跨越深度足夠，結論的方向不變。</p>
+</div>
+</details>
 
 <p class="prose">因此，<b>單一個共現觀測所改變的是樹的拓撲與群的個數，而非參數的數值</b>。
 這也是此路線的論據不在精度的原因：精度指「可區分，但量測是否準確」，
@@ -13871,8 +13951,13 @@ pigeonhole 至此容許分支：<math><msub><mi>c</mi><mi>B</mi></msub><mo>+</mo
 要真正定出 <math><mi>φ</mi></math>，需要的是<b>同群但分子池互相獨立</b>（即相距夠遠）的變異，
 而那組變異「真實頻率完全相等」的前提比本節弱得多。這是本路線尚未解決的問題之一。</p>
 
-<p class="prose">「點擴散函數」是此機制的比喻：真值為一個點，量測結果為具有寬度的散布。
+<details class="reveal reveal--aside">
+<summary>術語補充：「點擴散函數」只是一個比喻</summary>
+<div class="reveal__a">
+<p class="prose">真值為一個點，量測結果為具有寬度的散布。
 惟其操作內容為將一個 nuisance 參數由擬合改為量測，<b>並不涉及解卷積運算</b>。</p>
+</div>
+</details>
 
 <h3 id="sr2__五-用途三-以比值定出成分間距-使純度退化為整體縮放">五、用途三：以比值定出成分間距，使純度退化為整體縮放</h3>
 
@@ -14653,11 +14738,16 @@ composite likelihood 近似，可以用，但必須<b>如此稱呼</b>，
 
 <div class="eq"><math display="block"><mi>P</mi><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><mi>Θ</mi><mo>)</mo><mo>=</mo><munder><mo>∑</mo><msub><mi>σ</mi><mi>u</mi></msub></munder><mi>P</mi><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><mi>Θ</mi><mo>,</mo><msub><mi>σ</mi><mi>u</mi></msub><mo>)</mo><mo>·</mo><mi>P</mi><mo>(</mo><msub><mi>σ</mi><mi>u</mi></msub><mo>)</mo></math></div>
 
-<p class="prose">兩個細節值得寫明。其一，<math><mi>σ</mi></math> 是每個連鎖視窗一個，
+<details class="reveal reveal--aside">
+<summary>作用域補充：<math><mi>σ</mi></math> 如何跨 phase set 定義</summary>
+<div class="reveal__a">
+<p class="prose"><math><mi>σ</mi></math> 是每個連鎖視窗一個，
 不是每個連鎖區段一個 —— 同一個連鎖視窗的兩個家族互為補集，共用同一個方向。
-其二，若兩個 phase set 之間沒有共享的變異，也沒有其他錨點，而且相關 clone 的比例又相同，
+若兩個 phase set 之間沒有共享的變異，也沒有其他錨點，而且相關 clone 的比例又相同，
 則它們的對應關係<b>真的</b>不可辨識。此時正確的輸出是保留數個等價的對應，
 而不是挑一個印出來。</p>
+</div>
+</details>
 
 <h3 id="sr2b__三-預設是-multinomial-一條-read-是一個分子">三、預設是 multinomial：一條 read 是一個分子</h3>
 
@@ -14867,12 +14957,17 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
 </table>
 </div>
 
-<p class="prose">第三種最容易被誤讀。局部超立方體用的是「一步一個突變」的簡約假設，
+<details class="reveal reveal--aside">
+<summary>解讀邊界：記帳節點不等於 subclone</summary>
+<div class="reveal__a">
+<p class="prose">局部超立方體用的是「一步一個突變」的簡約假設，
 但全域的 <math><mi>z</mi></math> 把<b>多個</b>突變指派到同一個 clone —— 在全域這一層，
 <math><mn>010</mn><mo>→</mo><mn>111</mn></math> 完全可以是<b>一條邊</b>，中間不需要任何節點。
 所以那個補進來的節點是局部表示法的產物，不是「還沒找到的 subclone」。
 這正是 <span class="term" data-term="latent node" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2b__gd-latent-node-3">latent node<span class="term__pop" id="sr2b__gd-latent-node-3" role="tooltip"><b class="term__hd">latent node <i>潛在節點</i></b><span class="term__def" data-lang="zh">建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</span><span class="term__def" data-lang="en" lang="en">An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.</span><a class="term__more" href="glossary.html#latent-node">完整條目 →</a></span></span> 那條警告的具體形式：潛在節點數 <math><mo>|</mo><mi>H</mi><mo>|</mo></math> 仍然是個有用的統計量
 （它量的是這份重建有多少比例來自推論），但它是<b>記帳</b>，不是證據。</p>
+</div>
+</details>
 
 <h3 id="sr2b__五-分類是輸出-不是輸入">五、分類是輸出，不是輸入</h3>
 
@@ -16950,11 +17045,15 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 <p class="prose">三者合起來記為 <math><msub><mi>L</mi><mi>u</mi></msub><mo>=</mo><mo>(</mo><msub><mi>X</mi><mi>u</mi></msub><mo>,</mo><msub><mi>E</mi><mi>u</mi></msub><mo>)</mo></math> 與 <math><msub><mi>ν</mi><mi>u</mi></msub></math>，
 樹根固定為全參考狀態 <math><msup><mn>0</mn><msub><mi>k</mi><mi>u</mi></msub></msup></math>。</p>
 
-<p class="prose"><math><mi>ν</mi></math> 有一個容易寫錯的地方：它是<b>專屬</b>的，不是累積的。
-一條分子只由它<b>所屬那一個</b>節點的狀態產生，不由祖先節點產生；
+<details class="reveal reveal--aside">
+<summary>變數補充：<math><mi>ν</mi></math> 是專屬比例，不是累積比例</summary>
+<div class="reveal__a">
+<p class="prose">一條分子只由它<b>所屬那一個</b>節點的狀態產生，不由祖先節點產生；
 祖先節點的 <math><mi>ν</mi></math> 因此是「還停留在該狀態的分子」的比例，可以很小。
 換句話說，<b>樹的形狀不對 <math><mi>ν</mi></math> 施加任何單調性</b>，
 它只規定哪些狀態可以<b>同時存在</b>。</p>
+</div>
+</details>
 
 <h4 id="sr2c__先後關係幾乎不用估-四配子相容性">先後關係幾乎不用估：四配子相容性</h4>
 
@@ -17060,7 +17159,10 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 代表這個連鎖區段的錯誤地板偏高或家族誤標偏多。相容性檢定因此同時是品質訊號。</li>
 </ul>
 
-<p class="prose">還有一點：<math><msub><mi>X</mi><mi>u</mi></msub></math> 可以含<b>沒有被任何分子觀測到</b>的狀態。
+<details class="reveal reveal--aside">
+<summary>解讀補充：未觀測狀態可能是現存或歷史狀態</summary>
+<div class="reveal__a">
+<p class="prose"><math><msub><mi>X</mi><mi>u</mi></msub></math> 可以含<b>沒有被任何分子觀測到</b>的狀態。
 觀測到 <math><mn>110</mn></math> 與 <math><mn>101</mn></math> 而 <math><mn>100</mn></math> 沒看到時，
 兩者若不共用一個帶第一個突變的祖先，第一個突變就得發生兩次。
 這種狀態只有兩種身分 —— 現存但沒抽到（<math><mi>ν</mi><mo>&gt;</mo><mn>0</mn></math>），
@@ -17068,6 +17170,8 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 <b>前一篇還有第三種</b>：純粹因為「一步一個突變」的表示法而被迫補進來的記帳節點；
 本規格允許一條邊帶多個突變，那一種就隨表示法一起消失了。
 <span class="term" data-term="latent node" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2c__gd-latent-node-4">latent node<span class="term__pop" id="sr2c__gd-latent-node-4" role="tooltip"><b class="term__hd">latent node <i>潛在節點</i></b><span class="term__def" data-lang="zh">建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</span><span class="term__def" data-lang="en" lang="en">An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.</span><a class="term__more" href="glossary.html#latent-node">完整條目 →</a></span></span> 那條警告仍然適用，但適用範圍窄了一半。</p>
+</div>
+</details>
 
 <h4 id="sr2c__什麼時候算-估完了">什麼時候算「估完了」</h4>
 
@@ -19640,10 +19744,16 @@ M8 的<a href="m08.html#guard-2">重要區分 #2</a> 已建立此一分家，本
 
 <p class="prose"><b><span class="term" data-term="logR" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr3__gd-logr-6">深度比<span class="term__pop" id="sr3__gd-logr-6" role="tooltip"><b class="term__hd">logR <i>深度比對數</i></b><span class="term__def" data-lang="zh">同一位點上腫瘤與正常樣本的 read 深度比取以 2 為底的對數。ASCAT 再以全基因體比值的平均重新置中，因此 0 並不代表兩份拷貝 —— 倍體須由擬合結果另行推算。單獨的 logR 只能決定拷貝數輪廓至一個仿射變換。</span><span class="term__def" data-lang="en" lang="en">The base-2 logarithm of the tumour-to-normal read-depth ratio at a locus, re-centred on the genome-wide mean ratio. Zero therefore does not mean two copies; ploidy has to be recomputed from the fitted profile. logR alone determines the copy-number profile only up to an affine map.</span><a class="term__more" href="glossary.html#logr">完整條目 →</a></span></span></b>為同一位點上腫瘤與正常樣本的 read 深度比取以 2 為底的對數。
 ASCAT 的實作（<code>ascat.prepareHTS.R</code> 的 <code>ascat.getBAFsAndLogRs</code>）
-在取對數之後，再以<b>全基因體比值的算術平均</b>重新置中。
-此處有一項容易誤解之處：置中之後的 0 <b>並不代表兩份拷貝</b>，
+在取對數之後，再以<b>全基因體比值的算術平均</b>重新置中。</p>
+
+<details class="reveal reveal--aside">
+<summary>解讀補充：置中後的 logR=0 不代表二倍體</summary>
+<div class="reveal__a">
+<p class="prose">置中之後的 0 <b>並不代表兩份拷貝</b>，
 它只代表「與全基因體平均相同」。ASCAT 因此在擬合完成後，
 以擬合所得的拷貝數輪廓重新計算倍體，而不採用網格搜尋時所用的那個值。</p>
+</div>
+</details>
 
 <p class="prose"><b><span class="term" data-term="B-allele frequency" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr3__gd-b-allele-frequency-7">B-allele frequency<span class="term__pop" id="sr3__gd-b-allele-frequency-7" role="tooltip"><b class="term__hd">B-allele frequency <i>B 等位頻率</i></b><span class="term__def" data-lang="zh">在 germline heterozygous 位點上，兩個等位其中一個所佔的 read 比例。腫瘤樣本中混入的正常細胞在此值上恆為 0.5，該常數即為反推純度所依據的錨。ASCAT 與 PURPLE 皆刻意不做相位，故其標號在各位點之間獨立。</span><span class="term__def" data-lang="en" lang="en">The fraction of reads carrying one of the two alleles at a germline heterozygous site. Contaminating normal cells contribute exactly 0.5, and that constant is the anchor from which purity is recovered. ASCAT and PURPLE deliberately do not phase, so the A/B label is independent per site.</span><a class="term__more" href="glossary.html#b-allele-frequency">完整條目 →</a></span></span></b>僅在 <b>germline heterozygous</b> 位點計算。
 germline homozygous 位點在腫瘤與正常樣本中皆為 0 或 1，對純度零資訊，故予以剔除。
@@ -19814,8 +19924,9 @@ ASCAT 刻意不做相位，因此其等位軌道對稱於 0.5，PURPLE 的 AMBER
 SNP 陣列取 0.55，<b>定序資料一律取 1</b>。它以 <math><msup><mn>2</mn><mrow><mi>r</mi><mo>/</mo><mi>γ</mi></mrow></msup></math> 的形式進入反解，
 故設錯將使所有拷貝數整體縮放。</p>
 
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd">兩處與文獻用語不一致，須以原始碼為準</p>
+<details class="reveal reveal--aside">
+<summary>來源補充：ASCAT 反轉換式與文獻符號的對照</summary>
+<div class="reveal__a">
 <p class="prose">其一，ASCAT 原始文獻中的三條編號式在公開版本上為<b>影像</b>而非文字，
 上列兩式取自參考實作 <code>ascat.runAscat.R</code> 的 <code>rBacktransform</code> 與
 <code>bBacktransform</code>，與該文對 <math><mi>ρ</mi></math>、<math><mi>ψ</mi></math>、<math><mi>γ</mi></math> 的文字定義自洽。</p>
@@ -19823,6 +19934,7 @@ SNP 陣列取 0.55，<b>定序資料一律取 1</b>。它以 <math><msup><mn>2</
 的變數是 <math><msub><mi>ψ</mi><mi>t</mi></msub></math>，即<b>腫瘤</b>倍體；程式碼在需要 <math><mi>ψ</mi></math> 之處一律展開寫成
 <code>((1-rho)*2+rho*psi)</code>。兩者相差一個與 <math><mi>ρ</mi></math> 有關的項，混用將使拷貝數整體偏移。</p>
 </div>
+</details>
 
 <h3 id="sr3__三-反解式">三、反解式</h3>
 
@@ -20065,9 +20177,14 @@ SNP 陣列取 0.55，<b>定序資料一律取 1</b>。它以 <math><msup><mn>2</
 兩者並非近似相等，而是恆等，故任何以這兩條軌道為輸入的方法皆不可能區分。
 ASCAT 原始文獻在 79 例的驗證中有 10 例（12.7%）落於此點，該文亦明白寫出此限制。</p>
 
-<p class="prose">此處的方向性值得留意：<b>任何一組解皆可再加倍，但只有各處拷貝數皆為偶數的解可以對半</b>。
+<details class="reveal reveal--aside">
+<summary>數學補充：解可加倍，但不一定能對半</summary>
+<div class="reveal__a">
+<p class="prose"><b>任何一組解皆可再加倍，但只有各處拷貝數皆為偶數的解可以對半</b>。
 因此格點族在加倍方向上無界，實際的界限來自倍體的上限與簡約性偏好，
 而非來自資料。</p>
+</div>
+</details>
 
 <p class="prose">此處與上一節的錨相互印證：<math><mi>ρ</mi><mo>=</mo><mn>1</mn></math> 時正常細胞的錨消失，
 而正是在該處加倍的簡併最為徹底。</p>
@@ -21167,14 +21284,17 @@ subclonality 僅作為混淆項出現，其重建屬另一主題。</p>
 <code>H1</code> 與 <code>H2</code> 的 read 數。實作見 <code>HaplotagStrategy.h</code> 的
 <code>calculateHaplotypeImbalanceRatio</code>。</p></div>
 
-<p class="prose">三件必須先講清楚的事。</p>
-
-<p class="prose"><b>其一，分母只有 <code>H1</code> 與 <code>H2</code> 兩個計數。</b>
+<details class="reveal reveal--aside">
+<summary>實作補充：GHIR 分母只含 H1 與 H2</summary>
+<div class="reveal__a">
+<p class="prose">分母只有 <code>H1</code> 與 <code>H2</code> 兩個計數。
 <code>H1-1</code>、<code>H2-1</code>、<code>H3</code> 與未標記者<b>皆不在分母之內</b>。
 這一點決定了後續整個閉式的形狀，且與「涵蓋該位點的總 read 數」一語不同；
 以式子與原始碼為準。</p>
+</div>
+</details>
 
-<p class="prose"><b>其二，帶有 somatic 等位的 read 不會落入 <code>H1</code> 或 <code>H2</code>。</b>
+<p class="prose"><b>帶有 somatic 等位的 read 不會落入 <code>H1</code> 或 <code>H2</code>。</b>
 標記程序先判定該 read 是否帶有 somatic 等位（<code>tumorMaxHPcount != 0</code>），
 帶有者才進入 <code>H1-1</code>／<code>H2-1</code>／<code>H3</code> 的分支；
 兩個 germline 計數<b>僅收未帶 somatic 等位的 read</b>。</p>
@@ -21194,10 +21314,15 @@ subclonality 僅作為混淆項出現，其重建屬另一主題。</p>
 <b>但不足以定義任何單一位點的等位比例</b>。第五節據此重寫。</p>
 </div>
 
-<p class="prose"><b>其三，<code>max()</code> 使值域為 <math><mo>[</mo><mn>0.5</mn><mo>,</mo><mn>1</mn><mo>]</mo></math>。</b>
+<details class="reveal reveal--aside">
+<summary>實作補充：GHIR 的折疊與邊界值</summary>
+<div class="reveal__a">
+<p class="prose"><code>max()</code> 使值域為 <math><mo>[</mo><mn>0.5</mn><mo>,</mo><mn>1</mn><mo>]</mo></math>。
 這是一個<b>折疊</b>統計量，與上篇所述 AMBER 取兩個等位較大者的做法同型。
 邊界情形另有規定：兩個計數皆為零時回傳 0，僅其一為零時回傳 1，
 前者被後續濾波當作哨兵值排除。</p>
+</div>
+</details>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" class="dia-svg" role="img" aria-labelledby="sr4__sr4-ghir-buckets__title" aria-describedby="sr4__sr4-ghir-buckets__desc">
   <title id="sr4__sr4-ghir-buckets__title">一個 somatic 位點上的五個計數，以及 GHIR 的分母只含其中兩個</title>
@@ -22034,12 +22159,17 @@ GHIR 取兩者較大者除以兩者之和，故隨純度單調上升 —— 三�
 </table>
 </div>
 
+<details class="reveal reveal--aside">
+<summary>工程現況：四格表原料已存在，但尚未彙總</summary>
+<div class="reveal__a">
 <p class="prose">此表在現行實作中<b>尚未被彙總</b>，但其原料已經存在：
 <code>variantsHP</code> 記錄了每條 read 在每個位點的等位類別，
 且 <code>tumorPosReadCorrBaseHP[pos][readID]</code> 已將其逐位點、逐 read 保留下來。
 分子側另有一個確為逐位點的計數 <code>somaticReadHpCount</code> ——
 它只在該 read <b>於該位點</b>帶有 somatic 等位時才累加，故可直接充當 <math><msub><mi>R</mi><mrow><mn>1,</mn><mi>alt</mi></mrow></msub></math>。
 缺的是分母側：<code>ReadHpCount[H1]</code> 會漏掉「在別處帶 somatic 變異、在此處為 REF」的 read。</p>
+</div>
+</details>
 
 <div class="eq"><math display="block"><mi>s</mi><mo>(</mo><mi>i</mi><mo>)</mo><mo>=</mo><mfrac><msub><mi>R</mi><mrow><mn>1,</mn><mi>alt</mi></mrow></msub><mrow><msub><mi>R</mi><mrow><mn>1,</mn><mi>alt</mi></mrow></msub><mo>+</mo><msub><mi>R</mi><mrow><mn>1,</mn><mi>ref</mi></mrow></msub></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>p</mi><mo>·</mo><mi>c</mi><mo>·</mo><mi>μ</mi></mrow><mrow><mi>p</mi><mo>·</mo><msub><mi>n</mi><mn>1</mn></msub><mo>+</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo>)</mo></mrow></mfrac></math><p class="eq__note">分母為單倍型 1 在該位點的<b>全部</b>分子數，與該 read 在其他位置的 somatic 狀態無關。</p></div>
 
@@ -22465,8 +22595,13 @@ copy-neutral LOH、該條的擴增、變異發生於擴增之前或之後（決�
 </table>
 </div>
 
-<p class="prose">須注意第三列：區塊 N50 與拷貝數區段的尺度相近，
+<details class="reveal reveal--aside">
+<summary>尺度補充：N50 相近不代表斷點對應</summary>
+<div class="reveal__a">
+<p class="prose">區塊 N50 與拷貝數區段的尺度相近，
 但<b>尺度相近不蘊含斷點對應</b>。此點在下篇第三節展開。</p>
+</div>
+</details>
 </section>
 
 
@@ -22943,8 +23078,13 @@ DNA 比例再由它與第一層算出。<b>倍體與 DNA 比例都不是自由�
 </table>
 </div>
 
-<p class="prose">上篇所述的 PURPLE 亦將分段與平滑列為獨立步驟，其依據為深度、等位比例與結構變異支持，
+<details class="reveal reveal--aside">
+<summary>文獻補充：PURPLE 也將分段與平滑分開</summary>
+<div class="reveal__a">
+<p class="prose">PURPLE 將分段與平滑列為獨立步驟，其依據為深度、等位比例與結構變異支持，
 而非相位長度。此處沿用同一個分工。</p>
+</div>
+</details>
 
 <h3 id="sr5__四-nuisance-參數-c-與兩種錯誤">四、nuisance 參數：<math><mi>c</mi></math>、<math><mi>μ</mi></math> 與兩種錯誤</h3>
 

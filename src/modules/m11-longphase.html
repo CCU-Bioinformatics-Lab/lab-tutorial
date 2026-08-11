@@ -232,8 +232,9 @@ samtools view tagged.bam | grep -c 'HP:i:'
 </table>
 </div>
 
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd"><code>-h</code> 不是 help</p>
+<details class="reveal reveal--aside">
+<summary>指令提醒：<code>-h</code> 不是 help</summary>
+<div class="reveal__a">
 <p class="prose">在 <code>phase</code> 與 <code>haplotag</code> 的選項表裡，
 <code>-h</code> 綁的是 <code>--svThreshold</code>（需要一個參數），
 而 help <b>只有長選項</b> <code>--help</code>，沒有對應的短選項。
@@ -251,15 +252,18 @@ samtools view tagged.bam | grep -c 'HP:i:'
 <code>-L</code> 是 <code>--overlapThreshold</code> —— 短選項的字母跟參數名稱沒有明顯關聯，
 所以指令寫長一點反而不容易記錯。</p>
 </div>
+</details>
 
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd">遇到 help 與實際不一致時</p>
+<details class="reveal reveal--aside">
+<summary>來源提醒：help 與實際參數不一致時</summary>
+<div class="reveal__a">
 <p class="prose">以上差異都是在原始碼裡核對過的：help 字串與 <code>longopts</code> 註冊表<b>本來就不完全一致</b>。
 權威是原始碼裡的 <code>longopts</code> 表 —— 在
 <a href="https://github.com/twolinin/LongPhase"><code>twolinin/longphase</code></a> 的 repo 根目錄，
 <code>phase</code> 看 <code>Phasing.cpp</code>、<code>haplotag</code> 看 <code>Haplotag.cpp</code>、
 <code>modcall</code> 看 <code>ModCall.cpp</code>。使用新參數前先檢索該表確認名稱，並記錄版本。</p>
 </div>
+</details>
 </section>
 
 

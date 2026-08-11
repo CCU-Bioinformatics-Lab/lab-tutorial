@@ -103,9 +103,13 @@ caller 未產生的候選不會由此恢復；若後處理包含 re-calling 或 
 <b>依不同 cell line 的 benchmark 可靠度乘上相對應的權重</b>。
 此設計可能減少 benchmark 差異的影響，但比較不同論文的數字時，仍應確認 truth set 與加權方式是否一致。</p>
 
-<p class="prose">另一項常被忽略的限制是 <b>[[high-confidence region]]</b>。
-benchmark 通常附一個 BED 檔，標示「我們有把握的區間」。
+<details class="reveal reveal--aside">
+<summary>評估邊界：benchmark 只涵蓋高信心區域</summary>
+<div class="reveal__a">
+<p class="prose">benchmark 通常附一個 <b>[[high-confidence region]]</b> BED 檔，標示「我們有把握的區間」。
 區間外的標註信心通常較低，結果不宜直接解讀，除非有其他獨立驗證。</p>
+</div>
+</details>
 
 <h3>三項可能造成評估偏差的因素</h3>
 

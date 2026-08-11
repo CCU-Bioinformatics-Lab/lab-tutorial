@@ -217,11 +217,16 @@ composite likelihood 近似，可以用，但必須<b>如此稱呼</b>，
 P(D_u \mid Θ) = \sum_{σ_u} P(D_u \mid Θ, σ_u) · P(σ_u)
 {{/eq}}
 
-<p class="prose">兩個細節值得寫明。其一，{{m: σ}} 是每個連鎖視窗一個，
+<details class="reveal reveal--aside">
+<summary>作用域補充：{{m: σ}} 如何跨 phase set 定義</summary>
+<div class="reveal__a">
+<p class="prose">{{m: σ}} 是每個連鎖視窗一個，
 不是每個連鎖區段一個 —— 同一個連鎖視窗的兩個家族互為補集，共用同一個方向。
-其二，若兩個 phase set 之間沒有共享的變異，也沒有其他錨點，而且相關 clone 的比例又相同，
+若兩個 phase set 之間沒有共享的變異，也沒有其他錨點，而且相關 clone 的比例又相同，
 則它們的對應關係<b>真的</b>不可辨識。此時正確的輸出是保留數個等價的對應，
 而不是挑一個印出來。</p>
+</div>
+</details>
 
 <h3>三、預設是 multinomial：一條 read 是一個分子</h3>
 
@@ -303,12 +308,17 @@ q_{u,h}^{obs} = (1−ε_u) · q_{u,h} + ε_u · r_h
 </table>
 </div>
 
-<p class="prose">第三種最容易被誤讀。局部超立方體用的是「一步一個突變」的簡約假設，
+<details class="reveal reveal--aside">
+<summary>解讀邊界：記帳節點不等於 subclone</summary>
+<div class="reveal__a">
+<p class="prose">局部超立方體用的是「一步一個突變」的簡約假設，
 但全域的 {{m: z}} 把<b>多個</b>突變指派到同一個 clone —— 在全域這一層，
 {{m: 010 → 111}} 完全可以是<b>一條邊</b>，中間不需要任何節點。
 所以那個補進來的節點是局部表示法的產物，不是「還沒找到的 subclone」。
 這正是 [[latent node]] 那條警告的具體形式：潛在節點數 {{m: |H|}} 仍然是個有用的統計量
 （它量的是這份重建有多少比例來自推論），但它是<b>記帳</b>，不是證據。</p>
+</div>
+</details>
 
 <h3>五、分類是輸出，不是輸入</h3>
 

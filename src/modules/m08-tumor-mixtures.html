@@ -72,8 +72,13 @@
 VAF = \frac{purity × multiplicity × CCF}{purity × totalCN + (1 − purity) × 2}
 {{/eq}}
 
-<p class="prose">這是理想化模型：正常細胞的拷貝數設為 2，tumor totalCN 在此位置可代表腫瘤群體，且 read depth 與 DNA 量近似成正比；
+<details class="reveal reveal--aside">
+<summary>模型假設：這條 VAF 關係式何時成立</summary>
+<div class="reveal__a">
+<p class="prose">正常細胞的拷貝數設為 2，tumor totalCN 在此位置可代表腫瘤群體，且 read depth 與 DNA 量近似成正比；
 實務上仍需考慮 allele-specific copy number、mapping／定序偏差與估計不確定性。</p>
+</div>
+</details>
 
 <div class="table-wrap">
 <table>

@@ -830,11 +830,15 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 <p class="prose">三者合起來記為 <math><msub><mi>L</mi><mi>u</mi></msub><mo>=</mo><mo>(</mo><msub><mi>X</mi><mi>u</mi></msub><mo>,</mo><msub><mi>E</mi><mi>u</mi></msub><mo>)</mo></math> 與 <math><msub><mi>ν</mi><mi>u</mi></msub></math>，
 樹根固定為全參考狀態 <math><msup><mn>0</mn><msub><mi>k</mi><mi>u</mi></msub></msup></math>。</p>
 
-<p class="prose"><math><mi>ν</mi></math> 有一個容易寫錯的地方：它是<b>專屬</b>的，不是累積的。
-一條分子只由它<b>所屬那一個</b>節點的狀態產生，不由祖先節點產生；
+<details class="reveal reveal--aside">
+<summary>變數補充：<math><mi>ν</mi></math> 是專屬比例，不是累積比例</summary>
+<div class="reveal__a">
+<p class="prose">一條分子只由它<b>所屬那一個</b>節點的狀態產生，不由祖先節點產生；
 祖先節點的 <math><mi>ν</mi></math> 因此是「還停留在該狀態的分子」的比例，可以很小。
 換句話說，<b>樹的形狀不對 <math><mi>ν</mi></math> 施加任何單調性</b>，
 它只規定哪些狀態可以<b>同時存在</b>。</p>
+</div>
+</details>
 
 <h4 id="先後關係幾乎不用估-四配子相容性">先後關係幾乎不用估：四配子相容性</h4>
 
@@ -940,7 +944,10 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 代表這個連鎖區段的錯誤地板偏高或家族誤標偏多。相容性檢定因此同時是品質訊號。</li>
 </ul>
 
-<p class="prose">還有一點：<math><msub><mi>X</mi><mi>u</mi></msub></math> 可以含<b>沒有被任何分子觀測到</b>的狀態。
+<details class="reveal reveal--aside">
+<summary>解讀補充：未觀測狀態可能是現存或歷史狀態</summary>
+<div class="reveal__a">
+<p class="prose"><math><msub><mi>X</mi><mi>u</mi></msub></math> 可以含<b>沒有被任何分子觀測到</b>的狀態。
 觀測到 <math><mn>110</mn></math> 與 <math><mn>101</mn></math> 而 <math><mn>100</mn></math> 沒看到時，
 兩者若不共用一個帶第一個突變的祖先，第一個突變就得發生兩次。
 這種狀態只有兩種身分 —— 現存但沒抽到（<math><mi>ν</mi><mo>&gt;</mo><mn>0</mn></math>），
@@ -948,6 +955,8 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 <b>前一篇還有第三種</b>：純粹因為「一步一個突變」的表示法而被迫補進來的記帳節點；
 本規格允許一條邊帶多個突變，那一種就隨表示法一起消失了。
 <span class="term" data-term="latent node" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-latent-node-4">latent node<span class="term__pop" id="gd-latent-node-4" role="tooltip"><b class="term__hd">latent node <i>潛在節點</i></b><span class="term__def" data-lang="zh">建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</span><span class="term__def" data-lang="en" lang="en">An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.</span><a class="term__more" href="glossary.html#latent-node">完整條目 →</a></span></span> 那條警告仍然適用，但適用範圍窄了一半。</p>
+</div>
+</details>
 
 <h4 id="什麼時候算-估完了">什麼時候算「估完了」</h4>
 

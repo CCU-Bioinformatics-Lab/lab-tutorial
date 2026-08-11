@@ -591,11 +591,16 @@ composite likelihood 近似，可以用，但必須<b>如此稱呼</b>，
 
 <div class="eq"><math display="block"><mi>P</mi><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><mi>Θ</mi><mo>)</mo><mo>=</mo><munder><mo>∑</mo><msub><mi>σ</mi><mi>u</mi></msub></munder><mi>P</mi><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><mi>Θ</mi><mo>,</mo><msub><mi>σ</mi><mi>u</mi></msub><mo>)</mo><mo>·</mo><mi>P</mi><mo>(</mo><msub><mi>σ</mi><mi>u</mi></msub><mo>)</mo></math></div>
 
-<p class="prose">兩個細節值得寫明。其一，<math><mi>σ</mi></math> 是每個連鎖視窗一個，
+<details class="reveal reveal--aside">
+<summary>作用域補充：<math><mi>σ</mi></math> 如何跨 phase set 定義</summary>
+<div class="reveal__a">
+<p class="prose"><math><mi>σ</mi></math> 是每個連鎖視窗一個，
 不是每個連鎖區段一個 —— 同一個連鎖視窗的兩個家族互為補集，共用同一個方向。
-其二，若兩個 phase set 之間沒有共享的變異，也沒有其他錨點，而且相關 clone 的比例又相同，
+若兩個 phase set 之間沒有共享的變異，也沒有其他錨點，而且相關 clone 的比例又相同，
 則它們的對應關係<b>真的</b>不可辨識。此時正確的輸出是保留數個等價的對應，
 而不是挑一個印出來。</p>
+</div>
+</details>
 
 <h3 id="三-預設是-multinomial-一條-read-是一個分子">三、預設是 multinomial：一條 read 是一個分子</h3>
 
@@ -805,12 +810,17 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
 </table>
 </div>
 
-<p class="prose">第三種最容易被誤讀。局部超立方體用的是「一步一個突變」的簡約假設，
+<details class="reveal reveal--aside">
+<summary>解讀邊界：記帳節點不等於 subclone</summary>
+<div class="reveal__a">
+<p class="prose">局部超立方體用的是「一步一個突變」的簡約假設，
 但全域的 <math><mi>z</mi></math> 把<b>多個</b>突變指派到同一個 clone —— 在全域這一層，
 <math><mn>010</mn><mo>→</mo><mn>111</mn></math> 完全可以是<b>一條邊</b>，中間不需要任何節點。
 所以那個補進來的節點是局部表示法的產物，不是「還沒找到的 subclone」。
 這正是 <span class="term" data-term="latent node" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-latent-node-3">latent node<span class="term__pop" id="gd-latent-node-3" role="tooltip"><b class="term__hd">latent node <i>潛在節點</i></b><span class="term__def" data-lang="zh">建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。</span><span class="term__def" data-lang="en" lang="en">An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.</span><a class="term__more" href="glossary.html#latent-node">完整條目 →</a></span></span> 那條警告的具體形式：潛在節點數 <math><mo>|</mo><mi>H</mi><mo>|</mo></math> 仍然是個有用的統計量
 （它量的是這份重建有多少比例來自推論），但它是<b>記帳</b>，不是證據。</p>
+</div>
+</details>
 
 <h3 id="五-分類是輸出-不是輸入">五、分類是輸出，不是輸入</h3>
 

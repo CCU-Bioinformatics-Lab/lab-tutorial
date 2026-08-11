@@ -713,9 +713,14 @@ pigeonhole 至此才容許分支 —— 所改變的是樹的拓撲，而非參�
 其中兩個成分位於同一位置 <math><mi>θ</mi><mo>=</mo><mn>0.12</mn></math>。
 pigeonhole 至此容許分支：<math><msub><mi>c</mi><mi>B</mi></msub><mo>+</mo><msub><mi>c</mi><mi>C</mi></msub><mo>=</mo><mn>0.80</mn><mo>≤</mo><msub><mi>c</mi><mi>A</mi></msub><mo>=</mo><mn>1.00</mn></math>。</p>
 
-<p class="prose">此處刻意說「機率極低」而非「不可行」：那一格空著也可能只是沒抽到，
+<details class="reveal reveal--aside">
+<summary>機率補充：空格不是結構零</summary>
+<div class="reveal__a">
+<p class="prose">此處說「機率極低」而非「不可行」：那一格空著也可能只是沒抽到，
 或只是定序錯誤沒把它造出來。<b>把它當成硬性的不可行是下篇要拆掉的一個誤讀</b> ——
 但只要跨越深度足夠，結論的方向不變。</p>
+</div>
+</details>
 
 <p class="prose">因此，<b>單一個共現觀測所改變的是樹的拓撲與群的個數，而非參數的數值</b>。
 這也是此路線的論據不在精度的原因：精度指「可區分，但量測是否準確」，
@@ -1043,8 +1048,13 @@ pigeonhole 至此容許分支：<math><msub><mi>c</mi><mi>B</mi></msub><mo>+</mo
 要真正定出 <math><mi>φ</mi></math>，需要的是<b>同群但分子池互相獨立</b>（即相距夠遠）的變異，
 而那組變異「真實頻率完全相等」的前提比本節弱得多。這是本路線尚未解決的問題之一。</p>
 
-<p class="prose">「點擴散函數」是此機制的比喻：真值為一個點，量測結果為具有寬度的散布。
+<details class="reveal reveal--aside">
+<summary>術語補充：「點擴散函數」只是一個比喻</summary>
+<div class="reveal__a">
+<p class="prose">真值為一個點，量測結果為具有寬度的散布。
 惟其操作內容為將一個 nuisance 參數由擬合改為量測，<b>並不涉及解卷積運算</b>。</p>
+</div>
+</details>
 
 <h3 id="五-用途三-以比值定出成分間距-使純度退化為整體縮放">五、用途三：以比值定出成分間距，使純度退化為整體縮放</h3>
 

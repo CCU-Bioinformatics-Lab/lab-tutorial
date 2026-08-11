@@ -275,9 +275,14 @@
 <p class="prose">在此示例中，indel F1 低於 SNV F1，表示 somatic-indel 的整體偵測效能仍有改善空間；
 後續方法會利用更多 read-level 特徵處理此問題。</p>
 
-<p class="prose">除了 homopolymer，還有一個原因是 <b>alignment 位置的模糊性</b>：
+<details class="reveal reveal--aside">
+<summary>補充：重複序列中的等價比對位置</summary>
+<div class="reveal__a">
+<p class="prose">除了 homopolymer，另一個原因是 <b>alignment 位置的模糊性</b>：
 同一個 deletion 在重複序列中可有多種等價表示位置，使不同 reads 的訊號分散。
 這些差異會反映在 <span class="term" data-term="CIGAR" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-cigar-4">CIGAR<span class="term__pop" id="gd-cigar-4" role="tooltip"><b class="term__hd">CIGAR</b><span class="term__def" data-lang="zh">描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。</span><span class="term__def" data-lang="en" lang="en">A compact string describing how read bases and reference positions are consumed by an alignment. For example, 5M1I5M has five alignment columns, one insertion, then five alignment columns; M may contain matches or mismatches.</span><a class="term__more" href="glossary.html#cigar">完整條目 →</a></span></span>；CIGAR 是描述 read 與參考序列對齊操作的字串。</p>
+</div>
+</details>
 
 <h3 id="三項核心數值">三項核心數值</h3>
 

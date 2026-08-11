@@ -199,9 +199,14 @@ driver 變異的頻率本即偏向 0 與 1 兩端，不易在中間頻率被觀�
 <code>10</code> 或 <code>01</code>。方法只能補入其一，而所補入者
 係「模型為連通所假設」，並非觀測所得。</p>
 
-<p class="prose">因此 latent node 的解讀須謹慎：它<b>並非</b>「一群尚未被觀測到的細胞」。
+<details class="reveal reveal--aside">
+<summary>解讀邊界：latent node 不一定是未觀測細胞群</summary>
+<div class="reveal__a">
+<p class="prose">latent node <b>並非</b>「一群尚未被觀測到的細胞」。
 它可能對應真實的中間世代（該群細胞其後被取代），亦可能僅為此模型記帳上的需要。
 且此處有兩種並列的補法（補 <code>10</code> 或補 <code>01</code>），資料同樣無從擇一。</p>
+</div>
+</details>
 
 {{guard:11 | 頻率群集不等於 clone tree}}
 <p class="prose">閱讀「腫瘤演化樹」一類圖示時，須區分圖上的兩種內容：
@@ -299,11 +304,16 @@ CCF 換算是在<b>估計邊際</b>，簡約性則是在<b>推定聯合</b>。
 <p class="prose">2014 年的 methclone 即在執行此項工作：它自 read 直接計數 epiallele 的組成，
 再以組成的熵變化量衡量兩個時間點之間譜系結構的改變。</p>
 
-<p class="prose">其技術要求值得留意，因為該形式為<b>此類做法所共有</b>，各工具所選的數值不同而已。
+<details class="reveal reveal--aside">
+<summary>資料需求：epiallele 分析需要多少 CpG 與深度</summary>
+<div class="reveal__a">
+<p class="prose">該形式為<b>此類做法所共有</b>，各工具所選的數值不同而已。
 methclone 要求單一條 read 跨越 <b>4 個相鄰的 CpG</b>（對應 {{m: 2^4 = 16}} 種可能組合），
 且該位置須有 <b>60× 以上的深度</b>，組成比例方能估得準確。
 亦即：同一條分子上須有足夠多的 CpG，且此類分子須有足夠的數量 ——
 4 為 methclone 的選擇，並非自然常數。</p>
+</div>
+</details>
 
 <h3>短讀相對於此門檻的位置</h3>
 
@@ -487,11 +497,16 @@ HP1-1 ⊂ HP1，且 HP1-1 與 HP1-2 為兄弟。前述六個 SNV 的例子之所
 它所回答的是「在此連鎖視窗內，這幾個變異的先後次序」。
 而其回答的品質直接取決於突變負荷：負荷越高，{{m: k ≥ 2}} 的連鎖視窗越多，該偏序的可用範圍越大。</p>
 
-<p class="prose">一項技術細節須先釐清，否則兩張圖不對等：左側該類圖通常為<b>全基因體</b>尺度
+<details class="reveal reveal--aside">
+<summary>比較口徑：全基因體頻率圖如何由局部視窗匯總</summary>
+<div class="reveal__a">
+<p class="prose">左側該類圖通常為<b>全基因體</b>尺度
 （數千個位點全部納入），此處所繪為<b>單一連鎖視窗</b>。若要製作全基因體版本，
 即將各連鎖視窗各自算得的單倍型頻率全部匯入同一張直方圖 ——
 標籤具有局部性（跨連鎖視窗的 HP1-1 並非同一條，重要區分 #13 為此現象的極端情形），
 但<b>頻率值可以匯總</b>。</p>
+</div>
+</details>
 
 <p class="prose">故此路線所要檢驗的是一個具體的問題：
 <b>將頻率的計數單位由單一位點改為多位點的單倍型，重建所得的樹是否不同？</b>

@@ -80,10 +80,16 @@ M8 的<a href="m08.html#guard-2">重要區分 #2</a> 已建立此一分家，本
 
 <p class="prose"><b>[[logR|深度比]]</b>為同一位點上腫瘤與正常樣本的 read 深度比取以 2 為底的對數。
 ASCAT 的實作（<code>ascat.prepareHTS.R</code> 的 <code>ascat.getBAFsAndLogRs</code>）
-在取對數之後，再以<b>全基因體比值的算術平均</b>重新置中。
-此處有一項容易誤解之處：置中之後的 0 <b>並不代表兩份拷貝</b>，
+在取對數之後，再以<b>全基因體比值的算術平均</b>重新置中。</p>
+
+<details class="reveal reveal--aside">
+<summary>解讀補充：置中後的 logR=0 不代表二倍體</summary>
+<div class="reveal__a">
+<p class="prose">置中之後的 0 <b>並不代表兩份拷貝</b>，
 它只代表「與全基因體平均相同」。ASCAT 因此在擬合完成後，
 以擬合所得的拷貝數輪廓重新計算倍體，而不採用網格搜尋時所用的那個值。</p>
+</div>
+</details>
 
 <p class="prose"><b>[[B-allele frequency]]</b>僅在 <b>germline heterozygous</b> 位點計算。
 germline homozygous 位點在腫瘤與正常樣本中皆為 0 或 1，對純度零資訊，故予以剔除。
@@ -134,8 +140,9 @@ b_i = \frac{ρ · n_B + (1 − ρ)}{ρ · (n_A + n_B) + 2 · (1 − ρ)}
 SNP 陣列取 0.55，<b>定序資料一律取 1</b>。它以 {{m: 2^{r/γ}}} 的形式進入反解，
 故設錯將使所有拷貝數整體縮放。</p>
 
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd">兩處與文獻用語不一致，須以原始碼為準</p>
+<details class="reveal reveal--aside">
+<summary>來源補充：ASCAT 反轉換式與文獻符號的對照</summary>
+<div class="reveal__a">
 <p class="prose">其一，ASCAT 原始文獻中的三條編號式在公開版本上為<b>影像</b>而非文字，
 上列兩式取自參考實作 <code>ascat.runAscat.R</code> 的 <code>rBacktransform</code> 與
 <code>bBacktransform</code>，與該文對 {{m: ρ}}、{{m: ψ}}、{{m: γ}} 的文字定義自洽。</p>
@@ -143,6 +150,7 @@ SNP 陣列取 0.55，<b>定序資料一律取 1</b>。它以 {{m: 2^{r/γ}}} 的
 的變數是 {{m: ψ_t}}，即<b>腫瘤</b>倍體；程式碼在需要 {{m: ψ}} 之處一律展開寫成
 <code>((1-rho)*2+rho*psi)</code>。兩者相差一個與 {{m: ρ}} 有關的項，混用將使拷貝數整體偏移。</p>
 </div>
+</details>
 
 <h3>三、反解式</h3>
 
@@ -253,9 +261,14 @@ SNP 陣列取 0.55，<b>定序資料一律取 1</b>。它以 {{m: 2^{r/γ}}} 的
 兩者並非近似相等，而是恆等，故任何以這兩條軌道為輸入的方法皆不可能區分。
 ASCAT 原始文獻在 79 例的驗證中有 10 例（12.7%）落於此點，該文亦明白寫出此限制。</p>
 
-<p class="prose">此處的方向性值得留意：<b>任何一組解皆可再加倍，但只有各處拷貝數皆為偶數的解可以對半</b>。
+<details class="reveal reveal--aside">
+<summary>數學補充：解可加倍，但不一定能對半</summary>
+<div class="reveal__a">
+<p class="prose"><b>任何一組解皆可再加倍，但只有各處拷貝數皆為偶數的解可以對半</b>。
 因此格點族在加倍方向上無界，實際的界限來自倍體的上限與簡約性偏好，
 而非來自資料。</p>
+</div>
+</details>
 
 <p class="prose">此處與上一節的錨相互印證：{{m: ρ = 1}} 時正常細胞的錨消失，
 而正是在該處加倍的簡併最為徹底。</p>

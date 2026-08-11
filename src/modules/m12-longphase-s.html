@@ -153,10 +153,15 @@ GHIR = \frac{\max(\text{HP1 read 數}, \text{HP2 read 數})}{\text{HP1 read 數}
 <b>最上方標出訓練標籤的來源</b>：五個樣本是把純腫瘤與正常的 BAM 依 read 數混出來的，
 所以已知的那個數字是<b>分子</b>的比例。最下方是訓練方式與外推的界線。}}
 
-<p class="prose">為什麼只用兩個特徵就夠？因為要學的是一條單調的關係，不是分類問題；
+<details class="reveal reveal--aside">
+<summary>模型補充：為何迴歸只用兩個特徵</summary>
+<div class="reveal__a">
+<p class="prose">要學的是一條單調的關係，不是分類問題；
 特徵少也讓模型不容易在八個資料集上過擬合。
 代價是這條曲線只在<b>訓練資料涵蓋的範圍內</b>可信 ——
 這也是後面「判讀練習」要處理的問題。</p>
+</div>
+</details>
 
 <h3>這個迴歸估的是哪一個量</h3>
 

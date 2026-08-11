@@ -152,9 +152,14 @@ LongPhase-TO 做的是<b>再校正</b>（[[recalibration]]）：把明顯不合�
 加上 LOH 佔了基因體多少。為什麼要加 LOH 這一項？因為 LOH 區本身就會把比值推向 1.0
 （那裡本來就只剩一條），只看比值分布會高估。兩個特徵一起看，才對得起來。</p>
 
+<details class="reveal reveal--aside">
+<summary>模型邊界：預訓練係數何時可能失準</summary>
+<div class="reveal__a">
 <p class="prose">這條式子的係數是在幾個已知答案的細胞株資料上配出來後<b>固定下來</b>的，
 之後每個樣本都用同一組係數。所以它的可靠度取決於新樣本跟當初那些細胞株像不像 ——
 這是所有預訓練模型共通的邊界條件，不是這個工具特有的問題。</p>
+</div>
+</details>
 </section>
 
 
@@ -174,11 +179,16 @@ longphase-to phase \
   --loh
 {{/cli}}
 
-<p class="cli-note">四個容易寫錯的地方：<code>--caller</code> 只接受
+<details class="reveal reveal--aside">
+<summary>指令提醒：四個常見參數錯誤</summary>
+<div class="reveal__a">
+<p class="prose"><code>--caller</code> 只接受
 <code>clairs_to_ss</code>、<code>clairs_to_ssrs</code>、<code>deepsomatic_to</code>，寫錯會直接報錯結束。
 <code>--pon-file</code> 的值是<b>一個用逗號分隔的字串</b>，不是重複的旗標。
 <code>--strict-pon-file</code> 比 <code>--pon-file</code> 嚴格：它要求位置<b>與</b> ALT allele 都吻合才算命中。
 <code>--loh</code> 不加就不會輸出 LOH 區間。</p>
+</div>
+</details>
 
 {{fig:b-s31-somatic-calling}}
 
@@ -306,8 +316,9 @@ longphase-to phase ... --dot -o phased_prefix
 它跟一般定相用的 <code>--connectAdjacent</code>（預設 35）是<b>兩個不同的參數</b>，別看錯。</p>
 </div>
 
-<h3>兩個版本的差異對照表</h3>
-
+<details class="reveal reveal--aside">
+<summary>實作查表：LongPhase-S 與 LongPhase-TO 的差異</summary>
+<div class="reveal__a">
 <p class="prose">在兩個工具之間切換時最容易搞混的六件事：</p>
 
 <div class="table-wrap">
@@ -323,6 +334,8 @@ longphase-to phase ... --dot -o phased_prefix
 </tbody>
 </table>
 </div>
+</div>
+</details>
 
 {{quiz:m13}}
 

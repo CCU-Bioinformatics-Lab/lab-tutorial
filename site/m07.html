@@ -1076,9 +1076,14 @@ clonality 與 depth（完整關係式見 M8）。因此不能只用「有沒有�
   <text class="anno zh" x="20" y="676">LongPhase-S 把它實作成 read-level 與 haplotype origin 兩個過濾器，門檻與細節見 M12。</text>
 </svg><figcaption>兩欄的支持 read <b>總數刻意設成一樣</b>（12 條裡 4 條，VAF 都是 0.33），因為重點正是「光看數量分不出來」。左欄 4 條全在 HP1；右欄 2 條在 HP1、2 條在 HP2。這個判準不需要配對正常樣本，只需要 read 夠長到同時蓋住 germline 錨點與候選位置 —— 所以它是 long read 才拿得到的證據。</figcaption></figure>
 
+<details class="reveal reveal--aside">
+<summary>實作對照：LongPhase-S 與 LongPhase-TO</summary>
+<div class="reveal__a">
 <p class="prose">這個想法在兩個工具裡有不同的實作：LongPhase-S 做成 read-level 與 haplotype origin
 兩個過濾器（四個過濾器與各自的門檻見 M12）；LongPhase-TO 把它擴展成三個位點的
 <span class="term" data-term="triplet graph" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-triplet-graph-12">triplet graph<span class="term__pop" id="gd-triplet-graph-12" role="tooltip"><b class="term__hd">triplet graph</b><span class="term__def" data-lang="zh">LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。</span><span class="term__def" data-lang="en" lang="en">LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.</span><a class="term__more" href="glossary.html#triplet-graph">完整條目 →</a></span></span>，用路徑結構判斷（見 M13）。</p>
+</div>
+</details>
 
 <h3 id="一句話總結">一句話總結</h3>
 

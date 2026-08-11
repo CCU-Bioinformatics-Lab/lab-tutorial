@@ -123,6 +123,19 @@ html[data-gloss="both"] .term__def[data-lang="en"] {
 .reveal__a { margin-top: var(--sp-4); padding-top: var(--sp-4); border-top: 1px dashed var(--rule); }
 .reveal__a > :last-child { margin-bottom: 0; }
 
+/* 補充說明：比練習答案更低調，讓主論述可連續閱讀。 */
+.reveal--aside {
+  background: transparent;
+  border-style: dashed;
+  padding-block: var(--sp-3);
+  margin-block: var(--sp-4);
+}
+.reveal--aside > summary {
+  color: var(--muted);
+  font-weight: 600;
+}
+.reveal--aside[open] > summary { color: var(--accent); }
+
 /* --- 「這出現在哪」來源卡 ---------------------------------------------- */
 .source-card {
   border: 1px solid var(--rule);

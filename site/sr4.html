@@ -263,14 +263,17 @@ subclonality 僅作為混淆項出現，其重建屬另一主題。</p>
 <code>H1</code> 與 <code>H2</code> 的 read 數。實作見 <code>HaplotagStrategy.h</code> 的
 <code>calculateHaplotypeImbalanceRatio</code>。</p></div>
 
-<p class="prose">三件必須先講清楚的事。</p>
-
-<p class="prose"><b>其一，分母只有 <code>H1</code> 與 <code>H2</code> 兩個計數。</b>
+<details class="reveal reveal--aside">
+<summary>實作補充：GHIR 分母只含 H1 與 H2</summary>
+<div class="reveal__a">
+<p class="prose">分母只有 <code>H1</code> 與 <code>H2</code> 兩個計數。
 <code>H1-1</code>、<code>H2-1</code>、<code>H3</code> 與未標記者<b>皆不在分母之內</b>。
 這一點決定了後續整個閉式的形狀，且與「涵蓋該位點的總 read 數」一語不同；
 以式子與原始碼為準。</p>
+</div>
+</details>
 
-<p class="prose"><b>其二，帶有 somatic 等位的 read 不會落入 <code>H1</code> 或 <code>H2</code>。</b>
+<p class="prose"><b>帶有 somatic 等位的 read 不會落入 <code>H1</code> 或 <code>H2</code>。</b>
 標記程序先判定該 read 是否帶有 somatic 等位（<code>tumorMaxHPcount != 0</code>），
 帶有者才進入 <code>H1-1</code>／<code>H2-1</code>／<code>H3</code> 的分支；
 兩個 germline 計數<b>僅收未帶 somatic 等位的 read</b>。</p>
@@ -290,10 +293,15 @@ subclonality 僅作為混淆項出現，其重建屬另一主題。</p>
 <b>但不足以定義任何單一位點的等位比例</b>。第五節據此重寫。</p>
 </div>
 
-<p class="prose"><b>其三，<code>max()</code> 使值域為 <math><mo>[</mo><mn>0.5</mn><mo>,</mo><mn>1</mn><mo>]</mo></math>。</b>
+<details class="reveal reveal--aside">
+<summary>實作補充：GHIR 的折疊與邊界值</summary>
+<div class="reveal__a">
+<p class="prose"><code>max()</code> 使值域為 <math><mo>[</mo><mn>0.5</mn><mo>,</mo><mn>1</mn><mo>]</mo></math>。
 這是一個<b>折疊</b>統計量，與上篇所述 AMBER 取兩個等位較大者的做法同型。
 邊界情形另有規定：兩個計數皆為零時回傳 0，僅其一為零時回傳 1，
 前者被後續濾波當作哨兵值排除。</p>
+</div>
+</details>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" class="dia-svg" role="img" aria-labelledby="sr4-ghir-buckets__title" aria-describedby="sr4-ghir-buckets__desc">
   <title id="sr4-ghir-buckets__title">一個 somatic 位點上的五個計數，以及 GHIR 的分母只含其中兩個</title>
@@ -1130,12 +1138,17 @@ GHIR 取兩者較大者除以兩者之和，故隨純度單調上升 —— 三�
 </table>
 </div>
 
+<details class="reveal reveal--aside">
+<summary>工程現況：四格表原料已存在，但尚未彙總</summary>
+<div class="reveal__a">
 <p class="prose">此表在現行實作中<b>尚未被彙總</b>，但其原料已經存在：
 <code>variantsHP</code> 記錄了每條 read 在每個位點的等位類別，
 且 <code>tumorPosReadCorrBaseHP[pos][readID]</code> 已將其逐位點、逐 read 保留下來。
 分子側另有一個確為逐位點的計數 <code>somaticReadHpCount</code> ——
 它只在該 read <b>於該位點</b>帶有 somatic 等位時才累加，故可直接充當 <math><msub><mi>R</mi><mrow><mn>1,</mn><mi>alt</mi></mrow></msub></math>。
 缺的是分母側：<code>ReadHpCount[H1]</code> 會漏掉「在別處帶 somatic 變異、在此處為 REF」的 read。</p>
+</div>
+</details>
 
 <div class="eq"><math display="block"><mi>s</mi><mo>(</mo><mi>i</mi><mo>)</mo><mo>=</mo><mfrac><msub><mi>R</mi><mrow><mn>1,</mn><mi>alt</mi></mrow></msub><mrow><msub><mi>R</mi><mrow><mn>1,</mn><mi>alt</mi></mrow></msub><mo>+</mo><msub><mi>R</mi><mrow><mn>1,</mn><mi>ref</mi></mrow></msub></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>p</mi><mo>·</mo><mi>c</mi><mo>·</mo><mi>μ</mi></mrow><mrow><mi>p</mi><mo>·</mo><msub><mi>n</mi><mn>1</mn></msub><mo>+</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo>)</mo></mrow></mfrac></math><p class="eq__note">分母為單倍型 1 在該位點的<b>全部</b>分子數，與該 read 在其他位置的 somatic 狀態無關。</p></div>
 
@@ -1561,8 +1574,13 @@ copy-neutral LOH、該條的擴增、變異發生於擴增之前或之後（決�
 </table>
 </div>
 
-<p class="prose">須注意第三列：區塊 N50 與拷貝數區段的尺度相近，
+<details class="reveal reveal--aside">
+<summary>尺度補充：N50 相近不代表斷點對應</summary>
+<div class="reveal__a">
+<p class="prose">區塊 N50 與拷貝數區段的尺度相近，
 但<b>尺度相近不蘊含斷點對應</b>。此點在下篇第三節展開。</p>
+</div>
+</details>
 </section>
 
 

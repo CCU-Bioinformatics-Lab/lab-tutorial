@@ -47,11 +47,13 @@
   /* 紙上不能有東西藏在互動後面 */
   details, details[open] { display: block; }
   details > summary { list-style: none; font-weight: 600; }
+  details > :not(summary) { display: block !important; }
   .reveal > summary::before { content: "" !important; }
   .reveal > summary::after {
     content: "（答案如下）";
     font-weight: 400; color: var(--muted); font-size: .9em;
   }
+  .reveal--aside > summary::after { content: "（補充說明如下）"; }
   .quiz__why, .quiz__explain { display: block !important; }
 
   /* 分頁控制 */

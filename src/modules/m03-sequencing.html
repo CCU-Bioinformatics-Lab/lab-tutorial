@@ -73,9 +73,14 @@
 <p class="prose">在此示例中，indel F1 低於 SNV F1，表示 somatic-indel 的整體偵測效能仍有改善空間；
 後續方法會利用更多 read-level 特徵處理此問題。</p>
 
-<p class="prose">除了 homopolymer，還有一個原因是 <b>alignment 位置的模糊性</b>：
+<details class="reveal reveal--aside">
+<summary>補充：重複序列中的等價比對位置</summary>
+<div class="reveal__a">
+<p class="prose">除了 homopolymer，另一個原因是 <b>alignment 位置的模糊性</b>：
 同一個 deletion 在重複序列中可有多種等價表示位置，使不同 reads 的訊號分散。
 這些差異會反映在 [[CIGAR]]；CIGAR 是描述 read 與參考序列對齊操作的字串。</p>
+</div>
+</details>
 
 <h3>三項核心數值</h3>
 
