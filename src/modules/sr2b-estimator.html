@@ -162,7 +162,7 @@ P(D\mid Θ_K)=∏_{m∈ S_1}P_{BB}(a_m\mid d_m,Θ_K)
 <tr><td>{{m: S_1}}</td><td>只含一個變異、而且其 read 未進入任何多變異連鎖區段的變異集合</td></tr>
 <tr><td>{{m: S_2}}</td><td>含兩個以上變異的連鎖區段集合；{{m: u}} 是其中一個區段，{{m: k_u}} 是該區段的變異數</td></tr>
 <tr><td>{{m: D_u}}</td><td>連鎖區段 {{m: u}} 的逐條 read 觀測：覆蓋遮罩、ref／alt 狀態與家族標記</td></tr>
-<tr><td>{{m: P_{BB}}}</td><td>第一個變異的 beta-binomial 機率；中心與離散度已包含在參數中</td></tr>
+<tr><td>{{m: P_{BB}}}</td><td>{{m: S_1}} 中一個單變異觀測的 beta-binomial 機率；中心與離散度已包含在參數中</td></tr>
 <tr><td>{{m: P_u}}</td><td>第二節才會展開的多變異聯合 read 模型；它也包含各位點的邊際 VAF</td></tr>
 <tr><td>{{m: Θ_K}}</td><td>固定群數 {{m: K}} 時所有待估狀態的縮寫</td></tr>
 </tbody>
@@ -172,9 +172,16 @@ P(D\mid Θ_K)=∏_{m∈ S_1}P_{BB}(a_m\mid d_m,Θ_K)
 <p class="prose">更完整地說，{{m: Θ_K}} 包含 clone 細胞比例 {{m: w}}、[[clone tree]] {{m: T}}、
 突變指派 {{m: z}}、逐拷貝基因型 {{m: G}}、觀測錯誤參數 {{m: e}}，以及未被外部固定時的純度 {{m: ρ}}。
 {{m: c_k}} 由 {{m: w}}、{{m: T}} 與 {{m: z}} 決定，{{m: μ_m}} 由 {{m: G}} 決定。
+{{m: e}} 不是一個錯誤率，而是一組觀測通道參數的縮寫，包括稍後的逐位點錯誤 {{m: ε}} 與
+連鎖區段家族誤標率 {{m: ξ_u}}。
 外部提供的 copy number 與校準後的 {{m: \hat{φ}}} 是條件輸入，為了避免式子過長沒有逐項寫在條件線右側。</p>
 
-<p class="prose"><b>成立的關鍵不是「{{m: S_1}} 與 {{m: S_2}} 兩個名字不同」，而是它們背後使用的 read 沒有交集。</b>
+<p class="prose">本式把 {{m: z}} 當作與其他參數共同最佳化的離散狀態，也就是輸出一組明確的突變指派。
+若實作選擇把 {{m: z}} 邊際化，likelihood 必須改為對所有指派加總，模型選擇的校準也要跟著重做；
+兩種推論方式不可在同一個 {{m: Score}} 裡混用。</p>
+
+<p class="prose"><b>成立的關鍵不是「{{m: S_1}} 與 {{m: S_2}} 兩個名字不同」，而是給定
+{{m: Θ_K}} 後，兩者背後的 read 觀測可視為條件獨立且沒有交集。</b>
 若一批 read 已進入 {{m: D_u}}，它就不能再透過該位點的 {{m: a_m/d_m}} 進入第一個乘積。</p>
 
 <p class="prose">要點在於 {{m: S_2}} 的因子<b>已經包含</b>那些變異的邊際 VAF：
@@ -195,7 +202,7 @@ Score(K,Θ_K)=L_{data}(K,Θ_K)−\frac{1}{2}p_K\log M_{eff}+\log p(K),
 \qquad
 \hat{Θ}_K=\arg\max_{Θ_K}L_{data}(K,Θ_K),
 \quad
-\hat K=\arg\max_K Score(K,\hat{Θ}_K)
+\hat K=\arg\max_{K\in\{1,\ldots,K_{max}\}} Score(K,\hat{Θ}_K)
 {{/eq}}
 
 <div class="table-wrap">
@@ -209,7 +216,7 @@ Score(K,Θ_K)=L_{data}(K,Θ_K)−\frac{1}{2}p_K\log M_{eff}+\log p(K),
 </table>
 </div>
 
-<p class="prose">其中 {{m: p_K}} 是群數固定為 {{m: K}} 時真正被估計的自由參數數目；
+<p class="prose">其中 {{m: K_{max}}} 是分析前指定的最大候選群數；{{m: p_K}} 是群數固定為 {{m: K}} 時真正被估計的自由參數數目；
 {{m: M_{eff}}} 是考慮同一突變叢與同一連鎖區段內相關性後的<b>有效獨立資訊量</b>，
 不是把 read 或變異數直接代入；{{m: p(K)}} 是群數先驗。
 先對每個候選 {{m: K}} 找到最佳的 {{m: \hat{Θ}_K}}，再比較其分數。
@@ -227,7 +234,7 @@ held-out predictive score，而不是把未校準的 BIC 當成精確答案。</
 
 <h3>二、一個多變異連鎖區段的生成模型</h3>
 
-<p class="prose">上式的 {{m: P_u(D_u \mid Θ)}} 是整份規格的核心。它必須從全域參數<b>一路長到一條 read
+<p class="prose">上式的 {{m: P_u(D_u \mid Θ_K)}} 是整份規格的核心。它必須從全域參數<b>一路長到一條 read
 上看到的字母</b>，中間不能有任何自由參數 —— 一旦局部比例可以自己亂動，
 這個連鎖區段就不再對全域參數施加任何限制，整條路線也就白做了。</p>
 
@@ -327,7 +334,7 @@ composite likelihood 近似，可以用，但必須<b>如此稱呼</b>，
 處理方式是引入一個局部方向變數 {{m: σ_u ∈ \{原樣, 對調\}}} 並把它邊際化：</p>
 
 {{eq}}
-P(D_u \mid Θ) = \sum_{σ_u} P(D_u \mid Θ, σ_u) · P(σ_u)
+P(D_u \mid Θ_K) = \sum_{σ_u} P(D_u \mid Θ_K, σ_u) · P(σ_u)
 {{/eq}}
 
 <details class="reveal reveal--aside">

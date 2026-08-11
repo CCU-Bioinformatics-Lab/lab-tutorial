@@ -258,7 +258,7 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 <tr><td><math><msub><mi>S</mi><mn>1</mn></msub></math></td><td>只含一個變異、而且其 read 未進入任何多變異連鎖區段的變異集合</td></tr>
 <tr><td><math><msub><mi>S</mi><mn>2</mn></msub></math></td><td>含兩個以上變異的連鎖區段集合；<math><mi>u</mi></math> 是其中一個區段，<math><msub><mi>k</mi><mi>u</mi></msub></math> 是該區段的變異數</td></tr>
 <tr><td><math><msub><mi>D</mi><mi>u</mi></msub></math></td><td>連鎖區段 <math><mi>u</mi></math> 的逐條 read 觀測：覆蓋遮罩、ref／alt 狀態與家族標記</td></tr>
-<tr><td><math><msub><mi>P</mi><mi>BB</mi></msub></math></td><td>第一個變異的 beta-binomial 機率；中心與離散度已包含在參數中</td></tr>
+<tr><td><math><msub><mi>P</mi><mi>BB</mi></msub></math></td><td><math><msub><mi>S</mi><mn>1</mn></msub></math> 中一個單變異觀測的 beta-binomial 機率；中心與離散度已包含在參數中</td></tr>
 <tr><td><math><msub><mi>P</mi><mi>u</mi></msub></math></td><td>第二節才會展開的多變異聯合 read 模型；它也包含各位點的邊際 VAF</td></tr>
 <tr><td><math><msub><mi>Θ</mi><mi>K</mi></msub></math></td><td>固定群數 <math><mi>K</mi></math> 時所有待估狀態的縮寫</td></tr>
 </tbody>
@@ -268,9 +268,16 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 <p class="prose">更完整地說，<math><msub><mi>Θ</mi><mi>K</mi></msub></math> 包含 clone 細胞比例 <math><mi>w</mi></math>、<span class="term" data-term="clone tree" tabindex="0" role="button" aria-expanded="false" aria-describedby="gd-clone-tree-3">clone tree<span class="term__pop" id="gd-clone-tree-3" role="tooltip"><b class="term__hd">clone tree <i>克隆演化樹</i></b><span class="term__def" data-lang="zh">描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</span><span class="term__def" data-lang="en" lang="en">A tree describing ancestral relationships among cell populations in a tumour: nodes are groups of cells sharing a mutation set, edges represent additional mutations acquired on top of an ancestor. Multiple trees are often compatible with the same clusters.</span><a class="term__more" href="glossary.html#clone-tree">完整條目 →</a></span></span> <math><mi>T</mi></math>、
 突變指派 <math><mi>z</mi></math>、逐拷貝基因型 <math><mi>G</mi></math>、觀測錯誤參數 <math><mi>e</mi></math>，以及未被外部固定時的純度 <math><mi>ρ</mi></math>。
 <math><msub><mi>c</mi><mi>k</mi></msub></math> 由 <math><mi>w</mi></math>、<math><mi>T</mi></math> 與 <math><mi>z</mi></math> 決定，<math><msub><mi>μ</mi><mi>m</mi></msub></math> 由 <math><mi>G</mi></math> 決定。
+<math><mi>e</mi></math> 不是一個錯誤率，而是一組觀測通道參數的縮寫，包括稍後的逐位點錯誤 <math><mi>ε</mi></math> 與
+連鎖區段家族誤標率 <math><msub><mi>ξ</mi><mi>u</mi></msub></math>。
 外部提供的 copy number 與校準後的 <math><mover accent="true"><mi>φ</mi><mo>^</mo></mover></math> 是條件輸入，為了避免式子過長沒有逐項寫在條件線右側。</p>
 
-<p class="prose"><b>成立的關鍵不是「<math><msub><mi>S</mi><mn>1</mn></msub></math> 與 <math><msub><mi>S</mi><mn>2</mn></msub></math> 兩個名字不同」，而是它們背後使用的 read 沒有交集。</b>
+<p class="prose">本式把 <math><mi>z</mi></math> 當作與其他參數共同最佳化的離散狀態，也就是輸出一組明確的突變指派。
+若實作選擇把 <math><mi>z</mi></math> 邊際化，likelihood 必須改為對所有指派加總，模型選擇的校準也要跟著重做；
+兩種推論方式不可在同一個 <math><mi>Score</mi></math> 裡混用。</p>
+
+<p class="prose"><b>成立的關鍵不是「<math><msub><mi>S</mi><mn>1</mn></msub></math> 與 <math><msub><mi>S</mi><mn>2</mn></msub></math> 兩個名字不同」，而是給定
+<math><msub><mi>Θ</mi><mi>K</mi></msub></math> 後，兩者背後的 read 觀測可視為條件獨立且沒有交集。</b>
 若一批 read 已進入 <math><msub><mi>D</mi><mi>u</mi></msub></math>，它就不能再透過該位點的 <math><msub><mi>a</mi><mi>m</mi></msub><mo>/</mo><msub><mi>d</mi><mi>m</mi></msub></math> 進入第一個乘積。</p>
 
 <p class="prose">要點在於 <math><msub><mi>S</mi><mn>2</mn></msub></math> 的因子<b>已經包含</b>那些變異的邊際 VAF：
@@ -282,7 +289,7 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 
 <div class="eq"><math display="block"><msub><mi>L</mi><mi>data</mi></msub><mo>(</mo><mi>K</mi><mo>,</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>=</mo><munder><mo>∑</mo><mrow><mi>m</mi><mo>∈</mo><msub><mi>S</mi><mn>1</mn></msub></mrow></munder><mi>log</mi><msub><mi>P</mi><mi>BB</mi></msub><mo>(</mo><msub><mi>a</mi><mi>m</mi></msub><mo>∣</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>+</mo><munder><mo>∑</mo><mrow><mi>u</mi><mo>∈</mo><msub><mi>S</mi><mn>2</mn></msub></mrow></munder><mi>log</mi><msub><mi>P</mi><mi>u</mi></msub><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo></math></div>
 
-<div class="eq"><math display="block"><mi>Score</mi><mo>(</mo><mi>K</mi><mo>,</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>=</mo><msub><mi>L</mi><mi>data</mi></msub><mo>(</mo><mi>K</mi><mo>,</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>p</mi><mi>K</mi></msub><mi>log</mi><msub><mi>M</mi><mi>eff</mi></msub><mo>+</mo><mi>log</mi><mi>p</mi><mo>(</mo><mi>K</mi><mo>)</mo><mo>,</mo><mspace width="2em"/><msub><mover accent="true"><mi>Θ</mi><mo>^</mo></mover><mi>K</mi></msub><mo>=</mo><mi>arg</mi><msub><mi>max</mi><msub><mi>Θ</mi><mi>K</mi></msub></msub><msub><mi>L</mi><mi>data</mi></msub><mo>(</mo><mi>K</mi><mo>,</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>,</mo><mspace width="1em"/><mover accent="true"><mi>K</mi><mo>^</mo></mover><mo>=</mo><mi>arg</mi><msub><mi>max</mi><mi>K</mi></msub><mi>Score</mi><mo>(</mo><mi>K</mi><mo>,</mo><msub><mover accent="true"><mi>Θ</mi><mo>^</mo></mover><mi>K</mi></msub><mo>)</mo></math></div>
+<div class="eq"><math display="block"><mi>Score</mi><mo>(</mo><mi>K</mi><mo>,</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>=</mo><msub><mi>L</mi><mi>data</mi></msub><mo>(</mo><mi>K</mi><mo>,</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>p</mi><mi>K</mi></msub><mi>log</mi><msub><mi>M</mi><mi>eff</mi></msub><mo>+</mo><mi>log</mi><mi>p</mi><mo>(</mo><mi>K</mi><mo>)</mo><mo>,</mo><mspace width="2em"/><msub><mover accent="true"><mi>Θ</mi><mo>^</mo></mover><mi>K</mi></msub><mo>=</mo><mi>arg</mi><msub><mi>max</mi><msub><mi>Θ</mi><mi>K</mi></msub></msub><msub><mi>L</mi><mi>data</mi></msub><mo>(</mo><mi>K</mi><mo>,</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>,</mo><mspace width="1em"/><mover accent="true"><mi>K</mi><mo>^</mo></mover><mo>=</mo><mi>arg</mi><msub><mi>max</mi><mrow><mi>K</mi><mo>∈</mo><mo>{</mo><mn>1,</mn><mo>…</mo><mo>,</mo><msub><mi>K</mi><mi>max</mi></msub><mo>}</mo></mrow></msub><mi>Score</mi><mo>(</mo><mi>K</mi><mo>,</mo><msub><mover accent="true"><mi>Θ</mi><mo>^</mo></mover><mi>K</mi></msub><mo>)</mo></math></div>
 
 <div class="table-wrap">
 <table>
@@ -295,7 +302,7 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 </table>
 </div>
 
-<p class="prose">其中 <math><msub><mi>p</mi><mi>K</mi></msub></math> 是群數固定為 <math><mi>K</mi></math> 時真正被估計的自由參數數目；
+<p class="prose">其中 <math><msub><mi>K</mi><mi>max</mi></msub></math> 是分析前指定的最大候選群數；<math><msub><mi>p</mi><mi>K</mi></msub></math> 是群數固定為 <math><mi>K</mi></math> 時真正被估計的自由參數數目；
 <math><msub><mi>M</mi><mi>eff</mi></msub></math> 是考慮同一突變叢與同一連鎖區段內相關性後的<b>有效獨立資訊量</b>，
 不是把 read 或變異數直接代入；<math><mi>p</mi><mo>(</mo><mi>K</mi><mo>)</mo></math> 是群數先驗。
 先對每個候選 <math><mi>K</mi></math> 找到最佳的 <math><msub><mover accent="true"><mi>Θ</mi><mo>^</mo></mover><mi>K</mi></msub></math>，再比較其分數。
@@ -313,7 +320,7 @@ held-out predictive score，而不是把未校準的 BIC 當成精確答案。</
 
 <h3 id="二-一個多變異連鎖區段的生成模型">二、一個多變異連鎖區段的生成模型</h3>
 
-<p class="prose">上式的 <math><msub><mi>P</mi><mi>u</mi></msub><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><mi>Θ</mi><mo>)</mo></math> 是整份規格的核心。它必須從全域參數<b>一路長到一條 read
+<p class="prose">上式的 <math><msub><mi>P</mi><mi>u</mi></msub><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo></math> 是整份規格的核心。它必須從全域參數<b>一路長到一條 read
 上看到的字母</b>，中間不能有任何自由參數 —— 一旦局部比例可以自己亂動，
 這個連鎖區段就不再對全域參數施加任何限制，整條路線也就白做了。</p>
 
@@ -684,7 +691,7 @@ composite likelihood 近似，可以用，但必須<b>如此稱呼</b>，
 所以「這個連鎖區段的家族一」對應到全域基因型的哪一條拷貝 <math><mi>b</mi></math> 並不確定。
 處理方式是引入一個局部方向變數 <math><msub><mi>σ</mi><mi>u</mi></msub><mo>∈</mo><mo>{</mo><mi>原</mi><mi>樣</mi><mo>,</mo><mi>對</mi><mi>調</mi><mo>}</mo></math> 並把它邊際化：</p>
 
-<div class="eq"><math display="block"><mi>P</mi><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><mi>Θ</mi><mo>)</mo><mo>=</mo><munder><mo>∑</mo><msub><mi>σ</mi><mi>u</mi></msub></munder><mi>P</mi><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><mi>Θ</mi><mo>,</mo><msub><mi>σ</mi><mi>u</mi></msub><mo>)</mo><mo>·</mo><mi>P</mi><mo>(</mo><msub><mi>σ</mi><mi>u</mi></msub><mo>)</mo></math></div>
+<div class="eq"><math display="block"><mi>P</mi><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>=</mo><munder><mo>∑</mo><msub><mi>σ</mi><mi>u</mi></msub></munder><mi>P</mi><mo>(</mo><msub><mi>D</mi><mi>u</mi></msub><mo>∣</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>,</mo><msub><mi>σ</mi><mi>u</mi></msub><mo>)</mo><mo>·</mo><mi>P</mi><mo>(</mo><msub><mi>σ</mi><mi>u</mi></msub><mo>)</mo></math></div>
 
 <details class="reveal reveal--aside">
 <summary>作用域補充：<math><mi>σ</mi></math> 如何跨 phase set 定義</summary>
