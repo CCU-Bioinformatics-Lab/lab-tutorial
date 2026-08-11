@@ -72,7 +72,7 @@
   <circle class="cell tumor" cx="450" cy="354" r="16"/>
 
   <text class="tick zh" x="640" y="270">一個節點 ＝ 一群細胞</text>
-  <text class="tick zh" x="640" y="298">解析度連鎖區段：全基因體共用的 CCF</text>
+  <text class="tick zh" x="640" y="298">解析度：全基因體共用的 CCF</text>
   <text class="tick zh bad" x="640" y="326">CCF 相同的兩支必然併成一個節點</text>
 
   <!-- ── 本規格：每個連鎖視窗 × 每條拷貝各一棵 ── -->

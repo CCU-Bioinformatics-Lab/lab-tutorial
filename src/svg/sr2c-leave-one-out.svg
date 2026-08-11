@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 550">
+  <title>錨點與候選的角色分離，以及留一法算出來的特徵</title>
+  <desc>這張圖解決一個循環：局部系譜要靠可信的體細胞變異才建得起來，
+        而我們想幫的正是那些不可信的候選。
+        左欄把兩者分成兩個角色。錨點是 germline 雜合位點加上通過嚴格門檻的體細胞呼叫，
+        它們負責建樹；候選是 caller 在寬鬆門檻下給出的東西，它是被評分的對象，
+        絕對不能進入錨點集合，否則循環就回來了。
+        中欄是把候選拿掉之後才建起來的局部系譜，四個節點分別是全零、一零零、一一零、一零一。
+        候選不在這棵樹裡，所以算出來的特徵不可能抄它自己的資料。
+        右欄是把候選的 ALT 分子投到這棵樹的節點上之後看到的兩種形狀。
+        真的低頻體細胞變異來自某一支既有的 lineage，
+        所以它的支持分子會集中在一個節點上，巢狀對數似然比因而很高。
+        定序錯誤與嵌合對局部系譜完全無所謂，分子會散落在各節點之間，對數似然比接近零。
+        讀法是：不做留一，特徵就退化成把「這個候選有幾條 ALT read」抄一遍 ——
+        訓練時看起來很有效，在真正的低頻變異上完全沒有幫助。</desc>
+
+  <text class="ttl zh" x="20" y="36">留一法：候選被拿掉之後，才建局部系譜</text>
+  <text class="anno zh" x="20" y="66">錨點建樹、候選被評分。<tspan class="bold">兩個角色混用，循環就回來了</tspan>。</text>
+
+  <!-- ══ ① 角色分離 ══ -->
+  <rect class="box ghost" x="20" y="88" width="300" height="380" rx="8"/>
+  <text class="lbl bold zh accent" x="44" y="122">① 兩個角色分開</text>
+
+  <rect class="box ok" x="44" y="140" width="252" height="98" rx="8"/>
+  <text class="lbl bold zh ok" x="64" y="176">錨點</text>
+  <text class="tick zh" x="64" y="202">germline 雜合位點</text>
+  <text class="tick zh" x="64" y="226">＋ 通過嚴格門檻的 somatic</text>
+
+  <text class="tick zh ok mid" x="170" y="262">↓ 只有錨點建樹</text>
+
+  <rect class="box warn" x="44" y="276" width="252" height="98" rx="8"/>
+  <text class="lbl bold zh warn" x="64" y="312">候選 m</text>
+  <text class="tick zh" x="64" y="338">caller 寬鬆門檻下的候選</text>
+  <text class="tick zh" x="64" y="362">被評分的對象</text>
+
+  <text class="tick zh bad" x="44" y="404">候選<tspan class="bold">不</tspan>進錨點集合，</text>
+  <text class="tick zh bad" x="44" y="428">錨點也不得取自 truth set。</text>
+  <text class="tick zh" x="44" y="452">後者是最典型的資料洩漏。</text>
+
+  <!-- ══ ② 拿掉 m 之後的局部系譜 ══ -->
+  <rect class="box ghost" x="340" y="88" width="280" height="380" rx="8"/>
+  <text class="lbl bold zh accent" x="364" y="122">② 拿掉 m 之後建樹</text>
+
+  <line class="conn" x1="480" y1="204" x2="480" y2="242"/>
+  <line class="conn" x1="474" y1="283" x2="428" y2="334"/>
+  <line class="conn" x1="486" y1="283" x2="532" y2="334"/>
+  <circle class="cell normal" cx="480" cy="182" r="22"/>
+  <circle class="cell tumor"  cx="480" cy="264" r="22"/>
+  <circle class="cell clone1" cx="418" cy="354" r="22"/>
+  <circle class="cell clone2" cx="542" cy="354" r="22"/>
+  <text class="tick mono mid" x="480" y="187">000</text>
+  <text class="tick mono mid" x="480" y="269">100</text>
+  <text class="tick mono mid" x="418" y="359">110</text>
+  <text class="tick mono mid" x="542" y="359">101</text>
+
+  <text class="tick zh mid" x="480" y="410">這棵樹叫 L(−m)</text>
+  <text class="tick zh bold mid" x="480" y="436">m 不在裡面</text>
+  <text class="tick zh mid" x="480" y="458">所以特徵抄不到它自己</text>
+
+  <!-- ══ ③ m 的 ALT 分子落在哪裡 ══ -->
+  <rect class="box ghost" x="640" y="88" width="340" height="380" rx="8"/>
+  <text class="lbl bold zh accent" x="664" y="122">③ m 的 ALT 分子落在哪</text>
+
+  <text class="tick zh ok" x="664" y="152">真的低頻 somatic：集中在一個節點</text>
+  <line class="axis" x1="676" y1="248" x2="960" y2="248"/>
+  <rect class="bar ok" x="686" y="240" width="44" height="8"/>
+  <rect class="bar ok" x="748" y="236" width="44" height="12"/>
+  <rect class="bar ok" x="810" y="160" width="44" height="88"/>
+  <rect class="bar ok" x="872" y="244" width="44" height="4"/>
+  <text class="tick mono mid" x="708" y="268">000</text>
+  <text class="tick mono mid" x="770" y="268">100</text>
+  <text class="tick mono mid" x="832" y="268">110</text>
+  <text class="tick mono mid" x="894" y="268">101</text>
+  <text class="tick zh ok" x="664" y="294"><tspan class="mono">llr_nested</tspan> 高 → 判為真</text>
+
+  <line class="guide" x1="664" y1="312" x2="956" y2="312"/>
+
+  <text class="tick zh bad" x="664" y="342">定序錯誤或嵌合：散落各節點</text>
+  <line class="axis" x1="676" y1="416" x2="960" y2="416"/>
+  <rect class="bar bad" x="686" y="392" width="44" height="24"/>
+  <rect class="bar bad" x="748" y="388" width="44" height="28"/>
+  <rect class="bar bad" x="810" y="392" width="44" height="24"/>
+  <rect class="bar bad" x="872" y="388" width="44" height="28"/>
+  <text class="tick mono mid" x="708" y="436">000</text>
+  <text class="tick mono mid" x="770" y="436">100</text>
+  <text class="tick mono mid" x="832" y="436">110</text>
+  <text class="tick mono mid" x="894" y="436">101</text>
+  <text class="tick zh bad" x="664" y="462"><tspan class="mono">llr_nested</tspan> ≈ 0 → 判為錯誤</text>
+
+  <rect class="box accent" x="20" y="486" width="960" height="48" rx="8"/>
+  <text class="anno zh" x="40" y="516">不做留一，特徵等於把「這個候選有幾條 ALT read」抄一遍 —— <tspan class="bold">訓練時好看，低頻變異上沒有幫助</tspan>。</text>
+</svg>

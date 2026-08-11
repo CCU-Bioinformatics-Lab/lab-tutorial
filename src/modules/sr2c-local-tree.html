@@ -843,6 +843,13 @@ Poisson 模型給的單一數字在這裡沒有用：真正該做的是逐樣本
 而分岔正是拆峰能力唯一的來源，所以這個偏誤系統性地移除的，
 剛好就是本規格最想留下來的那一類。}}
 
+{{svg:sr2c-inference-budget | [wide] 左欄七步由上而下。<b>只有 ④⑤ 與既有實作不同</b>，
+③ 是沿用而非貢獻，其餘四步既有實作都已具備。
+右上是兩個上限的實測行為：節點上限有 12.47% 的連鎖區段撞到，家族上限從不觸發 ——
+兩者都是工程設定，不是關於 {{m: q}} 的數學結果。
+右中是 ⑤ 取代掉的東西：舊的 read-AF 分數會<b>先砍掉</b> 30.03% 的最小成本解且無拷貝數校正。
+右下是實測成本；<b>成本的變異來自 {{m: q}} 的分布，不是連鎖區段總數</b>。}}
+
 <h4>上限、棄權，以及棄權必須留在分母裡</h4>
 
 <p class="prose">既有實作用兩個上限：搜尋節點上限 {{m: κ_{node}=1{,}000}}
@@ -927,6 +934,14 @@ solver 122.03 秒、census 58.96 秒、峰值常駐記憶體 356.7 MB、
 在訓練時看起來很有效，在真正的低頻變異上完全沒有幫助。
 錨點也<b>不得</b>取自 truth set —— 那是最典型的[[data leakage|資料洩漏]]。</p>
 
+{{svg:sr2c-leave-one-out | [wide] 左欄是角色分離：錨點建樹，候選只被評分，
+<b>候選不進錨點集合</b>，否則那個循環就回來了。
+中欄是把候選拿掉之後才建起來的 {{m: L_u^{(−m)}}} —— 候選不在裡面，所以特徵抄不到它自己的資料。
+右欄是把候選的 ALT 分子投到這棵樹上之後的兩種形狀：
+真的低頻 somatic 來自某一支既有 lineage，分子<b>集中在一個節點</b>；
+定序錯誤與嵌合對局部系譜無所謂，分子<b>散落各節點</b>，{{m: llr_nested}} 因而接近零。
+這就是 <tspan class="mono">llr_nested</tspan> 與 <tspan class="mono">lineage_coherence</tspan> 量的東西。}}
+
 <h4>三層特徵</h4>
 
 {{svg:sr2c-caller-tiers | [wide] 三層的覆蓋率與要打敗的基準都不同。
@@ -938,7 +953,7 @@ solver 122.03 秒、census 58.96 秒、峰值常駐記憶體 356.7 MB、
 <table>
 <thead><tr><th>層</th><th>欄位</th><th>意義</th></tr></thead>
 <tbody>
-<tr><td>0</td><td><code>vaf_grid_dist</code></td><td>觀測 VAF 與「階段 G 原子 × 該處 CN／multiplicity」所隱含的期望值格點的最近距離，以抽樣標準差為連鎖區段</td></tr>
+<tr><td>0</td><td><code>vaf_grid_dist</code></td><td>觀測 VAF 與「階段 G 原子 × 該處 CN／multiplicity」所隱含的期望值格點的最近距離，以抽樣標準差為單位</td></tr>
 <tr><td>0</td><td><code>floor_ratio</code></td><td>ALT 分子數 ÷ 該連鎖區段錯誤地板的期望分子數</td></tr>
 <tr><td>0</td><td><code>purity</code>、<code>cn_local</code>、<code>phi_stratum</code></td><td>樣本與區段層的脈絡量</td></tr>
 <tr><td>1</td><td><code>hp_concentration</code></td><td>ALT 分子集中在單一 germline 單倍型的比例</td></tr>
@@ -984,6 +999,13 @@ solver 122.03 秒、census 58.96 秒、峰值常駐記憶體 356.7 MB、
 </tbody>
 </table>
 </div>
+
+{{svg:sr2c-integration-abc | [wide] 上排是 caller 本來的流程，三個箭頭是三種接法的<b>接入位置</b> ——
+位置決定成本與風險。<b>越靠前上限越高，也越不可逆</b>：
+A 接在給分之後，只改排序，碰不到已經被丟掉的候選；
+B 接進張量後重訓，上限最高但難以歸因；
+C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續指標裡</b>，
+所以它傷害 recall 的方式是安靜的。}}
 
 <p class="prose">建議順序是 A 先做。它便宜、可歸因（每一層可以單獨加減）、
 而且如果 A 沒有效果，B 幾乎不可能有 —— 因為 A 的失敗代表這些特徵

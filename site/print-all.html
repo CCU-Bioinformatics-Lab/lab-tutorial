@@ -15768,7 +15768,7 @@ report: 每個遮罩的 read 數、連鎖區段的最大跨越深度、
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 450" class="dia-svg" role="img" aria-labelledby="sr2b__rg-detection-window__title" aria-describedby="sr2b__rg-detection-window__desc">
   <title id="sr2b__rg-detection-window__title">可分析的頻率連鎖視窗：傳統 VAF 擬合區間與譜系內比例區間的比較</title>
-  <desc id="sr2b__rg-detection-window__desc">兩條橫軸畫的是同一件事在兩條路線上的可用範圍，範圍都以「佔細胞的比例」為連鎖區段。
+  <desc id="sr2b__rg-detection-window__desc">兩條橫軸畫的是同一件事在兩條路線上的可用範圍，範圍都以「佔細胞的比例」為單位。
         上排是傳統做法：原始研究刻意只在 VAF 零點一二到零點二四之間擬合，
         更低的一端混著假陽性，更高的一端已經進入 clonal 峰。
         把它換算成細胞比例，在純度零點六的樣本上大約是零點四到零點八，是一段相當窄的區間。
@@ -16265,7 +16265,7 @@ MOBSTER，Caravagna G et al., <i>Nat Genet</i> 2020;52:898–907
   <circle class="cell tumor" cx="450" cy="354" r="16"/>
 
   <text class="tick zh" x="640" y="270">一個節點 ＝ 一群細胞</text>
-  <text class="tick zh" x="640" y="298">解析度連鎖區段：全基因體共用的 CCF</text>
+  <text class="tick zh" x="640" y="298">解析度：全基因體共用的 CCF</text>
   <text class="tick zh bad" x="640" y="326">CCF 相同的兩支必然併成一個節點</text>
 
   <!-- ── 本規格：每個連鎖視窗 × 每條拷貝各一棵 ── -->
@@ -18669,6 +18669,89 @@ Poisson 模型給的單一數字在這裡沒有用：真正該做的是逐樣本
 而分岔正是拆峰能力唯一的來源，所以這個偏誤系統性地移除的，
 剛好就是本規格最想留下來的那一類。</figcaption></figure>
 
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" class="dia-svg" role="img" aria-labelledby="sr2c__sr2c-inference-budget__title" aria-describedby="sr2c__sr2c-inference-budget__desc">
+  <title id="sr2c__sr2c-inference-budget__title">階段 L 的七步推論流程、兩個上限與實測成本</title>
+  <desc id="sr2c__sr2c-inference-budget__desc">左側是階段 L 的七個步驟，由上而下：輸出稀疏狀態表、就地校準兩個錯誤率、
+        跑階段 G、列舉候選狀態集合、算邊際似然、把階段 G 的不確定度傳下來、輸出。
+        其中第四步與第五步用深色標出，因為只有這兩步與既有實作不同；
+        第三步是沿用，不是本規格的貢獻。
+        右側三張卡分別說明三件會影響實作的事。
+        第一張是兩個上限：搜尋節點上限一千，實測有一成二的連鎖區段撞到它；
+        候選家族上限十萬，實測從來不觸發。兩者都是工程設定不是數學結果，
+        必須寫進 provenance，而撞到上限的連鎖區段要標記棄權並且仍然留在分母裡。
+        第二張說明第五步取代掉的是既有實作的 read-AF 排序：
+        那個分數會先砍掉三成的最小成本解，而且沒有任何拷貝數校正；
+        改成邊際似然之後候選整組留著，由後驗質量表達。
+        第三張是既有實作量過的成本：九萬多個連鎖區段兩分鐘、記憶體不到四百 MB，
+        而成本的變異來自作用位點數的分布，不是連鎖區段的總數 —— 跨資料集差約十九倍。
+        讀法是：這條流程沒有全域取樣包在外層，所以它是尷尬平行的，
+        成本隨連鎖區段數線性成長。</desc>
+
+  <text class="ttl zh" x="20" y="36">階段 L 的七步，以及成本落在哪裡</text>
+  <text class="anno zh" x="20" y="66">深色的兩步才是與既有實作的差異；<tspan class="bold">③ 是沿用，不是貢獻</tspan>。</text>
+
+  <!-- ══ 左：七步 ══ -->
+  <rect class="box ghost" x="20" y="88" width="540" height="470" rx="8"/>
+  <text class="lbl bold zh accent" x="44" y="122">階段 L 的七步</text>
+
+  <line class="guide" x1="32" y1="140" x2="32" y2="480"/>
+
+  <rect class="box plain"  x="44" y="134" width="488" height="34" rx="6"/>
+  <text class="tick zh" x="60" y="158">① 前處理：稀疏狀態表，覆蓋遮罩不得先併掉</text>
+
+  <rect class="box plain"  x="44" y="186" width="488" height="34" rx="6"/>
+  <text class="tick zh" x="60" y="210">② 就地校準：逐位點錯誤率與家族誤標率，成對估</text>
+
+  <rect class="box sunken" x="44" y="238" width="488" height="34" rx="6"/>
+  <text class="tick zh" x="60" y="262">③ 階段 G：只用 S₁，斷言與 S₂ 的位點交集為空</text>
+
+  <rect class="box accent" x="44" y="290" width="488" height="34" rx="6"/>
+  <text class="tick zh bold" x="60" y="314">④ 候選列舉：狀態空間 2^q，q=12 時 4,096 格</text>
+
+  <rect class="box accent" x="44" y="342" width="488" height="34" rx="6"/>
+  <text class="tick zh bold" x="60" y="366">⑤ 邊際似然：ν 依先驗積掉，候選整組留著不先砍</text>
+
+  <rect class="box plain"  x="44" y="394" width="488" height="34" rx="6"/>
+  <text class="tick zh" x="60" y="418">⑥ 傳遞階段 G 的不確定度：抽 S ≈ 50 組逐組重算</text>
+
+  <rect class="box plain"  x="44" y="446" width="488" height="34" rx="6"/>
+  <text class="tick zh" x="60" y="470">⑦ 輸出：候選與質量、節點比例區間、旗標、分子數</text>
+
+  <text class="tick zh accent" x="44" y="516">④⑤ 是本規格自己的部分，其餘六步既有實作都已具備。</text>
+  <text class="tick zh" x="44" y="542">沒有任何一步把全域取樣包在外層。</text>
+
+  <!-- ══ 右上：上限與棄權 ══ -->
+  <rect class="box warn" x="580" y="88" width="400" height="150" rx="8"/>
+  <text class="lbl bold zh" x="604" y="124">兩個上限與棄權</text>
+  <text class="tick mono" x="604" y="152">κ_node = 1,000</text>
+  <text class="tick zh warn" x="604" y="174">→ 12.47% 的連鎖區段撞到（實測）</text>
+  <text class="tick mono" x="604" y="196">κ_fam = 100,000</text>
+  <text class="tick zh" x="604" y="218">→ 實測從不觸發；兩者皆為工程設定</text>
+
+  <!-- ══ 右中：取代 read-AF ══ -->
+  <rect class="box accent" x="580" y="254" width="400" height="150" rx="8"/>
+  <text class="lbl bold zh accent" x="604" y="290">⑤ 取代舊的 read-AF 排序</text>
+  <text class="tick zh bad" x="604" y="318">舊分數先砍掉 30.03% 的最小成本解</text>
+  <text class="tick zh bad" x="604" y="340">而且沒有任何拷貝數校正</text>
+  <text class="tick zh ok" x="604" y="368">新做法：候選整組留著</text>
+  <text class="tick zh ok" x="604" y="390">由後驗質量表達，不先砍</text>
+
+  <!-- ══ 右下：成本 ══ -->
+  <rect class="box sunken" x="580" y="420" width="400" height="138" rx="8"/>
+  <text class="lbl bold zh" x="604" y="456">成本：既有實作已經量過</text>
+  <text class="tick mono" x="604" y="484">98,955 段 · 122.03 s · 356.7 MB</text>
+  <text class="tick zh" x="604" y="506">13,773,565 個搜尋節點，平均 139.2</text>
+  <text class="tick zh bold" x="604" y="534">跨資料集差 19 倍：292.0 對 15.5</text>
+
+  <rect class="box accent" x="20" y="576" width="960" height="48" rx="8"/>
+  <text class="anno zh" x="40" y="606">要控成本，該控的是 <tspan class="mono">q</tspan> 的分布，<tspan class="bold">不是連鎖區段總數</tspan> —— 成本隨連鎖區段數線性成長。</text>
+</svg><figcaption>左欄七步由上而下。<b>只有 ④⑤ 與既有實作不同</b>，
+③ 是沿用而非貢獻，其餘四步既有實作都已具備。
+右上是兩個上限的實測行為：節點上限有 12.47% 的連鎖區段撞到，家族上限從不觸發 ——
+兩者都是工程設定，不是關於 <math><mi>q</mi></math> 的數學結果。
+右中是 ⑤ 取代掉的東西：舊的 read-AF 分數會<b>先砍掉</b> 30.03% 的最小成本解且無拷貝數校正。
+右下是實測成本；<b>成本的變異來自 <math><mi>q</mi></math> 的分布，不是連鎖區段總數</b>。</figcaption></figure>
+
 <h4 id="sr2c__上限-棄權-以及棄權必須留在分母裡">上限、棄權，以及棄權必須留在分母裡</h4>
 
 <p class="prose">既有實作用兩個上限：搜尋節點上限 <math><msub><mi>κ</mi><mi>node</mi></msub><mo>=</mo><mn>1</mn><mo>,</mo><mn>000</mn></math>
@@ -18748,6 +18831,105 @@ solver 122.03 秒、census 58.96 秒、峰值常駐記憶體 356.7 MB、
 否則特徵會直接把「這個候選有幾條 ALT read」抄一遍，
 在訓練時看起來很有效，在真正的低頻變異上完全沒有幫助。
 錨點也<b>不得</b>取自 truth set —— 那是最典型的<span class="term" data-term="data leakage" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2c__gd-data-leakage-22">資料洩漏<span class="term__pop" id="sr2c__gd-data-leakage-22" role="tooltip"><b class="term__hd">data leakage <i>資料洩漏</i></b><span class="term__def" data-lang="zh">訓練或模型選擇階段取得了評估資料的資訊，讓效能被高估。實驗室的做法是<b>按染色體切分</b>，確保同一個位點不會同時出現在訓練、驗證與最終測試中。</span><span class="term__def" data-lang="en" lang="en">Evaluation information entering training or model selection and inflating performance. The lab splits by chromosome so a locus cannot appear in training, validation and final test partitions at once.</span><a class="term__more" href="glossary.html#data-leakage">完整條目 →</a></span></span>。</p>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 550" class="dia-svg" role="img" aria-labelledby="sr2c__sr2c-leave-one-out__title" aria-describedby="sr2c__sr2c-leave-one-out__desc">
+  <title id="sr2c__sr2c-leave-one-out__title">錨點與候選的角色分離，以及留一法算出來的特徵</title>
+  <desc id="sr2c__sr2c-leave-one-out__desc">這張圖解決一個循環：局部系譜要靠可信的體細胞變異才建得起來，
+        而我們想幫的正是那些不可信的候選。
+        左欄把兩者分成兩個角色。錨點是 germline 雜合位點加上通過嚴格門檻的體細胞呼叫，
+        它們負責建樹；候選是 caller 在寬鬆門檻下給出的東西，它是被評分的對象，
+        絕對不能進入錨點集合，否則循環就回來了。
+        中欄是把候選拿掉之後才建起來的局部系譜，四個節點分別是全零、一零零、一一零、一零一。
+        候選不在這棵樹裡，所以算出來的特徵不可能抄它自己的資料。
+        右欄是把候選的 ALT 分子投到這棵樹的節點上之後看到的兩種形狀。
+        真的低頻體細胞變異來自某一支既有的 lineage，
+        所以它的支持分子會集中在一個節點上，巢狀對數似然比因而很高。
+        定序錯誤與嵌合對局部系譜完全無所謂，分子會散落在各節點之間，對數似然比接近零。
+        讀法是：不做留一，特徵就退化成把「這個候選有幾條 ALT read」抄一遍 ——
+        訓練時看起來很有效，在真正的低頻變異上完全沒有幫助。</desc>
+
+  <text class="ttl zh" x="20" y="36">留一法：候選被拿掉之後，才建局部系譜</text>
+  <text class="anno zh" x="20" y="66">錨點建樹、候選被評分。<tspan class="bold">兩個角色混用，循環就回來了</tspan>。</text>
+
+  <!-- ══ ① 角色分離 ══ -->
+  <rect class="box ghost" x="20" y="88" width="300" height="380" rx="8"/>
+  <text class="lbl bold zh accent" x="44" y="122">① 兩個角色分開</text>
+
+  <rect class="box ok" x="44" y="140" width="252" height="98" rx="8"/>
+  <text class="lbl bold zh ok" x="64" y="176">錨點</text>
+  <text class="tick zh" x="64" y="202">germline 雜合位點</text>
+  <text class="tick zh" x="64" y="226">＋ 通過嚴格門檻的 somatic</text>
+
+  <text class="tick zh ok mid" x="170" y="262">↓ 只有錨點建樹</text>
+
+  <rect class="box warn" x="44" y="276" width="252" height="98" rx="8"/>
+  <text class="lbl bold zh warn" x="64" y="312">候選 m</text>
+  <text class="tick zh" x="64" y="338">caller 寬鬆門檻下的候選</text>
+  <text class="tick zh" x="64" y="362">被評分的對象</text>
+
+  <text class="tick zh bad" x="44" y="404">候選<tspan class="bold">不</tspan>進錨點集合，</text>
+  <text class="tick zh bad" x="44" y="428">錨點也不得取自 truth set。</text>
+  <text class="tick zh" x="44" y="452">後者是最典型的資料洩漏。</text>
+
+  <!-- ══ ② 拿掉 m 之後的局部系譜 ══ -->
+  <rect class="box ghost" x="340" y="88" width="280" height="380" rx="8"/>
+  <text class="lbl bold zh accent" x="364" y="122">② 拿掉 m 之後建樹</text>
+
+  <line class="conn" x1="480" y1="204" x2="480" y2="242"/>
+  <line class="conn" x1="474" y1="283" x2="428" y2="334"/>
+  <line class="conn" x1="486" y1="283" x2="532" y2="334"/>
+  <circle class="cell normal" cx="480" cy="182" r="22"/>
+  <circle class="cell tumor"  cx="480" cy="264" r="22"/>
+  <circle class="cell clone1" cx="418" cy="354" r="22"/>
+  <circle class="cell clone2" cx="542" cy="354" r="22"/>
+  <text class="tick mono mid" x="480" y="187">000</text>
+  <text class="tick mono mid" x="480" y="269">100</text>
+  <text class="tick mono mid" x="418" y="359">110</text>
+  <text class="tick mono mid" x="542" y="359">101</text>
+
+  <text class="tick zh mid" x="480" y="410">這棵樹叫 L(−m)</text>
+  <text class="tick zh bold mid" x="480" y="436">m 不在裡面</text>
+  <text class="tick zh mid" x="480" y="458">所以特徵抄不到它自己</text>
+
+  <!-- ══ ③ m 的 ALT 分子落在哪裡 ══ -->
+  <rect class="box ghost" x="640" y="88" width="340" height="380" rx="8"/>
+  <text class="lbl bold zh accent" x="664" y="122">③ m 的 ALT 分子落在哪</text>
+
+  <text class="tick zh ok" x="664" y="152">真的低頻 somatic：集中在一個節點</text>
+  <line class="axis" x1="676" y1="248" x2="960" y2="248"/>
+  <rect class="bar ok" x="686" y="240" width="44" height="8"/>
+  <rect class="bar ok" x="748" y="236" width="44" height="12"/>
+  <rect class="bar ok" x="810" y="160" width="44" height="88"/>
+  <rect class="bar ok" x="872" y="244" width="44" height="4"/>
+  <text class="tick mono mid" x="708" y="268">000</text>
+  <text class="tick mono mid" x="770" y="268">100</text>
+  <text class="tick mono mid" x="832" y="268">110</text>
+  <text class="tick mono mid" x="894" y="268">101</text>
+  <text class="tick zh ok" x="664" y="294"><tspan class="mono">llr_nested</tspan> 高 → 判為真</text>
+
+  <line class="guide" x1="664" y1="312" x2="956" y2="312"/>
+
+  <text class="tick zh bad" x="664" y="342">定序錯誤或嵌合：散落各節點</text>
+  <line class="axis" x1="676" y1="416" x2="960" y2="416"/>
+  <rect class="bar bad" x="686" y="392" width="44" height="24"/>
+  <rect class="bar bad" x="748" y="388" width="44" height="28"/>
+  <rect class="bar bad" x="810" y="392" width="44" height="24"/>
+  <rect class="bar bad" x="872" y="388" width="44" height="28"/>
+  <text class="tick mono mid" x="708" y="436">000</text>
+  <text class="tick mono mid" x="770" y="436">100</text>
+  <text class="tick mono mid" x="832" y="436">110</text>
+  <text class="tick mono mid" x="894" y="436">101</text>
+  <text class="tick zh bad" x="664" y="462"><tspan class="mono">llr_nested</tspan> ≈ 0 → 判為錯誤</text>
+
+  <rect class="box accent" x="20" y="486" width="960" height="48" rx="8"/>
+  <text class="anno zh" x="40" y="516">不做留一，特徵等於把「這個候選有幾條 ALT read」抄一遍 —— <tspan class="bold">訓練時好看，低頻變異上沒有幫助</tspan>。</text>
+</svg><figcaption>左欄是角色分離：錨點建樹，候選只被評分，
+<b>候選不進錨點集合</b>，否則那個循環就回來了。
+中欄是把候選拿掉之後才建起來的 <math><msubsup><mi>L</mi><mi>u</mi><mrow><mo>(</mo><mo>−</mo><mi>m</mi><mo>)</mo></mrow></msubsup></math> —— 候選不在裡面，所以特徵抄不到它自己的資料。
+右欄是把候選的 ALT 分子投到這棵樹上之後的兩種形狀：
+真的低頻 somatic 來自某一支既有 lineage，分子<b>集中在一個節點</b>；
+定序錯誤與嵌合對局部系譜無所謂，分子<b>散落各節點</b>，<math><msub><mi>llr</mi><mi>nested</mi></msub></math> 因而接近零。
+這就是 <tspan class="mono">llr_nested</tspan> 與 <tspan class="mono">lineage_coherence</tspan> 量的東西。</figcaption></figure>
 
 <h4 id="sr2c__三層特徵">三層特徵</h4>
 
@@ -18830,7 +19012,7 @@ solver 122.03 秒、census 58.96 秒、峰值常駐記憶體 356.7 MB、
 <table>
 <thead><tr><th scope="col">層</th><th scope="col">欄位</th><th scope="col">意義</th></tr></thead>
 <tbody>
-<tr><td>0</td><td><code>vaf_grid_dist</code></td><td>觀測 VAF 與「階段 G 原子 × 該處 CN／multiplicity」所隱含的期望值格點的最近距離，以抽樣標準差為連鎖區段</td></tr>
+<tr><td>0</td><td><code>vaf_grid_dist</code></td><td>觀測 VAF 與「階段 G 原子 × 該處 CN／multiplicity」所隱含的期望值格點的最近距離，以抽樣標準差為單位</td></tr>
 <tr><td>0</td><td><code>floor_ratio</code></td><td>ALT 分子數 ÷ 該連鎖區段錯誤地板的期望分子數</td></tr>
 <tr><td>0</td><td><code>purity</code>、<code>cn_local</code>、<code>phi_stratum</code></td><td>樣本與區段層的脈絡量</td></tr>
 <tr><td>1</td><td><code>hp_concentration</code></td><td>ALT 分子集中在單一 germline 單倍型的比例</td></tr>
@@ -18876,6 +19058,65 @@ solver 122.03 秒、census 58.96 秒、峰值常駐記憶體 356.7 MB、
 </tbody>
 </table>
 </div>
+
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440" class="dia-svg" role="img" aria-labelledby="sr2c__sr2c-integration-abc__title" aria-describedby="sr2c__sr2c-integration-abc__desc">
+  <title id="sr2c__sr2c-integration-abc__title">三種整合方式各自接在 somatic caller 流程的哪一個位置</title>
+  <desc id="sr2c__sr2c-integration-abc__desc">上排是 somatic caller 本來的流程：產生候選、算特徵與張量、模型給分、輸出 VCF。
+        三種整合方式的差別就是接在這條流程的哪一個位置，而位置決定了成本與風險。
+        方式 A 接在模型給分之後，只重新排序，所以不必重訓 caller，成本最低，
+        但它只碰得到 caller 已經留下來的候選，被前面丟掉的救不回來。
+        方式 B 把特徵接進張量之後重訓，位置最靠前，上限最高，
+        代價是需要完整訓練資料與算力，而且很難歸因是哪一層特徵有用。
+        方式 C 接在產生候選之前，直接用特徵先砍候選。
+        它便宜，但它是不可逆的：被砍掉的候選不會出現在任何後續指標裡，
+        所以它會安靜地傷害 recall，圖上因此標為不建議。
+        讀法是：建議順序是 A 先做，因為 A 可歸因、每一層可以單獨加減；
+        而如果 A 沒有效果，B 幾乎不可能有 —— A 的失敗代表這些特徵
+        在 caller 已有的資訊之外沒有增量。</desc>
+
+  <text class="ttl zh" x="20" y="36">三種接法接在 caller 流程的哪裡</text>
+  <text class="anno zh" x="20" y="66">位置決定成本與風險：<tspan class="bold">越靠前上限越高，也越不可逆</tspan>。</text>
+
+  <!-- ══ caller 本來的流程 ══ -->
+  <rect class="box sunken" x="40" y="108" width="200" height="46" rx="8"/>
+  <text class="lbl zh mid" x="140" y="138">產生候選</text>
+  <rect class="box sunken" x="272" y="108" width="200" height="46" rx="8"/>
+  <text class="lbl zh mid" x="372" y="138">特徵／張量</text>
+  <rect class="box sunken" x="504" y="108" width="200" height="46" rx="8"/>
+  <text class="lbl zh mid" x="604" y="138">模型給分</text>
+  <rect class="box sunken" x="736" y="108" width="200" height="46" rx="8"/>
+  <text class="lbl zh mid" x="836" y="138">輸出 VCF</text>
+
+  <line class="flow" x1="244" y1="131" x2="266" y2="131" marker-end="url(#arrow-sm)"/>
+  <line class="flow" x1="476" y1="131" x2="498" y2="131" marker-end="url(#arrow-sm)"/>
+  <line class="flow" x1="708" y1="131" x2="730" y2="131" marker-end="url(#arrow-sm)"/>
+
+  <!-- 三個接入點 -->
+  <line class="conn bad"    x1="90"  y1="196" x2="90"  y2="158" marker-end="url(#arrow-sm)"/>
+  <text class="tick bad bold mid" x="90" y="216">C</text>
+  <line class="conn warn"   x1="322" y1="196" x2="322" y2="158" marker-end="url(#arrow-sm)"/>
+  <text class="tick warn bold mid" x="322" y="216">B</text>
+  <line class="conn ok"     x1="654" y1="196" x2="654" y2="158" marker-end="url(#arrow-sm)"/>
+  <text class="tick ok bold mid" x="654" y="216">A</text>
+
+  <!-- ══ 三條 ══ -->
+  <rect class="box ok" x="20" y="238" width="960" height="42" rx="8"/>
+  <text class="tick zh" x="40" y="264"><tspan class="bold ok">A · 事後重新評分</tspan> —— 接在給分之後，只改排序。成本低、不必重訓；但只碰得到 caller 已留下的候選。</text>
+
+  <rect class="box warn" x="20" y="290" width="960" height="42" rx="8"/>
+  <text class="tick zh" x="40" y="316"><tspan class="bold warn">B · 加成輸入通道</tspan> —— 特徵接進張量後重訓。上限最高；需要完整訓練資料與算力，且難以歸因哪一層有用。</text>
+
+  <rect class="box bad" x="20" y="342" width="960" height="42" rx="8"/>
+  <text class="tick zh" x="40" y="368"><tspan class="bold bad">C · 前置過濾（不建議）</tspan> —— 先砍候選。便宜，但<tspan class="bold">不可逆</tspan>：被砍掉的不出現在任何後續指標裡，會安靜地傷害 recall。</text>
+
+  <rect class="box accent" x="20" y="396" width="960" height="40" rx="8"/>
+  <text class="anno zh" x="40" y="423">建議順序 <tspan class="bold">A 先做</tspan> —— A 沒有效果，B 幾乎不可能有。</text>
+</svg><figcaption>上排是 caller 本來的流程，三個箭頭是三種接法的<b>接入位置</b> ——
+位置決定成本與風險。<b>越靠前上限越高，也越不可逆</b>：
+A 接在給分之後，只改排序，碰不到已經被丟掉的候選；
+B 接進張量後重訓，上限最高但難以歸因；
+C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續指標裡</b>，
+所以它傷害 recall 的方式是安靜的。</figcaption></figure>
 
 <p class="prose">建議順序是 A 先做。它便宜、可歸因（每一層可以單獨加減）、
 而且如果 A 沒有效果，B 幾乎不可能有 —— 因為 A 的失敗代表這些特徵
@@ -18938,7 +19179,7 @@ solver 122.03 秒、census 58.96 秒、峰值常駐記憶體 356.7 MB、
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 450" class="dia-svg" role="img" aria-labelledby="sr2c__rg-detection-window__title" aria-describedby="sr2c__rg-detection-window__desc">
   <title id="sr2c__rg-detection-window__title">可分析的頻率連鎖視窗：傳統 VAF 擬合區間與譜系內比例區間的比較</title>
-  <desc id="sr2c__rg-detection-window__desc">兩條橫軸畫的是同一件事在兩條路線上的可用範圍，範圍都以「佔細胞的比例」為連鎖區段。
+  <desc id="sr2c__rg-detection-window__desc">兩條橫軸畫的是同一件事在兩條路線上的可用範圍，範圍都以「佔細胞的比例」為單位。
         上排是傳統做法：原始研究刻意只在 VAF 零點一二到零點二四之間擬合，
         更低的一端混著假陽性，更高的一端已經進入 clonal 峰。
         把它換算成細胞比例，在純度零點六的樣本上大約是零點四到零點八，是一段相當窄的區間。

@@ -168,6 +168,13 @@ figcaption {
 }
 figcaption b { color: var(--ink); font-weight: 600; }
 
+/* 圖說裡沿用了圖內的 <tspan class="mono"> 寫法（sr2c、sr5 共 20 處）。
+   在 HTML 裡 <tspan> 是未知元素 —— 文字照樣顯示，但 .mono 只定義在
+   .dia-svg 之下，所以那些欄位名一直是以正文字型渲染的。
+   這種壞法完全無聲：畫面上看不出來，四支 linter 也都不管樣式。
+   一行補上，比把圖說改成 <code>（與圖內寫法不一致）好。 */
+figcaption .mono { font-family: var(--font-mono); font-size: .95em; }
+
 .fig img {
   display: block; width: 100%; height: auto;
   border: 1px solid var(--rule);

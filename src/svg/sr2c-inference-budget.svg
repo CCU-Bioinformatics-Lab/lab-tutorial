@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640">
+  <title>階段 L 的七步推論流程、兩個上限與實測成本</title>
+  <desc>左側是階段 L 的七個步驟，由上而下：輸出稀疏狀態表、就地校準兩個錯誤率、
+        跑階段 G、列舉候選狀態集合、算邊際似然、把階段 G 的不確定度傳下來、輸出。
+        其中第四步與第五步用深色標出，因為只有這兩步與既有實作不同；
+        第三步是沿用，不是本規格的貢獻。
+        右側三張卡分別說明三件會影響實作的事。
+        第一張是兩個上限：搜尋節點上限一千，實測有一成二的連鎖區段撞到它；
+        候選家族上限十萬，實測從來不觸發。兩者都是工程設定不是數學結果，
+        必須寫進 provenance，而撞到上限的連鎖區段要標記棄權並且仍然留在分母裡。
+        第二張說明第五步取代掉的是既有實作的 read-AF 排序：
+        那個分數會先砍掉三成的最小成本解，而且沒有任何拷貝數校正；
+        改成邊際似然之後候選整組留著，由後驗質量表達。
+        第三張是既有實作量過的成本：九萬多個連鎖區段兩分鐘、記憶體不到四百 MB，
+        而成本的變異來自作用位點數的分布，不是連鎖區段的總數 —— 跨資料集差約十九倍。
+        讀法是：這條流程沒有全域取樣包在外層，所以它是尷尬平行的，
+        成本隨連鎖區段數線性成長。</desc>
+
+  <text class="ttl zh" x="20" y="36">階段 L 的七步，以及成本落在哪裡</text>
+  <text class="anno zh" x="20" y="66">深色的兩步才是與既有實作的差異；<tspan class="bold">③ 是沿用，不是貢獻</tspan>。</text>
+
+  <!-- ══ 左：七步 ══ -->
+  <rect class="box ghost" x="20" y="88" width="540" height="470" rx="8"/>
+  <text class="lbl bold zh accent" x="44" y="122">階段 L 的七步</text>
+
+  <line class="guide" x1="32" y1="140" x2="32" y2="480"/>
+
+  <rect class="box plain"  x="44" y="134" width="488" height="34" rx="6"/>
+  <text class="tick zh" x="60" y="158">① 前處理：稀疏狀態表，覆蓋遮罩不得先併掉</text>
+
+  <rect class="box plain"  x="44" y="186" width="488" height="34" rx="6"/>
+  <text class="tick zh" x="60" y="210">② 就地校準：逐位點錯誤率與家族誤標率，成對估</text>
+
+  <rect class="box sunken" x="44" y="238" width="488" height="34" rx="6"/>
+  <text class="tick zh" x="60" y="262">③ 階段 G：只用 S₁，斷言與 S₂ 的位點交集為空</text>
+
+  <rect class="box accent" x="44" y="290" width="488" height="34" rx="6"/>
+  <text class="tick zh bold" x="60" y="314">④ 候選列舉：狀態空間 2^q，q=12 時 4,096 格</text>
+
+  <rect class="box accent" x="44" y="342" width="488" height="34" rx="6"/>
+  <text class="tick zh bold" x="60" y="366">⑤ 邊際似然：ν 依先驗積掉，候選整組留著不先砍</text>
+
+  <rect class="box plain"  x="44" y="394" width="488" height="34" rx="6"/>
+  <text class="tick zh" x="60" y="418">⑥ 傳遞階段 G 的不確定度：抽 S ≈ 50 組逐組重算</text>
+
+  <rect class="box plain"  x="44" y="446" width="488" height="34" rx="6"/>
+  <text class="tick zh" x="60" y="470">⑦ 輸出：候選與質量、節點比例區間、旗標、分子數</text>
+
+  <text class="tick zh accent" x="44" y="516">④⑤ 是本規格自己的部分，其餘六步既有實作都已具備。</text>
+  <text class="tick zh" x="44" y="542">沒有任何一步把全域取樣包在外層。</text>
+
+  <!-- ══ 右上：上限與棄權 ══ -->
+  <rect class="box warn" x="580" y="88" width="400" height="150" rx="8"/>
+  <text class="lbl bold zh" x="604" y="124">兩個上限與棄權</text>
+  <text class="tick mono" x="604" y="152">κ_node = 1,000</text>
+  <text class="tick zh warn" x="604" y="174">→ 12.47% 的連鎖區段撞到（實測）</text>
+  <text class="tick mono" x="604" y="196">κ_fam = 100,000</text>
+  <text class="tick zh" x="604" y="218">→ 實測從不觸發；兩者皆為工程設定</text>
+
+  <!-- ══ 右中：取代 read-AF ══ -->
+  <rect class="box accent" x="580" y="254" width="400" height="150" rx="8"/>
+  <text class="lbl bold zh accent" x="604" y="290">⑤ 取代舊的 read-AF 排序</text>
+  <text class="tick zh bad" x="604" y="318">舊分數先砍掉 30.03% 的最小成本解</text>
+  <text class="tick zh bad" x="604" y="340">而且沒有任何拷貝數校正</text>
+  <text class="tick zh ok" x="604" y="368">新做法：候選整組留著</text>
+  <text class="tick zh ok" x="604" y="390">由後驗質量表達，不先砍</text>
+
+  <!-- ══ 右下：成本 ══ -->
+  <rect class="box sunken" x="580" y="420" width="400" height="138" rx="8"/>
+  <text class="lbl bold zh" x="604" y="456">成本：既有實作已經量過</text>
+  <text class="tick mono" x="604" y="484">98,955 段 · 122.03 s · 356.7 MB</text>
+  <text class="tick zh" x="604" y="506">13,773,565 個搜尋節點，平均 139.2</text>
+  <text class="tick zh bold" x="604" y="534">跨資料集差 19 倍：292.0 對 15.5</text>
+
+  <rect class="box accent" x="20" y="576" width="960" height="48" rx="8"/>
+  <text class="anno zh" x="40" y="606">要控成本，該控的是 <tspan class="mono">q</tspan> 的分布，<tspan class="bold">不是連鎖區段總數</tspan> —— 成本隨連鎖區段數線性成長。</text>
+</svg>

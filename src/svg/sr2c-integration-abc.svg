@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440">
+  <title>三種整合方式各自接在 somatic caller 流程的哪一個位置</title>
+  <desc>上排是 somatic caller 本來的流程：產生候選、算特徵與張量、模型給分、輸出 VCF。
+        三種整合方式的差別就是接在這條流程的哪一個位置，而位置決定了成本與風險。
+        方式 A 接在模型給分之後，只重新排序，所以不必重訓 caller，成本最低，
+        但它只碰得到 caller 已經留下來的候選，被前面丟掉的救不回來。
+        方式 B 把特徵接進張量之後重訓，位置最靠前，上限最高，
+        代價是需要完整訓練資料與算力，而且很難歸因是哪一層特徵有用。
+        方式 C 接在產生候選之前，直接用特徵先砍候選。
+        它便宜，但它是不可逆的：被砍掉的候選不會出現在任何後續指標裡，
+        所以它會安靜地傷害 recall，圖上因此標為不建議。
+        讀法是：建議順序是 A 先做，因為 A 可歸因、每一層可以單獨加減；
+        而如果 A 沒有效果，B 幾乎不可能有 —— A 的失敗代表這些特徵
+        在 caller 已有的資訊之外沒有增量。</desc>
+
+  <text class="ttl zh" x="20" y="36">三種接法接在 caller 流程的哪裡</text>
+  <text class="anno zh" x="20" y="66">位置決定成本與風險：<tspan class="bold">越靠前上限越高，也越不可逆</tspan>。</text>
+
+  <!-- ══ caller 本來的流程 ══ -->
+  <rect class="box sunken" x="40" y="108" width="200" height="46" rx="8"/>
+  <text class="lbl zh mid" x="140" y="138">產生候選</text>
+  <rect class="box sunken" x="272" y="108" width="200" height="46" rx="8"/>
+  <text class="lbl zh mid" x="372" y="138">特徵／張量</text>
+  <rect class="box sunken" x="504" y="108" width="200" height="46" rx="8"/>
+  <text class="lbl zh mid" x="604" y="138">模型給分</text>
+  <rect class="box sunken" x="736" y="108" width="200" height="46" rx="8"/>
+  <text class="lbl zh mid" x="836" y="138">輸出 VCF</text>
+
+  <line class="flow" x1="244" y1="131" x2="266" y2="131" marker-end="url(#arrow-sm)"/>
+  <line class="flow" x1="476" y1="131" x2="498" y2="131" marker-end="url(#arrow-sm)"/>
+  <line class="flow" x1="708" y1="131" x2="730" y2="131" marker-end="url(#arrow-sm)"/>
+
+  <!-- 三個接入點 -->
+  <line class="conn bad"    x1="90"  y1="196" x2="90"  y2="158" marker-end="url(#arrow-sm)"/>
+  <text class="tick bad bold mid" x="90" y="216">C</text>
+  <line class="conn warn"   x1="322" y1="196" x2="322" y2="158" marker-end="url(#arrow-sm)"/>
+  <text class="tick warn bold mid" x="322" y="216">B</text>
+  <line class="conn ok"     x1="654" y1="196" x2="654" y2="158" marker-end="url(#arrow-sm)"/>
+  <text class="tick ok bold mid" x="654" y="216">A</text>
+
+  <!-- ══ 三條 ══ -->
+  <rect class="box ok" x="20" y="238" width="960" height="42" rx="8"/>
+  <text class="tick zh" x="40" y="264"><tspan class="bold ok">A · 事後重新評分</tspan> —— 接在給分之後，只改排序。成本低、不必重訓；但只碰得到 caller 已留下的候選。</text>
+
+  <rect class="box warn" x="20" y="290" width="960" height="42" rx="8"/>
+  <text class="tick zh" x="40" y="316"><tspan class="bold warn">B · 加成輸入通道</tspan> —— 特徵接進張量後重訓。上限最高；需要完整訓練資料與算力，且難以歸因哪一層有用。</text>
+
+  <rect class="box bad" x="20" y="342" width="960" height="42" rx="8"/>
+  <text class="tick zh" x="40" y="368"><tspan class="bold bad">C · 前置過濾（不建議）</tspan> —— 先砍候選。便宜，但<tspan class="bold">不可逆</tspan>：被砍掉的不出現在任何後續指標裡，會安靜地傷害 recall。</text>
+
+  <rect class="box accent" x="20" y="396" width="960" height="40" rx="8"/>
+  <text class="anno zh" x="40" y="423">建議順序 <tspan class="bold">A 先做</tspan> —— A 沒有效果，B 幾乎不可能有。</text>
+</svg>
