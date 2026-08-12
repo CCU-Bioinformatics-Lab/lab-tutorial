@@ -14607,82 +14607,104 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 直覺上，既然家族一與家族二的 read 各自形成一張 0／1 狀態表，
 把兩張表各算一次機率再相乘似乎最自然。<b>但那樣寫是錯的</b>，有兩個各自獨立的理由：</p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" class="dia-svg" role="img" aria-labelledby="sr2b__sr2b-window-vs-family__title" aria-describedby="sr2b__sr2b-window-vs-family__desc">
-  <title id="sr2b__sr2b-window-vs-family__title">狀態表逐家族分開，機率在連鎖視窗合併</title>
-  <desc id="sr2b__sr2b-window-vs-family__desc">圖分上下兩半。上半是正確的寫法：一個連鎖視窗裡有兩條單倍型家族，
-        各自建立自己的 0/1 狀態表，所以資料結構上確實是分開的。
-        但兩件東西把它們綁在一起：家族誤標閘門會把少數分子從一條通道搬到另一條，
-        使兩邊的觀測不再條件獨立；方向變數 sigma_v 則是整個視窗共用一個，
-        因為兩條家族互為補集，要對調就同時對調。
-        因此兩張表最後合成一個因子 P_v，一個連鎖視窗只出一個因子。
-        下半是錯誤的寫法與它的兩個後果：逐家族各算一次機率再相乘，
-        會把同一條被誤標的分子在兩邊各算一次而高估證據量，
-        並且把同一個 sigma_v 邊際化兩次，等於當成兩次獨立的擲硬幣，
-        把方向的不確定性算掉一半。
-        讀者要帶走的一句話是：分開的是表，不是機率。</desc>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 402" class="dia-svg" role="img" aria-labelledby="sr2b__sr2b-window-vs-family__title" aria-describedby="sr2b__sr2b-window-vs-family__desc">
+  <title id="sr2b__sr2b-window-vs-family__title">兩條家族被兩件東西綁在一起，所以拆不開</title>
+  <desc id="sr2b__sr2b-window-vs-family__desc">左右並排比較同一個連鎖視窗的兩種寫法。
+        每一邊都畫成兩條泳道，上面一條是家族一，下面一條是家族二，泳道裡是該家族的 read。
+        兩件把兩族綁在一起的東西都畫了出來。
+        第一件是家族誤標：家族一的泳道裡混進一條顏色屬於家族二的 read，
+        並有一支箭頭從家族二的泳道指過來，表示這條分子實際來自隔壁，只是標籤標錯了。
+        第二件是方向開關：左邊只有一個開關，兩條接線分別接到兩條泳道，
+        所以撥動它會同時翻轉兩族。
+        左邊因此只輸出一個因子，方向也只被邊際化一次。
+        右邊是錯誤的寫法：兩條泳道之間築了一道牆當成互相獨立，
+        那條被誤標的分子於是在兩條泳道各留下一份，用紅圈標出「同一條算了兩次」；
+        方向開關也變成各自獨立的兩個。
+        右邊因此輸出兩個相乘的因子，證據量被高估，方向的不確定性也被算掉一半。</desc>
 
-  <text class="ttl zh" x="20" y="38">分開的是「表」，不是「機率」</text>
+  <text class="ttl zh" x="20" y="40">兩族被兩件東西綁在一起，所以拆不開</text>
 
-  <!-- ── 上半：正確寫法 ──────────────────────────────────────────── -->
-  <text class="lbl bold zh ok" x="20" y="78">正確：一個連鎖視窗 → 一個因子</text>
+  <!-- ════════════ 左：正確 ════════════ -->
+  <rect class="box ok" x="20" y="60" width="460" height="326" rx="12"/>
+  <text class="lbl bold zh ok" x="40" y="92">✓ 綁在一起 → 一個因子</text>
 
-  <!-- 連鎖視窗外框 -->
-  <rect class="box" x="20" y="92" width="600" height="238" rx="10"/>
-  <text class="lbl bold zh" x="38" y="122">連鎖視窗 v</text>
-  <text class="tick zh" x="176" y="122">同一段 DNA，同一組 somatic 位點</text>
+  <!-- 泳道：家族 u₁ -->
+  <rect class="box sunken" x="40" y="106" width="290" height="72" rx="8"/>
+  <text class="lbl bold zh hp1" x="54" y="132">家族 u₁</text>
+  <rect class="read hp1" x="150" y="114" width="158" height="14" rx="7"/>
+  <rect class="read hp1" x="162" y="136" width="158" height="14" rx="7"/>
+  <rect class="read hp2" x="150" y="158" width="158" height="14" rx="7"/>
 
-  <!-- 家族 u1 -->
-  <rect class="box sunken" x="38" y="136" width="564" height="82" rx="8"/>
-  <text class="lbl bold zh hp1" x="56" y="164">家族 u₁</text>
-  <rect class="read hp1" x="152" y="150" width="150" height="14" rx="7"/>
-  <rect class="read hp1" x="176" y="170" width="150" height="14" rx="7"/>
-  <rect class="read hp1" x="160" y="190" width="150" height="14" rx="7"/>
-  <circle class="mark somatic" cx="206" cy="157" r="6"/>
-  <circle class="mark somatic" cx="266" cy="177" r="6"/>
-  <text class="tick zh" x="352" y="184">狀態表 q_u₁：2^k_v 格</text>
+  <!-- 泳道：家族 u₂ -->
+  <rect class="box sunken" x="40" y="206" width="290" height="72" rx="8"/>
+  <text class="lbl bold zh hp2" x="54" y="232">家族 u₂</text>
+  <rect class="read hp2" x="150" y="214" width="158" height="14" rx="7"/>
+  <rect class="read hp2" x="162" y="236" width="158" height="14" rx="7"/>
+  <rect class="read hp2" x="150" y="258" width="158" height="14" rx="7"/>
 
-  <!-- 家族 u2 -->
-  <rect class="box sunken" x="38" y="230" width="564" height="82" rx="8"/>
-  <text class="lbl bold zh hp2" x="56" y="258">家族 u₂</text>
-  <rect class="read hp2" x="152" y="244" width="150" height="14" rx="7"/>
-  <rect class="read hp2" x="176" y="264" width="150" height="14" rx="7"/>
-  <rect class="read hp2" x="160" y="284" width="150" height="14" rx="7"/>
-  <circle class="mark somatic" cx="230" cy="251" r="6"/>
-  <text class="tick zh" x="352" y="278">狀態表 q_u₂：另一條拷貝</text>
+  <!-- ① 誤標：一條分子從下面那條泳道被搬上來 -->
+  <path class="conn warn thick" d="M262,206 C262,194 262,186 262,178" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh warn" x="54" y="200">① 誤標 ξ<tspan style="font-size:11px" dy="3">v</tspan><tspan dy="-3">：這條來自 u₂</tspan></text>
 
-  <!-- 綁住兩條家族的兩件東西 -->
-  <path class="conn warn thick" d="M620,177 C650,177 650,224 676,224" marker-end="url(#arrow-sm)"/>
-  <path class="conn warn thick" d="M620,271 C650,271 650,246 676,246" marker-end="url(#arrow-sm)"/>
+  <!-- ② 方向：一個開關，兩條接線 -->
+  <path class="conn accent" d="M330,142 L358,142 L358,190"/>
+  <path class="conn accent" d="M330,242 L358,242 L358,206"/>
+  <rect class="box accent" x="358" y="184" width="58" height="28" rx="14"/>
+  <rect class="bar ok" x="364" y="190" width="20" height="16" rx="8"/>
+  <text class="lbl bold zh accent mid" x="410" y="248">σ<tspan style="font-size:15px" dy="4">v</tspan></text>
+  <text class="tick zh mid" x="410" y="270">一個開關</text>
+  <text class="tick zh mid" x="410" y="290">兩族共用</text>
 
-  <rect class="box warn" x="678" y="130" width="302" height="86" rx="8"/>
-  <text class="lbl bold zh warn" x="696" y="160">① 家族誤標 ξ_v</text>
-  <text class="tick zh" x="696" y="184">少數分子被標到另一條家族，</text>
-  <text class="tick zh" x="696" y="204">兩邊的觀測因此不獨立</text>
+  <path class="conn thick" d="M185,278 L185,306" marker-end="url(#arrow-sm)"/>
 
-  <rect class="box accent" x="678" y="232" width="302" height="86" rx="8"/>
-  <text class="lbl bold zh accent" x="696" y="262">② 方向 σ_v</text>
-  <text class="tick zh" x="696" y="286">兩條家族互為補集，</text>
-  <text class="tick zh" x="696" y="306">要對調就同時對調</text>
+  <rect class="box ok" x="40" y="310" width="420" height="64" rx="10"/>
+  <text class="lbl bold zh ok mid" x="250" y="340">P<tspan style="font-size:15px" dy="4">v</tspan><tspan dy="-4">(D</tspan><tspan style="font-size:15px" dy="4">v</tspan><tspan dy="-4"> ∣ Θ</tspan><tspan style="font-size:15px" dy="4">K</tspan><tspan dy="-4">)</tspan></text>
+  <text class="tick zh mid" x="250" y="364">兩族一起算，方向只邊際化一次</text>
 
-  <!-- 合成一個因子 -->
-  <path class="conn thick" d="M320,330 L320,356" marker-end="url(#arrow-sm)"/>
-  <rect class="box ok" x="140" y="358" width="720" height="60" rx="8"/>
-  <text class="lbl bold zh ok mid" x="500" y="384">兩條家族一起算，合成一個因子　P_v(D_v ∣ Θ_K)</text>
-  <text class="tick zh mid" x="500" y="406">σ_v 在這裡只被邊際化一次</text>
 
-  <!-- ── 下半：錯誤寫法 ──────────────────────────────────────────── -->
-  <text class="lbl bold zh bad" x="20" y="466">錯誤：逐家族各算一次再相乘</text>
+  <!-- ════════════ 右：錯誤 ════════════ -->
+  <rect class="box bad" x="520" y="60" width="460" height="326" rx="12"/>
+  <text class="lbl bold zh bad" x="540" y="92">✗ 當成獨立 → 兩個因子</text>
 
-  <rect class="box bad" x="20" y="480" width="960" height="140" rx="10"/>
-  <text class="lbl zh mid" x="500" y="512">P_u₁ × P_u₂　—— 兩個各自獨立的因子</text>
+  <rect class="box sunken" x="540" y="106" width="290" height="72" rx="8"/>
+  <text class="lbl bold zh hp1" x="554" y="132">家族 u₁</text>
+  <rect class="read hp1" x="650" y="114" width="158" height="14" rx="7"/>
+  <rect class="read hp1" x="662" y="136" width="158" height="14" rx="7"/>
+  <rect class="read hp2" x="650" y="158" width="158" height="14" rx="7"/>
 
-  <rect class="box ghost bad" x="44" y="528" width="450" height="76" rx="8"/>
-  <text class="lbl bold zh bad" x="62" y="556">誤標讓證據量被高估</text>
-  <text class="tick zh" x="62" y="580">同一條被搬過去的分子，在兩邊各留下一次痕跡</text>
+  <rect class="box sunken" x="540" y="206" width="290" height="72" rx="8"/>
+  <text class="lbl bold zh hp2" x="554" y="232">家族 u₂</text>
+  <rect class="read hp2" x="650" y="214" width="158" height="14" rx="7"/>
+  <rect class="read hp2" x="662" y="236" width="158" height="14" rx="7"/>
+  <rect class="read hp2 ghost" x="650" y="258" width="158" height="14" rx="7"/>
 
-  <rect class="box ghost bad" x="506" y="528" width="450" height="76" rx="8"/>
-  <text class="lbl bold zh bad" x="524" y="556">σ_v 被邊際化兩次</text>
-  <text class="tick zh" x="524" y="580">一個方向當成兩次擲硬幣，不確定性算掉一半</text>
+  <!-- 中間那道牆：假設兩族互相獨立 -->
+  <line class="guide bad" x1="546" y1="192" x2="824" y2="192"/>
+
+  <!-- 同一條分子在兩邊各留下一份 -->
+  <rect class="box ghost bad" x="644" y="152" width="170" height="26" rx="8"/>
+  <rect class="box ghost bad" x="644" y="252" width="170" height="26" rx="8"/>
+
+  <text class="tick zh bad" x="836" y="205">同一條算了兩次</text>
+
+  <!-- 兩個各自獨立的開關 -->
+  <path class="conn bad" d="M830,128 L858,128"/>
+  <rect class="box bad" x="858" y="114" width="58" height="28" rx="14"/>
+  <rect class="bar bad" x="864" y="120" width="20" height="16" rx="8"/>
+
+  <path class="conn bad" d="M830,228 L858,228"/>
+  <rect class="box bad" x="858" y="214" width="58" height="28" rx="14"/>
+  <rect class="bar bad" x="894" y="220" width="20" height="16" rx="8"/>
+
+
+  <text class="tick zh bad mid" x="887" y="272">兩個獨立開關</text>
+
+  <path class="conn thick bad" d="M685,278 L685,306" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box bad" x="540" y="310" width="420" height="64" rx="10"/>
+  <text class="lbl bold zh bad mid" x="750" y="340">P<tspan style="font-size:15px" dy="4">u₁</tspan><tspan dy="-4"> × P</tspan><tspan style="font-size:15px" dy="4">u₂</tspan></text>
+  <text class="tick zh mid" x="750" y="364">兩個因子各自獨立</text>
+
 </svg><figcaption>兩條家族各有自己的狀態表 —— 資料結構上確實是分開的 ——
 但它們被兩件東西綁在一起：家族誤標閘門會把分子從一條通道搬到另一條，
 而方向變數 <math><msub><mi>σ</mi><mi>v</mi></msub></math> 是整個視窗<b>共用</b>一個。
