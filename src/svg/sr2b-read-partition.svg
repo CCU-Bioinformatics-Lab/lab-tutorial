@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650">
+  <title>同一批 read 先互斥分流，再形成完整 likelihood</title>
+  <desc>圖由上往下讀。最上方是一批依連鎖視窗整理的原始 read，仍保留每條 read 在各位點看到的 ref 或 alt。
+        中央只做一個不涉及生物結論的分流判斷：這個連鎖視窗內有幾個變異。
+        若只有一個變異，read 進入左路 S1，濃縮為總深度 d_m 與 alt count a_m，
+        以 beta-binomial 計算單位點因子 P_BB。
+        若有兩個以上變異，read 進入右路 S2，保留逐條 read 的聯合狀態與覆蓋遮罩 D_u，
+        以多位點 read 模型計算區段因子 P_u。
+        左右兩路沒有共享 read，底部以乘號合併成 P(D given Theta_K)，並標示每條 read 恰好計算一次。
+        中間的關係帶說明兩路不是兩個生物模型：單位點只有 ref 與 alt 兩格，
+        多位點則有二的 k_u 次方個聯合狀態；k_u 等於一時，多位點模型的邊界情形就是 beta-binomial。
+        讀法是先分資料、保留適合的資料粒度、各算一個因子，最後相乘。</desc>
+
+  <text class="ttl zh" x="20" y="36">先分資料，再寫 likelihood：每條 read 恰好進入一個因子</text>
+
+  <!-- 原始觀測 -->
+  <rect class="box sunken" x="178" y="56" width="644" height="92" rx="8"/>
+  <text class="lbl bold zh" x="198" y="84">原始觀測：依連鎖視窗整理的 read</text>
+  <rect class="read hp0" x="198" y="101" width="150" height="14" rx="7"/>
+  <rect class="read hp1" x="218" y="121" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="272" cy="108" r="6"/>
+  <circle class="mark somatic" cx="309" cy="128" r="6"/>
+  <rect class="read hp0" x="406" y="101" width="150" height="14" rx="7"/>
+  <rect class="read hp1" x="426" y="121" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="456" cy="108" r="6"/>
+  <circle class="mark somatic" cx="512" cy="128" r="6"/>
+  <rect class="read hp0" x="614" y="101" width="150" height="14" rx="7"/>
+  <rect class="read hp1" x="634" y="121" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="674" cy="108" r="6"/>
+  <circle class="mark somatic" cx="730" cy="128" r="6"/>
+
+  <path class="conn" d="M500,148 L500,174" marker-end="url(#arrow-sm)"/>
+
+  <!-- 唯一分流規則 -->
+  <rect class="box accent" x="316" y="176" width="368" height="64" rx="8"/>
+  <text class="lbl bold zh accent mid" x="500" y="202">這個連鎖視窗含幾個變異？</text>
+  <text class="tick zh mid" x="500" y="226">只依資料結構分流，不先推論 clone 關係</text>
+
+  <path class="conn" d="M430,240 C390,258 300,258 256,278" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M570,240 C610,258 700,258 744,278" marker-end="url(#arrow-sm)"/>
+
+  <!-- 左路：單變異 -->
+  <rect class="box" x="18" y="280" width="460" height="190" rx="8"/>
+  <text class="lbl bold zh" x="36" y="310">S₁：單變異視窗　kᵤ = 1</text>
+  <text class="tick zh" x="36" y="338">保留的資料粒度：一個位點的 ref／alt 計數</text>
+
+  <rect class="read hp0" x="38" y="360" width="108" height="14" rx="7"/>
+  <rect class="read hp0" x="48" y="382" width="108" height="14" rx="7"/>
+  <rect class="read hp1" x="34" y="404" width="108" height="14" rx="7"/>
+  <circle class="mark somatic" cx="94" cy="411" r="6"/>
+  <text class="tick mono" x="170" y="378">dₘ = total reads</text>
+  <text class="tick mono" x="170" y="408">aₘ = alt reads</text>
+  <path class="conn" d="M322,390 L352,390" marker-end="url(#arrow-sm)"/>
+  <rect class="box ok" x="354" y="354" width="106" height="72" rx="8"/>
+  <text class="tick bold mid" x="407" y="382">P<tspan baseline-shift="sub">BB</tspan></text>
+  <text class="tick zh mid" x="407" y="408">單位點因子</text>
+  <text class="anno bold zh ok" x="36" y="452">beta-binomial：兩格（ref／alt）</text>
+
+  <!-- 右路：多變異 -->
+  <rect class="box accent" x="522" y="280" width="460" height="190" rx="8"/>
+  <text class="lbl bold zh accent" x="540" y="310">S₂：多變異區段　kᵤ ≥ 2</text>
+  <text class="tick zh" x="540" y="338">保留的資料粒度：每條 read 的聯合狀態與遮罩</text>
+
+  <rect class="read hp0" x="540" y="360" width="124" height="18" rx="9"/>
+  <text class="tick mono" x="552" y="374">0 – 1</text>
+  <rect class="read hp1" x="540" y="388" width="124" height="18" rx="9"/>
+  <text class="tick mono" x="552" y="402">1 0 1</text>
+  <rect class="read hp0" x="540" y="416" width="124" height="18" rx="9"/>
+  <text class="tick mono" x="552" y="430">0 1 –</text>
+  <text class="tick mono" x="686" y="378">Dᵤ = read states</text>
+  <text class="tick mono" x="686" y="408">＋ coverage masks</text>
+  <path class="conn" d="M820,390 L850,390" marker-end="url(#arrow-sm)"/>
+  <rect class="box ok" x="852" y="354" width="112" height="72" rx="8"/>
+  <text class="tick bold mid" x="908" y="382">Pᵤ</text>
+  <text class="tick zh mid" x="908" y="408">聯合因子</text>
+  <text class="anno bold zh accent" x="540" y="452">同一生成模型：2<tspan baseline-shift="super">kᵤ</tspan> 個聯合狀態</text>
+
+  <!-- 同一模型關係 -->
+  <rect class="box ghost" x="126" y="490" width="748" height="54" rx="8"/>
+  <text class="tick bold zh mid" x="500" y="514">不是兩個模型：kᵤ = 1 時，聯合狀態只剩 ref／alt 兩格</text>
+  <text class="tick zh mid" x="500" y="536">因此左路的 beta-binomial 是右路 read 模型的單位點邊界情形</text>
+
+  <!-- 合流 -->
+  <path class="conn" d="M250,470 C250,566 408,558 454,580" marker-end="url(#arrow-sm)"/>
+  <path class="conn" d="M750,470 C750,566 592,558 546,580" marker-end="url(#arrow-sm)"/>
+  <text class="lbl bold mid" x="500" y="584">×</text>
+
+  <rect class="box ok" x="210" y="594" width="580" height="42" rx="8"/>
+  <text class="lbl bold mid" x="500" y="621">P(D | Θ<tspan baseline-shift="sub">K</tspan>)　—— 每條 read 恰好計算一次</text>
+</svg>
