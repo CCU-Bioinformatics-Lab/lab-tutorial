@@ -355,7 +355,8 @@ window.TW_GLOSSARY = {
   ],
   "slug": "homopolymer",
   "modules": [
-   "m03"
+   "m03",
+   "sr2b"
   ]
  },
  "5mC": {

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <title>平台固定住的是逐位點錯誤，不是家族誤標</title>
+  <desc>圖比較同一台機器、同一個 basecaller 在兩個不同區域的行為。
+        上排是雜合位點密集的區域：定相有很多錨點，phase block 長，
+        分子被標到正確家族的把握高，所以家族誤標率低。
+        下排是雜合位點稀疏的區域：錨點少，phase block 短，
+        同一台機器下的家族誤標率可以高一個數量級。
+        兩排的逐位點錯誤率則幾乎一樣，因為它由平台與 basecaller 決定。
+        結論寫在下方：把逐位點錯誤當成校準過的已知量大致無害，
+        因為它隨差異位點數以指數下降；
+        但家族誤標與位點數無關，在多位點時它幾乎單獨決定錯誤地板，
+        而它衡量的是定相品質而不是定序品質，所以平台固定完全不決定它。</desc>
+
+  <text class="ttl zh" x="20" y="38">同一台機器，兩個區域，兩種行為</text>
+
+  <!-- ── 上排：雜合位點密集 ─────────────────────────────────────── -->
+  <rect class="box" x="20" y="62" width="960" height="150" rx="10"/>
+  <text class="lbl bold zh" x="40" y="94">雜合位點<tspan class="bold">密集</tspan>的區域</text>
+
+  <line class="axis" x1="40" y1="122" x2="600" y2="122"/>
+  <circle class="mark germline" cx="70" cy="122" r="6"/>
+  <circle class="mark germline" cx="118" cy="122" r="6"/>
+  <circle class="mark germline" cx="172" cy="122" r="6"/>
+  <circle class="mark germline" cx="228" cy="122" r="6"/>
+  <circle class="mark germline" cx="286" cy="122" r="6"/>
+  <circle class="mark germline" cx="342" cy="122" r="6"/>
+  <circle class="mark germline" cx="404" cy="122" r="6"/>
+  <circle class="mark germline" cx="462" cy="122" r="6"/>
+  <circle class="mark germline" cx="524" cy="122" r="6"/>
+  <circle class="mark germline" cx="578" cy="122" r="6"/>
+  <text class="tick zh" x="40" y="150">錨點多 → phase block 長 → 家族標得準</text>
+
+  <rect class="box ok" x="628" y="86" width="160" height="106" rx="8"/>
+  <text class="tick zh mid" x="708" y="114">ε　逐位點</text>
+  <text class="lbl bold zh ok mid" x="708" y="148">基準值</text>
+  <text class="tick zh mid" x="708" y="174">由平台決定</text>
+
+  <rect class="box ok" x="808" y="86" width="152" height="106" rx="8"/>
+  <text class="tick zh mid" x="884" y="114">ξ　家族誤標</text>
+  <text class="lbl bold zh ok mid" x="884" y="148">低</text>
+  <text class="tick zh mid" x="884" y="174">錨點充足</text>
+
+  <!-- ── 下排：雜合位點稀疏 ─────────────────────────────────────── -->
+  <rect class="box" x="20" y="228" width="960" height="150" rx="10"/>
+  <text class="lbl bold zh" x="40" y="260">雜合位點<tspan class="bold">稀疏</tspan>的區域</text>
+
+  <line class="axis" x1="40" y1="288" x2="600" y2="288"/>
+  <circle class="mark germline" cx="96" cy="288" r="6"/>
+  <circle class="mark germline" cx="304" cy="288" r="6"/>
+  <circle class="mark germline" cx="536" cy="288" r="6"/>
+  <text class="tick zh" x="40" y="316">錨點少 → phase block 短 → 家族容易標錯</text>
+
+  <rect class="box ok" x="628" y="252" width="160" height="106" rx="8"/>
+  <text class="tick zh mid" x="708" y="280">ε　逐位點</text>
+  <text class="lbl bold zh ok mid" x="708" y="314">幾乎不變</text>
+  <text class="tick zh mid" x="708" y="340">機器沒換</text>
+
+  <rect class="box bad" x="808" y="252" width="152" height="106" rx="8"/>
+  <text class="tick zh mid" x="884" y="280">ξ　家族誤標</text>
+  <text class="lbl bold zh bad mid" x="884" y="314">高一個級距</text>
+  <text class="tick zh mid" x="884" y="340">錨點不足</text>
+
+  <!-- ── 底部結論 ───────────────────────────────────────────────── -->
+  <rect class="box warn" x="20" y="394" width="960" height="92" rx="10"/>
+  <text class="lbl bold zh warn" x="40" y="426">ξ 衡量的是<tspan class="bold">定相</tspan>品質，不是<tspan class="bold">定序</tspan>品質</text>
+  <text class="tick zh" x="40" y="456">所以「平台固定所以錯誤率已知」對 ε 大致成立，對 ξ 完全不成立 ——</text>
+  <text class="tick zh" x="40" y="478">而多位點時錯誤地板幾乎由 ξ 單獨決定，因為 ε 隨差異位點數以指數掉下去。</text>
+</svg>

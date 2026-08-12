@@ -4,11 +4,11 @@
         中央只做一個不涉及生物結論的分流判斷：這個連鎖視窗內有幾個變異。
         若只有一個變異，read 進入左路 S1，濃縮為總深度 d_m 與 alt count a_m，
         以 beta-binomial 計算單位點因子 P_BB。
-        若有兩個以上變異，read 進入右路 S2，保留逐條 read 的聯合狀態與覆蓋遮罩 D_u，
-        以多位點 read 模型計算區段因子 P_u。
+        若有兩個以上變異，read 進入右路 S2，保留逐條 read 的聯合狀態與覆蓋遮罩 D_v，
+        以多位點 read 模型計算區段因子 P_v。
         左右兩路沒有共享 read，底部以乘號合併成 P(D given Theta_K)，並標示每條 read 恰好計算一次。
         中間的關係帶說明兩路不是兩個生物模型：單位點只有 ref 與 alt 兩格，
-        多位點則有二的 k_u 次方個聯合狀態；k_u 等於一時，多位點模型的邊界情形就是 beta-binomial。
+        多位點則有二的 k_v 次方個聯合狀態；k_v 等於一時，多位點模型的邊界情形就是 beta-binomial。
         讀法是先分資料、保留適合的資料粒度、各算一個因子，最後相乘。</desc>
 
   <text class="ttl zh" x="20" y="36">先分資料，再寫 likelihood：每條 read 恰好進入一個因子</text>

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520">
+  <title>無限位點假設違反時，錯的不是節點而是拓撲</title>
+  <desc>圖分成三欄。左欄是假設成立的情形：每個突變在整棵樹上只發生一次，
+        所以兩個細胞群共同帶有某個突變，就真的代表它們共享一個祖先，重建出來的樹是對的。
+        中欄是重複突變：同一個位點在兩支各自獨立發生一次，
+        資料上看起來和共享祖先完全一樣，於是兩支被錯誤地併到同一個祖先之下。
+        右欄是突變遺失：某支的突變被刪除或因雜合性缺失而消失，
+        子代看起來沒有祖先的突變，於是本來巢狀的關係被讀成分岔。
+        三欄的觀測都不會產生任何錯誤訊息，差別只在重建出來的樹是對是錯。
+        重點是這兩種違反改動的是樹的形狀本身，不是多補一個潛在節點就能修掉的問題。</desc>
+
+  <text class="ttl zh" x="20" y="38">違反時，錯的是樹的形狀</text>
+
+  <!-- ── 左欄：假設成立 ─────────────────────────────────────────── -->
+  <rect class="box ok" x="20" y="62" width="306" height="330" rx="10"/>
+  <text class="lbl bold zh ok" x="40" y="94">假設成立</text>
+  <text class="tick zh" x="40" y="118">每個突變只發生一次</text>
+
+  <path class="conn thick" d="M173,150 L110,214"/>
+  <path class="conn thick" d="M173,150 L236,214"/>
+  <circle class="mark ref" cx="173" cy="142" r="13"/>
+  <circle class="mark somatic" cx="110" cy="222" r="13"/>
+  <circle class="mark somatic" cx="236" cy="222" r="13"/>
+  <text class="tick zh mid" x="173" y="256">兩支各帶自己的突變</text>
+
+  <rect class="box sunken" x="40" y="272" width="266" height="102" rx="8"/>
+  <text class="tick zh" x="58" y="300">共同帶有某突變</text>
+  <text class="tick zh" x="58" y="324">＝ 真的共享祖先</text>
+  <text class="tick zh ok" x="58" y="356">→ 重建出來的樹是對的</text>
+
+  <!-- ── 中欄：重複突變 ─────────────────────────────────────────── -->
+  <rect class="box bad" x="346" y="62" width="306" height="330" rx="10"/>
+  <text class="lbl bold zh bad" x="366" y="94">違反一：重複突變</text>
+  <text class="tick zh" x="366" y="118">同一位點在兩支各發生一次</text>
+
+  <path class="conn thick" d="M499,150 L436,214"/>
+  <path class="conn thick" d="M499,150 L562,214"/>
+  <circle class="mark ref" cx="499" cy="142" r="13"/>
+  <circle class="mark artifact" cx="436" cy="222" r="13"/>
+  <circle class="mark artifact" cx="562" cy="222" r="13"/>
+  <text class="tick zh mid" x="499" y="256">兩邊看到同一個突變</text>
+
+  <rect class="box ghost bad" x="366" y="272" width="266" height="102" rx="8"/>
+  <text class="tick zh" x="384" y="300">資料上與「共享祖先」</text>
+  <text class="tick zh" x="384" y="324">完全一樣，分不出來</text>
+  <text class="tick zh bad" x="384" y="356">→ 兩支被併到同一祖先下</text>
+
+  <!-- ── 右欄：突變遺失 ─────────────────────────────────────────── -->
+  <rect class="box bad" x="672" y="62" width="308" height="330" rx="10"/>
+  <text class="lbl bold zh bad" x="692" y="94">違反二：突變遺失</text>
+  <text class="tick zh" x="692" y="118">deletion 或 LOH 把它刪掉</text>
+
+  <path class="conn thick" d="M826,150 L826,214"/>
+  <circle class="mark somatic" cx="826" cy="142" r="13"/>
+  <circle class="mark ref" cx="826" cy="222" r="13"/>
+  <text class="tick zh mid" x="826" y="256">子代看起來沒有它</text>
+
+  <rect class="box ghost bad" x="692" y="272" width="268" height="102" rx="8"/>
+  <text class="tick zh" x="710" y="300">本來是巢狀關係，</text>
+  <text class="tick zh" x="710" y="324">卻讀成兩群互不包含</text>
+  <text class="tick zh bad" x="710" y="356">→ 偽造出一個分岔</text>
+
+  <!-- ── 底部 ───────────────────────────────────────────────────── -->
+  <rect class="box warn" x="20" y="412" width="960" height="94" rx="10"/>
+  <text class="lbl bold zh warn" x="40" y="444">這不是多補一個潛在節點就能修掉的問題</text>
+  <text class="tick zh" x="40" y="474">潛在節點修的是「這個狀態沒被抽到」；這裡壞掉的是<tspan class="bold">拓撲本身</tspan>，</text>
+  <text class="tick zh" x="40" y="496">而且三欄的觀測都不會產生任何錯誤訊息。</text>
+</svg>

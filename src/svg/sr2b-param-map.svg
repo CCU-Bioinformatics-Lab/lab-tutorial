@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">
+  <title>符號多，但真正要搜尋的只有左上角那一格</title>
+  <desc>圖把這份規格裡的所有量分成四格。
+        左上是主模型真正在搜尋的東西：離散結構（群數 K、clone tree、突變指派、逐拷貝基因型）
+        與一組連續的細胞比例 w，後者只有 K 個自由度。
+        左下是推導量：純度、CCF、multiplicity 都由左上算出來，不另外自由擬合，
+        所以它們雖然各有符號，卻不增加任何待估參數。
+        右上是上游輸入：拷貝數由 copy-number 分析提供。
+        右下是必須先校準的量：單位點過度離散度、逐位點錯誤率、家族誤標率與有效資訊量。
+        箭頭一律由左上指向左下，表示誰決定誰。
+        圖要傳達的重點是風險的位置：右邊兩格估偏時模型不會報錯，
+        它會照樣收斂，只是收斂到錯的群數與錯的樹。</desc>
+
+  <text class="ttl zh" x="20" y="38">四類量，只有一類是主模型在搜尋的</text>
+
+  <!-- ── 左上：自由參數 ─────────────────────────────────────────── -->
+  <rect class="box ok" x="20" y="60" width="470" height="242" rx="10"/>
+  <text class="lbl bold zh ok" x="40" y="92">① 主模型自由估</text>
+  <text class="tick zh" x="252" y="92">這一格才是「在搜尋」的東西</text>
+
+  <rect class="box sunken" x="40" y="106" width="430" height="82" rx="8"/>
+  <text class="lbl bold zh" x="58" y="134">離散結構（外層）</text>
+  <text class="tick zh" x="58" y="160">K：群數　　T：clone tree</text>
+  <text class="tick zh" x="58" y="180">z：突變指派　　G：逐拷貝基因型</text>
+
+  <rect class="box sunken" x="40" y="200" width="430" height="82" rx="8"/>
+  <text class="lbl bold zh" x="58" y="228">連續參數（內層）</text>
+  <text class="tick zh" x="58" y="254">w：細胞比例，含正常細胞 w₀</text>
+  <text class="tick zh" x="58" y="274">自由度只有 K 個，定義域是一個 simplex</text>
+
+  <!-- ── 左下：推導量 ───────────────────────────────────────────── -->
+  <path class="conn thick" d="M255,302 L255,338" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh" x="272" y="326">沿箭頭算出來</text>
+
+  <rect class="box" x="20" y="340" width="470" height="150" rx="10"/>
+  <text class="lbl bold zh" x="40" y="372">② 推導量 —— 不是額外的參數</text>
+  <text class="tick zh" x="40" y="402">ρ ＝ 1 − w₀　　純度，由細胞組成算出</text>
+  <text class="tick zh" x="40" y="426">c_k　　CCF，由 w、T、z 算出</text>
+  <text class="tick zh" x="40" y="450">μ_m　　multiplicity，由 G 決定</text>
+  <text class="tick zh" x="40" y="474">θ、q　　預期 VAF 與分子比例，由上述算出</text>
+
+  <!-- ── 右上：上游輸入 ─────────────────────────────────────────── -->
+  <rect class="box" x="510" y="60" width="470" height="150" rx="10"/>
+  <text class="lbl bold zh" x="530" y="92">③ 上游輸入</text>
+  <text class="tick zh" x="530" y="122">CN_m　　total copy number，由 copy-number 分析提供</text>
+  <text class="tick zh" x="530" y="146">phase set 與家族標籤　　由定相與單倍型標記提供</text>
+  <text class="tick zh" x="530" y="170">覆蓋遮罩　　每條 read 實際跨過哪些位點</text>
+  <text class="tick zh" x="530" y="194">這一格不進最佳化，但它決定了上面那一格能看到什麼</text>
+
+  <!-- ── 右下：校準量 ───────────────────────────────────────────── -->
+  <rect class="box warn" x="510" y="230" width="470" height="260" rx="10"/>
+  <text class="lbl bold zh warn" x="530" y="262">④ 必須先校準</text>
+  <text class="tick zh" x="530" y="292">φ　　單位點過度離散度，依 depth × CN 分層</text>
+  <text class="tick zh" x="530" y="316">ε　　逐位點錯誤率，平台校準＋序列脈絡分層</text>
+  <text class="tick zh" x="530" y="340">ξ_v　家族誤標率，就地、成對估計</text>
+  <text class="tick zh" x="530" y="364">M_eff　有效獨立資訊量，模擬或 bootstrap</text>
+
+  <rect class="box ghost bad" x="530" y="382" width="430" height="92" rx="8"/>
+  <text class="lbl bold zh bad" x="548" y="410">風險在這裡，不在①</text>
+  <text class="tick zh" x="548" y="434">這四個估偏時不會有錯誤訊息，</text>
+  <text class="tick zh" x="548" y="456">模型照樣收斂，只是收斂到錯的 K 與錯的樹</text>
+
+  <!-- ── 底部總結 ───────────────────────────────────────────────── -->
+  <rect class="box accent" x="20" y="512" width="960" height="88" rx="10"/>
+  <text class="lbl bold zh accent mid" x="500" y="544">符號有二十幾個，待估參數只有五類</text>
+  <text class="tick zh mid" x="500" y="570">四個離散結構 ＋ 一組 K 個自由度的細胞比例；</text>
+  <text class="tick zh mid" x="500" y="590">其餘不是算出來的，就是進模型前該備妥的</text>
+</svg>

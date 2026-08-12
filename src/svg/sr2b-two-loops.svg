@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580">
+  <title>外層列舉離散結構，內層只是一個小的 simplex 最佳化</title>
+  <desc>圖由左至右分成三段。最外層是群數 K 的迴圈，從 1 跑到 K_max，
+        這一層是真的迴圈，而且必須跑完再比較 Score，
+        因為資料配適度對 K 幾乎單調遞增，中途看到上升就停會停不下來。
+        中間一層是離散結構的搜尋：固定 K 之後，clone tree、突變指派與逐拷貝基因型
+        仍有大量組合，數量隨 K 迅速上升，不可能全部列舉，
+        所以要靠候選剪枝、啟發式搜尋或取樣，而局部連鎖視窗算出來的候選集合
+        正是在這裡先把不相容的全域結構排除掉。
+        最內層是連續參數的最佳化：結構固定之後只剩細胞比例 w，
+        自由度只有 K 個，定義域是一個 simplex，
+        直接用受限最佳化即可，不需要 EM 或 MCMC。
+        下方標出成本的分布：幾乎全部落在中間那層，內層是幾毫秒的事。
+        右側標出兩個必須誠實記住的保留：內層不保證凹，需要多起點；
+        以及 EM 與 MCMC 各自真正該出場的時機。</desc>
+
+  <text class="ttl zh" x="20" y="38">難的是離散那一半，連續那一半小到可以直接解</text>
+
+  <!-- ── 外層：K 迴圈 ────────────────────────────────────────────── -->
+  <rect class="box" x="20" y="60" width="640" height="400" rx="12"/>
+  <text class="lbl bold zh" x="40" y="92">外層迴圈　K ＝ 1 … K_max</text>
+  <text class="tick zh" x="40" y="116">真的是一個 for 迴圈；必須跑完再比 Score，不可中途停</text>
+
+  <!-- ── 中層：離散結構搜尋 ─────────────────────────────────────── -->
+  <rect class="box warn" x="42" y="132" width="596" height="196" rx="10"/>
+  <text class="lbl bold zh warn" x="62" y="164">結構搜尋（離散）</text>
+  <text class="tick zh" x="62" y="190">固定 K 之後，仍要決定：</text>
+  <text class="tick zh" x="62" y="212">T　clone tree 的形狀</text>
+  <text class="tick zh" x="62" y="234">z　每個突變掛到哪一群</text>
+  <text class="tick zh" x="62" y="256">G　每個位點的逐拷貝基因型</text>
+
+  <rect class="box ghost" x="62" y="270" width="556" height="44" rx="8"/>
+  <text class="tick zh" x="80" y="298">組合數隨 K 迅速上升 —— 不可能窮舉，要靠剪枝與啟發式搜尋</text>
+
+  <!-- ── 內層：simplex 最佳化 ───────────────────────────────────── -->
+  <rect class="box ok" x="62" y="342" width="556" height="100" rx="10"/>
+  <text class="lbl bold zh ok" x="82" y="372">內層：連續最佳化</text>
+  <text class="tick zh" x="82" y="398">只剩細胞比例 w，K 個自由度，w_g ≥ 0 且總和為 1</text>
+  <text class="tick zh" x="82" y="422">受限最佳化直接解 —— 幾毫秒，不需要 EM 或 MCMC</text>
+
+  <!-- 迴圈回頭的箭頭 -->
+  <path class="conn" d="M634,392 C654,392 654,240 640,230" marker-end="url(#arrow-sm)"/>
+
+  <!-- ── 右欄：成本與保留 ───────────────────────────────────────── -->
+  <rect class="box accent" x="680" y="60" width="300" height="128" rx="10"/>
+  <text class="lbl bold zh accent" x="700" y="92">成本落在哪裡</text>
+  <text class="tick zh" x="700" y="120">中層　幾乎全部</text>
+  <text class="tick zh" x="700" y="144">內層　幾毫秒</text>
+  <text class="tick zh" x="700" y="170">所以要少列舉，不是把內層解得更快</text>
+
+  <rect class="box bad" x="680" y="204" width="300" height="124" rx="10"/>
+  <text class="lbl bold zh bad" x="700" y="236">內層不保證凹</text>
+  <text class="tick zh" x="700" y="264">q 對 w 是比值函數，</text>
+  <text class="tick zh" x="700" y="286">狀態機率又是加權和。</text>
+  <text class="tick zh" x="700" y="308">必須多起點，並記錄是否收斂到同一點</text>
+
+  <rect class="box" x="680" y="344" width="300" height="116" rx="10"/>
+  <text class="lbl bold zh" x="700" y="376">EM／MCMC 何時才需要</text>
+  <text class="tick zh" x="700" y="404">EM　　把突變指派 z 邊際化時</text>
+  <text class="tick zh" x="700" y="428">MCMC　要的是後驗區間而非點估計</text>
+  <text class="tick zh" x="700" y="450">兩者都不是為了那 K 個比例</text>
+
+  <!-- ── 底部 ───────────────────────────────────────────────────── -->
+  <rect class="box sunken" x="20" y="484" width="960" height="76" rx="10"/>
+  <text class="lbl bold zh mid" x="500" y="516">外層定結構，內層估比例</text>
+  <text class="tick zh mid" x="500" y="544">看到 likelihood 就想用 EM 或 MCMC，在這個內層問題上是殺雞用牛刀</text>
+</svg>

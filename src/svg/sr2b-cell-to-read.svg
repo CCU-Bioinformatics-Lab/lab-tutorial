@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560">
+  <title>單位點 VAF 與多位點狀態表是同一條生成鏈的兩個出口</title>
+  <desc>圖由左至右分成三段。左段是細胞這一層：正常細胞與各個 clone 依細胞比例 w 混在一起。
+        中段是換算：每個 clone 貢獻的分子數不只看它的細胞比例，還要乘上它在這個位置的拷貝數，
+        所以細胞比例與分子比例之間差一個拷貝數因子，這就是 eta 與 q 所做的事。
+        右段是兩個出口：同一組分子比例，只問一個位點時得到預期 VAF theta，
+        問一整組位點的聯合時得到狀態表 q，兩者最後都變成 read 上的觀測。
+        圖下方的橫帶是重點：VAF 不是狀態表的先驗，
+        兩者是同一組參數生出來的兩批觀測，所以能相乘的是機率，
+        前提是同一條 read 不會同時進入兩個出口。</desc>
+
+  <text class="ttl zh" x="20" y="38">同一條鏈，兩個出口</text>
+
+  <!-- ── 左：細胞層 ─────────────────────────────────────────────── -->
+  <rect class="box" x="20" y="62" width="286" height="300" rx="10"/>
+  <text class="lbl bold zh" x="40" y="94">① 細胞組成</text>
+  <text class="tick zh" x="40" y="118">參數 w、T、z</text>
+
+  <use href="#sym-cell" x="46" y="136" width="40" height="40" class="cell normal"/>
+  <use href="#sym-cell" x="94" y="136" width="40" height="40" class="cell normal"/>
+  <text class="tick zh" x="146" y="162">正常細胞 w₀</text>
+
+  <use href="#sym-cell" x="46" y="196" width="40" height="40" class="cell clone1"/>
+  <use href="#sym-cell" x="94" y="196" width="40" height="40" class="cell clone1"/>
+  <text class="tick zh" x="146" y="222">clone 1　w₁</text>
+
+  <use href="#sym-cell" x="46" y="256" width="40" height="40" class="cell clone2"/>
+  <text class="tick zh" x="146" y="282">clone 2　w₂</text>
+
+  <text class="tick zh" x="40" y="330">這一層講的是「有多少細胞」</text>
+  <text class="tick zh" x="40" y="350">總和為 1，所以純度 ρ ＝ 1 − w₀</text>
+
+  <!-- ── 中：換算 ───────────────────────────────────────────────── -->
+  <path class="conn thick" d="M306,212 L346,212" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box accent" x="350" y="62" width="286" height="300" rx="10"/>
+  <text class="lbl bold zh accent" x="370" y="94">② 乘上拷貝數</text>
+  <text class="tick zh" x="370" y="118">得到 η 與 q</text>
+
+  <rect class="box sunken" x="370" y="136" width="246" height="90" rx="8"/>
+  <text class="tick zh" x="386" y="162">一個 clone 貢獻多少<tspan class="bold">分子</tspan>，</text>
+  <text class="tick zh" x="386" y="184">不只看它有多少<tspan class="bold">細胞</tspan>：</text>
+  <text class="tick zh" x="386" y="210">CN ＝ 4 的 clone 貢獻加倍</text>
+
+  <rect class="box sunken" x="370" y="240" width="246" height="70" rx="8"/>
+  <text class="tick zh" x="386" y="266">LOH 時兩條同源染色體</text>
+  <text class="tick zh" x="386" y="292">不再各佔一半 —— 這裡自動處理</text>
+
+  <text class="tick zh" x="370" y="340">這一層是「細胞 → 分子」的接縫</text>
+
+  <!-- ── 右：兩個出口 ───────────────────────────────────────────── -->
+  <path class="conn thick" d="M636,166 C664,166 664,140 690,140" marker-end="url(#arrow-sm)"/>
+  <path class="conn thick" d="M636,280 C664,280 664,308 690,308" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box ok" x="692" y="86" width="288" height="120" rx="10"/>
+  <text class="lbl bold zh ok" x="710" y="116">出口一：只問一個位點</text>
+  <text class="tick zh" x="710" y="144">預期 VAF　θ_mk</text>
+  <text class="tick zh" x="710" y="168">觀測是 a_m ／ d_m</text>
+  <text class="tick zh" x="710" y="192">→ beta-binomial 因子</text>
+
+  <rect class="box ok" x="692" y="240" width="288" height="120" rx="10"/>
+  <text class="lbl bold zh ok" x="710" y="270">出口二：問一整組位點</text>
+  <text class="tick zh" x="710" y="298">狀態表　q_u,h</text>
+  <text class="tick zh" x="710" y="322">觀測是 D_v</text>
+  <text class="tick zh" x="710" y="346">→ 多位點 read 因子</text>
+
+  <!-- ── 底部重點 ───────────────────────────────────────────────── -->
+  <rect class="box warn" x="20" y="386" width="960" height="150" rx="10"/>
+  <text class="lbl bold zh warn" x="40" y="418">所以 VAF 不是狀態表的先驗</text>
+  <text class="tick zh" x="40" y="448">兩個出口都是<tspan class="bold">觀測</tspan>，由同一組 Θ_K 生出來 —— 不是先用 VAF 當先驗，再去生 HP1／HP2。</text>
+  <text class="tick zh" x="40" y="472">層級之所以接得起來，是因為兩邊最後都被換算到 read 這一層：</text>
+  <text class="tick zh" x="40" y="496">「在這組參數下，看到眼前這些 read 的機率是多少？」</text>
+  <text class="tick zh bad" x="40" y="522">能相乘的前提只有一個：同一條 read 不可以同時進入兩個出口。</text>
+</svg>

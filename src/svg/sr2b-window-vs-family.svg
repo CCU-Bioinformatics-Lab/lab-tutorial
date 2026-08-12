@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640">
+  <title>狀態表逐家族分開，機率在連鎖視窗合併</title>
+  <desc>圖分上下兩半。上半是正確的寫法：一個連鎖視窗裡有兩條單倍型家族，
+        各自建立自己的 0/1 狀態表，所以資料結構上確實是分開的。
+        但兩件東西把它們綁在一起：家族誤標閘門會把少數分子從一條通道搬到另一條，
+        使兩邊的觀測不再條件獨立；方向變數 sigma_v 則是整個視窗共用一個，
+        因為兩條家族互為補集，要對調就同時對調。
+        因此兩張表最後合成一個因子 P_v，一個連鎖視窗只出一個因子。
+        下半是錯誤的寫法與它的兩個後果：逐家族各算一次機率再相乘，
+        會把同一條被誤標的分子在兩邊各算一次而高估證據量，
+        並且把同一個 sigma_v 邊際化兩次，等於當成兩次獨立的擲硬幣，
+        把方向的不確定性算掉一半。
+        讀者要帶走的一句話是：分開的是表，不是機率。</desc>
+
+  <text class="ttl zh" x="20" y="38">分開的是「表」，不是「機率」</text>
+
+  <!-- ── 上半：正確寫法 ──────────────────────────────────────────── -->
+  <text class="lbl bold zh ok" x="20" y="78">正確：一個連鎖視窗 → 一個因子</text>
+
+  <!-- 連鎖視窗外框 -->
+  <rect class="box" x="20" y="92" width="600" height="238" rx="10"/>
+  <text class="lbl bold zh" x="38" y="122">連鎖視窗 v</text>
+  <text class="tick zh" x="176" y="122">同一段 DNA，同一組 somatic 位點</text>
+
+  <!-- 家族 u1 -->
+  <rect class="box sunken" x="38" y="136" width="564" height="82" rx="8"/>
+  <text class="lbl bold zh hp1" x="56" y="164">家族 u₁</text>
+  <rect class="read hp1" x="152" y="150" width="150" height="14" rx="7"/>
+  <rect class="read hp1" x="176" y="170" width="150" height="14" rx="7"/>
+  <rect class="read hp1" x="160" y="190" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="206" cy="157" r="6"/>
+  <circle class="mark somatic" cx="266" cy="177" r="6"/>
+  <text class="tick zh" x="352" y="184">狀態表 q_u₁：2^k_v 格</text>
+
+  <!-- 家族 u2 -->
+  <rect class="box sunken" x="38" y="230" width="564" height="82" rx="8"/>
+  <text class="lbl bold zh hp2" x="56" y="258">家族 u₂</text>
+  <rect class="read hp2" x="152" y="244" width="150" height="14" rx="7"/>
+  <rect class="read hp2" x="176" y="264" width="150" height="14" rx="7"/>
+  <rect class="read hp2" x="160" y="284" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="230" cy="251" r="6"/>
+  <text class="tick zh" x="352" y="278">狀態表 q_u₂：另一條拷貝</text>
+
+  <!-- 綁住兩條家族的兩件東西 -->
+  <path class="conn warn thick" d="M620,177 C650,177 650,224 676,224" marker-end="url(#arrow-sm)"/>
+  <path class="conn warn thick" d="M620,271 C650,271 650,246 676,246" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box warn" x="678" y="130" width="302" height="86" rx="8"/>
+  <text class="lbl bold zh warn" x="696" y="160">① 家族誤標 ξ_v</text>
+  <text class="tick zh" x="696" y="184">少數分子被標到另一條家族，</text>
+  <text class="tick zh" x="696" y="204">兩邊的觀測因此不獨立</text>
+
+  <rect class="box accent" x="678" y="232" width="302" height="86" rx="8"/>
+  <text class="lbl bold zh accent" x="696" y="262">② 方向 σ_v</text>
+  <text class="tick zh" x="696" y="286">兩條家族互為補集，</text>
+  <text class="tick zh" x="696" y="306">要對調就同時對調</text>
+
+  <!-- 合成一個因子 -->
+  <path class="conn thick" d="M320,330 L320,356" marker-end="url(#arrow-sm)"/>
+  <rect class="box ok" x="140" y="358" width="720" height="60" rx="8"/>
+  <text class="lbl bold zh ok mid" x="500" y="384">兩條家族一起算，合成一個因子　P_v(D_v ∣ Θ_K)</text>
+  <text class="tick zh mid" x="500" y="406">σ_v 在這裡只被邊際化一次</text>
+
+  <!-- ── 下半：錯誤寫法 ──────────────────────────────────────────── -->
+  <text class="lbl bold zh bad" x="20" y="466">錯誤：逐家族各算一次再相乘</text>
+
+  <rect class="box bad" x="20" y="480" width="960" height="140" rx="10"/>
+  <text class="lbl zh mid" x="500" y="512">P_u₁ × P_u₂　—— 兩個各自獨立的因子</text>
+
+  <rect class="box ghost bad" x="44" y="528" width="450" height="76" rx="8"/>
+  <text class="lbl bold zh bad" x="62" y="556">誤標讓證據量被高估</text>
+  <text class="tick zh" x="62" y="580">同一條被搬過去的分子，在兩邊各留下一次痕跡</text>
+
+  <rect class="box ghost bad" x="506" y="528" width="450" height="76" rx="8"/>
+  <text class="lbl bold zh bad" x="524" y="556">σ_v 被邊際化兩次</text>
+  <text class="tick zh" x="524" y="580">一個方向當成兩次擲硬幣，不確定性算掉一半</text>
+</svg>
