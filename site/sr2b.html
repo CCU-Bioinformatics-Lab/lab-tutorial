@@ -53,7 +53,7 @@
 
 <div class="wrap ">
   <main class="main" id="main">
-    <header class="mhead"><p class="mhead__kicker">研究指引 · Subclone 系統發生重建 · Part 3 — the joint estimator and its feasibility</p><h1>下篇：完整的估計式，以及它能不能建起來</h1><p class="mhead__sub">把兩類觀測寫成兩個相乘的因子，說明 beta-binomial 為何只是它在單一變異時的邊界情形；再逐層寫出一個多變異單位的生成模型 —— 分子權重、覆蓋遮罩、兩種形狀不同的錯誤、三種不同的「沒有」—— 最後是現行實作要改的兩處與實作分期。</p><p class="mhead__meta"><a class="chip" href="sr2.html">建議先修：5% 能補的三格</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>寫出把兩類觀測合起來的完整估計式，並說明為何是兩個因子相乘而不是兩項相加</li><li>把一個多變異連鎖區段的生成過程逐層寫出來：全域 clone 如何投影成局部分子比例，再如何長成一條 read</li><li>區分抽樣零、結構零與錯誤地板，並說明為何 Dirichlet 參數不可為零這件事就是「零不代表不可能」的數學形式</li><li>說明分岔與不可同群這類分類為何是輸出而不是證據，以及現行實作要改的兩處各是什麼</li><li>依 Poisson 模型算出給定突變負荷下的可用連鎖區段產量，並說明該數量為何足夠</li></ul></section>
+    <header class="mhead"><p class="mhead__kicker">研究指引 · Subclone 系統發生重建 · Part 3 — the joint estimator and its feasibility</p><h1>下篇：完整的估計式，以及它能不能建起來</h1><p class="mhead__sub">把兩類觀測寫成兩個相乘的因子，說明 beta-binomial 為何只是它在單一變異時的邊界情形；再逐層寫出一個多變異單位的生成模型 —— 分子權重、覆蓋遮罩、兩種形狀不同的錯誤、三種不同的「沒有」—— 最後是現行實作要改的兩處與實作分期。</p><p class="mhead__meta"><a class="chip" href="sr2.html">建議先修：5% 能補的三格</a></p></header><section class="objectives"><h2>本模組學習目標</h2><ul><li>寫出把兩類觀測合起來的完整估計式，並說明為何是兩個因子相乘而不是兩項相加</li><li>把一個多變異連鎖視窗的生成過程逐層寫出來：全域 clone 如何投影成局部分子比例，再如何長成一條 read，以及同一個視窗的兩條家族為何要在同一個因子內合併</li><li>區分抽樣零、結構零與錯誤地板，並說明為何 Dirichlet 參數不可為零這件事就是「零不代表不可能」的數學形式</li><li>說明分岔與不可同群這類分類為何是輸出而不是證據，以及現行實作要改的兩處各是什麼</li><li>依 Poisson 模型算出給定突變負荷下的可用連鎖區段產量，並說明該數量為何足夠</li></ul></section>
 
 <section data-part="why" class="part" id="part-why">
 <h2 data-num="①" id="為什麼重要">為什麼重要</h2>
@@ -72,107 +72,143 @@
 權重之所以必須存在，正是為了事後稀釋這個重複。</p>
 
 <p class="prose">本頁採取另一條路，而它其實更簡單：<b>不要把 read 換算成關係，直接對 read 建模。</b>
-把觀測依連鎖視窗切成互不重疊的兩類 —— 只有一個變異的連鎖視窗，與兩個以上變異的連鎖區段 ——
+把觀測依連鎖視窗切成互不重疊的兩類 —— 只有一個變異的連鎖視窗，與兩個以上變異的連鎖視窗 ——
 兩類各寫一個因子，相乘即得完整的 likelihood。
-單變異連鎖視窗那個因子正是原本的 beta-binomial；
-多變異連鎖區段那個因子是同一個模型在多個位點上的一般形式。
-<b>兩者不是兩個模型；當連鎖區段只含一個變異時，這個 read 模型的邊界情形就是 beta-binomial。</b></p>
+單變異那個因子正是原本的 beta-binomial；
+多變異那個因子是同一個模型在多個位點上的一般形式。
+<b>兩者不是兩個模型；當視窗只含一個變異時，這個 read 模型的邊界情形就是 beta-binomial。</b></p>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" class="dia-svg" role="img" aria-labelledby="sr2b-read-partition__title" aria-describedby="sr2b-read-partition__desc">
-  <title id="sr2b-read-partition__title">同一批 read 先互斥分流，再形成完整 likelihood</title>
-  <desc id="sr2b-read-partition__desc">圖由上往下讀。最上方是一批依連鎖視窗整理的原始 read，仍保留每條 read 在各位點看到的 ref 或 alt。
-        中央只做一個不涉及生物結論的分流判斷：這個連鎖視窗內有幾個變異。
-        若只有一個變異，read 進入左路 S1，濃縮為總深度 d_m 與 alt count a_m，
-        以 beta-binomial 計算單位點因子 P_BB。
-        若有兩個以上變異，read 進入右路 S2，保留逐條 read 的聯合狀態與覆蓋遮罩 D_v，
-        以多位點 read 模型計算區段因子 P_v。
-        左右兩路沒有共享 read，底部以乘號合併成 P(D given Theta_K)，並標示每條 read 恰好計算一次。
-        中間的關係帶說明兩路不是兩個生物模型：單位點只有 ref 與 alt 兩格，
-        多位點則有二的 k_v 次方個聯合狀態；k_v 等於一時，多位點模型的邊界情形就是 beta-binomial。
-        讀法是先分資料、保留適合的資料粒度、各算一個因子，最後相乘。</desc>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 920" class="dia-svg" role="img" aria-labelledby="sr2b-read-partition__title" aria-describedby="sr2b-read-partition__desc">
+  <title id="sr2b-read-partition__title">估計流程的全貌：一組參數，兩類證據，一個分數</title>
+  <desc id="sr2b-read-partition__desc">圖由上往下讀，是一個會回頭的迴圈。
+        最上方是要估的參數：群數 K、clone tree、突變指派、逐拷貝基因型與細胞比例 w，
+        純度是由細胞比例推導出來的，不是額外的參數。
+        這組參數乘上拷貝數之後投影成局部的分子比例，決定了資料應該長什麼樣。
+        中段是資料：依「這個連鎖視窗裡有幾個變異」做一次互斥分流。
+        只有一個變異的視窗，所有 read 都跨過同一個位點，
+        因此只需要保留 alt 與 ref 的計數，形成 beta-binomial 因子。
+        兩個以上變異的視窗，每條 read 覆蓋的位點各不相同，
+        所以要保留逐條 read 的聯合狀態與覆蓋遮罩，形成多位點因子，
+        而同一個視窗的兩條單倍型家族在這個因子內一起計算。
+        兩路沒有共用任何一條 read，因此兩個因子是相乘而不是相加，也就不需要權重。
+        相乘得到完整的 likelihood，再扣掉複雜度、加上群數先驗，才是目標函數 Score。
+        最後跨不同的 K 比較 Score，取最大者。
+        右側的回頭箭頭是整個流程的關鍵：這不是一次算完，
+        外層換一組 K 與離散結構，內層調細胞比例，重算分數再比一次。</desc>
 
-  <text class="ttl zh" x="20" y="36">先分資料，再寫 likelihood：每條 read 恰好進入一個因子</text>
+  <text class="ttl zh" x="20" y="42">估計流程的全貌：一組參數，兩類證據，一個分數</text>
 
-  <!-- 原始觀測 -->
-  <rect class="box sunken" x="178" y="56" width="644" height="92" rx="8"/>
-  <text class="lbl bold zh" x="198" y="84">原始觀測：依連鎖視窗整理的 read</text>
-  <rect class="read hp0" x="198" y="101" width="150" height="14" rx="7"/>
-  <rect class="read hp1" x="218" y="121" width="150" height="14" rx="7"/>
-  <circle class="mark somatic" cx="272" cy="108" r="6"/>
-  <circle class="mark somatic" cx="309" cy="128" r="6"/>
-  <rect class="read hp0" x="406" y="101" width="150" height="14" rx="7"/>
-  <rect class="read hp1" x="426" y="121" width="150" height="14" rx="7"/>
-  <circle class="mark somatic" cx="456" cy="108" r="6"/>
-  <circle class="mark somatic" cx="512" cy="128" r="6"/>
-  <rect class="read hp0" x="614" y="101" width="150" height="14" rx="7"/>
-  <rect class="read hp1" x="634" y="121" width="150" height="14" rx="7"/>
-  <circle class="mark somatic" cx="674" cy="108" r="6"/>
-  <circle class="mark somatic" cx="730" cy="128" r="6"/>
+  <!-- ══ ① 待估的參數 ══════════════════════════════════════════════ -->
+  <rect class="box accent" x="60" y="76" width="640" height="150" rx="10"/>
+  <text class="lbl bold zh accent" x="80" y="110">① 要估的東西　Θ<tspan style="font-size:15px" dy="4">K</tspan></text>
 
-  <path class="conn" d="M500,148 L500,174" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh" x="80" y="148">K：群數</text>
+  <text class="tick zh" x="300" y="148">T：clone tree</text>
+  <text class="tick zh" x="500" y="148">z：突變指派</text>
+  <text class="tick zh" x="80" y="178">G：逐拷貝基因型</text>
+  <text class="tick zh" x="300" y="178">w：細胞比例（含正常細胞 w₀）</text>
+  <text class="tick zh" x="80" y="208">純度 ρ ＝ 1 − w₀ 是推導量，不是額外的參數</text>
 
-  <!-- 唯一分流規則 -->
-  <rect class="box accent" x="316" y="176" width="368" height="64" rx="8"/>
-  <text class="lbl bold zh accent mid" x="500" y="202">這個連鎖視窗含幾個變異？</text>
-  <text class="tick zh mid" x="500" y="226">只依資料結構分流，不先推論 clone 關係</text>
+  <path class="conn thick" d="M380,226 L380,258" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh" x="400" y="250">投影：乘上拷貝數 → 分子比例 q</text>
 
-  <path class="conn" d="M430,240 C390,258 300,258 256,278" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M570,240 C610,258 700,258 744,278" marker-end="url(#arrow-sm)"/>
+  <!-- ══ ② 資料分流 ═══════════════════════════════════════════════ -->
+  <text class="lbl bold zh" x="60" y="288">② 資料依「這個視窗有幾個變異」分成兩類</text>
 
-  <!-- 左路：單變異 -->
-  <rect class="box" x="18" y="280" width="460" height="190" rx="8"/>
-  <text class="lbl bold zh" x="36" y="310">S₁：單變異視窗　kᵤ = 1</text>
-  <text class="tick zh" x="36" y="338">保留的資料粒度：一個位點的 ref／alt 計數</text>
+  <!-- 左：單變異視窗 -->
+  <rect class="box" x="60" y="302" width="310" height="250" rx="10"/>
+  <text class="lbl bold zh" x="80" y="334">單變異視窗</text>
+  <text class="lbl zh" x="204" y="334">k<tspan style="font-size:15px" dy="4">v</tspan><tspan dy="-4"> ＝ 1</tspan></text>
 
-  <rect class="read hp0" x="38" y="360" width="108" height="14" rx="7"/>
-  <rect class="read hp0" x="48" y="382" width="108" height="14" rx="7"/>
-  <rect class="read hp1" x="34" y="404" width="108" height="14" rx="7"/>
-  <circle class="mark somatic" cx="94" cy="411" r="6"/>
-  <text class="tick mono" x="170" y="378">dₘ = total reads</text>
-  <text class="tick mono" x="170" y="408">aₘ = alt reads</text>
-  <path class="conn" d="M322,390 L352,390" marker-end="url(#arrow-sm)"/>
-  <rect class="box ok" x="354" y="354" width="106" height="72" rx="8"/>
-  <text class="tick bold mid" x="407" y="382">P<tspan baseline-shift="sub">BB</tspan></text>
-  <text class="tick zh mid" x="407" y="408">單位點因子</text>
-  <text class="anno bold zh ok" x="36" y="452">beta-binomial：兩格（ref／alt）</text>
+  <line class="guide somatic" x1="180" y1="348" x2="180" y2="424"/>
+  <rect class="read hp0" x="90" y="358" width="180" height="14" rx="7"/>
+  <rect class="read hp0" x="110" y="378" width="180" height="14" rx="7"/>
+  <rect class="read hp0" x="80" y="398" width="180" height="14" rx="7"/>
+  <circle class="mark somatic" cx="180" cy="365" r="6"/>
+  <circle class="mark somatic" cx="180" cy="385" r="6"/>
+  <circle class="mark ref" cx="180" cy="405" r="6"/>
+  <text class="tick zh" x="306" y="370">1</text>
+  <text class="tick zh" x="306" y="390">1</text>
+  <text class="tick zh" x="306" y="410">0</text>
 
-  <!-- 右路：多變異 -->
-  <rect class="box accent" x="522" y="280" width="460" height="190" rx="8"/>
-  <text class="lbl bold zh accent" x="540" y="310">S₂：多變異區段　kᵤ ≥ 2</text>
-  <text class="tick zh" x="540" y="338">保留的資料粒度：每條 read 的聯合狀態與遮罩</text>
+  <text class="tick zh" x="80" y="446">每條 read 都跨過同一個位點，</text>
+  <text class="tick zh" x="80" y="468">所以只要留下計數 (a<tspan style="font-size:11px" dy="3">m</tspan><tspan dy="-3">, d</tspan><tspan style="font-size:11px" dy="3">m</tspan><tspan dy="-3">)</tspan></text>
 
-  <rect class="read hp0" x="540" y="360" width="124" height="18" rx="9"/>
-  <text class="tick mono" x="552" y="374">0 – 1</text>
-  <rect class="read hp1" x="540" y="388" width="124" height="18" rx="9"/>
-  <text class="tick mono" x="552" y="402">1 0 1</text>
-  <rect class="read hp0" x="540" y="416" width="124" height="18" rx="9"/>
-  <text class="tick mono" x="552" y="430">0 1 –</text>
-  <text class="tick mono" x="686" y="378">Dᵤ = read states</text>
-  <text class="tick mono" x="686" y="408">＋ coverage masks</text>
-  <path class="conn" d="M820,390 L850,390" marker-end="url(#arrow-sm)"/>
-  <rect class="box ok" x="852" y="354" width="112" height="72" rx="8"/>
-  <text class="tick bold mid" x="908" y="382">Pᵤ</text>
-  <text class="tick zh mid" x="908" y="408">聯合因子</text>
-  <text class="anno bold zh accent" x="540" y="452">同一生成模型：2<tspan baseline-shift="super">kᵤ</tspan> 個聯合狀態</text>
+  <rect class="box ok" x="80" y="484" width="270" height="56" rx="8"/>
+  <text class="lbl bold zh ok mid" x="215" y="512">beta-binomial 因子</text>
+  <text class="tick zh mid" x="215" y="532">單位點的邊界情形</text>
 
-  <!-- 同一模型關係 -->
-  <rect class="box ghost" x="126" y="490" width="748" height="54" rx="8"/>
-  <text class="tick bold zh mid" x="500" y="514">不是兩個模型：kᵤ = 1 時，聯合狀態只剩 ref／alt 兩格</text>
-  <text class="tick zh mid" x="500" y="536">因此左路的 beta-binomial 是右路 read 模型的單位點邊界情形</text>
+  <!-- 右：多變異視窗 -->
+  <rect class="box" x="390" y="302" width="310" height="250" rx="10"/>
+  <text class="lbl bold zh" x="410" y="334">多變異視窗</text>
+  <text class="lbl zh" x="534" y="334">k<tspan style="font-size:15px" dy="4">v</tspan><tspan dy="-4"> ≥ 2</tspan></text>
 
-  <!-- 合流 -->
-  <path class="conn" d="M250,470 C250,566 408,558 454,580" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M750,470 C750,566 592,558 546,580" marker-end="url(#arrow-sm)"/>
-  <text class="lbl bold mid" x="500" y="584">×</text>
+  <line class="guide somatic" x1="470" y1="348" x2="470" y2="424"/>
+  <line class="guide somatic" x1="540" y1="348" x2="540" y2="424"/>
+  <line class="guide somatic" x1="610" y1="348" x2="610" y2="424"/>
+  <rect class="read hp0" x="420" y="358" width="150" height="14" rx="7"/>
+  <rect class="read hp0" x="490" y="378" width="150" height="14" rx="7"/>
+  <rect class="read hp0" x="440" y="398" width="110" height="14" rx="7"/>
+  <circle class="mark somatic" cx="470" cy="365" r="6"/>
+  <circle class="mark somatic" cx="540" cy="365" r="6"/>
+  <circle class="mark somatic" cx="540" cy="385" r="6"/>
+  <circle class="mark ref" cx="610" cy="385" r="6"/>
+  <circle class="mark somatic" cx="470" cy="405" r="6"/>
+  <circle class="mark ref" cx="540" cy="405" r="6"/>
+  <text class="tick zh" x="648" y="370">1 1 –</text>
+  <text class="tick zh" x="648" y="390">– 1 0</text>
+  <text class="tick zh" x="648" y="410">1 0 –</text>
 
-  <rect class="box ok" x="210" y="594" width="580" height="42" rx="8"/>
-  <text class="lbl bold mid" x="500" y="621">P(D | Θ<tspan baseline-shift="sub">K</tspan>)　—— 每條 read 恰好計算一次</text>
-</svg><figcaption>圖由上往下讀：原始 read 只依「連鎖視窗內有幾個變異」做一次互斥分流。
-<math><msub><mi>k</mi><mi>v</mi></msub><mo>=</mo><mn>1</mn></math> 的左路保留單位點 alt／ref 計數 <math><mo>(</mo><msub><mi>a</mi><mi>m</mi></msub><mo>,</mo><msub><mi>d</mi><mi>m</mi></msub><mo>)</mo></math>，形成 beta-binomial 因子；
-<math><msub><mi>k</mi><mi>v</mi></msub><mo>≥</mo><mn>2</mn></math> 的右路保留逐條 read 的聯合狀態與覆蓋遮罩 <math><msub><mi>D</mi><mi>v</mi></msub></math>，形成多位點因子。
-兩路使用的 read 沒有交集，最後才以乘號合併；<b>每條 read 恰好計算一次</b>。
-中間橫帶是本圖的關鍵：兩路不是兩個生物模型，<math><msub><mi>k</mi><mi>v</mi></msub><mo>=</mo><mn>1</mn></math> 時聯合狀態只剩 ref／alt 兩格，
-所以 beta-binomial 正是多位點 read 模型的單位點邊界情形。</figcaption></figure>
+  <text class="tick zh" x="410" y="446">每條 read 覆蓋的位點不同，</text>
+  <text class="tick zh" x="410" y="468">所以要留下聯合狀態與遮罩 D<tspan style="font-size:11px" dy="3">v</tspan></text>
+
+  <rect class="box ok" x="410" y="484" width="270" height="56" rx="8"/>
+  <text class="lbl bold zh ok mid" x="545" y="512">多位點 read 因子</text>
+  <text class="tick zh mid" x="545" y="532">兩條家族在這裡一起算</text>
+
+  <!-- 互斥保證 -->
+  <rect class="box warn" x="60" y="566" width="640" height="50" rx="8"/>
+  <text class="tick zh mid" x="380" y="596">兩路沒有共用任何一條 read —— 所以是相乘，不是相加，也就不需要權重</text>
+
+  <path class="conn thick" d="M380,616 L380,648" marker-end="url(#arrow-sm)"/>
+
+  <!-- ══ ③ likelihood ═════════════════════════════════════════════ -->
+  <rect class="box" x="60" y="650" width="640" height="76" rx="10"/>
+  <text class="lbl bold zh" x="80" y="682">③ 相乘就是完整的 likelihood</text>
+  <text class="tick zh" x="80" y="710">L<tspan style="font-size:11px" dy="3">data</tspan><tspan dy="-3"> ＝ Σ log P</tspan><tspan style="font-size:11px" dy="3">BB</tspan><tspan dy="-3"> ＋ Σ log P</tspan><tspan style="font-size:11px" dy="3">v</tspan></text>
+  <text class="tick zh" x="400" y="710">每條 read 恰好計算一次</text>
+
+  <path class="conn thick" d="M380,726 L380,752" marker-end="url(#arrow-sm)"/>
+
+  <!-- ══ ④ 目標函數 ═══════════════════════════════════════════════ -->
+  <rect class="box accent" x="60" y="754" width="640" height="76" rx="10"/>
+  <text class="lbl bold zh accent" x="80" y="786">④ 扣複雜度、加先驗，才是目標函數</text>
+  <text class="tick zh" x="80" y="814">Score ＝ L<tspan style="font-size:11px" dy="3">data</tspan><tspan dy="-3"> − 複雜度代價 ＋ log p(K)</tspan></text>
+
+  <path class="conn thick" d="M380,830 L380,856" marker-end="url(#arrow-sm)"/>
+
+  <!-- ══ ⑤ 輸出 ═══════════════════════════════════════════════════ -->
+  <rect class="box ok" x="60" y="858" width="640" height="52" rx="10"/>
+  <text class="lbl bold zh ok mid" x="380" y="890">⑤ 跨不同的 K 比較，取分數最大的那一個</text>
+
+  <!-- ══ 回頭的迴圈 ═══════════════════════════════════════════════ -->
+  <path class="conn thick accent" d="M700,792 L742,792 L742,151 L706,151" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box" x="772" y="380" width="208" height="196" rx="10"/>
+  <text class="lbl bold zh accent" x="790" y="412">不是一次算完</text>
+  <text class="tick zh" x="790" y="446">外層：換一組 K</text>
+  <text class="tick zh" x="790" y="468">以及 T、z、G</text>
+  <text class="tick zh" x="790" y="500">內層：調 w</text>
+  <text class="tick zh" x="790" y="522">只有 K 個自由度</text>
+  <text class="tick zh" x="790" y="554">重算分數，再比一次</text>
+</svg><figcaption>這是整頁的地圖，先看它再讀後面的式子。
+①一組參數往下投影成「資料應該長什麼樣」；②真實資料依<b>視窗裡有幾個變異</b>分成兩類 ——
+左路每條 read 都跨過同一個位點，留計數就夠；右路每條 read 覆蓋的位點各不相同，
+所以必須留下聯合狀態與遮罩。兩路沒有共用任何一條 read，
+<b>所以③是相乘而不是相加，權重也就不需要存在</b>。
+④相乘之後還要扣複雜度、加群數先驗才是目標函數，⑤最後跨 <math><mi>K</mi></math> 比較。
+右側那個回頭箭頭是重點：<b>這不是一次算完的公式，是一個迴圈</b> ——
+外層換結構、內層調比例，重算再比一次（第七節）。</figcaption></figure>
 
 <p class="prose">這個改動的代價與收益都很集中。收益是：權重、關係的可信度、以及為了保護硬約束而設的門檻
 <b>全部不需要了</b>，因為證據強弱本來就是似然自己會算的東西。
@@ -289,78 +325,86 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 
 <h4 id="第四層之一-全資料的-likelihood-讓每批-read-只出現一次">第四層之一：全資料的 likelihood，讓每批 read 只出現一次</h4>
 
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" class="dia-svg" role="img" aria-labelledby="sr2b-two-factors__title" aria-describedby="sr2b-two-factors__desc">
-  <title id="sr2b-two-factors__title">同一批 read 不能算兩次：由相加的合成目標改為相乘的兩個因子</title>
-  <desc id="sr2b-two-factors__desc">上半是原本的寫法。全基因體一萬五千五百個變異全部進入頻率項，
-        其中落在多變異連鎖視窗的一千四百七十五個變異，
-        它們的 read 又被拿去算成關係約束，再加進第二項。
-        中間用兩條指向同一疊 read 的箭頭標出問題：同一批分子被計了兩次，
-        所以那個和不是一個真正的 likelihood，只能叫合成目標，
-        而且必須另外校準一個權重來稀釋重複的部分。
-        下半是改過的寫法。把觀測依連鎖視窗切成兩類互不重疊的集合：
-        只有一個變異的連鎖視窗走 beta-binomial，兩個以上變異的連鎖區段走聯合的狀態表模型。
-        兩類的 read 沒有交集，所以兩個因子相乘就是一個真正的 likelihood，
-        不需要權重，也沒有東西被算第二次。
-        右下角標注一句關鍵的話：多變異連鎖區段的邊際 VAF 已經包含在它的聯合表裡，
-        所以不可以再把它加回頻率項。
-        讀法是：權重原本是用來修補重複計數的補丁，把觀測切乾淨之後那個補丁就不需要了。</desc>
+<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 630" class="dia-svg" role="img" aria-labelledby="sr2b-two-factors__title" aria-describedby="sr2b-two-factors__desc">
+  <title id="sr2b-two-factors__title">相加為什麼不是 likelihood：看兩項的取用範圍就知道</title>
+  <desc id="sr2b-two-factors__desc">圖用一條按比例畫的長條代表全部一萬五千五百個變異。
+        左邊較長的一段是自己獨佔一個連鎖視窗的變異，約一萬四千個；
+        右邊那一小段是落在多變異視窗裡的變異，約一千五百個，約佔一成。
+        每一項的取用範圍畫成長條上方或下方的一條細帶。
+        上半是相加的寫法：第一項的細帶蓋住整條長條，第二項的細帶只蓋住右邊那一小段，
+        兩條細帶在右段上下對齊、範圍重疊，該欄因此被標成紅色 ——
+        那一成變異的 read 被兩項各用了一次。
+        這就是為什麼那個和不是 likelihood，也是權重存在的唯一理由：稀釋這段重疊。
+        下半是相乘的寫法：同一條長條先被切開成沒有交集的兩段，中間留出可見的空隙，
+        兩條細帶因此不再上下重疊。
+        圖最下方用讀圖示表示兩段各留下什麼資料：左段只留一個位點的 alt 與 ref 計數，
+        右段留下逐條 read 跨越多個位點的聯合狀態與覆蓋遮罩。
+        因此兩個因子可以直接相乘得到完整的 likelihood，權重也就不需要存在。</desc>
 
-  <text class="ttl zh" x="20" y="36">同一批 read 被算了兩次 —— 這是相加那個寫法的病灶</text>
+  <text class="ttl zh" x="20" y="42">相加為什麼不是 likelihood：看取用範圍就知道</text>
 
-  <!-- 上半：舊 -->
-  <rect class="box bad" x="18" y="58" width="964" height="184" rx="8"/>
-  <text class="lbl bold zh bad" x="34" y="88">原本：兩項相加</text>
+  <!-- ══════════════ 上半：相加 ══════════════ -->
+  <text class="lbl bold zh bad" x="20" y="86">✗ 相加：兩項的取用範圍<tspan class="bold">重疊</tspan></text>
 
-  <rect class="box" x="36" y="104" width="300" height="60" rx="8"/>
-  <text class="lbl zh" x="50" y="130">頻率項</text>
-  <text class="tick zh" x="50" y="152">全部 15,500 個變異</text>
+  <!-- 第①項的取用範圍：蓋住全部 -->
+  <text class="tick zh" x="20" y="126">① 每個位點的 alt／ref 計數</text>
+  <rect class="bar ok" x="300" y="116" width="650" height="14" rx="7"/>
 
-  <text class="lbl bold mid" x="366" y="140">＋</text>
+  <!-- 變異長條（按比例：14,025 ＋ 1,475） -->
+  <rect class="bar" x="300" y="146" width="588" height="48" rx="4"/>
+  <rect class="bar somatic" x="888" y="146" width="62" height="48" rx="4"/>
+  <text class="tick zh mid" x="594" y="176">獨佔一個視窗的變異　14,025</text>
+  <text class="tick zh end" x="950" y="214">1,475</text>
 
-  <rect class="box" x="396" y="104" width="300" height="60" rx="8"/>
-  <text class="lbl zh" x="410" y="130">關係項</text>
-  <text class="tick zh" x="410" y="152">來自 1,475 個變異的 read</text>
+  <!-- 第②項的取用範圍：只蓋住右段 -->
+  <text class="tick zh" x="20" y="246">② 同一條 read 上的共現</text>
+  <line class="guide muted" x1="212" y1="241" x2="880" y2="241"/>
+  <rect class="bar warn" x="888" y="234" width="62" height="14" rx="7"/>
 
-  <rect class="box ghost" x="756" y="98" width="210" height="72" rx="8"/>
-  <text class="tick zh" x="770" y="124">必須另外校準一個權重</text>
-  <text class="tick zh" x="770" y="148">來稀釋重複的部分</text>
+  <!-- ★ 重疊高亮：務必畫在長條之後，否則會被填色蓋掉 ★ -->
+  <rect class="region bad" x="888" y="110" width="62" height="144"/>
+  <rect class="region bad" x="888" y="110" width="62" height="144"/>
+  <rect class="box ghost bad" x="888" y="110" width="62" height="144" rx="4"/>
 
-  <!-- 同一疊 read -->
-  <rect class="read hp1" x="330" y="188" width="150" height="14" rx="7"/>
-  <rect class="read hp1" x="340" y="206" width="150" height="14" rx="7"/>
-  <rect class="read hp1" x="326" y="224" width="150" height="14" rx="7"/>
-  <text class="tick bold zh bad" x="500" y="216">同一批分子</text>
+  <path class="conn bad" d="M919,258 L919,276" marker-end="url(#arrow-sm)"/>
+  <text class="lbl bold zh bad end" x="950" y="302">這一欄被兩項各用了一次</text>
 
-  <path class="conn bad" d="M186,166 L360,184" marker-end="url(#arrow-sm)"/>
-  <path class="conn bad" d="M546,166 L440,184" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh" x="20" y="336">同一批 read 算了兩次 → 那個和不是 likelihood；權重存在的唯一理由，就是事後稀釋這段重疊。</text>
 
-  <text class="anno bold zh bad" x="18" y="270">後果：那個和不是 likelihood，只能叫合成目標，而且權重是為了修補重複計數才存在的。</text>
+  <!-- ══════════════ 下半：相乘 ══════════════ -->
+  <text class="lbl bold zh ok" x="20" y="384">✓ 相乘：先把資料切開，兩個因子各管一段</text>
 
-  <!-- 下半：新 -->
-  <rect class="box ok" x="18" y="296" width="964" height="152" rx="8"/>
-  <text class="lbl bold zh ok" x="34" y="326">改成：兩個因子相乘，觀測先切成互不重疊的兩類</text>
+  <text class="tick zh" x="20" y="424">兩個因子的取用範圍</text>
+  <rect class="bar ok" x="300" y="414" width="574" height="14" rx="7"/>
+  <rect class="bar warn" x="888" y="414" width="62" height="14" rx="7"/>
 
-  <rect class="box" x="36" y="342" width="380" height="76" rx="8"/>
-  <text class="lbl zh" x="50" y="368">只有一個變異的連鎖視窗（95%）</text>
-  <text class="tick zh" x="50" y="392">beta-binomial，一個位點兩格</text>
-  <text class="tick mono" x="50" y="412">14,025 個變異</text>
+  <rect class="bar" x="300" y="444" width="574" height="48" rx="4"/>
+  <rect class="bar somatic" x="888" y="444" width="62" height="48" rx="4"/>
 
-  <text class="lbl bold mid" x="446" y="386">×</text>
+  <!-- 中間的空隙：兩段沒有交集 -->
+  <rect class="box ghost" x="874" y="408" width="14" height="90" rx="3"/>
 
-  <rect class="box accent" x="476" y="342" width="380" height="76" rx="8"/>
-  <text class="lbl zh accent" x="490" y="368">兩個以上變異的連鎖區段（5%）</text>
-  <text class="tick zh" x="490" y="392">聯合狀態表，一個連鎖區段 2ᵏ 格</text>
-  <text class="tick mono" x="490" y="412">1,475 個變異</text>
+  <text class="tick zh" x="300" y="516">S₁　14,025 個變異</text>
+  <text class="tick zh end" x="950" y="516">S₂　1,475 個變異</text>
 
-  <rect class="box ok" x="880" y="342" width="88" height="76" rx="8"/>
-  <text class="tick bold zh ok mid" x="924" y="374">沒有</text>
-  <text class="tick bold zh ok mid" x="924" y="398">交集</text>
+  <!-- 兩段各留下什麼資料：用讀圖示表示，文字放在圖示下方 -->
+  <rect class="read hp0" x="300" y="532" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="375" cy="539" r="6"/>
+  <text class="tick zh" x="300" y="578">只留一個位點的 alt／ref 計數</text>
 
-  <text class="anno bold zh accent" x="18" y="480">多變異連鎖區段的邊際 VAF <tspan class="bold">已經含在它的聯合表裡</tspan> —— 不可以再加回頻率項。</text>
-  <text class="tick zh" x="18" y="508">權重原本是修補重複計數的補丁；觀測切乾淨之後，那個補丁就不需要了。</text>
-</svg><figcaption>上半是相加的寫法：多變異連鎖視窗的 read 同時進了兩項，
-所以那個和不是 likelihood，權重是為了修補重複計數才存在的。
-下半把觀測切成互不重疊的兩類，兩個因子相乘即為完整的 likelihood，權重隨之消失。</figcaption></figure>
+  <rect class="read hp0" x="700" y="526" width="150" height="14" rx="7"/>
+  <rect class="read hp0" x="730" y="546" width="150" height="14" rx="7"/>
+  <circle class="mark somatic" cx="740" cy="533" r="6"/>
+  <circle class="mark somatic" cx="800" cy="533" r="6"/>
+  <circle class="mark somatic" cx="800" cy="553" r="6"/>
+  <circle class="mark ref" cx="860" cy="553" r="6"/>
+  <text class="tick zh end" x="950" y="578">留逐條 read 的聯合狀態與遮罩</text>
+
+  <text class="lbl bold zh ok" x="20" y="616">兩段沒有交集 → 相乘就是完整的 likelihood → 權重不必存在</text>
+</svg><figcaption>長條是按比例畫的全部變異。上半兩條範圍帶在右段<b>重疊</b> ——
+那一成的變異，其 read 被兩項各用了一次，所以那個和不是 likelihood；
+權重存在的唯一理由就是事後稀釋這段重疊。
+下半先把長條切成沒有交集的兩段，範圍帶之間出現空隙，重複計數消失，權重也就不必存在。</figcaption></figure>
 
 <div class="eq"><math display="block"><mi>P</mi><mo>(</mo><mi>D</mi><mo>∣</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>=</mo><msub><mo>∏</mo><mrow><mi>m</mi><mo>∈</mo><msub><mi>S</mi><mn>1</mn></msub></mrow></msub><msub><mi>P</mi><mi>BB</mi></msub><mo>(</mo><msub><mi>a</mi><mi>m</mi></msub><mo>∣</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>·</mo><msub><mo>∏</mo><mrow><mi>v</mi><mo>∈</mo><msub><mi>S</mi><mn>2</mn></msub></mrow></msub><msub><mi>P</mi><mi>v</mi></msub><mo>(</mo><msub><mi>D</mi><mi>v</mi></msub><mo>∣</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo></math><p class="eq__note">這是 likelihood，<b>不是</b>目標函數 —— 目標函數還要再扣複雜度、再加群數先驗，見下一小節。
 第二個乘積跑在<b>連鎖視窗</b>上，不是跑在單倍型連鎖區段上；理由見下方表格與其後兩段。</p></div>

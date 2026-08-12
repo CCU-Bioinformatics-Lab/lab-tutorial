@@ -1,90 +1,124 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650">
-  <title>同一批 read 先互斥分流，再形成完整 likelihood</title>
-  <desc>圖由上往下讀。最上方是一批依連鎖視窗整理的原始 read，仍保留每條 read 在各位點看到的 ref 或 alt。
-        中央只做一個不涉及生物結論的分流判斷：這個連鎖視窗內有幾個變異。
-        若只有一個變異，read 進入左路 S1，濃縮為總深度 d_m 與 alt count a_m，
-        以 beta-binomial 計算單位點因子 P_BB。
-        若有兩個以上變異，read 進入右路 S2，保留逐條 read 的聯合狀態與覆蓋遮罩 D_v，
-        以多位點 read 模型計算區段因子 P_v。
-        左右兩路沒有共享 read，底部以乘號合併成 P(D given Theta_K)，並標示每條 read 恰好計算一次。
-        中間的關係帶說明兩路不是兩個生物模型：單位點只有 ref 與 alt 兩格，
-        多位點則有二的 k_v 次方個聯合狀態；k_v 等於一時，多位點模型的邊界情形就是 beta-binomial。
-        讀法是先分資料、保留適合的資料粒度、各算一個因子，最後相乘。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 920">
+  <title>估計流程的全貌：一組參數，兩類證據，一個分數</title>
+  <desc>圖由上往下讀，是一個會回頭的迴圈。
+        最上方是要估的參數：群數 K、clone tree、突變指派、逐拷貝基因型與細胞比例 w，
+        純度是由細胞比例推導出來的，不是額外的參數。
+        這組參數乘上拷貝數之後投影成局部的分子比例，決定了資料應該長什麼樣。
+        中段是資料：依「這個連鎖視窗裡有幾個變異」做一次互斥分流。
+        只有一個變異的視窗，所有 read 都跨過同一個位點，
+        因此只需要保留 alt 與 ref 的計數，形成 beta-binomial 因子。
+        兩個以上變異的視窗，每條 read 覆蓋的位點各不相同，
+        所以要保留逐條 read 的聯合狀態與覆蓋遮罩，形成多位點因子，
+        而同一個視窗的兩條單倍型家族在這個因子內一起計算。
+        兩路沒有共用任何一條 read，因此兩個因子是相乘而不是相加，也就不需要權重。
+        相乘得到完整的 likelihood，再扣掉複雜度、加上群數先驗，才是目標函數 Score。
+        最後跨不同的 K 比較 Score，取最大者。
+        右側的回頭箭頭是整個流程的關鍵：這不是一次算完，
+        外層換一組 K 與離散結構，內層調細胞比例，重算分數再比一次。</desc>
 
-  <text class="ttl zh" x="20" y="36">先分資料，再寫 likelihood：每條 read 恰好進入一個因子</text>
+  <text class="ttl zh" x="20" y="42">估計流程的全貌：一組參數，兩類證據，一個分數</text>
 
-  <!-- 原始觀測 -->
-  <rect class="box sunken" x="178" y="56" width="644" height="92" rx="8"/>
-  <text class="lbl bold zh" x="198" y="84">原始觀測：依連鎖視窗整理的 read</text>
-  <rect class="read hp0" x="198" y="101" width="150" height="14" rx="7"/>
-  <rect class="read hp1" x="218" y="121" width="150" height="14" rx="7"/>
-  <circle class="mark somatic" cx="272" cy="108" r="6"/>
-  <circle class="mark somatic" cx="309" cy="128" r="6"/>
-  <rect class="read hp0" x="406" y="101" width="150" height="14" rx="7"/>
-  <rect class="read hp1" x="426" y="121" width="150" height="14" rx="7"/>
-  <circle class="mark somatic" cx="456" cy="108" r="6"/>
-  <circle class="mark somatic" cx="512" cy="128" r="6"/>
-  <rect class="read hp0" x="614" y="101" width="150" height="14" rx="7"/>
-  <rect class="read hp1" x="634" y="121" width="150" height="14" rx="7"/>
-  <circle class="mark somatic" cx="674" cy="108" r="6"/>
-  <circle class="mark somatic" cx="730" cy="128" r="6"/>
+  <!-- ══ ① 待估的參數 ══════════════════════════════════════════════ -->
+  <rect class="box accent" x="60" y="76" width="640" height="150" rx="10"/>
+  <text class="lbl bold zh accent" x="80" y="110">① 要估的東西　Θ<tspan style="font-size:15px" dy="4">K</tspan></text>
 
-  <path class="conn" d="M500,148 L500,174" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh" x="80" y="148">K：群數</text>
+  <text class="tick zh" x="300" y="148">T：clone tree</text>
+  <text class="tick zh" x="500" y="148">z：突變指派</text>
+  <text class="tick zh" x="80" y="178">G：逐拷貝基因型</text>
+  <text class="tick zh" x="300" y="178">w：細胞比例（含正常細胞 w₀）</text>
+  <text class="tick zh" x="80" y="208">純度 ρ ＝ 1 − w₀ 是推導量，不是額外的參數</text>
 
-  <!-- 唯一分流規則 -->
-  <rect class="box accent" x="316" y="176" width="368" height="64" rx="8"/>
-  <text class="lbl bold zh accent mid" x="500" y="202">這個連鎖視窗含幾個變異？</text>
-  <text class="tick zh mid" x="500" y="226">只依資料結構分流，不先推論 clone 關係</text>
+  <path class="conn thick" d="M380,226 L380,258" marker-end="url(#arrow-sm)"/>
+  <text class="tick zh" x="400" y="250">投影：乘上拷貝數 → 分子比例 q</text>
 
-  <path class="conn" d="M430,240 C390,258 300,258 256,278" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M570,240 C610,258 700,258 744,278" marker-end="url(#arrow-sm)"/>
+  <!-- ══ ② 資料分流 ═══════════════════════════════════════════════ -->
+  <text class="lbl bold zh" x="60" y="288">② 資料依「這個視窗有幾個變異」分成兩類</text>
 
-  <!-- 左路：單變異 -->
-  <rect class="box" x="18" y="280" width="460" height="190" rx="8"/>
-  <text class="lbl bold zh" x="36" y="310">S₁：單變異視窗　kᵤ = 1</text>
-  <text class="tick zh" x="36" y="338">保留的資料粒度：一個位點的 ref／alt 計數</text>
+  <!-- 左：單變異視窗 -->
+  <rect class="box" x="60" y="302" width="310" height="250" rx="10"/>
+  <text class="lbl bold zh" x="80" y="334">單變異視窗</text>
+  <text class="lbl zh" x="204" y="334">k<tspan style="font-size:15px" dy="4">v</tspan><tspan dy="-4"> ＝ 1</tspan></text>
 
-  <rect class="read hp0" x="38" y="360" width="108" height="14" rx="7"/>
-  <rect class="read hp0" x="48" y="382" width="108" height="14" rx="7"/>
-  <rect class="read hp1" x="34" y="404" width="108" height="14" rx="7"/>
-  <circle class="mark somatic" cx="94" cy="411" r="6"/>
-  <text class="tick mono" x="170" y="378">dₘ = total reads</text>
-  <text class="tick mono" x="170" y="408">aₘ = alt reads</text>
-  <path class="conn" d="M322,390 L352,390" marker-end="url(#arrow-sm)"/>
-  <rect class="box ok" x="354" y="354" width="106" height="72" rx="8"/>
-  <text class="tick bold mid" x="407" y="382">P<tspan baseline-shift="sub">BB</tspan></text>
-  <text class="tick zh mid" x="407" y="408">單位點因子</text>
-  <text class="anno bold zh ok" x="36" y="452">beta-binomial：兩格（ref／alt）</text>
+  <line class="guide somatic" x1="180" y1="348" x2="180" y2="424"/>
+  <rect class="read hp0" x="90" y="358" width="180" height="14" rx="7"/>
+  <rect class="read hp0" x="110" y="378" width="180" height="14" rx="7"/>
+  <rect class="read hp0" x="80" y="398" width="180" height="14" rx="7"/>
+  <circle class="mark somatic" cx="180" cy="365" r="6"/>
+  <circle class="mark somatic" cx="180" cy="385" r="6"/>
+  <circle class="mark ref" cx="180" cy="405" r="6"/>
+  <text class="tick zh" x="306" y="370">1</text>
+  <text class="tick zh" x="306" y="390">1</text>
+  <text class="tick zh" x="306" y="410">0</text>
 
-  <!-- 右路：多變異 -->
-  <rect class="box accent" x="522" y="280" width="460" height="190" rx="8"/>
-  <text class="lbl bold zh accent" x="540" y="310">S₂：多變異區段　kᵤ ≥ 2</text>
-  <text class="tick zh" x="540" y="338">保留的資料粒度：每條 read 的聯合狀態與遮罩</text>
+  <text class="tick zh" x="80" y="446">每條 read 都跨過同一個位點，</text>
+  <text class="tick zh" x="80" y="468">所以只要留下計數 (a<tspan style="font-size:11px" dy="3">m</tspan><tspan dy="-3">, d</tspan><tspan style="font-size:11px" dy="3">m</tspan><tspan dy="-3">)</tspan></text>
 
-  <rect class="read hp0" x="540" y="360" width="124" height="18" rx="9"/>
-  <text class="tick mono" x="552" y="374">0 – 1</text>
-  <rect class="read hp1" x="540" y="388" width="124" height="18" rx="9"/>
-  <text class="tick mono" x="552" y="402">1 0 1</text>
-  <rect class="read hp0" x="540" y="416" width="124" height="18" rx="9"/>
-  <text class="tick mono" x="552" y="430">0 1 –</text>
-  <text class="tick mono" x="686" y="378">Dᵤ = read states</text>
-  <text class="tick mono" x="686" y="408">＋ coverage masks</text>
-  <path class="conn" d="M820,390 L850,390" marker-end="url(#arrow-sm)"/>
-  <rect class="box ok" x="852" y="354" width="112" height="72" rx="8"/>
-  <text class="tick bold mid" x="908" y="382">Pᵤ</text>
-  <text class="tick zh mid" x="908" y="408">聯合因子</text>
-  <text class="anno bold zh accent" x="540" y="452">同一生成模型：2<tspan baseline-shift="super">kᵤ</tspan> 個聯合狀態</text>
+  <rect class="box ok" x="80" y="484" width="270" height="56" rx="8"/>
+  <text class="lbl bold zh ok mid" x="215" y="512">beta-binomial 因子</text>
+  <text class="tick zh mid" x="215" y="532">單位點的邊界情形</text>
 
-  <!-- 同一模型關係 -->
-  <rect class="box ghost" x="126" y="490" width="748" height="54" rx="8"/>
-  <text class="tick bold zh mid" x="500" y="514">不是兩個模型：kᵤ = 1 時，聯合狀態只剩 ref／alt 兩格</text>
-  <text class="tick zh mid" x="500" y="536">因此左路的 beta-binomial 是右路 read 模型的單位點邊界情形</text>
+  <!-- 右：多變異視窗 -->
+  <rect class="box" x="390" y="302" width="310" height="250" rx="10"/>
+  <text class="lbl bold zh" x="410" y="334">多變異視窗</text>
+  <text class="lbl zh" x="534" y="334">k<tspan style="font-size:15px" dy="4">v</tspan><tspan dy="-4"> ≥ 2</tspan></text>
 
-  <!-- 合流 -->
-  <path class="conn" d="M250,470 C250,566 408,558 454,580" marker-end="url(#arrow-sm)"/>
-  <path class="conn" d="M750,470 C750,566 592,558 546,580" marker-end="url(#arrow-sm)"/>
-  <text class="lbl bold mid" x="500" y="584">×</text>
+  <line class="guide somatic" x1="470" y1="348" x2="470" y2="424"/>
+  <line class="guide somatic" x1="540" y1="348" x2="540" y2="424"/>
+  <line class="guide somatic" x1="610" y1="348" x2="610" y2="424"/>
+  <rect class="read hp0" x="420" y="358" width="150" height="14" rx="7"/>
+  <rect class="read hp0" x="490" y="378" width="150" height="14" rx="7"/>
+  <rect class="read hp0" x="440" y="398" width="110" height="14" rx="7"/>
+  <circle class="mark somatic" cx="470" cy="365" r="6"/>
+  <circle class="mark somatic" cx="540" cy="365" r="6"/>
+  <circle class="mark somatic" cx="540" cy="385" r="6"/>
+  <circle class="mark ref" cx="610" cy="385" r="6"/>
+  <circle class="mark somatic" cx="470" cy="405" r="6"/>
+  <circle class="mark ref" cx="540" cy="405" r="6"/>
+  <text class="tick zh" x="648" y="370">1 1 –</text>
+  <text class="tick zh" x="648" y="390">– 1 0</text>
+  <text class="tick zh" x="648" y="410">1 0 –</text>
 
-  <rect class="box ok" x="210" y="594" width="580" height="42" rx="8"/>
-  <text class="lbl bold mid" x="500" y="621">P(D | Θ<tspan baseline-shift="sub">K</tspan>)　—— 每條 read 恰好計算一次</text>
+  <text class="tick zh" x="410" y="446">每條 read 覆蓋的位點不同，</text>
+  <text class="tick zh" x="410" y="468">所以要留下聯合狀態與遮罩 D<tspan style="font-size:11px" dy="3">v</tspan></text>
+
+  <rect class="box ok" x="410" y="484" width="270" height="56" rx="8"/>
+  <text class="lbl bold zh ok mid" x="545" y="512">多位點 read 因子</text>
+  <text class="tick zh mid" x="545" y="532">兩條家族在這裡一起算</text>
+
+  <!-- 互斥保證 -->
+  <rect class="box warn" x="60" y="566" width="640" height="50" rx="8"/>
+  <text class="tick zh mid" x="380" y="596">兩路沒有共用任何一條 read —— 所以是相乘，不是相加，也就不需要權重</text>
+
+  <path class="conn thick" d="M380,616 L380,648" marker-end="url(#arrow-sm)"/>
+
+  <!-- ══ ③ likelihood ═════════════════════════════════════════════ -->
+  <rect class="box" x="60" y="650" width="640" height="76" rx="10"/>
+  <text class="lbl bold zh" x="80" y="682">③ 相乘就是完整的 likelihood</text>
+  <text class="tick zh" x="80" y="710">L<tspan style="font-size:11px" dy="3">data</tspan><tspan dy="-3"> ＝ Σ log P</tspan><tspan style="font-size:11px" dy="3">BB</tspan><tspan dy="-3"> ＋ Σ log P</tspan><tspan style="font-size:11px" dy="3">v</tspan></text>
+  <text class="tick zh" x="400" y="710">每條 read 恰好計算一次</text>
+
+  <path class="conn thick" d="M380,726 L380,752" marker-end="url(#arrow-sm)"/>
+
+  <!-- ══ ④ 目標函數 ═══════════════════════════════════════════════ -->
+  <rect class="box accent" x="60" y="754" width="640" height="76" rx="10"/>
+  <text class="lbl bold zh accent" x="80" y="786">④ 扣複雜度、加先驗，才是目標函數</text>
+  <text class="tick zh" x="80" y="814">Score ＝ L<tspan style="font-size:11px" dy="3">data</tspan><tspan dy="-3"> − 複雜度代價 ＋ log p(K)</tspan></text>
+
+  <path class="conn thick" d="M380,830 L380,856" marker-end="url(#arrow-sm)"/>
+
+  <!-- ══ ⑤ 輸出 ═══════════════════════════════════════════════════ -->
+  <rect class="box ok" x="60" y="858" width="640" height="52" rx="10"/>
+  <text class="lbl bold zh ok mid" x="380" y="890">⑤ 跨不同的 K 比較，取分數最大的那一個</text>
+
+  <!-- ══ 回頭的迴圈 ═══════════════════════════════════════════════ -->
+  <path class="conn thick accent" d="M700,792 L742,792 L742,151 L706,151" marker-end="url(#arrow-sm)"/>
+
+  <rect class="box" x="772" y="380" width="208" height="196" rx="10"/>
+  <text class="lbl bold zh accent" x="790" y="412">不是一次算完</text>
+  <text class="tick zh" x="790" y="446">外層：換一組 K</text>
+  <text class="tick zh" x="790" y="468">以及 T、z、G</text>
+  <text class="tick zh" x="790" y="500">內層：調 w</text>
+  <text class="tick zh" x="790" y="522">只有 K 個自由度</text>
+  <text class="tick zh" x="790" y="554">重算分數，再比一次</text>
 </svg>
