@@ -703,12 +703,13 @@ held-out predictive score，而不是把未校準的 BIC 當成精確答案。</
   <path class="conn thick" d="M255,302 L255,338" marker-end="url(#arrow-sm)"/>
   <text class="tick zh" x="272" y="326">沿箭頭算出來</text>
 
-  <rect class="box" x="20" y="340" width="470" height="150" rx="10"/>
-  <text class="lbl bold zh" x="40" y="372">② 推導量 —— 不是額外的參數</text>
-  <text class="tick zh" x="40" y="402">ρ ＝ 1 − w₀　　純度，由細胞組成算出</text>
-  <text class="tick zh" x="40" y="426">c_k　　CCF，由 w、T、z 算出</text>
-  <text class="tick zh" x="40" y="450">μ_m　　multiplicity，由 G 決定</text>
-  <text class="tick zh" x="40" y="474">θ、q　　預期 VAF 與分子比例，由上述算出</text>
+  <rect class="box" x="20" y="340" width="470" height="154" rx="10"/>
+  <text class="lbl bold zh" x="40" y="370">② 推導量 —— 不是額外的參數</text>
+  <text class="tick zh" x="40" y="396">ρ ＝ 1 − w₀　　純度，由細胞組成算出</text>
+  <text class="tick zh" x="40" y="418">c_k　　CCF，由 w、T、z 算出</text>
+  <text class="tick zh" x="40" y="440">μ_m　　multiplicity，由 G 決定</text>
+  <text class="tick zh" x="40" y="462">θ、q　　預期 VAF 與分子比例，由上述算出</text>
+  <text class="tick zh" x="40" y="484">δ_v　　錯誤地板總量，由 ε 與 ξ_v 算出</text>
 
   <!-- ── 右上：上游輸入 ─────────────────────────────────────────── -->
   <rect class="box" x="510" y="60" width="470" height="150" rx="10"/>
@@ -759,6 +760,7 @@ held-out predictive score，而不是把未校準的 BIC 當成精確答案。</
 <tr><td><math><msub><mi>φ</mi><mi>m</mi></msub></math>（單位點 overdispersion）</td><td><b>校準量</b></td><td>獨立校準資料，依 depth × CN 分層</td><td>否</td><td><b>是</b></td><td>分層校準；稀疏格標為未知</td></tr>
 <tr><td><math><mi>ε</mi></math>（逐位點錯誤）</td><td><b>校準輸入</b></td><td>平台／basecaller，加序列脈絡分層</td><td>否</td><td><b>是</b></td><td>依脈絡分層，不用單一常數</td></tr>
 <tr><td><math><msub><mi>ξ</mi><mi>v</mi></msub></math>（家族誤標率）</td><td>觀測 nuisance</td><td><b>就地、成對</b>估計</td><td>視實作</td><td><b>是</b></td><td>成對估計；<math><msub><mi>k</mi><mi>v</mi></msub><mo>≥</mo><mn>2</mn></math> 時主導錯誤地板</td></tr>
+<tr><td><math><msub><mi>δ</mi><mi>v</mi></msub></math>（錯誤地板總量）</td><td>推導量</td><td>由 <math><mi>ε</mi></math> 與 <math><msub><mi>ξ</mi><mi>v</mi></msub></math> 算出</td><td>否</td><td>否</td><td>隨兩個錯誤通道傳遞；<b>不要與 <math><mi>ε</mi></math> 混用</b></td></tr>
 <tr><td><math><msub><mi>τ</mi><mi>u</mi></msub></math>（區段內離散度）</td><td>觀測 nuisance</td><td>預設不啟用（第三節）</td><td>預設否</td><td>否</td><td>殘差顯示過度離散時才加</td></tr>
 <tr><td><math><msub><mi>σ</mi><mi>v</mi></msub></math>（家族方向）</td><td>潛在變數</td><td>—</td><td>邊際化掉</td><td>否</td><td>每視窗一個，加總掉</td></tr>
 <tr><td><math><msub><mi>M</mi><mi>eff</mi></msub></math>（有效資訊量）</td><td><b>校準量</b></td><td>模擬或 bootstrap</td><td>否</td><td><b>是</b></td><td>做不到就改用 held-out predictive score</td></tr>
@@ -1599,14 +1601,15 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
 而 <math><mi>τ</mi><msub><mi>q</mi><mi>h</mi></msub><mo>=</mo><mn>0</mn></math> 不是一個合法的 Dirichlet 分量。
 所以結構零一定要先經過錯誤通道抬到地板之上：</p>
 
-<div class="eq"><math display="block"><msubsup><mi>q</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow><mi>obs</mi></msubsup><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><msub><mi>ε</mi><mi>v</mi></msub><mo>)</mo><mo>·</mo><msub><mi>q</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub><mo>+</mo><msub><mi>ε</mi><mi>v</mi></msub><mo>·</mo><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math><p class="eq__note"><math><msub><mi>ε</mi><mi>v</mi></msub></math> 在這裡是<b>地板的總量</b>（一條 read 有多少機率來自任何錯誤來源），
-<b>不是</b>第二節那個逐位點錯誤率 —— 兩者恰好都用 <math><mi>ε</mi></math> 這個字母，不要混。
-<math><msub><mi>k</mi><mi>v</mi></msub><mo>≥</mo><mn>2</mn></math> 時 <math><msub><mi>ε</mi><mi>v</mi></msub></math> 幾乎完全由家族誤標 <math><msub><mi>ξ</mi><mi>v</mi></msub></math> 撐起來，這也是它掛在視窗層的原因。
-<math><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 是地板的<b>形狀</b>，逐家族不同，因為它取決於隔壁那條家族長什麼樣。</p></div>
+<div class="eq"><math display="block"><msubsup><mi>q</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow><mi>obs</mi></msubsup><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><msub><mi>δ</mi><mi>v</mi></msub><mo>)</mo><mo>·</mo><msub><mi>q</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub><mo>+</mo><msub><mi>δ</mi><mi>v</mi></msub><mo>·</mo><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math><p class="eq__note"><math><msub><mi>δ</mi><mi>v</mi></msub></math> 是<b>地板的總量</b>：一條 read 有多少機率來自任何一種錯誤來源。
+它<b>由 <math><mi>ε</mi></math> 與 <math><msub><mi>ξ</mi><mi>v</mi></msub></math> 算出來，不是第三個自由參數</b>；
+<math><msub><mi>k</mi><mi>v</mi></msub><mo>≥</mo><mn>2</mn></math> 時幾乎完全由家族誤標 <math><msub><mi>ξ</mi><mi>v</mi></msub></math> 撐起來，這也是它掛在視窗層的原因。
+<math><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 是地板的<b>形狀</b>（錯誤會把機率灑到哪幾格），逐家族不同，
+因為它取決於隔壁那條家族長什麼樣。</p></div>
 
 <p class="prose">這不是為了數值穩定而加的小常數。
 <b>它就是「零不代表不可能」這句話的數學形式</b> ——
-<math><msub><mi>ε</mi><mi>v</mi></msub><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 的大小正是這個連鎖區段能分辨的最小比例，
+<math><msub><mi>δ</mi><mi>v</mi></msub><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 的大小正是這個連鎖區段能分辨的最小比例，
 也就是第十一節那個偵測下界的來源。若 <math><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 由第二節的兩個錯誤通道算出來，
 這個地板是<b>可以就地估計</b>的量，不需要另設參數。</p>
 
@@ -2799,10 +2802,10 @@ report: 每個遮罩的 read 數、連鎖區段的最大跨越深度、
         上排是傳統做法：原始研究刻意只在 VAF 零點一二到零點二四之間擬合，
         更低的一端混著假陽性，更高的一端已經進入 clonal 峰。
         把它換算成細胞比例，在純度零點六的樣本上大約是零點四到零點八，是一段相當窄的區間。
-        下排是本頁的做法：下界由每一個連鎖區段自己的深度與錯誤率決定，不是一個固定常數，
-        在每個家族六十條分子、錯誤率千分之五時大約是零點零五；
+        下排是本頁的做法：下界由每一個連鎖區段自己的深度與地板總量決定，不是一個固定常數，
+        在每個家族六十條分子、地板總量千分之五時大約是零點零五；
         上界則由譜系內的 clonal 堆積決定，暫定零點五。
-        右側的表列出下界怎麼隨分子數與錯誤率變化。
+        右側的表列出下界怎麼隨分子數與地板總量變化。
         底下標出一個重要提醒：上界零點五是全文最弱的一個數字，必須由模擬重新推定。
         讀法是：把比例改成在譜系內部量，動態範圍不但沒有變窄，反而變寬了。</desc>
 
@@ -2832,8 +2835,8 @@ report: 每個遮罩的 read 數、連鎖區段的最大跨越深度、
   <rect class="box" x="660" y="76" width="316" height="230" rx="8"/>
   <text class="lbl bold zh mid" x="818" y="106">下界隨深度變化</text>
   <text class="tick mid" x="712" y="136">分子數</text>
-  <text class="tick mid" x="798" y="136">ε=0.005</text>
-  <text class="tick mid" x="900" y="136">ε=0.01</text>
+  <text class="tick mid" x="798" y="136">δ=0.005</text>
+  <text class="tick mid" x="900" y="136">δ=0.01</text>
   <line class="guide" x1="680" y1="148" x2="956" y2="148"/>
   <text class="tick mono mid" x="712" y="176">20</text>
   <text class="tick mono mid" x="798" y="176">0.10</text>
@@ -2852,9 +2855,10 @@ report: 每個遮罩的 read 數、連鎖區段的最大跨越深度、
   <text class="anno zh ok" x="20" y="356">把比例改成在譜系內部量，動態範圍不但沒有變窄，反而變寬。</text>
   <text class="anno zh bad" x="20" y="390">但上界 0.5 是本頁最弱的一個數字：它是從傳統區間的比例類推來的，</text>
   <text class="anno zh bad" x="20" y="418">必須由模擬重新推定，不要當成已知常數引用。</text>
-</svg><figcaption>窄連鎖視窗下每個家族 60 條分子、錯誤率千分之五時，
+</svg><figcaption>窄連鎖視窗下每個家族 60 條分子、地板總量 <math><mi>δ</mi></math> 為千分之五時，
 可偵測的比例下界約為 0.05。該下界應逐連鎖區段計算，不宜採用固定常數 ——
-它正是第四節那個錯誤地板 <math><msub><mi>ε</mi><mi>v</mi></msub><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 的數值。</figcaption></figure>
+它正是第四節那個錯誤地板 <math><msub><mi>δ</mi><mi>v</mi></msub><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 的數值 —— 注意 <math><mi>δ</mi></math> 是地板總量，
+與逐位點錯誤率 <math><mi>ε</mi></math> 是兩個不同的量。</figcaption></figure>
 
 <p class="prose">建議兩種連鎖視窗寬度並行。<b>在似然的寫法下這不需要兩套權重</b>：
 兩批都進同一個乘積，各自的證據量由各自的計數與遮罩決定。

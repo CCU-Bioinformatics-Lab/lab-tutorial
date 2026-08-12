@@ -32,12 +32,13 @@
   <path class="conn thick" d="M255,302 L255,338" marker-end="url(#arrow-sm)"/>
   <text class="tick zh" x="272" y="326">沿箭頭算出來</text>
 
-  <rect class="box" x="20" y="340" width="470" height="150" rx="10"/>
-  <text class="lbl bold zh" x="40" y="372">② 推導量 —— 不是額外的參數</text>
-  <text class="tick zh" x="40" y="402">ρ ＝ 1 − w₀　　純度，由細胞組成算出</text>
-  <text class="tick zh" x="40" y="426">c_k　　CCF，由 w、T、z 算出</text>
-  <text class="tick zh" x="40" y="450">μ_m　　multiplicity，由 G 決定</text>
-  <text class="tick zh" x="40" y="474">θ、q　　預期 VAF 與分子比例，由上述算出</text>
+  <rect class="box" x="20" y="340" width="470" height="154" rx="10"/>
+  <text class="lbl bold zh" x="40" y="370">② 推導量 —— 不是額外的參數</text>
+  <text class="tick zh" x="40" y="396">ρ ＝ 1 − w₀　　純度，由細胞組成算出</text>
+  <text class="tick zh" x="40" y="418">c_k　　CCF，由 w、T、z 算出</text>
+  <text class="tick zh" x="40" y="440">μ_m　　multiplicity，由 G 決定</text>
+  <text class="tick zh" x="40" y="462">θ、q　　預期 VAF 與分子比例，由上述算出</text>
+  <text class="tick zh" x="40" y="484">δ_v　　錯誤地板總量，由 ε 與 ξ_v 算出</text>
 
   <!-- ── 右上：上游輸入 ─────────────────────────────────────────── -->
   <rect class="box" x="510" y="60" width="470" height="150" rx="10"/>

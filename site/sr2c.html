@@ -461,8 +461,9 @@ MOBSTER，因為第③步的冪次尾是它特有的），而它們正是這個�
 <li><math><msub><mi>θ</mi><mn>1</mn></msub><mo>=</mo><msub><mi>θ</mi><mn>2</mn></msub></math> 時分子為零、商為無限大 —— 那就是兩群期望 VAF 相同的情形。
 <b>表中那四列是同一條曲線上的四個點</b>，不是四件不同的事。</li>
 <li>共現那一側：<math><mn>5</mn></math> 條對 <math><mn>0.2</mn></math> 條的對數似然比約 12，
-遠高於分辨兩個局部結構所需。錯誤地板 1% 的來源是後文「局部生成模型」的逐位點錯誤與家族誤標，
-它<b>不是常數</b>，要逐連鎖區段估。</li>
+遠高於分辨兩個局部結構所需。這裡的錯誤地板（總量 <math><msub><mi>δ</mi><mi>u</mi></msub></math>，本頁取 1%）
+來自後文「局部生成模型」的逐位點錯誤 <math><mi>ε</mi></math> 與家族誤標，
+所以 <math><msub><mi>δ</mi><mi>u</mi></msub></math> 是<b>算出來的</b>而不是另一個自由參數，而且<b>不是常數</b>，要逐連鎖區段估。</li>
 </ul>
 </div>
 </details>
@@ -1425,8 +1426,9 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 這些權重由成對家族的分子數與誤標率導出，不是每個 unit 自由擬合的比例。
 因此 production likelihood 以 <math><msub><mi>p</mi><mrow><mi>u</mi><mo>,</mo><msub><mi>M</mi><mi>r</mi></msub></mrow></msub><mo>(</mo><msub><mi>Y</mi><mi>r</mi></msub><mo>)</mo></math> 取代前一個基礎似然括號內的值。</p></div>
 
-<div class="eq"><math display="block"><msubsup><mi>ν</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow><mi>obs</mi></msubsup><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><msub><mi>ε</mi><mi>u</mi></msub><mo>)</mo><mo>·</mo><msub><mi>ν</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub><mo>+</mo><msub><mi>ε</mi><mi>u</mi></msub><mo>·</mo><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math><p class="eq__note">這是前述成對觀測通道的摘要寫法。<math><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 由逐位點錯誤與整條分子的家族誤標算出，不是自由參數。
-<math><msub><mi>ε</mi><mi>u</mi></msub><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 就是這個連鎖區段能分辨的最小比例，也是所有偵測下界的來源。</p></div>
+<div class="eq"><math display="block"><msubsup><mi>ν</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow><mi>obs</mi></msubsup><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><msub><mi>δ</mi><mi>u</mi></msub><mo>)</mo><mo>·</mo><msub><mi>ν</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub><mo>+</mo><msub><mi>δ</mi><mi>u</mi></msub><mo>·</mo><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math><p class="eq__note">這是前述成對觀測通道的摘要寫法。<math><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 由逐位點錯誤與整條分子的家族誤標算出，不是自由參數。
+<math><msub><mi>δ</mi><mi>u</mi></msub></math> 是<b>地板總量</b>，由逐位點錯誤 <math><mi>ε</mi></math> 與家族誤標算出，不是另一個自由參數；
+<math><msub><mi>δ</mi><mi>u</mi></msub><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 就是這個連鎖區段能分辨的最小比例，也是所有偵測下界的來源。</p></div>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 604" class="dia-svg" role="img" aria-labelledby="sr2b-zero-kinds__title" aria-describedby="sr2b-zero-kinds__desc">
   <title id="sr2b-zero-kinds__title">一格是空的，有三種完全不同的原因</title>
@@ -1502,7 +1504,7 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
   <text class="tick zh" x="18" y="584">讀法：門檻只能把三種零一起丟掉；似然可以分別給它們不同的重量。</text>
 </svg><figcaption>三欄的觀測一模一樣，都是「這一格計數為 0」。
 分得開它們的不是那個 0，而是跨越深度、其他連鎖區段的證據，與就地估到的錯誤率。
-第③欄那個地板就是上面那條式子的 <math><msub><mi>ε</mi><mi>u</mi></msub><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math>：<b>結構零在觀測上永遠到不了零</b>，
+第③欄那個地板就是上面那條式子的 <math><msub><mi>δ</mi><mi>u</mi></msub><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math>：<b>結構零在觀測上永遠到不了零</b>，
 所以「這個狀態不存在」這件事只能由它與地板的距離來講，不能由計數是不是 0 來講。</figcaption></figure>
 
 <p class="prose">家族誤標尤其要<b>成對</b>估計，因為它連結同一連鎖視窗的兩個連鎖區段。
@@ -3112,10 +3114,10 @@ C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續
         上排是傳統做法：原始研究刻意只在 VAF 零點一二到零點二四之間擬合，
         更低的一端混著假陽性，更高的一端已經進入 clonal 峰。
         把它換算成細胞比例，在純度零點六的樣本上大約是零點四到零點八，是一段相當窄的區間。
-        下排是本頁的做法：下界由每一個連鎖區段自己的深度與錯誤率決定，不是一個固定常數，
-        在每個家族六十條分子、錯誤率千分之五時大約是零點零五；
+        下排是本頁的做法：下界由每一個連鎖區段自己的深度與地板總量決定，不是一個固定常數，
+        在每個家族六十條分子、地板總量千分之五時大約是零點零五；
         上界則由譜系內的 clonal 堆積決定，暫定零點五。
-        右側的表列出下界怎麼隨分子數與錯誤率變化。
+        右側的表列出下界怎麼隨分子數與地板總量變化。
         底下標出一個重要提醒：上界零點五是全文最弱的一個數字，必須由模擬重新推定。
         讀法是：把比例改成在譜系內部量，動態範圍不但沒有變窄，反而變寬了。</desc>
 
@@ -3145,8 +3147,8 @@ C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續
   <rect class="box" x="660" y="76" width="316" height="230" rx="8"/>
   <text class="lbl bold zh mid" x="818" y="106">下界隨深度變化</text>
   <text class="tick mid" x="712" y="136">分子數</text>
-  <text class="tick mid" x="798" y="136">ε=0.005</text>
-  <text class="tick mid" x="900" y="136">ε=0.01</text>
+  <text class="tick mid" x="798" y="136">δ=0.005</text>
+  <text class="tick mid" x="900" y="136">δ=0.01</text>
   <line class="guide" x1="680" y1="148" x2="956" y2="148"/>
   <text class="tick mono mid" x="712" y="176">20</text>
   <text class="tick mono mid" x="798" y="176">0.10</text>
@@ -3168,10 +3170,11 @@ C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續
 </svg><figcaption>上表「地板」那一列要驗的就是這條下界。
 圖上兩條軸是兩種比例的可分析區間：上面是傳統做法在細胞比例上量得動的範圍，
 下面是本規格在<b>連鎖區段內分子比例</b>上量得動的範圍（圖上寫「譜系內比例」，就是 <math><msub><mi>ν</mi><mi>u</mi></msub></math>）。
-右下那張小表是下界怎麼算出來的：每個家族 60 條分子、逐位點錯誤率千分之五時約 0.05，
-分子數加倍就往下掉一截。<b>注意它與局部生成模型的錯誤地板是兩個量</b> ——
-<math><mi>ε</mi></math> 是輸入（本頁用的量級是 1%），0.05 是它在這個分子數之下換算出來的
-「一支要佔多少才看得見」。所以下界必須逐連鎖區段算，不能當成固定常數引用。</figcaption></figure>
+右下那張小表是下界怎麼算出來的：本頁的地板總量 <math><msub><mi>δ</mi><mi>u</mi></msub></math> 取 1%，
+每個家族 60 條分子時下界約 0.07；分子數加倍就往下掉一截，地板減半也會往下掉一截。
+<b>注意下界與地板是兩個量</b>：<math><msub><mi>δ</mi><mi>u</mi></msub></math> 是<b>輸入</b>，
+下界則是它在這個分子數之下換算出來的「一支要佔多少才看得見」。
+所以下界必須逐連鎖區段算，不能當成固定常數引用。</figcaption></figure>
 
 <details class="reveal">
 <summary>實作順序（展開查看）</summary>
