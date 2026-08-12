@@ -588,79 +588,22 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 家族誤標率 <math><mi>ξ</mi></math>。
 外部提供的 copy number 與校準後的 <math><mover accent="true"><mi>φ</mi><mo>^</mo></mover></math> 是條件輸入，為了避免式子過長沒有逐項寫在條件線右側。</p>
 
-<p class="prose"><b><math><mi>ρ</mi></math> 不在這張清單上，這是刻意的。</b>本頁的 <math><mi>w</mi></math>
-把正常細胞當成第 0 項一起放進同一個 simplex（<math><msubsup><mo>∑</mo><mrow><mi>g</mi><mo>=</mo><mn>0</mn></mrow><mi>K</mi></msubsup><msub><mi>w</mi><mi>g</mi></msub><mo>=</mo><mn>1</mn></math>，見第二節），
+<p class="prose"><b><math><mi>ρ</mi></math> 不在這張清單上。</b>本頁的 <math><mi>w</mi></math> 把正常細胞當成第 0 項
+一起放進同一個 simplex（<math><msubsup><mo>∑</mo><mrow><mi>g</mi><mo>=</mo><mn>0</mn></mrow><mi>K</mi></msubsup><msub><mi>w</mi><mi>g</mi></msub><mo>=</mo><mn>1</mn></math>，見第二節），
 所以純度是<b>推導量</b> <math><mi>ρ</mi><mo>=</mo><mn>1</mn><mo>−</mo><msub><mi>w</mi><mn>0</mn></msub></math>，不是另一個自由參數。
-另一種常見寫法把 <math><mi>ρ</mi></math> 單獨拉出來、再讓腫瘤內部的比例自成一個 simplex
-（<math><msubsup><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></msubsup><msub><mi>w</mi><mi>k</mi></msub><mo>=</mo><mn>1</mn></math>）；兩種寫法<b>自由度完全相同</b>：</p>
+連續自由度因此是 <math><mi>K</mi></math> 個 —— <math><mi>K</mi><mo>=</mo><mn>5</mn></math> 時是 5 個。</p>
 
-<div class="table-wrap">
-<table>
-<thead><tr><th scope="col">寫法</th><th scope="col">連續自由參數</th><th scope="col">自由度</th></tr></thead>
-<tbody>
-<tr><td><b>本頁採用</b>：<math><mi>w</mi></math> 含正常細胞 <math><msub><mi>w</mi><mn>0</mn></msub></math></td><td><math><msub><mi>w</mi><mn>0,</mn></msub><mo>…</mo><mo>,</mo><msub><mi>w</mi><mi>K</mi></msub></math> 受 <math><mo>∑</mo><msub><mi>w</mi><mi>g</mi></msub><mo>=</mo><mn>1</mn></math> 約束</td><td><math><mi>K</mi></math>；<math><mi>ρ</mi><mo>=</mo><mn>1</mn><mo>−</mo><msub><mi>w</mi><mn>0</mn></msub></math> 為推導量</td></tr>
-<tr><td>等價寫法：<math><mi>ρ</mi></math> 另計</td><td><math><mi>ρ</mi></math> ＋ <math><msub><mi>w</mi><mn>1,</mn></msub><mo>…</mo><mo>,</mo><msub><mi>w</mi><mi>K</mi></msub></math> 受 <math><mo>∑</mo><msub><mi>w</mi><mi>k</mi></msub><mo>=</mo><mn>1</mn></math> 約束</td><td><math><mn>1</mn><mo>+</mo><mo>(</mo><mi>K</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>=</mo><mi>K</mi></math></td></tr>
-</tbody>
-</table>
+<details class="reveal reveal--aside">
+<summary>符號對照：別的論文把 <math><mi>ρ</mi></math> 寫成獨立參數，那樣算會不會多一個？</summary>
+<div class="reveal__a">
+<p class="prose">不會，兩種寫法自由度相同。文獻上常見的寫法是把 <math><mi>ρ</mi></math> 單獨拉出來，
+再讓腫瘤內部的比例自成一個 simplex（<math><msubsup><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></msubsup><msub><mi>w</mi><mi>k</mi></msub><mo>=</mo><mn>1</mn></math>），
+於是自由度是 <math><mn>1</mn><mo>+</mo><mo>(</mo><mi>K</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>=</mo><mi>K</mi></math> —— 跟本頁的 <math><mi>K</mi></math> 一樣，
+因為<b><math><mi>ρ</mi></math> 與 <math><msub><mi>w</mi><mn>0</mn></msub></math> 本來就是同一個自由度的兩種寫法</b>。
+兩個數錯的方向相反：把 <math><mi>ρ</mi></math> 與 <math><msub><mi>w</mi><mn>0</mn></msub></math> 各算一次會多一個，
+只數腫瘤內部的 <math><mi>K</mi><mo>−</mo><mn>1</mn></math> 則漏掉純度那一格。</p>
 </div>
-
-<p class="prose">兩者都是 <math><mi>K</mi></math>，因為<b><math><mi>ρ</mi></math> 與 <math><msub><mi>w</mi><mn>0</mn></msub></math> 是同一個自由度的兩種寫法</b>。</p>
-
-<figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" class="dia-svg" role="img" aria-labelledby="sr2b-dof__title" aria-describedby="sr2b-dof__desc">
-  <title id="sr2b-dof__title">兩種寫純度的方式，自由度相同</title>
-  <desc id="sr2b-dof__desc">圖並排比較兩種參數化。左邊是本頁採用的寫法：把正常細胞當成第 0 項，
-        和各個 clone 一起放進同一個總和為一的比例向量，
-        因此有 K 加一個分量、扣掉一條總和限制，自由度是 K，而純度是推導出來的 1 減 w0。
-        右邊是另一種常見寫法：純度單獨算一個參數，腫瘤內部的比例再自成一個總和為一的向量，
-        因此是一加上 K 減一，同樣是 K。
-        中間的等號說明兩者其實是同一個自由度的兩種切法，
-        純度與正常細胞比例不是兩個獨立的量。
-        下方列出兩個常見的數錯法：把純度和正常細胞比例各算一次會多算一個，
-        只數腫瘤內部的比例則會少算一個。</desc>
-
-  <text class="ttl zh" x="20" y="38">ρ 與 w₀ 是同一個自由度的兩種寫法</text>
-
-  <!-- ── 左：本頁採用 ───────────────────────────────────────────── -->
-  <rect class="box ok" x="20" y="62" width="420" height="238" rx="10"/>
-  <text class="lbl bold zh ok" x="40" y="94">寫法 A（本頁採用）</text>
-
-  <rect class="box sunken" x="40" y="110" width="380" height="104" rx="8"/>
-  <text class="tick zh" x="58" y="138">正常細胞與各 clone 放在同一個向量裡：</text>
-  <text class="lbl zh" x="58" y="172">w₀, w₁, …, w_K</text>
-  <text class="tick zh" x="58" y="200">受一條限制：總和 ＝ 1</text>
-
-  <text class="lbl bold zh ok" x="40" y="248">自由度 ＝ K</text>
-  <text class="tick zh" x="40" y="276">純度是推導量：ρ ＝ 1 − w₀</text>
-
-  <!-- ── 中：等號 ───────────────────────────────────────────────── -->
-  <text class="ttl zh accent mid" x="500" y="192">＝</text>
-
-  <!-- ── 右：等價寫法 ───────────────────────────────────────────── -->
-  <rect class="box" x="560" y="62" width="420" height="238" rx="10"/>
-  <text class="lbl bold zh" x="580" y="94">寫法 B（等價）</text>
-
-  <rect class="box sunken" x="580" y="110" width="380" height="104" rx="8"/>
-  <text class="tick zh" x="598" y="138">純度單獨一個，腫瘤內部再自成一個向量：</text>
-  <text class="lbl zh" x="598" y="172">ρ　＋　w₁, …, w_K</text>
-  <text class="tick zh" x="598" y="200">後者受一條限制：總和 ＝ 1</text>
-
-  <text class="lbl bold zh" x="580" y="248">自由度 ＝ 1 ＋ (K − 1) ＝ K</text>
-  <text class="tick zh" x="580" y="276">兩種寫法交出同一組預測</text>
-
-  <!-- ── 底部：兩個常見的數錯法 ─────────────────────────────────── -->
-  <rect class="box bad" x="20" y="322" width="960" height="128" rx="10"/>
-  <text class="lbl bold zh bad" x="40" y="354">K ＝ 5 時，連續自由度是 5</text>
-
-  <rect class="box ghost bad" x="44" y="370" width="450" height="62" rx="8"/>
-  <text class="tick zh" x="62" y="396">數成 6：把 ρ 與 w₀ 各算一次</text>
-  <text class="tick zh" x="62" y="420">—— 它們是同一個量</text>
-
-  <rect class="box ghost bad" x="506" y="370" width="450" height="62" rx="8"/>
-  <text class="tick zh" x="524" y="396">數成 4：只數腫瘤內部的 K − 1</text>
-  <text class="tick zh" x="524" y="420">—— 漏掉了純度那一格</text>
-</svg><figcaption>兩種寫法交出同一組預測，自由度都是 <math><mi>K</mi></math>。
-兩個常見的數錯法方向相反：把 <math><mi>ρ</mi></math> 與 <math><msub><mi>w</mi><mn>0</mn></msub></math> 各算一次會多一個，
-只數腫瘤內部的 <math><mi>K</mi><mo>−</mo><mn>1</mn></math> 會少一個。</figcaption></figure>
+</details>
 
 <p class="prose">本式把 <math><mi>z</mi></math> 當作與其他參數共同最佳化的離散狀態，也就是輸出一組明確的突變指派。
 若實作選擇把 <math><mi>z</mi></math> 邊際化，likelihood 必須改為對所有指派加總，模型選擇的校準也要跟著重做；
