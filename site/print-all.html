@@ -17956,16 +17956,21 @@ MOBSTER，因為第③步的冪次尾是它特有的），而它們正是這個�
 
 <h4 id="sr2c__一個必要的但書">一個必要的但書</h4>
 
-<p class="prose">上面整段的前提是「似然只吃邊際計數」。有兩個既有方法<b>不</b>滿足這個前提：
+<p class="prose">上面整段的前提是「似然只吃邊際計數」，而有兩個既有方法<b>不</b>滿足這個前提：
 <b>PairClone 與 TreeClone 已經把「同一條短讀上一對鄰近 SNV 的共現」寫進了全域似然</b>。
-所以對這兩者而言，「頻率譜看不到共現」並不成立。</p>
+所以本規格與它們的差別<b>不是</b>「有沒有用共現」，而是這條通道有多寬 ——
+通道寬度完全由讀長決定，而<b>同一扇門，門後的東西差兩個數量級</b>。</p>
 
-<p class="prose">但它們是<b>短讀</b>方法，而這條通道的寬度完全由讀長決定 ——
-兩個 sSNV 要落在同一條讀序上才數得到。
+<details class="reveal reveal--aside">
+<summary>數量級補充：短讀只有 0.15%–1.5% 的 sSNV 有伴，ONT 是 40.5%–98.1%</summary>
+<div class="reveal__a">
+<p class="prose">兩個 sSNV 要落在同一條讀序上才數得到，所以能不能用共現，取決於讀長與突變密度的比值。
 300 bp 的短讀在 5–50／Mb 的突變負荷下只有 <b>0.15%–1.5%</b> 的 sSNV 有伴；
 ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
-<b>同一扇門，門後的東西差兩個數量級</b> —— 這才是本規格與它們的實際差別，
-而不是「有沒有用共現」。</p>
+這也是為什麼 PairClone 與 TreeClone 只處理<b>成對</b>位點：在那個產量下，
+<math><mi>k</mi></math> 大於 2 的視窗幾乎不存在，可變 <math><mi>k</mi></math> 沒有意義。</p>
+</div>
+</details>
 
 </section>
 
@@ -18678,8 +18683,11 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 <math><msub><mi>ν</mi><mi>u</mi></msub><mo>=</mo><mo>(</mo><mn>0.60</mn><mo>,</mo><mn>0.30</mn><mo>,</mo><mn>0.10</mn><mo>)</mo></math>。現在有一條 read 只覆蓋第一與第三個位點，
 並在這兩處讀到 <code>1–1</code>。在尚未加入錯誤時，這條 read 同時相容於
 <code>101</code> 與 <code>111</code>，因此其觀測機率為
-<math><mn>0.30</mn><mo>+</mo><mn>0.10</mn><mo>=</mo><mn>0.40</mn></math>。</p>
+<math><mn>0.30</mn><mo>+</mo><mn>0.10</mn><mo>=</mo><mn>0.40</mn></math>。<b>一條 read 支持的是一組狀態，不是一個狀態</b> —— 這句話就是下面整節的全部內容。</p>
 
+<details class="reveal reveal--aside">
+<summary>符號表：<math><msub><mi>H</mi><mi>r</mi></msub></math>、<math><msub><mi>M</mi><mi>r</mi></msub></math>、<math><msub><mi>Y</mi><mi>r</mi></msub></math> 三者的分工（隨時可回來查）</summary>
+<div class="reveal__a">
 <div class="table-wrap">
 <table>
 <thead><tr><th scope="col">記號</th><th scope="col">在此例中的值</th><th scope="col">意義</th></tr></thead>
@@ -18691,6 +18699,10 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 </tbody>
 </table>
 </div>
+<p class="prose">三者的關係是一條單向鏈：<math><msub><mi>H</mi><mi>r</mi></msub></math> 經覆蓋遮罩投影成 <math><msub><mi>H</mi><mrow><mi>r</mi><mo>,</mo><msub><mi>M</mi><mi>r</mi></msub></mrow></msub></math>，
+再經錯誤通道變成資料裡的 <math><msub><mi>Y</mi><mi>r</mi></msub></math>。推論要走的是反方向。</p>
+</div>
+</details>
 
 <p class="prose">先條件於 read 已進入正確的單倍型家族；此時 read-level 的骨架可寫成：</p>
 
@@ -19103,12 +19115,20 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 
 <h4 id="sr2c__第三個細節-只准-0-1-時-loh-會被誤讀">第三個細節：只准 0 → 1 時，LOH 會被誤讀</h4>
 
-<p class="prose">四配子相容性與 perfect phylogeny 都預設<b>突變只增不減</b>。
-既有實作的 Camin–Sokal 條件同樣只准 <math><mn>0</mn><mo>→</mo><mn>1</mn></math>：復發（同一個突變在兩支各發生一次）
-不被罰，但<b>喪失完全不在模型的表達範圍內</b>。
-後果很具體：一段發生 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2c__gd-loh-7">LOH<span class="term__pop" id="sr2c__gd-loh-7" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en" lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 而失去某個突變的區域，
-在模型眼中會被描述成「那個狀態從來沒有取得過」，而不是「取得後又失去」。
-既有實作在整條鏈上沒有任何一處修正這件事。</p>
+<p class="prose">四配子相容性與 perfect phylogeny 都預設<b>突變只增不減</b>，所以
+一段發生 <span class="term" data-term="LOH" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2c__gd-loh-7">LOH<span class="term__pop" id="sr2c__gd-loh-7" role="tooltip"><b class="term__hd">LOH <i>異型合子性喪失</i></b><span class="term__def" data-lang="zh">原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。</span><span class="term__def" data-lang="en" lang="en">Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.</span><a class="term__more" href="glossary.html#loh">完整條目 →</a></span></span> 而失去某個突變的區域，在模型眼中會被描述成
+「那個狀態<b>從來沒有取得過</b>」，而不是「取得後又失去」。</p>
+
+<details class="reveal reveal--aside">
+<summary>來源補充：既有實作的 Camin–Sokal 條件在哪裡漏掉了「喪失」</summary>
+<div class="reveal__a">
+<p class="prose">既有實作的 Camin–Sokal 條件同樣只准 <math><mn>0</mn><mo>→</mo><mn>1</mn></math>：復發（同一個突變在兩支各發生一次）
+不被罰，但<b>喪失完全不在模型的表達範圍內</b> ——
+它不是被罰得很重，是連寫都寫不出來。
+既有實作在整條鏈上沒有任何一處修正這件事，所以 LOH 區段的局部系譜會安靜地錯，
+而且錯得跟一個正常結果長得一樣。</p>
+</div>
+</details>
 
 <p class="prose">本規格的處理是把它變成明示的邊界，而不是默默承受：
 拷貝數由全域基準提供，故<b>每個連鎖區段都知道自己落在哪一種區段</b>。
@@ -19118,14 +19138,22 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 這會減少可用連鎖區段（在 CN 變異廣泛的實體腫瘤可能減少一半以上），
 所以納入與排除的連鎖區段數必須逐階段載明 —— 這正好也是連鎖率之外的第二個分層變數。</p>
 
-<h4 id="sr2c__方向是-nuisance-但這裡的用途不同">方向是 nuisance，但這裡的用途不同</h4>
+<h4 id="sr2c__家族標號的方向不影響局部系譜">家族標號的方向不影響局部系譜</h4>
 
 <p class="prose">家族標號在每個 <span class="term" data-term="phase block" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2c__gd-phase-block-8">phase set<span class="term__pop" id="sr2c__gd-phase-block-8" role="tooltip"><b class="term__hd">phase block</b><span class="term__def" data-lang="zh">一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。</span><span class="term__def" data-lang="en" lang="en">A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.</span><a class="term__more" href="glossary.html#phase-block">完整條目 →</a></span></span> 內獨立決定，
-故引入 <math><msub><mi>σ</mi><mi>u</mi></msub><mo>∈</mo><mo>{</mo><mi>原</mi><mi>樣</mi><mo>,</mo><mi>對</mi><mi>調</mi><mo>}</mo></math> 並邊際化。
-與前一篇不同的是：<b>局部系譜的形狀完全不依賴 <math><msub><mi>σ</mi><mi>u</mi></msub></math></b> ——
-連鎖區段內部的狀態集合與包含關係與家族標號無關。
-<math><msub><mi>σ</mi><mi>u</mi></msub></math> 只在兩處才要緊：把節點對應到某一條 germline 單倍型（用於後文 caller 的單倍型特徵），
-以及把節點對應到全域群。所以本規格的 <math><msub><mi>σ</mi><mi>u</mi></msub></math> 不進核心推論，只進註解層。</p>
+故仍引入 <math><msub><mi>σ</mi><mi>u</mi></msub><mo>∈</mo><mo>{</mo><mi>原</mi><mi>樣</mi><mo>,</mo><mi>對</mi><mi>調</mi><mo>}</mo></math> 並邊際化。但與前一篇不同的是，
+這裡有一件可以放心的事：<b>局部系譜的形狀完全不依賴 <math><msub><mi>σ</mi><mi>u</mi></msub></math></b> ——
+連鎖區段內部的狀態集合與包含關係與家族標號無關，所以 <math><msub><mi>σ</mi><mi>u</mi></msub></math> 不進核心推論，只進註解層。</p>
+
+<details class="reveal reveal--aside">
+<summary>作用範圍補充：那 <math><msub><mi>σ</mi><mi>u</mi></msub></math> 到底在哪兩處還是要緊</summary>
+<div class="reveal__a">
+<p class="prose">兩處都在「把局部結果接到外面」的時候：
+把節點對應到某一條 germline 單倍型（用於後文 caller 的單倍型特徵），
+以及把節點對應到全域群。兩者都屬於註解層 ——
+它們錯了，這個連鎖區段的狀態集合、比例與先後關係<b>一個都不會變</b>。</p>
+</div>
+</details>
 
 <h4 id="sr2c__與前一篇的唯一結構差異">與前一篇的唯一結構差異</h4>
 
@@ -19238,12 +19266,21 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 中篇以 Poisson 模型推得「約 9.5% 的變異落在多變異連鎖區段」，若真是如此，
 排掉 <math><msub><mi>S</mi><mn>2</mn></msub></math> 對頻率譜幾乎沒有影響。但既有實作實測到的是
 <b>40.5% 到 98.1%</b>（見「輸入與前處理契約」）—— 在連鎖率高的樣本上，
-排掉 <math><msub><mi>S</mi><mn>2</mn></msub></math> 等於排掉大半個變異集合。三個後果必須跟著寫進報告：
-<b><math><msub><mi>S</mi><mn>1</mn></msub></math> 剩幾個變異</b>是逐樣本的量，不是一個可以忽略的尾數；
-<math><msub><mi>S</mi><mn>1</mn></msub></math> 太小時全域基準的原子後驗會變寬，那份不確定度必須在局部推論中逐次傳遞，
-不能只傳原子的位置；而在極端情況下 <math><msub><mi>S</mi><mn>1</mn></msub></math> 可能小到撐不起分群，
-那時全域基準就該直接棄權，全部連鎖區段標 <code>UNLINKED_TO_GLOBAL</code>，
-而不是拿一個估不準的原子集合去當先驗。</p>
+排掉 <math><msub><mi>S</mi><mn>2</mn></msub></math> 等於排掉大半個變異集合。
+所以<b><math><msub><mi>S</mi><mn>1</mn></msub></math> 剩幾個變異，是逐樣本必須先算、必須寫進報告的量</b>，
+不是一個可以忽略的尾數。</p>
+
+<details class="reveal reveal--aside">
+<summary>後果補充：<math><msub><mi>S</mi><mn>1</mn></msub></math> 被排小之後，該傳什麼、什麼時候該直接棄權</summary>
+<div class="reveal__a">
+<p class="prose"><math><msub><mi>S</mi><mn>1</mn></msub></math> 太小時全域基準的原子後驗會變寬，那份不確定度必須在局部推論中<b>逐次傳遞</b>，
+不能只傳原子的位置 —— 只傳位置等於把一個很寬的估計當成確定值使用。</p>
+<p class="prose">而在極端情況下 <math><msub><mi>S</mi><mn>1</mn></msub></math> 可能小到撐不起分群。
+那時全域基準就該<b>直接棄權</b>，全部連鎖區段標 <code>UNLINKED_TO_GLOBAL</code>，
+而不是拿一個估不準的原子集合去當先驗 —— 後者會把全域的雜訊當成局部的先驗知識，
+而且在輸出裡看不出來。</p>
+</div>
+</details>
 
 <div class="guardrail">
 <p class="guardrail__hd">兩個必須量出來、而不是宣稱掉的邊界</p>
@@ -19444,6 +19481,22 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 再對每個候選算邊際似然（<math><mi>ν</mi></math> 依上節先驗積掉），最後正規化成後驗。
 <math><msub><mi>X</mi><mi>u</mi></msub></math> 不取單一最大值，而是輸出前若干個候選與各自的質量。</p>
 
+<p class="prose">每個連鎖區段除了那份後驗，還帶一組旗標。十二個旗標分成三類，
+<b>只有第一類是產出，另外兩類都是「這個連鎖區段的話只能講到哪裡」</b>：</p>
+
+<ul class="prose">
+<li><b>與全域基準的關係</b>（四個）：<code>REFINES_GLOBAL</code>、<code>GLOBAL_CONSISTENT</code>、
+<code>LOCAL_ONLY_LINEAGE</code>、<code>CONTRADICTS_GLOBAL</code> —— 第一個是本規格的主要產出。</li>
+<li><b>證據不足以作答</b>（五個）：<code>FLOOR_LIMITED</code>、<code>ORDER_UNRESOLVED</code>、
+<code>BRANCH_UNDERPOWERED</code>、<code>PARTIAL_DOMINATED</code>、<code>STATE_CAP_REACHED</code> ——
+每一個都代表「沒看到」，<b>不代表「不存在」</b>。</li>
+<li><b>品質訊號</b>（兩個）：<code>INCOMPATIBLE</code>、<code>KATAEGIS_DOWNWEIGHTED</code> ——
+它們指向地板、誤標或取樣偏性，不是新發現。</li>
+</ul>
+
+<details class="reveal reveal--aside">
+<summary>旗標全表：十二個旗標各自的觸發條件與讀法（實作時逐欄對照）</summary>
+<div class="reveal__a">
 <div class="table-wrap">
 <table>
 <thead><tr><th scope="col">旗標</th><th scope="col">觸發條件</th><th scope="col">讀法</th></tr></thead>
@@ -19462,6 +19515,8 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 </tbody>
 </table>
 </div>
+</div>
+</details>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="sr2c__sr2c-unit-verdict__title" aria-describedby="sr2c__sr2c-unit-verdict__desc">
   <title id="sr2c__sr2c-unit-verdict__title">一個連鎖區段定得下來什麼、定不下來什麼，以及每一項各由哪個旗標承接</title>
@@ -19527,8 +19582,8 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
   <rect class="box accent" x="18" y="404" width="964" height="82" rx="8"/>
   <text class="lbl bold zh accent" x="34" y="438">旗標不是免責聲明，是欄位</text>
   <text class="anno zh" x="34" y="470">右格每一項都有名字，所以「對多少比例的資料拒絕作答」查得出來；被沉默補齊的東西在統計量上是隱形的。</text>
-</svg><figcaption>把上表讀成一張對照：左格三件事全部由該連鎖區段自己的分子定出來，
-右格四件事它定不下來 —— 而<b>每一項各對應上表的一個旗標</b>。
+</svg><figcaption>把十二個旗標讀成一張對照：左格三件事全部由該連鎖區段自己的分子定出來，
+右格四件事它定不下來 —— 而<b>每一項各對應一個旗標</b>。
 兩格的分界就是上述估計範圍：問題只要越出「一個連鎖視窗、一條拷貝」，
 答案就不在左格。這也是為什麼旗標必須是欄位而不是註解：
 右格每一項都有名字，「這條流程對多少比例的資料拒絕作答」才查得出來。</figcaption></figure>
@@ -19628,6 +19683,9 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 <b>這不是文件疏漏，是重跑不出同一份狀態表的直接原因</b> ——
 狀態表換了，連鎖區段、候選集合與每一個下游數字都跟著換。</p>
 
+<details class="reveal reveal--aside">
+<summary>清單：五項必須釘住的設定，以及各自不釘住會壞在哪</summary>
+<div class="reveal__a">
 <div class="table-wrap">
 <table>
 <thead><tr><th scope="col">必須釘住的</th><th scope="col">不釘住的後果</th></tr></thead>
@@ -19640,6 +19698,8 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 </tbody>
 </table>
 </div>
+</div>
+</details>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" class="dia-svg" role="img" aria-labelledby="sr2c__sr2c-unit-build__title" aria-describedby="sr2c__sr2c-unit-build__desc">
   <title id="sr2c__sr2c-unit-build__title">單倍型標籤的五個值，以及連鎖視窗如何由讀序連鎖的傳遞閉包長出來</title>
@@ -19824,14 +19884,17 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 似然寫法讓第二種成因自動只貢獻很少的證據，不需要門檻就分得開 ——
 但前提是那條 read 有沒有跨過去，必須<b>記下來</b>而不是先併掉。</figcaption></figure>
 
-<h4 id="sr2c__切完之後還要記一個量-作用位點數-q">切完之後還要記一個量：作用位點數 <math><mi>q</mi></math></h4>
-
+<details class="reveal reveal--aside">
+<summary>定義補充：前處理還要交出一個量 —— 作用位點數 <math><mi>q</mi></math>（搜尋成本要用它，不是 <math><mi>k</mi></math>）</summary>
+<div class="reveal__a">
 <p class="prose">前處理交出去的不只是連鎖區段本身，還有一個決定推論成本的量，
 而它必須在這裡就算出來，因為它只有看得到狀態表的時候算得出來：
 <b>作用位點數</b> <math><mi>q</mi></math>，
 即在該家族內<b>真的有變化</b>的位點數。某個位點若該家族每條 read 都是同一個 allele，
 它不產生任何座標，故 <math><mi>q</mi><mo>≤</mo><mi>k</mi></math>；用 <math><mi>k</mi></math> 估搜尋成本會系統性高估。
 本頁凡涉及狀態空間、頂點、遮罩與上限之處，一律以 <math><mi>q</mi></math> 為準。</p>
+</div>
+</details>
 
 <h4 id="sr2c__連鎖率才是真正的閘門-而它逐樣本差很大">連鎖率才是真正的閘門，而它逐樣本差很大</h4>
 
@@ -19977,9 +20040,14 @@ Poisson 模型給的單一數字在這裡沒有用：真正該做的是逐樣本
 右欄：無分支的形狀在每個資料集都佔七到九成，而且原因是機械性的 ——
 一條鏈只要一個樣式，一個分岔要兩個互不包含的樣式。</figcaption></figure>
 
-<p class="prose">這件事必須誠實地放進定位，但它<b>不動搖前面那個證據預算</b>，
-兩者常被混在一起：</p>
+<p class="prose">這件事必須誠實地放進定位，但它<b>不動搖前面那個證據預算</b>，兩者常被混在一起：
+<math><mi>k</mi><mo>=</mo><mn>2</mn></math> 佔多數限制的是<b>深度</b>（多數連鎖區段只講得出一對突變的關係），
+不是<b>可偵測性</b> ——「預期 0.2 條、實際 5 條」在 <math><mi>k</mi><mo>=</mo><mn>2</mn></math> 同樣成立，
+而分辨兩支等值 CCF 的 lineage 本來就只需要一對位點。</p>
 
+<details class="reveal reveal--aside">
+<summary>逐項對照：<math><mi>k</mi><mo>=</mo><mn>2</mn></math> 佔多數改變了什麼、沒有改變什麼</summary>
+<div class="reveal__a">
 <div class="table-wrap">
 <table>
 <thead><tr><th scope="col"><math><mi>k</mi><mo>=</mo><mn>2</mn></math> 佔多數</th><th scope="col">影響</th></tr></thead>
@@ -19991,6 +20059,8 @@ Poisson 模型給的單一數字在這裡沒有用：真正該做的是逐樣本
 </tbody>
 </table>
 </div>
+</div>
+</details>
 
 <p class="prose">連帶的還有兩個直接後果。<b>其一，caller 的局部系譜特徵覆蓋率不是固定的一成</b> ——
 在高連鎖率的樣本上它可以覆蓋大部分候選，在低連鎖率的樣本上則接近無效。
@@ -20193,8 +20263,9 @@ Poisson 模型給的單一數字在這裡沒有用：真正該做的是逐樣本
 任何百分比都必須帶著自己的分母出現。</p>
 </div>
 
-<h4 id="sr2c__並列的數目不必抽樣-它沿頂點分解">並列的數目不必抽樣，它沿頂點分解</h4>
-
+<details class="reveal reveal--aside">
+<summary>計數補充：同一個候選底下有幾棵等價的樹，不必抽樣（它沿頂點分解）</summary>
+<div class="reveal__a">
 <p class="prose">上限管的是「候選列不列舉得完」；另一件不同的事是<b>列舉完之後，
 同一個候選底下有幾棵等價的樹</b>。
 這個數目不需要抽樣，因為它<b>沿頂點分解</b>。
@@ -20204,20 +20275,29 @@ Poisson 模型給的單一數字在這裡沒有用：真正該做的是逐樣本
 <div class="eq"><math display="block"><mi>CT</mi><mo>(</mo><mi>N</mi><mo>)</mo><mo>=</mo><munder><mo>∏</mo><mrow><mi>v</mi><mo>∈</mo><mi>N</mi><mo>,</mo><mi>v</mi><mo>≠</mo><mi>root</mi></mrow></munder><msubsup><mi>d</mi><mi>N</mi><mo>-</mo></msubsup><mo>(</mo><mi>v</mi><mo>)</mo></math><p class="eq__note">既有實作用這條式子精確計算並列數。在本規格下它有第二個用途：
 它是簡約先驗在給定狀態集合下的<b>正規化常數</b>，
 所以「這個候選有多少種等價寫法」不會被誤算成「這個候選有多少證據」。</p></div>
+</div>
+</details>
 
-<h4 id="sr2c__成本-既有實作已經量過">成本：既有實作已經量過</h4>
+<h4 id="sr2c__成本不是這條路線的瓶頸">成本不是這條路線的瓶頸</h4>
 
+<p class="prose">既有實作已經量過：<b>整個基因體的局部重建是兩分鐘的工作，記憶體不到 400 MB</b>。
+本規格在它之外只加了每個候選的積分與全域基準的 <math><mi>S</mi><mo>≈</mo><mn>50</mn></math> 次重算，
+仍然遠低於任何全域取樣。要注意的只有一件事：
+<b>成本的變異來自 <math><mi>q</mi></math> 的分布而非連鎖區段數</b> ——
+<math><mi>q</mi></math> 大的資料集吃掉絕大部分節點，所以要控成本，該控的是 <math><mi>q</mi></math> 的分布，
+不是連鎖區段總數。</p>
+
+<details class="reveal reveal--aside">
+<summary>實測數字：98,955 個連鎖區段的秒數、記憶體與跨資料集 19 倍差異</summary>
+<div class="reveal__a">
 <p class="prose">既有實作處理 98,955 個連鎖區段，
 solver 122.03 秒、census 58.96 秒、峰值常駐記憶體 356.7 MB、
 展開 13,773,565 個搜尋節點 —— 平均每個連鎖區段 139.2 個節點，
-但跨資料集差約 19 倍（H2009 每連鎖區段 292.0，HCC1395_NYGC 15.5）。</p>
-
-<p class="prose">兩點值得記下來。<b>其一，這個量級小得驚人</b>：
-整個基因體的局部重建是兩分鐘的工作，記憶體不到 400 MB。
-本規格在它之外只加了每個候選的積分與全域基準的 <math><mi>S</mi><mo>≈</mo><mn>50</mn></math> 次重算，
-仍然遠低於任何全域取樣。<b>其二，成本的變異來自 <math><mi>q</mi></math> 的分布而非連鎖區段數</b> ——
-<math><mi>q</mi></math> 大的資料集吃掉絕大部分節點。所以要控成本，該控的是 <math><mi>q</mi></math> 的分布，
-不是連鎖區段總數。</p>
+但跨資料集差約 19 倍（H2009 每連鎖區段 292.0，HCC1395_NYGC 15.5）。
+那個 19 倍就是上面「變異來自 <math><mi>q</mi></math> 的分布」的量：
+H2009 正是唯一把 <math><mi>k</mi></math> 一路填到上限 12 的資料集。</p>
+</div>
+</details>
 
 <p class="prose">關鍵仍在於<b>沒有全域取樣包在外層</b>，所以整份工作是尷尬平行的，
 成本隨連鎖區段數線性成長。這是放棄全域目標換來的直接好處，
@@ -20425,6 +20505,16 @@ solver 122.03 秒、census 58.96 秒、峰值常駐記憶體 356.7 MB、
 局部系譜特徵群的覆蓋率<b>逐樣本由 40.5% 到 98.1%</b>，不是固定的一成；
 但它是唯一沒有現成替代的特徵群。</figcaption></figure>
 
+<p class="prose">局部系譜特徵群的核心是 <code>llr_nested</code>，而它的邏輯與 ClairS 的相位通道相同、
+只是改用更局部的分類單位：真的低頻 somatic 變異來自某一支既有的 lineage，
+所以它的支持分子應該<b>整齊地落在該節點的後代位置上</b>；
+定序錯誤與嵌合則對局部系譜完全無所謂，會散落在各節點之間。
+差別在於相位通道分的是兩條 germline 單倍型，
+局部系譜特徵分的則是同一條單倍型內部的數支 somatic lineage。</p>
+
+<details class="reveal reveal--aside">
+<summary>欄位全表：三組特徵的每一個欄位與定義（實作時逐欄對照）</summary>
+<div class="reveal__a">
 <div class="table-wrap">
 <table>
 <thead><tr><th scope="col">特徵群</th><th scope="col">欄位</th><th scope="col">意義</th></tr></thead>
@@ -20443,13 +20533,8 @@ solver 122.03 秒、census 58.96 秒、峰值常駐記憶體 356.7 MB、
 </tbody>
 </table>
 </div>
-
-<p class="prose">局部系譜特徵群的核心是 <code>llr_nested</code>，而它的邏輯與 ClairS 的相位通道相同、
-只是改用更局部的分類單位：真的低頻 somatic 變異來自某一支既有的 lineage，
-所以它的支持分子應該<b>整齊地落在該節點的後代位置上</b>；
-定序錯誤與嵌合則對局部系譜完全無所謂，會散落在各節點之間。
-差別在於相位通道分的是兩條 germline 單倍型，
-局部系譜特徵分的則是同一條單倍型內部的數支 somatic lineage。</p>
+</div>
+</details>
 
 <div class="guardrail">
 <p class="guardrail__hd">缺席不是零</p>
@@ -20539,8 +20624,13 @@ C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續
 而且如果 A 沒有效果，B 幾乎不可能有 —— 因為 A 的失敗代表這些特徵
 在 caller 已有的資訊之外沒有增量。</p>
 
-<h4 id="sr2c__訓練與評估的切分">訓練與評估的切分</h4>
+<p class="prose">不論走哪一種接法，訓練與評估的切分有四條不能違反的規則，
+其中最容易犯的是<b>用逐變異的隨機切分</b> ——
+同一個連鎖區段裡的候選共用一份局部系譜，隨機切分會讓指標系統性偏高。</p>
 
+<details class="reveal reveal--aside">
+<summary>切分紀律：四條規則逐條（切分單位、錨點來源、同一條管線、分層驗收）</summary>
+<div class="reveal__a">
 <ul class="prose">
 <li><b>不可以用逐變異的隨機切分。</b>同一個連鎖區段裡的候選共用一份局部系譜，
 彼此高度相關；隨機切分會讓同一個連鎖區段同時出現在訓練與驗證集，
@@ -20551,6 +20641,8 @@ C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續
 <li>驗收須跨純度、突變負荷、平台與 basecaller 分層報告，
 以檢查<span class="term" data-term="distribution shift" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2c__gd-distribution-shift-22">分布偏移<span class="term__pop" id="sr2c__gd-distribution-shift-22" role="tooltip"><b class="term__hd">distribution shift <i>分布偏移</i></b><span class="term__def" data-lang="zh">測試資料的組成與訓練資料存在顯著差異（例如正負樣本比例不同），使得模型表現不如預期。</span><span class="term__def" data-lang="en" lang="en">Test data differing in composition from training data, so measured performance does not transfer.</span><a class="term__more" href="glossary.html#distribution-shift">完整條目 →</a></span></span>。</li>
 </ul>
+</div>
+</details>
 
 <h3 id="sr2c__驗收設計">驗收設計</h3>
 
@@ -20576,6 +20668,14 @@ C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續
 
 <h4 id="sr2c__其餘驗收項目">其餘驗收項目</h4>
 
+<p class="prose">其餘十項分成三段：<b>機率核、相容性、地板</b>檢查程式有沒有寫對；
+<b>先驗影響、可辨識性、重現性、半合成</b>檢查結論是不是由資料而非旋鈕決定；
+<b>下游、留一法、切分</b>檢查外部驗證有沒有洩漏。
+每一項都要有「失敗代表什麼」，否則它只是一個會綠的測試。</p>
+
+<details class="reveal reveal--aside">
+<summary>驗收全表：十個層級各自必須通過的測試與失敗意義（實作時逐列勾）</summary>
+<div class="reveal__a">
 <div class="table-wrap">
 <table>
 <thead><tr><th scope="col">層級</th><th scope="col">必須通過的測試</th><th scope="col">失敗意義</th></tr></thead>
@@ -20593,6 +20693,8 @@ C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續
 </tbody>
 </table>
 </div>
+</div>
+</details>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 450" class="dia-svg" role="img" aria-labelledby="sr2c__rg-detection-window__title" aria-describedby="sr2c__rg-detection-window__desc">
   <title id="sr2c__rg-detection-window__title">可分析的頻率連鎖視窗：傳統 VAF 擬合區間與譜系內比例區間的比較</title>
@@ -20653,7 +20755,7 @@ C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續
   <text class="anno zh ok" x="20" y="356">把比例改成在譜系內部量，動態範圍不但沒有變窄，反而變寬。</text>
   <text class="anno zh bad" x="20" y="390">但上界 0.5 是本頁最弱的一個數字：它是從傳統區間的比例類推來的，</text>
   <text class="anno zh bad" x="20" y="418">必須由模擬重新推定，不要當成已知常數引用。</text>
-</svg><figcaption>上表「地板」那一列要驗的就是這條下界。
+</svg><figcaption>驗收項目裡「地板」那一項要驗的就是這條下界。
 圖上兩條軸是兩種比例的可分析區間：上面是傳統做法在細胞比例上量得動的範圍，
 下面是本規格在<b>連鎖區段內分子比例</b>上量得動的範圍（圖上寫「譜系內比例」，就是 <math><msub><mi>ν</mi><mi>u</mi></msub></math>）。
 右下那張小表是下界怎麼算出來的：本頁的地板總量 <math><msub><mi>δ</mi><mi>u</mi></msub></math> 取 1%，
@@ -20805,12 +20907,18 @@ C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續
 </table>
 </div>
 
-<p class="prose">三點必須先講清楚。<b>其一，四個數字是巢狀的子集，不是四個版本的同一件事。</b>
-98,955 是全部連鎖區段；85,941 是其中帶變異的；75,224 是其中列舉得完的；
+<p class="prose">三點必須先講清楚。<b>其一，前四個數字是巢狀的子集，不是四個版本的同一件事</b> ——
+所以每一個百分比都必須帶著自己的分母出現。</p>
+
+<details class="reveal reveal--aside">
+<summary>算法補充：棄權率該用哪一個分母（12.47% 與 10.83% 回答的是不同問題）</summary>
+<div class="reveal__a">
+<p class="prose">98,955 是全部連鎖區段；85,941 是其中帶變異的；75,224 是其中列舉得完的；
 71,955 是再往下可排序的。<b>棄權率該用的分母是 85,941</b>（12.47%），
 因為不帶變異的連鎖區段根本沒有東西可列舉、也撞不到任何上限；
-用 98,955 算會得到 10.83%，那個數字回答的是另一個問題。
-每一個百分比都必須帶著自己的分母出現。</p>
+用 98,955 算會得到 10.83%，那個數字回答的是另一個問題。</p>
+</div>
+</details>
 
 <p class="prose"><b>其二，形狀分布是一條啟發式規則作用「之後」的結果。</b>
 既有實作用 read-AF 分數排序並列的最小成本解，但它並不只是排序 ——
@@ -20829,8 +20937,12 @@ C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續
 <h3 id="sr2c__分岔比例的檢定力限制">分岔比例的檢定力限制</h3>
 
 <p class="prose">分岔是 <code>REFINES_GLOBAL</code> 最可能的來源，也是最稀缺的一類。
-既有實作在七個資料集上的形狀組成，無分支類一律佔 <b>71.7%–88.5%</b>：</p>
+既有實作在七個資料集上的形狀組成，無分支類一律佔 <b>71.7%–88.5%</b>
+（最高的是 COLO829 的 88.5%，最低的是 H2009 的 71.7%）。</p>
 
+<details class="reveal reveal--aside">
+<summary>逐資料集：七個資料集的無分支比例與已分類連鎖區段數</summary>
+<div class="reveal__a">
 <div class="table-wrap">
 <table>
 <thead><tr><th scope="col">資料集</th><th scope="col">無分支合計</th><th scope="col">已分類連鎖區段數</th></tr></thead>
@@ -20845,6 +20957,8 @@ C 接在產生候選之前，被它砍掉的候選<b>不會出現在任何後續
 </tbody>
 </table>
 </div>
+</div>
+</details>
 
 <p class="prose">關鍵是<b>為什麼</b>稀少，而這個理由是機械性的：
 <b>一條鏈只要一個觀測到的樣式就建得起來，一個分岔要兩個互不包含的樣式。</b>
@@ -20981,6 +21095,9 @@ Zhou T, Sengupta S, Müller P, Ji Y, <i>PairClone: a Bayesian subclone caller ba
 以及 Zhou T et al., <i>TreeClone: Reconstruction of tumor subclone phylogeny based on genotype pairs</i>，
 <a href="https://arxiv.org/abs/1703.03853">arXiv:1703.03853</a>。</p>
 
+<details class="reveal reveal--aside">
+<summary>延伸引用：全域重建路線、下游 caller、切斷回饋與四配子檢定的原始出處</summary>
+<div class="reveal__a">
 <p class="prose">作為對照基準的全域重建路線：SciClone，Miller CA et al., <i>PLoS Comput Biol</i>
 2014;10:e1003665；PyClone，Roth A et al., <i>Nat Methods</i> 2014;11:396–398；
 PhyloWGS，Deshwar AG et al., <i>Genome Biol</i> 2015;16:35
@@ -21010,6 +21127,8 @@ multiple sequencing technologies with DeepSomatic</i>，<i>Nat Biotechnol</i> 20
 <i>Efficient algorithms for inferring evolutionary trees</i>, <i>Networks</i> 1991;21:19–28；
 簡約假設的原始出處為 Camin JH, Sokal RR,
 <i>A method for deducing branching sequences in phylogeny</i>, <i>Evolution</i> 1965;19:311–326。</p>
+</div>
+</details>
 
 <p class="prose">前處理所依賴的單倍型標記見 LongPhase-S 預印本
 （<a href="https://www.biorxiv.org/content/10.1101/2025.11.20.689492v1">bioRxiv, 2025，doi 10.1101/2025.11.20.689492</a>），
