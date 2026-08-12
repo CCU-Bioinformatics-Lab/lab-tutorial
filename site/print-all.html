@@ -14362,12 +14362,24 @@ pigeonhole 至此容許分支：<math><msub><mi>c</mi><mi>B</mi></msub><mo>+</mo
 代價是：觀測通道必須寫完整 —— 逐位點的定序錯誤與整條分子的家族誤標形狀不同，
 少寫一種，錯誤造出來的少數幾條 read 就會被讀成一個新的 clone。</p>
 
-<p class="prose">因此本頁的順序是：先寫出估計式並清點到底有幾個參數要估（第一節），
-再逐層寫出多變異連鎖視窗的生成過程（第二節）與它的預設抽樣分布（第三節）；
-接著處理三種不同的「沒有」（第四節）、分類為何是輸出而不是輸入（第五節）、
-數百個連鎖區段如何合併（第六節）、推論實際上怎麼跑（第七節）；
-最後是現行實作要改的兩處（第八節）、兩類與相位有關的誤讀（第九節）、
-產量與參數取捨（第十、十一節）與實作分期（第十二節）。</p>
+<p class="prose">十二節分成四段，每一段回答一個不同層次的問題：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">段</th><th scope="col">節</th><th scope="col">回答什麼</th></tr></thead>
+<tbody>
+<tr><td><b>式子長什麼樣</b></td><td>一～三</td><td>完整的估計式、多變異連鎖視窗的生成過程，以及它預設的抽樣分布</td></tr>
+<tr><td><b>怎麼不被錯誤騙</b></td><td>四～六</td><td>三種不同的「沒有」、分類為何是輸出而不是輸入、數百個形狀不同的連鎖區段如何合併</td></tr>
+<tr><td><b>怎麼算出來</b></td><td>七～八</td><td>外層定結構、內層估比例；現行實作要改的兩處</td></tr>
+<tr><td><b>工程現實</b></td><td>九～十二</td><td>與相位有關的兩類誤讀、連鎖區段產量、視窗寬度取捨、實作分期</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">閱讀方式：<b>主線全部寫在沒有摺疊的段落、式子與圖裡</b>。
+內文中的虛線摺疊區一律是補充 —— 符號的逐項查表、數字怎麼推出來的、
+換一種實作寫法會怎樣、與前兩篇的接點。
+第一遍可以整批略過，需要時再展開，主線不會因此斷掉。</p>
 </section>
 
 
@@ -14411,6 +14423,14 @@ read，同時又沒有為了追逐雜訊而多開群？</b></p>
 
 <h4 id="sr2b__第一層-先分清楚觀測值-未知狀態與校準量">第一層：先分清楚觀測值、未知狀態與校準量</h4>
 
+<p class="prose">這一層只做一件事：把接下來會反覆出現的符號分成三類 ——
+<b>可觀測的</b>（<math><msub><mi>a</mi><mi>m</mi></msub></math>、<math><msub><mi>d</mi><mi>m</mi></msub></math>）、<b>要推論的</b>（<math><mi>K</mi></math>、<math><msub><mi>z</mi><mi>m</mi></msub></math>、<math><msub><mi>c</mi><mi>k</mi></msub></math>），
+以及<b>由上游餵進來或先校準好的</b>（<math><msub><mi>CN</mi><mi>m</mi></msub></math>、<math><msub><mi>μ</mi><mi>m</mi></msub></math>、<math><msub><mi>φ</mi><mi>m</mi></msub></math>）。
+<math><mi>ρ</mi></math> 兩邊都不是 —— 它是推導量，理由在本節後半。</p>
+
+<details class="reveal reveal--aside">
+<summary>符號表：九個符號逐項的意思與角色（隨時可回來查）</summary>
+<div class="reveal__a">
 <div class="table-wrap">
 <table>
 <thead><tr><th scope="col">符號</th><th scope="col">意思</th><th scope="col">在 estimator 中的角色</th></tr></thead>
@@ -14428,6 +14448,8 @@ read，同時又沒有為了追逐雜訊而多開群？</b></p>
 </tbody>
 </table>
 </div>
+</div>
+</details>
 
 <h4 id="sr2b__第二層-生物狀態先決定預期-vaf">第二層：生物狀態先決定預期 VAF</h4>
 
@@ -14437,34 +14459,53 @@ read，同時又沒有為了追逐雜訊而多開群？</b></p>
 「這個位置總共有多少份 DNA」。因此 <math><msub><mi>θ</mi><mi>mk</mi></msub></math> 不是新的觀測值，而是
 <b>在候選指派 <math><msub><mi>z</mi><mi>m</mi></msub><mo>=</mo><mi>k</mi></math> 成立時，模型預測的 VAF 中心</b>。</p>
 
+<p class="prose">要記住的一句話是：<b>同一群的變異不必落在同一個原始 VAF</b> ——
+拷貝數與 multiplicity 會把中心推到別的地方。</p>
+
+<details class="reveal reveal--aside">
+<summary>數值例：同一群、同一個 CCF，<math><mi>CN</mi></math> 從 2 變成 4 時預期 VAF 掉到哪</summary>
+<div class="reveal__a">
 <p class="prose">例如變異 <math><mi>m</mi></math> 有 <math><msub><mi>a</mi><mi>m</mi></msub><mo>=</mo><mn>20</mn></math>、<math><msub><mi>d</mi><mi>m</mi></msub><mo>=</mo><mn>100</mn></math>，所以觀測 VAF 是 0.20。
 若候選群的 <math><msub><mi>c</mi><mi>k</mi></msub><mo>=</mo><mn>0.50</mn></math>、純度 <math><mi>ρ</mi><mo>=</mo><mn>0.80</mn></math>、<math><msub><mi>CN</mi><mi>m</mi></msub><mo>=</mo><mn>2</mn></math>、<math><msub><mi>μ</mi><mi>m</mi></msub><mo>=</mo><mn>1</mn></math>，
 模型預測 <math><msub><mi>θ</mi><mi>mk</mi></msub><mo>=</mo><mo>(</mo><mn>0.8</mn><mo>×</mo><mn>0.5</mn><mo>×</mo><mn>1</mn><mo>)</mo><mo>/</mo><mo>(</mo><mn>0.8</mn><mo>×</mo><mn>2</mn><mo>+</mo><mn>0.2</mn><mo>×</mo><mn>2</mn><mo>)</mo><mo>=</mo><mn>0.20</mn></math>，與資料吻合。
-只把 <math><msub><mi>CN</mi><mi>m</mi></msub></math> 改成 4，預期 VAF 就降為約 0.11；所以<b>同一群的變異也不必落在同一個原始 VAF</b>。
-只有二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub><mo>=</mo><mn>1</mn></math> 時，才可化簡成 <math><msub><mi>θ</mi><mi>mk</mi></msub><mo>=</mo><mi>ρ</mi><msub><mi>c</mi><mi>k</mi></msub><mo>/</mo><mn>2</mn></math>；
+只把 <math><msub><mi>CN</mi><mi>m</mi></msub></math> 改成 4，預期 VAF 就降為約 0.11。</p>
+<p class="prose">只有二倍體且 <math><msub><mi>μ</mi><mi>m</mi></msub><mo>=</mo><mn>1</mn></math> 時，才可化簡成 <math><msub><mi>θ</mi><mi>mk</mi></msub><mo>=</mo><mi>ρ</mi><msub><mi>c</mi><mi>k</mi></msub><mo>/</mo><mn>2</mn></math>；
 有 copy-number alteration 或 LOH 時不可使用這個捷徑。</p>
+</div>
+</details>
 
 <h4 id="sr2b__第三層-beta-binomial-把-相差多少-換成機率">第三層：beta-binomial 把「相差多少」換成機率</h4>
 
+<p class="prose">這一層要的只有一句話：<b>觀測到的 alt count 不會剛好落在 <math><msub><mi>θ</mi><mi>mk</mi></msub></math> 上，
+所以要用一個容許波動的分布去問「差這麼多有多不意外」</b>。</p>
+
+<div class="eq"><math display="block"><msub><mi>a</mi><mi>m</mi></msub><mo>∣</mo><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>z</mi><mi>m</mi></msub><mo>=</mo><mi>k</mi><mo>)</mo><mo>∼</mo><mi>BetaBinomial</mi><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>;</mo><msub><mi>α</mi><mi>mk</mi></msub><mo>,</mo><msub><mi>β</mi><mi>mk</mi></msub><mo>)</mo><mo>,</mo><mspace width="2em"/><msub><mi>α</mi><mi>mk</mi></msub><mo>=</mo><msub><mi>θ</mi><mi>mk</mi></msub><msub><mi>κ</mi><mi>m</mi></msub><mo>,</mo><mspace width="1em"/><msub><mi>β</mi><mi>mk</mi></msub><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><msub><mi>θ</mi><mi>mk</mi></msub><mo>)</mo><msub><mi>κ</mi><mi>m</mi></msub></math><p class="eq__note">隨機結果是 alt count <math><msub><mi>a</mi><mi>m</mi></msub></math>；<math><msub><mi>d</mi><mi>m</mi></msub></math> 是已知的試驗次數，<math><msub><mi>θ</mi><mi>mk</mi></msub></math> 控制中心。</p></div>
+
+<details class="reveal reveal--aside">
+<summary>推導補充：beta-binomial 是兩段抽樣積出來的，以及 <math><mi>κ</mi></math> 與 <math><mi>φ</mi></math> 的換算</summary>
+<div class="reveal__a">
 <div class="eq"><math display="block"><msub><mi>π</mi><mi>m</mi></msub><mo>∣</mo><msub><mi>z</mi><mi>m</mi></msub><mo>=</mo><mi>k</mi><mo>∼</mo><mi>Beta</mi><mo>(</mo><msub><mi>α</mi><mi>mk</mi></msub><mo>,</mo><msub><mi>β</mi><mi>mk</mi></msub><mo>)</mo><mo>,</mo><mspace width="2em"/><msub><mi>a</mi><mi>m</mi></msub><mo>∣</mo><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>π</mi><mi>m</mi></msub><mo>)</mo><mo>∼</mo><mi>Binomial</mi><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>π</mi><mi>m</mi></msub><mo>)</mo></math></div>
-
 <p class="prose">白話是先允許這一批分子的真實 alt 比例 <math><msub><mi>π</mi><mi>m</mi></msub></math> 在
-<math><msub><mi>θ</mi><mi>mk</mi></msub></math> 周圍小幅變動，再由 <math><msub><mi>d</mi><mi>m</mi></msub></math> 條 read 抽出 alt count <math><msub><mi>a</mi><mi>m</mi></msub></math>。
-把看不見的 <math><msub><mi>π</mi><mi>m</mi></msub></math> 積分掉，就得到：</p>
-
-<div class="eq"><math display="block"><msub><mi>a</mi><mi>m</mi></msub><mo>∣</mo><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>z</mi><mi>m</mi></msub><mo>=</mo><mi>k</mi><mo>)</mo><mo>∼</mo><mi>BetaBinomial</mi><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>;</mo><msub><mi>α</mi><mi>mk</mi></msub><mo>,</mo><msub><mi>β</mi><mi>mk</mi></msub><mo>)</mo><mo>,</mo><mspace width="2em"/><msub><mi>α</mi><mi>mk</mi></msub><mo>=</mo><msub><mi>θ</mi><mi>mk</mi></msub><msub><mi>κ</mi><mi>m</mi></msub><mo>,</mo><mspace width="1em"/><msub><mi>β</mi><mi>mk</mi></msub><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><msub><mi>θ</mi><mi>mk</mi></msub><mo>)</mo><msub><mi>κ</mi><mi>m</mi></msub></math></div>
-
-<p class="prose">這條式子的隨機結果是 alt count <math><msub><mi>a</mi><mi>m</mi></msub></math>；<math><msub><mi>d</mi><mi>m</mi></msub></math> 是已知的試驗次數。
-<math><msub><mi>θ</mi><mi>mk</mi></msub></math> 控制中心，<math><msub><mi>κ</mi><mi>m</mi></msub></math> 是 Beta 分布的 concentration：越大表示 <math><msub><mi>π</mi><mi>m</mi></msub></math>
-越集中在中心。為了讓「越大越寬」較直觀，本頁改用</p>
-
+<math><msub><mi>θ</mi><mi>mk</mi></msub></math> 周圍小幅變動，再由 <math><msub><mi>d</mi><mi>m</mi></msub></math> 條 read 抽出 alt count <math><msub><mi>a</mi><mi>m</mi></msub></math>；
+把看不見的 <math><msub><mi>π</mi><mi>m</mi></msub></math> 積分掉，就得到上面那條 beta-binomial。</p>
+<p class="prose"><math><msub><mi>κ</mi><mi>m</mi></msub></math> 是 Beta 分布的 concentration：越大表示 <math><msub><mi>π</mi><mi>m</mi></msub></math> 越集中在中心。
+為了讓「越大越寬」較直觀，本頁改用 <math><mi>φ</mi></math>：</p>
 <div class="eq"><math display="block"><msub><mi>φ</mi><mi>m</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><msub><mi>κ</mi><mi>m</mi></msub><mo>+</mo><mn>1</mn></mrow></mfrac><mo>,</mo><mspace width="2em"/><mi>Var</mi><mo>(</mo><msub><mi>a</mi><mi>m</mi></msub><mo>∣</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>z</mi><mi>m</mi></msub><mo>=</mo><mi>k</mi><mo>)</mo><mo>=</mo><msub><mi>d</mi><mi>m</mi></msub><msub><mi>θ</mi><mi>mk</mi></msub><mo>(</mo><mn>1</mn><mo>−</mo><msub><mi>θ</mi><mi>mk</mi></msub><mo>)</mo><mo>[</mo><mn>1</mn><mo>+</mo><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>−</mo><mn>1</mn><mo>)</mo><msub><mi>φ</mi><mi>m</mi></msub><mo>]</mo></math></div>
+</div>
+</details>
 
 <p class="prose">因此 <math><msub><mi>φ</mi><mi>m</mi></msub><mo>=</mo><mn>0</mn></math> 是普通 binomial 的極限；<math><msub><mi>φ</mi><mi>m</mi></msub></math> 越大，同一中心周圍可接受的
-read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作使用
-<math><msub><mi>φ</mi><mi>m</mi></msub><mo>=</mo><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>CN</mi><mi>m</mi></msub><mo>)</mo></math>：在「read depth 分層 × 腫瘤 CN 分層」內用獨立校準資料估計，
+read-count 波動越大。<b>它不是可任意調寬的「峰寬旋鈕」</b> ——
+進模型的是一個先用獨立資料校準好的 <math><mover accent="true"><mi>φ</mi><mo>^</mo></mover><mo>(</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>CN</mi><mi>m</mi></msub><mo>)</mo></math>，不是搜尋時可以順手調大的參數。</p>
+
+<details class="reveal reveal--aside">
+<summary>實作補充：<math><mi>φ</mi></math> 怎麼分層校準，沒資料的格子怎麼辦</summary>
+<div class="reveal__a">
+<p class="prose">在「read depth 分層 × 腫瘤 CN 分層」內用獨立校準資料估計，
 再以平滑或 shrinkage 幫助稀疏 strata。沒有足夠資料的 <math><mo>(</mo><mi>d</mi><mo>,</mo><mi>CN</mi><mo>)</mo></math> 格要標為未知並做敏感度分析，
-不可悄悄套用一個寬峰。</p>
+不可悄悄套用一個寬峰 —— 那等於偷偷把峰調寬，而峰寬與 <math><mi>K</mi></math> 在中篇已證明不可區辨。</p>
+</div>
+</details>
 
 <p class="prose"><b>不要把這裡的 <math><msub><mi>φ</mi><mi>m</mi></msub></math> 與第三節的 <math><msub><mi>τ</mi><mi>u</mi></msub></math> 混在一起。</b>
 <math><msub><mi>φ</mi><mi>m</mi></msub></math> 描述跨獨立變異時單位點 alt count 的額外變異；<math><msub><mi>τ</mi><mi>u</mi></msub></math> 則是多變異連鎖區段內
@@ -14554,8 +14595,11 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 下半先把長條切成沒有交集的兩段，範圍帶之間出現空隙，重複計數消失，權重也就不必存在。</figcaption></figure>
 
 <div class="eq"><math display="block"><mi>P</mi><mo>(</mo><mi>D</mi><mo>∣</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>=</mo><msub><mo>∏</mo><mrow><mi>m</mi><mo>∈</mo><msub><mi>S</mi><mn>1</mn></msub></mrow></msub><msub><mi>P</mi><mi>BB</mi></msub><mo>(</mo><msub><mi>a</mi><mi>m</mi></msub><mo>∣</mo><msub><mi>d</mi><mi>m</mi></msub><mo>,</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo><mo>·</mo><msub><mo>∏</mo><mrow><mi>v</mi><mo>∈</mo><msub><mi>S</mi><mn>2</mn></msub></mrow></msub><msub><mi>P</mi><mi>v</mi></msub><mo>(</mo><msub><mi>D</mi><mi>v</mi></msub><mo>∣</mo><msub><mi>Θ</mi><mi>K</mi></msub><mo>)</mo></math><p class="eq__note">這是 likelihood，<b>不是</b>目標函數 —— 目標函數還要再扣複雜度、再加群數先驗，見下一小節。
-第二個乘積跑在<b>連鎖視窗</b>上，不是跑在單倍型連鎖區段上；理由見下方表格與其後兩段。</p></div>
+第二個乘積跑在<b>連鎖視窗</b>上，不是跑在單倍型連鎖區段上；理由見後面兩小節。</p></div>
 
+<details class="reveal reveal--aside">
+<summary>符號表：<math><msub><mi>S</mi><mn>1</mn></msub></math>、<math><msub><mi>S</mi><mn>2</mn></msub></math>、<math><msub><mi>D</mi><mi>v</mi></msub></math>、<math><mi>u</mi></math>、<math><msub><mi>P</mi><mi>v</mi></msub></math> 在這條式子裡的精確意思</summary>
+<div class="reveal__a">
 <div class="table-wrap">
 <table>
 <thead><tr><th scope="col">符號</th><th scope="col">這裡的精確意思</th></tr></thead>
@@ -14571,6 +14615,8 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 </tbody>
 </table>
 </div>
+</div>
+</details>
 
 <h4 id="sr2b__先講清楚-家族-是什麼">先講清楚「家族」是什麼</h4>
 
@@ -14588,10 +14634,14 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 </table>
 </div>
 
-<p class="prose">叫「家族」而不是直接叫「單倍型」，是因為分組看的是
-<b>germline 那一層</b>：<code>1</code> 與 <code>1-1</code> 屬於<b>同一族</b>，
+<details class="reveal reveal--aside">
+<summary>命名補充：為什麼叫「家族」而不是直接叫「單倍型」</summary>
+<div class="reveal__a">
+<p class="prose">因為分組看的是<b>germline 那一層</b>：<code>1</code> 與 <code>1-1</code> 屬於<b>同一族</b>，
 差別只在後者多帶了 somatic 改變。換句話說，一族＝一條 germline 單倍型
 <b>連同從它長出來的 somatic 分支</b>。</p>
+</div>
+</details>
 
 <aside class="guardrail" id="sr2b__guard-1"><p class="guardrail__hd">重要區分 #1：HP1 與 HP2 不等於父系與母系</p>「兩條同源染色體」很容易被讀成「一條來自父親、一條來自母親」，但<b>軟體分不出來</b>。
 定相只能把 read 分成互不相同的兩組，<b>哪一組來自哪一位親代，要另外定序父母才知道</b>。
@@ -14722,11 +14772,17 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 
 <p class="prose">因此本頁的規格是：<b>資料表依家族分開建立，機率在視窗這一層合併。</b>
 兩條家族的狀態表都由同一組 <math><msub><mi>Θ</mi><mi>K</mi></msub></math> 投影出來，
-再一起通過第二節那個成對的觀測通道，最後合成一個 <math><msub><mi>P</mi><mi>v</mi></msub></math>。
-若實作為了計算成本而選擇逐家族相乘，那是一個
-<b>composite likelihood 近似</b>（把相關的觀測當成獨立來相乘的簡化寫法），
-可以用，但必須<b>如此稱呼</b>並記錄它的偏誤方向 —— 標準與本頁稍後對
+再一起通過第二節那個成對的觀測通道，最後合成一個 <math><msub><mi>P</mi><mi>v</mi></msub></math>。</p>
+
+<details class="reveal reveal--aside">
+<summary>實作補充：若為了計算成本還是逐家族相乘，該怎麼稱呼它</summary>
+<div class="reveal__a">
+<p class="prose">那是一個 <b>composite likelihood 近似</b>（把相關的觀測當成獨立來相乘的簡化寫法），
+可以用，但必須<b>如此稱呼</b>並記錄它的偏誤方向 —— 上表兩列已經寫出方向：
+高估證據量、低估方向的不確定性。標準與本頁稍後對
 「每個遮罩各自一個分布」所立的完全相同。</p>
+</div>
+</details>
 
 <p class="prose">更完整地說，<math><msub><mi>Θ</mi><mi>K</mi></msub></math> 包含細胞比例 <math><mi>w</mi></math>、<span class="term" data-term="clone tree" tabindex="0" role="button" aria-expanded="false" aria-describedby="sr2b__gd-clone-tree-4">clone tree<span class="term__pop" id="sr2b__gd-clone-tree-4" role="tooltip"><b class="term__hd">clone tree <i>克隆演化樹</i></b><span class="term__def" data-lang="zh">描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。</span><span class="term__def" data-lang="en" lang="en">A tree describing ancestral relationships among cell populations in a tumour: nodes are groups of cells sharing a mutation set, edges represent additional mutations acquired on top of an ancestor. Multiple trees are often compatible with the same clusters.</span><a class="term__more" href="glossary.html#clone-tree">完整條目 →</a></span></span> <math><mi>T</mi></math>、
 突變指派 <math><mi>z</mi></math>、逐拷貝基因型 <math><mi>G</mi></math>，以及觀測錯誤參數 <math><mi>e</mi></math>。
@@ -14752,9 +14808,15 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 </div>
 </details>
 
+<details class="reveal reveal--aside">
+<summary>推論選項：把突變指派 <math><mi>z</mi></math> 邊際化掉會改變什麼</summary>
+<div class="reveal__a">
 <p class="prose">本式把 <math><mi>z</mi></math> 當作與其他參數共同最佳化的離散狀態，也就是輸出一組明確的突變指派。
 若實作選擇把 <math><mi>z</mi></math> 邊際化，likelihood 必須改為對所有指派加總，模型選擇的校準也要跟著重做；
-兩種推論方式不可在同一個 <math><mi>Score</mi></math> 裡混用。</p>
+<b>兩種推論方式不可在同一個 <math><mi>Score</mi></math> 裡混用</b>。第七節那張「什麼時候才需要 EM」的表
+講的就是這個選擇的下游後果。</p>
+</div>
+</details>
 
 <p class="prose"><b>成立的關鍵不是「<math><msub><mi>S</mi><mn>1</mn></msub></math> 與 <math><msub><mi>S</mi><mn>2</mn></msub></math> 兩個名字不同」，而是給定
 <math><msub><mi>Θ</mi><mi>K</mi></msub></math> 後，兩者背後的 read 觀測可視為條件獨立且沒有交集。</b>
@@ -14783,20 +14845,32 @@ read-count 波動越大。它不是可任意調寬的「峰寬旋鈕」。實作
 </table>
 </div>
 
-<p class="prose">其中 <math><msub><mi>K</mi><mi>max</mi></msub></math> 是分析前指定的最大候選群數；<math><msub><mi>p</mi><mi>K</mi></msub></math> 是群數固定為 <math><mi>K</mi></math> 時真正被估計的自由參數數目；
-<math><msub><mi>M</mi><mi>eff</mi></msub></math> 是考慮同一突變叢與同一連鎖區段內相關性後的<b>有效獨立資訊量</b>，
-不是把 read 或變異數直接代入；<math><mi>p</mi><mo>(</mo><mi>K</mi><mo>)</mo></math> 是群數先驗。
-先對每個候選 <math><mi>K</mi></math> 找到最佳的 <math><msub><mover accent="true"><mi>Θ</mi><mo>^</mo></mover><mi>K</mi></msub></math>，再比較其分數。
-複雜度項不可省略，因為多開一群幾乎總能改善資料配適，卻可能只是在吸收錯誤。
-<math><msub><mi>M</mi><mi>eff</mi></msub></math> 的定義必須在實作前固定並以模擬或 bootstrap 校準；若做不到，應改用預先指定的
-held-out predictive score，而不是把未校準的 BIC 當成精確答案。</p>
+<p class="prose"><b>複雜度項不可省略</b>，因為多開一群幾乎總能改善資料配適，卻可能只是在吸收錯誤。
+而它扣多少，取決於 <math><msub><mi>M</mi><mi>eff</mi></msub></math> —— 那是考慮同一突變叢與同一連鎖區段內相關性後的
+<b>有效獨立資訊量</b>，不是把 read 或變異數直接代入。<b>這個量估錯，模型選擇就整個歪掉</b>。</p>
 
-<p class="prose">若已有可靠的外部純度估計，作法不是「多固定一個參數」，而是<b>把 <math><msub><mi>w</mi><mn>0</mn></msub></math> 釘住</b>
-（<math><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn><mo>−</mo><mover accent="true"><mi>ρ</mi><mo>^</mo></mover></math>），自由度因而由 <math><mi>K</mi></math> 降為 <math><mi>K</mi><mo>−</mo><mn>1</mn></math>。
-沒有外部估計時 <math><msub><mi>w</mi><mn>0</mn></msub></math> 與其餘比例一起估。
-無論哪一種，都要記得：局部的比值只能定出 <math><mi>c</mi></math> 的<b>相對</b>尺度，
-不能憑空補出純度的絕對尺度 —— 絕對尺度只能來自 <math><msub><mi>S</mi><mn>1</mn></msub></math> 那一批全基因體的單變異觀測，
+<details class="reveal reveal--aside">
+<summary>符號與校準：<math><msub><mi>K</mi><mi>max</mi></msub></math>、<math><msub><mi>p</mi><mi>K</mi></msub></math>、<math><msub><mi>M</mi><mi>eff</mi></msub></math>、<math><mi>p</mi><mo>(</mo><mi>K</mi><mo>)</mo></math> 各是什麼</summary>
+<div class="reveal__a">
+<p class="prose"><math><msub><mi>K</mi><mi>max</mi></msub></math> 是分析前指定的最大候選群數；<math><msub><mi>p</mi><mi>K</mi></msub></math> 是群數固定為 <math><mi>K</mi></math> 時真正被估計的自由參數數目；
+<math><mi>p</mi><mo>(</mo><mi>K</mi><mo>)</mo></math> 是群數先驗。先對每個候選 <math><mi>K</mi></math> 找到最佳的 <math><msub><mover accent="true"><mi>Θ</mi><mo>^</mo></mover><mi>K</mi></msub></math>，再比較其分數。</p>
+<p class="prose"><math><msub><mi>M</mi><mi>eff</mi></msub></math> 的定義必須在實作前固定並以模擬或 bootstrap 校準；若做不到，應改用預先指定的
+held-out predictive score，而不是把未校準的 BIC 當成精確答案。</p>
+</div>
+</details>
+
+<p class="prose">還有一件尺度上的事要先講清楚：<b>局部的比值只能定出 <math><mi>c</mi></math> 的相對尺度，
+不能憑空補出純度的絕對尺度</b> —— 絕對尺度只能來自 <math><msub><mi>S</mi><mn>1</mn></msub></math> 那一批全基因體的單變異觀測，
 或外部的純度估計。</p>
+
+<details class="reveal reveal--aside">
+<summary>實作選項：有可靠的外部純度估計時該怎麼接進來</summary>
+<div class="reveal__a">
+<p class="prose">作法不是「多固定一個參數」，而是<b>把 <math><msub><mi>w</mi><mn>0</mn></msub></math> 釘住</b>
+（<math><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn><mo>−</mo><mover accent="true"><mi>ρ</mi><mo>^</mo></mover></math>），自由度因而由 <math><mi>K</mi></math> 降為 <math><mi>K</mi><mo>−</mo><mn>1</mn></math>。
+沒有外部估計時 <math><msub><mi>w</mi><mn>0</mn></msub></math> 與其餘比例一起估。</p>
+</div>
+</details>
 
 <p class="prose">此處寫的是<b>可實作的統計規格</b>，不是已完成或已驗證的 estimator 程式。
 以下各項定義的目的，是讓後續實作能逐項測試；在合成資料與真實重複資料通過末節所列驗證之前，
@@ -14917,6 +14991,17 @@ held-out predictive score，而不是把未校準的 BIC 當成精確答案。</
 下表逐項列出同一批量；圖要看的是<b>方向與比重</b> —— 中間那一欄只有五個，
 而紅框圈起來的左欄估偏時不會報錯，只會讓中欄安靜地收斂到錯的答案。</figcaption></figure>
 
+<p class="prose">兩個讀法上的要點。<b>其一，真正在搜尋的只有五樣東西</b>：
+群數 <math><mi>K</mi></math>、clone tree <math><mi>T</mi></math>、突變指派 <math><mi>z</mi></math>、逐拷貝基因型 <math><mi>G</mi></math>，
+以及一組 <math><mi>K</mi></math> 個自由度的細胞比例 <math><mi>w</mi></math>。其餘不是算出來的，就是進模型前該備妥的。
+<b>其二，「不自由估」的那幾個才是這個方法的真正風險所在</b> ——
+<math><mi>CN</mi></math>、<math><mi>φ</mi></math>、<math><mi>ε</mi></math>、<math><msub><mi>ξ</mi><mi>v</mi></msub></math>、<math><msub><mi>M</mi><mi>eff</mi></msub></math>
+估偏時模型不會報錯，它會照樣收斂，只是收斂到錯的 <math><mi>K</mi></math> 與錯的樹。
+第四節的錯誤地板與本頁末的問答，講的都是這件事。</p>
+
+<details class="reveal reveal--aside">
+<summary>逐項清單：十五個量各自的類型、來源、是否自由估、不確定度怎麼處理</summary>
+<div class="reveal__a">
 <div class="table-wrap">
 <table>
 <thead><tr>
@@ -14942,14 +15027,8 @@ held-out predictive score，而不是把未校準的 BIC 當成精確答案。</
 </tbody>
 </table>
 </div>
-
-<p class="prose">兩個讀法上的要點。<b>其一，真正在搜尋的只有前五列</b>：
-四個離散結構加一組 <math><mi>K</mi></math> 個自由度的細胞比例。
-其餘不是算出來的，就是進模型前該備妥的。
-<b>其二，「否」那幾列才是這個方法的真正風險所在</b> ——
-<math><mi>CN</mi></math>、<math><mi>φ</mi></math>、<math><mi>ε</mi></math>、<math><msub><mi>ξ</mi><mi>v</mi></msub></math>、<math><msub><mi>M</mi><mi>eff</mi></msub></math>
-估偏時模型不會報錯，它會照樣收斂，只是收斂到錯的 <math><mi>K</mi></math> 與錯的樹。
-第四節的錯誤地板與本頁末的問答，講的都是這件事。</p>
+</div>
+</details>
 
 <p class="prose">因此這個 estimator <b>不是</b>從原始 BAM 無條件地推出 clone tree。
 它吃的是一套已經跑過 variant calling、copy-number calling、定相、單倍型標記
@@ -15288,15 +15367,28 @@ held-out predictive score，而不是把未校準的 BIC 當成精確答案。</
 分母是全部分子數，所以 <math><msub><mo>∑</mo><mrow><mi>g</mi><mo>,</mo><mi>b</mi></mrow></msub><msub><mi>η</mi><mi>ugb</mi></msub><mo>=</mo><mn>1</mn></math>。
 <b>拷貝數在這裡進入，不是事後乘上去的</b>；LOH 時兩條同源染色體不再各佔一半，
 這條式子自動處理。正常細胞是 <math><msub><mi>w</mi><mn>0</mn></msub></math> 那一項，<math><mi>CN</mi><mo>=</mo><mn>2</mn></math>，
-其局部基因型恆為全參考；<math><mi>g</mi></math> 跑遍 <math><mn>0</mn></math> 到 <math><mi>K</mi></math>，且 <math><msubsup><mo>∑</mo><mrow><mi>g</mi><mo>=</mo><mn>0</mn></mrow><mi>K</mi></msubsup><msub><mi>w</mi><mi>g</mi></msub><mo>=</mo><mn>1</mn></math>，
-所以純度是 <math><mi>ρ</mi><mo>=</mo><mn>1</mn><mo>−</mo><msub><mi>w</mi><mn>0</mn></msub></math>。
-<b>這就是第一節說「<math><mi>ρ</mi></math> 不是自由參數」的來源</b>：純度已經包含在細胞組成裡，
-不是事後再乘一次的換算因子。第一節 <math><msub><mi>θ</mi><mi>mk</mi></msub></math> 那條式子裡的 <math><mi>ρ</mi></math> 與 <math><msub><mi>c</mi><mi>k</mi></msub></math>
-也都是從這同一個 <math><mi>w</mi></math> 算出來的，只是在單變異那一層寫成比較眼熟的形式。</p>
+其局部基因型恆為全參考。</p>
 
-<p class="prose">要注意 <math><msub><mi>q</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 是<b>分子</b>比例而非細胞比例，兩者差一個拷貝數因子。
-中篇第五節那條「兩個非參考型的組相除、共同分母消去」的式子，
-就是這裡任取兩格相除的結果 —— 用途三因此不是一條額外的等式約束，它是這個模型的一個推論。</p>
+<details class="reveal reveal--aside">
+<summary>回頭對照：這條式子就是第一節說「<math><mi>ρ</mi></math> 不是自由參數」的來源</summary>
+<div class="reveal__a">
+<p class="prose"><math><mi>g</mi></math> 跑遍 <math><mn>0</mn></math> 到 <math><mi>K</mi></math>，且 <math><msubsup><mo>∑</mo><mrow><mi>g</mi><mo>=</mo><mn>0</mn></mrow><mi>K</mi></msubsup><msub><mi>w</mi><mi>g</mi></msub><mo>=</mo><mn>1</mn></math>，
+所以純度是 <math><mi>ρ</mi><mo>=</mo><mn>1</mn><mo>−</mo><msub><mi>w</mi><mn>0</mn></msub></math> —— 純度已經包含在細胞組成裡，不是事後再乘一次的換算因子。
+第一節 <math><msub><mi>θ</mi><mi>mk</mi></msub></math> 那條式子裡的 <math><mi>ρ</mi></math> 與 <math><msub><mi>c</mi><mi>k</mi></msub></math>
+也都是從這同一個 <math><mi>w</mi></math> 算出來的，只是在單變異那一層寫成比較眼熟的形式。</p>
+</div>
+</details>
+
+<p class="prose">要注意 <math><msub><mi>q</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 是<b>分子</b>比例而非細胞比例，兩者差一個拷貝數因子。</p>
+
+<details class="reveal reveal--aside">
+<summary>與中篇的接點：用途三不是額外的約束，是這個模型的推論</summary>
+<div class="reveal__a">
+<p class="prose">中篇第五節那條「兩個非參考型的組相除、共同分母消去」的式子，
+就是這裡任取兩格相除的結果。
+所以它不是一條要另外加進去的等式約束 —— 寫下 <math><msub><mi>q</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 之後，那條式子自動成立。</p>
+</div>
+</details>
 
 <h4 id="sr2b__覆蓋遮罩-沒覆蓋到的位點要邊際化">覆蓋遮罩：沒覆蓋到的位點要邊際化</h4>
 
@@ -15318,10 +15410,14 @@ held-out predictive score，而不是把未校準的 BIC 當成精確答案。</
 
 <div class="eq"><math display="block"><msub><mi>p</mi><mi>u</mi></msub><mo>∼</mo><mi>Dirichlet</mi><mo>(</mo><msub><mi>τ</mi><mi>u</mi></msub><mo>·</mo><msub><mi>q</mi><mi>u</mi></msub><mo>)</mo><mo>,</mo><mspace width="2em"/><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>M</mi><mi>i</mi></msub><mo>,</mo><msub><mi>p</mi><mi>u</mi></msub><mo>∼</mo><mi>Categorical</mi><mo>(</mo><msub><mi>Proj</mi><msub><mi>M</mi><mi>i</mi></msub></msub><mo>(</mo><msub><mi>p</mi><mi>u</mi></msub><mo>)</mo><mo>)</mo></math></div>
 
-<p class="prose">若改成「每個遮罩各自一個 Dirichlet-multinomial」，
-等於宣稱不同遮罩的 read 來自互相獨立的分子池。那是一個
+<details class="reveal reveal--aside">
+<summary>實作補充：改成「每個遮罩各自一個分布」會怎樣</summary>
+<div class="reveal__a">
+<p class="prose">那等於宣稱不同遮罩的 read 來自互相獨立的分子池。那是一個
 composite likelihood 近似，可以用，但必須<b>如此稱呼</b>，
-而且它會低估同一連鎖區段內部的相關性。</p>
+而且它會低估同一連鎖區段內部的相關性 —— 與前一節「逐家族相乘」是同一類的簡化。</p>
+</div>
+</details>
 
 <h4 id="sr2b__觀測通道-兩種形狀不同的錯誤">觀測通道：兩種形狀不同的錯誤</h4>
 
@@ -15673,15 +15769,23 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
 而非分子抽樣）。<math><msub><mi>τ</mi><mi>u</mi></msub></math> 若要估，也必須跨可比較的連鎖區段分層借力 ——
 一張稀疏的計數表沒有能力同時定出 <math><msub><mi>q</mi><mi>u</mi></msub></math> 與它自己的離散度。</p>
 
-<p class="prose">順帶一提，這也讓中篇用途二的估計方式需要重新檢查。
-用途二以「同一連鎖區段、同一條單倍型上數個變異之間的離散度」量測 <math><mi>φ</mi></math>。
+<details class="reveal reveal--aside">
+<summary>與中篇的接點：同一個理由讓用途二的 <math><mi>φ</mi></math> 量測方式需要重做</summary>
+<div class="reveal__a">
+<p class="prose">用途二以「同一連鎖區段、同一條單倍型上數個變異之間的離散度」量測 <math><mi>φ</mi></math>。
 但若這些變異位於<b>同一批分子</b>上，分子池的偏離是它們<b>共有</b>的，
 在兩者相減時會消去 —— 剩下的只有各自的 read 抽樣與 base error。
 這樣估出來的 <math><mover accent="true"><mi>φ</mi><mo>^</mo></mover></math> 會<b>偏低</b>，而偏低的 <math><mover accent="true"><mi>φ</mi><mo>^</mo></mover></math> 正好把
-<math><mi>K</mi></math> 往上推，方向與這條路線想要的結論相同。
-<math><mi>φ</mi></math> 應改由<b>相距夠遠、分子池獨立</b>的同群變異估計。</p>
+<math><mi>K</mi></math> 往上推，方向與這條路線想要的結論相同 —— 這是一個要主動避開的偏誤。
+<math><mi>φ</mi></math> 應改由<b>相距夠遠、分子池獨立</b>的同群變異估計。本頁末的未解問題有列這一項。</p>
+</div>
+</details>
 
 <h3 id="sr2b__四-三種不同的-沒有">四、三種不同的「沒有」</h3>
+
+<p class="prose">這一節是整份規格裡<b>最容易出事的一節</b>：狀態表上一格是 0，
+可能代表三件完全不同的事，而三者的觀測一模一樣。
+分不開它們，錯誤造出來的少數幾條 read 就會被讀成一個新的 clone。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 604" class="dia-svg" role="img" aria-labelledby="sr2b__sr2b-zero-kinds__title" aria-describedby="sr2b__sr2b-zero-kinds__desc">
   <title id="sr2b__sr2b-zero-kinds__title">一格是空的，有三種完全不同的原因</title>
@@ -15884,6 +15988,10 @@ read 的計數<b>本來就是 multinomial</b>，額外的離散度沒有來源�
 </details>
 
 <h3 id="sr2b__五-分類是輸出-不是輸入">五、分類是輸出，不是輸入</h3>
+
+<p class="prose">現行流程會把每個連鎖區段標成分岔、串接或不相容。
+這些標籤在新寫法下<b>照樣產生，但不再是餵進模型的證據</b> ——
+它們只是狀態表本身的形狀。這一節說明為什麼，以及因此有三個問題直接消失。</p>
 
 <figure class="dia dia--wide"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="dia-svg" role="img" aria-labelledby="sr2b__rg-unit-classes__title" aria-describedby="sr2b__rg-unit-classes__desc">
   <title id="sr2b__rg-unit-classes__title">k＝2 的連鎖區段只會落入三類：串接、分岔、不相容</title>
@@ -16327,9 +16435,13 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 <math><mo>(</mo><mi>w</mi><mo>,</mo><mi>T</mi><mo>,</mo><mi>z</mi><mo>)</mo></math> 產生，相乘即完成合併。
 <b>形狀不同從頭到尾都不是需要處理的問題</b>，而合併也不需要任何對齊步驟。</p>
 
-<p class="prose">最後一項精確度的保留：所謂「唯一」指的是<b>樹的形狀</b>唯一。
-拆出來的兩群頻率相同，所以它們的標號可以<b>整組對調</b>而不影響任何機率 ——
+<details class="reveal reveal--aside">
+<summary>精確度的保留：「唯一解」是指樹的形狀唯一</summary>
+<div class="reveal__a">
+<p class="prose">拆出來的兩群頻率相同，所以它們的標號可以<b>整組對調</b>而不影響任何機率 ——
 編號本就是任意的，這與手動 phasing 練習裡 HP1／HP2 對調也算正確是同一回事。</p>
+</div>
+</details>
 
 <p class="prose">由此導出一條實作規則，與第九節那條互為表裡：
 <b>可以合併的是機率，不是標籤。</b>
@@ -16340,8 +16452,20 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 <h4 id="sr2b__真正的矛盾長什麼樣">真正的矛盾長什麼樣</h4>
 
 <p class="prose">真正的矛盾並非形狀相異，而是<b>整組連鎖區段找不到任何一組
-<math><mo>(</mo><mi>w</mi><mo>,</mo><mi>T</mi><mo>,</mo><mi>z</mi><mo>)</mo></math> 能同時給出夠高的機率</b>。在舊的硬約束寫法下，它會表現為三種無解形式；
-在似然寫法下它不再讓求解器卡住，但<b>仍然是必須報告的診斷量</b>：</p>
+<math><mo>(</mo><mi>w</mi><mo>,</mo><mi>T</mi><mo>,</mo><mi>z</mi><mo>)</mo></math> 能同時給出夠高的機率</b>。
+在似然寫法下它不再讓求解器卡住 —— 因為沒有任何一格的機率是 0，
+求解器會取總機率最大的那組參數，少數異常的連鎖區段被多數蓋過。
+<b>但它仍然是必須報告的診斷量</b>：擬合後各連鎖區段的狀態表與模型預測的差距，
+估計的是整條產線的錯誤率。</p>
+
+<p class="prose">惟此處有一個陷阱：<b>殘差小不代表模型正確。</b>
+系統性偏誤（例如第八節的排序偏誤）會使錯誤<b>彼此一致</b> ——
+它們朝同一方向偏，因而完全不互相矛盾，卻一併使結論偏移。
+殘差只偵測得到隨機錯誤。</p>
+
+<details class="reveal reveal--aside">
+<summary>診斷細節：舊的硬約束寫法下，矛盾會表現成哪三種無解形式</summary>
+<div class="reveal__a">
 
 <div class="table-wrap">
 <table>
@@ -16354,19 +16478,14 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 </table>
 </div>
 
-<p class="prose">處理方式已內建：由於沒有任何一格的機率是 0，
-求解器不會因矛盾而無解，它取總機率最大的那組參數，少數異常的連鎖區段被多數蓋過。
+<p class="prose">三種形式在似然寫法下都不再讓求解器停住，
 此即第四節堅持要有錯誤地板的理由 —— 那個地板同時是「零不代表不可能」與
 「矛盾不會炸掉求解器」這兩件事的來源。</p>
 
-<p class="prose">而<b>殘差本身是一個診斷量</b>：擬合後各連鎖區段的狀態表與模型預測的差距，
-估計的是整條產線的錯誤率，邏輯與以「不相容連鎖區段」估計單倍型標記錯誤率相同，
+<p class="prose">殘差這個診斷量的邏輯，與以「不相容連鎖區段」估計單倍型標記錯誤率相同，
 僅是提升至全域這一層。報告應予載明。</p>
-
-<p class="prose">惟此處有一個陷阱：<b>殘差小不代表模型正確。</b>
-系統性偏誤（例如第八節的排序偏誤）會使錯誤<b>彼此一致</b> ——
-它們朝同一方向偏，因而完全不互相矛盾，卻一併使結論偏移。
-殘差只偵測得到隨機錯誤。</p>
+</div>
+</details>
 
 <h3 id="sr2b__七-推論怎麼跑-外層定結構-內層估比例">七、推論怎麼跑：外層定結構，內層估比例</h3>
 
@@ -16468,13 +16587,17 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 
 <p class="prose">這就是一個 <b>constrained maximum-likelihood 問題</b>：
 在「每項非負、總和為一」這個定義域（一個 simplex）上找最大值。
-「直接解」不是說有閉式解 —— 一般沒有 —— 而是說<b>把目標函數與這兩條限制交給數值最佳化器即可</b>。
-常見做法是投影梯度法、序列二次規劃，或用
-<math><msub><mi>w</mi><mi>g</mi></msub><mo>∝</mo><msup><mi>e</mi><msub><mi>x</mi><mi>g</mi></msub></msup></math> 這類重參數化把限制吸收掉之後改用一般的無限制最佳化器。</p>
+「直接解」不是說有閉式解 —— 一般沒有 —— 而是說<b>把目標函數與這兩條限制交給數值最佳化器即可</b>。</p>
 
 <p class="prose"><b>這裡不需要 EM，也不需要 MCMC。</b>這一點值得說清楚，
 因為看到 likelihood 就想到 EM／MCMC 是很自然的反射，但在這個內層問題上兩者都是殺雞用牛刀：
 五個參數的凸定義域最佳化，數值最佳化器幾毫秒就收斂。</p>
+
+<details class="reveal reveal--aside">
+<summary>方法補充：用哪一種最佳化器，以及什麼時候<b>才</b>真的需要 EM 或 MCMC</summary>
+<div class="reveal__a">
+<p class="prose">常見做法是投影梯度法、序列二次規劃，或用
+<math><msub><mi>w</mi><mi>g</mi></msub><mo>∝</mo><msup><mi>e</mi><msub><mi>x</mi><mi>g</mi></msub></msup></math> 這類重參數化把限制吸收掉之後改用一般的無限制最佳化器。</p>
 
 <div class="table-wrap">
 <table>
@@ -16486,6 +16609,8 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 </tbody>
 </table>
 </div>
+</div>
+</details>
 
 <p class="prose"><b>但有一個必須誠實標註的保留：這個內層問題不保證是凹的。</b>
 定義域確實是凸的，可是 <math><msub><mi>q</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 是 <math><mi>w</mi></math> 的<b>比值</b>函數
@@ -16521,6 +16646,11 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 也是第十二節把它排在最後幾階段的理由。</p>
 
 <h3 id="sr2b__八-現行實作要改的兩處">八、現行實作要改的兩處</h3>
+
+<p class="prose">前面七節寫的是規格。落到現有的程式碼上，
+真正要動的<b>只有兩個地方</b>，而且兩處都是「把資訊留下來」而不是「加一道閘門」：
+<b>其一，覆蓋遮罩不要併掉</b>；<b>其二，候選排序的分數換成似然</b>。
+超立方體列舉、分類輸出、前處理全部沿用。</p>
 
 <h4 id="sr2b__其一-覆蓋遮罩要留下來-而不是併掉">其一：覆蓋遮罩要留下來，而不是併掉</h4>
 
@@ -16660,12 +16790,17 @@ B 與 C 的期望 VAF 完全相同，所以兩種掛法產生<b>一模一樣</b>
 而不是先把部分覆蓋的 read 併進某個完整狀態。
 門檻退居為<b>報告量</b>：收得幾條、各遮罩各有幾條、哪些連鎖區段的證據其實很薄。</p>
 
+<details class="reveal reveal--aside">
+<summary>實作草稿：稀疏列怎麼產生，以及該報告哪三個數字</summary>
+<div class="reveal__a">
 <pre><code>for each unit u:
     for each read r spanning ≥1 site in u:
         emit (u, phase_set, sites(u), mask(r), pattern(r), 1)
     aggregate → sparse rows
 report: 每個遮罩的 read 數、連鎖區段的最大跨越深度、
         以及「若某狀態真佔 5%，這個連鎖區段看得到它的機率」</code></pre>
+</div>
+</details>
 
 <p class="prose">可跨越範圍受限的成因，來自以下三層結構：</p>
 
@@ -16900,14 +17035,20 @@ report: 每個遮罩的 read 數、連鎖區段的最大跨越深度、
 
 <h3 id="sr2b__十-連鎖區段預算">十、連鎖區段預算</h3>
 
-<h4 id="sr2b__兩個-5-的分母不同">兩個 5% 的分母不同</h4>
+<p class="prose">結論先講：在<b>最不利</b>的低突變負荷樣本（5／Mb）上，
+全基因體約產出 <b>369</b> 個同家族的多變異連鎖區段；
+若腫瘤有三群、質量 0.60／0.25／0.15，最稀疏的那一對群仍分到 <b>28</b> 個。
+這個數量看起來很小，但<b>它要回答的是一個是非題</b>（這兩個成分是不是同一個），
+不是要指派一萬五千個點 —— 所以夠用。</p>
 
-<p class="prose">本頁所稱的「5%」為固定寬度視窗的比例：含變異的視窗中，
+<details class="reveal reveal--aside">
+<summary>推導：Poisson 模型下的三個閉式比例，以及「兩個 5%」的分母差異</summary>
+<div class="reveal__a">
+
+<p class="prose">先釐清兩個 5%。本頁所稱的「5%」為固定寬度視窗的比例：含變異的視窗中，
 僅 5% 含有兩個以上的變異。以下推導所用者則為<b>變異</b>的比例，其分母不同 ——
 由於每個多變異視窗至少含兩個變異，「5% 的視窗」對應 <b>9.5% 的變異</b>。
 兩個數字皆正確，但計數的對象不同；<b>可用連鎖區段的產量由後者決定</b>。</p>
-
-<h4 id="sr2b__推導">推導</h4>
 
 <p class="prose">設變異在基因體上依 Poisson 分布。令 λ 為每個固定寬度視窗的期望變異數：每 Mb 5 個、視窗寬 20 kb 時λ ＝ 0.1；基因體 3.1 Gb 切分為 155,000 個固定寬度視窗。
 三個關鍵比例皆為 λ 的閉式函數：</p>
@@ -16925,6 +17066,8 @@ report: 每個遮罩的 read 數、連鎖區段的最大跨越深度、
 </tbody>
 </table>
 </div>
+</div>
+</details>
 
 <p class="prose">依上述模型，若腫瘤含三群、質量分別為 0.60／0.25／0.15，
 則跨第 i 群與第 j 群的連鎖區段數為總數乘以 2w<sub>i</sub>w<sub>j</sub>：</p>
@@ -16952,12 +17095,21 @@ report: 每個遮罩的 read 數、連鎖區段的最大跨越深度、
 低負荷樣本要等到允許非中性區域之後才有足夠的連鎖區段。
 報告須載明各階段實際納入與排除的連鎖區段數。</p>
 
-<p class="prose">另需明確界定<b>配對慣例</b>：上式所計為<b>相鄰</b>位點對；
-若改為視窗內全配對（每個固定寬度視窗<math><mi>C</mi><mo>(</mo><mi>k</mi><mo>,</mo><mn>2</mn><mo>)</mo></math> 對），在低負荷下兩者相近
+<details class="reveal reveal--aside">
+<summary>計數口徑：上表算的是<b>相鄰</b>位點對，不是視窗內全配對</summary>
+<div class="reveal__a">
+<p class="prose">若改為視窗內全配對（每個固定寬度視窗<math><mi>C</mi><mo>(</mo><mi>k</mi><mo>,</mo><mn>2</mn><mo>)</mo></math> 對），在低負荷下兩者相近
 （5／Mb：388 與 375），但在高負荷下顯著分離 —— 50／Mb 時全配對約為 38,750，
-相鄰配對約為 28,500。表列的 24,500 屬相鄰配對。</p>
+相鄰配對約為 28,500。表列的 24,500 屬相鄰配對。
+引用這些數字時要一併說明是哪一種配對。</p>
+</div>
+</details>
 
 <h3 id="sr2b__十一-連鎖視窗寬度-連鎖區段產量與品質的取捨">十一、連鎖視窗寬度：連鎖區段產量與品質的取捨</h3>
+
+<p class="prose">視窗開得寬，收得到的位點多，但多數 read 只覆蓋其中一部分，狀態表變得很稀疏；
+視窗開得窄則相反。<b>結論是兩種都做，因為在似然的寫法下同時用兩種寬度不需要付任何代價</b> ——
+兩批都進同一個乘積，各自的證據量由各自的計數與遮罩決定。</p>
 
 <div class="table-wrap">
 <table>
@@ -17035,9 +17187,7 @@ report: 每個遮罩的 read 數、連鎖區段的最大跨越深度、
 它正是第四節那個錯誤地板 <math><msub><mi>δ</mi><mi>v</mi></msub><msub><mi>r</mi><mrow><mi>u</mi><mo>,</mo><mi>h</mi></mrow></msub></math> 的數值 —— 注意 <math><mi>δ</mi></math> 是地板總量，
 與逐位點錯誤率 <math><mi>ε</mi></math> 是兩個不同的量。</figcaption></figure>
 
-<p class="prose">建議兩種連鎖視窗寬度並行。<b>在似然的寫法下這不需要兩套權重</b>：
-兩批都進同一個乘積，各自的證據量由各自的計數與遮罩決定。
-這是與舊寫法最直接的對照 —— 舊寫法必須替兩批各設一個 <math><msub><mi>ω</mi><mi>r</mi></msub></math>，
+<p class="prose">這是與舊寫法最直接的對照 —— 舊寫法必須替兩批各設一個 <math><msub><mi>ω</mi><mi>r</mi></msub></math>，
 新寫法什麼都不必設。</p>
 
 <h3 id="sr2b__十二-實作分期">十二、實作分期</h3>
@@ -17137,13 +17287,18 @@ report: 每個遮罩的 read 數、連鎖區段的最大跨越深度、
 兩處改寫都是把「先挑一個」換成「全部留著，讓似然決定」。
 右下角標出由此消失的一步：約束的信心值不再需要。</figcaption></figure>
 
-<p class="prose">關於 <math><mi>k</mi></math> 的上限：狀態空間本身<b>不是</b>瓶頸 ——
+<details class="reveal reveal--aside">
+<summary>規模補充：一個視窗最多放幾個變異（<math><mi>k</mi></math> 的上限該由什麼決定）</summary>
+<div class="reveal__a">
+<p class="prose">狀態空間本身<b>不是</b>瓶頸 ——
 <math><msub><mi>k</mi><mi>v</mi></msub><mo>=</mo><mn>6</mn></math> 也只有 64 格，而實際觀測到的樣式遠少於此。
 真正的成本在於局部候選集合與 <math><msub><mi>σ</mi><mi>v</mi></msub></math> 的加總被包在全域取樣的內層。
-所以上限應由<b>候選列舉</b>的成本決定，不是由 <math><msup><mn>2</mn><msub><mi>k</mi><mi>v</mi></msub></msup></math> 決定。
-依第十節的 Poisson 模型，5／Mb 時 <math><mi>k</mi><mo>≤</mo><mn>4</mn></math> 已涵蓋多變異固定寬度視窗的 99.99%，
+所以上限應由<b>候選列舉</b>的成本決定，不是由 <math><msup><mn>2</mn><msub><mi>k</mi><mi>v</mi></msub></msup></math> 決定。</p>
+<p class="prose">依第十節的 Poisson 模型，5／Mb 時 <math><mi>k</mi><mo>≤</mo><mn>4</mn></math> 已涵蓋多變異固定寬度視窗的 99.99%，
 50／Mb 時仍有 98.6%（固定寬度 20 kb 視窗）—— 先做 <math><mi>k</mi><mo>≤</mo><mn>4</mn></math> 幾乎不損失任何資料。
 而 <math><mi>k</mi></math> 特別大的連鎖視窗多半是 kataegis，本來就該降權為一個有效觀測。</p>
+</div>
+</details>
 </section>
 
 
