@@ -100,6 +100,20 @@ html[data-gloss="both"] .term__def[data-lang="en"] {
 .guardrail--info { --gr: var(--accent); --gr-fill: var(--term-bg); }
 .guardrail--info .guardrail__hd::before { content: "ℹ"; }
 
+/* 摺疊版警告框：<details class="guardrail"> ＋ <summary class="guardrail__hd">。
+   可以收起來的是「為什麼」，不是警告本身 —— 標題那一句就是警告，恆常可見。
+   論述密度高的研究指引頁用它，讓主線不被六個展開的方框切斷。 */
+details.guardrail > summary { cursor: pointer; list-style: none; margin-bottom: 0; }
+details.guardrail[open] > summary { margin-bottom: .5em; }
+details.guardrail > summary::-webkit-details-marker { display: none; }
+details.guardrail > summary::after {
+  content: "▸";
+  margin-inline-start: auto;
+  font-weight: 400;
+  opacity: .7;
+}
+details.guardrail[open] > summary::after { content: "▾"; }
+
 /* --- Predict → reveal --------------------------------------------------
    用原生 <details>，關掉 JS 仍可展開；列印時強制展開。 */
 .reveal {

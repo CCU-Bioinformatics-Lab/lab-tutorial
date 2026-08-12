@@ -54,6 +54,8 @@
     font-weight: 400; color: var(--muted); font-size: .9em;
   }
   .reveal--aside > summary::after { content: "（補充說明如下）"; }
+  /* 摺疊版警告框在紙上就是普通警告框，不要留下展開箭頭 */
+  details.guardrail > summary::after { content: "" !important; }
   .quiz__why, .quiz__explain { display: block !important; }
 
   /* 分頁控制 */

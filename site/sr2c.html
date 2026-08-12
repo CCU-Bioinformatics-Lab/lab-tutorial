@@ -239,8 +239,8 @@
 （高於該連鎖區段的錯誤地板），而不是要求兩支之間差得夠開。
 這個限制由後文「候選模型與輸出旗標」的 <code>FLOOR_LIMITED</code> 旗標承接。</p>
 
-<div class="guardrail guardrail--info">
-<p class="guardrail__hd">交付物是「成對關係目錄」，不是幾百棵漂亮的樹</p>
+<details class="guardrail guardrail--info">
+<summary class="guardrail__hd">交付物是「成對關係目錄」，不是幾百棵漂亮的樹；而本頁是規格，不是已驗證的方法</summary>
 <p class="prose">既有實作實測到，<b>七個資料集中有六個，最大的一類是「一個連鎖區段只有兩個變異」</b>
 （完整分布見「輸入與前處理契約」）。所以這條路線的主要產出是<b>全基因體的成對分子關係目錄</b> ——
 這兩個突變共不共存、誰在前 —— 多層的局部系譜是其中的少數。
@@ -248,7 +248,7 @@
 <p class="prose">另外，<b>本頁是規格，不是已驗證的方法</b>（LiLT，工作名稱）。
 文中所有數字都出自既有的原型實作，不是這份規格跑出來的結果 ——
 自己實作時應當重新量一次，不要直接引用。</p>
-</div>
+</details>
 
 <h3 id="頻率譜為什麼看不到某些局部結構">頻率譜為什麼看不到某些局部結構</h3>
 
@@ -1063,8 +1063,8 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 </table>
 </div>
 
-<div class="guardrail">
-<p class="guardrail__hd">局部節點是一類分子狀態，不是一群細胞</p>
+<details class="guardrail">
+<summary class="guardrail__hd">局部節點是一類分子狀態，不是一群細胞</summary>
 <p class="prose">上表的「換算成細胞比例」只是尺度轉換，<b>它不會把節點變成細胞群</b>。
 一個節點只表示「這些分子在 <math><msub><mi>J</mi><mi>u</mi></msub></math> 上帶有同一組突變」。
 兩群基因體其他地方不同、但在這個連鎖視窗內完全相同的細胞，會落進<b>同一個</b>節點。
@@ -1072,7 +1072,7 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 仍可再分出數群甲基化模式。因此節點數的正確讀法恆為「<b>至少</b>此數」。
 反向也不成立：同一群細胞在不同連鎖區段裡對應到不同的局部狀態，
 因為每個連鎖區段看的位點集合不同。</p>
-</div>
+</details>
 
 <h3 id="局部生成模型">局部生成模型</h3>
 
@@ -1796,15 +1796,15 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 </div>
 </details>
 
-<div class="guardrail">
-<p class="guardrail__hd">兩個必須量出來、而不是宣稱掉的邊界</p>
+<details class="guardrail">
+<summary class="guardrail__hd">兩個邊界必須量出來，不能用講的：深度不是嚴格互斥，先驗不是硬約束</summary>
 <p class="prose"><b>其一，深度不是嚴格互斥的。</b>拷貝數分段與純度用的是全基因體深度，
 其中含有 <math><msub><mi>S</mi><mn>2</mn></msub></math> 連鎖視窗的 read。一個 20 kb 尺度的連鎖視窗通常佔其所屬 CN 區段不到 1%，
 所以這個洩漏有界 —— 但界線要實際算出來寫進報告，
 嚴格版本則在 CN 分段時把 <math><msub><mi>S</mi><mn>2</mn></msub></math> 連鎖視窗一併排除，並比較兩者的差異。
 <b>其二，先驗不是硬約束。</b>全域基準的原子若當成 <math><mi>ν</mi></math> 只能取的值，
 局部解析度就歸零了；下面那個逃逸質量存在的唯一理由，就是不讓這件事發生。</p>
-</div>
+</details>
 
 <h4 id="先驗-原子加上逃逸質量">先驗：原子加上逃逸質量</h4>
 
@@ -2311,8 +2311,8 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 沒有更長的後綴，所以<b>後綴不是一條獲得序列</b> ——
 不可以把它讀成「先 1 再加一步」。不認得的標籤一律排除在所有分組之外。</p>
 
-<div class="guardrail">
-<p class="guardrail__hd">HP3 破壞的正是「一個連鎖區段只看得到一條拷貝」</p>
+<details class="guardrail">
+<summary class="guardrail__hd">HP3 破壞的正是「一個連鎖區段只看得到一條拷貝」</summary>
 <p class="prose">估計單位的核心假設是：連鎖區段內部不必處理兩條拷貝的混合。
 <b>HP3 的分子不滿足它</b>，因為它們的體細胞改變兩條都歸不上去。
 三種處理各有代價，必須明選其一並在輸出載明實際被影響的量：
@@ -2321,7 +2321,7 @@ ONT 的實測是 <b>40.5%–98.1%</b>（見「輸入與前處理契約」）。
 <b>當成缺失並在兩個家族之間邊際化</b>（統計上正確，成本最高）。
 既有實作採第一種，但沒有報告被排除的量 —— 沒有那個量，
 <math><mi>ν</mi></math> 的分母就是錯的，而且錯得沒有跡象。</p>
-</div>
+</details>
 
 <h4 id="連鎖視窗不是固定寬度-是讀序連鎖的傳遞閉包">連鎖視窗不是固定寬度，是讀序連鎖的傳遞閉包</h4>
 
@@ -2766,8 +2766,8 @@ Poisson 模型給的單一數字在這裡沒有用：真正該做的是逐樣本
 兩個上限都是這套輸入與這台機器上的<b>工程設定</b>，不是關於 <math><mi>q</mi></math> 的數學結果；
 換一台機器或換一個搜尋順序，數字就會移動，所以它們必須寫進 provenance。</p>
 
-<div class="guardrail">
-<p class="guardrail__hd">撞到上限的連鎖區段要標記並計數，不可以丟掉</p>
+<details class="guardrail">
+<summary class="guardrail__hd">撞到上限的連鎖區段要標記並計數，不可以丟掉</summary>
 <p class="prose">這是既有實作做對、而且值得整條抄過來的一件事：
 撞上限的連鎖區段得到一個明示的棄權標記，<b>而且仍然佔據每一個比例的分母</b>。
 被無聲丟棄的連鎖區段在完全相同的統計量上是隱形的 ——
@@ -2775,7 +2775,7 @@ Poisson 模型給的單一數字在這裡沒有用：真正該做的是逐樣本
 另有一條連帶的紀律：同一份報告至少有兩個分母
 （全部連鎖區段、帶變異的連鎖區段），兩者回答不同的問題，
 任何百分比都必須帶著自己的分母出現。</p>
-</div>
+</details>
 
 <details class="reveal reveal--aside">
 <summary>計數補充：同一個候選底下有幾棵等價的樹，不必抽樣（它沿頂點分解）</summary>
@@ -3050,8 +3050,8 @@ H2009 正是唯一把 <math><mi>k</mi></math> 一路填到上限 12 的資料集
 </div>
 </details>
 
-<div class="guardrail">
-<p class="guardrail__hd">缺席不是零</p>
+<details class="guardrail">
+<summary class="guardrail__hd">缺席不是零</summary>
 <p class="prose">沒有連鎖進任何連鎖視窗的候選就沒有局部系譜特徵群，而<b>那個比例逐樣本由 1.9% 到 59.5%</b>
 （連鎖率的補數）。把缺席欄位填 0 會讓模型學到「0 代表沒有支持」，
 而那正好與「這個位點根本沒有可用的連鎖區段」相反。
@@ -3060,7 +3060,7 @@ H2009 正是唯一把 <math><mi>k</mi></math> 一路填到上限 12 的資料集
 分層報告在這裡不是謹慎，是必要條件：<b>可用比例本身逐樣本就差兩倍以上</b>，
 把 COLO829 那種 98% 與 HCC1395 那種 41% 平均起來，
 一邊的增益與另一邊的傷害會同時消失。</p>
-</div>
+</details>
 
 <h4 id="三種整合方式">三種整合方式</h4>
 
@@ -3548,47 +3548,109 @@ caller 特徵則必須在留一法下，對既有相位通道提供額外的 pre
 
 <h3 id="尚未解決的問題">尚未解決的問題</h3>
 
-<ul class="prose">
-<li><b>整條路線尚未經實測。</b>本頁各項皆有結構性的理由，但都未在真實資料上檢驗。
+<p class="prose">十個問題，每一條都是<b>「目前沒有答案」</b>，不是「還沒寫」。
+標題那一句就是問題本身；展開看的是它為什麼還沒被回答，以及要回答它得先做什麼。
+其中<b>連鎖率為什麼逐樣本差兩倍以上</b>是第一個該回答的 ——
+在弄清楚它之前，無法事先判斷一個新樣本值不值得跑。</p>
+
+<details class="reveal reveal--aside">
+<summary>整條路線尚未經實測。</summary>
+<div class="reveal__a">
+<p class="prose">本頁各項皆有結構性的理由，但都未在真實資料上檢驗。
 最小的驗證是驗收設計中等值 CCF 的合成例子：確認僅用邊際的擬合必然分不開，
-再量需要多少條跨越分子、地板要估得多準才分得開而不誤拆。</li>
-<li><b><math><mi>λ</mi></math> 沒有客觀的訂法。</b>它是這條路線唯一一個靠判斷的旋鈕。
+再量需要多少條跨越分子、地板要估得多準才分得開而不誤拆。</p>
+</div>
+</details>
+
+<details class="reveal reveal--aside">
+<summary><math><mi>λ</mi></math> 沒有客觀的訂法。</summary>
+<div class="reveal__a">
+<p class="prose">它是這條路線唯一一個靠判斷的旋鈕。
 可以掃描與做敏感度分析，但「掃出來最好看的那個值」不是估計。
-是否有辦法由資料本身（例如以留一連鎖區段的預測似然）把它定下來，尚未回答。</li>
-<li><b>全域基準的錯誤會整批傳下去。</b>切斷回饋的代價是局部無法修正全域；
+是否有辦法由資料本身（例如以留一連鎖區段的預測似然）把它定下來，尚未回答。</p>
+</div>
+</details>
+
+<details class="reveal reveal--aside">
+<summary>全域基準的錯誤會整批傳下去。</summary>
+<div class="reveal__a">
+<p class="prose">切斷回饋的代價是局部無法修正全域；
 若全域基準的群數少算一個，所有原子都會偏，而局部只會用逃逸質量吸收，
-表現為 <code>LOCAL_ONLY_LINEAGE</code> 大量出現。這個失效模式的診斷還沒設計。</li>
-<li><b>連鎖率為什麼逐樣本差兩倍以上，沒有人知道。</b>它由 40.5% 到 98.1%，
+表現為 <code>LOCAL_ONLY_LINEAGE</code> 大量出現。這個失效模式的診斷還沒設計。</p>
+</div>
+</details>
+
+<details class="reveal reveal--aside">
+<summary>連鎖率為什麼逐樣本差兩倍以上，沒有人知道。</summary>
+<div class="reveal__a">
+<p class="prose">它由 40.5% 到 98.1%，
 既有實作沒有把它與突變數、突變密度、深度或讀長分布關聯起來，
 而技術重複只解釋得了 5.2 個百分點。
 在弄清楚機制之前，無法事先判斷一個新樣本值不值得跑，
 也無法判斷低連鎖率是生物學（突變稀疏）還是流程（定相破碎、讀長短）造成的 ——
-兩者的補救方式完全不同。這是本規格第一個該回答的經驗問題。</li>
-<li><b>連鎖區段的來源有偏性。</b>它們只來自變異密集的連鎖視窗，
-而密集有時並非偶然（kataegis）。降權規則已寫，但降權的強度沒有依據。</li>
-<li><b>甲基化是一個誘人但被綁住的第四層。</b>既有實作量到，
+兩者的補救方式完全不同。這是本規格第一個該回答的經驗問題。</p>
+</div>
+</details>
+
+<details class="reveal reveal--aside">
+<summary>連鎖區段的來源有偏性。</summary>
+<div class="reveal__a">
+<p class="prose">它們只來自變異密集的連鎖視窗，
+而密集有時並非偶然（kataegis）。降權規則已寫，但降權的強度沒有依據。</p>
+</div>
+</details>
+
+<details class="reveal reveal--aside">
+<summary>甲基化是一個誘人但被綁住的第四層。</summary>
+<div class="reveal__a">
+<p class="prose">既有實作量到，
 在有穩定甲基化差異的位點中，<b>51.2%–80.4%</b> 的差異落在<b>單一單倍型的 ALT read 內部</b> ——
 那正是本規格想分開的地方，所以它看起來是局部系譜特徵群之外的另一條通道。
 但等位特異甲基化以<b>順式</b>作用，因此它與界定連鎖區段的單倍型切分<b>並非獨立</b>：
 一個甲基化分群與 ALT／REF 軸或單倍型軸對齊，機制上本來就會發生，
 不需要任何 lineage 解釋。要把它變成證據，得先有一個能把「順式機制」與
-「lineage 差異」分開的設計，而那個設計目前不存在。</li>
-<li><b>LOH 區域怎麼辦，只有一個保守答案。</b>局部生成模型把非中性區段標記並排除，
+「lineage 差異」分開的設計，而那個設計目前不存在。</p>
+</div>
+</details>
+
+<details class="reveal reveal--aside">
+<summary>LOH 區域怎麼辦，只有一個保守答案。</summary>
+<div class="reveal__a">
+<p class="prose">局部生成模型把非中性區段標記並排除，
 但這在 CN 變異廣泛的實體腫瘤可能排掉一半以上的連鎖區段。
 要放寬就得讓模型表達突變的<b>喪失</b>，而那會破壞四配子相容性
-與「給定狀態集合樹即唯一」這兩個讓局部推論便宜的性質。這個取捨還沒有評估。</li>
-<li><b>與整合篇的關係尚未決定。</b>本規格刻意切斷回饋，整合篇則走完整聯合。
+與「給定狀態集合樹即唯一」這兩個讓局部推論便宜的性質。這個取捨還沒有評估。</p>
+</div>
+</details>
+
+<details class="reveal reveal--aside">
+<summary>與整合篇的關係尚未決定。</summary>
+<div class="reveal__a">
+<p class="prose">本規格刻意切斷回饋，整合篇則走完整聯合。
 兩者不是替代關係，但如果聯合模型可行，本規格的局部後驗應該是它的一個近似 ——
-這個近似有多差，沒有評估。</li>
-<li><b>「首次」尚不可用，而且門檻比原本以為的高。</b>PairClone 與 TreeClone
+這個近似有多差，沒有評估。</p>
+</div>
+</details>
+
+<details class="reveal reveal--aside">
+<summary>「首次」尚不可用，而且門檻比原本以為的高。</summary>
+<div class="reveal__a">
+<p class="prose">PairClone 與 TreeClone
 已經把成對共現與相位寫進全域似然，所以候選新意不能再宣稱在「使用共現」這件事上，
 只能落在「可用位點對多兩個數量級、<math><mi>k</mi></math> 可變、逐連鎖區段交付」這幾點。
-Pairtree、CliP、LICHeE 與任何以 read linkage 輔助 subclone 的後續工作仍待系統檢索。</li>
-<li><b>短讀成對共現的實際產量沒有實測過。</b>開頭那個 0.15%–1.5% 是 Poisson 估計，
+Pairtree、CliP、LICHeE 與任何以 read linkage 輔助 subclone 的後續工作仍待系統檢索。</p>
+</div>
+</details>
+
+<details class="reveal reveal--aside">
+<summary>短讀成對共現的實際產量沒有實測過。</summary>
+<div class="reveal__a">
+<p class="prose">開頭那個 0.15%–1.5% 是 Poisson 估計，
 不是量出來的；PairClone／TreeClone 論文用的資料集實際有幾對可用，
 以及它們在那個產量下對全域結論的改變幅度有多大，會直接決定
-「長讀多兩個數量級」這句話值多少。這是說服審稿人最需要的一個數字，目前沒有。</li>
-</ul>
+「長讀多兩個數量級」這句話值多少。這是說服審稿人最需要的一個數字，目前沒有。</p>
+</div>
+</details>
 
 <h3 id="原始文獻與程式碼">原始文獻與程式碼</h3>
 
