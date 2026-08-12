@@ -626,11 +626,7 @@ window.TW_GLOSSARY = {
   ],
   "slug": "somatic-haplotype",
   "modules": [
-   "m04",
-   "sr1",
-   "sr2",
-   "sr2b",
-   "sr2c"
+   "m04"
   ]
  },
  "somatic haplotagging": {
@@ -1460,6 +1456,24 @@ window.TW_GLOSSARY = {
   "slug": "連鎖視窗",
   "modules": [
    "sr1"
+  ]
+ },
+ "單倍型家族": {
+  "zh_gloss": "一條 germline 單倍型，加上由它衍生的 somatic 單倍型",
+  "zh": "把 read 依 <code>HP</code> tag 分成的兩組之一。<b>家族一</b>是 <code>HP1</code> 與從它長出來的 <code>HP1-1</code>，<b>家族二</b>是 <code>HP2</code> 與 <code>HP2-1</code>；歸不到任何一條 germline 單倍型的 <code>HP3</code> 不屬於任何一族。叫「家族」是因為它把一條 germline 單倍型與由它衍生的 somatic 單倍型收在同一組裡 —— 分組看的是 <b>germline 那一層</b>，不是有沒有帶 somatic 突變。<br><br>在同一個 phase block 內，一個家族對應<b>一條染色體拷貝</b>，所以「兩族」就是那個位置上的兩條同源染色體。但兩件事不成立：<b>其一，軟體判定不出哪一族來自父親、哪一族來自母親</b>（那需要另外定序父母）；<b>其二，標號只在該 phase block 內有定義</b>，跨 block 的「家族一」並非同一條染色體。",
+  "en": "One of the two groups reads are split into by HP tag. Family 1 is HP1 plus the somatic haplotype HP1-1 derived from it; family 2 is HP2 plus HP2-1; HP3, which cannot be assigned to either germline haplotype, belongs to neither. It is called a family because it groups a germline haplotype together with the somatic haplotypes descended from it — the split is by the germline layer, not by whether a read carries a somatic mutation. Within one phase block a family corresponds to one chromosome copy, so the two families are the two homologous chromosomes at that locus. Two things do not follow: which family is paternal cannot be determined without sequencing the parents, and the labels are defined only within that phase block.",
+  "see": [
+   "somatic haplotype",
+   "單倍型連鎖區段",
+   "phase block",
+   "HP tag"
+  ],
+  "slug": "單倍型家族",
+  "modules": [
+   "sr1",
+   "sr2",
+   "sr2b",
+   "sr2c"
   ]
  },
  "單倍型連鎖區段": {

@@ -1,962 +1,973 @@
 {
- "locus": {
-  "zh_gloss": "位點",
-  "zh": "基因體上的一個特定位置。講「這個 locus」時通常指某個座標，例如 <code>chr1:162,404,043</code>。",
-  "en": "A specific position in the genome, usually given as a chromosome and coordinate.",
-  "see": [
-   "allele",
-   "reference genome"
-  ]
- },
- "allele": {
-  "zh_gloss": "等位基因",
-  "zh": "同一個 locus 上可能出現的其中一種序列版本。在一般二倍體常染色體位點，個體通常有兩份 allele；性染色體、拷貝數變化與腫瘤基因體可能不符合這個簡化模型。",
-  "en": "One of the alternative sequence versions at a locus. At a typical diploid autosomal locus, an individual has two allele copies; sex chromosomes, copy-number changes and tumour genomes may differ.",
-  "long_zh": "同一個 locus 上可能出現的其中一種序列版本。在一般二倍體常染色體位點，個體通常有兩份 allele；性染色體、拷貝數變化與腫瘤基因體可能不符合這個簡化模型。<br><br>在 VCF 裡 allele 被編號：<code>0</code> 是 reference allele，<code>1</code> 是第一個 alternate allele，以此類推。因此，在一般二倍體位點，genotype <code>0/1</code> 表示一份 reference allele 與一份 alternate allele；<code>0|1</code> 則進一步標示相位。",
-  "see": [
-   "genotype",
-   "heterozygous",
-   "reference genome"
-  ]
- },
- "genotype": {
-  "zh_gloss": "基因型",
-  "zh": "某個 locus 上觀察到的 allele 組合；對一般二倍體常染色體位點，通常是兩份 allele。VCF 裡寫成 <code>0/1</code>（未定相）或 <code>0|1</code>（已定相）。",
-  "en": "The allele combination observed at a locus. At a typical diploid autosomal locus it has two copies; VCF writes these as 0/1 (unphased) or 0|1 (phased).",
-  "long_zh": "某個 locus 上觀察到的 allele 組合。<br><br>對一般二倍體常染色體位點，<code>0/1</code> 表示一份 ref 與一份 alt，但未指定其 haplotype；<code>0|1</code> 則表示已推定相位。性染色體、拷貝數變化與腫瘤基因體可能有不同倍性或更多拷貝，因此不應把「兩份 allele」當成所有情境的規則。",
-  "see": [
-   "allele",
-   "phasing",
-   "haplotype"
-  ]
- },
- "haplotype": {
-  "zh_gloss": "單倍型",
-  "zh": "同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。",
-  "en": "A set of variants that lie on the same physical chromosome copy and are inherited together.",
-  "long_zh": "同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。<br><br>兩個 variant 若在同一條 haplotype 上，稱為 <b>cis</b>；分在兩條上則稱為 <b>trans</b>。此差異可能影響生物學解讀或治療決策，需依特定變異與臨床情境判定。<br><br><b>注意：</b>HP1 與 HP2 本身不代表父系或母系。沒有親本或其他方向證據時，它們是局部一致、方向任意的編號。",
-  "aka": [
-   "hap",
-   "HP"
-  ],
-  "see": [
-   "phasing",
-   "cis",
-   "trans",
-   "PS tag"
-  ]
- },
- "diploid": {
-  "zh_gloss": "二倍體",
-  "zh": "正常人多數常染色體區段通常有兩份拷貝的狀態；性染色體、拷貝數變化與腫瘤細胞可能不同。",
-  "en": "A state in which a typical autosomal locus has two copies. Sex chromosomes, copy-number-altered regions and tumour cells may differ.",
-  "see": [
-   "ploidy",
-   "aneuploidy"
-  ]
- },
- "heterozygous": {
-  "zh_gloss": "異型合子",
-  "zh": "在一般二倍體位點上，兩份 allele 不同（例如一份 A、一份 G）。此類位點可作為區分 haplotype 的資訊錨點；複雜拷貝數情況需另行解讀。",
-  "en": "At a typical diploid locus, carrying two different allele copies (for example A and G). These sites can anchor phasing; copy-number changes require separate interpretation.",
-  "aka": [
-   "het"
-  ],
-  "see": [
-   "homozygous",
-   "phasing"
-  ]
- },
- "homozygous": {
-  "zh_gloss": "同型合子",
-  "zh": "在一般二倍體位點上，兩份 allele 相同。此位點本身通常無法用來區分兩條 haplotype。",
-  "en": "At a typical diploid locus, carrying two identical allele copies. The site itself usually cannot distinguish haplotypes.",
-  "aka": [
-   "hom"
-  ],
-  "see": [
-   "heterozygous"
-  ]
- },
- "SNP": {
-  "zh_gloss": "單核苷酸多型性",
-  "zh": "族群中以多型形式存在的單一鹼基差異；本教材主要以可作為 phasing 錨點的 germline SNP 為例。",
-  "en": "A single-nucleotide polymorphism observed as a population variant. This tutorial mainly uses germline SNPs as phasing anchors.",
-  "see": [
-   "SNV",
-   "germline variant"
-  ]
- },
- "SNV": {
-  "zh_gloss": "單核苷酸變異",
-  "zh": "單一鹼基的改變。與 SNP 的差別在於 SNV 不預設它在族群中常見 —— 腫瘤裡新產生的單點突變叫 somatic SNV（sSNV），不叫 SNP。",
-  "en": "A single-nucleotide change. Unlike SNP, it carries no implication of population frequency; new tumour mutations are sSNVs.",
-  "aka": [
-   "sSNV"
-  ],
-  "see": [
-   "SNP",
-   "somatic variant",
-   "indel"
-  ]
- },
- "indel": {
-  "zh_gloss": "插入／缺失",
-  "zh": "短的插入（insertion）或缺失（deletion）。在 nanopore 資料上通常比 SNV 更難可靠判讀，因為 homopolymer 與 alignment 位置漂移都可能製造假訊號。",
-  "en": "A short insertion or deletion. It is often harder to call reliably than an SNV in nanopore data because of homopolymers and alignment ambiguity.",
-  "see": [
-   "homopolymer",
-   "CIGAR"
-  ]
- },
- "germline variant": {
-  "zh_gloss": "生殖系變異",
-  "zh": "在生殖系形成、通常存在於多數細胞的變異；可遺傳給子代，但不代表必然傳遞。",
-  "en": "A variant arising in the germline and therefore present in essentially every cell of the individual. It may be inherited or arise de novo, and may be passed to offspring.",
-  "see": [
-   "somatic variant",
-   "SNP"
-  ]
- },
- "somatic variant": {
-  "zh_gloss": "體細胞變異",
-  "zh": "在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。",
-  "en": "A variant acquired outside the germline, usually after conception. It may be restricted to a subset of cells and is generally not passed to offspring; it is a central focus of cancer genomics.",
-  "aka": [
-   "sSNV",
-   "somatic mutation"
-  ],
-  "see": [
-   "germline variant",
-   "clone"
-  ]
- },
- "clone": {
-  "zh_gloss": "克隆",
-  "zh": "源自共同祖先細胞，並共享一組可辨識 somatic mutations 的細胞群。",
-  "en": "A population of tumour cells descended from a common ancestor and sharing the same set of somatic mutations.",
-  "see": [
-   "subclone",
-   "intratumour heterogeneity"
-  ]
- },
- "subclone": {
-  "zh_gloss": "次克隆",
-  "zh": "clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。",
-  "en": "A subset of a clone that acquired further mutations and expanded. Treatment-resistant populations are often subclones.",
-  "see": [
-   "clone",
-   "intratumour heterogeneity"
-  ]
- },
- "intratumour heterogeneity": {
-  "zh_gloss": "腫瘤內異質性",
-  "zh": "同一腫瘤內不同細胞可帶有不同突變組合，因而同時存在多種基因型。",
-  "en": "Different cells within one tumour carrying different mutation combinations.",
-  "see": [
-   "clone",
-   "subclone"
-  ]
- },
- "driver mutation": {
-  "zh_gloss": "驅動突變",
-  "zh": "可提升腫瘤細胞生長或存活優勢的候選變異；passenger mutation 通常不具有已知的選擇優勢。",
-  "en": "A mutation that confers a growth advantage, as opposed to the far more numerous passenger mutations.",
-  "see": [
-   "somatic variant"
-  ]
- },
- "long read": {
-  "zh_gloss": "長讀",
-  "zh": "單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。",
-  "en": "A sequencing read thousands to tens of thousands of bases long. Its length lets one molecule link multiple variants directly.",
-  "see": [
-   "ONT",
-   "phasing",
-   "read"
-  ]
- },
- "read": {
-  "zh": "定序儀產生的一段序列觀測。一條 read 通常來自一個 DNA 分子的片段，但不等同於一個細胞；仍需考慮重複、嵌合與定序錯誤。",
-  "en": "A sequence observation produced by the sequencer, usually a fragment from one DNA molecule. A read is molecular evidence, not a cell; duplicates, chimeras and sequencing errors still need to be considered.",
-  "see": [
-   "long read",
-   "coverage"
-  ]
- },
- "ONT": {
-  "zh_gloss": "奈米孔定序",
-  "zh": "Oxford Nanopore Technologies。以電流訊號讀取 DNA，可產生長 read；在 native-DNA 流程與適當模型下，可由訊號推定 5mC，通常不需 bisulfite 轉換。",
-  "en": "Oxford Nanopore Technologies. Reads DNA through ionic-current signals, producing long reads. With native DNA and a suitable model, 5mC can be inferred without bisulfite conversion.",
-  "see": [
-   "long read",
-   "5mC",
-   "basecalling"
-  ]
- },
- "basecalling": {
-  "zh_gloss": "鹼基判讀",
-  "zh": "把定序儀的原始訊號（ONT 是電流）轉成 A/C/G/T 字母的步驟。不同 basecaller 版本會產生不同的錯誤特性 —— 所以「同一個細胞株、不同 basecaller」是兩份不同的資料集。",
-  "en": "Converting raw sequencer signal into A/C/G/T. Different basecallers yield different error profiles.",
-  "see": [
-   "ONT",
-   "provenance"
-  ]
- },
- "coverage": {
-  "zh_gloss": "覆蓋度／深度",
-  "zh": "某個位置被多少條 read 覆蓋。50× 表示平均每個位置約有 50 條 read 覆蓋，不代表它們均支持同一 allele。",
-  "en": "How many reads span a position. 50x means on average 50 reads per position.",
-  "aka": [
-   "depth"
-  ],
-  "see": [
-   "read",
-   "VAF"
-  ]
- },
- "VAF": {
-  "zh_gloss": "變異等位基因頻率",
-  "zh": "在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。",
-  "en": "Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.",
-  "long_zh": "在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<br><br><b>最常見的誤解是把 VAF 當成「有多少比例的細胞帶這個突變」。</b>實際上還受到 tumor purity、該位置的 local copy number、mutation multiplicity 與 mapping bias 影響。理想的 diploid、單一拷貝突變情況下：<br>{{m: VAF = purity × multiplicity / \\text{total copy number}}}<br>所以 purity 0.4、diploid、單拷貝時 VAF 只有 0.2。",
-  "aka": [
-   "allele fraction"
-  ],
-  "see": [
-   "tumour purity",
-   "copy number",
-   "mutation multiplicity",
-   "cancer cell fraction"
-  ]
- },
- "homopolymer": {
-  "zh_gloss": "同聚物",
-  "zh": "同一個鹼基連續重複的區段，例如 <code>AAAAAA</code>。nanopore 在此類區段較容易發生長度判讀錯誤，是 indel 假陽性的常見來源之一。",
-  "en": "A run of identical bases. Nanopore miscounts their length, a major source of false indel calls.",
-  "see": [
-   "indel"
-  ]
- },
- "5mC": {
-  "zh_gloss": "5-甲基胞嘧啶",
-  "zh": "胞嘧啶第 5 個碳上的甲基化修飾。這是常見的 DNA 甲基化形式，主要見於 CpG；可影響轉錄調控，效應依基因組位置與細胞類型而異。",
-  "en": "5-methylcytosine, the commonest DNA methylation mark, usually at CpG sites. Affects expression without changing sequence.",
-  "see": [
-   "CpG",
-   "MM/ML tag"
-  ]
- },
- "CpG": {
-  "zh": "序列上一個 C 後接一個 G（p 代表兩者之間的磷酸鍵）。哺乳類多數 5mC 位於 CpG，特定細胞或情況亦可見非 CpG 甲基化。",
-  "en": "A cytosine followed by a guanine. Most mammalian 5mC occurs at CpG sites, although non-CpG methylation is also observed in particular cells and contexts.",
-  "see": [
-   "5mC"
-  ]
- },
- "MM/ML tag": {
-  "zh": "BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。",
-  "en": "BAM tags carrying per-read methylation calls: MM for positions, ML for probabilities. Easily lost during processing.",
-  "see": [
-   "5mC",
-   "BAM"
-  ]
- },
- "reference genome": {
-  "zh_gloss": "參考基因體",
-  "zh": "用於比對的標準序列（人類資料常用 GRCh38）。所有座標均相對於指定版本；更換 build 會改變座標系，座標不可直接比較。",
-  "en": "The standard sequence everything is aligned to. All coordinates are relative to it, so changing build changes coordinates.",
-  "see": [
-   "locus",
-   "BAM"
-  ]
- },
- "FASTA": {
-  "zh": "以文字保存 DNA 或 RNA 序列的格式；在本模組中，FASTA 主要用來提供比對所需的參考基因體序列。",
-  "en": "A text format for DNA or RNA sequences; here it mainly supplies the reference genome used for alignment.",
-  "see": [
-   "reference genome",
-   "FASTQ"
-  ]
- },
- "FASTQ": {
-  "zh": "存放 read 序列與每個鹼基品質分數的文字格式；每筆紀錄由四行組成。",
-  "en": "Text format holding read sequences plus per-base quality scores; four lines per record.",
-  "see": [
-   "BAM"
-  ]
- },
- "BAM": {
-  "zh": "已比對到參考基因體的 read 的二進位格式（SAM 的壓縮版）。每一列是一條 read，帶著它的位置、CIGAR、品質與各種 tag。",
-  "en": "Binary format for reads aligned to the reference. One record per read, carrying position, CIGAR, quality and tags.",
-  "aka": [
-   "SAM",
-   "CRAM"
-  ],
-  "see": [
-   "CIGAR",
-   "HP tag",
-   "MM/ML tag"
-  ]
- },
- "CIGAR": {
-  "zh": "描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。",
-  "en": "A compact string describing how read bases and reference positions are consumed by an alignment. For example, 5M1I5M has five alignment columns, one insertion, then five alignment columns; M may contain matches or mismatches.",
-  "long_zh": "描述一條 read 如何對上參考基因體的緊湊字串。<br><br>常見操作碼：<code>M</code> 消耗一個 read 鹼基與一個參考鹼基，表示對齊欄位，但可能吻合也可能錯配；<code>=</code> 是精確吻合；<code>X</code> 是明確錯配（若流程輸出這兩種操作）；<code>I</code> 表示 read 相對於參考序列的插入；<code>D</code> 表示 read 相對於參考序列的缺失；<code>S</code> 是 soft clip（read 有這段但未對上，序列仍保留）；<code>H</code> 是 hard clip（序列不保留在該 alignment record）；<code>N</code> 跳過參考序列區段。<br><br>例：<code>5M1I5M</code> = 5 個對齊欄位、1 個插入、再 5 個對齊欄位。若要判斷 <code>M</code> 中的實際鹼基是否吻合，需查看 read 序列、參考序列或 <code>MD</code> tag，不能只看 CIGAR。<br><br>LongPhase-TO 偵測 CNV/BFB 區間就是靠統計 soft clip（<code>S</code>）出現的位置 —— 見 M13。",
-  "see": [
-   "BAM",
-   "soft clipping",
-   "indel"
-  ]
- },
- "soft clipping": {
-  "zh": "read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。",
-  "en": "A read end that failed to align but is retained in the BAM (CIGAR S). Clipping clustered at one position may suggest a structural breakpoint and needs corroborating evidence.",
-  "see": [
-   "CIGAR",
-   "BFB"
-  ]
- },
- "VCF": {
-  "zh": "存放 variant 的文字格式。每一列是一個位點，記錄位置、ref/alt allele、品質、FILTER 與各種 FORMAT 欄位。",
-  "en": "Text format for variants: one line per site with position, ref/alt alleles, quality, FILTER and FORMAT fields.",
-  "see": [
-   "genotype",
-   "PS tag"
-  ]
- },
- "PS tag": {
-  "zh_gloss": "phase set",
-  "zh": "標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。",
-  "en": "Phase set identifier grouping variants phased together. Haplotype orientation is only consistent within one PS.",
-  "aka": [
-   "PS",
-   "phase set"
-  ],
-  "see": [
-   "phasing",
-   "haplotype"
-  ]
- },
- "HP tag": {
-  "zh": "BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。",
-  "en": "BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.",
-  "see": [
-   "haplotagging",
-   "somatic haplotype"
-  ]
- },
- "phasing": {
-  "zh_gloss": "定相",
-  "zh": "為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。",
-  "en": "Determining which variants lie on the same physical chromosome, turning 0/1 into 0|1. Long reads provide direct molecular evidence.",
-  "see": [
-   "haplotype",
-   "PS tag",
-   "haplotagging",
-   "cis"
-  ]
- },
- "cis": {
-  "zh": "兩個 variants 在<b>同一條</b> haplotype 上。",
-  "en": "Two variants on the same haplotype.",
-  "see": [
-   "trans",
-   "phasing"
-  ]
- },
- "trans": {
-  "zh": "兩個 variants 分別在<b>兩條不同</b>的 haplotype 上。",
-  "en": "Two variants on opposite haplotypes.",
-  "see": [
-   "cis",
-   "phasing"
-  ]
- },
- "phase block": {
-  "zh": "一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。",
-  "en": "A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.",
-  "see": [
-   "PS tag",
-   "switch error"
-  ]
- },
- "switch error": {
-  "zh": "phasing 結果自某一位置起將兩條 haplotype 的方向對調，是常見的 phasing 錯誤類型。",
-  "en": "A phasing error in which the two haplotype labels swap from some point onward; a common phasing error mode.",
-  "see": [
-   "phasing",
-   "phase block"
-  ]
- },
- "haplotagging": {
-  "zh": "根據已 phase 好的 variants，把每一條 read 指派到 HP1 或 HP2，並把結果寫回 BAM 的 <code>HP</code> tag。",
-  "en": "Assigning each read to HP1 or HP2 using phased variants, and writing the result back as a BAM HP tag.",
-  "see": [
-   "HP tag",
-   "phasing",
-   "somatic haplotagging"
-  ]
- },
- "somatic haplotype": {
-  "zh": "在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。",
-  "en": "A sub-level beneath the germline haplotype: HP1-1 and HP2-1 carry somatic mutations derived from HP1 and HP2; HP3 is unassignable.",
-  "see": [
-   "haplotype",
-   "somatic haplotagging",
-   "HP tag"
-  ]
- },
- "somatic haplotagging": {
-  "zh": "把帶有 somatic 突變的 read 指派到它們源自的 germline haplotype。這是 LongPhase-S 的核心產出。",
-  "en": "Assigning somatic-mutation-bearing reads to the germline haplotype they arose from. The core output of LongPhase-S.",
-  "see": [
-   "somatic haplotype",
-   "LongPhase-S"
-  ]
- },
- "variant calling": {
-  "zh": "從已比對 read 中判斷哪些位置具有足夠證據支持變異存在的過程，通常輸出 VCF。",
-  "en": "Deciding which positions genuinely carry variants, given aligned reads. Outputs a VCF.",
-  "see": [
-   "VCF",
-   "candidate"
-  ]
- },
- "candidate": {
-  "zh_gloss": "候選變異",
-  "zh": "caller 提出、但尚未被確認的變異位點。本實驗室多數工具位於 caller 之後，進行<b>再校正</b>，處理的就是這些 candidates。",
-  "en": "A proposed but unconfirmed variant. Most tools in this lab post-process the caller's candidate set.",
-  "see": [
-   "variant calling",
-   "recalibration"
-  ]
- },
- "recalibration": {
-  "zh_gloss": "再校正",
-  "zh": "以額外證據重新評估 caller 已輸出的 candidates。若僅處理既有候選，可移除 false positives，但不能恢復 caller 未輸出的變異。",
-  "en": "Re-judging a caller's candidates with extra evidence. When the candidate set is fixed, it can remove false positives but cannot recover variants the caller never emitted.",
-  "see": [
-   "candidate",
-   "precision",
-   "recall"
-  ]
- },
- "Clair3": {
-  "zh": "以深度學習做 germline variant calling 的工具，長 read 上常用。",
-  "en": "A deep-learning germline variant caller widely used for long reads.",
-  "see": [
-   "variant calling",
-   "DeepVariant"
-  ]
- },
- "DeepVariant": {
-  "zh": "Google 開發的 germline variant caller，把 pileup 轉成影像再用 CNN 分類。",
-  "en": "Google's germline variant caller; encodes pileups as images and classifies them with a CNN.",
-  "see": [
-   "Clair3",
-   "variant calling"
-  ]
- },
- "ClairS": {
-  "zh": "配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。",
-  "en": "A somatic variant caller for matched tumour–normal data; ClairS-TO is the tumour-only version.",
-  "see": [
-   "DeepSomatic",
-   "tumour-normal",
-   "tumour-only"
-  ]
- },
- "DeepSomatic": {
-  "zh": "Google 的 somatic variant caller，同樣有 tumor-only 版本。",
-  "en": "Google's somatic variant caller, also available in a tumour-only mode.",
-  "see": [
-   "ClairS",
-   "somatic variant"
-  ]
- },
- "tumour-normal": {
-  "zh_gloss": "配對腫瘤／正常",
-  "zh": "同時定序病人的腫瘤與正常組織；正常樣本提供個體 germline 背景，有助於辨識 somatic 候選。",
-  "en": "Sequencing a patient's tumour alongside their normal tissue, which supplies the germline background.",
-  "aka": [
-   "TN",
-   "matched normal"
-  ],
-  "see": [
-   "tumour-only",
-   "TINC"
-  ]
- },
- "tumour-only": {
-  "zh_gloss": "僅腫瘤",
-  "zh": "只有腫瘤樣本、沒有配對正常樣本。在成本或檢體受限時很常見，但少了 germline 對照，分析難度會大幅提高。",
-  "en": "Having only the tumour sample. Common for cost or specimen reasons, but much harder without a germline baseline.",
-  "aka": [
-   "TO"
-  ],
-  "see": [
-   "tumour-normal",
-   "PON"
-  ]
- },
- "PON": {
-  "zh_gloss": "正常樣本面板／族群資料庫（依流程而異）",
-  "zh": "PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。",
-  "en": "The abbreviation is workflow-dependent and the two uses are not interchangeable. In this tutorial's tumour-only workflows, PON denotes a population germline database set; in GATK Mutect2, a Panel of Normals (PoN) is built from multiple normal samples to flag recurrent technical artifacts. Either can miss a private germline variant or an unseen artifact, so neither replaces a patient's matched normal.",
-  "long_zh": "<b>同一縮寫的兩種用法：</b><br>· 本教材在 LongPhase-TO、ClairS-TO 情境中特別稱為 <b>population germline database set</b>：1000G、CoLoRSdb、dbSNP、gnomAD 等族群資料庫的聯集，用於標記族群中常見的遺傳變異。<br>· GATK Mutect2 的 <b>Panel of Normals</b>（PoN）：由多個正常樣本建立的 recurrent-artifact panel，用於辨識反覆出現的技術性訊號。<br><br>兩者均可能漏掉某個病人的私有 germline 變異或尚未見過的 artifact，因此都不能取代同一病人的 matched normal。matched normal 提供的是個體層級的直接對照；PON 只能提供族群背景或跨樣本的技術性背景。",
-  "aka": [
-   "Panel of Normals",
-   "PoN"
-  ],
-  "see": [
-   "tumour-only",
-   "germline variant"
-  ]
- },
- "TINC": {
-  "zh_gloss": "腫瘤污染正常樣本",
-  "zh": "Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。",
-  "en": "Tumour-in-normal contamination: tumour cells present in the matched normal, causing true somatic variants to produce signal there as well.",
-  "see": [
-   "tumour-normal",
-   "somatic variant"
-  ]
- },
- "tumour purity": {
-  "zh_gloss": "腫瘤純度",
-  "zh": "樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。",
-  "en": "The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.",
-  "long_zh": "樣本中腫瘤<b>細胞</b>所佔的比例。<br><br>注意它跟 <b>tumor DNA fraction</b>（腫瘤來源 DNA 的比例）不是同一件事：一個腫瘤細胞若含有比正常細胞多的 DNA（aneuploidy 或 whole-genome duplication），它在分子層貢獻的份量就大於它在細胞層佔的份量，兩個數字因此分開。換算式為 {{m: f = pκ/(pκ + 2(1 − p))}}，只有倍體 {{m: κ = 2}} 時兩者相等。<br><br>常見的誤解是「用 BAM 依覆蓋度混出來的合成樣本裡兩者恰好相等」。<b>不成立</b>：混合控制的是 read 數，也就是 {{m: f}}；來源腫瘤細胞株若非二倍體，同一份樣本的細胞比例低於標示值。以標示 0.2、來源 {{m: κ = 3.2}} 為例，{{m: p}} 只有 0.135。",
-  "aka": [
-   "purity"
-  ],
-  "see": [
-   "tumour DNA fraction",
-   "VAF",
-   "ploidy"
-  ]
- },
- "tumour DNA fraction": {
-  "zh_gloss": "腫瘤 DNA 比例",
-  "zh": "樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。",
-  "en": "The fraction of DNA originating from tumour cells; diverges from cellular purity under aneuploidy or WGD.",
-  "aka": [
-   "DNA fraction"
-  ],
-  "see": [
-   "tumour purity",
-   "ploidy"
-  ],
-  "long_zh": "樣本 DNA 中源自腫瘤的比例，分母是<b>分子</b>而非細胞。<br><br>凡是依 read 數混合而得的合成樣本，其已知的比例就是這個量；凡是以「支持 read 大概會有幾條」為用途的下游步驟（過濾門檻、偵測極限），需要的也是這個量。<br><br><b>LongPhase-S 的 <code>estimate_purity</code> 輸出的是這個量</b>，儘管子指令、參數 <code>--tumor-purity</code> 與輸出欄位 <code>Tumor purity:</code> 都寫 purity。理由是它的迴歸標籤是混合比例，且模型中沒有倍體參數，因此無從換算成細胞比例。"
- },
- "cancer cell fraction": {
-  "zh_gloss": "癌細胞比例",
-  "zh": "帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（{{m: ≈ 1}}）與 subclonal（{{m: < 1}}）突變。<b>不等於 VAF。</b>",
-  "en": "The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.",
-  "aka": [
-   "CCF"
-  ],
-  "see": [
-   "VAF",
-   "subclone",
-   "mutation multiplicity"
-  ]
- },
- "ploidy": {
-  "zh_gloss": "倍性",
-  "zh": "細胞內染色體套數。多數正常常染色體為 2（diploid）；腫瘤可呈現 3、4 或其他非整倍體狀態。",
-  "en": "The number of chromosome sets in a cell. Most normal autosomal regions are diploid (2); tumours may be triploid, tetraploid or otherwise non-diploid.",
-  "see": [
-   "diploid",
-   "aneuploidy",
-   "copy number"
-  ]
- },
- "aneuploidy": {
-  "zh_gloss": "非整倍體",
-  "zh": "染色體數目異常。腫瘤裡非常普遍，也可能使 cellular purity 與 DNA fraction 不一致。",
-  "en": "An abnormal chromosome count. It is common in tumours and can make cellular purity differ from tumour DNA fraction.",
-  "see": [
-   "ploidy",
-   "tumour purity"
-  ]
- },
- "copy number": {
-  "zh_gloss": "拷貝數",
-  "zh": "某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。",
-  "en": "How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.",
-  "aka": [
-   "CNV",
-   "SCNA"
-  ],
-  "see": [
-   "LOH",
-   "ploidy",
-   "VAF"
-  ]
- },
- "mutation multiplicity": {
-  "zh": "在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。",
-  "en": "How many mutant-allele copies are present in a cell carrying the mutation; a necessary term when converting VAF to cancer cell fraction.",
-  "see": [
-   "VAF",
-   "cancer cell fraction",
-   "copy number"
-  ]
- },
- "LOH": {
-  "zh_gloss": "異型合子性喪失",
-  "zh": "原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。",
-  "en": "Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.",
-  "long_zh": "原本 heterozygous 的區域只保留一種 allele。<br><br><b>兩種常見機制：</b><br>· <b>Copy-loss LOH</b>：一條 haplotype 遺失，使該處 copy number 由 2 變 1。<br>· <b>Copy-neutral LOH</b>：一條 haplotype 遺失後，另一條被複製，使 copy number 仍為 2；僅依 coverage 通常難以辨識。<br><br>LongPhase-TO 的設計以 heterozygosity ratio 偵測兩類 LOH，但實際能力仍取決於資料品質與參數。LOH 也可能減少 phasing 錨點、改變 VAF，並在 M13 形成 low-confidence triplet。",
-  "see": [
-   "copy number",
-   "phasing",
-   "heterozygous"
-  ]
- },
- "BFB": {
-  "zh_gloss": "斷裂—融合—橋循環",
-  "zh": "Breakage-fusion-bridge：染色體反覆斷裂與融合造成的劇烈重排，在 coverage 上呈現特殊的階梯形狀。",
-  "en": "Breakage-fusion-bridge: repeated chromosome breakage and fusion producing characteristic coverage staircases.",
-  "see": [
-   "copy number",
-   "soft clipping"
-  ]
- },
- "precision": {
-  "zh_gloss": "精確率",
-  "zh": "所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。",
-  "en": "Of the calls you made, the fraction that are correct: TP / (TP + FP).",
-  "see": [
-   "recall",
-   "F1"
-  ]
- },
- "recall": {
-  "zh_gloss": "召回率",
-  "zh": "在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。",
-  "en": "Within a stated evaluation scope, the fraction of true positives that were found: TP / (TP + FN). With a fixed caller candidate set, post-filtering can preserve or lower recall but cannot recover variants the caller never emitted; report the candidate-set scope explicitly.",
-  "aka": [
-   "sensitivity"
-  ],
-  "see": [
-   "precision",
-   "F1",
-   "recalibration"
-  ]
- },
- "F1": {
-  "zh": "precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。",
-  "en": "The harmonic mean of precision and recall. A precision gain has little effect when false negatives dominate the evaluation.",
-  "see": [
-   "precision",
-   "recall"
-  ]
- },
- "truth set": {
-  "zh_gloss": "標準答案集",
-  "zh": "評估用的參考標註。可靠度依資料來源與建立方法而異，困難區域可能包含標註錯誤。",
-  "en": "The reference labels used for evaluation. A truth set is not infallible truth: reliability varies, and hard regions can contain label errors.",
-  "aka": [
-   "benchmark"
-  ],
-  "see": [
-   "high-confidence region",
-   "label noise"
-  ]
- },
- "high-confidence region": {
-  "zh": "benchmark 建立者指定的高可信度區間，通常以 BED 檔表示；區間外不宜視為具有相同標註可靠度。",
-  "en": "Intervals that benchmark authors consider reliable, usually supplied as a BED file. Results outside those intervals should not be assumed to have the same label reliability.",
-  "see": [
-   "truth set"
-  ]
- },
- "label noise": {
-  "zh_gloss": "標籤雜訊",
-  "zh": "訓練或評估標籤與真實狀態不一致的情況。在 homopolymer 與重複區域可能較常見；特徵相近的位點也可能得到相反標籤。",
-  "en": "Errors in the labels themselves. They can be more frequent in homopolymers and repeats, where near-identical sites may receive different labels.",
-  "see": [
-   "truth set",
-   "homopolymer"
-  ]
- },
- "data leakage": {
-  "zh_gloss": "資料洩漏",
-  "zh": "訓練或模型選擇階段取得了評估資料的資訊，讓效能被高估。實驗室的做法是<b>按染色體切分</b>，確保同一個位點不會同時出現在訓練、驗證與最終測試中。",
-  "en": "Evaluation information entering training or model selection and inflating performance. The lab splits by chromosome so a locus cannot appear in training, validation and final test partitions at once.",
-  "see": [
-   "cross-validation",
-   "distribution shift"
-  ]
- },
- "distribution shift": {
-  "zh_gloss": "分布偏移",
-  "zh": "測試資料的組成與訓練資料存在顯著差異（例如正負樣本比例不同），使得模型表現不如預期。",
-  "en": "Test data differing in composition from training data, so measured performance does not transfer.",
-  "see": [
-   "data leakage",
-   "cross-validation"
-  ]
- },
- "cross-validation": {
-  "zh_gloss": "交叉驗證",
-  "zh": "輪流保留資料子集作為驗證折，用來估計模型的泛化能力與選擇設定；這些折是 validation，不是最終 test。最終測試集應在模型與設定確定後才使用，並另行保留。",
-  "en": "Repeatedly holding out validation folds to estimate generalisation and choose model settings. The folds are validation data, not the final test; an untouched final test set is used only after the model is fixed.",
-  "see": [
-   "data leakage"
-  ]
- },
- "LongPhase": {
-  "zh": "實驗室開發的長 read phasing 工具，是後續所有工具的共同基礎。輸出 germline haplotype。",
-  "en": "The lab's long-read phasing tool and the common foundation for everything else. Produces germline haplotypes.",
-  "see": [
-   "phasing",
-   "LongPhase-S",
-   "LongPhase-TO"
-  ]
- },
- "LongPhase-S": {
-  "zh": "配對 tumor–normal 版本。做腫瘤 DNA 比例估計（輸出欄位名為 purity）、比例感知的 somatic variant 過濾，以及 somatic haplotagging。",
-  "en": "The matched tumour–normal version: tumour DNA fraction estimation (the output field is named purity), fraction-aware somatic filtering, and somatic haplotagging.",
-  "see": [
-   "LongPhase",
-   "somatic haplotagging",
-   "GHIR",
-   "tumour DNA fraction"
-  ]
- },
- "LongPhase-TO": {
-  "zh": "tumor-only 版本。做染色體等級的 LOH 偵測、triplet graph 再校正、somatic phasing 與腫瘤 DNA 比例估計。",
-  "en": "The tumour-only version: chromosome-scale LOH detection, triplet-graph recalibration, somatic phasing and purity estimation.",
-  "see": [
-   "LongPhase",
-   "LOH",
-   "triplet graph"
-  ]
- },
- "GHIR": {
-  "zh_gloss": "生殖系單倍型失衡比",
-  "zh": "Germline Haplotype Imbalance Ratio：在<b>候選 somatic 位點</b>上，取標為 HP1 與 HP2 的 read 數中較大者除以兩者之和，值域為 0.5 至 1。須注意兩件事：分母<b>只含這兩個 germline 計數</b>，HP1-1／HP2-1／HP3 皆不在內；且這些標籤是<b>整條 read</b> 的判定（該 read 任一處帶 somatic 等位即離開 germline 計數），並非該位點的等位計數。它不是直接的 purity 讀數：拷貝數變異、LOH、read 跨距內的突變密度、標記錯誤與抽樣不足都會使它偏移。",
-  "en": "Germline Haplotype Imbalance Ratio: at a candidate somatic locus, the larger of the HP1 and HP2 tagged read counts divided by their sum, ranging from 0.5 to 1. Two caveats: the denominator contains only those two germline counts, excluding HP1-1/HP2-1/HP3; and those tags are whole-read decisions (a read carrying a somatic allele anywhere leaves the germline counts), not per-locus allele counts. It is not a direct purity readout — copy number, LOH, mutation density within the read span, tagging error and sparse sampling all shift it.",
-  "long_zh": "GHIR 的解讀依賴幾個前提：<br>· germline VCF 的 phasing 與 HP1／HP2 分群大致正確；<br>· normal 樣本能代表 germline 基準，且 TINC 不高；<br>· 納入的 germline 位點沒有被 LOH 或 CNV 顯著影響；<br>· read 數足夠，mapping 與抽樣不造成明顯 allele bias；<br>· 迴歸模型的校準資料與目前樣本的來源、basecaller、coverage 等分布相近。<br><br>在這些前提下，腫瘤來源 read 被分到 somatic 分支後，GHIR 偏離 0.5 的程度可與 tumor DNA fraction 建立關聯（現行迴歸的標籤就是這個量）；若前提不成立，同樣的偏移也可能來自結構變異、phasing 錯誤或技術偏差，不能單獨當成比例證據。此外，單一位點的 GHIR 無雜訊值 {{m: 1/(2 − p)}} 的自變數是 cellular purity，與迴歸的標籤 {{m: f}} 不是同一個量。",
-  "long_en": "Interpreting GHIR assumes that germline phasing and HP1/HP2 assignment are reliable, the matched normal represents the germline baseline with limited TINC, selected germline sites are not strongly affected by LOH or CNV, read depth and mapping do not create substantial allele bias, and the regression calibration applies to the sample's source, basecaller and coverage distribution. Under those assumptions, reads diverted to a somatic branch can make the deviation from 0.5 correlate with tumour DNA fraction, which is what the current regression is trained against. Note that the noise-free value at a single locus, 1/(2 - p), is driven by cellular purity, not by the DNA fraction used as the training label. Without them, the same shift may reflect structural variation, phasing error or technical bias and is not purity evidence by itself.",
-  "see": [
-   "LongPhase-S",
-   "tumour purity"
-  ]
- },
- "triplet graph": {
-  "zh": "LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。",
-  "en": "LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.",
-  "see": [
-   "LongPhase-TO",
-   "somatic variant"
-  ]
- },
- "provenance": {
-  "zh_gloss": "資料來源履歷",
-  "zh": "記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。",
-  "en": "The full origin record of a dataset. In this lab it is a first-class experimental variable, not metadata.",
-  "see": [
-   "basecalling",
-   "truth set"
-  ]
- },
- "mutation frequency spectrum": {
-  "zh_gloss": "突變頻率譜",
-  "zh": "把一份樣本裡所有 somatic 變異的 VAF 畫成直方圖後得到的分布。分布上的峰與肩對應不同大小的細胞群，最低頻端的尾巴斜率則被用來判斷有沒有天擇。",
-  "en": "The distribution obtained by histogramming the VAFs of all somatic variants in a sample. Peaks and shoulders correspond to cell populations of different sizes; the slope of the low-frequency tail is used to test for selection.",
-  "see": [
-   "VAF",
-   "cancer cell fraction",
-   "subclone",
-   "marginal distribution"
-  ]
- },
- "marginal distribution": {
-  "zh_gloss": "邊際分布",
-  "zh": "只描述單一變數的分布。VAF 與甲基化 β 值都是邊際統計：它們各自只講一個位點有多少比例帶有標記，不講兩個位點在同一個分子或同一個細胞上的搭配情形。",
-  "en": "A distribution over a single variable. VAF and methylation beta values are both marginal statistics: each describes one site in isolation and says nothing about how two sites co-occur on the same molecule or cell.",
-  "see": [
-   "joint distribution",
-   "VAF",
-   "mutation frequency spectrum"
-  ]
- },
- "joint distribution": {
-  "zh_gloss": "聯合分布",
-  "zh": "多個變數一起看的分布，也就是「哪些組合各出現多少」。演化樹的形狀取決於聯合分布，而不是邊際分布；長讀的價值在於一條分子上的組合是直接觀測到的。",
-  "en": "A distribution over several variables jointly, i.e. how often each combination occurs. Tree topology depends on the joint distribution, not the marginals; the value of long reads is that combinations on one molecule are observed directly.",
-  "see": [
-   "marginal distribution",
-   "long read",
-   "clone tree"
-  ]
- },
- "clone tree": {
-  "zh_gloss": "克隆演化樹",
-  "zh": "描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。",
-  "en": "A tree describing ancestral relationships among cell populations in a tumour: nodes are groups of cells sharing a mutation set, edges represent additional mutations acquired on top of an ancestor. Multiple trees are often compatible with the same clusters.",
-  "see": [
-   "clone",
-   "subclone",
-   "parsimony",
-   "cancer cell fraction"
-  ]
- },
- "parsimony": {
-  "zh_gloss": "簡約法",
-  "zh": "在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。",
-  "en": "Choosing, among all solutions compatible with the data, the one requiring the fewest steps or lowest cost. It is a preference rather than evidence: when several solutions tie, parsimony picks one, but the data has not ruled the others out.",
-  "see": [
-   "clone tree",
-   "latent node",
-   "joint distribution"
-  ]
- },
- "latent node": {
-  "zh_gloss": "潛在節點",
-  "zh": "建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。",
-  "en": "An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.",
-  "see": [
-   "clone tree",
-   "parsimony",
-   "provenance"
-  ]
- },
- "epiallele": {
-  "zh_gloss": "表觀等位型",
-  "zh": "同一條分子上一組相鄰 CpG 的甲基化組合，例如四個 CpG 的 1101。逐位點的 β 值看不到它 —— 要算 epiallele 的組成，一條 read 至少得跨過 4 個 CpG。",
-  "en": "The combination of methylation states across a set of neighbouring CpGs on a single molecule, e.g. 1101 over four CpGs. Per-site beta values cannot resolve it; computing epiallele composition requires reads spanning at least four CpGs.",
-  "see": [
-   "5mC",
-   "CpG",
-   "epimutation",
-   "joint distribution"
-  ]
- },
- "epimutation": {
-  "zh_gloss": "表觀突變",
-  "zh": "細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 {{m: 10^{−5}}} 到 {{m: 10^{−4}}}，而 DNA 突變約每鹼基 {{m: 10^{−9}}} 到 {{m: 10^{−10}}}，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 {{m: 10^{−3}}} 的），應當成量級而非定值。",
-  "en": "A stochastic flip of methylation state during cell division. Commonly cited at {{m: 10^{−5}}}–{{m: 10^{−4}}} per CpG per division versus {{m: 10^{−9}}}–{{m: 10^{−10}}} per base for DNA mutation — roughly five orders of magnitude faster like-for-like — which makes it a higher-resolution lineage clock. Treat it as an order of magnitude, not a constant: estimates vary by site and assay, up to ~{{m: 10^{−3}}}.",
-  "see": [
-   "5mC",
-   "CpG",
-   "epiallele"
-  ]
- },
- "read-AF": {
-  "zh_gloss": "read 層級的 ALT 比例",
-  "zh": "在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。",
-  "en": "The fraction of reads carrying the ALT allele at a somatic site, computed within one analysis window and one haplotype family. Because the denominator is already restricted, no purity or copy-number correction is needed; it is used to rank candidate trees of equal cost.",
-  "see": [
-   "VAF",
-   "somatic haplotype",
-   "clone tree"
-  ]
- },
- "pigeonhole": {
-  "zh_gloss": "鴿籠原理",
-  "zh": "由父代與子代的細胞比例限制樹形的算術規則：一個細胞至多屬於父節點底下的<b>一個</b>子節點，所以各子節點的細胞比例加起來不得超過父節點。名稱來自鴿籠原理 —— 東西放進籠子，總量不會憑空變多。在 subclone 重建的文獻中也稱為 sum rule 或 crossing rule。<b>它只能排除樹，不能挑出樹</b>：通過檢查的候選通常仍不只一棵，其餘要靠 parsimony 之類的偏好決定。",
-  "en": "The arithmetic constraint that limits tree shape from parent and child cell fractions: a cell belongs to at most one child of a given parent, so the children's cell fractions cannot sum to more than the parent's. The name comes from the pigeonhole principle. Also called the sum rule or crossing rule in the subclonal reconstruction literature. It can only rule trees out, never select one: the surviving candidates are usually more than one, and the choice among them falls to a preference such as parsimony.",
-  "see": [
-   "clone tree",
-   "parsimony",
-   "cancer cell fraction"
-  ]
- },
- "B-allele frequency": {
-  "zh_gloss": "B 等位頻率",
-  "zh": "在 germline heterozygous 位點上，兩個等位其中一個所佔的 read 比例。腫瘤樣本中混入的正常細胞在此值上恆為 0.5，該常數即為反推純度所依據的錨。ASCAT 與 PURPLE 皆刻意不做相位，故其標號在各位點之間獨立。",
-  "en": "The fraction of reads carrying one of the two alleles at a germline heterozygous site. Contaminating normal cells contribute exactly 0.5, and that constant is the anchor from which purity is recovered. ASCAT and PURPLE deliberately do not phase, so the A/B label is independent per site.",
-  "aka": [
-   "BAF"
-  ],
-  "see": [
-   "logR",
-   "allele-specific copy number",
-   "tumour purity",
-   "LOH"
-  ]
- },
- "logR": {
-  "zh_gloss": "深度比對數",
-  "zh": "同一位點上腫瘤與正常樣本的 read 深度比取以 2 為底的對數。ASCAT 再以全基因體比值的平均重新置中，因此 0 並不代表兩份拷貝 —— 倍體須由擬合結果另行推算。單獨的 logR 只能決定拷貝數輪廓至一個仿射變換。",
-  "en": "The base-2 logarithm of the tumour-to-normal read-depth ratio at a locus, re-centred on the genome-wide mean ratio. Zero therefore does not mean two copies; ploidy has to be recomputed from the fitted profile. logR alone determines the copy-number profile only up to an affine map.",
-  "aka": [
-   "log R ratio",
-   "LRR"
-  ],
-  "see": [
-   "B-allele frequency",
-   "copy number",
-   "ploidy"
-  ]
- },
- "allele-specific copy number": {
-  "zh_gloss": "等位特異拷貝數",
-  "zh": "把一個區段的總拷貝數拆成兩個親源等位各自的份數，通常記為 major 與 minor。總拷貝數相同而兩個等位不同的狀態（例如 2+0 與 1+1）在深度上完全一致，只有 B-allele frequency 分得開 —— copy-neutral LOH 即為此類。",
-  "en": "The total copy number of a segment split into the counts contributed by each parental allele, usually reported as major and minor. States with equal total but different split (2+0 versus 1+1) are identical in depth and separable only by B-allele frequency; copy-neutral LOH is exactly such a case.",
-  "see": [
-   "copy number",
-   "B-allele frequency",
-   "LOH",
-   "haplotype imbalance"
-  ]
- },
- "whole-genome doubling": {
-  "zh_gloss": "全基因體加倍",
-  "zh": "腫瘤演化過程中整套基因體複製一次的事件，使各處拷貝數同時加倍。其重要後果是可辨識性：若加倍後所有等位特異拷貝數皆為偶數，則該解與未加倍的解對深度與等位比例給出完全相同的觀測；純度為 1 時兩者逐點相同。",
-  "en": "An event doubling the entire tumour genome, multiplying every copy number by two. Its consequence is identifiability: if all allele-specific copy numbers are even afterwards, the doubled solution reproduces the observed depth and allele ratios exactly, and at purity one the two models are pointwise identical.",
-  "aka": [
-   "WGD"
-  ],
-  "see": [
-   "ploidy",
-   "aneuploidy",
-   "identifiability",
-   "allele-specific copy number"
-  ]
- },
- "haplotype imbalance": {
-  "zh_gloss": "單倍型失衡",
-  "zh": "指派至兩條親源單倍型的 read 數不相等。其成因有二：該處兩條單倍型的拷貝數不同，或其中一條的分子被改標至 somatic 子單倍型。兩者在數值上形式相同，僅憑一個失衡值無法區分。",
-  "en": "Unequal read counts assigned to the two parental haplotypes. Two mechanisms produce it: unequal allele-specific copy number, or molecules of one haplotype being relabelled to a somatic sub-haplotype. The two are indistinguishable from a single imbalance value.",
-  "see": [
-   "GHIR",
-   "somatic haplotype",
-   "allele-specific copy number",
-   "B-allele frequency"
-  ]
- },
- "identifiability": {
-  "zh_gloss": "可辨識性",
-  "zh": "資料在原則上能否區分兩組不同的參數值。若兩組參數對任何可能的觀測給出相同的機率，則兩者不可辨識，增加深度、變異數目或更換工具皆無作用 —— 須改變的是可行域，例如加入外部約束或錨。此性質與精度不同：精度指可區分之後量得準不準。",
-  "en": "Whether the data can in principle distinguish two parameter values. If both assign the same probability to every possible observation they are unidentifiable, and more depth, more variants or a different tool cannot help; only changing the feasible set — an external constraint or anchor — can. This differs from precision, which concerns accuracy once two states are already distinguishable.",
-  "see": [
-   "whole-genome doubling",
-   "tumour purity",
-   "ploidy"
-  ]
- },
- "連鎖視窗": {
-  "zh": "同一個 phase block 之內，由 read 連鎖的傳遞閉包所界定的一段：凡有某條 read 同時覆蓋至少兩個 somatic 位點，該段即成一個視窗；另一條 read 疊到已連鎖的位點又碰到新位點時，兩段合併成更長的視窗。<b>不是固定寬度</b>，也<b>不跨 phase block</b>。早期估算比例時所用的「20 kb 視窗」是固定寬度的近似，兩者的計數不可互換。",
-  "en": "Within a single phase block, the span defined by the transitive closure of read linkage: any read covering at least two somatic sites opens a window, and overlapping reads merge windows. It is not a fixed width and never crosses a phase block. The fixed-width 20 kb window used in early proportion estimates is an approximation; the two counts are not interchangeable.",
-  "see": [
-   "phase block",
-   "單倍型連鎖區段"
-  ]
- },
- "單倍型連鎖區段": {
-  "zh": "一個連鎖視窗再限定到一條單倍型家族 —— 也就是「一個連鎖視窗、一條染色體拷貝」。這是局部共現分析的最小單位：其中的 read 全部來自同一條染色體拷貝，另一條拷貝屬於另一個連鎖區段。因此一個連鎖視窗至多切出兩個連鎖區段，<b>連鎖區段數大於連鎖視窗數</b>，兩者不可混用為同一個分母。單倍型標號只在該區段內有定義，跨區段的同名標號並非同一條染色體。",
-  "en": "A linkage window restricted to one haplotype family — one window, one chromosome copy. It is the smallest unit of local co-occurrence analysis: all its reads come from the same chromosome copy, the other copy forming a separate segment. One window yields at most two segments, so segments outnumber windows and the two must not share a denominator. Haplotype labels are defined only within a segment.",
-  "see": [
-   "連鎖視窗",
-   "phase block",
-   "somatic haplotype"
-  ]
- }
+  "locus": {
+    "zh_gloss": "位點",
+    "zh": "基因體上的一個特定位置。講「這個 locus」時通常指某個座標，例如 <code>chr1:162,404,043</code>。",
+    "en": "A specific position in the genome, usually given as a chromosome and coordinate.",
+    "see": [
+      "allele",
+      "reference genome"
+    ]
+  },
+  "allele": {
+    "zh_gloss": "等位基因",
+    "zh": "同一個 locus 上可能出現的其中一種序列版本。在一般二倍體常染色體位點，個體通常有兩份 allele；性染色體、拷貝數變化與腫瘤基因體可能不符合這個簡化模型。",
+    "en": "One of the alternative sequence versions at a locus. At a typical diploid autosomal locus, an individual has two allele copies; sex chromosomes, copy-number changes and tumour genomes may differ.",
+    "long_zh": "同一個 locus 上可能出現的其中一種序列版本。在一般二倍體常染色體位點，個體通常有兩份 allele；性染色體、拷貝數變化與腫瘤基因體可能不符合這個簡化模型。<br><br>在 VCF 裡 allele 被編號：<code>0</code> 是 reference allele，<code>1</code> 是第一個 alternate allele，以此類推。因此，在一般二倍體位點，genotype <code>0/1</code> 表示一份 reference allele 與一份 alternate allele；<code>0|1</code> 則進一步標示相位。",
+    "see": [
+      "genotype",
+      "heterozygous",
+      "reference genome"
+    ]
+  },
+  "genotype": {
+    "zh_gloss": "基因型",
+    "zh": "某個 locus 上觀察到的 allele 組合；對一般二倍體常染色體位點，通常是兩份 allele。VCF 裡寫成 <code>0/1</code>（未定相）或 <code>0|1</code>（已定相）。",
+    "en": "The allele combination observed at a locus. At a typical diploid autosomal locus it has two copies; VCF writes these as 0/1 (unphased) or 0|1 (phased).",
+    "long_zh": "某個 locus 上觀察到的 allele 組合。<br><br>對一般二倍體常染色體位點，<code>0/1</code> 表示一份 ref 與一份 alt，但未指定其 haplotype；<code>0|1</code> 則表示已推定相位。性染色體、拷貝數變化與腫瘤基因體可能有不同倍性或更多拷貝，因此不應把「兩份 allele」當成所有情境的規則。",
+    "see": [
+      "allele",
+      "phasing",
+      "haplotype"
+    ]
+  },
+  "haplotype": {
+    "zh_gloss": "單倍型",
+    "zh": "同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。HP1 與 HP2 是任意的相對標籤。",
+    "en": "A set of variants that lie on the same physical chromosome copy and are inherited together.",
+    "long_zh": "同一條實體染色體拷貝上，具有一致相位的一組 alleles 或 variants。<br><br>兩個 variant 若在同一條 haplotype 上，稱為 <b>cis</b>；分在兩條上則稱為 <b>trans</b>。此差異可能影響生物學解讀或治療決策，需依特定變異與臨床情境判定。<br><br><b>注意：</b>HP1 與 HP2 本身不代表父系或母系。沒有親本或其他方向證據時，它們是局部一致、方向任意的編號。",
+    "aka": [
+      "hap",
+      "HP"
+    ],
+    "see": [
+      "phasing",
+      "cis",
+      "trans",
+      "PS tag"
+    ]
+  },
+  "diploid": {
+    "zh_gloss": "二倍體",
+    "zh": "正常人多數常染色體區段通常有兩份拷貝的狀態；性染色體、拷貝數變化與腫瘤細胞可能不同。",
+    "en": "A state in which a typical autosomal locus has two copies. Sex chromosomes, copy-number-altered regions and tumour cells may differ.",
+    "see": [
+      "ploidy",
+      "aneuploidy"
+    ]
+  },
+  "heterozygous": {
+    "zh_gloss": "異型合子",
+    "zh": "在一般二倍體位點上，兩份 allele 不同（例如一份 A、一份 G）。此類位點可作為區分 haplotype 的資訊錨點；複雜拷貝數情況需另行解讀。",
+    "en": "At a typical diploid locus, carrying two different allele copies (for example A and G). These sites can anchor phasing; copy-number changes require separate interpretation.",
+    "aka": [
+      "het"
+    ],
+    "see": [
+      "homozygous",
+      "phasing"
+    ]
+  },
+  "homozygous": {
+    "zh_gloss": "同型合子",
+    "zh": "在一般二倍體位點上，兩份 allele 相同。此位點本身通常無法用來區分兩條 haplotype。",
+    "en": "At a typical diploid locus, carrying two identical allele copies. The site itself usually cannot distinguish haplotypes.",
+    "aka": [
+      "hom"
+    ],
+    "see": [
+      "heterozygous"
+    ]
+  },
+  "SNP": {
+    "zh_gloss": "單核苷酸多型性",
+    "zh": "族群中以多型形式存在的單一鹼基差異；本教材主要以可作為 phasing 錨點的 germline SNP 為例。",
+    "en": "A single-nucleotide polymorphism observed as a population variant. This tutorial mainly uses germline SNPs as phasing anchors.",
+    "see": [
+      "SNV",
+      "germline variant"
+    ]
+  },
+  "SNV": {
+    "zh_gloss": "單核苷酸變異",
+    "zh": "單一鹼基的改變。與 SNP 的差別在於 SNV 不預設它在族群中常見 —— 腫瘤裡新產生的單點突變叫 somatic SNV（sSNV），不叫 SNP。",
+    "en": "A single-nucleotide change. Unlike SNP, it carries no implication of population frequency; new tumour mutations are sSNVs.",
+    "aka": [
+      "sSNV"
+    ],
+    "see": [
+      "SNP",
+      "somatic variant",
+      "indel"
+    ]
+  },
+  "indel": {
+    "zh_gloss": "插入／缺失",
+    "zh": "短的插入（insertion）或缺失（deletion）。在 nanopore 資料上通常比 SNV 更難可靠判讀，因為 homopolymer 與 alignment 位置漂移都可能製造假訊號。",
+    "en": "A short insertion or deletion. It is often harder to call reliably than an SNV in nanopore data because of homopolymers and alignment ambiguity.",
+    "see": [
+      "homopolymer",
+      "CIGAR"
+    ]
+  },
+  "germline variant": {
+    "zh_gloss": "生殖系變異",
+    "zh": "在生殖系形成、通常存在於多數細胞的變異；可遺傳給子代，但不代表必然傳遞。",
+    "en": "A variant arising in the germline and therefore present in essentially every cell of the individual. It may be inherited or arise de novo, and may be passed to offspring.",
+    "see": [
+      "somatic variant",
+      "SNP"
+    ]
+  },
+  "somatic variant": {
+    "zh_gloss": "體細胞變異",
+    "zh": "在非生殖系細胞譜系中、通常於受精後取得的變異；可只存在於部分細胞，通常不由親代遺傳給子代。癌症基因體學常分析此類變異。",
+    "en": "A variant acquired outside the germline, usually after conception. It may be restricted to a subset of cells and is generally not passed to offspring; it is a central focus of cancer genomics.",
+    "aka": [
+      "sSNV",
+      "somatic mutation"
+    ],
+    "see": [
+      "germline variant",
+      "clone"
+    ]
+  },
+  "clone": {
+    "zh_gloss": "克隆",
+    "zh": "源自共同祖先細胞，並共享一組可辨識 somatic mutations 的細胞群。",
+    "en": "A population of tumour cells descended from a common ancestor and sharing the same set of somatic mutations.",
+    "see": [
+      "subclone",
+      "intratumour heterogeneity"
+    ]
+  },
+  "subclone": {
+    "zh_gloss": "次克隆",
+    "zh": "clone 內取得額外變異並擴增的子群；治療後可能富集具有抗性的 subclone。",
+    "en": "A subset of a clone that acquired further mutations and expanded. Treatment-resistant populations are often subclones.",
+    "see": [
+      "clone",
+      "intratumour heterogeneity"
+    ]
+  },
+  "intratumour heterogeneity": {
+    "zh_gloss": "腫瘤內異質性",
+    "zh": "同一腫瘤內不同細胞可帶有不同突變組合，因而同時存在多種基因型。",
+    "en": "Different cells within one tumour carrying different mutation combinations.",
+    "see": [
+      "clone",
+      "subclone"
+    ]
+  },
+  "driver mutation": {
+    "zh_gloss": "驅動突變",
+    "zh": "可提升腫瘤細胞生長或存活優勢的候選變異；passenger mutation 通常不具有已知的選擇優勢。",
+    "en": "A mutation that confers a growth advantage, as opposed to the far more numerous passenger mutations.",
+    "see": [
+      "somatic variant"
+    ]
+  },
+  "long read": {
+    "zh_gloss": "長讀",
+    "zh": "單條可達數千至數萬鹼基的定序片段（例如 ONT、PacBio）。若可靠地同時覆蓋多個 variant，可提供它們位於同一 DNA 分子上的直接觀測證據。",
+    "en": "A sequencing read thousands to tens of thousands of bases long. Its length lets one molecule link multiple variants directly.",
+    "see": [
+      "ONT",
+      "phasing",
+      "read"
+    ]
+  },
+  "read": {
+    "zh": "定序儀產生的一段序列觀測。一條 read 通常來自一個 DNA 分子的片段，但不等同於一個細胞；仍需考慮重複、嵌合與定序錯誤。",
+    "en": "A sequence observation produced by the sequencer, usually a fragment from one DNA molecule. A read is molecular evidence, not a cell; duplicates, chimeras and sequencing errors still need to be considered.",
+    "see": [
+      "long read",
+      "coverage"
+    ]
+  },
+  "ONT": {
+    "zh_gloss": "奈米孔定序",
+    "zh": "Oxford Nanopore Technologies。以電流訊號讀取 DNA，可產生長 read；在 native-DNA 流程與適當模型下，可由訊號推定 5mC，通常不需 bisulfite 轉換。",
+    "en": "Oxford Nanopore Technologies. Reads DNA through ionic-current signals, producing long reads. With native DNA and a suitable model, 5mC can be inferred without bisulfite conversion.",
+    "see": [
+      "long read",
+      "5mC",
+      "basecalling"
+    ]
+  },
+  "basecalling": {
+    "zh_gloss": "鹼基判讀",
+    "zh": "把定序儀的原始訊號（ONT 是電流）轉成 A/C/G/T 字母的步驟。不同 basecaller 版本會產生不同的錯誤特性 —— 所以「同一個細胞株、不同 basecaller」是兩份不同的資料集。",
+    "en": "Converting raw sequencer signal into A/C/G/T. Different basecallers yield different error profiles.",
+    "see": [
+      "ONT",
+      "provenance"
+    ]
+  },
+  "coverage": {
+    "zh_gloss": "覆蓋度／深度",
+    "zh": "某個位置被多少條 read 覆蓋。50× 表示平均每個位置約有 50 條 read 覆蓋，不代表它們均支持同一 allele。",
+    "en": "How many reads span a position. 50x means on average 50 reads per position.",
+    "aka": [
+      "depth"
+    ],
+    "see": [
+      "read",
+      "VAF"
+    ]
+  },
+  "VAF": {
+    "zh_gloss": "變異等位基因頻率",
+    "zh": "在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<b>VAF 不等於帶有這個突變的細胞比例</b>。",
+    "en": "Variant Allele Frequency: the fraction of reads supporting the alternate allele. Not the same as the fraction of cells carrying it.",
+    "long_zh": "在某個位點上，支持 alt allele 的 read 佔全部 read 的比例。<br><br><b>最常見的誤解是把 VAF 當成「有多少比例的細胞帶這個突變」。</b>實際上還受到 tumor purity、該位置的 local copy number、mutation multiplicity 與 mapping bias 影響。理想的 diploid、單一拷貝突變情況下：<br>{{m: VAF = purity × multiplicity / \\text{total copy number}}}<br>所以 purity 0.4、diploid、單拷貝時 VAF 只有 0.2。",
+    "aka": [
+      "allele fraction"
+    ],
+    "see": [
+      "tumour purity",
+      "copy number",
+      "mutation multiplicity",
+      "cancer cell fraction"
+    ]
+  },
+  "homopolymer": {
+    "zh_gloss": "同聚物",
+    "zh": "同一個鹼基連續重複的區段，例如 <code>AAAAAA</code>。nanopore 在此類區段較容易發生長度判讀錯誤，是 indel 假陽性的常見來源之一。",
+    "en": "A run of identical bases. Nanopore miscounts their length, a major source of false indel calls.",
+    "see": [
+      "indel"
+    ]
+  },
+  "5mC": {
+    "zh_gloss": "5-甲基胞嘧啶",
+    "zh": "胞嘧啶第 5 個碳上的甲基化修飾。這是常見的 DNA 甲基化形式，主要見於 CpG；可影響轉錄調控，效應依基因組位置與細胞類型而異。",
+    "en": "5-methylcytosine, the commonest DNA methylation mark, usually at CpG sites. Affects expression without changing sequence.",
+    "see": [
+      "CpG",
+      "MM/ML tag"
+    ]
+  },
+  "CpG": {
+    "zh": "序列上一個 C 後接一個 G（p 代表兩者之間的磷酸鍵）。哺乳類多數 5mC 位於 CpG，特定細胞或情況亦可見非 CpG 甲基化。",
+    "en": "A cytosine followed by a guanine. Most mammalian 5mC occurs at CpG sites, although non-CpG methylation is also observed in particular cells and contexts.",
+    "see": [
+      "5mC"
+    ]
+  },
+  "MM/ML tag": {
+    "zh": "BAM 中儲存每條 read 甲基化判讀的兩個 tag：<code>MM</code> 記錄位置、<code>ML</code> 記錄機率。在轉換或重新比對流程中可能遺失，需確認 tags 是否保留。",
+    "en": "BAM tags carrying per-read methylation calls: MM for positions, ML for probabilities. Easily lost during processing.",
+    "see": [
+      "5mC",
+      "BAM"
+    ]
+  },
+  "reference genome": {
+    "zh_gloss": "參考基因體",
+    "zh": "用於比對的標準序列（人類資料常用 GRCh38）。所有座標均相對於指定版本；更換 build 會改變座標系，座標不可直接比較。",
+    "en": "The standard sequence everything is aligned to. All coordinates are relative to it, so changing build changes coordinates.",
+    "see": [
+      "locus",
+      "BAM"
+    ]
+  },
+  "FASTA": {
+    "zh": "以文字保存 DNA 或 RNA 序列的格式；在本模組中，FASTA 主要用來提供比對所需的參考基因體序列。",
+    "en": "A text format for DNA or RNA sequences; here it mainly supplies the reference genome used for alignment.",
+    "see": [
+      "reference genome",
+      "FASTQ"
+    ]
+  },
+  "FASTQ": {
+    "zh": "存放 read 序列與每個鹼基品質分數的文字格式；每筆紀錄由四行組成。",
+    "en": "Text format holding read sequences plus per-base quality scores; four lines per record.",
+    "see": [
+      "BAM"
+    ]
+  },
+  "BAM": {
+    "zh": "已比對到參考基因體的 read 的二進位格式（SAM 的壓縮版）。每一列是一條 read，帶著它的位置、CIGAR、品質與各種 tag。",
+    "en": "Binary format for reads aligned to the reference. One record per read, carrying position, CIGAR, quality and tags.",
+    "aka": [
+      "SAM",
+      "CRAM"
+    ],
+    "see": [
+      "CIGAR",
+      "HP tag",
+      "MM/ML tag"
+    ]
+  },
+  "CIGAR": {
+    "zh": "描述一條 read 如何對上參考基因體的緊湊字串。例如 <code>5M1I5M</code> 表示兩端各有 5 個對齊欄位，中間有 1 個相對於參考序列的插入；<code>M</code> 可能代表吻合，也可能代表錯配。",
+    "en": "A compact string describing how read bases and reference positions are consumed by an alignment. For example, 5M1I5M has five alignment columns, one insertion, then five alignment columns; M may contain matches or mismatches.",
+    "long_zh": "描述一條 read 如何對上參考基因體的緊湊字串。<br><br>常見操作碼：<code>M</code> 消耗一個 read 鹼基與一個參考鹼基，表示對齊欄位，但可能吻合也可能錯配；<code>=</code> 是精確吻合；<code>X</code> 是明確錯配（若流程輸出這兩種操作）；<code>I</code> 表示 read 相對於參考序列的插入；<code>D</code> 表示 read 相對於參考序列的缺失；<code>S</code> 是 soft clip（read 有這段但未對上，序列仍保留）；<code>H</code> 是 hard clip（序列不保留在該 alignment record）；<code>N</code> 跳過參考序列區段。<br><br>例：<code>5M1I5M</code> = 5 個對齊欄位、1 個插入、再 5 個對齊欄位。若要判斷 <code>M</code> 中的實際鹼基是否吻合，需查看 read 序列、參考序列或 <code>MD</code> tag，不能只看 CIGAR。<br><br>LongPhase-TO 偵測 CNV/BFB 區間就是靠統計 soft clip（<code>S</code>）出現的位置 —— 見 M13。",
+    "see": [
+      "BAM",
+      "soft clipping",
+      "indel"
+    ]
+  },
+  "soft clipping": {
+    "zh": "read 端部未與參考序列對齊，但序列仍保留在 BAM 中（CIGAR 為 <code>S</code>）。大量 clipping 集中於同一位置時，可能提示結構變異斷點，仍需其他證據確認。",
+    "en": "A read end that failed to align but is retained in the BAM (CIGAR S). Clipping clustered at one position may suggest a structural breakpoint and needs corroborating evidence.",
+    "see": [
+      "CIGAR",
+      "BFB"
+    ]
+  },
+  "VCF": {
+    "zh": "存放 variant 的文字格式。每一列是一個位點，記錄位置、ref/alt allele、品質、FILTER 與各種 FORMAT 欄位。",
+    "en": "Text format for variants: one line per site with position, ref/alt alleles, quality, FILTER and FORMAT fields.",
+    "see": [
+      "genotype",
+      "PS tag"
+    ]
+  },
+  "PS tag": {
+    "zh_gloss": "phase set",
+    "zh": "標示某群 variants 屬於同一 phase block 的編號。同一 PS 內的相位方向可相互比較；不同 PS 的 HP1/HP2 方向彼此獨立。",
+    "en": "Phase set identifier grouping variants phased together. Haplotype orientation is only consistent within one PS.",
+    "aka": [
+      "PS",
+      "phase set"
+    ],
+    "see": [
+      "phasing",
+      "haplotype"
+    ]
+  },
+  "HP tag": {
+    "zh": "BAM 裡標示某條 read 屬於哪一條 haplotype 的 tag。LongPhase-S 的 germline haplotag 寫成整數 <code>HP:i:1</code>；somatic haplotag 與 LongPhase-TO 則寫成字串 <code>HP:Z:1-1</code>。",
+    "en": "BAM tag assigning a read to a haplotype. Integer HP:i:1 for germline haplotag; string HP:Z:1-1 for somatic.",
+    "see": [
+      "haplotagging",
+      "somatic haplotype"
+    ]
+  },
+  "phasing": {
+    "zh_gloss": "定相",
+    "zh": "為可判定的 variants 建立其位於不同實體染色體拷貝上的相位關係；VCF 常以 <code>0|1</code> 等形式表示。長 read 可提供跨位點的分子層級觀測證據。",
+    "en": "Determining which variants lie on the same physical chromosome, turning 0/1 into 0|1. Long reads provide direct molecular evidence.",
+    "see": [
+      "haplotype",
+      "PS tag",
+      "haplotagging",
+      "cis"
+    ]
+  },
+  "cis": {
+    "zh": "兩個 variants 在<b>同一條</b> haplotype 上。",
+    "en": "Two variants on the same haplotype.",
+    "see": [
+      "trans",
+      "phasing"
+    ]
+  },
+  "trans": {
+    "zh": "兩個 variants 分別在<b>兩條不同</b>的 haplotype 上。",
+    "en": "Two variants on opposite haplotypes.",
+    "see": [
+      "cis",
+      "phasing"
+    ]
+  },
+  "phase block": {
+    "zh": "一段可建立連續相位關係的區域。read 長度不足、缺少 informative heterozygous 位點或證據不一致時，可能形成不同 phase blocks。",
+    "en": "A contiguous stretch over which phasing is consistent. It can break when reads are too short, informative heterozygous sites are absent or evidence conflicts.",
+    "see": [
+      "PS tag",
+      "switch error"
+    ]
+  },
+  "switch error": {
+    "zh": "phasing 結果自某一位置起將兩條 haplotype 的方向對調，是常見的 phasing 錯誤類型。",
+    "en": "A phasing error in which the two haplotype labels swap from some point onward; a common phasing error mode.",
+    "see": [
+      "phasing",
+      "phase block"
+    ]
+  },
+  "haplotagging": {
+    "zh": "根據已 phase 好的 variants，把每一條 read 指派到 HP1 或 HP2，並把結果寫回 BAM 的 <code>HP</code> tag。",
+    "en": "Assigning each read to HP1 or HP2 using phased variants, and writing the result back as a BAM HP tag.",
+    "see": [
+      "HP tag",
+      "phasing",
+      "somatic haplotagging"
+    ]
+  },
+  "somatic haplotype": {
+    "zh": "在 germline haplotype 之下再細分出來的層級。某條 HP1 的 read 若帶有 somatic 突變，就屬於 <code>HP1-1</code>；HP2 的則是 <code>HP2-1</code>。無法判定來源的歸為 <code>HP3</code>。",
+    "en": "A sub-level beneath the germline haplotype: HP1-1 and HP2-1 carry somatic mutations derived from HP1 and HP2; HP3 is unassignable.",
+    "see": [
+      "haplotype",
+      "somatic haplotagging",
+      "HP tag"
+    ]
+  },
+  "somatic haplotagging": {
+    "zh": "把帶有 somatic 突變的 read 指派到它們源自的 germline haplotype。這是 LongPhase-S 的核心產出。",
+    "en": "Assigning somatic-mutation-bearing reads to the germline haplotype they arose from. The core output of LongPhase-S.",
+    "see": [
+      "somatic haplotype",
+      "LongPhase-S"
+    ]
+  },
+  "variant calling": {
+    "zh": "從已比對 read 中判斷哪些位置具有足夠證據支持變異存在的過程，通常輸出 VCF。",
+    "en": "Deciding which positions genuinely carry variants, given aligned reads. Outputs a VCF.",
+    "see": [
+      "VCF",
+      "candidate"
+    ]
+  },
+  "candidate": {
+    "zh_gloss": "候選變異",
+    "zh": "caller 提出、但尚未被確認的變異位點。本實驗室多數工具位於 caller 之後，進行<b>再校正</b>，處理的就是這些 candidates。",
+    "en": "A proposed but unconfirmed variant. Most tools in this lab post-process the caller's candidate set.",
+    "see": [
+      "variant calling",
+      "recalibration"
+    ]
+  },
+  "recalibration": {
+    "zh_gloss": "再校正",
+    "zh": "以額外證據重新評估 caller 已輸出的 candidates。若僅處理既有候選，可移除 false positives，但不能恢復 caller 未輸出的變異。",
+    "en": "Re-judging a caller's candidates with extra evidence. When the candidate set is fixed, it can remove false positives but cannot recover variants the caller never emitted.",
+    "see": [
+      "candidate",
+      "precision",
+      "recall"
+    ]
+  },
+  "Clair3": {
+    "zh": "以深度學習做 germline variant calling 的工具，長 read 上常用。",
+    "en": "A deep-learning germline variant caller widely used for long reads.",
+    "see": [
+      "variant calling",
+      "DeepVariant"
+    ]
+  },
+  "DeepVariant": {
+    "zh": "Google 開發的 germline variant caller，把 pileup 轉成影像再用 CNN 分類。",
+    "en": "Google's germline variant caller; encodes pileups as images and classifies them with a CNN.",
+    "see": [
+      "Clair3",
+      "variant calling"
+    ]
+  },
+  "ClairS": {
+    "zh": "配對 tumor–normal 的 somatic variant caller。tumor-only 版本叫 ClairS-TO。",
+    "en": "A somatic variant caller for matched tumour–normal data; ClairS-TO is the tumour-only version.",
+    "see": [
+      "DeepSomatic",
+      "tumour-normal",
+      "tumour-only"
+    ]
+  },
+  "DeepSomatic": {
+    "zh": "Google 的 somatic variant caller，同樣有 tumor-only 版本。",
+    "en": "Google's somatic variant caller, also available in a tumour-only mode.",
+    "see": [
+      "ClairS",
+      "somatic variant"
+    ]
+  },
+  "tumour-normal": {
+    "zh_gloss": "配對腫瘤／正常",
+    "zh": "同時定序病人的腫瘤與正常組織；正常樣本提供個體 germline 背景，有助於辨識 somatic 候選。",
+    "en": "Sequencing a patient's tumour alongside their normal tissue, which supplies the germline background.",
+    "aka": [
+      "TN",
+      "matched normal"
+    ],
+    "see": [
+      "tumour-only",
+      "TINC"
+    ]
+  },
+  "tumour-only": {
+    "zh_gloss": "僅腫瘤",
+    "zh": "只有腫瘤樣本、沒有配對正常樣本。在成本或檢體受限時很常見，但少了 germline 對照，分析難度會大幅提高。",
+    "en": "Having only the tumour sample. Common for cost or specimen reasons, but much harder without a germline baseline.",
+    "aka": [
+      "TO"
+    ],
+    "see": [
+      "tumour-normal",
+      "PON"
+    ]
+  },
+  "PON": {
+    "zh_gloss": "正常樣本面板／族群資料庫（依流程而異）",
+    "zh": "PON 依分析流程有兩種用法，兩者不可互換：本教材的 tumor-only 流程以它指稱 population germline database set（如 1000G、CoLoRSdb、dbSNP、gnomAD 的聯集）；GATK Mutect2 的 Panel of Normals（PoN）則由多個正常樣本建立，用來標記反覆出現的技術性 artifact。兩者都不能完全取代同一病人的 matched normal。",
+    "en": "The abbreviation is workflow-dependent and the two uses are not interchangeable. In this tutorial's tumour-only workflows, PON denotes a population germline database set; in GATK Mutect2, a Panel of Normals (PoN) is built from multiple normal samples to flag recurrent technical artifacts. Either can miss a private germline variant or an unseen artifact, so neither replaces a patient's matched normal.",
+    "long_zh": "<b>同一縮寫的兩種用法：</b><br>· 本教材在 LongPhase-TO、ClairS-TO 情境中特別稱為 <b>population germline database set</b>：1000G、CoLoRSdb、dbSNP、gnomAD 等族群資料庫的聯集，用於標記族群中常見的遺傳變異。<br>· GATK Mutect2 的 <b>Panel of Normals</b>（PoN）：由多個正常樣本建立的 recurrent-artifact panel，用於辨識反覆出現的技術性訊號。<br><br>兩者均可能漏掉某個病人的私有 germline 變異或尚未見過的 artifact，因此都不能取代同一病人的 matched normal。matched normal 提供的是個體層級的直接對照；PON 只能提供族群背景或跨樣本的技術性背景。",
+    "aka": [
+      "Panel of Normals",
+      "PoN"
+    ],
+    "see": [
+      "tumour-only",
+      "germline variant"
+    ]
+  },
+  "TINC": {
+    "zh_gloss": "腫瘤污染正常樣本",
+    "zh": "Tumour-in-normal contamination：配對正常樣本含有腫瘤來源訊號，使 genuine somatic 變異也可能在 normal 中被觀察到，因而可能被錯誤過濾。",
+    "en": "Tumour-in-normal contamination: tumour cells present in the matched normal, causing true somatic variants to produce signal there as well.",
+    "see": [
+      "tumour-normal",
+      "somatic variant"
+    ]
+  },
+  "tumour purity": {
+    "zh_gloss": "腫瘤純度",
+    "zh": "樣本中腫瘤<b>細胞</b>所佔的比例。purity 越低，somatic 訊號被正常細胞稀釋得越嚴重，偵測越困難。",
+    "en": "The fraction of cells in a sample that are tumour cells. Low purity dilutes somatic signal.",
+    "long_zh": "樣本中腫瘤<b>細胞</b>所佔的比例。<br><br>注意它跟 <b>tumor DNA fraction</b>（腫瘤來源 DNA 的比例）不是同一件事：一個腫瘤細胞若含有比正常細胞多的 DNA（aneuploidy 或 whole-genome duplication），它在分子層貢獻的份量就大於它在細胞層佔的份量，兩個數字因此分開。換算式為 {{m: f = pκ/(pκ + 2(1 − p))}}，只有倍體 {{m: κ = 2}} 時兩者相等。<br><br>常見的誤解是「用 BAM 依覆蓋度混出來的合成樣本裡兩者恰好相等」。<b>不成立</b>：混合控制的是 read 數，也就是 {{m: f}}；來源腫瘤細胞株若非二倍體，同一份樣本的細胞比例低於標示值。以標示 0.2、來源 {{m: κ = 3.2}} 為例，{{m: p}} 只有 0.135。",
+    "aka": [
+      "purity"
+    ],
+    "see": [
+      "tumour DNA fraction",
+      "VAF",
+      "ploidy"
+    ]
+  },
+  "tumour DNA fraction": {
+    "zh_gloss": "腫瘤 DNA 比例",
+    "zh": "樣本 DNA 中源自腫瘤的比例。與 tumor purity（細胞比例）在 aneuploid 或 WGD 的情況下會不一樣。",
+    "en": "The fraction of DNA originating from tumour cells; diverges from cellular purity under aneuploidy or WGD.",
+    "aka": [
+      "DNA fraction"
+    ],
+    "see": [
+      "tumour purity",
+      "ploidy"
+    ],
+    "long_zh": "樣本 DNA 中源自腫瘤的比例，分母是<b>分子</b>而非細胞。<br><br>凡是依 read 數混合而得的合成樣本，其已知的比例就是這個量；凡是以「支持 read 大概會有幾條」為用途的下游步驟（過濾門檻、偵測極限），需要的也是這個量。<br><br><b>LongPhase-S 的 <code>estimate_purity</code> 輸出的是這個量</b>，儘管子指令、參數 <code>--tumor-purity</code> 與輸出欄位 <code>Tumor purity:</code> 都寫 purity。理由是它的迴歸標籤是混合比例，且模型中沒有倍體參數，因此無從換算成細胞比例。"
+  },
+  "cancer cell fraction": {
+    "zh_gloss": "癌細胞比例",
+    "zh": "帶有某個特定突變的腫瘤細胞佔全部腫瘤細胞的比例。用來區分 clonal（{{m: ≈ 1}}）與 subclonal（{{m: < 1}}）突變。<b>不等於 VAF。</b>",
+    "en": "The fraction of tumour cells carrying a given mutation; distinguishes clonal from subclonal. Not the same as VAF.",
+    "aka": [
+      "CCF"
+    ],
+    "see": [
+      "VAF",
+      "subclone",
+      "mutation multiplicity"
+    ]
+  },
+  "ploidy": {
+    "zh_gloss": "倍性",
+    "zh": "細胞內染色體套數。多數正常常染色體為 2（diploid）；腫瘤可呈現 3、4 或其他非整倍體狀態。",
+    "en": "The number of chromosome sets in a cell. Most normal autosomal regions are diploid (2); tumours may be triploid, tetraploid or otherwise non-diploid.",
+    "see": [
+      "diploid",
+      "aneuploidy",
+      "copy number"
+    ]
+  },
+  "aneuploidy": {
+    "zh_gloss": "非整倍體",
+    "zh": "染色體數目異常。腫瘤裡非常普遍，也可能使 cellular purity 與 DNA fraction 不一致。",
+    "en": "An abnormal chromosome count. It is common in tumours and can make cellular purity differ from tumour DNA fraction.",
+    "see": [
+      "ploidy",
+      "tumour purity"
+    ]
+  },
+  "copy number": {
+    "zh_gloss": "拷貝數",
+    "zh": "某段基因體在細胞內的拷貝數。多數正常常染色體區段為 2，可再分為 major 與 minor allele copy number。",
+    "en": "How many copies of a genomic segment a cell carries; a typical diploid autosomal segment has two. It can be split into major- and minor-allele copy numbers.",
+    "aka": [
+      "CNV",
+      "SCNA"
+    ],
+    "see": [
+      "LOH",
+      "ploidy",
+      "VAF"
+    ]
+  },
+  "mutation multiplicity": {
+    "zh": "在帶有某突變的細胞中，該突變所占的拷貝數；是 VAF 與 cancer cell fraction 換算時的重要參數。",
+    "en": "How many mutant-allele copies are present in a cell carrying the mutation; a necessary term when converting VAF to cancer cell fraction.",
+    "see": [
+      "VAF",
+      "cancer cell fraction",
+      "copy number"
+    ]
+  },
+  "LOH": {
+    "zh_gloss": "異型合子性喪失",
+    "zh": "原本 heterozygous 的區域變成只剩一種 allele。<b>LOH 不等於缺失</b> —— 也可能是一條 haplotype 遺失後另一條被複製（copy-neutral LOH）。",
+    "en": "Loss of heterozygosity: a formerly het region retains only one allele. Not necessarily a deletion.",
+    "long_zh": "原本 heterozygous 的區域只保留一種 allele。<br><br><b>兩種常見機制：</b><br>· <b>Copy-loss LOH</b>：一條 haplotype 遺失，使該處 copy number 由 2 變 1。<br>· <b>Copy-neutral LOH</b>：一條 haplotype 遺失後，另一條被複製，使 copy number 仍為 2；僅依 coverage 通常難以辨識。<br><br>LongPhase-TO 的設計以 heterozygosity ratio 偵測兩類 LOH，但實際能力仍取決於資料品質與參數。LOH 也可能減少 phasing 錨點、改變 VAF，並在 M13 形成 low-confidence triplet。",
+    "see": [
+      "copy number",
+      "phasing",
+      "heterozygous"
+    ]
+  },
+  "BFB": {
+    "zh_gloss": "斷裂—融合—橋循環",
+    "zh": "Breakage-fusion-bridge：染色體反覆斷裂與融合造成的劇烈重排，在 coverage 上呈現特殊的階梯形狀。",
+    "en": "Breakage-fusion-bridge: repeated chromosome breakage and fusion producing characteristic coverage staircases.",
+    "see": [
+      "copy number",
+      "soft clipping"
+    ]
+  },
+  "precision": {
+    "zh_gloss": "精確率",
+    "zh": "所有 calls 中實際為真陽性的比例：<code>TP / (TP + FP)</code>。後處理常以提升此指標為目標。",
+    "en": "Of the calls you made, the fraction that are correct: TP / (TP + FP).",
+    "see": [
+      "recall",
+      "F1"
+    ]
+  },
+  "recall": {
+    "zh_gloss": "召回率",
+    "zh": "在指定評估範圍內，所有真陽性中被找出的比例：<code>TP / (TP + FN)</code>。若只對固定的 caller 候選集做後處理，recall 只能維持或下降，不能恢復 caller 從未輸出的真陽性；報告時應說清楚這個候選集範圍。",
+    "en": "Within a stated evaluation scope, the fraction of true positives that were found: TP / (TP + FN). With a fixed caller candidate set, post-filtering can preserve or lower recall but cannot recover variants the caller never emitted; report the candidate-set scope explicitly.",
+    "aka": [
+      "sensitivity"
+    ],
+    "see": [
+      "precision",
+      "F1",
+      "recalibration"
+    ]
+  },
+  "F1": {
+    "zh": "precision 與 recall 的調和平均。當資料裡 FN 遠多於 FP 時，precision 的改善對 F1 的影響有限 —— 見 M10。",
+    "en": "The harmonic mean of precision and recall. A precision gain has little effect when false negatives dominate the evaluation.",
+    "see": [
+      "precision",
+      "recall"
+    ]
+  },
+  "truth set": {
+    "zh_gloss": "標準答案集",
+    "zh": "評估用的參考標註。可靠度依資料來源與建立方法而異，困難區域可能包含標註錯誤。",
+    "en": "The reference labels used for evaluation. A truth set is not infallible truth: reliability varies, and hard regions can contain label errors.",
+    "aka": [
+      "benchmark"
+    ],
+    "see": [
+      "high-confidence region",
+      "label noise"
+    ]
+  },
+  "high-confidence region": {
+    "zh": "benchmark 建立者指定的高可信度區間，通常以 BED 檔表示；區間外不宜視為具有相同標註可靠度。",
+    "en": "Intervals that benchmark authors consider reliable, usually supplied as a BED file. Results outside those intervals should not be assumed to have the same label reliability.",
+    "see": [
+      "truth set"
+    ]
+  },
+  "label noise": {
+    "zh_gloss": "標籤雜訊",
+    "zh": "訓練或評估標籤與真實狀態不一致的情況。在 homopolymer 與重複區域可能較常見；特徵相近的位點也可能得到相反標籤。",
+    "en": "Errors in the labels themselves. They can be more frequent in homopolymers and repeats, where near-identical sites may receive different labels.",
+    "see": [
+      "truth set",
+      "homopolymer"
+    ]
+  },
+  "data leakage": {
+    "zh_gloss": "資料洩漏",
+    "zh": "訓練或模型選擇階段取得了評估資料的資訊，讓效能被高估。實驗室的做法是<b>按染色體切分</b>，確保同一個位點不會同時出現在訓練、驗證與最終測試中。",
+    "en": "Evaluation information entering training or model selection and inflating performance. The lab splits by chromosome so a locus cannot appear in training, validation and final test partitions at once.",
+    "see": [
+      "cross-validation",
+      "distribution shift"
+    ]
+  },
+  "distribution shift": {
+    "zh_gloss": "分布偏移",
+    "zh": "測試資料的組成與訓練資料存在顯著差異（例如正負樣本比例不同），使得模型表現不如預期。",
+    "en": "Test data differing in composition from training data, so measured performance does not transfer.",
+    "see": [
+      "data leakage",
+      "cross-validation"
+    ]
+  },
+  "cross-validation": {
+    "zh_gloss": "交叉驗證",
+    "zh": "輪流保留資料子集作為驗證折，用來估計模型的泛化能力與選擇設定；這些折是 validation，不是最終 test。最終測試集應在模型與設定確定後才使用，並另行保留。",
+    "en": "Repeatedly holding out validation folds to estimate generalisation and choose model settings. The folds are validation data, not the final test; an untouched final test set is used only after the model is fixed.",
+    "see": [
+      "data leakage"
+    ]
+  },
+  "LongPhase": {
+    "zh": "實驗室開發的長 read phasing 工具，是後續所有工具的共同基礎。輸出 germline haplotype。",
+    "en": "The lab's long-read phasing tool and the common foundation for everything else. Produces germline haplotypes.",
+    "see": [
+      "phasing",
+      "LongPhase-S",
+      "LongPhase-TO"
+    ]
+  },
+  "LongPhase-S": {
+    "zh": "配對 tumor–normal 版本。做腫瘤 DNA 比例估計（輸出欄位名為 purity）、比例感知的 somatic variant 過濾，以及 somatic haplotagging。",
+    "en": "The matched tumour–normal version: tumour DNA fraction estimation (the output field is named purity), fraction-aware somatic filtering, and somatic haplotagging.",
+    "see": [
+      "LongPhase",
+      "somatic haplotagging",
+      "GHIR",
+      "tumour DNA fraction"
+    ]
+  },
+  "LongPhase-TO": {
+    "zh": "tumor-only 版本。做染色體等級的 LOH 偵測、triplet graph 再校正、somatic phasing 與腫瘤 DNA 比例估計。",
+    "en": "The tumour-only version: chromosome-scale LOH detection, triplet-graph recalibration, somatic phasing and purity estimation.",
+    "see": [
+      "LongPhase",
+      "LOH",
+      "triplet graph"
+    ]
+  },
+  "GHIR": {
+    "zh_gloss": "生殖系單倍型失衡比",
+    "zh": "Germline Haplotype Imbalance Ratio：在<b>候選 somatic 位點</b>上，取標為 HP1 與 HP2 的 read 數中較大者除以兩者之和，值域為 0.5 至 1。須注意兩件事：分母<b>只含這兩個 germline 計數</b>，HP1-1／HP2-1／HP3 皆不在內；且這些標籤是<b>整條 read</b> 的判定（該 read 任一處帶 somatic 等位即離開 germline 計數），並非該位點的等位計數。它不是直接的 purity 讀數：拷貝數變異、LOH、read 跨距內的突變密度、標記錯誤與抽樣不足都會使它偏移。",
+    "en": "Germline Haplotype Imbalance Ratio: at a candidate somatic locus, the larger of the HP1 and HP2 tagged read counts divided by their sum, ranging from 0.5 to 1. Two caveats: the denominator contains only those two germline counts, excluding HP1-1/HP2-1/HP3; and those tags are whole-read decisions (a read carrying a somatic allele anywhere leaves the germline counts), not per-locus allele counts. It is not a direct purity readout — copy number, LOH, mutation density within the read span, tagging error and sparse sampling all shift it.",
+    "long_zh": "GHIR 的解讀依賴幾個前提：<br>· germline VCF 的 phasing 與 HP1／HP2 分群大致正確；<br>· normal 樣本能代表 germline 基準，且 TINC 不高；<br>· 納入的 germline 位點沒有被 LOH 或 CNV 顯著影響；<br>· read 數足夠，mapping 與抽樣不造成明顯 allele bias；<br>· 迴歸模型的校準資料與目前樣本的來源、basecaller、coverage 等分布相近。<br><br>在這些前提下，腫瘤來源 read 被分到 somatic 分支後，GHIR 偏離 0.5 的程度可與 tumor DNA fraction 建立關聯（現行迴歸的標籤就是這個量）；若前提不成立，同樣的偏移也可能來自結構變異、phasing 錯誤或技術偏差，不能單獨當成比例證據。此外，單一位點的 GHIR 無雜訊值 {{m: 1/(2 − p)}} 的自變數是 cellular purity，與迴歸的標籤 {{m: f}} 不是同一個量。",
+    "long_en": "Interpreting GHIR assumes that germline phasing and HP1/HP2 assignment are reliable, the matched normal represents the germline baseline with limited TINC, selected germline sites are not strongly affected by LOH or CNV, read depth and mapping do not create substantial allele bias, and the regression calibration applies to the sample's source, basecaller and coverage distribution. Under those assumptions, reads diverted to a somatic branch can make the deviation from 0.5 correlate with tumour DNA fraction, which is what the current regression is trained against. Note that the noise-free value at a single locus, 1/(2 - p), is driven by cellular purity, not by the DNA fraction used as the training label. Without them, the same shift may reflect structural variation, phasing error or technical bias and is not purity evidence by itself.",
+    "see": [
+      "LongPhase-S",
+      "tumour purity"
+    ]
+  },
+  "triplet graph": {
+    "zh": "LongPhase-TO 判斷候選變異真假時用的最小結構：候選位置加上左右各一個變異，共三個位置。把 read 上看到的 allele 組合畫成路徑後，真的 somatic 變異會形成一條「跟某一條 germline haplotype 只差候選這一格」的新路徑；定序錯誤則湊不出一致的路徑。因為左右兩側都要對得上，所以三個位置是最小單位。",
+    "en": "LongPhase-TO's minimal unit for judging a candidate: the candidate plus one flanking variant on each side. A true somatic allele forms a third path differing from one parental haplotype at the candidate alone; artifacts show no consistent path.",
+    "see": [
+      "LongPhase-TO",
+      "somatic variant"
+    ]
+  },
+  "provenance": {
+    "zh_gloss": "資料來源履歷",
+    "zh": "記錄資料來源、細胞株、定序平台、basecaller、reference build、caller、benchmark 與混樣方式。在本實驗室中，這些資訊是重要實驗變數，而非附註。",
+    "en": "The full origin record of a dataset. In this lab it is a first-class experimental variable, not metadata.",
+    "see": [
+      "basecalling",
+      "truth set"
+    ]
+  },
+  "mutation frequency spectrum": {
+    "zh_gloss": "突變頻率譜",
+    "zh": "把一份樣本裡所有 somatic 變異的 VAF 畫成直方圖後得到的分布。分布上的峰與肩對應不同大小的細胞群，最低頻端的尾巴斜率則被用來判斷有沒有天擇。",
+    "en": "The distribution obtained by histogramming the VAFs of all somatic variants in a sample. Peaks and shoulders correspond to cell populations of different sizes; the slope of the low-frequency tail is used to test for selection.",
+    "see": [
+      "VAF",
+      "cancer cell fraction",
+      "subclone",
+      "marginal distribution"
+    ]
+  },
+  "marginal distribution": {
+    "zh_gloss": "邊際分布",
+    "zh": "只描述單一變數的分布。VAF 與甲基化 β 值都是邊際統計：它們各自只講一個位點有多少比例帶有標記，不講兩個位點在同一個分子或同一個細胞上的搭配情形。",
+    "en": "A distribution over a single variable. VAF and methylation beta values are both marginal statistics: each describes one site in isolation and says nothing about how two sites co-occur on the same molecule or cell.",
+    "see": [
+      "joint distribution",
+      "VAF",
+      "mutation frequency spectrum"
+    ]
+  },
+  "joint distribution": {
+    "zh_gloss": "聯合分布",
+    "zh": "多個變數一起看的分布，也就是「哪些組合各出現多少」。演化樹的形狀取決於聯合分布，而不是邊際分布；長讀的價值在於一條分子上的組合是直接觀測到的。",
+    "en": "A distribution over several variables jointly, i.e. how often each combination occurs. Tree topology depends on the joint distribution, not the marginals; the value of long reads is that combinations on one molecule are observed directly.",
+    "see": [
+      "marginal distribution",
+      "long read",
+      "clone tree"
+    ]
+  },
+  "clone tree": {
+    "zh_gloss": "克隆演化樹",
+    "zh": "描述腫瘤內各群細胞祖先關係的樹：節點是一群帶有相同變異組合的細胞，邊代表在祖先之上又多拿到變異。要注意同一組群集常常有多棵樹同時相容。",
+    "en": "A tree describing ancestral relationships among cell populations in a tumour: nodes are groups of cells sharing a mutation set, edges represent additional mutations acquired on top of an ancestor. Multiple trees are often compatible with the same clusters.",
+    "see": [
+      "clone",
+      "subclone",
+      "parsimony",
+      "cancer cell fraction"
+    ]
+  },
+  "parsimony": {
+    "zh_gloss": "簡約法",
+    "zh": "在所有與資料相容的解裡，選步數（或成本）最少的那一個。它是一個偏好而不是證據 —— 當多個解並列時，簡約法決定選哪一個，但資料本身沒有排除其他解。",
+    "en": "Choosing, among all solutions compatible with the data, the one requiring the fewest steps or lowest cost. It is a preference rather than evidence: when several solutions tie, parsimony picks one, but the data has not ruled the others out.",
+    "see": [
+      "clone tree",
+      "latent node",
+      "joint distribution"
+    ]
+  },
+  "latent node": {
+    "zh_gloss": "潛在節點",
+    "zh": "建樹時為了讓圖連得起來而補進的中間狀態，沒有被任何 read 直接觀測到。它是模型的產物，不能當成「還沒觀察到的細胞」。",
+    "en": "An intermediate state added during tree construction to keep the graph connected, not directly observed in any read. It is a product of the model and must not be read as an unobserved cell population.",
+    "see": [
+      "clone tree",
+      "parsimony",
+      "provenance"
+    ]
+  },
+  "epiallele": {
+    "zh_gloss": "表觀等位型",
+    "zh": "同一條分子上一組相鄰 CpG 的甲基化組合，例如四個 CpG 的 1101。逐位點的 β 值看不到它 —— 要算 epiallele 的組成，一條 read 至少得跨過 4 個 CpG。",
+    "en": "The combination of methylation states across a set of neighbouring CpGs on a single molecule, e.g. 1101 over four CpGs. Per-site beta values cannot resolve it; computing epiallele composition requires reads spanning at least four CpGs.",
+    "see": [
+      "5mC",
+      "CpG",
+      "epimutation",
+      "joint distribution"
+    ]
+  },
+  "epimutation": {
+    "zh_gloss": "表觀突變",
+    "zh": "細胞分裂時甲基化狀態的隨機翻轉。文獻常引的量級是每個 CpG、每次分裂 {{m: 10^{−5}}} 到 {{m: 10^{−4}}}，而 DNA 突變約每鹼基 {{m: 10^{−9}}} 到 {{m: 10^{−10}}}，同量級對比約差五個數量級，所以甲基化是解析度更高的譜系時鐘。要注意這個速率隨位點與量測方式差異很大（有估到 {{m: 10^{−3}}} 的），應當成量級而非定值。",
+    "en": "A stochastic flip of methylation state during cell division. Commonly cited at {{m: 10^{−5}}}–{{m: 10^{−4}}} per CpG per division versus {{m: 10^{−9}}}–{{m: 10^{−10}}} per base for DNA mutation — roughly five orders of magnitude faster like-for-like — which makes it a higher-resolution lineage clock. Treat it as an order of magnitude, not a constant: estimates vary by site and assay, up to ~{{m: 10^{−3}}}.",
+    "see": [
+      "5mC",
+      "CpG",
+      "epiallele"
+    ]
+  },
+  "read-AF": {
+    "zh_gloss": "read 層級的 ALT 比例",
+    "zh": "在同一個分析區域、同一個單倍型家族的 read 之中，某個 somatic 位點帶 ALT 的比例。分母已限縮到同一條 haplotype 的同一段區域，所以不必經過純度與拷貝數換算；用途是在步數並列的候選樹之間排序。",
+    "en": "The fraction of reads carrying the ALT allele at a somatic site, computed within one analysis window and one haplotype family. Because the denominator is already restricted, no purity or copy-number correction is needed; it is used to rank candidate trees of equal cost.",
+    "see": [
+      "VAF",
+      "somatic haplotype",
+      "clone tree"
+    ]
+  },
+  "pigeonhole": {
+    "zh_gloss": "鴿籠原理",
+    "zh": "由父代與子代的細胞比例限制樹形的算術規則：一個細胞至多屬於父節點底下的<b>一個</b>子節點，所以各子節點的細胞比例加起來不得超過父節點。名稱來自鴿籠原理 —— 東西放進籠子，總量不會憑空變多。在 subclone 重建的文獻中也稱為 sum rule 或 crossing rule。<b>它只能排除樹，不能挑出樹</b>：通過檢查的候選通常仍不只一棵，其餘要靠 parsimony 之類的偏好決定。",
+    "en": "The arithmetic constraint that limits tree shape from parent and child cell fractions: a cell belongs to at most one child of a given parent, so the children's cell fractions cannot sum to more than the parent's. The name comes from the pigeonhole principle. Also called the sum rule or crossing rule in the subclonal reconstruction literature. It can only rule trees out, never select one: the surviving candidates are usually more than one, and the choice among them falls to a preference such as parsimony.",
+    "see": [
+      "clone tree",
+      "parsimony",
+      "cancer cell fraction"
+    ]
+  },
+  "B-allele frequency": {
+    "zh_gloss": "B 等位頻率",
+    "zh": "在 germline heterozygous 位點上，兩個等位其中一個所佔的 read 比例。腫瘤樣本中混入的正常細胞在此值上恆為 0.5，該常數即為反推純度所依據的錨。ASCAT 與 PURPLE 皆刻意不做相位，故其標號在各位點之間獨立。",
+    "en": "The fraction of reads carrying one of the two alleles at a germline heterozygous site. Contaminating normal cells contribute exactly 0.5, and that constant is the anchor from which purity is recovered. ASCAT and PURPLE deliberately do not phase, so the A/B label is independent per site.",
+    "aka": [
+      "BAF"
+    ],
+    "see": [
+      "logR",
+      "allele-specific copy number",
+      "tumour purity",
+      "LOH"
+    ]
+  },
+  "logR": {
+    "zh_gloss": "深度比對數",
+    "zh": "同一位點上腫瘤與正常樣本的 read 深度比取以 2 為底的對數。ASCAT 再以全基因體比值的平均重新置中，因此 0 並不代表兩份拷貝 —— 倍體須由擬合結果另行推算。單獨的 logR 只能決定拷貝數輪廓至一個仿射變換。",
+    "en": "The base-2 logarithm of the tumour-to-normal read-depth ratio at a locus, re-centred on the genome-wide mean ratio. Zero therefore does not mean two copies; ploidy has to be recomputed from the fitted profile. logR alone determines the copy-number profile only up to an affine map.",
+    "aka": [
+      "log R ratio",
+      "LRR"
+    ],
+    "see": [
+      "B-allele frequency",
+      "copy number",
+      "ploidy"
+    ]
+  },
+  "allele-specific copy number": {
+    "zh_gloss": "等位特異拷貝數",
+    "zh": "把一個區段的總拷貝數拆成兩個親源等位各自的份數，通常記為 major 與 minor。總拷貝數相同而兩個等位不同的狀態（例如 2+0 與 1+1）在深度上完全一致，只有 B-allele frequency 分得開 —— copy-neutral LOH 即為此類。",
+    "en": "The total copy number of a segment split into the counts contributed by each parental allele, usually reported as major and minor. States with equal total but different split (2+0 versus 1+1) are identical in depth and separable only by B-allele frequency; copy-neutral LOH is exactly such a case.",
+    "see": [
+      "copy number",
+      "B-allele frequency",
+      "LOH",
+      "haplotype imbalance"
+    ]
+  },
+  "whole-genome doubling": {
+    "zh_gloss": "全基因體加倍",
+    "zh": "腫瘤演化過程中整套基因體複製一次的事件，使各處拷貝數同時加倍。其重要後果是可辨識性：若加倍後所有等位特異拷貝數皆為偶數，則該解與未加倍的解對深度與等位比例給出完全相同的觀測；純度為 1 時兩者逐點相同。",
+    "en": "An event doubling the entire tumour genome, multiplying every copy number by two. Its consequence is identifiability: if all allele-specific copy numbers are even afterwards, the doubled solution reproduces the observed depth and allele ratios exactly, and at purity one the two models are pointwise identical.",
+    "aka": [
+      "WGD"
+    ],
+    "see": [
+      "ploidy",
+      "aneuploidy",
+      "identifiability",
+      "allele-specific copy number"
+    ]
+  },
+  "haplotype imbalance": {
+    "zh_gloss": "單倍型失衡",
+    "zh": "指派至兩條親源單倍型的 read 數不相等。其成因有二：該處兩條單倍型的拷貝數不同，或其中一條的分子被改標至 somatic 子單倍型。兩者在數值上形式相同，僅憑一個失衡值無法區分。",
+    "en": "Unequal read counts assigned to the two parental haplotypes. Two mechanisms produce it: unequal allele-specific copy number, or molecules of one haplotype being relabelled to a somatic sub-haplotype. The two are indistinguishable from a single imbalance value.",
+    "see": [
+      "GHIR",
+      "somatic haplotype",
+      "allele-specific copy number",
+      "B-allele frequency"
+    ]
+  },
+  "identifiability": {
+    "zh_gloss": "可辨識性",
+    "zh": "資料在原則上能否區分兩組不同的參數值。若兩組參數對任何可能的觀測給出相同的機率，則兩者不可辨識，增加深度、變異數目或更換工具皆無作用 —— 須改變的是可行域，例如加入外部約束或錨。此性質與精度不同：精度指可區分之後量得準不準。",
+    "en": "Whether the data can in principle distinguish two parameter values. If both assign the same probability to every possible observation they are unidentifiable, and more depth, more variants or a different tool cannot help; only changing the feasible set — an external constraint or anchor — can. This differs from precision, which concerns accuracy once two states are already distinguishable.",
+    "see": [
+      "whole-genome doubling",
+      "tumour purity",
+      "ploidy"
+    ]
+  },
+  "連鎖視窗": {
+    "zh": "同一個 phase block 之內，由 read 連鎖的傳遞閉包所界定的一段：凡有某條 read 同時覆蓋至少兩個 somatic 位點，該段即成一個視窗；另一條 read 疊到已連鎖的位點又碰到新位點時，兩段合併成更長的視窗。<b>不是固定寬度</b>，也<b>不跨 phase block</b>。早期估算比例時所用的「20 kb 視窗」是固定寬度的近似，兩者的計數不可互換。",
+    "en": "Within a single phase block, the span defined by the transitive closure of read linkage: any read covering at least two somatic sites opens a window, and overlapping reads merge windows. It is not a fixed width and never crosses a phase block. The fixed-width 20 kb window used in early proportion estimates is an approximation; the two counts are not interchangeable.",
+    "see": [
+      "phase block",
+      "單倍型連鎖區段"
+    ]
+  },
+  "單倍型家族": {
+    "zh_gloss": "一條 germline 單倍型，加上由它衍生的 somatic 單倍型",
+    "zh": "把 read 依 <code>HP</code> tag 分成的兩組之一。<b>家族一</b>是 <code>HP1</code> 與從它長出來的 <code>HP1-1</code>，<b>家族二</b>是 <code>HP2</code> 與 <code>HP2-1</code>；歸不到任何一條 germline 單倍型的 <code>HP3</code> 不屬於任何一族。叫「家族」是因為它把一條 germline 單倍型與由它衍生的 somatic 單倍型收在同一組裡 —— 分組看的是 <b>germline 那一層</b>，不是有沒有帶 somatic 突變。<br><br>在同一個 phase block 內，一個家族對應<b>一條染色體拷貝</b>，所以「兩族」就是那個位置上的兩條同源染色體。但兩件事不成立：<b>其一，軟體判定不出哪一族來自父親、哪一族來自母親</b>（那需要另外定序父母）；<b>其二，標號只在該 phase block 內有定義</b>，跨 block 的「家族一」並非同一條染色體。",
+    "en": "One of the two groups reads are split into by HP tag. Family 1 is HP1 plus the somatic haplotype HP1-1 derived from it; family 2 is HP2 plus HP2-1; HP3, which cannot be assigned to either germline haplotype, belongs to neither. It is called a family because it groups a germline haplotype together with the somatic haplotypes descended from it — the split is by the germline layer, not by whether a read carries a somatic mutation. Within one phase block a family corresponds to one chromosome copy, so the two families are the two homologous chromosomes at that locus. Two things do not follow: which family is paternal cannot be determined without sequencing the parents, and the labels are defined only within that phase block.",
+    "see": [
+      "somatic haplotype",
+      "單倍型連鎖區段",
+      "phase block",
+      "HP tag"
+    ]
+  },
+  "單倍型連鎖區段": {
+    "zh": "一個連鎖視窗再限定到一條單倍型家族 —— 也就是「一個連鎖視窗、一條染色體拷貝」。這是局部共現分析的最小單位：其中的 read 全部來自同一條染色體拷貝，另一條拷貝屬於另一個連鎖區段。因此一個連鎖視窗至多切出兩個連鎖區段，<b>連鎖區段數大於連鎖視窗數</b>，兩者不可混用為同一個分母。單倍型標號只在該區段內有定義，跨區段的同名標號並非同一條染色體。",
+    "en": "A linkage window restricted to one haplotype family — one window, one chromosome copy. It is the smallest unit of local co-occurrence analysis: all its reads come from the same chromosome copy, the other copy forming a separate segment. One window yields at most two segments, so segments outnumber windows and the two must not share a denominator. Haplotype labels are defined only within a segment.",
+    "see": [
+      "連鎖視窗",
+      "phase block",
+      "somatic haplotype"
+    ]
+  }
 }

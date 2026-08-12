@@ -201,10 +201,41 @@ P(D\mid Θ_K)=∏_{m∈ S_1}P_{BB}(a_m\mid d_m,Θ_K)
 </table>
 </div>
 
+<h4>先講清楚「家族」是什麼</h4>
+
+<p class="prose">這個詞接下來會一直出現，所以先定義。
+一條 [[單倍型家族]]就是<b>依 <code>HP</code> tag 分出來的兩組 read 之一</b>：</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>家族</th><th>包含哪些 <code>HP</code> tag</th><th>對應什麼</th></tr></thead>
+<tbody>
+<tr><td>家族一</td><td><code>1</code>（germline 單倍型 1）＋ <code>1-1</code>（由它衍生、帶 somatic 改變的分子）</td><td rowspan="2">在同一個 phase block 內，兩族就是該處的<b>兩條同源染色體</b></td></tr>
+<tr><td>家族二</td><td><code>2</code> ＋ <code>2-1</code></td></tr>
+<tr><td>都不是</td><td><code>3</code>：somatic 改變歸不到任何一條 germline 單倍型</td><td>不進任何一族</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose">叫「家族」而不是直接叫「單倍型」，是因為分組看的是
+<b>germline 那一層</b>：<code>1</code> 與 <code>1-1</code> 屬於<b>同一族</b>，
+差別只在後者多帶了 somatic 改變。換句話說，一族＝一條 germline 單倍型
+<b>連同從它長出來的 somatic 分支</b>。</p>
+
+{{guard:1 | HP1 與 HP2 不等於父系與母系}}
+「兩條同源染色體」很容易被讀成「一條來自父親、一條來自母親」，但<b>軟體分不出來</b>。
+定相只能把 read 分成互不相同的兩組，<b>哪一組來自哪一位親代，要另外定序父母才知道</b>。
+所以本頁的「家族一／家族二」純粹是<b>編號</b>，不帶親源意義 ——
+這也是第二節要把方向 {{m: σ_v}} 邊際化掉的原因：那個編號本來就是任意的。
+
+還有一層限制：<b>標號只在同一個 phase block 內有定義</b>。
+跨 block 的「家族一」<b>不是</b>同一條染色體，因此不得跨 block 把同名家族併起來算（見第九節）。
+{{/guard}}
+
 <h4>為什麼因子跑在視窗上，而不是跑在家族上</h4>
 
 <p class="prose">這是很容易寫錯的一步，而且寫錯不會有任何錯誤訊息。
-直覺上，既然 HP1 與 HP2 的 read 各自形成一張 0／1 狀態表，
+直覺上，既然家族一與家族二的 read 各自形成一張 0／1 狀態表，
 把兩張表各算一次機率再相乘似乎最自然。<b>但那樣寫是錯的</b>，有兩個各自獨立的理由：</p>
 
 {{svg:sr2b-window-vs-family | [wide] 兩條家族各有自己的狀態表 —— 資料結構上確實是分開的 ——
@@ -440,7 +471,7 @@ held-out predictive score，而不是把未校準的 BIC 當成精確答案。</
 
 <h4>連鎖區段、局部基因型與分子權重</h4>
 
-<p class="prose">一個<b>連鎖區段</b> {{m: u}} 是一個<b>單倍型連鎖區段</b>：一個連鎖視窗 × 一條 [[somatic haplotype|單倍型家族]]。
+<p class="prose">一個<b>連鎖區段</b> {{m: u}} 是一個<b>單倍型連鎖區段</b>：一個連鎖視窗 × 一條 [[單倍型家族]]。
 這個切法很重要：它表示<b>一個連鎖區段裡的 read 全部來自同一條染色體拷貝</b>，
 另一條拷貝屬於<b>同一個視窗的另一條連鎖區段</b>。因此
 <b>不可以在連鎖區段內部再把兩條拷貝混起來寫成各佔一半</b> ——
